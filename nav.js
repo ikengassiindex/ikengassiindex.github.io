@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════════ */
 
 // Ikenga logo
-const SSI_LOGO = `<img src="ikenga-logo.png" alt="Ikenga" style="height:36px;width:auto;display:block" />`;
+const SSI_LOGO = `<img src="ikenga-logo.png" alt="Ikenga" style="height:72px;width:auto;display:block" />`;
 
 function renderNav(activePage) {
   const pages = [
@@ -36,7 +36,6 @@ function renderNav(activePage) {
       ${SSI_LOGO}
       <div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15">
         <h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0</span></h1>
-        <span style="font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:#8a7e76;font-weight:500;white-space:nowrap">Grow · Protect · Sustain in the 4IR</span>
       </div>
     </a>
     <button class="nav-toggle" onclick="document.querySelector('.topnav-links').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false">
