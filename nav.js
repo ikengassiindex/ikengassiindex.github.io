@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════════ */
 
 // Ikenga logo
-const SSI_LOGO = `<img src="ikenga-logo.png" alt="Ikenga" style="height:144px;width:auto;display:block" />`;
+const SSI_LOGO = `<img src="ikenga-logo.png" alt="Ikenga" style="height:187px;width:auto;display:block" />`;
 
 function renderNav(activePage) {
   const pages = [
