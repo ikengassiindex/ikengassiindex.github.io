@@ -1,6 +1,8 @@
 # SSI Index Dashboard — v4.0
 
-**Systemic System Infrastructure Index** — a composite resilience score for Italy's 4,293 HV/MV substations.
+**Systemic System Infrastructure Index** — a composite resilience score for Italy's 4,293 substations.
+
+475 EHV (≥220 kV) · 3,035 HV (100–219 kV) · 115 MV (20–99 kV) · 668 LV (<20 kV)
 
 81 variables · 30 public data sources · 6 components · 20 metrics · 7 modifiers · 10k Monte Carlo iterations
 

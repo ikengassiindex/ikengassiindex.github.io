@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI Index Dashboard — Interactive Map Engine
-   Canvas-based renderer for 4,293 substations + 14,221 lines
+   Canvas-based renderer for 4,293 substations (EHV/HV/MV/LV) + 14,221 lines
    ═══════════════════════════════════════════════════════════ */
 
 (function () {
