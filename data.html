@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 30 verified public data sources, 81 variables, 8 data layers.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Data &amp; Download</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script src="nav.js"></script>
+<script src="ssi-engine.js"></script>
+<script src="ssi-metadata.js"></script>
+<script>renderNav('data');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Data &amp; Download</h1>
+    <p>All 30 data sources are public, free, and independently verifiable. Download the full SSI dataset or explore source documentation.</p>
+  </div>
+
+  <!-- Data Status -->
+  <div class="kpi-grid animate-in delay-1" style="margin-bottom:32px">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Variables</div>
+      <div class="kpi-value" style="color:var(--ink)">81</div>
+      <div class="kpi-sub">Across 8 data layers</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Data Sources</div>
+      <div class="kpi-value" style="color:var(--bronze)">30</div>
+      <div class="kpi-sub">All verified & public</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Substations</div>
+      <div class="kpi-value" style="color:var(--sage)" id="data-subs">—</div>
+      <div class="kpi-sub" id="data-subs-sub">Loading…</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Max Frequency</div>
+      <div class="kpi-value" style="color:var(--terracotta)">Weekly</div>
+      <div class="kpi-sub">Layer B proxy/fuzzy vars</div>
+    </div>
+  </div>
+
+  <!-- Download Section -->
+  <div class="card animate-in delay-2" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Download SSI Dataset</h3>
+      <span class="label-xs">Latest fleet run</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px">
+      <div id="dl-json" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📊</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (JSON)</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-json-info">— substations · all fields</div>
+      </div>
+      <div id="dl-csv" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📋</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Summary (CSV)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">R_median, band, components, CI</div>
+      </div>
+      <div id="dl-geojson" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">🗺️</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">GeoJSON</div>
+        <div style="font-size:12px;color:var(--warm-grey)">Substation points + SSI scores</div>
+      </div>
+      <div style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);opacity:0.5">
+        <div style="font-size:22px;margin-bottom:6px">📐</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Formula Construct (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">Complete v4.0 technical reference</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Layers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Layers</h3>
+      <span class="label-xs">8 layers · 81 variables</span>
+    </div>
+    <table class="data-table" style="margin-top:4px">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Domain</th>
+          <th style="text-align:right">Variables</th>
+          <th>Status</th>
+          <th>Key Sources</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600;color:var(--crimson)">A</td>
+          <td>SSI v4.0 Resilience</td>
+          <td class="num">17</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">E-Distribuzione · BdI QEF 737 · Dimovski · ISTAT SBS</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.1</td>
+          <td>Grid Telemetry: Open</td>
+          <td class="num">3</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">Open-Meteo / ERA5 · ARERA</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.2</td>
+          <td>Grid Telemetry: Proxy</td>
+          <td class="num">4</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">IEEE C57.91 · Terna · ISPRA</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.3</td>
+          <td>Grid Telemetry: Fuzzy</td>
+          <td class="num">12</td>
+          <td><span class="band-badge medium" style="font-size:10px">FUZZY</span></td>
+          <td style="font-size:12px">IEEE/CIGRÉ standards · GSE · EEA</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#a67cff">C</td>
+          <td>Socio-Economic</td>
+          <td class="num">9</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">ISTAT · OIPE LIHC · Eurostat · DESI · SVIMEZ</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#ff8c42">D</td>
+          <td>Environmental Hazards</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">EEA · INGV · ISPRA · ISO 9223 · Copernicus</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#3b9eff">E</td>
+          <td>Italian Open Data</td>
+          <td class="num">8</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">ISPRA · MISE · MEF · ARERA · Terna</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">F</td>
+          <td>Markov Transitions</td>
+          <td class="num">12</td>
+          <td><span class="band-badge medium" style="font-size:10px">BAYESIAN</span></td>
+          <td style="font-size:12px">DSO history OR IEEE/CIGRÉ + priors</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#22d3ee">G</td>
+          <td>Modifier Inputs</td>
+          <td class="num">3</td>
+          <td><span class="band-badge low" style="font-size:10px">NEW</span></td>
+          <td style="font-size:12px">ARERA TIQE · OSM Power · JRC DSO Obs.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Source Registry (all 30, rendered from metadata) -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Source Registry</h3>
+      <span class="label-xs">30 verified · all free & public</span>
+    </div>
+    <div class="source-grid" style="margin-top:12px" id="data-source-grid"></div>
+  </div>
+
+  <!-- Engine Info -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>SSI Engine</h3>
+      <span class="label-xs">Client-side formula implementation</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:12px">
+      The SSI v4.0 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 5 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6 restoration speed, R7 cyber-exposure), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">—</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Public API functions</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">20</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Global weight entries</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">5</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Modifier functions</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">1,000</div>
+        <div style="font-size:10px;color:var(--warm-grey)">MC iterations (browser)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API / Schema -->
+  <div class="card animate-in">
+    <div class="card-header">
+      <h3>Output Schema</h3>
+      <span class="label-xs">JSON per substation</span>
+    </div>
+    <div class="formula-block" id="schema-block" style="font-size:12px;line-height:1.6">
+      Loading live sample…
+    </div>
+  </div>
+</main>
+
+<script>
+renderFooter();
+
+function download(filename, text, mime) {
+  var blob = new Blob([text], { type: mime || 'text/plain' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// Render source grid from metadata
+(function() {
+  var M = window.SSIMetadata;
+  if (!M) return;
+  var catIcons = { Grid: '⚡', Economic: '🏛️', 'Socio-Econ': '📊', Standards: '📐', Climate: '🌍', Infrastructure: '🗺️', Transition: '☀️', Hazard: '🌊', Environment: '🌡️' };
+  var catColors = { Grid: '148,25,20', Economic: '184,134,58', 'Socio-Econ': '93,133,99', Standards: '170,66,52', Climate: '59,158,255', Infrastructure: '34,211,238', Transition: '255,140,66', Hazard: '255,140,66', Environment: '170,66,52' };
+  var grid = document.getElementById('data-source-grid');
+  if (grid) {
+    grid.innerHTML = M.DATA_SOURCES.map(function(s) {
+      var c = catColors[s.category] || '93,133,99';
+      return '<div class="source-card">' +
+        '<div class="source-icon" style="background:rgba(' + c + ',0.1)">' + (catIcons[s.category] || '📊') + '</div>' +
+        '<div class="source-meta"><div class="source-name">' + s.name + (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">⚠</span>' : '') + '</div>' +
+        '<div class="source-detail">' + s.vars + ' variable' + (s.vars > 1 ? 's' : '') + ' · ' + s.freq + '</div></div></div>';
+    }).join('');
+  }
+  // Engine function count
+  var engEl = document.getElementById('engine-fns');
+  if (engEl && window.SSIEngine) {
+    engEl.textContent = Object.keys(window.SSIEngine).length;
+  }
+})();
+
+fetch('ssi-data.json').then(function(r) { return r.json(); }).then(function(ssi) {
+  var n = ssi.substations.length;
+
+  // Update KPI
+  document.getElementById('data-subs').textContent = n.toLocaleString();
+  document.getElementById('data-subs-sub').textContent = ssi.regions.length + ' regions · 107 provinces';
+  document.getElementById('dl-json-info').textContent = n.toLocaleString() + ' substations · all fields';
+
+  // ── JSON download ──
+  document.getElementById('dl-json').addEventListener('click', function() {
+    download('ssi-index-v4.json', JSON.stringify(ssi, null, 2), 'application/json');
+  });
+
+  // ── CSV download ──
+  document.getElementById('dl-csv').addEventListener('click', function() {
+    var headers = ['substation_id','internal_id','name','region','province','lon','lat','voltage_kv',
+      'R_median','R_P5','R_P95','CI_width','classification','fleet_percentile',
+      'C','V','I','E','S','T','R3_C_mult','R4_F_topo','R6_restoration','R7_cyber','confidence_tier'];
+    var rows = ssi.substations.map(function(s) {
+      return [s.substation_id, s.internal_id, '"' + s.name + '"', s.region, '"' + s.province + '"',
+        s.lon, s.lat, s.voltage_kv,
+        s.R_median, s.R_P5, s.R_P95, s.CI_width, s.classification, s.fleet_percentile,
+        s.components.C, s.components.V, s.components.I, s.components.E, s.components.S, s.components.T,
+        s.modifiers.R3_C_mult, s.modifiers.R4_F_topo, s.modifiers.R6_restoration, s.modifiers.R7_cyber,
+        s.confidence_tier].join(',');
+    });
+    download('ssi-index-v4.csv', headers.join(',') + '\n' + rows.join('\n'), 'text/csv');
+  });
+
+  // ── GeoJSON download ──
+  document.getElementById('dl-geojson').addEventListener('click', function() {
+    var features = ssi.substations.map(function(s) {
+      return {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [s.lon, s.lat] },
+        properties: {
+          id: s.internal_id, name: s.name, region: s.region, province: s.province,
+          R_median: s.R_median, classification: s.classification,
+          C: s.components.C, V: s.components.V, I: s.components.I,
+          E: s.components.E, S: s.components.S, T: s.components.T
+        }
+      };
+    });
+    var geo = { type: 'FeatureCollection', features: features };
+    download('ssi-index-v4.geojson', JSON.stringify(geo), 'application/geo+json');
+  });
+
+  // ── Live schema sample ──
+  var s = ssi.substations[Math.floor(n / 2)]; // mid-fleet example
+  var schemaHTML = '{\n' +
+    '  <span class="hl-var">"substation_id"</span>: <span class="hl-num">"' + s.substation_id + '"</span>,\n' +
+    '  <span class="hl-var">"version"</span>: <span class="hl-num">"' + s.version + '"</span>,\n' +
+    '  <span class="hl-var">"name"</span>: <span class="hl-num">"' + s.name + '"</span>,\n' +
+    '  <span class="hl-var">"region"</span>: <span class="hl-num">"' + s.region + '"</span>,  <span class="hl-var">"province"</span>: <span class="hl-num">"' + s.province + '"</span>,\n' +
+    '  <span class="hl-var">"R_median"</span>: <span class="hl-num">' + s.R_median.toFixed(4) + '</span>,\n' +
+    '  <span class="hl-var">"R_P5"</span>: <span class="hl-num">' + s.R_P5.toFixed(4) + '</span>,  <span class="hl-var">"R_P95"</span>: <span class="hl-num">' + s.R_P95.toFixed(4) + '</span>,\n' +
+    '  <span class="hl-var">"classification"</span>: <span class="hl-num">"' + s.classification + '"</span>,\n' +
+    '  <span class="hl-var">"fleet_percentile"</span>: <span class="hl-num">' + s.fleet_percentile.toFixed(2) + '</span>,\n' +
+    '  <span class="hl-var">"components"</span>: { ' +
+      '<span class="hl-num">"C"</span>: ' + s.components.C.toFixed(3) + ', ' +
+      '<span class="hl-num">"V"</span>: ' + s.components.V.toFixed(3) + ', ' +
+      '<span class="hl-num">"I"</span>: ' + s.components.I.toFixed(3) + ', ' +
+      '<span class="hl-num">"E"</span>: ' + s.components.E.toFixed(3) + ', ' +
+      '<span class="hl-num">"S"</span>: ' + s.components.S.toFixed(3) + ', ' +
+      '<span class="hl-num">"T"</span>: ' + s.components.T.toFixed(3) + ' },\n' +
+    '  <span class="hl-var">"modifiers"</span>: { ' +
+      '<span class="hl-num">"R3"</span>: ' + s.modifiers.R3_C_mult.toFixed(3) + ', ' +
+      '<span class="hl-num">"R4"</span>: ' + s.modifiers.R4_F_topo.toFixed(3) + ', ' +
+      '<span class="hl-num">"R6"</span>: ' + s.modifiers.R6_restoration.toFixed(3) + ', ' +
+      '<span class="hl-num">"R7"</span>: ' + s.modifiers.R7_cyber.toFixed(3) + ' },\n' +
+    '  <span class="hl-var">"socio_economic"</span>: { <span class="hl-num">"V_socio"</span>: ' + s.socio_economic.V_socio.toFixed(3) + ', <span class="hl-num">"EP_rate"</span>: ' + s.socio_economic.EP_rate_region.toFixed(1) + ' },\n' +
+    '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + s.graph_topology.BC_percentile.toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' +
+    '  <span class="hl-var">"confidence_tier"</span>: <span class="hl-num">"' + s.confidence_tier + '"</span>\n' +
+    '}';
+  document.getElementById('schema-block').innerHTML = schemaHTML;
+});
+</script>
+</body>
+</html>

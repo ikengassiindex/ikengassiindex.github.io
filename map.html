@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive map of Italy's electrical grid with SSI resilience scores for 4,293 substations.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Map Explorer</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .map-container {
+    position: relative;
+    width: 100%;
+    height: 620px;
+    background: var(--cream-deep);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .map-container canvas {
+    display: block;
+    cursor: grab;
+    width: 100%;
+    height: 100%;
+  }
+  .map-container canvas.grabbing { cursor: grabbing; }
+
+  #map-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(250,246,245,0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(44,36,32,0.12);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--ink);
+    z-index: 200;
+    display: none;
+    max-width: 260px;
+    box-shadow: 0 4px 16px rgba(44,36,32,0.1);
+    line-height: 1.5;
+  }
+
+  .map-legend {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    z-index: 10;
+    box-shadow: 0 2px 12px rgba(44,36,32,0.06);
+  }
+  .map-legend h4 {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--warm-grey);
+    margin-bottom: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+  }
+  .map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 3px;
+    font-size: 11px;
+  }
+
+  .map-zoom {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 3px;
+    z-index: 10;
+  }
+  .map-zoom button {
+    width: 34px;
+    height: 34px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 7px;
+    color: var(--ink);
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(44,36,32,0.06);
+  }
+  .map-zoom button:hover { background: var(--cream); }
+
+  .map-stats {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    z-index: 10;
+    font-size: 11px;
+    color: var(--warm-grey);
+    letter-spacing: 0.02em;
+  }
+  .map-stats b { color: var(--ink); font-weight: 500; }
+
+  .detail-scroll {
+    max-height: 620px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(44,36,32,0.15) transparent;
+  }
+  .detail-scroll::-webkit-scrollbar { width: 5px; }
+  .detail-scroll::-webkit-scrollbar-thumb { background: rgba(44,36,32,0.15); border-radius: 3px; }
+
+  @media (max-width: 1100px) {
+    .map-layout { grid-template-columns: 1fr !important; }
+    .map-container { height: 450px; }
+    .detail-scroll { max-height: none; }
+  }
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<script src="ssi-engine.js"></script>
+<script src="ssi-metadata.js"></script>
+<script>renderNav('map');</script>
+
+<main class="page-shell" style="max-width:1440px">
+  <div class="page-header animate-in">
+    <h1>Map Explorer</h1>
+    <p>Explore every substation in Italy's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar animate-in delay-1">
+    <label>Band</label>
+    <select id="filter-band">
+      <option value="all">All Bands</option>
+      <option value="Low">Low (0.00–0.25)</option>
+      <option value="Medium">Medium (0.25–0.50)</option>
+      <option value="High">High (0.50–0.75)</option>
+      <option value="Critical">Critical (0.75–1.00)</option>
+    </select>
+    <label>Region</label>
+    <select id="filter-region">
+      <option value="all">All Regions</option>
+    </select>
+    <label>Voltage</label>
+    <select id="filter-voltage">
+      <option value="all">All Voltages</option>
+      <option value="380">≥ 380 kV</option>
+      <option value="220">220 kV</option>
+      <option value="132">132–150 kV</option>
+      <option value="other">&lt; 132 kV</option>
+    </select>
+    <label>Component Focus</label>
+    <select id="filter-component">
+      <option value="overall">Overall R Score</option>
+      <option value="C">C — Continuity</option>
+      <option value="V">V — Voltage Quality</option>
+      <option value="I">I — Infrastructure</option>
+      <option value="E">E — Economic</option>
+      <option value="S">S — Saturation</option>
+      <option value="T">T — Energy Transition</option>
+    </select>
+    <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
+  </div>
+
+  <!-- Map + Detail Panel -->
+  <div class="map-layout animate-in delay-2" style="display:grid;grid-template-columns:1fr 360px;gap:20px">
+    <!-- Map -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="map-container">
+        <canvas id="ssi-map-canvas" role="img" aria-label="Interactive map of Italy's electrical grid showing substations colored by SSI resilience score. Use mouse to pan and zoom, click substations for details."></canvas>
+        <div id="map-tooltip"></div>
+
+        <div class="map-legend">
+          <h4>SSI Band</h4>
+          <div class="map-legend-item"><div class="band-dot low"></div> Low (0.00–0.25)</div>
+          <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25–0.50)</div>
+          <div class="map-legend-item"><div class="band-dot high"></div> High (0.50–0.75)</div>
+          <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75–1.00)</div>
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(44,36,32,0.08);font-size:10px;color:var(--warm-grey);line-height:1.5">
+            Scroll to zoom · Drag to pan<br>Click substation to inspect
+          </div>
+        </div>
+
+        <div class="map-zoom">
+          <button id="zoomIn" title="Zoom in">+</button>
+          <button id="zoomOut" title="Zoom out">−</button>
+          <button id="zoomFit" title="Fit Italy" style="font-size:13px">⟐</button>
+        </div>
+
+        <div class="map-stats" id="map-stats">
+          Loading data…
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-scroll" id="detail-panel">
+      <!-- Populated by map.js on click -->
+    </div>
+  </div>
+</main>
+
+<script src="map.js"></script>
+<script>
+  SSIMap.init('ssi-map-canvas', {
+    onLoaded: function(ssi) {
+      var stats = document.getElementById('map-stats');
+      if (stats) {
+        stats.innerHTML = '<b>' + ssi.fleet_summary.total + '</b> substations · ' +
+          '<b>' + ssi.fleet_summary.bands.Critical + '</b> critical · ' +
+          'median R = <b>' + ssi.fleet_summary.median_R.toFixed(3) + '</b>';
+      }
+    }
+  });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>
