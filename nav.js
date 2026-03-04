@@ -139,14 +139,13 @@ function showRegistrationGate(onSuccess) {
       timestamp: new Date().toISOString()
     };
 
-    // Send to Google Sheets (fire-and-forget, don't block on failure)
+    // Send to Google Sheets via GET (Image beacon — reliable cross-origin)
     try {
-      fetch(SSI_REGISTRATION_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload)
-      }).catch(function() {});
+      var params = Object.keys(payload).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]);
+      }).join('&');
+      var img = new Image();
+      img.src = SSI_REGISTRATION_ENDPOINT + '?' + params;
     } catch(err) {}
 
     // Mark registered and remove overlay
