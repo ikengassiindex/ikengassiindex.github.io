@@ -23,6 +23,8 @@
   let animFrame = null;
   let loadedCallback = null;
   let isEmbedded = false;    // true when used in overview page mini-map
+  let fleetMedian = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 }; // for radar overlay
+  let breakdownOpen = false; // toggle state for Score Breakdown
 
   const COS42 = Math.cos(42 * Math.PI / 180);
 
@@ -347,6 +349,225 @@
     requestAnimationFrame(step);
   }
 
+  // ── Radar Chart ──
+  function drawRadarChart(canvasId, ssi) {
+    const c = document.getElementById(canvasId);
+    if (!c) return;
+    const dpr = window.devicePixelRatio || 1;
+    const size = 280;
+    c.width = size * dpr;
+    c.height = (size + 24) * dpr;
+    c.style.width = size + 'px';
+    c.style.height = (size + 24) + 'px';
+    const cx2 = c.getContext('2d');
+    cx2.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const keys = ['C', 'V', 'I', 'E', 'S', 'T'];
+    const labels = ['Continuity', 'Voltage', 'Infra.', 'Economic', 'Saturation', 'Transition'];
+    const weights = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 };
+    const cols = { C: '#941914', V: '#aa4234', I: '#5d8563', E: '#3b9eff', S: '#b8863a', T: '#22d3ee' };
+    const centerX = size / 2, centerY = size / 2 + 4;
+    const radius = 105;
+    const n = keys.length;
+
+    function angle(i) { return (Math.PI * 2 * i / n) - Math.PI / 2; }
+    function pointAt(i, r) {
+      return [centerX + Math.cos(angle(i)) * r, centerY + Math.sin(angle(i)) * r];
+    }
+
+    // Background rings
+    cx2.strokeStyle = 'rgba(44,36,32,0.06)';
+    cx2.lineWidth = 0.5;
+    for (let ring = 1; ring <= 4; ring++) {
+      const r = radius * ring / 4;
+      cx2.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const [x, y] = pointAt(i % n, r);
+        i === 0 ? cx2.moveTo(x, y) : cx2.lineTo(x, y);
+      }
+      cx2.stroke();
+    }
+
+    // Axis lines
+    cx2.strokeStyle = 'rgba(44,36,32,0.08)';
+    cx2.lineWidth = 0.5;
+    for (let i = 0; i < n; i++) {
+      cx2.beginPath();
+      cx2.moveTo(centerX, centerY);
+      const [x, y] = pointAt(i, radius);
+      cx2.lineTo(x, y);
+      cx2.stroke();
+    }
+
+    // Normalize: component / weight gives 0..1 (capped)
+    function norm(k, val) { return Math.min(val / weights[k], 1); }
+
+    // Fleet median polygon (faint reference)
+    cx2.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const k = keys[i % n];
+      const v = norm(k, fleetMedian[k]);
+      const [x, y] = pointAt(i % n, radius * v);
+      i === 0 ? cx2.moveTo(x, y) : cx2.lineTo(x, y);
+    }
+    cx2.fillStyle = 'rgba(138,126,118,0.08)';
+    cx2.fill();
+    cx2.strokeStyle = 'rgba(138,126,118,0.3)';
+    cx2.lineWidth = 1;
+    cx2.setLineDash([4, 3]);
+    cx2.stroke();
+    cx2.setLineDash([]);
+
+    // Substation polygon
+    cx2.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const k = keys[i % n];
+      const v = norm(k, ssi.components[k]);
+      const [x, y] = pointAt(i % n, radius * v);
+      i === 0 ? cx2.moveTo(x, y) : cx2.lineTo(x, y);
+    }
+    const bandCol = BAND_COLORS[ssi.classification] || '#8a7e76';
+    cx2.fillStyle = bandCol + '18';
+    cx2.fill();
+    cx2.strokeStyle = bandCol;
+    cx2.lineWidth = 2;
+    cx2.stroke();
+
+    // Data points
+    for (let i = 0; i < n; i++) {
+      const k = keys[i];
+      const v = norm(k, ssi.components[k]);
+      const [x, y] = pointAt(i, radius * v);
+      cx2.beginPath();
+      cx2.arc(x, y, 3.5, 0, Math.PI * 2);
+      cx2.fillStyle = cols[k];
+      cx2.fill();
+      cx2.strokeStyle = '#fff';
+      cx2.lineWidth = 1.5;
+      cx2.stroke();
+    }
+
+    // Labels
+    cx2.font = '500 10px "DM Sans", sans-serif';
+    cx2.textBaseline = 'middle';
+    for (let i = 0; i < n; i++) {
+      const [x, y] = pointAt(i, radius + 18);
+      cx2.fillStyle = cols[keys[i]];
+      cx2.textAlign = x < centerX - 5 ? 'right' : (x > centerX + 5 ? 'left' : 'center');
+      cx2.fillText(labels[i], x, y);
+    }
+
+    // Legend line for fleet median
+    const ly = size + 12;
+    cx2.setLineDash([4, 3]);
+    cx2.strokeStyle = 'rgba(138,126,118,0.5)';
+    cx2.lineWidth = 1;
+    cx2.beginPath();
+    cx2.moveTo(size / 2 - 50, ly);
+    cx2.lineTo(size / 2 - 30, ly);
+    cx2.stroke();
+    cx2.setLineDash([]);
+    cx2.font = '400 9px "DM Sans", sans-serif';
+    cx2.fillStyle = '#8a7e76';
+    cx2.textAlign = 'left';
+    cx2.fillText('Fleet median', size / 2 - 26, ly);
+  }
+
+  // ── Score Articulation ──
+  function buildArticulation(ssi) {
+    const weights = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 };
+    const labels = { C: 'C Continuity', V: 'V Voltage', I: 'I Infrastructure', E: 'E Economic', S: 'S Saturation', T: 'T Transition' };
+    const cols = { C: '#941914', V: '#aa4234', I: '#5d8563', E: '#3b9eff', S: '#b8863a', T: '#22d3ee' };
+
+    const R_base = ssi.R_base_median;
+    const R3 = ssi.modifiers.R3_C_mult;
+    const R4 = ssi.modifiers.R4_F_topo;
+    const R6 = ssi.modifiers.R6_restoration;
+    const R7 = ssi.modifiers.R7_cyber;
+    const combined = R3 * R4 * R6 * R7;
+    const R_raw = R_base * combined;
+    const R_final = ssi.R_median;
+
+    // Component rows
+    const compRows = ['C', 'V', 'I', 'E', 'S', 'T'].map(k => {
+      const val = ssi.components[k];
+      const w = weights[k];
+      const normPct = Math.min(val / w * 100, 100).toFixed(0);
+      return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0 3px 20px;font-size:11px">
+        <span style="color:${cols[k]};font-weight:600;width:14px">${k}</span>
+        <span style="flex:1;color:var(--warm-grey)">${labels[k]} (w=${w.toFixed(2)})</span>
+        <span style="font-variant-numeric:tabular-nums;font-weight:500;width:50px;text-align:right">${val.toFixed(4)}</span>
+        <span style="font-size:9px;color:var(--warm-grey);width:32px;text-align:right">${normPct}%</span>
+      </div>`;
+    }).join('');
+
+    // Modifier rows
+    function modColor(v) {
+      if (v > 1.03) return '#941914';
+      if (v < 0.97) return '#5d8563';
+      return 'var(--warm-grey)';
+    }
+    function modArrow(v) {
+      if (v > 1.01) return '▲';
+      if (v < 0.99) return '▼';
+      return '—';
+    }
+
+    const modRows = [
+      ['R3', 'Consequence', R3],
+      ['R4', 'Graph Criticality', R4],
+      ['R6', 'Restoration Speed', R6],
+      ['R7', 'Cyber-Exposure', R7]
+    ].map(([id, name, val]) => {
+      const pctImpact = ((val - 1) * 100).toFixed(1);
+      const sign = val >= 1 ? '+' : '';
+      return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0 3px 20px;font-size:11px">
+        <span style="font-weight:600;width:20px;color:${modColor(val)}">${id}</span>
+        <span style="flex:1;color:var(--warm-grey)">${name}</span>
+        <span style="font-weight:600;color:${modColor(val)};width:50px;text-align:right">×${val.toFixed(3)}</span>
+        <span style="font-size:9px;color:${modColor(val)};width:38px;text-align:right">${sign}${pctImpact}%</span>
+      </div>`;
+    }).join('');
+
+    return `
+      <div style="font-family:'SF Mono','Fira Code',monospace;font-size:11px;line-height:1.6">
+        <!-- R_final -->
+        <div style="padding:8px 10px;background:${BAND_COLORS[ssi.classification]}08;border-radius:6px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:700;color:${BAND_COLORS[ssi.classification]}">R_final</span>
+            <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:${BAND_COLORS[ssi.classification]}">${R_final.toFixed(4)}</span>
+          </div>
+          <div style="font-size:9px;color:var(--warm-grey);margin-top:2px">= soft_clip( R_base × R3 × R4 × R6 × R7 )</div>
+        </div>
+
+        <!-- R_base -->
+        <div style="padding:6px 10px;background:rgba(44,36,32,0.02);border-radius:6px;margin-bottom:4px">
+          <div style="display:flex;justify-content:space-between;font-weight:600">
+            <span>R_base</span>
+            <span>${R_base.toFixed(4)}</span>
+          </div>
+          <div style="font-size:9px;color:var(--warm-grey)">= 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T</div>
+        </div>
+        ${compRows}
+
+        <!-- Modifiers -->
+        <div style="padding:6px 10px;background:rgba(44,36,32,0.02);border-radius:6px;margin:8px 0 4px">
+          <div style="display:flex;justify-content:space-between;font-weight:600">
+            <span>Combined Modifiers</span>
+            <span>×${combined.toFixed(3)}</span>
+          </div>
+          <div style="font-size:9px;color:var(--warm-grey)">= R3 × R4 × R6 × R7</div>
+        </div>
+        ${modRows}
+
+        <!-- Soft clip note -->
+        <div style="margin-top:8px;padding:6px 10px;border-left:2px solid var(--warm-grey-light);font-size:9px;color:var(--warm-grey);line-height:1.5">
+          R_raw = ${R_base.toFixed(4)} × ${combined.toFixed(3)} = ${R_raw.toFixed(4)}<br>
+          ${R_raw > 1.0 ? 'soft_clip compresses overflow → ' + R_final.toFixed(4) : 'No clipping applied (R_raw ≤ 1.0)'}
+        </div>
+      </div>`;
+  }
+
   // ── Detail Panel ──
   function updateDetailPanel(sid) {
     const panel = document.getElementById('detail-panel');
@@ -437,7 +658,62 @@
           <div style="display:flex;justify-content:space-between"><span>Confidence</span><span style="font-weight:500">${ssi.confidence_tier}</span></div>
           <div style="display:flex;justify-content:space-between"><span>Fleet percentile</span><span style="font-weight:500">${(ssi.fleet_percentile * 100).toFixed(1)}%</span></div>
         </div>
+      </div>
+      <button id="btn-breakdown" onclick="SSIMap.toggleBreakdown()" style="
+        width:100%;margin-top:12px;padding:10px 16px;
+        font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
+        color:var(--terracotta);background:rgba(170,66,52,0.06);
+        border:1px solid rgba(170,66,52,0.15);border-radius:8px;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+        transition:all 0.15s;
+      ">
+        <span id="breakdown-arrow" style="font-size:9px;transition:transform 0.2s">${breakdownOpen ? '▼' : '▶'}</span>
+        Score Breakdown
+      </button>
+      <div id="breakdown-panel" style="display:${breakdownOpen ? 'block' : 'none'};margin-top:12px">
+        <div class="card" style="margin-bottom:12px">
+          <div class="label-xs" style="margin-bottom:10px">Component Radar</div>
+          <div style="display:flex;justify-content:center">
+            <canvas id="radar-canvas"></canvas>
+          </div>
+          <div style="margin-top:6px;text-align:center;font-size:9px;color:var(--warm-grey)">
+            Axes normalised to component weight. Outer edge = weight cap.
+          </div>
+        </div>
+        <div class="card">
+          <div class="label-xs" style="margin-bottom:10px">Full Score Articulation</div>
+          ${buildArticulation(ssi)}
+        </div>
       </div>`;
+
+    // Draw radar after DOM update
+    if (breakdownOpen) {
+      setTimeout(function() { drawRadarChart('radar-canvas', ssi); }, 0);
+    }
+    // Store current sid for toggle
+    panel.dataset.sid = sid;
+  }
+
+  function toggleBreakdown() {
+    breakdownOpen = !breakdownOpen;
+    const bp = document.getElementById('breakdown-panel');
+    const arrow = document.getElementById('breakdown-arrow');
+    if (bp) {
+      bp.style.display = breakdownOpen ? 'block' : 'none';
+      if (arrow) arrow.textContent = breakdownOpen ? '▼' : '▶';
+      if (breakdownOpen) {
+        const panel = document.getElementById('detail-panel');
+        const sid = panel ? panel.dataset.sid : null;
+        const ssi = sid ? ssiMap[sid] : null;
+        if (ssi) {
+          setTimeout(function() {
+            drawRadarChart('radar-canvas', ssi);
+            // Scroll breakdown into view
+            bp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 10);
+        }
+      }
+    }
   }
 
   function clearDetailPanel() {
@@ -682,6 +958,19 @@
         lineById[l.i] = l;
       }
 
+      // Compute fleet median components for radar overlay
+      const compArrays = { C: [], V: [], I: [], E: [], S: [], T: [] };
+      for (const sub of SSI.substations) {
+        for (const k of ['C', 'V', 'I', 'E', 'S', 'T']) {
+          compArrays[k].push(sub.components[k]);
+        }
+      }
+      for (const k of ['C', 'V', 'I', 'E', 'S', 'T']) {
+        const sorted = compArrays[k].slice().sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        fleetMedian[k] = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+      }
+
       resize();
       wireFilters();
       clearDetailPanel();
@@ -699,5 +988,5 @@
   }
 
   // Export
-  window.SSIMap = { init: initMap };
+  window.SSIMap = { init: initMap, toggleBreakdown: toggleBreakdown };
 })();
