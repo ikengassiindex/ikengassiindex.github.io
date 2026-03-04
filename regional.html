@@ -193,13 +193,14 @@ function buildProvinceData(data) {
     map[p].count = n;
     // Average components
     var comps = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 };
-    var mods = { R3: 0, R4: 0, R6: 0, R7: 0 };
+    var mods = { R3: 0, R4: 0, R6a: 0, R6b: 0, R7: 0 };
     var epSum = 0, degSum = 0;
     arr.forEach(function(s) {
       Object.keys(comps).forEach(function(k) { comps[k] += s.components[k]; });
       mods.R3 += s.modifiers.R3_C_mult;
       mods.R4 += s.modifiers.R4_F_topo;
-      mods.R6 += s.modifiers.R6_restoration;
+      mods.R6a += s.modifiers.R6_restoration;
+      mods.R6b += (s.modifiers.R6_seismic || 1.0);
       mods.R7 += s.modifiers.R7_cyber;
       epSum += s.socio_economic.EP_rate_region;
       degSum += s.graph_topology.degree;

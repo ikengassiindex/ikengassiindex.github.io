@@ -434,8 +434,8 @@ window.SSIEngine = (function () {
       const R_base_k = computeRBase(perturbed, adaptedI);
 
       // Apply modifiers
-      const R_raw_k = R_base_k * (modifiers.F_topo || 1) * (modifiers.C_mult || 1)
-                     * (modifiers.R6_mult || 1) * (modifiers.R6_seis || 1) * (modifiers.Cyber_factor || 1);
+      const R_raw_k = R_base_k * (modifiers.R4_F_topo || 1) * (modifiers.R3_C_mult || 1)
+                     * (modifiers.R6_restoration || 1) * (modifiers.R6_seismic || 1) * (modifiers.R7_cyber || 1);
 
       samples.push(softClipUpper(R_raw_k));
     }

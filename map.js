@@ -555,9 +555,10 @@
     const R_base = ssi.R_base_median;
     const R3 = ssi.modifiers.R3_C_mult;
     const R4 = ssi.modifiers.R4_F_topo;
-    const R6 = ssi.modifiers.R6_restoration;
+    const R6a = ssi.modifiers.R6_restoration;
+    const R6b = ssi.modifiers.R6_seismic || 1.0;
     const R7 = ssi.modifiers.R7_cyber;
-    const combined = R3 * R4 * R6 * R7;
+    const combined = R3 * R4 * R6a * R6b * R7;
     const R_raw = R_base * combined;
     const R_final = ssi.R_median;
 
@@ -619,7 +620,8 @@
     const modRows = [
       ['R3', 'Consequence', R3],
       ['R4', 'Graph Criticality', R4],
-      ['R6', 'Restoration Speed', R6],
+      ['R6a', 'Restoration Speed', R6a],
+      ['R6b', 'Seismic Hazard', R6b],
       ['R7', 'Cyber-Exposure', R7]
     ].map(([id, name, val]) => {
       const pctImpact = ((val - 1) * 100).toFixed(1);
@@ -640,7 +642,7 @@
             <span style="font-weight:700;color:${BAND_COLORS[ssi.classification]}">R_final</span>
             <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:${BAND_COLORS[ssi.classification]}">${R_final.toFixed(4)}</span>
           </div>
-          <div style="font-size:9px;color:var(--warm-grey);margin-top:2px">= soft_clip( R_base × R3 × R4 × R6 × R7 )</div>
+          <div style="font-size:9px;color:var(--warm-grey);margin-top:2px">= soft_clip( R_base × R3 × R4 × R6a × R6b × R7 )</div>
         </div>
 
         <!-- R_base -->
@@ -659,7 +661,7 @@
             <span>Combined Modifiers</span>
             <span>×${combined.toFixed(3)}</span>
           </div>
-          <div style="font-size:9px;color:var(--warm-grey)">= R3 × R4 × R6 × R7</div>
+          <div style="font-size:9px;color:var(--warm-grey)">= R3 × R4 × R6a × R6b × R7</div>
         </div>
         ${modRows}
 

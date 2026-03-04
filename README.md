@@ -1,10 +1,10 @@
-# SSI Index Dashboard — v4.0
+# SSI Index Dashboard — v4.0.2
 
 **Systemic System Infrastructure Index** — a composite resilience score for Italy's 4,293 substations.
 
 475 EHV (≥220 kV) · 3,035 HV (100–219 kV) · 115 MV (20–99 kV) · 668 LV (<20 kV)
 
-81 variables · 30 public data sources · 6 components · 20 metrics · 7 modifiers · 10k Monte Carlo iterations
+95 variables · 30 public data sources · 6 components · 20 metrics · 8 modifiers · 11 data layers · 10k Monte Carlo iterations
 
 ## Live Dashboard
 
@@ -21,8 +21,8 @@ ssi-dashboard/
 ├── data.html           # Data & Download — JSON/CSV/GeoJSON exports
 ├── style.css           # Complete Ikenga design system
 ├── nav.js              # Shared navigation + footer
-├── ssi-engine.js       # SSI v4.0 calculation engine (client-side)
-├── ssi-metadata.js     # Complete metadata registry (81 vars, 30 sources)
+├── ssi-engine.js       # SSI v4.0.2 calculation engine (client-side)
+├── ssi-metadata.js     # Complete metadata registry (95 vars, 30 sources)
 ├── map.js              # Canvas map engine (pan/zoom/click/touch)
 ├── ssi-data.json       # SSI dataset (4,293 substations)
 └── grid-geo.json       # Grid geometry (14,221 lines + substations)
@@ -31,14 +31,15 @@ ssi-dashboard/
 ## Formula
 
 ```
-R_final = soft_clip_upper(R_base × F_topo × C_mult × R6_mult × Cyber_factor)
+R_final = soft_clip_upper(R_base × F_topo × C_mult × R6a_rest × R6b_seis × Cyber_factor)
 
 R_base  = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T
 
-F_topo  = graph_criticality(degree, BC, bridge)      // R4 [0.80, 1.35]
-C_mult  = consequence_sigmoid(pop, load, V_socio)     // R3 [0.70, 1.30]
-R6_mult = restoration_speed_sigmoid(CAIDI)             // R6 [0.90, 1.10]
-Cyber   = cyber_categorical(automation_level)          // R7 [0.95, 1.05]
+F_topo  = graph_criticality(degree, BC, bridge)               // R4  [0.80, 1.35]
+C_mult  = consequence_sigmoid(pop, load, V_socio)              // R3  [0.70, 1.30]
+R6a     = restoration_speed_sigmoid(CAIDI)                     // R6a [0.90, 1.10]
+R6b     = seismic_hazard(PGA_g, zone_weight)                   // R6b [1.00, 1.25]
+Cyber   = province_DESI_cyber(region, province, voltage)       // R7  [0.99, 1.05]
 ```
 
 ## Components
