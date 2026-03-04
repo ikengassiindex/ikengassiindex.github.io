@@ -3,15 +3,8 @@
    v4.0 — Session 5 Polish (logo, a11y, noscript)
    ═══════════════════════════════════════════════════════════ */
 
-// Ikenga-inspired logo mark (abstract shield/grid motif)
-const SSI_LOGO = `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <rect x="2" y="2" width="10" height="10" rx="2" fill="#941914"/>
-  <rect x="16" y="2" width="10" height="10" rx="2" fill="#aa4234"/>
-  <rect x="2" y="16" width="10" height="10" rx="2" fill="#b8863a"/>
-  <rect x="16" y="16" width="10" height="10" rx="2" fill="#5d8563"/>
-  <rect x="9" y="9" width="10" height="10" rx="2" fill="#2c2420" fill-opacity="0.9"/>
-  <text x="14" y="17" text-anchor="middle" font-size="7" font-weight="700" font-family="DM Sans, sans-serif" fill="white">SSI</text>
-</svg>`;
+// Ikenga logo
+const SSI_LOGO = `<img src="ikenga-logo.png" alt="Ikenga" style="height:36px;width:auto;display:block" />`;
 
 function renderNav(activePage) {
   const pages = [
@@ -39,10 +32,12 @@ function renderNav(activePage) {
   nav.setAttribute('role', 'navigation');
   nav.setAttribute('aria-label', 'Main navigation');
   nav.innerHTML = `
-    <a class="topnav-brand" href="index.html" aria-label="SSI Index — Home">
+    <a class="topnav-brand" href="index.html" aria-label="SSI Index — Home" style="gap:10px">
       ${SSI_LOGO}
-      <h1>SSI <span>Index</span></h1>
-      <span class="topnav-version">v4.0</span>
+      <div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15">
+        <h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0</span></h1>
+        <span style="font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:#8a7e76;font-weight:500;white-space:nowrap">Grow · Protect · Sustain in the 4IR</span>
+      </div>
     </a>
     <button class="nav-toggle" onclick="document.querySelector('.topnav-links').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false">
       <span></span><span></span><span></span>
