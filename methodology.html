@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
-<script src="nav.js?v=7"></script>
+<script src="nav.js?v=8"></script>
 <script src="ssi-engine.js"></script>
 <script src="ssi-metadata.js"></script>
 <script>renderNav('methodology');</script>
@@ -96,7 +96,7 @@
 <span class="hl-var">F_topo</span>  = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
 <span class="hl-var">C_mult</span>  = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
 <span class="hl-var">R6_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6 — [0.90, 1.10]</span>
-<span class="hl-var">Cyber</span>   = <span class="hl-fn">cyber_categorical</span>(automation_level)       <span class="hl-comment">// R7 — [0.95, 1.05]</span>
+<span class="hl-var">Cyber</span>   = <span class="hl-fn">province_DESI_cyber</span>(region, province, voltage) <span class="hl-comment">// R7 — [0.99, 1.05]</span>
     </div>
   </div>
 
@@ -193,8 +193,8 @@
         <tr>
           <td style="font-weight:500">R7</td>
           <td>Cyber-Exposure</td>
-          <td class="num">[0.95, 1.05]</td>
-          <td>Indicative proxy based on smart meter rollout and SCADA modernisation. Weakest modifier — awaiting NIS2 compliance data.</td>
+          <td class="num">[0.99, 1.05]</td>
+          <td>Province-level continuous model based on DESI regional digital readiness, urban/rural adjustments, and HV voltage class bonus. 556 unique values. Indicative — awaiting NIS2 compliance data.</td>
         </tr>
       </tbody>
     </table>

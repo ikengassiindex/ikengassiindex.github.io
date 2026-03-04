@@ -102,8 +102,8 @@ window.SSIEngine = (function () {
     range_hi: 1.10
   };
 
-  // R7 — Cyber Exposure
-  const R7_MAP = { LOW: 0.95, MEDIUM: 1.00, HIGH: 1.05 };
+  // R7 — Cyber Exposure (v4.1: province-level DESI — values pre-computed in ssi-data.json)
+  const R7_MAP = { LOW: 0.99, MEDIUM: 1.02, HIGH: 1.05 }; // fallback only; actual R7 from data
 
   // ─── Enrichment Parameters ───────────────────────────────
   const ENRICHMENT_PARAMS = {
@@ -283,14 +283,16 @@ window.SSIEngine = (function () {
     return p.range_lo + (p.range_hi - p.range_lo) * raw;
   }
 
-  // R7 — Cyber Exposure
+  // R7 — Cyber Exposure (v4.1: province-level DESI model)
+  // R7 values are now pre-computed per substation in ssi-data.json
+  // This function serves as fallback only if R7_cyber is missing from data
   function computeR7(cyber_class, digital_readiness) {
     let factor = R7_MAP[cyber_class] || R7_MAP.MEDIUM;
-    // Digital readiness modulation
+    // Province-level DESI modulation (legacy fallback)
     if (digital_readiness != null) {
-      factor *= (1.0 + ENRICHMENT_PARAMS.digital_readiness.weight * (digital_readiness - 0.5));
+      factor = 1.0 + 0.06 * (digital_readiness - 0.50);
     }
-    return Math.max(0.93, Math.min(1.08, factor));
+    return Math.max(0.99, Math.min(1.05, factor));
   }
 
   // Soft clip upper (overflow compression)

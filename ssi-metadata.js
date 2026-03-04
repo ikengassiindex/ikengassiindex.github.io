@@ -19,7 +19,7 @@ window.SSIMetadata = (function () {
     { id: 'D5',    name: 'OIPE LIHC',                      url: 'oipeosservatorio.it',                    freq: 'Annual',    res: 'Region (NUTS2)',  vars: 1,  category: 'Socio-Econ',    feeds: 'R3 V_socio energy poverty' },
     { id: 'D6',    name: 'ARERA TIQE Tables',              url: 'reporting.arera.it',                     freq: 'Annual',    res: 'Ambito',          vars: 3,  category: 'Grid',          feeds: 'R6 CAIDI, quality regulation' },
     { id: 'D7',    name: 'OSM Power Infrastructure',       url: 'overpass-api.de',                        freq: 'Weekly',    res: 'Node/edge',       vars: 2,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges' },
-    { id: 'JRC',   name: 'JRC DSO Observatory',            url: 'ses.jrc.ec.europa.eu',                   freq: 'Annual',    res: 'DSO-level',       vars: 2,  category: 'Grid',          feeds: 'R7 automation/smart meter proxy' },
+    { id: 'JRC',   name: 'JRC DSO Observatory',            url: 'ses.jrc.ec.europa.eu',                   freq: 'Annual',    res: 'DSO-level',       vars: 2,  category: 'Grid',          feeds: 'R7 province-level cyber-exposure (secondary)' },
     { id: 'D-OM',  name: 'Open-Meteo / ERA5',              url: 'open-meteo.com',                         freq: 'Hourly',    res: '~1 km',           vars: 1,  category: 'Climate',       feeds: 'I5 ambient temperature proxy' },
     { id: 'IEEE-1',name: 'IEEE C57.91 / IEC 60076',        url: 'standards.ieee.org',                     freq: 'Static',    res: 'Asset-level',     vars: 16, category: 'Standards',     feeds: 'I5 thermal model, B.3 Markov states' },
     { id: 'D13',   name: 'ISTAT Census / Demographics',    url: 'demo.istat.it',                          freq: 'Annual',    res: 'Municipal',       vars: 8,  category: 'Socio-Econ',    feeds: 'R3 pop density, elderly, migration' },
@@ -29,7 +29,7 @@ window.SSIMetadata = (function () {
     { id: 'D4',    name: 'Eurostat Energy Statistics',      url: 'ec.europa.eu/eurostat',                  freq: 'Annual',    res: 'NUTS2',           vars: 3,  category: 'Economic',      feeds: 'Energy poverty cross-validation' },
     { id: 'MEF',   name: 'MEF IRPEF Tax Statistics',       url: 'finanze.gov.it',                         freq: 'Annual',    res: 'Municipal',       vars: 1,  category: 'Socio-Econ',    feeds: 'R3 fiscal enrichment' },
     { id: 'MIMIT', name: 'MIMIT/InfoCamere Startup',       url: 'startup.registroimprese.it',             freq: 'Quarterly', res: 'Provincial',      vars: 1,  category: 'Economic',      feeds: 'E2 innovation enrichment' },
-    { id: 'DESI',  name: 'DESI Digital Economy Index',      url: 'digital-strategy.ec.europa.eu',          freq: 'Annual',    res: 'EU Regional',     vars: 2,  category: 'Socio-Econ',    feeds: 'R7 digital readiness' },
+    { id: 'DESI',  name: 'DESI Digital Economy Index',      url: 'digital-strategy.ec.europa.eu',          freq: 'Annual',    res: 'EU Regional',     vars: 2,  category: 'Socio-Econ',    feeds: 'R7 province-level cyber-exposure (primary DESI input)' },
     { id: 'SVIMEZ',name: 'SVIMEZ Rapporto Mezzogiorno',    url: 'svimez.info',                            freq: 'Annual',    res: 'Macro-area',      vars: 1,  category: 'Socio-Econ',    feeds: 'R3 development gap' },
     { id: 'MIN-SAL', name: 'Min. Salute Health Registry',  url: 'salute.gov.it',                          freq: 'Annual',    res: 'Regional',        vars: 1,  category: 'Socio-Econ',    feeds: 'S3 healthcare criticality' },
     { id: 'ISO-9223', name: 'ISO 9223 Corrosion',          url: '(derived from EEA + ISPRA)',             freq: 'Derived',   res: 'Provincial',      vars: 1,  category: 'Environment',   feeds: 'I8 corrosion classification' },
@@ -156,13 +156,13 @@ window.SSIMetadata = (function () {
     },
     {
       id: 'R7', name: 'Cyber-Exposure Proxy',
-      range: '[0.95, 1.05]', type: 'Multiplicative',
-      desc: 'Categorical classification {LOW, MEDIUM, HIGH} based on smart-meter rollout and automation level.',
-      formula: 'Cyber_factor = {LOW: 0.95, MEDIUM: 1.00, HIGH: 1.05} × (1 + 0.04 × (digital_readiness − 0.5))',
-      sources: ['JRC DSO Observatory', 'DESI Index'],
+      range: '[0.99, 1.05]', type: 'Multiplicative',
+      desc: 'Province-level continuous model based on DESI regional digital readiness scores, urban/rural adjustments, HV voltage class bonus, and per-substation noise. 556 unique values across 4,293 substations.',
+      formula: 'R7_cyber(s) = clip( DESI_base(region) + urban_adj(province) + HV_bonus(voltage) + noise, 0.99, 1.05 )',
+      sources: ['DESI / Eurostat', 'JRC DSO Observatory'],
       isNew: true,
       enrichments: [
-        { name: 'Digital Readiness Modulation', effect: '±2% around base R7', sources: 'DESI / Eurostat' },
+        { name: 'Province-Level DESI Computation', effect: 'Continuous [0.99, 1.05] per substation', sources: 'DESI / Eurostat' },
       ]
     },
   ];
@@ -215,7 +215,7 @@ window.SSIMetadata = (function () {
       F_topo: 'graph_criticality(degree, BC, bridge) [R4]',
       C_mult: 'consequence_sigmoid(pop, load, V_socio) [R3]',
       R6_mult: 'restoration_speed_sigmoid(CAIDI_local) [R6]',
-      Cyber_factor: 'cyber_exposure_categorical(automation_level) [R7]'
+      Cyber_factor: 'province_DESI_cyber(region, province, voltage) [R7]'
     },
     soft_clip: 'if R_raw ≤ 1.00 → R_raw; if R_raw > 1.00 → 1.00 − 1/(1 + e^(20×(R_raw − 1.05)))'
   };
@@ -243,7 +243,7 @@ window.SSIMetadata = (function () {
     { id: 'F3', section: '§5',     change: 'R3 enhanced — Energy Poverty Vulnerability (V_socio)', type: 'enhanced' },
     { id: 'F4', section: '§5',     change: 'R4 enhanced — Graph-theoretic betweenness + bridge detection', type: 'enhanced' },
     { id: 'F5', section: '§5',     change: 'R2 enhanced — Climate Trajectory (CMIP6 SSP2-4.5)', type: 'enhanced' },
-    { id: 'F6', section: '§5',     change: 'New R7 — Cyber-Exposure Proxy', type: 'new' },
+    { id: 'F6', section: '§5',     change: 'R7 Cyber-Exposure — Province-level DESI model (v4.1)', type: 'enhanced' },
     { id: 'L1', section: '§2, §8', change: 'New I5, I7–I9 metrics — thermal, load, corrosion, hydrogeo', type: 'new' },
     { id: 'L2', section: '§6',     change: 'E2 Innovation Enrichment — HRST + startup density', type: 'enhanced' },
     { id: 'L3', section: '§5',     change: 'V_socio Fiscal Enrichment — MEF + SVIMEZ + energy price', type: 'enhanced' },
