@@ -367,7 +367,7 @@
     const weights = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 };
     const cols = { C: '#941914', V: '#aa4234', I: '#5d8563', E: '#3b9eff', S: '#b8863a', T: '#22d3ee' };
     const centerX = size / 2, centerY = size / 2 + 4;
-    const radius = 89;
+    const radius = 80;
     const n = keys.length;
 
     function angle(i) { return (Math.PI * 2 * i / n) - Math.PI / 2; }
