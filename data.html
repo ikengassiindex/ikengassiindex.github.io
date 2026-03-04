@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
-<script src="nav.js?v=5"></script>
+<script src="nav.js?v=6"></script>
 <script src="ssi-engine.js"></script>
 <script src="ssi-metadata.js"></script>
 <script>renderNav('data');</script>
@@ -51,22 +51,22 @@
       <span class="label-xs">Latest fleet run</span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px">
-      <div id="dl-json" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+      <div id="dl-full" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📊</div>
-        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (JSON)</div>
-        <div style="font-size:12px;color:var(--warm-grey)" id="dl-json-info">— substations · all fields</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">— substations · all fields</div>
       </div>
-      <div id="dl-csv" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+      <div id="dl-summary" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📋</div>
-        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Summary (CSV)</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Summary Report (PDF)</div>
         <div style="font-size:12px;color:var(--warm-grey)">R_median, band, components, CI</div>
       </div>
-      <div id="dl-geojson" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+      <div id="dl-geo" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">🗺️</div>
-        <div style="font-weight:500;font-size:14px;margin-bottom:2px">GeoJSON</div>
-        <div style="font-size:12px;color:var(--warm-grey)">Substation points + SSI scores</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Geographic Data (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">Substation coordinates + SSI scores</div>
       </div>
-      <div style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);opacity:0.5">
+      <div id="dl-formula" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📐</div>
         <div style="font-weight:500;font-size:14px;margin-bottom:2px">Formula Construct (PDF)</div>
         <div style="font-size:12px;color:var(--warm-grey)">Complete v4.0 technical reference</div>
@@ -208,6 +208,8 @@
   </div>
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script>
 renderFooter();
 
@@ -218,6 +220,38 @@ function download(filename, text, mime) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+// ── PDF generation helpers ──
+function pdfHeader(doc, title, subtitle) {
+  doc.setFillColor(148, 25, 20); // crimson
+  doc.rect(0, 0, doc.internal.pageSize.width, 32, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('SSI Index v4.0', 14, 14);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(title, 14, 22);
+  if (subtitle) {
+    doc.setFontSize(8);
+    doc.text(subtitle, 14, 28);
+  }
+  doc.setTextColor(0, 0, 0);
+  return 40; // y position after header
+}
+
+function pdfFooter(doc) {
+  var pageCount = doc.internal.getNumberOfPages();
+  for (var i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    doc.text(
+      'SSI Index v4.0 \u00b7 \u00a9 2026 Altinium Invest S.r.L. \u00b7 Page ' + i + '/' + pageCount,
+      doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: 'center' }
+    );
+  }
 }
 
 // Render source grid from metadata
@@ -245,60 +279,207 @@ function download(filename, text, mime) {
 
 fetch('ssi-data.json').then(function(r) { return r.json(); }).then(function(ssi) {
   var n = ssi.substations.length;
+  var jsPDF = window.jspdf.jsPDF;
 
   // Update KPI
   document.getElementById('data-subs').textContent = n.toLocaleString();
   document.getElementById('data-subs-sub').textContent = ssi.regions.length + ' regions · 107 provinces';
-  document.getElementById('dl-json-info').textContent = n.toLocaleString() + ' substations · all fields';
+  document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' substations · all fields';
 
-  // ── JSON download (registration-gated) ──
-  document.getElementById('dl-json').addEventListener('click', function() {
-    if (!requireRegistration(function() {
-      download('ssi-index-v4.json', JSON.stringify(ssi, null, 2), 'application/json');
-    })) return;
-    download('ssi-index-v4.json', JSON.stringify(ssi, null, 2), 'application/json');
+  // ── Full Dataset PDF (registration-gated) ──
+  document.getElementById('dl-full').addEventListener('click', function() {
+    function doFullPDF() {
+      var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      var y = pdfHeader(doc, 'Full Dataset Export', n.toLocaleString() + ' substations \u00b7 Generated ' + new Date().toLocaleDateString());
+
+      doc.autoTable({
+        startY: y,
+        styles: { fontSize: 5.5, cellPadding: 1.5 },
+        headStyles: { fillColor: [148, 25, 20], textColor: 255, fontSize: 6 },
+        alternateRowStyles: { fillColor: [252, 249, 244] },
+        head: [['ID', 'Name', 'Region', 'Province', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6', 'R7', 'Tier']],
+        body: ssi.substations.map(function(s) {
+          return [
+            s.internal_id, s.name, s.region, s.province, s.voltage_kv,
+            s.R_median.toFixed(3), s.R_P5.toFixed(3), s.R_P95.toFixed(3), s.CI_width.toFixed(3),
+            s.classification, (s.fleet_percentile * 100).toFixed(0) + '%',
+            s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
+            s.components.E.toFixed(2), s.components.S.toFixed(2), s.components.T.toFixed(2),
+            s.modifiers.R3_C_mult.toFixed(2), s.modifiers.R4_F_topo.toFixed(2),
+            s.modifiers.R6_restoration.toFixed(2), s.modifiers.R7_cyber.toFixed(2),
+            s.confidence_tier
+          ];
+        }),
+        margin: { left: 8, right: 8 },
+        didDrawPage: function() {}
+      });
+
+      pdfFooter(doc);
+      doc.save('ssi-index-v4-full-dataset.pdf');
+    }
+    if (!requireRegistration(doFullPDF)) return;
+    doFullPDF();
   });
 
-  // ── CSV download (registration-gated) ──
-  document.getElementById('dl-csv').addEventListener('click', function() {
-    function doCSV() {
-      var headers = ['substation_id','internal_id','name','region','province','lon','lat','voltage_kv',
-        'R_median','R_P5','R_P95','CI_width','classification','fleet_percentile',
-        'C','V','I','E','S','T','R3_C_mult','R4_F_topo','R6_restoration','R7_cyber','confidence_tier'];
-      var rows = ssi.substations.map(function(s) {
-        return [s.substation_id, s.internal_id, '"' + s.name + '"', s.region, '"' + s.province + '"',
-          s.lon, s.lat, s.voltage_kv,
-          s.R_median, s.R_P5, s.R_P95, s.CI_width, s.classification, s.fleet_percentile,
-          s.components.C, s.components.V, s.components.I, s.components.E, s.components.S, s.components.T,
-          s.modifiers.R3_C_mult, s.modifiers.R4_F_topo, s.modifiers.R6_restoration, s.modifiers.R7_cyber,
-          s.confidence_tier].join(',');
+  // ── Summary Report PDF (registration-gated) ──
+  document.getElementById('dl-summary').addEventListener('click', function() {
+    function doSummaryPDF() {
+      var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      var y = pdfHeader(doc, 'Summary Report', 'Fleet overview \u00b7 Generated ' + new Date().toLocaleDateString());
+
+      // Band distribution
+      var bands = {};
+      ssi.substations.forEach(function(s) { bands[s.classification] = (bands[s.classification] || 0) + 1; });
+      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+      doc.text('Classification Distribution', 14, y); y += 6;
+
+      doc.autoTable({
+        startY: y,
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [148, 25, 20], textColor: 255 },
+        alternateRowStyles: { fillColor: [252, 249, 244] },
+        head: [['Band', 'Count', 'Share']],
+        body: Object.keys(bands).sort().map(function(b) {
+          return [b, bands[b], (bands[b] / n * 100).toFixed(1) + '%'];
+        }),
+        margin: { left: 14, right: 14 }
       });
-      download('ssi-index-v4.csv', headers.join(',') + '\n' + rows.join('\n'), 'text/csv');
+      y = doc.lastAutoTable.finalY + 10;
+
+      // Regional summary
+      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+      doc.text('Regional Summary', 14, y); y += 6;
+
+      var regData = {};
+      ssi.substations.forEach(function(s) {
+        if (!regData[s.region]) regData[s.region] = { sum: 0, count: 0, min: 1, max: 0 };
+        regData[s.region].sum += s.R_median;
+        regData[s.region].count++;
+        if (s.R_median < regData[s.region].min) regData[s.region].min = s.R_median;
+        if (s.R_median > regData[s.region].max) regData[s.region].max = s.R_median;
+      });
+
+      doc.autoTable({
+        startY: y,
+        styles: { fontSize: 8, cellPadding: 2.5 },
+        headStyles: { fillColor: [148, 25, 20], textColor: 255 },
+        alternateRowStyles: { fillColor: [252, 249, 244] },
+        head: [['Region', 'Substations', 'Mean R', 'Min R', 'Max R']],
+        body: Object.keys(regData).sort().map(function(r) {
+          var d = regData[r];
+          return [r, d.count, (d.sum / d.count).toFixed(3), d.min.toFixed(3), d.max.toFixed(3)];
+        }),
+        margin: { left: 14, right: 14 }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      // Top/bottom substations
+      var sorted = ssi.substations.slice().sort(function(a, b) { return a.R_median - b.R_median; });
+
+      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+      doc.text('Top 20 Most Resilient Substations', 14, y); y += 6;
+      doc.autoTable({
+        startY: y,
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [93, 133, 99], textColor: 255 },
+        alternateRowStyles: { fillColor: [252, 249, 244] },
+        head: [['#', 'Name', 'Region', 'kV', 'R_median', 'Band']],
+        body: sorted.slice(0, 20).map(function(s, i) {
+          return [i + 1, s.name, s.region, s.voltage_kv, s.R_median.toFixed(4), s.classification];
+        }),
+        margin: { left: 14, right: 14 }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      if (y > 240) { doc.addPage(); y = 20; }
+      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+      doc.text('Top 20 Most Vulnerable Substations', 14, y); y += 6;
+      doc.autoTable({
+        startY: y,
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [170, 66, 52], textColor: 255 },
+        alternateRowStyles: { fillColor: [252, 249, 244] },
+        head: [['#', 'Name', 'Region', 'kV', 'R_median', 'Band']],
+        body: sorted.slice(-20).reverse().map(function(s, i) {
+          return [i + 1, s.name, s.region, s.voltage_kv, s.R_median.toFixed(4), s.classification];
+        }),
+        margin: { left: 14, right: 14 }
+      });
+
+      pdfFooter(doc);
+      doc.save('ssi-index-v4-summary-report.pdf');
     }
-    if (!requireRegistration(doCSV)) return;
-    doCSV();
+    if (!requireRegistration(doSummaryPDF)) return;
+    doSummaryPDF();
   });
 
-  // ── GeoJSON download (registration-gated) ──
-  document.getElementById('dl-geojson').addEventListener('click', function() {
-    function doGeoJSON() {
-      var features = ssi.substations.map(function(s) {
-        return {
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: [s.lon, s.lat] },
-          properties: {
-            id: s.internal_id, name: s.name, region: s.region, province: s.province,
-            R_median: s.R_median, classification: s.classification,
-            C: s.components.C, V: s.components.V, I: s.components.I,
-            E: s.components.E, S: s.components.S, T: s.components.T
-          }
-        };
+  // ── Geographic Data PDF (registration-gated) ──
+  document.getElementById('dl-geo').addEventListener('click', function() {
+    function doGeoPDF() {
+      var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      var y = pdfHeader(doc, 'Geographic Data Export', 'Coordinates + SSI scores \u00b7 Generated ' + new Date().toLocaleDateString());
+
+      doc.autoTable({
+        startY: y,
+        styles: { fontSize: 6, cellPadding: 1.5 },
+        headStyles: { fillColor: [148, 25, 20], textColor: 255, fontSize: 6.5 },
+        alternateRowStyles: { fillColor: [252, 249, 244] },
+        head: [['ID', 'Name', 'Region', 'Province', 'Longitude', 'Latitude', 'kV', 'R_median', 'Band', 'C', 'V', 'I', 'E', 'S', 'T']],
+        body: ssi.substations.map(function(s) {
+          return [
+            s.internal_id, s.name, s.region, s.province,
+            s.lon.toFixed(5), s.lat.toFixed(5), s.voltage_kv,
+            s.R_median.toFixed(3), s.classification,
+            s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
+            s.components.E.toFixed(2), s.components.S.toFixed(2), s.components.T.toFixed(2)
+          ];
+        }),
+        margin: { left: 8, right: 8 }
       });
-      var geo = { type: 'FeatureCollection', features: features };
-      download('ssi-index-v4.geojson', JSON.stringify(geo), 'application/geo+json');
+
+      pdfFooter(doc);
+      doc.save('ssi-index-v4-geographic-data.pdf');
     }
-    if (!requireRegistration(doGeoJSON)) return;
-    doGeoJSON();
+    if (!requireRegistration(doGeoPDF)) return;
+    doGeoPDF();
+  });
+
+  // ── Formula Construct PDF (registration-gated) ──
+  document.getElementById('dl-formula').addEventListener('click', function() {
+    function doFormulaPDF() {
+      var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      var y = pdfHeader(doc, 'Formula Construct — Technical Reference', 'SSI v4.0 complete specification');
+
+      var sections = [
+        { title: 'SSI v4.0 Composite Formula', text: 'R = softclip( w_C\u00b7C + w_V\u00b7V + w_I\u00b7I + w_E\u00b7E + w_S\u00b7S + w_T\u00b7T ) \u00d7 R3 \u00d7 R4 \u00d7 R6 \u00d7 R7\n\nwhere softclip(x) = 1 / (1 + exp(-12\u00b7(x - 0.5))) compresses overflow beyond [0,1].' },
+        { title: 'Component Weights', text: 'w_C = 0.30  Condition (asset health & age)\nw_V = 0.20  Vulnerability (exposure to hazards)\nw_I = 0.15  Importance (criticality & load)\nw_E = 0.15  Environment (socio-economic context)\nw_S = 0.10  Stress (DER penetration & grid strain)\nw_T = 0.10  Transition (energy transition readiness)' },
+        { title: 'Modifier Functions', text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence substations\nR4 — Graph criticality: betweenness centrality & bridge status from network topology\nR6 — Restoration speed: DSO historical MTTR or Bayesian estimate\nR7 — Cyber exposure: DESI digital index & smart meter penetration proxy' },
+        { title: 'Monte Carlo Uncertainty', text: '1,000 iterations per substation (browser mode)\nEach metric perturbed \u00b1 based on confidence tier:\n  Tier A (measured): \u03c3 = 5%\n  Tier B (proxy): \u03c3 = 12%\n  Tier C (fuzzy): \u03c3 = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
+        { title: 'Classification Bands', text: 'LOW risk: R_median < 0.35\nMEDIUM-LOW: 0.35 \u2264 R < 0.45\nMEDIUM: 0.45 \u2264 R < 0.55\nMEDIUM-HIGH: 0.55 \u2264 R < 0.65\nHIGH risk: R_median \u2265 0.65' },
+        { title: 'Data Layers (8 layers, 81 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, ARERA quality\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGR\u00c9 degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): seismic, flood, corrosion, wildfire\nE — Italian Open Data (8 vars): ISPRA, MEF, ARERA public indicators\nF — Markov Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): TIQE quality, topology, JRC DSO data' },
+        { title: 'Normalisation', text: 'All metrics normalised to [0, 1] using min-max scaling across the fleet.\nHigher score = higher risk. Inverted metrics (where high raw value = low risk) are flipped: x_norm = 1 - (x - min) / (max - min).' }
+      ];
+
+      doc.setFontSize(9);
+      sections.forEach(function(sec) {
+        if (y > 260) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(148, 25, 20);
+        doc.text(sec.title, 14, y); y += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(50, 50, 50);
+        var lines = doc.splitTextToSize(sec.text, 180);
+        doc.text(lines, 14, y);
+        y += lines.length * 4.2 + 6;
+      });
+
+      pdfFooter(doc);
+      doc.save('ssi-index-v4-formula-construct.pdf');
+    }
+    if (!requireRegistration(doFormulaPDF)) return;
+    doFormulaPDF();
   });
 
   // ── Live schema sample ──

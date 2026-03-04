@@ -68,8 +68,7 @@ function renderNav(activePage) {
   const main = document.querySelector('main');
   if (main) main.id = 'main-content';
 
-  // Show registration gate if not registered
-  renderRegistrationGate();
+  // Registration gate removed from page load — only triggered on download
 }
 
 // ── Registration Gate ──
