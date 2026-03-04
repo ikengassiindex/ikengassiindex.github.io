@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index — Systemic System Infrastructure Index. Composite resilience scoring for Italy's 4,293 substations across EHV, HV, MV and LV voltage classes. Open data, open methodology.">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Italy's 4,293 substations. 95 variables, seismic hazard + Markov degradation. Open data, open methodology.">
 <meta name="theme-color" content="#941914">
 <meta property="og:title" content="SSI Index — Overview">
-<meta property="og:description" content="Composite resilience scoring for Italy's electrical grid. 81 variables, 30 public data sources.">
+<meta property="og:description" content="Composite resilience scoring for Italy's electrical grid. 95 variables, 30 public data sources.">
 <meta property="og:type" content="website">
 <title>SSI Index — Overview</title>
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-<script src="nav.js?v=13"></script>
+<script src="nav.js?v=14"></script>
 <script src="ssi-engine.js"></script>
 <script src="ssi-metadata.js"></script>
 <script>renderNav('overview');</script>
@@ -21,7 +21,7 @@
   <!-- Page Header -->
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
-    <p>A composite resilience score for 4,293 Italian substations — 475 HV (≥132 kV), 3,818 MV (≥15 kV and &lt;132kV) — 81 variables, 30 public data sources, zero proprietary dependencies.</p>
+    <p>A composite resilience score for 4,293 Italian substations — 475 HV (≥132 kV), 3,818 MV (≥15 kV and &lt;132kV) — 95 variables, 30 public data sources, zero proprietary dependencies.</p>
   </div>
 
   <!-- KPI Row -->
@@ -43,8 +43,8 @@
     </div>
     <div class="kpi-card animate-in delay-4">
       <div class="kpi-label">Data Freshness</div>
-      <div class="kpi-value" style="color:var(--bronze)">93%</div>
-      <div class="kpi-sub">81 LIVE · 12 Fuzzy · 1 Proxy</div>
+      <div class="kpi-value" style="color:var(--bronze)">100%</div>
+      <div class="kpi-sub">95 LIVE · 0 Pending</div>
     </div>
   </div>
 
@@ -107,7 +107,7 @@
   <div class="card animate-in" style="margin-bottom:24px">
     <div class="card-header">
       <h3>Component Contribution — Fleet Average</h3>
-      <span class="label-xs">6 components · 20 metrics</span>
+      <span class="label-xs">6 components · 20 metrics · 6 modifiers</span>
     </div>
     <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:8px">
       <div style="flex:1;min-width:300px" id="comp-bars">
@@ -118,7 +118,7 @@
           <div class="label-xs" style="margin-bottom:12px">Quick Facts</div>
           <div style="font-size:13px;line-height:2">
             <div><strong>20</strong> metrics across 6 components</div>
-            <div><strong>5</strong> modifiers (R2–R7)</div>
+            <div><strong>6</strong> modifiers (R3, R4, R6a, R6b, R7)</div>
             <div><strong>10,000</strong> Monte Carlo iterations</div>
             <div><strong>20×20</strong> correlation matrix</div>
             <div><strong>107</strong> provinces covered</div>
@@ -147,7 +147,7 @@
     <div class="card animate-in delay-2">
       <div class="card-header">
         <h3>Modifier Impact — Fleet Stats</h3>
-        <span class="label-xs">R3–R7</span>
+        <span class="label-xs">R3–R7 (incl. R6a + R6b)</span>
       </div>
       <table class="data-table" style="margin-top:4px">
         <thead>
@@ -253,7 +253,8 @@
       var modDefs = [
         { key: 'R4_F_topo', label: 'R4', domain: 'Graph Criticality', range: '[0.80, 1.35]' },
         { key: 'R3_C_mult', label: 'R3', domain: 'Consequence', range: '[0.70, 1.30]' },
-        { key: 'R6_restoration', label: 'R6', domain: 'Restoration Speed', range: '[0.90, 1.10]' },
+        { key: 'R6_restoration', label: 'R6a', domain: 'Restoration Speed', range: '[0.90, 1.10]' },
+        { key: 'R6_seismic', label: 'R6b', domain: 'Seismic Hazard', range: '[1.00, 1.25]' },
         { key: 'R7_cyber', label: 'R7', domain: 'Cyber-Exposure', range: '[0.95, 1.05]' }
       ];
       // Compute standard deviation for each modifier

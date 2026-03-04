@@ -35,7 +35,7 @@ function renderNav(activePage) {
     <a class="topnav-brand" href="index.html" aria-label="SSI Index — Home" style="gap:10px">
       ${SSI_LOGO}
       <div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15">
-        <h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0</span></h1>
+        <h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0.2</span></h1>
       </div>
     </a>
     <button class="nav-toggle" onclick="document.querySelector('.topnav-links').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false">
@@ -170,8 +170,8 @@ function renderFooter() {
   footer.className = 'site-footer';
   footer.setAttribute('role', 'contentinfo');
   footer.innerHTML = `
-    <div>SSI Index v4.0 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>
-    <div>81 variables · 30 sources · 4,293 substations (475 HV · 3,818 MV) · Open data, open methodology</div>
+    <div>SSI Index v4.0.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>
+    <div>95 variables · 30 sources · 4,293 substations (475 HV · 3,818 MV) · Open data, open methodology</div>
     <div class="copyright-notice">Copyright &copy; 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Societ&agrave; Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div>
   `;
   document.body.appendChild(footer);

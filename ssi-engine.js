@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
-   SSI v4.0 — Calculation Engine (Client-Side)
-   Implements the complete SSI v4.0 formula construct
-   6 components · 20 metrics · 7 modifiers · 81 variables
+   SSI v4.0.2 — Calculation Engine (Client-Side)
+   Implements the complete SSI v4.0.2 formula construct
+   6 components · 20 metrics · 8 modifiers · 95 variables
    ═══════════════════════════════════════════════════════════ */
 
 window.SSIEngine = (function () {
@@ -100,6 +100,13 @@ window.SSIEngine = (function () {
     sigmoid_steepness: 4,
     range_lo: 0.90,
     range_hi: 1.10
+  };
+
+  // R6b — Seismic Hazard (INGV MPS04)
+  const R6B_PARAMS = {
+    pga_scale: 0.50,
+    clip_lo: 1.00,
+    clip_hi: 1.25
   };
 
   // R7 — Cyber Exposure (v4.1: province-level DESI — values pre-computed in ssi-data.json)
@@ -283,6 +290,15 @@ window.SSIEngine = (function () {
     return p.range_lo + (p.range_hi - p.range_lo) * raw;
   }
 
+  // R6b — Seismic Hazard (INGV MPS04)
+  // R6b values are pre-computed per substation in ssi-data.json
+  function computeR6b(pga_g, zone_weight) {
+    if (!pga_g) return 1.00;
+    const p = R6B_PARAMS;
+    const raw = 1.0 + p.pga_scale * pga_g * (zone_weight || 1.0);
+    return Math.max(p.clip_lo, Math.min(p.clip_hi, raw));
+  }
+
   // R7 — Cyber Exposure (v4.1: province-level DESI model)
   // R7 values are now pre-computed per substation in ssi-data.json
   // This function serves as fallback only if R7_cyber is missing from data
@@ -369,10 +385,11 @@ window.SSIEngine = (function () {
     const C_mult = mods.R3_C_mult || 1.00;
     const F_topo = mods.R4_F_topo || 1.00;
     const R6_mult = mods.R6_restoration || 1.00;
+    const R6_seis = mods.R6_seismic || 1.00;
     const Cyber_factor = mods.R7_cyber || 1.00;
 
     // R_final
-    const R_raw = R_base * F_topo * C_mult * R6_mult * Cyber_factor;
+    const R_raw = R_base * F_topo * C_mult * R6_mult * R6_seis * Cyber_factor;
     const R_final = softClipUpper(R_raw);
 
     // Classification
@@ -387,7 +404,7 @@ window.SSIEngine = (function () {
       classification: band.name,
       band_color: band.color,
       components: comps,
-      modifiers: { R3_C_mult: C_mult, R4_F_topo: F_topo, R6_restoration: R6_mult, R7_cyber: Cyber_factor },
+      modifiers: { R3_C_mult: C_mult, R4_F_topo: F_topo, R6_restoration: R6_mult, R6_seismic: R6_seis, R7_cyber: Cyber_factor },
       modifier_impact: R_final - R_base,
       modifier_pct: R_base > 0 ? ((R_final - R_base) / R_base * 100).toFixed(1) + '%' : '0%',
       confidence_tier: classifyConfidence(sub.R_P5, sub.R_P95)
@@ -418,7 +435,7 @@ window.SSIEngine = (function () {
 
       // Apply modifiers
       const R_raw_k = R_base_k * (modifiers.F_topo || 1) * (modifiers.C_mult || 1)
-                     * (modifiers.R6_mult || 1) * (modifiers.Cyber_factor || 1);
+                     * (modifiers.R6_mult || 1) * (modifiers.R6_seis || 1) * (modifiers.Cyber_factor || 1);
 
       samples.push(softClipUpper(R_raw_k));
     }
@@ -491,7 +508,7 @@ window.SSIEngine = (function () {
 
     // Modifier stats
     const mod_stats = {};
-    ['R3_C_mult', 'R4_F_topo', 'R6_restoration', 'R7_cyber'].forEach(mk => {
+    ['R3_C_mult', 'R4_F_topo', 'R6_restoration', 'R6_seismic', 'R7_cyber'].forEach(mk => {
       const vals = substations.map(s => (s.modifiers && s.modifiers[mk]) || 1.0);
       const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
       const sigma = Math.sqrt(vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length);
@@ -601,6 +618,7 @@ window.SSIEngine = (function () {
     R3_PARAMS,
     R4_PARAMS,
     R6_PARAMS,
+    R6B_PARAMS,
     R7_MAP,
     ENRICHMENT_PARAMS,
 
@@ -626,6 +644,7 @@ window.SSIEngine = (function () {
     computeR3,
     computeR4,
     computeR6,
+    computeR6b,
     computeR7,
 
     // Analytics

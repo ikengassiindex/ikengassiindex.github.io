@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   SSI Index Dashboard — Interactive Map Engine
+   SSI Index Dashboard v4.0.2 — Interactive Map Engine
    Canvas-based renderer for 4,293 substations (EHV/HV/MV/LV) + 14,221 lines
    ═══════════════════════════════════════════════════════════ */
 
@@ -706,7 +706,8 @@
     const modifiers = [
       ['R3 Consequence', ssi.modifiers.R3_C_mult],
       ['R4 Graph Criticality', ssi.modifiers.R4_F_topo],
-      ['R6 Restoration Speed', ssi.modifiers.R6_restoration],
+      ['R6a Restoration', ssi.modifiers.R6_restoration],
+      ['R6b Seismic', ssi.modifiers.R6_seismic || 1.0],
       ['R7 Cyber-Exposure', ssi.modifiers.R7_cyber]
     ];
 
@@ -758,6 +759,9 @@
           <div style="display:flex;justify-content:space-between"><span>DER Stress (T1)</span><span style="font-weight:500">${ssi.transition.T1_score.toFixed(3)}</span></div>
           <div style="display:flex;justify-content:space-between"><span>Graph degree</span><span style="font-weight:500">${ssi.graph_topology.degree}${ssi.graph_topology.is_bridge ? ' (bridge)' : ''}</span></div>
           <div style="display:flex;justify-content:space-between"><span>BC percentile</span><span style="font-weight:500">${ssi.graph_topology.BC_percentile.toFixed(2)}</span></div>
+          ${ssi.seismic ? '<div style="display:flex;justify-content:space-between"><span>Seismic zone</span><span style="font-weight:500">Zone ' + ssi.seismic.zone + ' · PGA ' + ssi.seismic.pga_g.toFixed(3) + 'g</span></div>' : ''}
+          ${ssi.markov ? '<div style="display:flex;justify-content:space-between"><span>Markov risk</span><span style="font-weight:500">' + ssi.markov.risk_score.toFixed(3) + ' · ETTC ' + ssi.markov.ettc_years.toFixed(1) + 'y</span></div>' : ''}
+          ${ssi.markov ? '<div style="display:flex;justify-content:space-between"><span>Corrosion</span><span style="font-weight:500">' + ssi.markov.corrosion_class + '</span></div>' : ''}
           <div style="display:flex;justify-content:space-between"><span>Confidence</span><span style="font-weight:500">${ssi.confidence_tier}</span></div>
           <div style="display:flex;justify-content:space-between"><span>Fleet percentile</span><span style="font-weight:500">${(ssi.fleet_percentile * 100).toFixed(1)}%</span></div>
         </div>

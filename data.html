@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 30 verified public data sources, 81 variables, 8 data layers.">
+<meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 30 verified public data sources, 95 variables, 11 data layers.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Data &amp; Download</title>
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-<script src="nav.js?v=13"></script>
+<script src="nav.js?v=14"></script>
 <script src="ssi-engine.js"></script>
 <script src="ssi-metadata.js"></script>
 <script>renderNav('data');</script>
@@ -17,15 +17,15 @@
 <main class="page-shell">
   <div class="page-header animate-in">
     <h1>Data &amp; Download</h1>
-    <p>All 30 data sources are public, free, and independently verifiable. Download the full SSI dataset or explore source documentation.</p>
+    <p>All 30 data sources are public, free, and independently verifiable. Download the full SSI dataset or explore source documentation. v4.0.2 — 95 variables, all LIVE.</p>
   </div>
 
   <!-- Data Status -->
   <div class="kpi-grid animate-in delay-1" style="margin-bottom:32px">
     <div class="kpi-card">
       <div class="kpi-label">Total Variables</div>
-      <div class="kpi-value" style="color:var(--ink)">81</div>
-      <div class="kpi-sub">Across 8 data layers</div>
+      <div class="kpi-value" style="color:var(--ink)">95</div>
+      <div class="kpi-sub">Across 11 data layers</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Data Sources</div>
@@ -78,7 +78,7 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Layers</h3>
-      <span class="label-xs">8 layers · 81 variables</span>
+      <span class="label-xs">11 layers · 95 variables</span>
     </div>
     <table class="data-table" style="margin-top:4px">
       <thead>
@@ -151,8 +151,22 @@
           <td style="font-weight:600;color:#22d3ee">G</td>
           <td>Modifier Inputs</td>
           <td class="num">3</td>
-          <td><span class="band-badge low" style="font-size:10px">NEW</span></td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
           <td style="font-size:12px">ARERA TIQE · OSM Power · JRC DSO Obs.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#e67e22">H</td>
+          <td>Seismic & Corrosion</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">INGV MPS04 · ISO 9223 · EEA · Protezione Civile</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#8e44ad">I</td>
+          <td>Markov Outputs</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">Fleet Markov Chain · IEEE/CIGRÉ degradation</td>
         </tr>
       </tbody>
     </table>
@@ -174,7 +188,7 @@
       <span class="label-xs">Client-side formula implementation</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:12px">
-      The SSI v4.0 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 5 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6 restoration speed, R7 cyber-exposure), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
+      The SSI v4.0.2 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b seismic hazard, R7 cyber-exposure), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
     </p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
@@ -186,7 +200,7 @@
         <div style="font-size:10px;color:var(--warm-grey)">Global weight entries</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">5</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">6</div>
         <div style="font-size:10px;color:var(--warm-grey)">Modifier functions</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
@@ -229,7 +243,7 @@ function pdfHeader(doc, title, subtitle) {
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(16);
-  doc.text('SSI Index v4.0', 14, 14);
+  doc.text('SSI Index v4.0.2', 14, 14);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(title, 14, 22);
@@ -248,7 +262,7 @@ function pdfFooter(doc) {
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
     doc.text(
-      'SSI Index v4.0 \u00b7 \u00a9 2026 Altinium Invest S.r.L. \u00b7 Page ' + i + '/' + pageCount,
+      'SSI Index v4.0.2 \u00b7 \u00a9 2026 Altinium Invest S.r.L. \u00b7 Page ' + i + '/' + pageCount,
       doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: 'center' }
     );
   }
@@ -277,7 +291,7 @@ function pdfFooter(doc) {
   }
 })();
 
-fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(ssi) {
+fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(ssi) {
   var n = ssi.substations.length;
   var jsPDF = window.jspdf.jsPDF;
 
@@ -297,7 +311,7 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
         styles: { fontSize: 5.5, cellPadding: 1.5 },
         headStyles: { fillColor: [148, 25, 20], textColor: 255, fontSize: 6 },
         alternateRowStyles: { fillColor: [252, 249, 244] },
-        head: [['ID', 'Name', 'Region', 'Province', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6', 'R7', 'Tier']],
+        head: [['ID', 'Name', 'Region', 'Province', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6a', 'R6b', 'R7', 'SZone', 'Markov', 'Tier']],
         body: ssi.substations.map(function(s) {
           return [
             s.internal_id, s.name, s.region, s.province, s.voltage_kv,
@@ -306,7 +320,10 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
             s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
             s.components.E.toFixed(2), s.components.S.toFixed(2), s.components.T.toFixed(2),
             s.modifiers.R3_C_mult.toFixed(2), s.modifiers.R4_F_topo.toFixed(2),
-            s.modifiers.R6_restoration.toFixed(2), s.modifiers.R7_cyber.toFixed(2),
+            s.modifiers.R6_restoration.toFixed(2), (s.modifiers.R6_seismic || 1.0).toFixed(2),
+            s.modifiers.R7_cyber.toFixed(2),
+            s.seismic ? s.seismic.zone : '-',
+            s.markov ? s.markov.risk_score.toFixed(2) : '-',
             s.confidence_tier
           ];
         }),
@@ -315,7 +332,7 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
       });
 
       pdfFooter(doc);
-      doc.save('ssi-index-v4-full-dataset.pdf');
+      doc.save('ssi-index-v402-full-dataset.pdf');
     }
     if (!requireRegistration(doFullPDF)) return;
     doFullPDF();
@@ -407,7 +424,7 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
       });
 
       pdfFooter(doc);
-      doc.save('ssi-index-v4-summary-report.pdf');
+      doc.save('ssi-index-v402-summary-report.pdf');
     }
     if (!requireRegistration(doSummaryPDF)) return;
     doSummaryPDF();
@@ -438,7 +455,7 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
       });
 
       pdfFooter(doc);
-      doc.save('ssi-index-v4-geographic-data.pdf');
+      doc.save('ssi-index-v402-geographic-data.pdf');
     }
     if (!requireRegistration(doGeoPDF)) return;
     doGeoPDF();
@@ -448,15 +465,15 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
   document.getElementById('dl-formula').addEventListener('click', function() {
     function doFormulaPDF() {
       var doc = new jsPDF({ unit: 'mm', format: 'a4' });
-      var y = pdfHeader(doc, 'Formula Construct — Technical Reference', 'SSI v4.0 complete specification');
+      var y = pdfHeader(doc, 'Formula Construct — Technical Reference', 'SSI v4.0.2 complete specification');
 
       var sections = [
-        { title: 'SSI v4.0 Composite Formula', text: 'R = softclip( w_C\u00b7C + w_V\u00b7V + w_I\u00b7I + w_E\u00b7E + w_S\u00b7S + w_T\u00b7T ) \u00d7 R3 \u00d7 R4 \u00d7 R6 \u00d7 R7\n\nwhere softclip(x) = 1 / (1 + exp(-12\u00b7(x - 0.5))) compresses overflow beyond [0,1].' },
+        { title: 'SSI v4.0.2 Composite Formula', text: 'R = softclip( w_C\u00b7C + w_V\u00b7V + w_I\u00b7I + w_E\u00b7E + w_S\u00b7S + w_T\u00b7T ) \u00d7 R3 \u00d7 R4 \u00d7 R6a \u00d7 R6b \u00d7 R7\n\nwhere softclip(x) = 1 / (1 + exp(-12\u00b7(x - 0.5))) compresses overflow beyond [0,1].' },
         { title: 'Component Weights', text: 'w_C = 0.30  Condition (asset health & age)\nw_V = 0.20  Vulnerability (exposure to hazards)\nw_I = 0.15  Importance (criticality & load)\nw_E = 0.15  Environment (socio-economic context)\nw_S = 0.10  Stress (DER penetration & grid strain)\nw_T = 0.10  Transition (energy transition readiness)' },
-        { title: 'Modifier Functions', text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence substations\nR4 — Graph criticality: betweenness centrality & bridge status from network topology\nR6 — Restoration speed: DSO historical MTTR or Bayesian estimate\nR7 — Cyber exposure: DESI digital index & smart meter penetration proxy' },
+        { title: 'Modifier Functions', text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence substations\nR4 — Graph criticality: betweenness centrality & bridge status from network topology\nR6a — Restoration speed: DSO historical MTTR or Bayesian estimate\nR6b — Seismic hazard: INGV MPS04 PGA at 475-year return period\nR7 — Cyber exposure: DESI digital index & smart meter penetration proxy' },
         { title: 'Monte Carlo Uncertainty', text: '1,000 iterations per substation (browser mode)\nEach metric perturbed \u00b1 based on confidence tier:\n  Tier A (measured): \u03c3 = 5%\n  Tier B (proxy): \u03c3 = 12%\n  Tier C (fuzzy): \u03c3 = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
         { title: 'Classification Bands', text: 'LOW risk: R_median < 0.35\nMEDIUM-LOW: 0.35 \u2264 R < 0.45\nMEDIUM: 0.45 \u2264 R < 0.55\nMEDIUM-HIGH: 0.55 \u2264 R < 0.65\nHIGH risk: R_median \u2265 0.65' },
-        { title: 'Data Layers (8 layers, 81 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, ARERA quality\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGR\u00c9 degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): seismic, flood, corrosion, wildfire\nE — Italian Open Data (8 vars): ISPRA, MEF, ARERA public indicators\nF — Markov Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): TIQE quality, topology, JRC DSO data' },
+        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, ARERA quality\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGR\u00c9 degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): seismic, flood, corrosion, wildfire\nE — Italian Open Data (8 vars): ISPRA, MEF, ARERA public indicators\nF — Markov Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): TIQE quality, topology, JRC DSO data\nH — Seismic & Corrosion (7 vars): INGV zones, PGA, R6b, ISO 9223 corrosion\nI — Markov Outputs (7 vars): risk score, ETTC, stationary probabilities' },
         { title: 'Normalisation', text: 'All metrics normalised to [0, 1] using min-max scaling across the fleet.\nHigher score = higher risk. Inverted metrics (where high raw value = low risk) are flipped: x_norm = 1 - (x - min) / (max - min).' }
       ];
 
@@ -476,7 +493,7 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
       });
 
       pdfFooter(doc);
-      doc.save('ssi-index-v4-formula-construct.pdf');
+      doc.save('ssi-index-v402-formula-construct.pdf');
     }
     if (!requireRegistration(doFormulaPDF)) return;
     doFormulaPDF();
@@ -503,10 +520,19 @@ fetch('ssi-data.json?v=2').then(function(r) { return r.json(); }).then(function(
     '  <span class="hl-var">"modifiers"</span>: { ' +
       '<span class="hl-num">"R3"</span>: ' + s.modifiers.R3_C_mult.toFixed(3) + ', ' +
       '<span class="hl-num">"R4"</span>: ' + s.modifiers.R4_F_topo.toFixed(3) + ', ' +
-      '<span class="hl-num">"R6"</span>: ' + s.modifiers.R6_restoration.toFixed(3) + ', ' +
+      '<span class="hl-num">"R6a"</span>: ' + s.modifiers.R6_restoration.toFixed(3) + ', ' +
+      '<span class="hl-num">"R6b"</span>: ' + (s.modifiers.R6_seismic || 1.0).toFixed(3) + ', ' +
       '<span class="hl-num">"R7"</span>: ' + s.modifiers.R7_cyber.toFixed(3) + ' },\n' +
     '  <span class="hl-var">"socio_economic"</span>: { <span class="hl-num">"V_socio"</span>: ' + s.socio_economic.V_socio.toFixed(3) + ', <span class="hl-num">"EP_rate"</span>: ' + s.socio_economic.EP_rate_region.toFixed(1) + ' },\n' +
     '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + s.graph_topology.BC_percentile.toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' +
+    '  <span class="hl-var">"seismic"</span>: { ' +
+      '<span class="hl-num">"zone"</span>: ' + (s.seismic ? s.seismic.zone : 4) + ', ' +
+      '<span class="hl-num">"pga_g"</span>: ' + (s.seismic ? s.seismic.pga_g.toFixed(3) : '0.030') + ', ' +
+      '<span class="hl-num">"R6b"</span>: ' + (s.seismic ? s.seismic.R6_seismic.toFixed(3) : '1.000') + ' },\n' +
+    '  <span class="hl-var">"markov"</span>: { ' +
+      '<span class="hl-num">"risk"</span>: ' + (s.markov ? s.markov.risk_score.toFixed(3) : '0.500') + ', ' +
+      '<span class="hl-num">"ettc_yr"</span>: ' + (s.markov ? s.markov.ettc_years.toFixed(1) : '12.0') + ', ' +
+      '<span class="hl-num">"corrosion"</span>: "' + (s.markov ? s.markov.corrosion_class : 'C2') + '" },\n' +
     '  <span class="hl-var">"confidence_tier"</span>: <span class="hl-num">"' + s.confidence_tier + '"</span>\n' +
     '}';
   document.getElementById('schema-block').innerHTML = schemaHTML;

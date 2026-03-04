@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
-   SSI v4.0 — Metadata Registry
-   81 variables · 30 sources · 20 metrics · 6 components · 7 modifiers
+   SSI v4.0.2 — Metadata Registry
+   95 variables · 30 sources · 20 metrics · 6 components · 8 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -147,12 +147,21 @@ window.SSIMetadata = (function () {
       formula: 'skewness = (CI_upper − CI_lower) / (CI_upper + CI_lower)'
     },
     {
-      id: 'R6', name: 'Restoration Speed',
+      id: 'R6a', name: 'Restoration Speed',
       range: '[0.90, 1.10]', type: 'Multiplicative',
       desc: 'CAIDI-based sigmoid that distinguishes fast-restoring vs slow-restoring areas.',
-      formula: 'R6_mult = sigmoid_bounded(CAIDI_local / CAIDI_med, 0.90, 1.10)',
+      formula: 'R6a_mult = sigmoid_bounded(CAIDI_local / CAIDI_med, 0.90, 1.10)',
       sources: ['ARERA TIQE'],
       isNew: true
+    },
+    {
+      id: 'R6b', name: 'Seismic Hazard',
+      range: '[1.00, 1.25]', type: 'Multiplicative',
+      desc: 'INGV MPS04 seismic hazard modifier. Penalises substations in high-seismicity zones (Zone 1–2) using PGA at 475-year return period.',
+      formula: 'R6b_seis = clip(1.0 + 0.50 × PGA_g × zone_weight, 1.00, 1.25)',
+      sources: ['INGV MPS04', 'Protezione Civile'],
+      isNew: true,
+      isP2: true
     },
     {
       id: 'R7', name: 'Cyber-Exposure Proxy',
@@ -177,16 +186,18 @@ window.SSIMetadata = (function () {
     { id: 'D',   name: 'Environmental Hazards',         vars: 7,  status: 'LIVE',        sources: 'EEA · INGV · ISPRA · ISO 9223 · Copernicus CDS' },
     { id: 'E',   name: 'Italian Open Data',             vars: 8,  status: 'LIVE',        sources: 'ISPRA · MISE · MEF · ARERA · Terna' },
     { id: 'F',   name: 'Markov Transitions',            vars: 12, status: 'LIVE (BAYESIAN)', sources: 'DSO history OR IEEE/CIGRÉ + priors' },
-    { id: 'G',   name: 'Modifier Inputs',               vars: 3,  status: 'NEW',         sources: 'ARERA TIQE · OSM Power · JRC DSO', isNew: true },
+    { id: 'G',   name: 'Modifier Inputs',               vars: 3,  status: 'LIVE',        sources: 'ARERA TIQE · OSM Power · JRC DSO', isNew: true },
+    { id: 'H',   name: 'Seismic & Corrosion',           vars: 7,  status: 'LIVE',        sources: 'INGV MPS04 · ISO 9223 · EEA · Protezione Civile', isNew: true, isP2: true },
+    { id: 'I',   name: 'Markov Outputs',                vars: 7,  status: 'LIVE',        sources: 'Fleet Markov Chain · IEEE/CIGRÉ degradation', isNew: true, isP2: true },
   ];
 
   // ─── Processing Pipeline ──────────────────────────────────
   const PIPELINE = [
-    { step: 1, name: 'Ingest',     desc: '81 variables from 30 verified data sources', icon: '①' },
+    { step: 1, name: 'Ingest',     desc: '95 variables from 30 verified data sources', icon: '①' },
     { step: 2, name: 'Normalise',  desc: 'Methods A–D: fleet percentile, bounded, categorical → [0,1]', icon: '②' },
     { step: 3, name: 'Weight',     desc: '6-level hierarchy: component × intra-metric weights', icon: '③' },
     { step: 4, name: 'Compose',    desc: 'R_base = Σ wᵢ·Cᵢ (6 components, 20 metrics)', icon: '④' },
-    { step: 5, name: 'Modify',     desc: 'R2 adaptive + R3 consequence × R4 topology × R6 restoration × R7 cyber', icon: '⑤' },
+    { step: 5, name: 'Modify',     desc: 'R2 adaptive + R3 consequence × R4 topology × R6a restoration × R6b seismic × R7 cyber', icon: '⑤' },
     { step: 6, name: 'Monte Carlo', desc: '10,000 iterations with 20×20 Gaussian copula', icon: '⑥' },
     { step: 7, name: 'Classify',   desc: '4 bands (Low/Medium/High/Critical) + confidence tiers + alerts', icon: '⑦' },
   ];
@@ -209,12 +220,13 @@ window.SSIMetadata = (function () {
 
   // ─── Master Equation ─────────────────────────────────────
   const MASTER_EQUATION = {
-    formula: 'R_final = soft_clip_upper(R_base × F_topo × C_mult × R6_mult × Cyber_factor)',
+    formula: 'R_final = soft_clip_upper(R_base × F_topo × C_mult × R6a_mult × R6b_seis × Cyber_factor)',
     R_base: 'R_base = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T',
     modifiers: {
       F_topo: 'graph_criticality(degree, BC, bridge) [R4]',
       C_mult: 'consequence_sigmoid(pop, load, V_socio) [R3]',
-      R6_mult: 'restoration_speed_sigmoid(CAIDI_local) [R6]',
+      R6a_mult: 'restoration_speed_sigmoid(CAIDI_local) [R6a]',
+      R6b_seis: 'seismic_hazard(PGA_g, zone) [R6b]',
       Cyber_factor: 'province_DESI_cyber(region, province, voltage) [R7]'
     },
     soft_clip: 'if R_raw ≤ 1.00 → R_raw; if R_raw > 1.00 → 1.00 − 1/(1 + e^(20×(R_raw − 1.05)))'
@@ -234,6 +246,9 @@ window.SSIMetadata = (function () {
     { check: 'R4 bridge identification',   criterion: 'is_bridge=1 subs have higher R than degree-matched non-bridges', status: 'new', isNew: true },
     { check: 'Climate trajectory direction', criterion: 'I3 trajectory > 1.0 in South, I1 < 1.0 in Alpine North', status: 'new', isNew: true },
     { check: 'Weight sum invariant',        criterion: 'Σ w_component = 1.000 exactly', status: 'verified' },
+    { check: 'R6b seismic gradient',     criterion: 'Zone 1 substations have R6b > 1.10; Zone 4 substations R6b ≈ 1.00', status: 'verified', isNew: true, isP2: true },
+    { check: 'Markov risk coherence',    criterion: 'markov_risk_score positively correlates with asset age and outage rates', status: 'verified', isNew: true, isP2: true },
+    { check: 'Corrosion class gradient', criterion: 'Coastal provinces C3–C5 > inland C1–C2', status: 'verified', isNew: true, isP2: true },
   ];
 
   // ─── Changelog v3.4 → v4.0 ───────────────────────────────
@@ -249,6 +264,10 @@ window.SSIMetadata = (function () {
     { id: 'L3', section: '§5',     change: 'V_socio Fiscal Enrichment — MEF + SVIMEZ + energy price', type: 'enhanced' },
     { id: 'L4', section: '§5',     change: 'R3 Migration Amplifier — ISTAT net migration', type: 'enhanced' },
     { id: 'L5', section: '§8, §12', change: '80/81 variables operational (98.8%). 30 data sources total.', type: 'data' },
+    { id: 'P1', section: '§5',     change: 'R6 split into R6a (Restoration Speed) + R6b (Seismic Hazard — INGV MPS04)', type: 'new', isP2: true },
+    { id: 'P2', section: '§12',    change: 'Seismic & Corrosion layer (H): 7 variables — zone, PGA, R6b_seis, corrosion class/kappa/rate/life', type: 'new', isP2: true },
+    { id: 'P3', section: '§12',    change: 'Markov Outputs layer (I): 7 variables — risk_score, ETTC, stationary probs, corrosion class', type: 'new', isP2: true },
+    { id: 'P4', section: '§8, §12', change: '95/95 variables operational (100%). All P0+P1+P2 pipelines LIVE.', type: 'data', isP2: true },
   ];
 
   // ─── Frequency Distribution ───────────────────────────────
@@ -280,10 +299,10 @@ window.SSIMetadata = (function () {
 
     // Quick stats
     stats: {
-      variables: 81,
+      variables: 95,
       metrics: 20,
       components: 6,
-      modifiers: 7,
+      modifiers: 8,
       sources: 30,
       substations: 4293,
       powerLines: 14221,

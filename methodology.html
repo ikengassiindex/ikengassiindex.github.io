@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0 methodology — master equation, 6 components, 7 modifiers, 81 variables, 30 data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 8 modifiers, 95 variables, 30 data sources, Monte Carlo uncertainty. Open, reproducible.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Methodology</title>
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-<script src="nav.js?v=13"></script>
+<script src="nav.js?v=14"></script>
 <script src="ssi-engine.js"></script>
 <script src="ssi-metadata.js"></script>
 <script>renderNav('methodology');</script>
@@ -17,7 +17,7 @@
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
     <h1>Methodology</h1>
-    <p>How the SSI v4.0 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
   </div>
 
   <!-- Thesis -->
@@ -35,7 +35,7 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>81 variables from 30 verified public data sources — E-Distribuzione, ARERA, ISTAT, Copernicus CDS, OSM, GSE, ENTSO-E, and 23 others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
+        <p>95 variables from 30 verified public data sources — E-Distribuzione, ARERA, ISTAT, Copernicus CDS, OSM, GSE, ENTSO-E, and 23 others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
       </div>
     </div>
     <div class="method-step">
@@ -63,7 +63,7 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Five multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6 (restoration speed), R7 (cyber-exposure proxy). Plus 5 micro-enrichments for elderly vulnerability, flood zones, landslides, digital readiness, and healthcare criticality.</p>
+        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (seismic hazard), R7 (cyber-exposure proxy). Plus 5 micro-enrichments for elderly vulnerability, flood zones, landslides, digital readiness, and healthcare criticality.</p>
       </div>
     </div>
     <div class="method-step">
@@ -86,17 +86,18 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Master Equation</h3>
-      <span class="label-xs">v4.0</span>
+      <span class="label-xs">v4.0.2</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6_mult × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_seis × Cyber_factor )
 
 <span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
 
-<span class="hl-var">F_topo</span>  = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>  = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6 — [0.90, 1.10]</span>
-<span class="hl-var">Cyber</span>   = <span class="hl-fn">province_DESI_cyber</span>(region, province, voltage) <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
+<span class="hl-var">R6b_seis</span> = <span class="hl-fn">seismic_hazard</span>(PGA_g, zone)              <span class="hl-comment">// R6b — [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">province_DESI_cyber</span>(region, province, voltage) <span class="hl-comment">// R7 — [0.99, 1.05]</span>
     </div>
   </div>
 
@@ -158,7 +159,7 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7</h3>
+      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
       <span class="label-xs">Context multipliers</span>
     </div>
     <table class="data-table">
@@ -185,10 +186,16 @@
           <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
         </tr>
         <tr>
-          <td style="font-weight:500">R6</td>
+          <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
           <td>CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two substations with identical SAIDI can have different risk profiles.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6b</td>
+          <td>Seismic Hazard</td>
+          <td class="num">[1.00, 1.25]</td>
+          <td>INGV MPS04 seismic hazard. Penalises substations in high-PGA zones (Zone 1–2). Uses 475-year return period peak ground acceleration. ISO 9223 corrosion classification enriches exposure assessment.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
@@ -268,8 +275,8 @@
   <!-- Data Layers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Data Layers — 81 Variables</h3>
-      <span class="label-xs">8 layers</span>
+      <h3>Data Layers — 95 Variables</h3>
+      <span class="label-xs">11 layers</span>
     </div>
     <table class="data-table" id="method-layers">
       <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
@@ -281,6 +288,7 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>30 Verified Data Sources</h3>
+      <!-- Note: All P2 variables derive from existing sources (INGV, ISO 9223, IEEE/CIGRÉ) -->
       <span class="label-xs">28 open + 2 free registration</span>
     </div>
     <table class="data-table" id="method-sources">
@@ -304,7 +312,7 @@
   <!-- Changelog -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>v3.4 → v4.0 Changelog</h3>
+      <h3>v3.4 → v4.0.2 Changelog</h3>
     </div>
     <table class="data-table" id="method-changelog">
       <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
@@ -316,10 +324,10 @@
   <div class="card animate-in" style="border-left:3px solid var(--sage)">
     <div class="card-header">
       <h3>Competitive Positioning</h3>
-      <span class="label-xs">v4.0</span>
+      <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0 scores competitively or leads on 14 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only cybersecurity (crude proxy, awaiting NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only cybersecurity (crude proxy, awaiting NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
 </main>
@@ -379,7 +387,7 @@
         '<td style="font-size:11px;font-weight:600;color:' + statusColor + '">' + l.status + '</td>' +
         '<td style="font-size:11px;color:var(--warm-grey)">' + l.sources + '</td></tr>';
     }).join('') +
-    '<tr style="border-top:2px solid var(--ink)"><td><strong>Total</strong></td><td class="num"><strong>81</strong></td><td colspan="2"></td></tr>';
+    '<tr style="border-top:2px solid var(--ink)"><td><strong>Total</strong></td><td class="num"><strong>95</strong></td><td colspan="2"></td></tr>';
   }
 
   // Data sources
