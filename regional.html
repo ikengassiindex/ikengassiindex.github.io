@@ -393,10 +393,11 @@ function renderDecomposition(data) {
   var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
   var colors = ['var(--crimson)', 'var(--terracotta)', 'var(--sage)', '#3b9eff', 'var(--bronze)', '#22d3ee'];
 
-  var html = regions.map(function(r) {
+  var html = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey);padding-left:148px"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
+  html += regions.map(function(r) {
     var total = r.C + r.V + r.I + r.E + r.S + r.T;
     if (total === 0) total = 1;
-    var barWidth = Math.max(20, (r.mean_R / maxR) * 100);
+    var barWidth = Math.max(20, Math.min((1 - r.mean_R) * 100, 100));
     var segments = comps.map(function(k, idx) {
       var w = (r[k] / total * 100).toFixed(1);
       return '<div style="width:' + w + '%;background:' + colors[idx] + '" title="' + k + ': ' + r[k].toFixed(3) + '"></div>';

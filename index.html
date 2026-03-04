@@ -217,10 +217,10 @@
       });
       Object.keys(sums).forEach(function(k) { sums[k] /= n; });
 
-      var maxComp = Math.max.apply(null, Object.values(sums));
-      var compHTML = compDefs.map(function(c) {
+      var compHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey)"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
+      compHTML += compDefs.map(function(c) {
         var avg = sums[c.key];
-        var barPct = Math.min((avg / maxComp) * 100, 100).toFixed(1);
+        var barPct = Math.max(0, Math.min((1 - avg / c.w) * 100, 100)).toFixed(1);
         return '<div style="margin-bottom:14px">' +
           '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
             '<span style="font-size:13px;font-weight:500">' + c.label + '</span>' +
