@@ -251,43 +251,54 @@ fetch('ssi-data.json').then(function(r) { return r.json(); }).then(function(ssi)
   document.getElementById('data-subs-sub').textContent = ssi.regions.length + ' regions · 107 provinces';
   document.getElementById('dl-json-info').textContent = n.toLocaleString() + ' substations · all fields';
 
-  // ── JSON download ──
+  // ── JSON download (registration-gated) ──
   document.getElementById('dl-json').addEventListener('click', function() {
+    if (!requireRegistration(function() {
+      download('ssi-index-v4.json', JSON.stringify(ssi, null, 2), 'application/json');
+    })) return;
     download('ssi-index-v4.json', JSON.stringify(ssi, null, 2), 'application/json');
   });
 
-  // ── CSV download ──
+  // ── CSV download (registration-gated) ──
   document.getElementById('dl-csv').addEventListener('click', function() {
-    var headers = ['substation_id','internal_id','name','region','province','lon','lat','voltage_kv',
-      'R_median','R_P5','R_P95','CI_width','classification','fleet_percentile',
-      'C','V','I','E','S','T','R3_C_mult','R4_F_topo','R6_restoration','R7_cyber','confidence_tier'];
-    var rows = ssi.substations.map(function(s) {
-      return [s.substation_id, s.internal_id, '"' + s.name + '"', s.region, '"' + s.province + '"',
-        s.lon, s.lat, s.voltage_kv,
-        s.R_median, s.R_P5, s.R_P95, s.CI_width, s.classification, s.fleet_percentile,
-        s.components.C, s.components.V, s.components.I, s.components.E, s.components.S, s.components.T,
-        s.modifiers.R3_C_mult, s.modifiers.R4_F_topo, s.modifiers.R6_restoration, s.modifiers.R7_cyber,
-        s.confidence_tier].join(',');
-    });
-    download('ssi-index-v4.csv', headers.join(',') + '\n' + rows.join('\n'), 'text/csv');
+    function doCSV() {
+      var headers = ['substation_id','internal_id','name','region','province','lon','lat','voltage_kv',
+        'R_median','R_P5','R_P95','CI_width','classification','fleet_percentile',
+        'C','V','I','E','S','T','R3_C_mult','R4_F_topo','R6_restoration','R7_cyber','confidence_tier'];
+      var rows = ssi.substations.map(function(s) {
+        return [s.substation_id, s.internal_id, '"' + s.name + '"', s.region, '"' + s.province + '"',
+          s.lon, s.lat, s.voltage_kv,
+          s.R_median, s.R_P5, s.R_P95, s.CI_width, s.classification, s.fleet_percentile,
+          s.components.C, s.components.V, s.components.I, s.components.E, s.components.S, s.components.T,
+          s.modifiers.R3_C_mult, s.modifiers.R4_F_topo, s.modifiers.R6_restoration, s.modifiers.R7_cyber,
+          s.confidence_tier].join(',');
+      });
+      download('ssi-index-v4.csv', headers.join(',') + '\n' + rows.join('\n'), 'text/csv');
+    }
+    if (!requireRegistration(doCSV)) return;
+    doCSV();
   });
 
-  // ── GeoJSON download ──
+  // ── GeoJSON download (registration-gated) ──
   document.getElementById('dl-geojson').addEventListener('click', function() {
-    var features = ssi.substations.map(function(s) {
-      return {
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [s.lon, s.lat] },
-        properties: {
-          id: s.internal_id, name: s.name, region: s.region, province: s.province,
-          R_median: s.R_median, classification: s.classification,
-          C: s.components.C, V: s.components.V, I: s.components.I,
-          E: s.components.E, S: s.components.S, T: s.components.T
-        }
-      };
-    });
-    var geo = { type: 'FeatureCollection', features: features };
-    download('ssi-index-v4.geojson', JSON.stringify(geo), 'application/geo+json');
+    function doGeoJSON() {
+      var features = ssi.substations.map(function(s) {
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [s.lon, s.lat] },
+          properties: {
+            id: s.internal_id, name: s.name, region: s.region, province: s.province,
+            R_median: s.R_median, classification: s.classification,
+            C: s.components.C, V: s.components.V, I: s.components.I,
+            E: s.components.E, S: s.components.S, T: s.components.T
+          }
+        };
+      });
+      var geo = { type: 'FeatureCollection', features: features };
+      download('ssi-index-v4.geojson', JSON.stringify(geo), 'application/geo+json');
+    }
+    if (!requireRegistration(doGeoJSON)) return;
+    doGeoJSON();
   });
 
   // ── Live schema sample ──

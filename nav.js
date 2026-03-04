@@ -67,6 +67,109 @@ function renderNav(activePage) {
   // Add id to main for skip link
   const main = document.querySelector('main');
   if (main) main.id = 'main-content';
+
+  // Show registration gate if not registered
+  renderRegistrationGate();
+}
+
+// ── Registration Gate ──
+// Google Sheets Apps Script endpoint — replace with your own
+var SSI_REGISTRATION_ENDPOINT = 'https://script.google.com/macros/s/REPLACE_WITH_YOUR_SCRIPT_ID/exec';
+
+function isRegistered() {
+  try { return localStorage.getItem('ssi-registered') === '1'; } catch(e) { return false; }
+}
+
+function showRegistrationGate(onSuccess) {
+  if (document.querySelector('.registration-overlay')) return; // already showing
+
+  var overlay = document.createElement('div');
+  overlay.className = 'registration-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-labelledby', 'reg-title');
+
+  overlay.innerHTML = '<div class="registration-modal">' +
+    '<h2 id="reg-title">Breaking the Silos</h2>' +
+    '<p class="reg-subtitle">Power grid resilience is inseparable from its socio-economic context. ' +
+    'A substation serving an energy-poor region with slow restoration times and weak fiscal capacity ' +
+    'is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. ' +
+    'The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, ' +
+    'and energy-transition data\u00a0\u2014\u00a0all from public sources.</p>' +
+    '<form id="reg-form" autocomplete="on">' +
+      '<label for="reg-email">Email</label>' +
+      '<input id="reg-email" name="email" type="email" required placeholder="you@organisation.com" autocomplete="email">' +
+      '<label for="reg-org">Organisation</label>' +
+      '<input id="reg-org" name="organisation" type="text" required placeholder="Company or institution name" autocomplete="organization">' +
+      '<label for="reg-type">Organisation type</label>' +
+      '<select id="reg-type" name="org_type" required>' +
+        '<option value="" disabled selected>Select\u2026</option>' +
+        '<option value="Company">Company</option>' +
+        '<option value="Research">Research</option>' +
+        '<option value="Regulator">Regulator</option>' +
+        '<option value="Other">Other</option>' +
+      '</select>' +
+      '<label for="reg-role">Your role</label>' +
+      '<input id="reg-role" name="role" type="text" required placeholder="e.g. Grid Analyst, Head of Strategy" autocomplete="organization-title">' +
+      '<button type="submit">Access the SSI Index</button>' +
+    '</form>' +
+    '<div class="reg-footer">Your data is handled by Altinium Invest S.r.L. and will not be shared with third parties.</div>' +
+  '</div>';
+
+  document.body.appendChild(overlay);
+
+  // Focus first input
+  setTimeout(function() {
+    var first = document.getElementById('reg-email');
+    if (first) first.focus();
+  }, 100);
+
+  document.getElementById('reg-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = this.querySelector('button[type="submit"]');
+    btn.textContent = 'Submitting\u2026';
+    btn.disabled = true;
+
+    var payload = {
+      email: document.getElementById('reg-email').value.trim(),
+      organisation: document.getElementById('reg-org').value.trim(),
+      org_type: document.getElementById('reg-type').value,
+      role: document.getElementById('reg-role').value.trim(),
+      page: window.location.pathname,
+      timestamp: new Date().toISOString()
+    };
+
+    // Send to Google Sheets (fire-and-forget, don't block on failure)
+    try {
+      fetch(SSI_REGISTRATION_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function() {});
+    } catch(err) {}
+
+    // Mark registered and remove overlay
+    try { localStorage.setItem('ssi-registered', '1'); } catch(err) {}
+    overlay.style.animation = 'regFadeIn 0.3s ease reverse forwards';
+    setTimeout(function() {
+      overlay.remove();
+      if (typeof onSuccess === 'function') onSuccess();
+    }, 300);
+  });
+}
+
+function renderRegistrationGate() {
+  if (!isRegistered()) {
+    showRegistrationGate();
+  }
+}
+
+// Called before downloads — returns true if registered, shows gate if not
+function requireRegistration(callback) {
+  if (isRegistered()) return true;
+  showRegistrationGate(callback);
+  return false;
 }
 
 function renderFooter() {

@@ -695,3 +695,112 @@ h3 { font-size: 17px; line-height: 1.4; }
   font-size: 14px;
   font-weight: 500;
 }
+
+/* ── Registration Gate ── */
+.registration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(44, 36, 32, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: regFadeIn 0.4s ease both;
+}
+@keyframes regFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.registration-modal {
+  background: var(--cream);
+  border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(44, 36, 32, 0.25);
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 40px 36px 32px;
+  animation: regSlideUp 0.45s ease both;
+}
+@keyframes regSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.registration-modal h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.registration-modal .reg-subtitle {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--warm-grey);
+  margin: 0 0 24px;
+}
+.registration-modal label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--warm-grey);
+  margin-bottom: 5px;
+}
+.registration-modal input,
+.registration-modal select {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: white;
+  border: 1px solid rgba(44, 36, 32, 0.15);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.registration-modal input:focus,
+.registration-modal select:focus {
+  outline: none;
+  border-color: var(--crimson);
+  box-shadow: 0 0 0 3px rgba(148, 25, 20, 0.1);
+}
+.registration-modal button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: var(--crimson);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.1s;
+}
+.registration-modal button[type="submit"]:hover {
+  background: #7a1410;
+}
+.registration-modal button[type="submit"]:active {
+  transform: scale(0.98);
+}
+.registration-modal .reg-footer {
+  font-size: 10px;
+  color: var(--warm-grey-light);
+  text-align: center;
+  margin-top: 16px;
+}
+@media (max-width: 600px) {
+  .registration-modal {
+    padding: 28px 20px 24px;
+    border-radius: 12px;
+  }
+  .registration-modal h2 { font-size: 19px; }
+}
