@@ -474,6 +474,76 @@
   }
 
   // ── Score Articulation ──
+
+  // Sub-metric definitions (from ssi-metadata.js COMPONENTS)
+  var SUB_METRICS = {
+    C: [
+      { id: 'C1', name: 'Outage Duration (SAIDI)',   intra: 0.40, norm: 'A (P5/P95)' },
+      { id: 'C2', name: 'Outage Count (SAIFI)',      intra: 0.30, norm: 'A (P5/P95)' },
+      { id: 'C3', name: 'MT Exceed Rate',            intra: 0.15, norm: 'C (0–100%)' },
+      { id: 'C4', name: 'Planned Outages',           intra: 0.15, norm: 'B (P5/P95)' }
+    ],
+    V: [
+      { id: 'V1', name: 'Severity-Weighted Dips',    intra: 1.00, norm: 'B (γ=0.50)' }
+    ],
+    I: [
+      { id: 'I1', name: 'Snow/Ice Risk (IRI)',       intra: 0.12, norm: 'C (0–0.30)', adaptive: true },
+      { id: 'I2', name: 'Tree-Fall Risk (IRI)',      intra: 0.09, norm: 'C (0–0.30)', adaptive: true },
+      { id: 'I3', name: 'Heat-Wave Risk (IRI)',      intra: 0.15, norm: 'C (0–0.30)', adaptive: true },
+      { id: 'I4', name: 'RTN Density',               intra: 0.12, norm: 'B ↓inverted' },
+      { id: 'I5', name: 'Thermal Stress Proxy',      intra: 0.12, norm: 'B (P5/P95)' },
+      { id: 'I6', name: 'Substation Density',        intra: 0.12, norm: 'B ↓inverted' },
+      { id: 'I7', name: 'Load Stress',               intra: 0.10, norm: 'B (P5/P95)' },
+      { id: 'I8', name: 'Air Quality Corrosion',     intra: 0.08, norm: 'B (P5/P95)' },
+      { id: 'I9', name: 'Hydrogeological Risk',      intra: 0.10, norm: 'B (P5/P95)' }
+    ],
+    E: [
+      { id: 'E1', name: 'ARERA Penalties/BT User',   intra: 0.55, norm: 'B (P5/P95)' },
+      { id: 'E2', name: 'Productivity Loss Coeff.',   intra: 0.45, norm: 'C (bounded)' }
+    ],
+    S: [
+      { id: 'S1', name: 'Municipal KPI (Gen/Cons)',   intra: 0.75, norm: 'B* (Dimovski)' },
+      { id: 'S2', name: 'Reverse Power Flow',         intra: 0.125, norm: 'D (categorical)' },
+      { id: 'S3', name: 'Criticality Class',          intra: 0.125, norm: 'D (categorical)' }
+    ],
+    T: [
+      { id: 'T1', name: 'DER Stress Index',           intra: 1.00, norm: 'B (composite)',
+        sub: [
+          { id: 'DER_ratio',       name: 'DER Penetration',    weight: 0.50 },
+          { id: 'DER_variability', name: 'DER Variability',    weight: 0.30 },
+          { id: 'EV_load_ratio',   name: 'EV Load Burden',     weight: 0.20 }
+        ]
+      }
+    ]
+  };
+
+  // Try to extract context values for sub-metrics from the ssi data
+  function getContextValue(ssi, metricId) {
+    if (!ssi) return null;
+    // Climate trajectory values
+    if (ssi.climate_trajectory) {
+      if (metricId === 'I1' && ssi.climate_trajectory.I1_trajectory != null) return { label: 'Δ climate', val: ssi.climate_trajectory.I1_trajectory };
+      if (metricId === 'I2' && ssi.climate_trajectory.I2_trajectory != null) return { label: 'Δ climate', val: ssi.climate_trajectory.I2_trajectory };
+      if (metricId === 'I3' && ssi.climate_trajectory.I3_trajectory != null) return { label: 'Δ climate', val: ssi.climate_trajectory.I3_trajectory };
+    }
+    // Socio-economic values
+    if (ssi.socio_economic) {
+      if (metricId === 'E2' && ssi.socio_economic.E2_local != null) return { label: 'β local', val: ssi.socio_economic.E2_local };
+    }
+    // Transition values
+    if (ssi.transition) {
+      if (metricId === 'T1' && ssi.transition.T1_score != null) return { label: 'score', val: ssi.transition.T1_score };
+      if (metricId === 'DER_ratio' && ssi.transition.DER_ratio != null) return { label: 'raw', val: ssi.transition.DER_ratio };
+      if (metricId === 'DER_variability' && ssi.transition.DER_variability != null) return { label: 'raw', val: ssi.transition.DER_variability };
+      if (metricId === 'EV_load_ratio' && ssi.transition.EV_load_ratio != null) return { label: 'raw', val: ssi.transition.EV_load_ratio };
+    }
+    // Graph topology
+    if (ssi.graph_topology) {
+      if (metricId === 'I6' && ssi.graph_topology.degree != null) return { label: 'degree', val: ssi.graph_topology.degree };
+    }
+    return null;
+  }
+
   function buildArticulation(ssi) {
     const weights = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 };
     const labels = { C: 'C Continuity', V: 'V Voltage', I: 'I Infrastructure', E: 'E Economic', S: 'S Saturation', T: 'T Transition' };
@@ -488,17 +558,47 @@
     const R_raw = R_base * combined;
     const R_final = ssi.R_median;
 
-    // Component rows
+    // Component rows with sub-metric expansion
     const compRows = ['C', 'V', 'I', 'E', 'S', 'T'].map(k => {
       const val = ssi.components[k];
       const w = weights[k];
       const normPct = Math.min(val / w * 100, 100).toFixed(0);
+
+      // Build sub-metric rows
+      var subRows = (SUB_METRICS[k] || []).map(function(m) {
+        var ctx = getContextValue(ssi, m.id);
+        var ctxHtml = ctx ? '<span style="font-variant-numeric:tabular-nums;font-weight:500;width:46px;text-align:right;color:var(--ink)">' + (typeof ctx.val === 'number' ? ctx.val.toFixed(3) : ctx.val) + '</span>' : '';
+        var tagHtml = '';
+        if (m.adaptive) tagHtml = '<span style="display:inline-block;font-size:7px;background:rgba(93,133,99,0.12);color:#5d8563;padding:0 3px;border-radius:2px;margin-left:2px">R2</span>';
+
+        // T1 sub-metrics (DER components)
+        var t1Sub = '';
+        if (m.sub) {
+          t1Sub = m.sub.map(function(s) {
+            var sCtx = getContextValue(ssi, s.id);
+            var sCtxHtml = sCtx ? '<span style="font-variant-numeric:tabular-nums;font-weight:500;width:46px;text-align:right;color:var(--ink)">' + (typeof sCtx.val === 'number' ? sCtx.val.toFixed(3) : sCtx.val) + '</span>' : '';
+            return '<div style="display:flex;align-items:center;gap:4px;padding:2px 0 2px 52px;font-size:9.5px;color:var(--warm-grey)">' +
+              '<span style="width:10px;text-align:right;opacity:0.5">·</span>' +
+              '<span style="flex:1">' + s.name + ' (α=' + s.weight.toFixed(2) + ')</span>' +
+              sCtxHtml +
+            '</div>';
+          }).join('');
+        }
+
+        return '<div style="display:flex;align-items:center;gap:4px;padding:2px 0 2px 36px;font-size:10px">' +
+          '<span style="color:' + cols[k] + ';opacity:0.65;font-weight:500;width:18px">' + m.id + '</span>' +
+          '<span style="flex:1;color:var(--warm-grey)">' + m.name + tagHtml + '</span>' +
+          '<span style="font-size:8.5px;color:var(--warm-grey);opacity:0.7;width:28px;text-align:right">' + (m.intra * 100).toFixed(0) + '%</span>' +
+          ctxHtml +
+        '</div>' + t1Sub;
+      }).join('');
+
       return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0 3px 20px;font-size:11px">
         <span style="color:${cols[k]};font-weight:600;width:14px">${k}</span>
         <span style="flex:1;color:var(--warm-grey)">${labels[k]} (w=${w.toFixed(2)})</span>
         <span style="font-variant-numeric:tabular-nums;font-weight:500;width:50px;text-align:right">${val.toFixed(4)}</span>
         <span style="font-size:9px;color:var(--warm-grey);width:32px;text-align:right">${normPct}%</span>
-      </div>`;
+      </div>` + subRows;
     }).join('');
 
     // Modifier rows
