@@ -176,7 +176,7 @@ function renderFooter() {
   footer.setAttribute('role', 'contentinfo');
   footer.innerHTML = `
     <div>SSI Index v4.0 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>
-    <div>81 variables · 30 sources · 4,293 substations (475 EHV · 3,818 MV) · Open data, open methodology</div>
+    <div>81 variables · 30 sources · 4,293 substations (475 HV · 3,818 MV) · Open data, open methodology</div>
     <div class="copyright-notice">Copyright &copy; 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Societ&agrave; Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div>
   `;
   document.body.appendChild(footer);
