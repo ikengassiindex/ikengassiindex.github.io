@@ -294,7 +294,7 @@ function drawRadar(a, b, nameA, nameB) {
 
   function polar(i, val) {
     var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
-    var r = (val / maxVal) * R;
+    var r = (1 - val / maxVal) * R;
     return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
   }
 
@@ -345,15 +345,17 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--warm-grey)" font-family="DM Sans" font-weight="500">' + labels[i] + '</text>';
   });
 
-  // Scale label
-  html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
+  // Scale labels — center = worst (maxVal), edge = best (0)
+  html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">0 (best)</text>';
+  html += '<text x="' + (cx + 4) + '" y="' + (cy + 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
 
   svg.innerHTML = html;
 
   // Legend
   document.getElementById('radar-legend').innerHTML =
     '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--crimson);border-radius:2px"></div>' + nameA + '</div>' +
-    '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--sage);border-radius:2px"></div>' + nameB + '</div>';
+    '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--sage);border-radius:2px"></div>' + nameB + '</div>' +
+    '<div style="font-size:10px;color:var(--warm-grey);margin-top:6px">Larger area = lower risk = better resilience</div>';
 }
 
 // ── Tab 3: Component Decomposition ──
