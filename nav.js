@@ -113,6 +113,7 @@ function showRegistrationGate(onSuccess) {
       '<button type="submit">Access the SSI Index</button>' +
     '</form>' +
     '<div class="reg-footer">Your data is handled by Altinium Invest S.r.L. and will not be shared with third parties.</div>' +
+    '<div class="reg-copyright" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(44,36,32,0.08);font-size:8.5px;line-height:1.5;color:#8a7e76;text-align:center">Copyright \u00a9 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Societ\u00e0 Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div>' +
   '</div>';
 
   document.body.appendChild(overlay);
