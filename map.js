@@ -137,6 +137,7 @@
     const showLines = s > 0.3;
     const subRadius = Math.max(1.5, Math.min(s * 1.8, 6));
     const isSelecting = sel.type !== null;
+    const isFiltering = filters.band !== 'all' || filters.region !== 'all' || filters.voltage !== 'all' || searchQuery;
 
     // ─ Draw lines ─
     if (showLines) {
@@ -145,6 +146,8 @@
         const highlighted = hlLines.has(l.i);
         if (isSelecting && !highlighted) {
           ctx.globalAlpha = 0.08;
+        } else if (isFiltering && !isSelecting) {
+          ctx.globalAlpha = highlighted ? 0.6 : 0.04;
         } else {
           ctx.globalAlpha = isSelecting ? 0.9 : 0.5;
         }
@@ -175,7 +178,7 @@
       if (isSelecting && !highlighted && !primary) {
         ctx.globalAlpha = show ? 0.15 : 0.05;
       } else if (!show) {
-        ctx.globalAlpha = 0.1;
+        ctx.globalAlpha = isFiltering ? 0.04 : 0.1;
       } else {
         ctx.globalAlpha = 1;
       }
@@ -203,7 +206,7 @@
 
       // Labels at high zoom
       if (showLabels && sub.n && (show || highlighted)) {
-        ctx.globalAlpha = isSelecting && !highlighted ? 0.3 : 0.9;
+        ctx.globalAlpha = isSelecting && !highlighted ? 0.3 : (isFiltering && !show ? 0.05 : 0.9);
         ctx.font = `500 ${Math.min(11, 9 + s * 0.3)}px "DM Sans", sans-serif`;
         ctx.fillStyle = '#2c2420';
         ctx.textAlign = 'left';
