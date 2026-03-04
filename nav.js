@@ -74,7 +74,7 @@ function renderNav(activePage) {
 
 // ── Registration Gate ──
 // Google Sheets Apps Script endpoint — replace with your own
-var SSI_REGISTRATION_ENDPOINT = 'https://script.google.com/macros/s/REPLACE_WITH_YOUR_SCRIPT_ID/exec';
+var SSI_REGISTRATION_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxAdkPAjrDc7kTkthJkODp55jwhh7jnFWJ9DvT0bDVn7RVTCmcrE9ufTrnvGKFbgClkZg/exec';
 
 function isRegistered() {
   try { return localStorage.getItem('ssi-registered') === '1'; } catch(e) { return false; }
