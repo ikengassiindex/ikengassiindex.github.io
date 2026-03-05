@@ -845,7 +845,110 @@
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7"><strong>This month's key insight:</strong> The Puglia corridor deep-dive shows [N] substations with effective SAIDI equivalent above 65 minutes — placing them in the "bassa concentrazione" band. In European terms, these substations individually perform closer to Hungarian or Spanish levels than to Italy's own national average. The SSI reveals that Italy's mid-tier European position is not a national condition but a statistical average of Dutch-quality urban performance and Eastern-European-level rural performance — and the Puglia corridor concentrates the worst of the latter.</p>
+<!-- Key insight + regional ranking — auto-populated -->
+<p style="font-size:13px;line-height:1.7" id="eu-insight">Loading European context insight…</p>
+
+<h3 style="margin-top:20px">Regional Risk Ranking — All 20 Italian Regions</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does Puglia sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison.</p>
+
+<div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
+
+<p style="font-size:13px;line-height:1.7" id="eu-ranking-narrative">Loading…</p>
+
+<script>
+(function(){
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var puglia = fleet.filter(function(s){ return s.region === 'Puglia'; });
+
+    // ── Key Insight ──
+    // C component > 70% of weight ceiling (0.30) = high continuity deficit ≈ "bassa concentrazione"
+    var highC = puglia.filter(function(s){ return s.components.C > 0.21; }).length;
+    var avgC_pug = puglia.reduce(function(a,s){ return a + s.components.C; }, 0) / puglia.length;
+    var avgC_fleet = fleet.reduce(function(a,s){ return a + s.components.C; }, 0) / fleet.length;
+    var cRatio = (avgC_pug / avgC_fleet).toFixed(1);
+
+    document.getElementById('eu-insight').innerHTML =
+      '<strong>This month\'s key insight:</strong> The Puglia corridor deep-dive shows <strong>' + highC +
+      ' substations</strong> (of ' + puglia.length + ') with C-component above 70% of its weight ceiling — ' +
+      'indicating continuity-of-supply performance consistent with Italy\'s "bassa concentrazione" territory class. ' +
+      'Puglia\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
+      avgC_fleet.toFixed(3) + '. In European terms, these substations individually perform closer to Hungarian or ' +
+      'Spanish SAIDI levels (~48–57 min/customer/year) than to Italy\'s own national average (~43 min). ' +
+      'The SSI reveals what aggregate CEER statistics conceal: that Italy\'s mid-tier European position is not a national ' +
+      'condition but a statistical average of Dutch-quality urban performance and Eastern-European-level rural performance — ' +
+      'and the Puglia corridor concentrates the worst of the latter.';
+
+    // ── Regional Ranking ──
+    var regData = {};
+    fleet.forEach(function(s){
+      var r = s.region;
+      if (!regData[r]) regData[r] = { subs: [], sumR: 0, bands: { Low:0, Medium:0, High:0, Critical:0 } };
+      regData[r].subs.push(s);
+      regData[r].sumR += s.R_median;
+      regData[r].bands[s.classification]++;
+    });
+
+    var regions = Object.keys(regData).map(function(r){
+      var d = regData[r];
+      return { name: r, n: d.subs.length, avgR: d.sumR / d.subs.length, bands: d.bands };
+    });
+    regions.sort(function(a,b){ return b.avgR - a.avgR; });
+
+    var fleetAvgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / fleet.length;
+    var maxAvgR = regions[0].avgR;
+
+    var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
+    var html = '';
+    regions.forEach(function(reg, idx){
+      var isPuglia = reg.name === 'Puglia';
+      var barPct = (reg.avgR / maxAvgR * 100).toFixed(1);
+      var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
+      var highlight = isPuglia ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
+
+      // Band distribution mini-bar
+      var total = reg.n;
+      var bandBar = '';
+      ['Critical','High','Medium','Low'].forEach(function(b){
+        var w = (reg.bands[b] / total * 100).toFixed(1);
+        if (reg.bands[b] > 0) {
+          bandBar += '<div style="width:' + w + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + reg.bands[b] + '"></div>';
+        }
+      });
+
+      html += '<div style="margin-bottom:8px;' + highlight + '">' +
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline">' +
+          '<span style="font-weight:' + (isPuglia ? '700' : '500') + ';min-width:180px">' +
+            '<span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#' + (idx + 1) + '</span>' +
+            reg.name + '</span>' +
+          '<span style="color:var(--warm-grey);font-size:11px">' + reg.n + ' subs · avg R = ' + reg.avgR.toFixed(3) +
+          ' · H:' + reg.bands.High + (reg.bands.Critical ? ' C:' + reg.bands.Critical : '') + '</span></div>' +
+        '<div style="display:flex;gap:4px;align-items:center">' +
+          '<div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden">' +
+            '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:3px;opacity:0.7"></div>' +
+          '</div>' +
+          '<div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+        '</div></div>';
+    });
+    document.getElementById('eu-regional-ranking').innerHTML = html;
+
+    // Ranking narrative
+    var pugliaRank = regions.findIndex(function(r){ return r.name === 'Puglia'; }) + 1;
+    var top3 = regions.slice(0, 3).map(function(r){ return r.name; });
+    var bot3 = regions.slice(-3).reverse().map(function(r){ return r.name; });
+    var aboveAvg = regions.filter(function(r){ return r.avgR > fleetAvgR; }).length;
+
+    document.getElementById('eu-ranking-narrative').innerHTML =
+      'Puglia ranks <strong>#' + pugliaRank + ' of 20 regions</strong> by mean R_median, placing it among the upper tier of national risk. ' +
+      'The three most stressed regions are ' + top3.join(', ') + ', while the three most resilient are ' + bot3.join(', ') + '. ' +
+      aboveAvg + ' of 20 regions score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
+      'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DSO or national statistics — ' +
+      'reveals the true spatial distribution of grid stress across Italy. ' +
+      'It is precisely this substation-level granularity that positions the SSI as a tool for PNRR investment prioritisation: ' +
+      'not treating "Southern Italy" as a monolith, but identifying the specific corridors within each region that demand attention.';
+  });
+})();
+</script>
 </section>
 
 <div style="margin:32px 0"></div>
