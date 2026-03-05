@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI Monthly Intelligence — Edition 001</title>
+<link rel="stylesheet" href="style.css?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --paper: #faf9f6;
+  --accent: #c0392b;
+  --accent2: #2c3e7a;
+  --accent3: #1a6b4a;
+  --accent4: #0e7490;
+  --gold: #b7950b;
+  --muted: #6b7280;
+  --border: #d1cfc9;
+  --code-bg: #f0ede6;
+  --highlight: #fff8e1;
+  --tag-bg: #e8e6df;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+  --sans: 'DM Sans', 'Helvetica Neue', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--serif); color: var(--ink); background: #efede8; line-height: 1.72; -webkit-font-smoothing: antialiased; }
+
+/* ─── MASTHEAD ─── */
+.masthead {
+  background: var(--ink);
+  color: #fff;
+  padding: 2rem 2rem 1.6rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.masthead::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent, transparent 59px,
+    rgba(255,255,255,0.03) 59px, rgba(255,255,255,0.03) 60px
+  );
+  pointer-events: none;
+}
+.masthead .edition-tag {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  display: block;
+  margin-bottom: 0.6rem;
+}
+.masthead h1 {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 0.3rem;
+}
+.masthead .edition-title {
+  font-family: var(--sans);
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 1rem;
+}
+.masthead .meta-bar {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.04em;
+  flex-wrap: wrap;
+}
+.masthead .inaugural-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.3em 0.9em;
+  border-radius: 2px;
+  margin-bottom: 0.8rem;
+}
+
+/* ─── PAGE SHELL ─── */
+.page-wrap {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.page {
+  background: var(--paper);
+  padding: 2.5rem 2.5rem 4rem;
+  margin-top: -0.5rem;
+  box-shadow: 0 2px 40px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+/* ─── TOC ─── */
+.toc {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.4rem 1.8rem;
+  margin-bottom: 2.5rem;
+  columns: 2;
+  column-gap: 2rem;
+}
+.toc-title {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+  column-span: all;
+}
+.toc a {
+  display: block;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 0.25em 0;
+  border-bottom: 1px dotted var(--border);
+  break-inside: avoid;
+  transition: color 0.15s;
+}
+.toc a:hover { color: var(--accent); }
+.toc a .toc-num {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-right: 0.5em;
+}
+
+/* ─── SECTIONS ─── */
+.section { margin-bottom: 2.8rem; }
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+h2 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.6rem 0 0.7rem;
+  color: var(--accent2);
+}
+h4 {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1.3rem 0 0.5rem;
+}
+p { margin-bottom: 1rem; }
+
+/* ─── KPI HERO STRIP ─── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 1.5rem 0 2rem;
+}
+.kpi-card {
+  background: #fff;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+.kpi-card .kpi-value {
+  font-family: var(--mono);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  display: block;
+  line-height: 1.1;
+}
+.kpi-card .kpi-label {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+  display: block;
+}
+.kpi-card .kpi-delta {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+  display: block;
+}
+.kpi-up { color: var(--accent3); }
+.kpi-down { color: var(--accent); }
+.kpi-neutral { color: var(--muted); }
+
+/* ─── SUBSTATION SPOTLIGHT ─── */
+.spotlight {
+  background: linear-gradient(135deg, #1a1a2e 0%, #2c3e7a 100%);
+  color: #fff;
+  border-radius: 6px;
+  padding: 1.5rem 1.8rem;
+  margin: 1.5rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+.spotlight h3 {
+  color: rgba(255,255,255,0.6);
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 0.4rem;
+}
+.spotlight .spot-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+.spotlight .spot-location {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 0.8rem;
+}
+.spotlight .spot-stat {
+  display: flex;
+  gap: 1.5rem;
+}
+.spotlight .spot-stat div {
+  text-align: center;
+}
+.spotlight .spot-stat .stat-val {
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: block;
+}
+.spotlight .spot-stat .stat-lbl {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.spotlight .spot-spider {
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── TABLES ─── */
+table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 1rem 0 1.3rem; }
+thead { background: var(--ink); color: #fff; }
+thead th { font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.65rem 0.6rem; text-align: left; font-weight: 600; }
+tbody td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
+.td-mono { font-family: var(--mono); font-size: 0.78rem; }
+.td-num { text-align: right; font-family: var(--mono); font-weight: 500; }
+.td-accent { color: var(--accent); font-weight: 600; }
+.td-green { color: var(--accent3); font-weight: 600; }
+.td-teal { color: var(--accent4); font-weight: 600; }
+tr.italy-row { background: #fff3e0 !important; }
+tr.italy-row td { font-weight: 600; }
+
+/* ─── NOTES ─── */
+.note { background: var(--highlight); border-left: 3px solid #f39c12; padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.86rem; border-radius: 0 4px 4px 0; }
+.note strong { color: #d68910; }
+.note-blue { background: #eaf2f8; border-left: 3px solid var(--accent2); padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.86rem; border-radius: 0 4px 4px 0; }
+.note-blue strong { color: var(--accent2); }
+.note-green { background: #e8f8f0; border-left: 3px solid var(--accent3); padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.86rem; border-radius: 0 4px 4px 0; }
+.note-green strong { color: var(--accent3); }
+.note-red { background: #fdedec; border-left: 3px solid var(--accent); padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.86rem; border-radius: 0 4px 4px 0; }
+.note-red strong { color: var(--accent); }
+.note-teal { background: #ecfdf5; border-left: 3px solid var(--accent4); padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.86rem; border-radius: 0 4px 4px 0; }
+.note-teal strong { color: var(--accent4); }
+
+code { font-family: var(--mono); font-size: 0.84em; background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 3px; }
+
+/* ─── EUROPEAN CONTEXT CARD ─── */
+.eu-card {
+  border: 2px solid var(--accent2);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 2rem 0;
+}
+.eu-card-header {
+  background: var(--accent2);
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.eu-card-header .eu-flag { font-size: 1.1rem; }
+.eu-card-header .eu-title {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.eu-card-header .eu-edition {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.55);
+}
+.eu-card-body {
+  padding: 1.2rem 1.4rem;
+  background: #fff;
+}
+.eu-card-body h4 { margin-top: 0; }
+.eu-bar-chart {
+  margin: 0.8rem 0 0.5rem;
+}
+.eu-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-family: var(--sans);
+  font-size: 0.76rem;
+}
+.eu-bar .bar-label {
+  width: 110px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 0.6rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.eu-bar .bar-track {
+  flex: 1;
+  height: 18px;
+  background: #f0ede6;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.eu-bar .bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+.eu-bar .bar-value {
+  width: 55px;
+  flex-shrink: 0;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding-left: 0.5rem;
+}
+.eu-bar.highlight .bar-label { color: var(--accent); font-weight: 700; }
+.eu-bar.highlight .bar-value { color: var(--accent); }
+.eu-card-footer {
+  background: #f8f7f4;
+  padding: 0.6rem 1.4rem;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+/* ─── CHANGELOG ─── */
+.changelog {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+.changelog-header {
+  background: var(--tag-bg);
+  padding: 0.5rem 1rem;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.changelog-row {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
+  border-bottom: 1px solid #f0ede6;
+  align-items: baseline;
+}
+.changelog-row:last-child { border-bottom: none; }
+.cl-date {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  width: 80px;
+  flex-shrink: 0;
+}
+.cl-source {
+  font-weight: 600;
+  width: 100px;
+  flex-shrink: 0;
+}
+.cl-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.1em 0.45em;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 0.3em;
+}
+.cl-new { background: #d5f5e3; color: #1a6b4a; }
+.cl-update { background: #eaf2f8; color: #2c3e7a; }
+.cl-no-change { background: var(--tag-bg); color: var(--muted); }
+
+/* ─── ENGAGEMENT TRACKER ─── */
+.tracker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.tracker-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+}
+.tracker-card h4 { margin-top: 0; font-size: 0.72rem; }
+.tracker-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  font-size: 0.82rem;
+  border-bottom: 1px dotted var(--border);
+}
+.tracker-item:last-child { border-bottom: none; }
+.tracker-icon { font-size: 0.9rem; flex-shrink: 0; }
+.tracker-status {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.status-active { color: var(--accent3); }
+.status-pending { color: var(--gold); }
+.status-new { color: var(--accent4); }
+
+/* ─── LOOKING AHEAD ─── */
+.ahead-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.ahead-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent2);
+  border-radius: 0 0 4px 4px;
+  padding: 1rem 1.2rem;
+}
+.ahead-card .ahead-month {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.ahead-card .ahead-title {
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.ahead-card .ahead-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ─── DIVIDERS ─── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+.divider-thick { border: none; border-top: 3px double var(--border); margin: 2.5rem 0; }
+
+/* ─── PLACEHOLDER ─── */
+.placeholder {
+  background: repeating-linear-gradient(
+    -45deg,
+    #f8f7f4, #f8f7f4 8px,
+    #f0ede6 8px, #f0ede6 16px
+  );
+  border: 2px dashed var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+.placeholder .ph-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.placeholder .ph-desc {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ─── FOOTER ─── */
+.report-footer {
+  background: var(--ink);
+  color: rgba(255,255,255,0.5);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  line-height: 1.8;
+}
+.report-footer a { color: rgba(255,255,255,0.7); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+  .page { padding: 1.5rem 1.2rem 3rem; }
+  .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  .spotlight { grid-template-columns: 1fr; }
+  .toc { columns: 1; }
+  .tracker-grid { grid-template-columns: 1fr; }
+  .ahead-grid { grid-template-columns: 1fr; }
+}
+@media print {
+  body { background: #fff; }
+  .page { box-shadow: none; padding: 0; }
+  .masthead { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<script src="nav.js?v=14"></script>
+<script src="ssi-metadata.js"></script>
+<script>renderNav('intelligence');</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     MASTHEAD
+     ═══════════════════════════════════════════════════════ -->
+<header class="masthead">
+  <span class="inaugural-badge">Inaugural Edition</span>
+  <span class="edition-tag">SSI Monthly Intelligence Report</span>
+  <h1>Edition 001</h1>
+  <p class="edition-title">The Puglia Corridor — Where the Energy Transition Meets the Grid</p>
+  <div class="meta-bar">
+    <span>[Month Year] · L+30</span>
+    <span>SSI v4.0 · 39,234 substations · 146,782 lines</span>
+    <span>Altinium Invest · Naples, Italy</span>
+  </div>
+</header>
+
+<div class="page-wrap">
+<div class="page">
+
+<!-- ═══════════════════ TABLE OF CONTENTS ═══════════════════ -->
+<nav class="toc">
+  <div class="toc-title">Contents</div>
+  <a href="#exec"><span class="toc-num">A</span> Executive Summary</a>
+  <a href="#launch"><span class="toc-num">B</span> Inaugural: Launch Reception</a>
+  <a href="#data"><span class="toc-num">C</span> Data Refresh &amp; Changelog</a>
+  <a href="#deep"><span class="toc-num">D</span> Deep-Dive: The Puglia Corridor</a>
+  <a href="#eu"><span class="toc-num">E</span> European Context Card</a>
+  <a href="#engage"><span class="toc-num">F</span> Stakeholder Engagement Tracker</a>
+  <a href="#ahead"><span class="toc-num">G</span> Looking Ahead</a>
+</nav>
+
+
+<!-- ═══════════════════ A. EXECUTIVE SUMMARY ═══════════════════ -->
+<section class="section" id="exec">
+<span class="section-label">Section A</span>
+<h2>Executive Summary</h2>
+
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <span class="kpi-value">[N]</span>
+    <span class="kpi-label">Digital Twin Visitors</span>
+    <span class="kpi-delta kpi-neutral">First 30 days</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-value">[N]</span>
+    <span class="kpi-label">Substations Searched</span>
+    <span class="kpi-delta kpi-neutral">Unique queries</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-value">[N] min</span>
+    <span class="kpi-label">Avg. Session Duration</span>
+    <span class="kpi-delta kpi-neutral">Target: &gt;2.5 min</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-value">[N]</span>
+    <span class="kpi-label">Email Subscribers</span>
+    <span class="kpi-delta kpi-neutral">3 segments</span>
+  </div>
+</div>
+
+<p>The first 30 days of the SSI Digital Twin have confirmed demand for open-access, substation-level grid intelligence. [N] unique visitors from [N] countries explored the platform, with the heaviest traffic concentrated in [Region 1], [Region 2], and [Region 3]. The most-searched province was [Province], consistent with the Puglia corridor findings highlighted at launch. Average session duration of [N] minutes exceeded the L+30 target of 2.5 minutes, indicating substantive engagement rather than casual browsing.</p>
+
+<p>This inaugural edition of the SSI Monthly Intelligence Report marks the transition from launch mode to recurring cadence. It is deliberately longer than future editions (8–10 pages vs the standard 5–6) and includes a special section reflecting on launch reception.</p>
+
+<!-- Substation in Focus -->
+<div class="spotlight">
+  <div>
+    <h3>Substation in Focus</h3>
+    <div class="spot-name">[Substation ID]</div>
+    <div class="spot-location">[Province], [Region] · [DSO Territory Class]</div>
+    <div class="spot-stat">
+      <div>
+        <span class="stat-val">[0.XX]</span>
+        <span class="stat-lbl">R_final</span>
+      </div>
+      <div>
+        <span class="stat-val">[Band]</span>
+        <span class="stat-lbl">Classification</span>
+      </div>
+      <div>
+        <span class="stat-val">[Quad]</span>
+        <span class="stat-lbl">Quadrant</span>
+      </div>
+    </div>
+  </div>
+  <div class="spot-spider">
+    [Spider graph image — 6 axes: C, V, I, E, S, T]<br><br>
+    <em>Insert spider graph PNG or SVG here</em>
+  </div>
+</div>
+
+<p>This month's spotlight substation was selected as the most-viewed node in the Digital Twin during the first 30 days. [2–3 sentences explaining why this substation is interesting: its component profile, what makes it unusual, what it reveals about the surrounding territory.]</p>
+</section>
+
+<hr class="divider-thick">
+
+
+<!-- ═══════════════════ B. INAUGURAL: LAUNCH RECEPTION ═══════════════════ -->
+<section class="section" id="launch">
+<span class="section-label">Section B — Inaugural Edition Only</span>
+<h2>Launch Reception: The First 30 Days</h2>
+
+<div class="note-teal">
+  <strong>This section appears only in Edition 001.</strong> Future editions replace it with the standard Data Refresh section at full length. It provides a transparent account of what happened after the SSI went live — what worked, what surprised us, and what we're adjusting.
+</div>
+
+<h3>B.1 &ensp; Traffic &amp; Engagement</h3>
+
+<table>
+<thead><tr><th>Metric</th><th>L+7</th><th>L+14</th><th>L+30</th><th>L+30 Target</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Unique visitors (Digital Twin)</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">5,000</td><td class="td-green">[✓/✗]</td></tr>
+<tr><td>Avg. session duration</td><td class="td-num">[N] min</td><td class="td-num">[N] min</td><td class="td-num">[N] min</td><td class="td-num">&gt;2.5 min</td><td class="td-green">[✓/✗]</td></tr>
+<tr><td>Email subscribers</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">1,000</td><td class="td-green">[✓/✗]</td></tr>
+<tr><td>LinkedIn impressions (cumulative)</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">50,000</td><td class="td-green">[✓/✗]</td></tr>
+<tr><td>Press mentions</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">10+</td><td class="td-green">[✓/✗]</td></tr>
+<tr><td>Institutional engagements initiated</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">[N]</td><td class="td-num">2+</td><td class="td-green">[✓/✗]</td></tr>
+</tbody>
+</table>
+
+<h3>B.2 &ensp; Top Regions by Traffic</h3>
+
+<div class="placeholder">
+  <span class="ph-label">Data Visualisation</span>
+  <span class="ph-desc">Horizontal bar chart: top 10 regions by Digital Twin visits, with percentage of total traffic. Insert from analytics dashboard.</span>
+</div>
+
+<h3>B.3 &ensp; What Surprised Us</h3>
+
+<p>[Paragraph: 2–3 unexpected findings from the first 30 days. Examples: an unexpected region dominated traffic; a specific substation went viral on social media; an academic contacted us with a critique that improved the methodology; journalists focused on a different story angle than anticipated.]</p>
+
+<h3>B.4 &ensp; Questions &amp; Critiques Received</h3>
+
+<table>
+<thead><tr><th>Source</th><th>Question / Critique</th><th>Our Response</th><th>Action Taken</th></tr></thead>
+<tbody>
+<tr><td>[e.g., Academic, PoliMi]</td><td>[e.g., "Why not use SCADA data for C1?"]</td><td>[e.g., "Open-data design principle — see §3.2 of methodology"]</td><td>None required</td></tr>
+<tr><td>[e.g., Journalist, QualEnergia]</td><td>[e.g., "Data vintage concern for Puglia"]</td><td>[e.g., "Markov staleness analysis quantifies uncertainty"]</td><td>Added FAQ entry</td></tr>
+<tr><td>[e.g., LinkedIn commenter]</td><td>[e.g., "Weights seem arbitrary"]</td><td>[e.g., "Sobol analysis demonstrates robustness"]</td><td>Published methodology explainer post</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+  <strong>Transparency principle:</strong> We publish every substantive critique we received and how we addressed it. The SSI's credibility rests on openness to scrutiny. If we received a critique that revealed a genuine methodological weakness, we would disclose it here and describe the corrective action.
+</div>
+</section>
+
+<hr class="divider-thick">
+
+
+<!-- ═══════════════════ C. DATA REFRESH ═══════════════════ -->
+<section class="section" id="data">
+<span class="section-label">Section C</span>
+<h2>Data Refresh &amp; Changelog</h2>
+
+<p>The SSI v4.0 draws on six primary data sources. This section documents which sources have been updated since launch, how scores have changed, and any methodology adjustments made. Transparency in data vintage is central to the SSI's credibility.</p>
+
+<div class="changelog">
+  <div class="changelog-header">Data Source Status — [Month Year]</div>
+  <div class="changelog-row">
+    <span class="cl-date">[Date]</span>
+    <span class="cl-source">ARERA</span>
+    <span><span class="cl-badge cl-no-change">No change</span> SAIDI/SAIFI data vintage remains [year]. Next expected release: [date]. Staleness trajectory: [±X] days.</span>
+  </div>
+  <div class="changelog-row">
+    <span class="cl-date">[Date]</span>
+    <span class="cl-source">Terna</span>
+    <span><span class="cl-badge cl-no-change">No change</span> Grid topology data vintage: [year]. RTN dataset stable.</span>
+  </div>
+  <div class="changelog-row">
+    <span class="cl-date">[Date]</span>
+    <span class="cl-source">GSE</span>
+    <span><span class="cl-badge cl-update">Updated</span> Atlaimpianti DER data refreshed to [date]. [N] new installations registered. S1 recalculated for [N] substations.</span>
+  </div>
+  <div class="changelog-row">
+    <span class="cl-date">[Date]</span>
+    <span class="cl-source">ISTAT</span>
+    <span><span class="cl-badge cl-no-change">No change</span> Provincial economic data vintage: [year]. E2 coefficients stable.</span>
+  </div>
+  <div class="changelog-row">
+    <span class="cl-date">[Date]</span>
+    <span class="cl-source">CMIP6</span>
+    <span><span class="cl-badge cl-no-change">No change</span> SSP2-4.5 projections are static (scenario-based). T2 scores unchanged.</span>
+  </div>
+  <div class="changelog-row">
+    <span class="cl-date">[Date]</span>
+    <span class="cl-source">QuEEN</span>
+    <span><span class="cl-badge cl-no-change">No change</span> Voltage dip data vintage: [year]. V1/V2 stable.</span>
+  </div>
+</div>
+
+<h3>C.1 &ensp; Score Changes This Month</h3>
+
+<p>[Summary paragraph: how many substations had their scores change due to data refreshes. If no data refreshed this month, state explicitly: "No primary data sources were updated this month. All 39,234 substation scores remain unchanged from the v4.0 launch baseline. The first material score changes are expected when [source] publishes [data] in [expected date]."]</p>
+
+<h3>C.2 &ensp; Methodology Adjustments</h3>
+
+<p>[If any: describe precisely what changed, why, and the impact on scores. If none: "No methodology adjustments were made this month. The v4.0 scoring framework remains as documented in the Technical Reference."]</p>
+</section>
+
+<hr class="divider-thick">
+
+
+<!-- ═══════════════════ D. THEMATIC DEEP-DIVE ═══════════════════ -->
+<section class="section" id="deep">
+<span class="section-label">Section D — Monthly Deep-Dive</span>
+<h2>The Puglia Corridor: Where the Energy Transition Is Outrunning the Grid</h2>
+
+<div class="note-blue">
+  <strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Puglia corridor · <strong>002</strong> DER saturation hotspots · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> North-South economic impact disparity · <strong>005</strong> Voltage quality and industrial output · <strong>006</strong> Infrastructure age vs investment · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> Provincial Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.
+</div>
+
+<h3>D.1 &ensp; Why Puglia, Why Now</h3>
+
+<p>[2–3 paragraphs establishing the significance of the Brindisi–Lecce corridor. The region has the highest concentration of Critical-band substations in the Mezzogiorno. It combines high DER penetration (driven by PNRR-funded solar in agricultural areas) with ageing infrastructure and above-average SAIDI. The T component's forward-looking analysis shows this stress will intensify under SSP2-4.5 climate trajectories.]</p>
+
+<h3>D.2 &ensp; Corridor Map and Scoring</h3>
+
+<div class="placeholder">
+  <span class="ph-label">Digital Twin Screenshot</span>
+  <span class="ph-desc">Annotated map of the Brindisi–Lecce corridor showing [N] substations colour-coded by SSI band (Robust / Adequate / Stressed / Critical). Include power lines and highlight the Critical cluster.</span>
+</div>
+
+<table>
+<thead><tr><th>Substation</th><th>Province</th><th>R_final</th><th>Band</th><th>C</th><th>V</th><th>I</th><th>E</th><th>S</th><th>T</th><th>Quadrant</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">[ID-001]</td><td>Brindisi</td><td class="td-num td-accent">[0.XX]</td><td class="td-accent">Critical</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num td-teal">[X]</td><td>High-S / Low-R</td></tr>
+<tr><td class="td-mono">[ID-002]</td><td>Lecce</td><td class="td-num td-accent">[0.XX]</td><td class="td-accent">Critical</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num td-teal">[X]</td><td>High-S / Low-R</td></tr>
+<tr><td class="td-mono">[ID-003]</td><td>Lecce</td><td class="td-num">[0.XX]</td><td>Stressed</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num">[X]</td><td class="td-num td-teal">[X]</td><td>High-S / Med-R</td></tr>
+<tr><td colspan="11" style="text-align:center;color:var(--muted);font-style:italic;font-size:0.82rem">… [N] additional substations — full table available in Digital Twin</td></tr>
+</tbody>
+</table>
+
+<h3>D.3 &ensp; Component Analysis</h3>
+
+<p>[2–3 paragraphs dissecting what drives the Puglia corridor's poor scores. Which components are the main contributors? The Sobol analysis reveals that for these substations, S (Saturation) and T (Transition) dominate — DER growth is outpacing infrastructure capacity. C (Continuity) contributes secondarily — SAIDI is above national average but not catastrophically so. The E2 VoLL analysis shows that a one-hour outage in Lecce destroys nearly twice the economic value per worker as the same outage in Brescia.]</p>
+
+<h3>D.4 &ensp; Forward Projection (T Component)</h3>
+
+<p>[1–2 paragraphs on what the CMIP6 SSP2-4.5 trajectory shows for Puglia. How will climate change compound the existing stress? What does the T1 DER Stress Index project for 2030 and 2050 under current PNRR deployment rates? How many additional substations are projected to enter the Critical band?]</p>
+
+<div class="placeholder">
+  <span class="ph-label">Projection Chart</span>
+  <span class="ph-desc">Line chart: number of Critical-band substations in Puglia projected from 2026 to 2050 under SSP2-4.5, with Monte Carlo 95% confidence band. Show the inflection point where DER growth crosses infrastructure capacity.</span>
+</div>
+
+<h3>D.5 &ensp; Implications</h3>
+
+<p>[Summary paragraph: what this means for PNRR investment prioritisation, what ARERA or the regional government should pay attention to, and how the SSI positions the Puglia corridor as a test case for anticipatory grid planning. Reference the Danish model from §16.5 as the target operating model.]</p>
+</section>
+
+<hr class="divider-thick">
+
+
+<!-- ═══════════════════ E. EUROPEAN CONTEXT CARD ═══════════════════ -->
+<section class="section" id="eu">
+<span class="section-label">Section E — Recurring Module</span>
+<h2>European Context Card</h2>
+
+<div class="note-blue">
+  <strong>How this works:</strong> Each edition includes one European Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Puglia corridor analysis hinges on Italy's continuity performance relative to European peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Germany (003), CMIP6 climate hazard vs Nordic peers (004), etc. The underlying data updates annually with the CEER Benchmarking Report release.
+</div>
+
+<!-- THE CARD ITSELF -->
+<div class="eu-card">
+  <div class="eu-card-header">
+    <span class="eu-flag">🇪🇺</span>
+    <span class="eu-title">European Context Card — SAIDI Benchmarking</span>
+    <span class="eu-edition">Ed. 001 · [Month Year]</span>
+  </div>
+  <div class="eu-card-body">
+    <h4>Unplanned SAIDI (min/customer/year) — Selected EU Countries</h4>
+    <div class="eu-bar-chart">
+      <div class="eu-bar">
+        <span class="bar-label">🇩🇪 Germany</span>
+        <div class="bar-track"><div class="bar-fill" style="width:4%;background:var(--accent3)"></div></div>
+        <span class="bar-value" style="color:var(--accent3)">11.7</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇨🇭 Switzerland</span>
+        <div class="bar-track"><div class="bar-fill" style="width:5.2%;background:var(--accent3)"></div></div>
+        <span class="bar-value" style="color:var(--accent3)">~15</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇳🇱 Netherlands</span>
+        <div class="bar-track"><div class="bar-fill" style="width:8.2%;background:var(--accent3)"></div></div>
+        <span class="bar-value" style="color:var(--accent3)">23.9</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇫🇷 France</span>
+        <div class="bar-track"><div class="bar-fill" style="width:12.4%;background:var(--accent2)"></div></div>
+        <span class="bar-value">~36</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇬🇧 UK</span>
+        <div class="bar-track"><div class="bar-fill" style="width:13.8%;background:var(--accent2)"></div></div>
+        <span class="bar-value">~40</span>
+      </div>
+      <div class="eu-bar highlight">
+        <span class="bar-label">🇮🇹 Italy (national)</span>
+        <div class="bar-track"><div class="bar-fill" style="width:14.8%;background:var(--accent)"></div></div>
+        <span class="bar-value">~43</span>
+      </div>
+      <div class="eu-bar highlight">
+        <span class="bar-label" style="font-size:0.7rem">&ensp;↳ Alta conc.</span>
+        <div class="bar-track"><div class="bar-fill" style="width:8.6%;background:#e67e22"></div></div>
+        <span class="bar-value" style="color:#e67e22">~25</span>
+      </div>
+      <div class="eu-bar highlight">
+        <span class="bar-label" style="font-size:0.7rem">&ensp;↳ Bassa conc.</span>
+        <div class="bar-track"><div class="bar-fill" style="width:22.4%;background:var(--accent)"></div></div>
+        <span class="bar-value">~65</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇪🇸 Spain</span>
+        <div class="bar-track"><div class="bar-fill" style="width:16.6%;background:var(--muted)"></div></div>
+        <span class="bar-value">~48</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇭🇺 Hungary</span>
+        <div class="bar-track"><div class="bar-fill" style="width:19.7%;background:var(--muted)"></div></div>
+        <span class="bar-value">~57</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇵🇱 Poland</span>
+        <div class="bar-track"><div class="bar-fill" style="width:32.8%;background:var(--muted)"></div></div>
+        <span class="bar-value">~95</span>
+      </div>
+      <div class="eu-bar">
+        <span class="bar-label">🇷🇴 Romania</span>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--muted)"></div></div>
+        <span class="bar-value">~290</span>
+      </div>
+    </div>
+  </div>
+  <div class="eu-card-footer">
+    Source: CEER 7th Benchmarking Report (2022); Bundesnetzagentur (2024); ARERA (2023). Italy sub-categories from ARERA territory classification. · See §16 Peer Benchmarking for full methodology and caveats. · Updated annually with CEER BR release.
+  </div>
+</div>
+
+<p><strong>This month's key insight:</strong> The Puglia corridor deep-dive shows [N] substations with effective SAIDI equivalent above 65 minutes — placing them in the "bassa concentrazione" band. In European terms, these substations individually perform closer to Hungarian or Spanish levels than to Italy's own national average. The SSI reveals that Italy's mid-tier European position is not a national condition but a statistical average of Dutch-quality urban performance and Eastern-European-level rural performance — and the Puglia corridor concentrates the worst of the latter.</p>
+</section>
+
+<hr class="divider-thick">
+
+
+<!-- ═══════════════════ F. STAKEHOLDER TRACKER ═══════════════════ -->
+<section class="section" id="engage">
+<span class="section-label">Section F</span>
+<h2>Stakeholder Engagement Tracker</h2>
+
+<div class="tracker-grid">
+  <div class="tracker-card">
+    <h4>🏛️ Institutional</h4>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇪🇺</span>
+      <span>JRC Smart Electricity Systems (Ispra)</span>
+      <span class="tracker-status status-pending">Contacted</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇪🇺</span>
+      <span>ACER / CEER Smart Grid KPI</span>
+      <span class="tracker-status status-pending">Submitted</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇪🇺</span>
+      <span>TwinEU Project</span>
+      <span class="tracker-status status-new">Initial email</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇮🇹</span>
+      <span>ARERA Direzione Infrastrutture</span>
+      <span class="tracker-status status-pending">Meeting requested</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇮🇹</span>
+      <span>ENEA Smart Grid</span>
+      <span class="tracker-status status-new">Initial email</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇮🇹</span>
+      <span>GSE Direzione Studi</span>
+      <span class="tracker-status status-new">Initial email</span>
+    </div>
+  </div>
+
+  <div class="tracker-card">
+    <h4>🎓 Academic</h4>
+    <div class="tracker-item">
+      <span class="tracker-icon">🏫</span>
+      <span>Politecnico di Milano</span>
+      <span class="tracker-status status-active">Feedback received</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🏫</span>
+      <span>TU Delft</span>
+      <span class="tracker-status status-pending">Paper sent</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🏫</span>
+      <span>ETH Zürich</span>
+      <span class="tracker-status status-new">Initial email</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🏫</span>
+      <span>Imperial College</span>
+      <span class="tracker-status status-pending">Paper sent</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">📄</span>
+      <span>ResearchGate pre-print</span>
+      <span class="tracker-status status-active">[N] reads</span>
+    </div>
+  </div>
+</div>
+
+<div class="tracker-grid">
+  <div class="tracker-card">
+    <h4>📰 Media Coverage</h4>
+    <div class="tracker-item">
+      <span class="tracker-icon">📰</span>
+      <span>[Publication 1]</span>
+      <span class="tracker-status status-active">Published</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">📰</span>
+      <span>[Publication 2]</span>
+      <span class="tracker-status status-active">Published</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">📰</span>
+      <span>[Publication 3]</span>
+      <span class="tracker-status status-pending">In pipeline</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">📺</span>
+      <span>Total press mentions</span>
+      <span class="tracker-status status-active">[N]</span>
+    </div>
+  </div>
+
+  <div class="tracker-card">
+    <h4>💰 Funder Pipeline</h4>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇪🇺</span>
+      <span>LIFE CET — pre-application</span>
+      <span class="tracker-status status-new">Researching</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇮🇹</span>
+      <span>Fondazione con il Sud</span>
+      <span class="tracker-status status-pending">Brief sent</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇮🇹</span>
+      <span>Compagnia di San Paolo</span>
+      <span class="tracker-status status-new">Identifying contact</span>
+    </div>
+    <div class="tracker-item">
+      <span class="tracker-icon">🇮🇹</span>
+      <span>Fondazione Cariplo</span>
+      <span class="tracker-status status-new">Identifying contact</span>
+    </div>
+  </div>
+</div>
+
+<div class="note-green">
+  <strong>Key milestone this month:</strong> [One-sentence highlight — e.g., "Politecnico di Milano's Power Systems group provided substantive feedback on the Sobol sensitivity methodology, confirming robustness and suggesting an extension to Shapley values for component interaction analysis. This is the SSI's first formal academic engagement."]
+</div>
+</section>
+
+<hr class="divider-thick">
+
+
+<!-- ═══════════════════ G. LOOKING AHEAD ═══════════════════ -->
+<section class="section" id="ahead">
+<span class="section-label">Section G</span>
+<h2>Looking Ahead</h2>
+
+<div class="ahead-grid">
+  <div class="ahead-card">
+    <span class="ahead-month">Next Month — Edition 002</span>
+    <div class="ahead-title">DER Saturation Hotspots</div>
+    <div class="ahead-desc">Which 412 substations have exceeded their DER threshold — and where the next wave is building. European Context Card: S/T comparison with Germany and Denmark.</div>
+  </div>
+  <div class="ahead-card" style="border-top-color:var(--accent3)">
+    <span class="ahead-month">Data Expected</span>
+    <div class="ahead-title">[Source] Release</div>
+    <div class="ahead-desc">[Description of expected data release and its impact on SSI scores — e.g., "ARERA annual quality report expected [month]. Will refresh C1/C2 for all substations."]</div>
+  </div>
+  <div class="ahead-card" style="border-top-color:var(--accent)">
+    <span class="ahead-month">Event</span>
+    <div class="ahead-title">[Conference / Submission]</div>
+    <div class="ahead-desc">[e.g., "SSI methodology paper submission to IEEE Transactions on Power Systems" or "Presentation at [conference name]"]</div>
+  </div>
+</div>
+
+<p>Edition 002 will be published on the first Monday of [next month]. To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) via the link in your welcome email.</p>
+</section>
+
+
+<!-- ═══════════════════ COLOPHON ═══════════════════ -->
+<hr class="divider">
+<div style="text-align:center;padding:1rem 0;font-size:0.78rem;color:var(--muted)">
+  <p style="font-family:var(--sans);font-weight:600;margin-bottom:0.3rem">SSI Monthly Intelligence Report — Edition 001 (Inaugural)</p>
+  <p style="font-family:var(--mono);font-size:0.68rem">Published [Date] · SSI Index v4.0 · 39,234 substations · 146,782 lines · 6 components · 17 metrics</p>
+  <p style="font-family:var(--mono);font-size:0.68rem">10,000-iteration Gaussian Copula Monte Carlo · Sobol global sensitivity analysis (196,608 evals/substation) · CMIP6 SSP2-4.5</p>
+</div>
+
+</div><!-- .page -->
+</div><!-- .page-wrap -->
+
+<footer class="report-footer">
+  © 2026 Altinium Invest · Corso Vittorio Emanuele 110/5, 80121 Napoli · P.IVA 10656441218<br>
+  USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 633/1941, Berne Convention, Copyright Act 1976<br>
+  <a href="#">Unsubscribe</a> · <a href="#">Update preferences</a> · <a href="#">View in browser</a>
+</footer>
+
+</body>
+</html>

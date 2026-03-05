@@ -13,6 +13,7 @@ function renderNav(activePage) {
     { id: 'regional', label: 'Regional', href: 'regional.html' },
     { id: 'methodology', label: 'Methodology', href: 'methodology.html' },
     { id: 'data', label: 'Data & Download', href: 'data.html' },
+    { id: 'intelligence', label: 'Intelligence', href: 'intelligence.html' },
   ];
 
   // Skip-link for keyboard/screen-reader users
