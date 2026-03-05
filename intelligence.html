@@ -71,38 +71,202 @@
 
 <p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 30 verified public sources, making the methodology fully auditable and reproducible. Initially covering Italy's entire transmission and distribution grid, the Index is progressively being rolled out to all OECD countries — applying the same silo-breaking approach: fusing grid risk with societal exposure at asset-level resolution wherever open data permits.</p>
 
-<!-- Substation in Focus -->
-<div class="card" style="border-left:3px solid var(--crimson);margin:20px 0">
+<!-- Substation in Focus — auto-populated from ssi-data.json -->
+<div class="card" style="border-left:3px solid var(--crimson);margin:20px 0" id="focus-card">
   <div style="display:flex;gap:24px;flex-wrap:wrap">
     <div style="flex:1;min-width:200px">
       <h3 style="margin-top:0">Substation in Focus</h3>
       <div style="font-size:13px;line-height:1.7">
-        <div style="font-size:16px;font-weight:600;margin-bottom:4px">[Substation ID]</div>
-        <div style="color:var(--warm-grey);font-size:13px;margin-bottom:12px">[Province], [Region] · [DSO Territory Class]</div>
-        <div style="display:flex;gap:20px">
+        <div style="font-size:16px;font-weight:600;margin-bottom:4px" id="focus-name">Loading…</div>
+        <div style="color:var(--warm-grey);font-size:13px;margin-bottom:12px" id="focus-location"></div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
           <div style="text-align:left">
-            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600">[0.XX]</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600" id="focus-r">—</div>
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">R_final</div>
           </div>
           <div style="text-align:left">
-            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600">[Band]</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600" id="focus-band">—</div>
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">Classification</div>
           </div>
           <div style="text-align:left">
-            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600">[Quad]</div>
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">Quadrant</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600" id="focus-ci">—</div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">CI Width</div>
+          </div>
+          <div style="text-align:left">
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600" id="focus-pctile">—</div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">Fleet Percentile</div>
           </div>
         </div>
       </div>
     </div>
-    <div style="width:200px;flex-shrink:0;text-align:center;color:var(--warm-grey);font-size:12px;background:var(--cream-deep);border-radius:var(--radius);padding:24px;display:flex;align-items:center;justify-content:center;min-height:160px">
-      [Spider graph image — 6 axes: C, V, I, E, S, T]<br><br>
-      <em>Insert spider graph PNG or SVG here</em>
+    <div style="width:220px;flex-shrink:0">
+      <canvas id="focus-radar" width="220" height="180"></canvas>
+    </div>
+  </div>
+  <!-- Component + Modifier detail rows -->
+  <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px">
+      <div class="label-xs" style="margin-bottom:6px">Components</div>
+      <div id="focus-components" style="font-size:12px;line-height:2"></div>
+    </div>
+    <div style="flex:1;min-width:200px">
+      <div class="label-xs" style="margin-bottom:6px">Modifiers</div>
+      <div id="focus-modifiers" style="font-size:12px;line-height:2"></div>
     </div>
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7">This month's spotlight substation was selected as the most-viewed node in the Digital Twin during the first 30 days. [2–3 sentences explaining why this substation is interesting: its component profile, what makes it unusual, what it reveals about the surrounding territory.]</p>
+<p style="font-size:13px;line-height:1.7" id="focus-narrative">Loading substation data…</p>
+
+<script>
+(function(){
+  // Deterministic monthly pick: seeded hash from year+month selects a substation
+  // Changes automatically on the 1st of each month — fully reproducible
+  function monthSeed() {
+    var d = new Date();
+    return d.getFullYear() * 100 + (d.getMonth() + 1); // e.g. 202603
+  }
+  function seededIndex(seed, len) {
+    // Simple LCG-style hash for deterministic "random" pick
+    var h = seed;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = (h >>> 16) ^ h;
+    return Math.abs(h) % len;
+  }
+
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    var subs = data.substations;
+    var idx = seededIndex(monthSeed(), subs.length);
+    var s = subs[idx];
+
+    // Basic info
+    document.getElementById('focus-name').textContent = s.name;
+    document.getElementById('focus-location').textContent = s.province + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
+    document.getElementById('focus-r').textContent = s.R_median.toFixed(3);
+    document.getElementById('focus-band').textContent = s.classification;
+    document.getElementById('focus-ci').textContent = s.CI_width.toFixed(3);
+    document.getElementById('focus-pctile').textContent = (s.fleet_percentile * 100).toFixed(0) + 'th';
+
+    // Band color
+    var bandColors = { Low: 'var(--sage)', Medium: 'var(--bronze)', High: 'var(--terracotta)', Critical: 'var(--crimson)' };
+    document.getElementById('focus-band').style.color = bandColors[s.classification] || 'var(--ink)';
+    document.getElementById('focus-r').style.color = bandColors[s.classification] || 'var(--ink)';
+
+    // Components breakdown
+    var compDefs = [
+      { key: 'C', label: 'Continuity', w: 0.30, color: 'var(--crimson)' },
+      { key: 'I', label: 'Infrastructure', w: 0.25, color: 'var(--sage)' },
+      { key: 'S', label: 'Saturation', w: 0.20, color: 'var(--bronze)' },
+      { key: 'V', label: 'Voltage', w: 0.10, color: 'var(--terracotta)' },
+      { key: 'E', label: 'Economic', w: 0.10, color: '#3b9eff' },
+      { key: 'T', label: 'Transition', w: 0.05, color: '#22d3ee' }
+    ];
+    var compHTML = compDefs.map(function(c){
+      var val = s.components[c.key];
+      var pct = (val / c.w * 100).toFixed(0);
+      var isAlert = s.alert_components && s.alert_components.indexOf(c.key) >= 0;
+      return '<div><strong style="color:' + c.color + '">' + c.key + '</strong> ' + c.label + ': ' +
+        val.toFixed(3) + ' / ' + c.w.toFixed(2) + ' (' + pct + '%)' +
+        (isAlert ? ' <span style="color:var(--crimson);font-weight:600">⚠</span>' : '') + '</div>';
+    }).join('');
+    document.getElementById('focus-components').innerHTML = compHTML;
+
+    // Modifiers breakdown
+    var modDefs = [
+      { key: 'R3_C_mult', label: 'R3 Consequence' },
+      { key: 'R4_F_topo', label: 'R4 Graph Criticality' },
+      { key: 'R6_restoration', label: 'R6a Restoration' },
+      { key: 'R6_seismic', label: 'R6b Seismic' },
+      { key: 'R7_cyber', label: 'R7 Digital Readiness' }
+    ];
+    var modHTML = modDefs.map(function(m){
+      var val = s.modifiers[m.key];
+      var dir = val > 1.01 ? '↑ amplifies' : val < 0.99 ? '↓ dampens' : '→ neutral';
+      var col = val > 1.05 ? 'var(--crimson)' : val < 0.95 ? 'var(--sage)' : 'var(--warm-grey)';
+      return '<div><strong>' + m.label + ':</strong> <span style="color:' + col + '">' + val.toFixed(3) + '</span> ' + dir + '</div>';
+    }).join('');
+    document.getElementById('focus-modifiers').innerHTML = modHTML;
+
+    // Radar chart on canvas
+    var canvas = document.getElementById('focus-radar');
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var cx = W / 2, cy = H / 2 + 6;
+    var R = 68;
+    var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
+    var weights = [0.30, 0.10, 0.25, 0.10, 0.20, 0.05];
+    var vals = labels.map(function(k, i){ return s.components[k] / weights[i]; }); // normalise to 0-1
+    var n = labels.length;
+
+    // Draw concentric rings
+    ctx.strokeStyle = 'rgba(44,36,32,0.08)';
+    ctx.lineWidth = 1;
+    [0.25, 0.5, 0.75, 1.0].forEach(function(ring){
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) {
+        var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+        var x = cx + R * ring * Math.cos(angle);
+        var y = cy + R * ring * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+
+    // Draw axes
+    for (var i = 0; i < n; i++) {
+      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+      ctx.stroke();
+    }
+
+    // Draw data polygon
+    ctx.fillStyle = 'rgba(148,25,20,0.15)';
+    ctx.strokeStyle = 'rgba(148,25,20,0.7)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var v = Math.min(vals[i % n], 1);
+      var x = cx + R * v * Math.cos(angle);
+      var y = cy + R * v * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw labels
+    ctx.fillStyle = '#2c2420';
+    ctx.font = '600 11px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (var i = 0; i < n; i++) {
+      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var lx = cx + (R + 16) * Math.cos(angle);
+      var ly = cy + (R + 16) * Math.sin(angle);
+      ctx.fillText(labels[i], lx, ly);
+    }
+
+    // Narrative
+    var dominant = compDefs.slice().sort(function(a,b){ return (s.components[b.key]/b.w) - (s.components[a.key]/a.w); });
+    var top1 = dominant[0], top2 = dominant[1];
+    var modImpact = s.modifier_pct || ((s.modifier_impact / s.R_base_median) * 100).toFixed(1) + '%';
+    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var d = new Date();
+    var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
+      ' — is <strong>' + s.name + '</strong> in ' + s.province + ', ' + s.region +
+      '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
+      (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
+      top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
+      '% of its weight ceiling, followed by ' + top2.key + ' (' + top2.label + ') at ' +
+      (s.components[top2.key] / top2.w * 100).toFixed(0) + '%. Modifiers collectively shift R_base by ' +
+      modImpact + ', reflecting the substation\'s specific geographic, socio-economic, and network context.';
+    document.getElementById('focus-narrative').innerHTML = narrative;
+  });
+})();
+</script>
 </section>
 
 <div style="margin:32px 0"></div>
@@ -166,7 +330,7 @@
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section C</span>
 <h2>Data Refresh &amp; Changelog</h2>
 
-<p style="font-size:13px;line-height:1.7">The SSI v4.0 draws on six primary data sources. This section documents which sources have been updated since launch, how scores have changed, and any methodology adjustments made. Transparency in data vintage is central to the SSI's credibility.</p>
+<p style="font-size:13px;line-height:1.7">The SSI v4.0.2 draws on 30 verified public data sources. This section documents which sources have been updated since launch, how scores have changed, and any methodology adjustments made. Transparency in data vintage is central to the SSI's credibility.</p>
 
 <div class="card" style="margin:16px 0">
   <div class="card-header"><h3 style="margin:0">Data Source Status — [Month Year]</h3></div>
@@ -206,11 +370,11 @@
 
 <h3>C.1 &ensp; Score Changes This Month</h3>
 
-<p style="font-size:13px;line-height:1.7">[Summary paragraph: how many substations had their scores change due to data refreshes. If no data refreshed this month, state explicitly: "No primary data sources were updated this month. All 39,234 substation scores remain unchanged from the v4.0 launch baseline. The first material score changes are expected when [source] publishes [data] in [expected date]."]</p>
+<p style="font-size:13px;line-height:1.7">[Summary paragraph: how many substations had their scores change due to data refreshes. If no data refreshed this month, state explicitly: "No primary data sources were updated this month. All 4,293 substation scores remain unchanged from the v4.0.2 launch baseline. The first material score changes are expected when [source] publishes [data] in [expected date]."]</p>
 
 <h3>C.2 &ensp; Methodology Adjustments</h3>
 
-<p style="font-size:13px;line-height:1.7">[If any: describe precisely what changed, why, and the impact on scores. If none: "No methodology adjustments were made this month. The v4.0 scoring framework remains as documented in the Technical Reference."]</p>
+<p style="font-size:13px;line-height:1.7">[If any: describe precisely what changed, why, and the impact on scores. If none: "No methodology adjustments were made this month. The v4.0.2 scoring framework remains as documented in the Technical Reference."]</p>
 </section>
 
 <div style="margin:32px 0"></div>
@@ -550,7 +714,7 @@
 <!-- ═══════════════════ COLOPHON ═══════════════════ -->
 <div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
   <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Monthly Intelligence Report — Edition 001 (Inaugural)</p>
-  <p style="margin-bottom:4px">Published [Date] · SSI Index v4.0 · 39,234 substations · 146,782 lines · 6 components · 17 metrics</p>
+  <p style="margin-bottom:4px">Published [Date] · SSI Index v4.0.2 · 4,293 substations · 14,221 grid lines · 6 components · 20 metrics · 6 modifiers</p>
   <p>10,000-iteration Gaussian Copula Monte Carlo · Sobol global sensitivity analysis (196,608 evals/substation) · CMIP6 SSP2-4.5</p>
 </div>
 
