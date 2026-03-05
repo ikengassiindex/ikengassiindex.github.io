@@ -860,20 +860,20 @@
       'a dimension invisible to every competing framework.';
 
     // ── D.4 Province breakdown ──
-    var provHTML = '<div class="label-xs" style="margin-bottom:10px">Province Risk Profile — Sorted by Mean R</div>';
+    var provHTML = '<div class="label-xs" style="margin-bottom:10px">Province Risk Profile — Sorted by Mean R</div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){
       var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var provBands = { Low:0, Medium:0, High:0, Critical:0 };
       provSubs.forEach(function(s){ provBands[s.classification]++; });
-      var maxR = puglia[0].R_median;
-      var barPct = (pv.avg / maxR * 100).toFixed(1);
+      var barPct = ((1 - pv.avg) * 100).toFixed(1);
       var col = pv.avg > 0.6 ? '#941914' : pv.avg > 0.5 ? '#aa4234' : '#b8863a';
       provHTML += '<div style="margin-bottom:12px">' +
         '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
           '<span style="font-weight:600">' + pv.name + '</span>' +
           '<span style="color:var(--warm-grey)">' + pv.n + ' subs · avg R = ' + pv.avg.toFixed(3) +
           ' · H:' + provBands.High + (provBands.Critical ? ' C:' + provBands.Critical : '') + ' M:' + provBands.Medium + '</span></div>' +
-        '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
+        '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">' +
           '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:4px;opacity:0.7"></div>' +
         '</div></div>';
     });
@@ -1072,10 +1072,10 @@
     var maxAvgR = regions[0].avgR;
 
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
-    var html = '';
+    var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
     regions.forEach(function(reg, idx){
       var isPuglia = reg.name === 'Puglia';
-      var barPct = (reg.avgR / maxAvgR * 100).toFixed(1);
+      var barPct = ((1 - reg.avgR) * 100).toFixed(1);
       var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
       var highlight = isPuglia ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
 
@@ -1097,7 +1097,7 @@
           '<span style="color:var(--warm-grey);font-size:11px">' + reg.n + ' subs · avg R = ' + reg.avgR.toFixed(3) +
           ' · H:' + reg.bands.High + (reg.bands.Critical ? ' C:' + reg.bands.Critical : '') + '</span></div>' +
         '<div style="display:flex;gap:4px;align-items:center">' +
-          '<div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden">' +
+          '<div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">' +
             '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:3px;opacity:0.7"></div>' +
           '</div>' +
           '<div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex">' + bandBar + '</div>' +
