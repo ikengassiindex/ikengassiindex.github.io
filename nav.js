@@ -33,7 +33,7 @@ function renderNav(activePage) {
   nav.setAttribute('role', 'navigation');
   nav.setAttribute('aria-label', 'Main navigation');
   nav.innerHTML = `
-    <a class="topnav-brand" href="index.html" aria-label="SSI Index — Home" style="gap:10px">
+    <a class="topnav-brand" href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga — Visit website" style="gap:10px">
       ${SSI_LOGO}
       <div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15">
         <h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0.2</span></h1>
