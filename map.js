@@ -104,6 +104,15 @@
   }
 
   // ── Filtering ──
+  function linePassesVoltageFilter(kv) {
+    if (filters.voltage === 'all') return true;
+    if (filters.voltage === '380') return kv >= 300;
+    if (filters.voltage === '220') return kv >= 200 && kv < 300;
+    if (filters.voltage === '132') return kv >= 100 && kv < 200;
+    if (filters.voltage === 'other') return kv < 100;
+    return true;
+  }
+
   function passesFilter(sid) {
     const ssi = ssiMap[sid];
     if (!ssi) return true; // show geo-only subs in grey
@@ -140,19 +149,25 @@
     const isFiltering = filters.band !== 'all' || filters.region !== 'all' || filters.voltage !== 'all' || searchQuery;
 
     // ─ Draw lines ─
+    const voltageActive = filters.voltage !== 'all';
     if (showLines) {
       ctx.lineCap = 'round';
       for (const l of GEO.l) {
         const highlighted = hlLines.has(l.i);
+        const matchesVoltage = linePassesVoltageFilter(l.kv);
         if (isSelecting && !highlighted) {
           ctx.globalAlpha = 0.08;
+        } else if (voltageActive && !isSelecting) {
+          // Voltage filter: highlight matching lines, heavily dim others
+          ctx.globalAlpha = matchesVoltage ? 0.85 : 0.03;
         } else if (isFiltering && !isSelecting) {
           ctx.globalAlpha = highlighted ? 0.6 : 0.04;
         } else {
           ctx.globalAlpha = isSelecting ? 0.9 : 0.5;
         }
+        const voltageBoosted = voltageActive && matchesVoltage && !isSelecting;
         ctx.strokeStyle = kvColor(l.kv);
-        ctx.lineWidth = (highlighted ? kvWidth(l.kv) * 1.8 : kvWidth(l.kv)) * Math.min(s * 0.5, 1.5);
+        ctx.lineWidth = (highlighted || voltageBoosted ? kvWidth(l.kv) * 1.8 : kvWidth(l.kv)) * Math.min(s * 0.5, 1.5);
 
         ctx.beginPath();
         for (let j = 0; j < l.p.length; j++) {
