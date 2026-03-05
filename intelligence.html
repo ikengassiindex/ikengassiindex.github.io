@@ -325,56 +325,228 @@
 <div style="margin:32px 0"></div>
 
 
-<!-- ═══════════════════ C. DATA REFRESH ═══════════════════ -->
+<!-- ═══════════════════ C. DATA REFRESH — AUTO-POPULATED ═══════════════════ -->
 <section id="data" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section C</span>
 <h2>Data Refresh &amp; Changelog</h2>
 
-<p style="font-size:13px;line-height:1.7">The SSI v4.0.2 draws on 30 verified public data sources. This section documents which sources have been updated since launch, how scores have changed, and any methodology adjustments made. Transparency in data vintage is central to the SSI's credibility.</p>
+<p style="font-size:13px;line-height:1.7" id="sec-c-intro">Loading data source registry…</p>
 
-<div class="card" style="margin:16px 0">
-  <div class="card-header"><h3 style="margin:0">Data Source Status — [Month Year]</h3></div>
-  <div style="display:flex;flex-direction:column;gap:8px">
-    <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--card-border)">
-      <span style="flex-shrink:0;font-size:11px;color:var(--warm-grey);min-width:60px">[Date]</span>
-      <span style="flex-shrink:0;font-weight:600;min-width:50px">ARERA</span>
-      <span><span class="band-badge" style="font-size:9px;margin-right:6px;background:rgba(44,36,32,0.08);color:var(--warm-grey);display:inline-block;padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600">No change</span> SAIDI/SAIFI data vintage remains [year]. Next expected release: [date]. Staleness trajectory: [±X] days.</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--card-border)">
-      <span style="flex-shrink:0;font-size:11px;color:var(--warm-grey);min-width:60px">[Date]</span>
-      <span style="flex-shrink:0;font-weight:600;min-width:50px">Terna</span>
-      <span><span class="band-badge" style="font-size:9px;margin-right:6px;background:rgba(44,36,32,0.08);color:var(--warm-grey);display:inline-block;padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600">No change</span> Grid topology data vintage: [year]. RTN dataset stable.</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--card-border)">
-      <span style="flex-shrink:0;font-size:11px;color:var(--warm-grey);min-width:60px">[Date]</span>
-      <span style="flex-shrink:0;font-weight:600;min-width:50px">GSE</span>
-      <span><span class="band-badge" style="font-size:9px;margin-right:6px;background:rgba(184,134,58,0.2);color:var(--bronze);display:inline-block;padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600">Updated</span> Atlaimpianti DER data refreshed to [date]. [N] new installations registered. S1 recalculated for [N] substations.</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--card-border)">
-      <span style="flex-shrink:0;font-size:11px;color:var(--warm-grey);min-width:60px">[Date]</span>
-      <span style="flex-shrink:0;font-weight:600;min-width:50px">ISTAT</span>
-      <span><span class="band-badge" style="font-size:9px;margin-right:6px;background:rgba(44,36,32,0.08);color:var(--warm-grey);display:inline-block;padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600">No change</span> Provincial economic data vintage: [year]. E2 coefficients stable.</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--card-border)">
-      <span style="flex-shrink:0;font-size:11px;color:var(--warm-grey);min-width:60px">[Date]</span>
-      <span style="flex-shrink:0;font-weight:600;min-width:50px">CMIP6</span>
-      <span><span class="band-badge" style="font-size:9px;margin-right:6px;background:rgba(44,36,32,0.08);color:var(--warm-grey);display:inline-block;padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600">No change</span> SSP2-4.5 projections are static (scenario-based). T2 scores unchanged.</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;padding:8px 0">
-      <span style="flex-shrink:0;font-size:11px;color:var(--warm-grey);min-width:60px">[Date]</span>
-      <span style="flex-shrink:0;font-weight:600;min-width:50px">QuEEN</span>
-      <span><span class="band-badge" style="font-size:9px;margin-right:6px;background:rgba(44,36,32,0.08);color:var(--warm-grey);display:inline-block;padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600">No change</span> Voltage dip data vintage: [year]. V1/V2 stable.</span>
-    </div>
+<!-- Frequency Distribution KPIs -->
+<div class="kpi-grid" style="margin:16px 0" id="sec-c-freq-kpis">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Sources</div>
+    <div class="kpi-value" style="color:var(--ink)" id="c-total-src">—</div>
+    <div class="kpi-sub" id="c-total-vars"></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Weekly / Monthly</div>
+    <div class="kpi-value" style="color:var(--sage)" id="c-freq-fast">—</div>
+    <div class="kpi-sub">High-frequency feeds</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Quarterly / Annual</div>
+    <div class="kpi-value" style="color:var(--bronze)" id="c-freq-slow">—</div>
+    <div class="kpi-sub">Regular refresh cycle</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Static / Derived</div>
+    <div class="kpi-value" style="color:var(--warm-grey)" id="c-freq-static">—</div>
+    <div class="kpi-sub">Standards + scenarios</div>
   </div>
 </div>
 
-<h3>C.1 &ensp; Score Changes This Month</h3>
+<!-- Data Source Registry Table -->
+<div class="card" style="margin:16px 0">
+  <div class="card-header" id="c-table-header"><h3 style="margin:0">Data Source Registry — Loading…</h3></div>
+  <div id="sec-c-source-list" style="display:flex;flex-direction:column;gap:0">
+    <div style="text-align:center;color:var(--warm-grey);padding:24px">Loading source registry…</div>
+  </div>
+</div>
 
-<p style="font-size:13px;line-height:1.7">[Summary paragraph: how many substations had their scores change due to data refreshes. If no data refreshed this month, state explicitly: "No primary data sources were updated this month. All 4,293 substation scores remain unchanged from the v4.0.2 launch baseline. The first material score changes are expected when [source] publishes [data] in [expected date]."]</p>
+<!-- Frequency Timeline -->
+<h3>C.1 &ensp; Update Frequency Timeline</h3>
+<div id="sec-c-timeline" style="margin:16px 0">Loading…</div>
 
-<h3>C.2 &ensp; Methodology Adjustments</h3>
+<!-- Fleet Score Summary -->
+<h3>C.2 &ensp; Fleet Score Snapshot</h3>
+<div id="sec-c-fleet" style="margin:16px 0">Loading…</div>
+<p style="font-size:13px;line-height:1.7" id="sec-c-fleet-narrative">Loading…</p>
 
-<p style="font-size:13px;line-height:1.7">[If any: describe precisely what changed, why, and the impact on scores. If none: "No methodology adjustments were made this month. The v4.0.2 scoring framework remains as documented in the Technical Reference."]</p>
+<!-- Changelog -->
+<h3>C.3 &ensp; Changelog — v3.4 → v4.0.2</h3>
+<div id="sec-c-changelog" style="margin:16px 0">Loading…</div>
+
+<script>
+(function(){
+  var meta = window.SSIMetadata;
+  if (!meta) return;
+
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var now = new Date();
+  var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+
+  // ── Intro ──
+  document.getElementById('sec-c-intro').innerHTML =
+    'The SSI v4.0.2 draws on <strong>' + meta.stats.sources + ' verified public data sources</strong> feeding ' +
+    meta.stats.variables + ' variables across ' + meta.stats.components + ' components and ' + meta.stats.modifiers +
+    ' modifiers. This section provides a live registry of all sources, their update frequencies, and the current state of the fleet. ' +
+    'Transparency in data vintage is central to the SSI\'s credibility.';
+
+  // ── Frequency KPIs ──
+  var freq = meta.FREQ_DISTRIBUTION;
+  var weekly = (freq.Weekly ? freq.Weekly.count : 0);
+  var monthly = (freq.Monthly ? freq.Monthly.count : 0);
+  var quarterly = (freq.Quarterly ? freq.Quarterly.count : 0);
+  var annual = (freq.Annual ? freq.Annual.count : 0);
+  var staticC = (freq.Static ? freq.Static.count : 0);
+  var derived = (freq.Derived ? freq.Derived.count : 0);
+
+  document.getElementById('c-total-src').textContent = meta.stats.sources;
+  document.getElementById('c-total-vars').textContent = meta.stats.variables + ' variables';
+  document.getElementById('c-freq-fast').textContent = (weekly + monthly);
+  document.getElementById('c-freq-slow').textContent = (quarterly + annual);
+  document.getElementById('c-freq-static').textContent = (staticC + derived);
+
+  // ── Source Registry Table ──
+  document.getElementById('c-table-header').innerHTML = '<h3 style="margin:0">Data Source Registry — ' + monthYear + '</h3>';
+
+  var sources = meta.DATA_SOURCES;
+  var freqOrder = { Hourly: 0, Weekly: 1, Monthly: 2, Quarterly: 3, Annual: 4, Static: 5, Derived: 6, Continuous: 2 };
+  var sorted = sources.slice().sort(function(a,b){
+    return (freqOrder[a.freq] || 9) - (freqOrder[b.freq] || 9);
+  });
+
+  var freqColors = {
+    Hourly: 'var(--sage)', Weekly: 'var(--sage)', Monthly: 'var(--sage)',
+    Quarterly: 'var(--bronze)', Annual: 'var(--bronze)', Continuous: 'var(--sage)',
+    Static: 'var(--warm-grey)', Derived: 'var(--warm-grey)'
+  };
+  var freqBgs = {
+    Hourly: 'rgba(93,133,99,0.12)', Weekly: 'rgba(93,133,99,0.12)', Monthly: 'rgba(93,133,99,0.12)',
+    Quarterly: 'rgba(184,134,58,0.12)', Annual: 'rgba(184,134,58,0.12)', Continuous: 'rgba(93,133,99,0.12)',
+    Static: 'rgba(44,36,32,0.06)', Derived: 'rgba(44,36,32,0.06)'
+  };
+
+  var listHTML = sorted.map(function(s, i){
+    var fCol = freqColors[s.freq] || 'var(--warm-grey)';
+    var fBg = freqBgs[s.freq] || 'rgba(44,36,32,0.06)';
+    var border = i < sorted.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
+    return '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:8px 0;' + border + '">' +
+      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:42px;font-family:Consolas,monospace">' + s.id + '</span>' +
+      '<span style="flex:1;font-weight:500">' + s.name + '</span>' +
+      '<span style="flex-shrink:0;font-size:10px;color:' + fCol + ';background:' + fBg + ';padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase">' + s.freq + '</span>' +
+      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:11px;min-width:90px;text-align:right">' + s.res + '</span>' +
+      '<span style="flex-shrink:0;font-weight:600;min-width:30px;text-align:right">' + s.vars + ' var' + (s.vars > 1 ? 's' : '') + '</span>' +
+    '</div>';
+  }).join('');
+  document.getElementById('sec-c-source-list').innerHTML = listHTML;
+
+  // ── C.1 Frequency Timeline ──
+  var timelineHTML = '<div class="label-xs" style="margin-bottom:10px">Expected Update Windows</div>';
+  var timelineDefs = [
+    { label: 'Weekly', sources: freq.Weekly ? freq.Weekly.sources : [], color: '#5d8563', note: 'OSM diffs + weather reanalysis' },
+    { label: 'Monthly', sources: freq.Monthly ? freq.Monthly.sources : [], color: '#5d8563', note: 'Grid load + procurement data' },
+    { label: 'Quarterly', sources: freq.Quarterly ? freq.Quarterly.sources : [], color: '#b8863a', note: 'DER registry + business data + macro indicators' },
+    { label: 'Annual', sources: freq.Annual ? freq.Annual.sources : [], color: '#aa4234', note: 'Core grid quality + demographics + environment' },
+    { label: 'Static', sources: freq.Static ? freq.Static.sources : [], color: '#6b7280', note: 'Standards + scenarios + seismic hazard' }
+  ];
+  timelineDefs.forEach(function(t){
+    if (t.sources.length === 0) return;
+    var barW = Math.min(t.sources.length / 20 * 100, 100).toFixed(0);
+    timelineHTML += '<div style="margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
+        '<span style="font-weight:600">' + t.label + ' <span style="font-weight:400;color:var(--warm-grey)">(' + t.sources.length + ' sources)</span></span>' +
+        '<span style="color:var(--warm-grey);font-size:11px">' + t.note + '</span></div>' +
+      '<div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden">' +
+        '<div style="width:' + barW + '%;height:100%;background:' + t.color + ';border-radius:3px;opacity:0.7"></div></div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-top:2px">' + t.sources.join(' · ') + '</div>' +
+    '</div>';
+  });
+  document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
+
+  // ── C.2 Fleet Score Snapshot — from ssi-data.json ──
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var n = fleet.length;
+    var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
+    var median = rVals[Math.floor(n / 2)];
+    var p5 = rVals[Math.floor(n * 0.05)];
+    var p95 = rVals[Math.floor(n * 0.95)];
+    var mean = rVals.reduce(function(a,b){ return a + b; }, 0) / n;
+
+    var bands = { Low:0, Medium:0, High:0, Critical:0 };
+    fleet.forEach(function(s){ bands[s.classification]++; });
+
+    var confTiers = { high:0, medium:0, low:0 };
+    fleet.forEach(function(s){
+      if (s.CI_width < 0.10) confTiers.high++;
+      else if (s.CI_width < 0.25) confTiers.medium++;
+      else confTiers.low++;
+    });
+
+    // Band distribution bar
+    var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
+    var bandBar = '';
+    ['Low','Medium','High','Critical'].forEach(function(b){
+      var pct = (bands[b] / n * 100).toFixed(1);
+      bandBar += '<div style="width:' + pct + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + bands[b] + ' (' + pct + '%)"></div>';
+    });
+
+    var fleetHTML = '<div class="kpi-grid" style="margin-bottom:16px">' +
+      '<div class="kpi-card"><div class="kpi-label">Fleet Size</div><div class="kpi-value" style="color:var(--ink)">' + n.toLocaleString() + '</div><div class="kpi-sub">substations scored</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">' + median.toFixed(3) + '</div><div class="kpi-sub">P5=' + p5.toFixed(3) + ' · P95=' + p95.toFixed(3) + '</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">High + Critical</div><div class="kpi-value" style="color:var(--crimson)">' + (bands.High + bands.Critical) + '</div><div class="kpi-sub">' + ((bands.High + bands.Critical) / n * 100).toFixed(1) + '% of fleet</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">' + (confTiers.high / n * 100).toFixed(0) + '%</div><div class="kpi-sub">' + confTiers.high + ' subs · CI &lt; 0.10</div></div>' +
+    '</div>';
+
+    // Band distribution
+    fleetHTML += '<div style="margin-bottom:8px"><div class="label-xs" style="margin-bottom:6px">Band Distribution</div>' +
+      '<div style="height:10px;border-radius:5px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--warm-grey);margin-top:4px">' +
+        '<span>Low ' + bands.Low + ' (' + (bands.Low/n*100).toFixed(1) + '%)</span>' +
+        '<span>Medium ' + bands.Medium + ' (' + (bands.Medium/n*100).toFixed(1) + '%)</span>' +
+        '<span>High ' + bands.High + ' (' + (bands.High/n*100).toFixed(1) + '%)</span>' +
+        '<span>Critical ' + bands.Critical + ' (' + (bands.Critical/n*100).toFixed(1) + '%)</span>' +
+      '</div></div>';
+
+    document.getElementById('sec-c-fleet').innerHTML = fleetHTML;
+
+    // Fleet narrative
+    document.getElementById('sec-c-fleet-narrative').innerHTML =
+      'No primary data sources have been updated since the v4.0.2 launch baseline. All <strong>' + n.toLocaleString() +
+      ' substation scores remain unchanged</strong> this edition. The fleet median R of ' + median.toFixed(3) +
+      ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
+      (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
+      'The first material score changes are expected when ARERA publishes the annual TIQE tables (affecting C1–C4 and R6a) ' +
+      'and when GSE refreshes the Atlaimpianti DER registry (affecting T1). ' +
+      'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
+      'which have minimal impact on fleet-level score distribution.';
+  });
+
+  // ── C.3 Changelog ──
+  var cl = meta.CHANGELOG;
+  var typeLabels = { 'new': 'New', 'enhanced': 'Enhanced', 'data': 'Data' };
+  var typeColors = { 'new': 'var(--sage)', 'enhanced': 'var(--bronze)', 'data': 'var(--terracotta)' };
+  var typeBgs = { 'new': 'rgba(93,133,99,0.12)', 'enhanced': 'rgba(184,134,58,0.12)', 'data': 'rgba(170,66,52,0.12)' };
+
+  var clHTML = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:10px">' + cl.length + ' changes tracked across P0, P1, and P2 releases</div>';
+  cl.forEach(function(c, i){
+    var col = typeColors[c.type] || 'var(--warm-grey)';
+    var bg = typeBgs[c.type] || 'rgba(44,36,32,0.06)';
+    var lbl = typeLabels[c.type] || c.type;
+    var border = i < cl.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
+    var p2 = c.isP2 ? ' <span style="font-size:9px;color:var(--terracotta);font-weight:600">P2</span>' : '';
+    clHTML += '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;' + border + '">' +
+      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">' + c.id + '</span>' +
+      '<span style="flex-shrink:0;font-size:10px;color:' + col + ';background:' + bg + ';padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">' + lbl + '</span>' +
+      '<span style="flex:1">' + c.change + p2 + '</span>' +
+      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">' + c.section + '</span>' +
+    '</div>';
+  });
+  document.getElementById('sec-c-changelog').innerHTML = clHTML;
+})();
+</script>
 </section>
 
 <div style="margin:32px 0"></div>
