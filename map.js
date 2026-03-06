@@ -1095,6 +1095,18 @@
         fleetMedian[k] = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
       }
 
+      // Auto-center map on data centroid
+      const subEntries = Object.values(GEO.s);
+      if (subEntries.length > 0) {
+        let sumLon = 0, sumLat = 0;
+        for (const s of subEntries) {
+          sumLon += s.x;
+          sumLat += s.y;
+        }
+        view.cx = sumLon / subEntries.length;
+        view.cy = sumLat / subEntries.length;
+      }
+
       resize();
       wireFilters();
       clearDetailPanel();

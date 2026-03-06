@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 8 modifiers, 95 variables, 30 data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Methodology</title>
+<link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+<script src="../nav.js?v=14"></script>
+<script src="../ssi-engine.js"></script>
+<script src="../ssi-metadata.js"></script>
+<script>renderNav('methodology');</script>
+
+<main class="page-shell" style="max-width:860px">
+  <div class="page-header animate-in">
+    <h1>Methodology</h1>
+    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+  </div>
+
+  <!-- Thesis -->
+  <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
+    <p style="font-size:14px;line-height:1.7;color:var(--ink)">
+      Power grid resilience is inseparable from its socio-economic context. A substation serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+    </p>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="animate-in delay-2" style="margin-bottom:40px">
+    <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
+    <div class="method-step">
+      <div class="method-step-num">1</div>
+      <div class="method-step-content">
+        <h3>Ingest</h3>
+        <p>95 variables from 30 verified public data sources — E-Distribuzione, ARERA, ISTAT, Copernicus CDS, OSM, GSE, ENTSO-E, and 23 others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">2</div>
+      <div class="method-step-content">
+        <h3>Normalise</h3>
+        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">3</div>
+      <div class="method-step-content">
+        <h3>Weight</h3>
+        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">4</div>
+      <div class="method-step-content">
+        <h3>Compose R_base</h3>
+        <p>Weighted sum of 6 normalised component scores produces the base resilience score.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">5</div>
+      <div class="method-step-content">
+        <h3>Modify</h3>
+        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (seismic hazard), R7 (cyber-exposure proxy). Plus 5 micro-enrichments for elderly vulnerability, flood zones, landslides, digital readiness, and healthcare criticality.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">6</div>
+      <div class="method-step-content">
+        <h3>Monte Carlo</h3>
+        <p>10,000 iterations per substation using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">7</div>
+      <div class="method-step-content">
+        <h3>Classify</h3>
+        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Equation -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Master Equation</h3>
+      <span class="label-xs">v4.0.2</span>
+    </div>
+    <div class="formula-block">
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_seis × Cyber_factor )
+
+<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+
+<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
+<span class="hl-var">R6b_seis</span> = <span class="hl-fn">seismic_hazard</span>(PGA_g, zone)              <span class="hl-comment">// R6b — [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">province_DESI_cyber</span>(region, province, voltage) <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+    </div>
+  </div>
+
+  <!-- Components -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>6 Components · 20 Metrics</h3>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Weight</th>
+          <th>Metrics</th>
+          <th>Domain</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
+          <td class="num">0.30</td>
+          <td>4 — Duration, Count, MT exceed, Planned</td>
+          <td>Outage frequency and duration</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
+          <td class="num">0.10</td>
+          <td>1 — Severity-weighted dips</td>
+          <td>Power quality events</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
+          <td class="num">0.25</td>
+          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
+          <td>Physical asset condition & environment</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#3b9eff">E</strong> Economic</td>
+          <td class="num">0.10</td>
+          <td>2 — ARERA penalties, productivity loss</td>
+          <td>Economic impact of interruptions</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
+          <td class="num">0.20</td>
+          <td>3 — Municipal KPI, reverse power flow, criticality class</td>
+          <td>Grid capacity utilisation</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#22d3ee">T</strong> Transition</td>
+          <td class="num">0.05</td>
+          <td>1 — DER Stress Index (DER penetration + variability + EV load)</td>
+          <td>Energy transition exposure</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modifiers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
+      <span class="label-xs">Context multipliers</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:500">R2</td>
+          <td>Adaptive IRI + Climate</td>
+          <td class="num">internal</td>
+          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R3</td>
+          <td>Consequence + Poverty</td>
+          <td class="num">[0.70, 1.30]</td>
+          <td>Amplifies risk for substations serving large/energy-poor populations with high economic dependency. Includes fiscal, migration, elderly, and flood enrichments.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R4</td>
+          <td>Graph Criticality</td>
+          <td class="num">[0.80, 1.35]</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6a</td>
+          <td>Restoration Speed</td>
+          <td class="num">[0.90, 1.10]</td>
+          <td>CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two substations with identical SAIDI can have different risk profiles.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6b</td>
+          <td>Seismic Hazard</td>
+          <td class="num">[1.00, 1.25]</td>
+          <td>INGV MPS04 seismic hazard. Penalises substations in high-PGA zones (Zone 1–2). Uses 475-year return period peak ground acceleration. ISO 9223 corrosion classification enriches exposure assessment.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R7</td>
+          <td>Cyber-Exposure</td>
+          <td class="num">[0.99, 1.05]</td>
+          <td>Province-level continuous model based on DESI regional digital readiness, urban/rural adjustments, and HV voltage class bonus. 556 unique values. Indicative — awaiting NIS2 compliance data.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Classification -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Classification Bands</h3>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MC & Confidence -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Uncertainty Quantification</h3>
+      <span class="label-xs">Monte Carlo engine</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
+      Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per sub</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">67s</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Metrics -->
+  <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
+
+  <!-- Normalisation Methods -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Normalisation Methods</h3>
+    </div>
+    <div id="method-norm"></div>
+  </div>
+
+  <!-- Data Layers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Layers — 95 Variables</h3>
+      <span class="label-xs">11 layers</span>
+    </div>
+    <table class="data-table" id="method-layers">
+      <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Data Sources -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>30 Verified Data Sources</h3>
+      <!-- Note: All P2 variables derive from existing sources (INGV, ISO 9223, IEEE/CIGRÉ) -->
+      <span class="label-xs">28 open + 2 free registration</span>
+    </div>
+    <table class="data-table" id="method-sources">
+      <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Validation -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Validation Framework</h3>
+      <span class="label-xs" id="method-val-count"></span>
+    </div>
+    <table class="data-table" id="method-validation">
+      <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Changelog -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>v3.4 → v4.0.2 Changelog</h3>
+    </div>
+    <table class="data-table" id="method-changelog">
+      <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Competitive Positioning Note -->
+  <div class="card animate-in" style="border-left:3px solid var(--sage)">
+    <div class="card-header">
+      <h3>Competitive Positioning</h3>
+      <span class="label-xs">v4.0.2</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7">
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only cybersecurity (crude proxy, awaiting NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
+    </p>
+  </div>
+</main>
+
+<script>
+(function() {
+  const M = window.SSIMetadata;
+  if (!M) return;
+
+  // Detailed metrics per component
+  const detailEl = document.getElementById('method-metrics-detail');
+  if (detailEl) {
+    let html = '<div class="card-header"><h3>Metric Detail — 20 Metrics</h3></div>';
+    M.COMPONENTS.forEach(comp => {
+      html += '<div style="margin:16px 0 8px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + comp.color + ';margin-right:6px"></span><strong style="color:' + comp.color + '">' + comp.id + '</strong> ' + comp.name + ' — <strong>' + comp.weight.toFixed(2) + '</strong>';
+      if (comp.isNew) html += ' <span style="font-size:10px;color:#0e7490;background:#e0f7fa;padding:1px 6px;border-radius:2px;font-weight:600">NEW v4.0</span>';
+      html += '</div>';
+      html += '<table class="data-table" style="margin-bottom:12px"><thead><tr><th>Metric</th><th style="text-align:right">Intra</th><th style="text-align:right">Global</th><th>Norm</th><th>Source</th></tr></thead><tbody>';
+      comp.metrics.forEach(m => {
+        html += '<tr' + (m.isNew ? ' style="background:#e0f7fa11"' : '') + '>';
+        html += '<td><strong>' + m.id + '</strong> ' + m.name;
+        if (m.isNew) html += ' <span style="font-size:9px;color:#0e7490;font-weight:600">NEW</span>';
+        if (m.inverted) html += ' <span style="font-size:9px;color:var(--sage);font-weight:600">↓INV</span>';
+        if (m.adaptive) html += ' <span style="font-size:9px;color:var(--terracotta);font-weight:600">R2</span>';
+        html += '</td>';
+        html += '<td class="num">' + m.intra.toFixed(m.intra < 0.1 ? 3 : 2) + '</td>';
+        html += '<td class="num">' + m.global.toFixed(3) + '</td>';
+        html += '<td style="font-size:11px">' + m.norm + '</td>';
+        html += '<td style="font-size:11px;color:var(--warm-grey)">' + m.source + '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+    });
+    detailEl.innerHTML = html;
+  }
+
+  // Normalisation methods
+  const normEl = document.getElementById('method-norm');
+  if (normEl) {
+    normEl.innerHTML = M.NORM_METHODS.map(n =>
+      '<div style="margin-bottom:12px;padding:12px 16px;background:var(--cream);border-radius:var(--radius-sm);border-left:2px solid var(--terracotta)">' +
+      '<div style="font-weight:600;font-size:13px;margin-bottom:4px">Method ' + n.id + ' — ' + n.name + '</div>' +
+      '<div class="formula-block" style="margin:8px 0;padding:8px 12px;font-size:12px">' + n.formula + '</div>' +
+      '<div style="font-size:11px;color:var(--warm-grey)">Applies to: ' + n.applies + '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  // Data layers
+  const layerTbody = document.querySelector('#method-layers tbody');
+  if (layerTbody) {
+    layerTbody.innerHTML = M.DATA_LAYERS.map(l => {
+      const statusColor = l.status === 'LIVE' ? 'var(--sage)' : l.status.includes('NEW') ? '#0e7490' : 'var(--bronze)';
+      return '<tr' + (l.isNew ? ' style="background:#e0f7fa11"' : '') + '>' +
+        '<td><strong>' + l.id + '</strong> ' + l.name + '</td>' +
+        '<td class="num">' + l.vars + '</td>' +
+        '<td style="font-size:11px;font-weight:600;color:' + statusColor + '">' + l.status + '</td>' +
+        '<td style="font-size:11px;color:var(--warm-grey)">' + l.sources + '</td></tr>';
+    }).join('') +
+    '<tr style="border-top:2px solid var(--ink)"><td><strong>Total</strong></td><td class="num"><strong>95</strong></td><td colspan="2"></td></tr>';
+  }
+
+  // Data sources
+  const srcTbody = document.querySelector('#method-sources tbody');
+  if (srcTbody) {
+    srcTbody.innerHTML = M.DATA_SOURCES.map(s =>
+      '<tr><td style="font-size:12px"><strong>' + s.name + '</strong>' +
+      (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">⚠ registration</span>' : '') +
+      '</td><td style="font-size:11px">' + s.category + '</td>' +
+      '<td style="font-size:11px">' + s.freq + '</td>' +
+      '<td style="font-size:11px">' + s.res + '</td>' +
+      '<td class="num">' + s.vars + '</td>' +
+      '<td style="font-size:11px;color:var(--warm-grey)">' + s.feeds + '</td></tr>'
+    ).join('');
+  }
+
+  // Validation
+  const valTbody = document.querySelector('#method-validation tbody');
+  const valCount = document.getElementById('method-val-count');
+  if (valTbody) {
+    valTbody.innerHTML = M.VALIDATION_CHECKS.map(v => {
+      const statusIcon = v.status === 'verified' ? '✓' : v.status === 'expected' ? '✓ expected' : '⏳ new';
+      const statusColor = v.status === 'verified' ? 'var(--sage)' : v.status === 'expected' ? 'var(--sage)' : '#0e7490';
+      return '<tr' + (v.isNew ? ' style="background:#e0f7fa11"' : '') + '>' +
+        '<td style="font-weight:500">' + v.check + '</td>' +
+        '<td style="font-size:12px">' + v.criterion + '</td>' +
+        '<td style="font-size:12px;font-weight:600;color:' + statusColor + '">' + statusIcon + '</td></tr>';
+    }).join('');
+    if (valCount) valCount.textContent = M.VALIDATION_CHECKS.length + ' checks';
+  }
+
+  // Changelog
+  const clTbody = document.querySelector('#method-changelog tbody');
+  if (clTbody) {
+    const typeColors = { new: '#0e7490', enhanced: 'var(--terracotta)', data: 'var(--bronze)' };
+    clTbody.innerHTML = M.CHANGELOG.map(c =>
+      '<tr><td style="font-family:monospace;font-weight:600">' + c.id + '</td>' +
+      '<td style="font-size:12px">' + c.change + '</td>' +
+      '<td><span style="font-size:10px;font-weight:600;color:' + (typeColors[c.type] || 'var(--ink)') +
+      ';background:' + (typeColors[c.type] || 'var(--ink)') + '15;padding:1px 8px;border-radius:2px">' +
+      c.type.toUpperCase() + '</span></td></tr>'
+    ).join('');
+  }
+})();
+</script>
+
+<script>renderFooter();</script>
+</body>
+</html>
