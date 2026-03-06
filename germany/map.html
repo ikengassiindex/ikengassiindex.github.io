@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Interactive map of Germany's electrical grid with SSI v4.0.2 resilience scores for 401 Kreise. 95 variables, topology network + MaStR registry risk.">
+<meta name="description" content="Interactive map of Germany's electrical grid with SSI v4.0.2 resilience scores for 9,051 substations across 401 Kreise. 95 variables, topology network + MaStR registry risk.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Map Explorer</title>
 <link rel="stylesheet" href="../style.css?v=3">
@@ -142,7 +142,7 @@
 <main class="page-shell" style="max-width:1440px">
   <div class="page-header animate-in">
     <h1>Map Explorer</h1>
-    <p>Explore 401 Kreise in Germany's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
+    <p>Explore 9,051 substations across Germany's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
   </div>
 
   <!-- Filter Bar -->
@@ -177,7 +177,7 @@
       <option value="S">S — Saturation</option>
       <option value="T">T — Energy Transition</option>
     </select>
-    <input type="search" id="filter-search" placeholder="Search Kreis…" style="margin-left:auto;width:180px">
+    <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
   </div>
 
   <!-- Map + Detail Panel -->
@@ -185,7 +185,7 @@
     <!-- Map -->
     <div class="card" style="padding:0;overflow:hidden">
       <div class="map-container">
-        <canvas id="ssi-map-canvas" role="img" aria-label="Interactive map of Germany's electrical grid showing Kreise colored by SSI resilience score. Use mouse to pan and zoom, click Kreise for details."></canvas>
+        <canvas id="ssi-map-canvas" role="img" aria-label="Interactive map of Germany's electrical grid showing substations colored by SSI resilience score. Use mouse to pan and zoom, click substations for details."></canvas>
         <div id="map-tooltip"></div>
 
         <div class="map-legend">
@@ -195,7 +195,7 @@
           <div class="map-legend-item"><div class="band-dot high"></div> High (0.50–0.75)</div>
           <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75–1.00)</div>
           <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(44,36,32,0.08);font-size:10px;color:var(--warm-grey);line-height:1.5">
-            Scroll to zoom · Drag to pan<br>Click Kreis to inspect
+            Scroll to zoom · Drag to pan<br>Click substation to inspect
           </div>
         </div>
 
@@ -224,7 +224,7 @@
     onLoaded: function(ssi) {
       var stats = document.getElementById('map-stats');
       if (stats) {
-        stats.innerHTML = '<b>' + ssi.fleet_summary.total + '</b> Kreise (401 Kreise · 16 Bundesländer) · ' +
+        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + ssi.meta.total_kreise + ' Kreise · 16 Bundesländer · ' +
           '<b>' + ssi.fleet_summary.bands.Critical + '</b> critical · ' +
           'median R = <b>' + ssi.fleet_summary.median_R.toFixed(3) + '</b>';
       }

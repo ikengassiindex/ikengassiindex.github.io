@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Germany's 401 Kreise. 95 variables, topology network + MaStR DER registry. Open data, open methodology.">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Germany's 9,051 substations across 401 Kreise and 16 Bundesländer. 95 variables, topology network + MaStR DER registry. Open data, open methodology.">
 <meta name="theme-color" content="#941914">
 <meta property="og:title" content="SSI Index — Overview">
 <meta property="og:description" content="Composite resilience scoring for Germany's electrical grid. 95 variables, 16 public data sources.">
@@ -22,7 +22,7 @@
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
     <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
-    <p>A composite resilience score for 401 German Kreise — 401 Kreise, 16 Bundesländer — 95 variables, 16 public data sources, zero proprietary dependencies.</p>
+    <p>A composite resilience score for Germany's electrical grid — 9,051 substations across 401 Kreise and 16 Bundesländer — 95 variables, 16 public data sources, zero proprietary dependencies.</p>
     <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
   </div>
 
@@ -45,9 +45,9 @@
   <!-- KPI Row -->
   <div class="kpi-grid">
     <div class="kpi-card animate-in delay-1">
-      <div class="kpi-label">Kreise Scored</div>
+      <div class="kpi-label">Substations Scored</div>
       <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
-      <div class="kpi-sub">401 Kreise · 16 Bundesländer</div>
+      <div class="kpi-sub" id="kpi-total-sub">9,051 substations · 401 Kreise · 16 Bundesländer</div>
     </div>
     <div class="kpi-card animate-in delay-2">
       <div class="kpi-label">Fleet Median R</div>
@@ -95,21 +95,21 @@
         <a href="map.html" style="font-size:12px;color:var(--terracotta);text-decoration:none;font-weight:500">Explore map →</a>
       </div>
       <div style="position:relative;height:340px;background:var(--cream-deep);border-radius:var(--radius-sm);overflow:hidden">
-        <canvas id="mini-map-canvas" style="width:100%;height:100%;cursor:pointer" role="img" aria-label="Mini-map showing Germany's grid Kreise by SSI band. Click to open full map."></canvas>
+        <canvas id="mini-map-canvas" style="width:100%;height:100%;cursor:pointer" role="img" aria-label="Mini-map showing Germany's grid substations by SSI band. Click to open full map."></canvas>
       </div>
     </div>
 
-    <!-- Top Critical Kreise -->
+    <!-- Top Critical Substations -->
     <div class="card animate-in delay-2">
       <div class="card-header">
-        <h3>Highest Risk Kreise</h3>
+        <h3>Highest Risk Substations</h3>
         <span class="label-xs">Top 8 by R_median</span>
       </div>
       <table class="data-table">
         <thead>
           <tr>
+            <th>Substation</th>
             <th>Kreis</th>
-            <th>Bundesland</th>
             <th style="text-align:right">R Score</th>
             <th>Band</th>
           </tr>
@@ -148,7 +148,7 @@
               <div><strong>1.78 B</strong> computations per run</div>
               <div><strong>42.9 M</strong> Monte Carlo simulations</div>
               <div><strong>244,701</strong> output data points</div>
-              <div><strong>2,672</strong> unique risk scores</div>
+              <div><strong>9,051</strong> substation risk scores</div>
               <div><strong>14,221</strong> grid lines · ~46,000 km</div>
             </div>
           </div>
@@ -217,7 +217,8 @@
       document.getElementById('kpi-median-sub').textContent = 'P5 = ' + ssi.fleet_summary.P5.toFixed(3) + ' · P95 = ' + ssi.fleet_summary.P95.toFixed(3);
       document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
       document.getElementById('kpi-critical-sub').textContent = ssi.fleet_summary.band_pct.Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
-      document.getElementById('dist-count').textContent = ssi.fleet_summary.total.toLocaleString() + ' Kreise';
+      document.getElementById('dist-count').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations';
+      document.getElementById('kpi-total-sub').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations · ' + ssi.meta.total_kreise + ' Kreise · ' + ssi.regions.length + ' Bundesländer';
 
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;
@@ -236,7 +237,7 @@
       var top8 = ssi.substations.slice(0, 8);
       tbody.innerHTML = top8.map(function(s) {
         return '<tr><td style="font-weight:500">' + s.name + '</td>' +
-          '<td>' + s.region + '</td>' +
+          '<td>' + s.province + '</td>' +
           '<td class="num">' + s.R_median.toFixed(3) + '</td>' +
           '<td><span class="band-badge ' + s.classification.toLowerCase() + '"><span class="band-dot ' + s.classification.toLowerCase() + '"></span>' + s.classification + '</span></td></tr>';
       }).join('');

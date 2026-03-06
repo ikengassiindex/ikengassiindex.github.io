@@ -33,7 +33,7 @@
       <div class="kpi-sub">All verified & public</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Kreise</div>
+      <div class="kpi-label">Substations</div>
       <div class="kpi-value" style="color:var(--sage)" id="data-subs">—</div>
       <div class="kpi-sub" id="data-subs-sub">Loading…</div>
     </div>
@@ -54,7 +54,7 @@
       <div id="dl-full" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📊</div>
         <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (PDF)</div>
-        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">— Kreise · all fields</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">— substations · all fields</div>
       </div>
       <div id="dl-summary" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📋</div>
@@ -214,7 +214,7 @@
   <div class="card animate-in">
     <div class="card-header">
       <h3>Output Schema</h3>
-      <span class="label-xs">JSON per Kreis</span>
+      <span class="label-xs">JSON per substation</span>
     </div>
     <div class="formula-block" id="schema-block" style="font-size:12px;line-height:1.6">
       Loading live sample…
@@ -297,8 +297,8 @@ fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(
 
   // Update KPI
   document.getElementById('data-subs').textContent = n.toLocaleString();
-  document.getElementById('data-subs-sub').textContent = ssi.regions.length + ' Bundesländer · 401 Kreise';
-  document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' Kreise · all fields';
+  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + ssi.meta.total_kreise + ' Kreise · ' + ssi.regions.length + ' Bundesländer';
+  document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' substations · all fields';
 
   // ── Full Dataset PDF (registration-gated) ──
   document.getElementById('dl-full').addEventListener('click', function() {
@@ -381,7 +381,7 @@ fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(
         styles: { fontSize: 8, cellPadding: 2.5 },
         headStyles: { fillColor: [148, 25, 20], textColor: 255 },
         alternateRowStyles: { fillColor: [252, 249, 244] },
-        head: [['Bundesland', 'Kreise', 'Mean R', 'Min R', 'Max R']],
+        head: [['Bundesland', 'Substations', 'Mean R', 'Min R', 'Max R']],
         body: Object.keys(regData).sort().map(function(r) {
           var d = regData[r];
           return [r, d.count, (d.sum / d.count).toFixed(3), d.min.toFixed(3), d.max.toFixed(3)];
@@ -394,7 +394,7 @@ fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(
       var sorted = ssi.substations.slice().sort(function(a, b) { return a.R_median - b.R_median; });
 
       doc.setFontSize(11); doc.setFont('helvetica', 'bold');
-      doc.text('Top 20 Most Resilient Kreise', 14, y); y += 6;
+      doc.text('Top 20 Most Resilient Substations', 14, y); y += 6;
       doc.autoTable({
         startY: y,
         styles: { fontSize: 8, cellPadding: 2 },
@@ -410,7 +410,7 @@ fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(
 
       if (y > 240) { doc.addPage(); y = 20; }
       doc.setFontSize(11); doc.setFont('helvetica', 'bold');
-      doc.text('Top 20 Most Vulnerable Kreise', 14, y); y += 6;
+      doc.text('Top 20 Most Vulnerable Substations', 14, y); y += 6;
       doc.autoTable({
         startY: y,
         styles: { fontSize: 8, cellPadding: 2 },
