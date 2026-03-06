@@ -47,17 +47,17 @@
 <div class="kpi-grid" style="margin:20px 0">
   <div class="kpi-card">
     <div class="kpi-label">Substations Scored</div>
-    <div class="kpi-value" style="color:var(--ink)">9,051</div>
+    <div class="kpi-value" style="color:var(--ink)">13,251</div>
     <div class="kpi-sub">401 Kreise · 16 Bundesländer</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
-    <div class="kpi-value" style="color:var(--ink)">8,670</div>
-    <div class="kpi-sub">~47,000 km coverage</div>
+    <div class="kpi-value" style="color:var(--ink)">12,869</div>
+    <div class="kpi-sub">~86,000 km coverage</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">MC Simulations</div>
-    <div class="kpi-value" style="color:var(--ink)">90.5 M</div>
+    <div class="kpi-value" style="color:var(--ink)">132.5 M</div>
     <div class="kpi-sub">10,000 per substation</div>
   </div>
   <div class="kpi-card">
@@ -67,7 +67,7 @@
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score — scoring 71/80 (89%) across 16 competitive dimensions, ahead of GMLC 1.1 (48/80), EPRI (40/80), and academic MCDA frameworks (41/80). Its engine processes 346,000+ source data points per run, executes 90.5 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and performs 3.76 billion arithmetic operations — producing 443,499 output data points with full uncertainty quantification across 9,051 substations spanning 401 Kreise and 8,670 grid lines covering ~47,000 km.</p>
+<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score — scoring 71/80 (89%) across 16 competitive dimensions, ahead of GMLC 1.1 (48/80), EPRI (40/80), and academic MCDA frameworks (41/80). Its engine processes 346,000+ source data points per run, executes 132.5 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and performs 2.65 billion arithmetic operations — producing 649,299 output data points with full uncertainty quantification across 13,251 substations spanning 401 Kreise and 12,869 grid lines covering ~86,000 km.</p>
 
 <p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 35 verified public sources, making the methodology fully auditable and reproducible. Initially covering Italy's entire transmission and distribution grid, the Index is progressively being rolled out to all OECD countries — applying the same silo-breaking approach: fusing grid risk with societal exposure at asset-level resolution wherever open data permits.</p>
 
@@ -1350,12 +1350,12 @@
       ssiLink: 'valuation-stack' },
     { layer: 3, ref: '§0.5.2', title: 'Gradient Boosting + Quantile DNN',
       subtitle: 'Ensemble learning for uncertainty quantification',
-      body: 'The neural network layer combines two complementary models: (1) Gradient Boosted Trees (GBT) for point-prediction of R_median across the 9,051-substation German fleet; (2) Quantile regression DNN heads for predicting P5, P95 confidence bounds. The GBT ingests all 95 variables and learns non-linear interactions — e.g., how S (saturation) amplifies I (infrastructure age) risk, or how E (economic density) dampens Voltage component effects. Training uses the Italian 4,293-substation ground truth (Monte Carlo scores + CI bounds) as the reference distribution. Transfer learning applies German data mapping (source substitution: Terna→BNetzA, ISTAT→StBA) with domain adaptation: recalibrating normalisation bounds and learning rates to account for Germany\'s higher renewable penetration, stricter safety standards, and different demand seasonality. The quantile DNN learns to predict CI_width accurately — crucial for the Platform layer\'s real-options valuation, where wide uncertainty intervals create higher option value.',
+      body: 'The neural network layer combines two complementary models: (1) Gradient Boosted Trees (GBT) for point-prediction of R_median across the 13,251-substation German fleet; (2) Quantile regression DNN heads for predicting P5, P95 confidence bounds. The GBT ingests all 95 variables and learns non-linear interactions — e.g., how S (saturation) amplifies I (infrastructure age) risk, or how E (economic density) dampens Voltage component effects. Training uses the Italian 4,293-substation ground truth (Monte Carlo scores + CI bounds) as the reference distribution. Transfer learning applies German data mapping (source substitution: Terna→BNetzA, ISTAT→StBA) with domain adaptation: recalibrating normalisation bounds and learning rates to account for Germany\'s higher renewable penetration, stricter safety standards, and different demand seasonality. The quantile DNN learns to predict CI_width accurately — crucial for the Platform layer\'s real-options valuation, where wide uncertainty intervals create higher option value.',
       concepts: ['GBT for point-prediction + Quantile DNN for uncertainty bounds', 'Training on Italian ground truth with domain adaptation to Germany', 'Transfer learning: source mapping + normalisation recalibration', 'Quantile regression critical for real-options value computation'],
       ssiLink: 'neural-net' },
     { layer: 4, ref: '§0.6.1', title: 'Country Expansion Protocol — Data Quality Scorecard',
       subtitle: 'Rigorous criteria for rollout to non-Italian countries',
-      body: 'The SSI was designed for Italy (4,293 substations, 20 regions, clean TERNA registry). Expanding to Germany (9,051 substations, 16 Bundesländer, 401 Kreise) requires passing a Coverage Quality Scorecard (DCI): (1) Source mapping — for each of 30 Italian data sources, identify German equivalent (BNetzA, StBA, DWD, etc.); (2) Granularity — does the German registry cover transmission+distribution to substation level? Germany passes: BNetzA MaStR has 9,051 substations. (3) Frequency — are key sources updated within 12 months? Germany passes: BNetzA publishes SAIDI/SAIFI quarterly, MaStR weekly. (4) Scope — do sources cover all 16 Bundesländer equally, or are there blind spots? Germany passes with caveats: eastern Bundesländer have lower data granularity. (5) Validation — can ground truth be independently verified? Germany passes: cross-validate substation counts against published grid operator reports. Scoring DCI > 0.70 qualifies a country for production-grade coverage. Germany scores 0.84 — among the highest for non-Italian rollout.',
+      body: 'The SSI was designed for Italy (4,293 substations, 20 regions, clean TERNA registry). Expanding to Germany (13,251 substations, 16 Bundesländer, 401 Kreise) requires passing a Coverage Quality Scorecard (DCI): (1) Source mapping — for each of 30 Italian data sources, identify German equivalent (BNetzA, StBA, DWD, etc.); (2) Granularity — does the German registry cover transmission+distribution to substation level? Germany passes: BNetzA MaStR has 13,251 substations. (3) Frequency — are key sources updated within 12 months? Germany passes: BNetzA publishes SAIDI/SAIFI quarterly, MaStR weekly. (4) Scope — do sources cover all 16 Bundesländer equally, or are there blind spots? Germany passes with caveats: eastern Bundesländer have lower data granularity. (5) Validation — can ground truth be independently verified? Germany passes: cross-validate substation counts against published grid operator reports. Scoring DCI > 0.70 qualifies a country for production-grade coverage. Germany scores 0.84 — among the highest for non-Italian rollout.',
       concepts: ['Coverage Quality Scorecard (DCI) for country eligibility', '5 criteria: source mapping, granularity, frequency, scope, validation', 'Germany: DCI = 0.84 (strong: BNetzA, MaStR, DWD integration)', 'DCI < 0.70 = research-grade only; > 0.70 = production-ready'],
       ssiLink: 'dci-scorecard' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
@@ -1390,7 +1390,7 @@
       ssiLink: 'api' },
     { layer: 4, ref: '§0.6.3', title: 'Substation Registry Construction',
       subtitle: 'How to identify 9,000+ substations across German transmission and distribution grids from open data',
-      body: 'Before any valuation can be computed, the substation population must be identified. Germany has a clean registry of 9,051 substations from BNetzA Marktstammdatenregister (MaStR) and TSO publications. The registry is constructed from OpenStreetMap (primary geometry), BNetzA publications (validation), and satellite imagery analysis (gap-filling). The construction pipeline follows four steps: (1) OSM extraction — query all nodes/ways tagged power=substation within Germany, filtering by voltage class; (2) deduplication — merge overlapping geometries and resolve naming conflicts with BNetzA master data; (3) attribute enrichment — assign voltage class, operator (TSO zone), and approximate capacity from OSM tags and BNetzA datasets; (4) validation — cross-reference against published grid statistics (total number of substations per TSO, installed capacity by voltage level) and flag discrepancies. For Germany, this pipeline recovered 97.8% of the official BNetzA registry, giving confidence in its applicability to other well-mapped European countries.',
+      body: 'Before any valuation can be computed, the substation population must be identified. Germany has a clean registry of 13,251 substations from BNetzA Marktstammdatenregister (MaStR) and TSO publications. The registry is constructed from OpenStreetMap (primary geometry), BNetzA publications (validation), and satellite imagery analysis (gap-filling). The construction pipeline follows four steps: (1) OSM extraction — query all nodes/ways tagged power=substation within Germany, filtering by voltage class; (2) deduplication — merge overlapping geometries and resolve naming conflicts with BNetzA master data; (3) attribute enrichment — assign voltage class, operator (TSO zone), and approximate capacity from OSM tags and BNetzA datasets; (4) validation — cross-reference against published grid statistics (total number of substations per TSO, installed capacity by voltage level) and flag discrepancies. For Germany, this pipeline recovered 97.8% of the official BNetzA registry, giving confidence in its applicability to other well-mapped European countries.',
       concepts: ['OSM extraction → deduplication → enrichment → validation', '97.8% recovery rate against official German registry', 'Voltage class, operator, capacity from OSM + BNetzA data', 'Target: full transmission + distribution grid coverage'],
       ssiLink: 'registry' }
   ];
@@ -1751,7 +1751,7 @@
 <!-- ═══════════════════ COLOPHON ═══════════════════ -->
 <div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
   <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Monthly Intelligence Report — Edition 001 (Inaugural)</p>
-  <p style="margin-bottom:4px">Published [Date] · SSI Index v4.0.2 · 9,051 substations · 8,670 grid lines · 6 components · 20 metrics · 5 modifiers</p>
+  <p style="margin-bottom:4px">Published [Date] · SSI Index v4.0.2 · 13,251 substations · 12,869 grid lines · 6 components · 20 metrics · 5 modifiers</p>
   <p>10,000-iteration Gaussian Copula Monte Carlo · Sobol global sensitivity analysis (3.76B operations) · CMIP6 SSP2-4.5</p>
 </div>
 
