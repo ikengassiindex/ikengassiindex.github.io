@@ -724,7 +724,7 @@
       ['R3 Consequence', ssi.modifiers.R3_C_mult],
       ['R4 Graph Criticality', ssi.modifiers.R4_F_topo],
       ['R6a Restoration', ssi.modifiers.R6_restoration],
-      ['R6b Seismic', ssi.modifiers.R6_seismic || 1.0],
+      ['R6b Network Topology', ssi.modifiers.R6_seismic || 1.0],
       ['R7 Cyber-Exposure', ssi.modifiers.R7_cyber]
     ];
 
@@ -771,11 +771,13 @@
       <div class="card">
         <div class="label-xs" style="margin-bottom:8px">Context</div>
         <div style="font-size:11px;line-height:2.1">
-          <div style="display:flex;justify-content:space-between"><span>Energy poverty</span><span style="font-weight:500">${ssi.socio_economic.EP_rate_region}% — V_socio ${ssi.socio_economic.V_socio.toFixed(2)}</span></div>
-          <div style="display:flex;justify-content:space-between"><span>E2 Productivity</span><span style="font-weight:500">${ssi.socio_economic.E2_local.toFixed(3)}</span></div>
-          <div style="display:flex;justify-content:space-between"><span>DER Stress (T1)</span><span style="font-weight:500">${ssi.transition.T1_score.toFixed(3)}</span></div>
-          <div style="display:flex;justify-content:space-between"><span>Graph degree</span><span style="font-weight:500">${ssi.graph_topology.degree}${ssi.graph_topology.is_bridge ? ' (bridge)' : ''}</span></div>
-          <div style="display:flex;justify-content:space-between"><span>BC percentile</span><span style="font-weight:500">${ssi.graph_topology.BC_percentile.toFixed(2)}</span></div>
+          ${ssi.socio_economic.EP_rate_region != null ? '<div style="display:flex;justify-content:space-between"><span>Energy poverty</span><span style="font-weight:500">' + ssi.socio_economic.EP_rate_region + '% — V_socio ' + (ssi.socio_economic.V_socio != null ? ssi.socio_economic.V_socio.toFixed(2) : '—') + '</span></div>' : ''}
+          ${ssi.socio_economic.E2_local != null ? '<div style="display:flex;justify-content:space-between"><span>E2 Productivity</span><span style="font-weight:500">' + ssi.socio_economic.E2_local.toFixed(3) + '</span></div>' : ''}
+          ${ssi.socio_economic.unemployment_rate != null ? '<div style="display:flex;justify-content:space-between"><span>Unemployment</span><span style="font-weight:500">' + ssi.socio_economic.unemployment_rate.toFixed(1) + '%</span></div>' : ''}
+          ${ssi.socio_economic.gdp_per_capita != null ? '<div style="display:flex;justify-content:space-between"><span>GDP per capita</span><span style="font-weight:500">€' + Math.round(ssi.socio_economic.gdp_per_capita).toLocaleString() + '</span></div>' : ''}
+          <div style="display:flex;justify-content:space-between"><span>DER Stress (T1)</span><span style="font-weight:500">${ssi.transition && ssi.transition.T1_score != null ? ssi.transition.T1_score.toFixed(3) : '—'}</span></div>
+          ${ssi.graph_topology ? '<div style="display:flex;justify-content:space-between"><span>Graph degree</span><span style="font-weight:500">' + ssi.graph_topology.degree + (ssi.graph_topology.is_bridge ? ' (bridge)' : '') + '</span></div>' : ''}
+          ${ssi.graph_topology ? '<div style="display:flex;justify-content:space-between"><span>BC percentile</span><span style="font-weight:500">' + ssi.graph_topology.BC_percentile.toFixed(2) + '</span></div>' : ''}
           ${ssi.seismic ? '<div style="display:flex;justify-content:space-between"><span>Seismic zone</span><span style="font-weight:500">Zone ' + ssi.seismic.zone + ' · PGA ' + ssi.seismic.pga_g.toFixed(3) + 'g</span></div>' : ''}
           ${ssi.markov ? '<div style="display:flex;justify-content:space-between"><span>Markov risk</span><span style="font-weight:500">' + ssi.markov.risk_score.toFixed(3) + ' · ETTC ' + ssi.markov.ettc_years.toFixed(1) + 'y</span></div>' : ''}
           ${ssi.markov ? '<div style="display:flex;justify-content:space-between"><span>Corrosion</span><span style="font-weight:500">' + ssi.markov.corrosion_class + '</span></div>' : ''}
@@ -1027,7 +1029,7 @@
     // Populate regions dropdown
     if (regionSel && SSI) {
       const regions = SSI.regions.map(r => r.region).sort();
-      regionSel.innerHTML = '<option value="all">All Regions</option>' +
+      regionSel.innerHTML = '<option value="all">All Bundesländer</option>' +
         regions.map(r => `<option value="${r}">${r}</option>`).join('');
     }
 

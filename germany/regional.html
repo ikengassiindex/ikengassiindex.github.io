@@ -202,8 +202,8 @@ function buildProvinceData(data) {
       mods.R6a += s.modifiers.R6_restoration;
       mods.R6b += (s.modifiers.R6_seismic || 1.0);
       mods.R7 += s.modifiers.R7_cyber;
-      epSum += s.socio_economic.EP_rate_region;
-      degSum += s.graph_topology.degree;
+      epSum += (s.socio_economic.EP_rate_region || s.socio_economic.unemployment_rate || 0);
+      degSum += (s.graph_topology ? s.graph_topology.degree : 0);
     });
     Object.keys(comps).forEach(function(k) { comps[k] /= n; });
     Object.keys(mods).forEach(function(k) { mods[k] /= n; });
@@ -272,7 +272,7 @@ function updateComparison() {
   addRow('T Transition', a.components.T, b.components.T);
 
   rows.push('<tr style="border-top:2px solid var(--card-border)"></tr>');
-  addRow('Energy Poverty', a.EP_rate, b.EP_rate, pct, 'pp');
+  addRow('Unemployment Rate', a.EP_rate, b.EP_rate, pct, 'pp');
   addRow('Avg Graph Degree', a.avg_degree, b.avg_degree, function(v) { return v.toFixed(1); }, 'int');
   addRow('Substations', a.count, b.count, function(v) { return v.toFixed(0); }, 'int');
 

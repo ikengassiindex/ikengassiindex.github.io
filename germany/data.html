@@ -523,16 +523,15 @@ fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(
       '<span class="hl-num">"R6a"</span>: ' + s.modifiers.R6_restoration.toFixed(3) + ', ' +
       '<span class="hl-num">"R6b"</span>: ' + (s.modifiers.R6_seismic || 1.0).toFixed(3) + ', ' +
       '<span class="hl-num">"R7"</span>: ' + s.modifiers.R7_cyber.toFixed(3) + ' },\n' +
-    '  <span class="hl-var">"socio_economic"</span>: { <span class="hl-num">"V_socio"</span>: ' + s.socio_economic.V_socio.toFixed(3) + ', <span class="hl-num">"EP_rate"</span>: ' + s.socio_economic.EP_rate_region.toFixed(1) + ' },\n' +
-    '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + s.graph_topology.BC_percentile.toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' +
-    '  <span class="hl-var">"network"</span>: { ' +
-      '<span class="hl-num">"topology"</span>: "' + (s.network ? s.network.topology : 'mesh') + '", ' +
-      '<span class="hl-num">"centrality"</span>: ' + (s.network ? s.network.centrality.toFixed(3) : '0.450') + ', ' +
-      '<span class="hl-num">"R6b"</span>: ' + (s.network ? s.network.R6b_topo.toFixed(3) : '1.050') + ' },\n' +
-    '  <span class="hl-var">"markov"</span>: { ' +
-      '<span class="hl-num">"risk"</span>: ' + (s.markov ? s.markov.risk_score.toFixed(3) : '0.500') + ', ' +
-      '<span class="hl-num">"ettc_yr"</span>: ' + (s.markov ? s.markov.ettc_years.toFixed(1) : '12.0') + ', ' +
-      '<span class="hl-num">"topology"</span>: "' + (s.markov ? s.markov.topology_class : 'ring') + '" },\n' +
+    '  <span class="hl-var">"socio_economic"</span>: { ' +
+      '<span class="hl-num">"population"</span>: ' + (s.socio_economic.population || 0) + ', ' +
+      '<span class="hl-num">"gdp_per_capita"</span>: ' + (s.socio_economic.gdp_per_capita ? s.socio_economic.gdp_per_capita.toFixed(0) : '—') + ', ' +
+      '<span class="hl-num">"unemployment_rate"</span>: ' + (s.socio_economic.unemployment_rate ? s.socio_economic.unemployment_rate.toFixed(1) : '—') + ' },\n' +
+    (s.graph_topology ? '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + s.graph_topology.BC_percentile.toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' : '') +
+    '  <span class="hl-var">"transition"</span>: { ' +
+      '<span class="hl-num">"T1_score"</span>: ' + (s.transition && s.transition.T1_score ? s.transition.T1_score.toFixed(3) : '—') + ', ' +
+      '<span class="hl-num">"solar_mw"</span>: ' + (s.transition && s.transition.solar_mw ? s.transition.solar_mw.toFixed(1) : '—') + ', ' +
+      '<span class="hl-num">"wind_mw"</span>: ' + (s.transition && s.transition.wind_mw ? s.transition.wind_mw.toFixed(1) : '—') + ' },\n' +
     '  <span class="hl-var">"confidence_tier"</span>: <span class="hl-num">"' + s.confidence_tier + '"</span>\n' +
     '}';
   document.getElementById('schema-block').innerHTML = schemaHTML;
