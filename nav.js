@@ -191,7 +191,7 @@ function requireRegistration(callback) {
 function renderFooter() {
   var countryStats = {
     italy: '95 variables · 30 sources · 4,293 substations (475 HV · 3,818 MV)',
-    germany: '95 variables · 16 sources · 401 Kreise across 16 Bundesländer'
+    germany: '95 variables · 35 sources · 401 Kreise across 16 Bundesländer'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
