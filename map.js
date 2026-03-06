@@ -704,7 +704,7 @@
     ['C', 'V', 'I', 'E', 'S', 'T'].map(k => {
       const w = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 }[k];
       const val = ssi.components[k];
-      const pct = Math.max(0, Math.min((1 - val / w) * 100, 100));
+      const pct = val * 100;
       const labels = { C: 'C Continuity', V: 'V Voltage', I: 'I Infrastructure', E: 'E Economic', S: 'S Saturation', T: 'T Transition' };
       const cols = { C: 'var(--crimson)', V: 'var(--terracotta)', I: 'var(--sage)', E: '#3b9eff', S: 'var(--bronze)', T: '#22d3ee' };
       return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
