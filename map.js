@@ -636,7 +636,7 @@
       ['R3', 'Consequence', R3],
       ['R4', 'Graph Criticality', R4],
       ['R6a', 'Restoration Speed', R6a],
-      ['R6b', 'Seismic Hazard', R6b],
+      ['R6b', 'Network Topology', R6b],
       ['R7', 'Cyber-Exposure', R7]
     ].map(([id, name, val]) => {
       const pctImpact = ((val - 1) * 100).toFixed(1);
@@ -1039,7 +1039,7 @@
     const zoomFit = document.getElementById('zoomFit');
     if (zoomIn) zoomIn.onclick = () => { view.scale = Math.min(50, view.scale * 1.4); requestDraw(); };
     if (zoomOut) zoomOut.onclick = () => { view.scale = Math.max(0.5, view.scale / 1.4); requestDraw(); };
-    if (zoomFit) zoomFit.onclick = () => { view.cx = 12.5; view.cy = 42.0; view.scale = 1; requestDraw(); };
+    if (zoomFit) zoomFit.onclick = () => { view.cx = 10.4; view.cy = 51.2; view.scale = 1; requestDraw(); };
   }
 
   // ── Init ──
@@ -1067,7 +1067,7 @@
     const basePath = options.basePath || '';
     Promise.all([
       fetch(basePath + 'grid-geo.json').then(r => r.json()),
-      fetch(basePath + 'ssi-data.json?v=2').then(r => r.json())
+      fetch(basePath + 'ssi-data.json?v=3').then(r => r.json())
     ]).then(([geo, ssi]) => {
       GEO = geo;
       SSI = ssi;
