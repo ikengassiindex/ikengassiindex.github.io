@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Germany's 13,251 substations across 401 Kreise and 16 Bundesländer. 95 variables, 35 public data sources. Open data, open methodology.">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Germany's 13,251 substations — 5,973 HV (≥110 kV), 7,278 MV — across 401 Kreise and 16 Bundesländer. 95 variables, 35 public data sources. Open data, open methodology.">
 <meta name="theme-color" content="#941914">
 <meta property="og:title" content="SSI Index — Overview">
 <meta property="og:description" content="Composite resilience scoring for Germany's electrical grid. 95 variables, 35 public data sources.">
@@ -22,7 +22,7 @@
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
     <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
-    <p>A composite resilience score for Germany's electrical grid — 13,251 substations across 401 Kreise and 16 Bundesländer — 95 variables, 35 public data sources, zero proprietary dependencies.</p>
+    <p>A composite resilience score for Germany's electrical grid — 13,251 substations — 5,973 HV (≥110 kV), 7,278 MV — across 401 Kreise and 16 Bundesländer — 95 variables, 35 public data sources, zero proprietary dependencies.</p>
     <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
   </div>
 
@@ -47,7 +47,7 @@
     <div class="kpi-card animate-in delay-1">
       <div class="kpi-label">Substations Scored</div>
       <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
-      <div class="kpi-sub" id="kpi-total-sub">13,251 substations · 401 Kreise · 16 Bundesländer</div>
+      <div class="kpi-sub" id="kpi-total-sub">5,973 HV · 7,278 MV · 401 Kreise · 16 Bundesländer</div>
     </div>
     <div class="kpi-card animate-in delay-2">
       <div class="kpi-label">Fleet Median R</div>
@@ -148,7 +148,7 @@
               <div><strong>2.65 B</strong> computations per run</div>
               <div><strong>132.5 M</strong> Monte Carlo simulations</div>
               <div><strong>649,299</strong> output data points</div>
-              <div><strong>13,251</strong> substation risk scores</div>
+              <div><strong>13,251</strong> substation risk scores · 5,973 HV · 7,278 MV</div>
               <div><strong>61,625</strong> grid lines · ~92,000 km</div>
             </div>
           </div>
@@ -206,7 +206,7 @@
   </div>
 </main>
 
-<script src="../map.js?v=14"></script>
+<script src="../map.js?v=15"></script>
 <script>
   SSIMap.init('mini-map-canvas', {
     embedded: true,
@@ -218,7 +218,9 @@
       document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
       document.getElementById('kpi-critical-sub').textContent = ssi.fleet_summary.band_pct.Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
       document.getElementById('dist-count').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations';
-      document.getElementById('kpi-total-sub').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations · ' + ssi.meta.total_kreise + ' Kreise · ' + ssi.regions.length + ' Bundesländer';
+      var hvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 110; }).length;
+      var mvCount = ssi.fleet_summary.total - hvCount;
+      document.getElementById('kpi-total-sub').textContent = hvCount.toLocaleString() + ' HV · ' + mvCount.toLocaleString() + ' MV · ' + ssi.meta.total_kreise + ' Kreise · ' + ssi.regions.length + ' Bundesländer';
 
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;

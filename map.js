@@ -797,7 +797,7 @@
       <div class="card" style="margin-bottom:12px">
         <div class="label-xs" style="margin-bottom:6px">Selected Substation</div>
         <h3 style="margin-bottom:2px;font-size:15px">${ssi.name}</h3>
-        <div style="font-size:11px;color:var(--warm-grey);margin-bottom:14px">${ssi.region} · ${ssi.province} · ${ssi.voltage_kv} kV · ${ssi.substation_id}</div>
+        <div style="font-size:11px;color:var(--warm-grey);margin-bottom:14px">${ssi.region} · ${ssi.province} · ${ssi.voltage_kv} kV ${ssi.voltage_kv >= 110 ? '(HV)' : '(MV)'} · ${ssi.substation_id}</div>
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px">
           <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:${BAND_COLORS[ssi.classification]}">${ssi.R_median.toFixed(4)}</div>
           <span class="band-badge ${ssi.classification.toLowerCase()}"><span class="band-dot ${ssi.classification.toLowerCase()}"></span>${ssi.classification}</span>
