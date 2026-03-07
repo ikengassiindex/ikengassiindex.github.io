@@ -862,8 +862,9 @@
 
     var confTiers = { high:0, medium:0, low:0 };
     fleet.forEach(function(s){
-      if (s.CI_width < 0.10) confTiers.high++;
-      else if (s.CI_width < 0.25) confTiers.medium++;
+      var ciRatio = s.R_median > 0.01 ? s.CI_width / s.R_median : 1.0;
+      if (ciRatio < 0.50) confTiers.high++;
+      else if (ciRatio < 0.70) confTiers.medium++;
       else confTiers.low++;
     });
 
@@ -879,7 +880,7 @@
       '<div class="kpi-card"><div class="kpi-label">Fleet Size</div><div class="kpi-value" style="color:var(--ink)">' + n.toLocaleString() + '</div><div class="kpi-sub">substations scored</div></div>' +
       '<div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">' + median.toFixed(3) + '</div><div class="kpi-sub">P5=' + p5.toFixed(3) + ' · P95=' + p95.toFixed(3) + '</div></div>' +
       '<div class="kpi-card"><div class="kpi-label">High + Critical</div><div class="kpi-value" style="color:var(--crimson)">' + (bands.High + bands.Critical) + '</div><div class="kpi-sub">' + ((bands.High + bands.Critical) / n * 100).toFixed(1) + '% of fleet</div></div>' +
-      '<div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">' + (confTiers.high / n * 100).toFixed(0) + '%</div><div class="kpi-sub">' + confTiers.high + ' subs · CI &lt; 0.10</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">' + (confTiers.high / n * 100).toFixed(0) + '%</div><div class="kpi-sub">' + confTiers.high + ' subs · CI/R &lt; 0.50</div></div>' +
     '</div>';
 
     // Band distribution
