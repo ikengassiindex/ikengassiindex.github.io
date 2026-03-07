@@ -284,7 +284,7 @@
 
     if (type === 'sub') {
       hlSubsPrimary.add(id); hlSubs.add(id);
-      const adj = GEO.a[id] || [];
+      const adj = (GEO.a && GEO.a[id]) || [];
       adj.forEach(li => {
         hlLines.add(li);
         const l = lineById[li];
@@ -320,7 +320,7 @@
     const sub = GEO.s[sid];
     if (!sub) return;
     const neighbors = [];
-    const adj = GEO.a[sid] || [];
+    const adj = (GEO.a && GEO.a[sid]) || [];
     adj.forEach(li => {
       const l = lineById[li];
       if (l) {
