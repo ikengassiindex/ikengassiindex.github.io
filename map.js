@@ -562,6 +562,63 @@
     return null;
   }
 
+  // ── Unified Context rows (same 13 metrics for all countries) ──
+  function buildContextRows(ssi) {
+    var se = ssi.socio_economic || {};
+    var tr = ssi.transition || {};
+    var gt = ssi.graph_topology || {};
+    var sm = ssi.seismic || {};
+    var mk = ssi.markov || {};
+    var na = '<span style="opacity:0.35">—</span>';
+
+    function row(label, val) {
+      return '<div style="display:flex;justify-content:space-between"><span>' + label + '</span><span style="font-weight:500">' + val + '</span></div>';
+    }
+
+    // 1. Unemployment
+    var unemployment = se.unemployment_rate != null ? se.unemployment_rate.toFixed(1) + '%' : na;
+    // 2. GDP per capita
+    var gdp = se.gdp_per_capita != null ? '\u20AC' + Math.round(se.gdp_per_capita).toLocaleString() : na;
+    // 3. Innovation (R&D % of GDP — GERD intensity)
+    var innovation = se.rd_pct_gdp != null ? se.rd_pct_gdp.toFixed(1) + '% of GDP' : na;
+    // 4. Energy poverty — V_socio
+    var epVal = se.EP_rate_region != null ? se.EP_rate_region + '%' : na;
+    var vsVal = se.V_socio != null ? ' — V_socio ' + se.V_socio.toFixed(2) : '';
+    var energyPoverty = se.EP_rate_region != null ? epVal + vsVal : na;
+    // 5. E2 Productivity
+    var e2 = se.E2_local != null ? se.E2_local.toFixed(3) : na;
+    // 6. DER Stress (T1)
+    var t1 = tr.T1_score != null ? tr.T1_score.toFixed(3) : na;
+    // 7. Graph degree
+    var degree = gt.degree != null ? gt.degree + (gt.is_bridge ? ' (bridge)' : '') : na;
+    // 8. BC percentile
+    var bc = gt.BC_percentile != null ? gt.BC_percentile.toFixed(2) : na;
+    // 9. Seismic zone
+    var seismic = sm.zone != null ? 'Zone ' + sm.zone + ' \u00B7 PGA ' + sm.pga_g.toFixed(3) + 'g' : na;
+    // 10. Markov risk
+    var markov = mk.risk_score != null ? mk.risk_score.toFixed(3) + ' \u00B7 ETTC ' + mk.ettc_years.toFixed(1) + 'y' : na;
+    // 11. Corrosion
+    var corrosion = mk.corrosion_class != null ? mk.corrosion_class : na;
+    // 12. Confidence
+    var confidence = ssi.confidence_tier || na;
+    // 13. Fleet percentile
+    var fleetPct = ssi.fleet_percentile != null ? (ssi.fleet_percentile * 100).toFixed(1) + '%' : na;
+
+    return row('Unemployment', unemployment) +
+      row('GDP per capita', gdp) +
+      row('Innovation (R&D)', innovation) +
+      row('Energy poverty', energyPoverty) +
+      row('E2 Productivity', e2) +
+      row('DER Stress (T1)', t1) +
+      row('Graph degree', degree) +
+      row('BC percentile', bc) +
+      row('Seismic zone', seismic) +
+      row('Markov risk', markov) +
+      row('Corrosion', corrosion) +
+      row('Confidence', confidence) +
+      row('Fleet percentile', fleetPct);
+  }
+
   function buildArticulation(ssi) {
     const weights = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 };
     const labels = { C: 'C Continuity', V: 'V Voltage', I: 'I Infrastructure', E: 'E Economic', S: 'S Saturation', T: 'T Transition' };
@@ -771,18 +828,7 @@
       <div class="card">
         <div class="label-xs" style="margin-bottom:8px">Context</div>
         <div style="font-size:11px;line-height:2.1">
-          ${ssi.socio_economic.EP_rate_region != null ? '<div style="display:flex;justify-content:space-between"><span>Energy poverty</span><span style="font-weight:500">' + ssi.socio_economic.EP_rate_region + '% — V_socio ' + (ssi.socio_economic.V_socio != null ? ssi.socio_economic.V_socio.toFixed(2) : '—') + '</span></div>' : ''}
-          ${ssi.socio_economic.E2_local != null ? '<div style="display:flex;justify-content:space-between"><span>E2 Productivity</span><span style="font-weight:500">' + ssi.socio_economic.E2_local.toFixed(3) + '</span></div>' : ''}
-          ${ssi.socio_economic.unemployment_rate != null ? '<div style="display:flex;justify-content:space-between"><span>Unemployment</span><span style="font-weight:500">' + ssi.socio_economic.unemployment_rate.toFixed(1) + '%</span></div>' : ''}
-          ${ssi.socio_economic.gdp_per_capita != null ? '<div style="display:flex;justify-content:space-between"><span>GDP per capita</span><span style="font-weight:500">€' + Math.round(ssi.socio_economic.gdp_per_capita).toLocaleString() + '</span></div>' : ''}
-          <div style="display:flex;justify-content:space-between"><span>DER Stress (T1)</span><span style="font-weight:500">${ssi.transition && ssi.transition.T1_score != null ? ssi.transition.T1_score.toFixed(3) : '—'}</span></div>
-          ${ssi.graph_topology ? '<div style="display:flex;justify-content:space-between"><span>Graph degree</span><span style="font-weight:500">' + ssi.graph_topology.degree + (ssi.graph_topology.is_bridge ? ' (bridge)' : '') + '</span></div>' : ''}
-          ${ssi.graph_topology ? '<div style="display:flex;justify-content:space-between"><span>BC percentile</span><span style="font-weight:500">' + ssi.graph_topology.BC_percentile.toFixed(2) + '</span></div>' : ''}
-          ${ssi.seismic ? '<div style="display:flex;justify-content:space-between"><span>Seismic zone</span><span style="font-weight:500">Zone ' + ssi.seismic.zone + ' · PGA ' + ssi.seismic.pga_g.toFixed(3) + 'g</span></div>' : ''}
-          ${ssi.markov ? '<div style="display:flex;justify-content:space-between"><span>Markov risk</span><span style="font-weight:500">' + ssi.markov.risk_score.toFixed(3) + ' · ETTC ' + ssi.markov.ettc_years.toFixed(1) + 'y</span></div>' : ''}
-          ${ssi.markov ? '<div style="display:flex;justify-content:space-between"><span>Corrosion</span><span style="font-weight:500">' + ssi.markov.corrosion_class + '</span></div>' : ''}
-          <div style="display:flex;justify-content:space-between"><span>Confidence</span><span style="font-weight:500">${ssi.confidence_tier}</span></div>
-          <div style="display:flex;justify-content:space-between"><span>Fleet percentile</span><span style="font-weight:500">${(ssi.fleet_percentile * 100).toFixed(1)}%</span></div>
+          ${buildContextRows(ssi)}
         </div>
       </div>
       <button id="btn-breakdown" onclick="SSIMap.toggleBreakdown()" style="
