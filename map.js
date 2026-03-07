@@ -1072,20 +1072,46 @@
       };
     }
 
-    // Populate regions dropdown
+    // Populate regions dropdown — detect country from meta or URL
     if (regionSel && SSI) {
       const regions = SSI.regions.map(r => r.region).sort();
-      regionSel.innerHTML = '<option value="all">All Bundesländer</option>' +
+      var allLabel = 'All Regions';
+      var countryCode = (SSI.meta && SSI.meta.country) || '';
+      if (countryCode === 'DE' || countryCode === 'AT') allLabel = 'All Bundesländer';
+      else if (countryCode === 'CH') allLabel = 'All Cantons';
+      else if (countryCode === 'IT') allLabel = 'All Regioni';
+      else if (window.SSI_COUNTRY === 'italy') allLabel = 'All Regioni';
+      else if (window.SSI_COUNTRY === 'switzerland') allLabel = 'All Cantons';
+      else if (window.SSI_COUNTRY === 'austria' || window.SSI_COUNTRY === 'germany') allLabel = 'All Bundesländer';
+      // Preserve existing label if the HTML already set one
+      var existingAll = regionSel.querySelector('option[value="all"]');
+      if (existingAll && existingAll.textContent !== 'All' && existingAll.textContent.length > 4) {
+        allLabel = existingAll.textContent;
+      }
+      regionSel.innerHTML = '<option value="all">' + allLabel + '</option>' +
         regions.map(r => `<option value="${r}">${r}</option>`).join('');
     }
 
-    // Zoom buttons
+    // Zoom buttons — detect country center from data
     const zoomIn = document.getElementById('zoomIn');
     const zoomOut = document.getElementById('zoomOut');
     const zoomFit = document.getElementById('zoomFit');
     if (zoomIn) zoomIn.onclick = () => { view.scale = Math.min(50, view.scale * 1.4); requestDraw(); };
     if (zoomOut) zoomOut.onclick = () => { view.scale = Math.max(0.5, view.scale / 1.4); requestDraw(); };
-    if (zoomFit) zoomFit.onclick = () => { view.cx = 10.4; view.cy = 51.2; view.scale = 1; requestDraw(); };
+    if (zoomFit) {
+      // Compute country center from substation data
+      var fitCx = 10.4, fitCy = 51.2; // Germany default
+      if (GEO && GEO.s) {
+        var subVals = Object.values(GEO.s);
+        if (subVals.length > 0) {
+          var lats = subVals.map(s => s.y);
+          var lons = subVals.map(s => s.x);
+          fitCx = (Math.min(...lons) + Math.max(...lons)) / 2;
+          fitCy = (Math.min(...lats) + Math.max(...lats)) / 2;
+        }
+      }
+      zoomFit.onclick = () => { view.cx = fitCx; view.cy = fitCy; view.scale = 1; requestDraw(); };
+    }
   }
 
   // ── Init ──
