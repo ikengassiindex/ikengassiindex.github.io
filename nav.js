@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(italy|germany|switzerland|austria)\//);
+  var match = path.match(/\/(italy|germany|switzerland|austria|france)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(italy|germany|switzerland|austria)\//);
+  var match = path.match(/\/(italy|germany|switzerland|austria|france)\//);
   return match ? match[1] : null;
 })();
 
@@ -20,7 +20,8 @@ var SSI_COUNTRY_LABELS = {
   italy: '🇮🇹 Italy',
   germany: '🇩🇪 Germany',
   switzerland: '🇨🇭 Switzerland',
-  austria: '🇦🇹 Austria'
+  austria: '🇦🇹 Austria',
+  france: '🇫🇷 France'
 };
 
 // Ikenga logo
