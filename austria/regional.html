@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Compare German Bundesländer and Bezirke by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="description" content="Compare Austrian Bundesländer and Bezirke by SSI resilience score, component breakdown, and socio-economic context across 1,406 substations.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Regional Analysis</title>
 <link rel="stylesheet" href="../style.css?v=3">
@@ -17,13 +17,13 @@
 <main class="page-shell">
   <div class="page-header animate-in">
     <h1>Regional Analysis</h1>
-    <p>Compare Bundesländer and Bezirke by SSI score, component breakdown, and socio-economic context across 262 substations in Austria's 9 Bundesländer.</p>
+    <p>Compare Bundesländer and Bezirke by SSI score, component breakdown, and socio-economic context across 1,406 substations in Austria's 9 Bundesländer.</p>
   </div>
 
   <!-- Tabs -->
   <div class="tabs animate-in delay-1">
     <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regional Ranking</button>
-    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Kreis Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Bezirk Comparison</button>
     <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
   </div>
 
@@ -53,19 +53,19 @@
     </div>
   </div>
 
-  <!-- Tab: Kreis Comparison -->
+  <!-- Tab: Bezirk Comparison -->
   <div id="tab-compare" style="display:none">
     <div class="grid-2" style="margin-bottom:24px">
       <div class="card">
         <div class="card-header"><h3>Select Bezirke to Compare</h3></div>
         <div style="display:flex;gap:12px;margin-bottom:16px">
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">Kreis A</div>
+            <div class="label-xs" style="margin-bottom:6px">Bezirk A</div>
             <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">Kreis B</div>
+            <div class="label-xs" style="margin-bottom:6px">Bezirk B</div>
             <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
@@ -174,7 +174,7 @@ function renderRanking(data) {
   }).join('');
 }
 
-// ── Tab 2: Kreis Comparison ──
+// ── Tab 2: Bezirk Comparison ──
 function buildProvinceData(data) {
   var map = {};
   data.substations.forEach(function(s) {
@@ -225,10 +225,10 @@ function populateProvinceSelects() {
   selA.innerHTML = html;
   selB.innerHTML = html;
 
-  // Smart defaults: pick a high-risk and low-risk Kreis
+  // Smart defaults: pick a high-risk and low-risk Bezirk
   var sorted = provNames.slice().sort(function(a, b) { return provinceData[b].median_R - provinceData[a].median_R; });
-  selA.value = sorted[0] || provNames[0]; // worst Kreis
-  // Find best Kreis
+  selA.value = sorted[0] || provNames[0]; // worst Bezirk
+  // Find best Bezirk
   var bestIdx = sorted.length - 1;
   selB.value = sorted[bestIdx];
 
@@ -319,11 +319,11 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="rgba(44,36,32,0.06)" stroke-width="1"/>';
   }
 
-  // Kreis A polygon
+  // Bezirk A polygon
   var ptsA = comps.map(function(k, i) { var p = polar(i, a.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsA + '" fill="rgba(148,25,20,0.12)" stroke="var(--crimson)" stroke-width="1.5"/>';
 
-  // Kreis B polygon
+  // Bezirk B polygon
   var ptsB = comps.map(function(k, i) { var p = polar(i, b.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsB + '" fill="rgba(93,133,99,0.12)" stroke="var(--sage)" stroke-width="1.5"/>';
 
