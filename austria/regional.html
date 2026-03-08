@@ -11,7 +11,7 @@
 <body>
 <script src="../nav.js?v=14"></script>
 <script src="../ssi-engine.js"></script>
-<script src="../ssi-metadata.js"></script>
+<script src="ssi-metadata.js"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
@@ -153,16 +153,25 @@ function renderRanking(data) {
   document.getElementById('ranking-count').textContent = regions.length + ' Bundesländer · sorted worst → best';
 
   tbody.innerHTML = regions.map(function(r, i) {
-    var total = r.count;
-    var pLow = ((r.bands.Low / total) * 100).toFixed(0);
-    var pMed = ((r.bands.Medium / total) * 100).toFixed(0);
-    var pHigh = ((r.bands.High / total) * 100).toFixed(0);
-    var pCrit = ((r.bands.Critical / total) * 100).toFixed(0);
+    var total = r.count || r.n_substations;
+    var pLow, pMed, pHigh, pCrit;
+    if (r.bands) {
+      pLow = ((r.bands.Low / total) * 100).toFixed(0);
+      pMed = ((r.bands.Medium / total) * 100).toFixed(0);
+      pHigh = ((r.bands.High / total) * 100).toFixed(0);
+      pCrit = ((r.bands.Critical / total) * 100).toFixed(0);
+    } else {
+      var bd = r.band_distribution || { Low: 0, Medium: 0, High: 0, Critical: 0 };
+      pLow = bd.Low.toFixed(0);
+      pMed = bd.Medium.toFixed(0);
+      pHigh = bd.High.toFixed(0);
+      pCrit = bd.Critical.toFixed(0);
+    }
     return '<tr>' +
       '<td style="color:var(--warm-grey)">' + (i + 1) + '</td>' +
       '<td style="font-weight:500">' + r.region + '</td>' +
       '<td class="num" style="color:' + scoreColor(r.median_R) + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
-      '<td class="num">' + r.count + '</td>' +
+      '<td class="num">' + total + '</td>' +
       '<td class="num">' + pct(r.pct_critical) + '</td>' +
       '<td class="num">' + pct(r.pct_high) + '</td>' +
       '<td><div class="dist-bar" style="margin:0;width:140px;height:6px">' +

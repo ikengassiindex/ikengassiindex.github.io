@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 25 verified public data sources, 95 variables, 11 data layers.">
+<meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 35 verified public data sources, 95 variables, 11 data layers.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Data &amp; Download</title>
 <link rel="stylesheet" href="../style.css?v=3">
@@ -11,7 +11,7 @@
 <body>
 <script src="../nav.js?v=14"></script>
 <script src="../ssi-engine.js"></script>
-<script src="../ssi-metadata.js"></script>
+<script src="ssi-metadata.js"></script>
 <script>renderNav('data');</script>
 
 <main class="page-shell">
@@ -110,21 +110,21 @@
           <td>Grid Telemetry: Proxy</td>
           <td class="num">4</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">IEEE C57.91 · TransnetBW · IRI</td>
+          <td style="font-size:12px">IEEE C57.91 · APG / DSOs · IRI</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:var(--sage)">B.3</td>
           <td>Grid Telemetry: Fuzzy</td>
           <td class="num">12</td>
           <td><span class="band-badge medium" style="font-size:10px">FUZZY</span></td>
-          <td style="font-size:12px">IEEE/CIGRÉ standards · BDEW · EEA</td>
+          <td style="font-size:12px">IEEE/CIGRÉ standards · OeE · EEA</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#a67cff">C</td>
           <td>Socio-Economic</td>
           <td class="num">9</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">Statistik Austria · SOEP · Eurostat · DESI</td>
+          <td style="font-size:12px">Statistik Austria · WIFO · Eurostat · DESI</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#ff8c42">D</td>
@@ -176,7 +176,7 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Source Registry</h3>
-      <span class="label-xs">25 verified · all free & public</span>
+      <span class="label-xs">35 verified · all free & public</span>
     </div>
     <div class="source-grid" style="margin-top:12px" id="data-source-grid"></div>
   </div>
@@ -473,7 +473,7 @@ fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(
         { title: 'Modifier Functions', text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence Bezirke\nR4 — Graph criticality: betweenness centrality & bridge status from network topology\nR6a — Restoration speed: DSO historical MTTR or Bayesian estimate\nR6b — Network topology: Centrality and ring topology from physical network analysis\nR7 — Digital readiness: DESI digital index & smart meter penetration proxy' },
         { title: 'Monte Carlo Uncertainty', text: '1,000 iterations per Bezirk (browser mode)\nEach metric perturbed \u00b1 based on confidence tier:\n  Tier A (measured): \u03c3 = 5%\n  Tier B (proxy): \u03c3 = 12%\n  Tier C (fuzzy): \u03c3 = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
         { title: 'Classification Bands', text: 'LOW risk: R_median < 0.35\nMEDIUM-LOW: 0.35 \u2264 R < 0.45\nMEDIUM: 0.45 \u2264 R < 0.55\nMEDIUM-HIGH: 0.55 \u2264 R < 0.65\nHIGH risk: R_median \u2265 0.65' },
-        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, E-Control monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGR\u00c9 degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): floods, landslides, corrosion, wildfire\nE — Austrian Open Data (8 vars): BMUV, BMWK, BMF, E-Control public indicators\nF — Network Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): E-Control quality, topology, JRC DSO data\nH — Network & Topology (7 vars): Netzentwicklungsplan, GFZ, ring analysis\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities' },
+        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, E-Control monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGR\u00c9 degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): floods, landslides, corrosion, wildfire\nE — Austrian Open Data (8 vars): BMNT, BMLRT, BMF, E-Control public indicators\nF — Network Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): E-Control quality, topology, JRC DSO data\nH — Network & Topology (7 vars): Netzentwicklungsplan, GFZ, ring analysis\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities' },
         { title: 'Normalisation', text: 'All metrics normalised to [0, 1] using min-max scaling across the fleet.\nHigher score = higher risk. Inverted metrics (where high raw value = low risk) are flipped: x_norm = 1 - (x - min) / (max - min).' }
       ];
 
