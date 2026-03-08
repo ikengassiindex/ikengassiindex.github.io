@@ -195,7 +195,7 @@ function renderFooter() {
     germany: '95 variables · 35 sources · 401 Kreise across 16 Bundesländer',
     austria: '95 variables · 35 sources · 1,406 substations (1,144 HV · 262 MV) across 9 Bundesländer',
     switzerland: '95 variables · 25 sources · 947 substations (147 HV · 776 MV) across 26 Cantons',
-    france: '95 variables · 35 sources · planned deployment across 13 Régions'
+    france: '95 variables · 35 sources · 7,898 substations (996 EHV · 6,902 HV) across 13 Régions'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
