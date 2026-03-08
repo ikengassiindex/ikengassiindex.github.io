@@ -1080,7 +1080,9 @@
       if (countryCode === 'DE' || countryCode === 'AT') allLabel = 'All Bundesländer';
       else if (countryCode === 'CH') allLabel = 'All Cantons';
       else if (countryCode === 'IT') allLabel = 'All Regioni';
+      else if (countryCode === 'FR') allLabel = 'All Régions';
       else if (window.SSI_COUNTRY === 'italy') allLabel = 'All Regioni';
+      else if (window.SSI_COUNTRY === 'france') allLabel = 'All Régions';
       else if (window.SSI_COUNTRY === 'switzerland') allLabel = 'All Cantons';
       else if (window.SSI_COUNTRY === 'austria' || window.SSI_COUNTRY === 'germany') allLabel = 'All Bundesländer';
       // Preserve existing label if the HTML already set one
