@@ -9,7 +9,7 @@
 </head>
 <body>
 <script src="../nav.js?v=14"></script>
-<script src="../ssi-metadata.js"></script>
+<script src="../ssi-metadata-ch.js"></script>
 <script>renderNav('intelligence');</script>
 
 <main class="page-shell" style="max-width:860px">
@@ -33,7 +33,8 @@
     <a href="#data" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">C</span> Data Refresh &amp; Changelog</a>
     <a href="#deep" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">D</span> Deep-Dive: Alpine Hydropower &amp; Grid Transition</a>
     <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> European Context Card</a>
-    <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F</span> Looking Ahead</a>
+    <a href="#enn" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F</span> SSI Enhanced Neural Network</a>
+    <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">G</span> Looking Ahead</a>
   </div>
 </div>
 
@@ -1040,9 +1041,273 @@
 </section>
 
 
-<!-- ═══════════════════ F. LOOKING AHEAD ═══════════════════ -->
+<!-- ═══════════════════ F. SSI ENHANCED NEURAL NETWORK ═══════════════════ -->
+<section id="enn" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F — Standing Item</span>
+<h2>SSI Enhanced Neural Network — Monthly Topic</h2>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to BESS valuation platform.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What is a BESS worth at this substation — to the DNO and to the community?"</em> Each edition of this report explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
+</div>
+
+<!-- Architecture overview — always visible -->
+<div style="display:flex;gap:6px;margin:16px 0;flex-wrap:wrap" id="enn-layer-nav"></div>
+
+<!-- Topic content — auto-populated -->
+<div id="enn-topic" style="margin:16px 0">Loading this month's topic…</div>
+
+<!-- SSI data connection — auto-populated -->
+<div id="enn-data-link" style="margin:16px 0"></div>
+
+<!-- Coming next -->
+<div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-top:16px" id="enn-next">
+  <p style="font-size:13px;line-height:1.7;margin:0">Loading next month's preview…</p>
+</div>
+
+<script>
+(function(){
+  // ── Topic registry: 20 topics rotating monthly ──
+  var topics = [
+    { layer: 1, ref: '§0.3', title: 'Data Architecture — Component Taxonomy',
+      subtitle: 'How the SSI\'s 6 components and 20 sub-metrics are sourced, validated, and scored',
+      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 25 Swiss public data sources in the SSI registry, validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither the BESS valuation engine nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs — for example, the C (Continuity) component feeds the DNO\'s avoided-outage calculation (D1), while the E (Economic) component feeds the community value stack\'s energy poverty reduction estimate (W3).',
+      concepts: ['6 components, 20 sub-metrics, 95 variables', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T', 'Each sub-metric traceable to authoritative public source'],
+      ssiLink: 'components' },
+    { layer: 1, ref: '§0.3.4', title: 'Gaussian Copula Monte Carlo Engine',
+      subtitle: 'How 9.47 million simulations capture the correlation structure across grid risk factors',
+      body: 'The SSI components are not independent — a substation with poor continuity (high C) often also has poor voltage quality (high V), aged infrastructure (high I5), and is located in a rural area with high economic vulnerability (high E). The Gaussian copula captures these dependencies through a 20×20 correlation matrix estimated from the Swiss fleet, decomposed via Cholesky factorisation to generate correlated random draws. For each of 947 substations, 10,000 Monte Carlo iterations propagate uncertainty through the full scoring formula, producing not just a point estimate (R_median) but a complete posterior distribution — P5, P50, P95, confidence interval width, and skewness. This is the computational backbone: 9.47 million simulations, yielding the uncertainty quantification that distinguishes the SSI from deterministic indices.',
+      concepts: ['20×20 Gaussian copula with Cholesky decomposition', '10,000 iterations per substation = 9.47M total', 'Full posterior: R_P5, R_median, R_P95, CI_width, skewness', 'Correlation captures systemic clustering of risk factors'],
+      ssiLink: 'mc' },
+    { layer: 2, ref: '§0.4.1', title: 'DNO Value Stack (D1–D5)',
+      subtitle: 'What a BESS is worth to the distribution network operator in avoided or deferred costs',
+      body: 'The DNO value stack quantifies five categories of value that a battery energy storage system creates for the distribution network operator at each substation. D1 (Avoided Outage Cost) uses the SSI\'s C component and SAIDI data to estimate the reduction in customer-minutes-lost. D2 (Deferred Reinforcement) leverages the S (Saturation) and I (Infrastructure) components to calculate how BESS deployment can postpone expensive grid upgrades. D3 (Reactive Power Support) draws on V (Voltage) data to value power quality improvement. D4 (Loss Reduction) uses graph topology (R4) to estimate reduced network losses. D5 (Fault Level Management) reflects the BESS\'s contribution to grid stability. Each component maps directly to one or more SSI v4.0 inputs — the Index doesn\'t just measure risk, it prices the economic case for intervention.',
+      concepts: ['D1: Avoided Outage = f(C, SAIDI, customer count)', 'D2: Deferred Reinforcement = f(S, I, load growth)', 'D3: Reactive Power = f(V, network impedance)', 'D4 + D5: Loss Reduction + Fault Level = f(R4, topology)'],
+      ssiLink: 'valuation' },
+    { layer: 2, ref: '§0.4.2', title: 'Community Value Stack (W1–W5)',
+      subtitle: 'Social and economic value to the local community — the case for public-interest investment',
+      body: 'While the DNO value stack speaks the language of regulated returns, the community value stack addresses a different audience: cantonal governments, federal energy programme allocators, and EU structural fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real), not the DNO WACC.',
+      concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0%'],
+      ssiLink: 'community' },
+    { layer: 2, ref: '§0.4.5', title: 'Real Options Pricing Framework',
+      subtitle: 'Why traditional DCF systematically undervalues BESS — and how six embedded options fix this',
+      body: 'Traditional discounted cashflow analysis treats a BESS investment as a fixed sequence of revenues and costs over 30 years. In reality, the asset owner has options: to expand capacity if market conditions improve, to repurpose for different services as regulations evolve, to delay investment until uncertainty resolves. The SSI-ENN prices six embedded real options for each substation-BESS pair: capacity expansion option (Black-Scholes on future demand growth), technology refresh option (call on next-generation battery chemistry), revenue-stream switching option (American option on emerging market mechanisms), grid-connection upgrade option, decommissioning timing option, and a regulatory windfall option capturing the value of favorable policy changes. The SSI data drives the underlying volatility: substations with wider confidence intervals (high CI_width) have higher option value because uncertainty creates optionality.',
+      concepts: ['6 embedded options per substation-BESS pair', 'Black-Scholes for capacity expansion, American options for switching', 'Higher SSI uncertainty (CI_width) = higher option value', 'Option-adjusted NPV typically 15-40% above base DCF'],
+      ssiLink: 'options' },
+    { layer: 2, ref: '§0.4.4', title: 'Revenue Stack & Dispatch Optimisation',
+      subtitle: 'Up to 11 revenue streams from a single battery — subject to one physical constraint',
+      body: 'A grid-connected BESS generates revenue from up to 11 streams (R1–R11), but is physically constrained to one full charge-discharge cycle per day. The dispatch optimiser allocates this single cycle across competing revenue opportunities: energy arbitrage (R1), frequency containment reserve (R2), automatic frequency restoration (R3), replacement reserve (R4), capacity market (R5), reactive power (R6), peak shaving (R7), backup power (R8), and three emerging streams — locational marginal pricing (R9), power quality as a service (R10), and carbon reduction services (R11). The optimiser is location-specific because the SSI data determines which streams are most valuable at each substation: a substation with high S (Saturation) generates more R7 peak-shaving value, while one with high C (Continuity) deficit generates more R2/R3 frequency reserve value. Switzerland\'s participation in the ENTSO-E balancing markets and Swissgrid\'s ancillary services procurement makes frequency reserve streams particularly valuable.',
+      concepts: ['11 revenue streams (R1–R11), 1-cycle/day constraint', 'Location-specific optimisation from SSI component data', 'R9–R11: Emerging streams modelled as forward-looking options', 'Swissgrid ancillary services enhance frequency reserve value'],
+      ssiLink: 'revenue' },
+    { layer: 3, ref: '§0.5.2', title: 'Neural Network — Ensemble Architecture',
+      subtitle: 'GBT + DNN ensemble: why two model families outperform either alone on grid data',
+      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (canton, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries like Switzerland. The shared feature representation enables multi-task learning: all 7 output heads (R_median, DNO NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously, forcing the network to learn representations useful for all tasks.',
+      concepts: ['Ensemble: α·GBT + (1-α)·DNN, α learned during validation', '7 simultaneous outputs via multi-task learning', 'GBT dominates with sparse data, DNN with dense data', 'Shared representation = implicit regularisation'],
+      ssiLink: 'nn' },
+    { layer: 3, ref: '§0.5.3', title: 'Transfer Learning & Feature Missingness',
+      subtitle: 'How Italian ground truth enables valuation across countries with incomplete data',
+      body: 'Transfer learning is the mechanism that enables the SSI-ENN to value substations in countries where the full feature vector is not available. The core insight: grid physics is universal — topology determines load flow, weather drives thermal degradation, population density correlates with outage impact — even though data availability varies dramatically across jurisdictions. The network is first trained on the complete Italian dataset (4,293 substations with all 95 SSI variables plus valuation outputs from Layers 1–2). Then, for each new country including Switzerland, available features are mapped to the Italian feature schema. Missing features are handled through a learned missingness embedding: the network learns not just to predict from available data, but to quantify how much accuracy it loses from each missing feature. Switzerland\'s high data quality (25 sources, 95 variables) means transfer losses are minimal — making it an ideal validation ground for the ENN framework.',
+      concepts: ['Train on Italy (full data), transfer to EU (partial data)', 'Learned missingness embedding quantifies data value', 'Grid physics universality enables cross-border transfer', 'Switzerland\'s high DCI minimises transfer accuracy loss'],
+      ssiLink: 'transfer' },
+    { layer: 3, ref: '§0.5.5', title: 'Uncertainty Quantification',
+      subtitle: 'Investment-grade predictions require calibrated confidence intervals, not just point estimates',
+      body: 'A point estimate without uncertainty bounds is unusable for investment-grade analysis. The SSI-ENN produces calibrated P10/P50/P90 prediction intervals using two complementary approaches: quantile regression (the DNN head directly outputs multiple quantiles, trained with pinball loss) and conformal prediction (a distribution-free method that provides guaranteed coverage). The SSI\'s own Monte Carlo confidence intervals (CI_width, P5/P95) serve as the ground truth for calibration: the neural network\'s uncertainty estimates are validated against the analytical uncertainty from the 10,000-iteration copula engine. If the NN says "P90 NPV = CHF 4.2M" for a substation, that bound must be calibrated — meaning 90% of true valuations (from the full analytical model) should indeed fall below CHF 4.2M. This calibration is verified per country, per voltage class, and per risk band.',
+      concepts: ['Quantile regression (pinball loss) + conformal prediction', 'Calibrated against SSI Monte Carlo ground truth', 'Per-country, per-voltage, per-band calibration verification', 'Investment-grade: P10/P50/P90 for all outputs'],
+      ssiLink: 'uncertainty' },
+    { layer: 3, ref: '§0.5.6', title: 'Explainability & SHAP Values',
+      subtitle: 'Clients need to understand not just the prediction but WHY a substation ranks highly',
+      body: 'Investment-grade models require interpretability. A BESS developer considering a CHF 10M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score — and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down. This directly connects to the SSI Index: if SHAP identifies C (Continuity) as the dominant positive driver, the client knows the BESS value depends primarily on the substation\'s poor reliability history — and can verify this against ElCom\'s published reliability data. Transparency is not optional; it is what converts model outputs into investment decisions.',
+      concepts: ['SHAP: game-theoretic feature attribution per prediction', 'Waterfall visualisation: fleet average → substation prediction', 'Direct traceability to SSI components and data sources', 'Feature importance validated against domain expertise'],
+      ssiLink: 'shap' },
+    { layer: 4, ref: '§0.6.1', title: 'European Expansion — Country Prioritisation',
+      subtitle: 'How 28 countries are ranked by expected commercial return per unit of expansion effort',
+      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). Italy scores highest by construction (it\'s the training ground), followed by Germany, Switzerland, Austria, France, Spain, Netherlands, UK.',
+      concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28 countries: EU-27 + UK', 'Italy = training ground, then DE, CH, AT, FR, ES, NL, UK', 'Each country requires bespoke regulatory mapping'],
+      ssiLink: 'expansion' },
+    { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index',
+      subtitle: 'Quantifying what fraction of the SSI feature vector is available for each country',
+      body: 'The Data Completeness Index (DCI) quantifies what fraction of the SSI-ENN\'s feature vector can be populated for a given country, weighted by each feature\'s contribution to prediction accuracy. Not all missing features matter equally — grid topology data (available globally via OpenStreetMap) matters more than hyper-local socio-economic variables. The DCI is computed as a weighted sum: DCI = Σ(w_i × available_i) where w_i is the feature\'s SHAP importance rank from the Italian training model and available_i is binary. A country with DCI > 0.70 can produce production-quality valuations; DCI 0.50–0.70 produces indicative estimates; below 0.50, the uncertainty bounds are too wide for commercial use. Switzerland\'s DCI is among the highest in Europe thanks to comprehensive BFE, ElCom, and BFS data ecosystems, making it a prime candidate for production-grade ENN deployment.',
+      concepts: ['DCI = Σ(SHAP_weight × data_available) per country', 'DCI > 0.70 = production quality, 0.50–0.70 = indicative', 'OSM topology available globally = high-weight features covered', 'Switzerland\'s strong data ecosystem yields high DCI'],
+      ssiLink: 'dci' },
+    { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
+      subtitle: 'Adapting the Italian-trained model to Swiss grid characteristics',
+      body: 'The SSI v4.0 was designed for Italian grid infrastructure. Transferring it to Switzerland requires adapting three elements: the data sources (substitute Italian sources with Swiss equivalents — e.g., replace ARERA quality data with ElCom, ISTAT with BFS, ISPRA with BAFU), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify Swiss equivalents for each of the Italian data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to Swiss distributions; (4) cross-validation — compare NN predictions against available ground-truth data; (5) coverage scorecard — assess whether Switzerland meets production-readiness criteria. Switzerland\'s high regulatory transparency (ElCom, BFE) makes this transfer particularly clean.',
+      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'Replace ARERA with ElCom, ISTAT with BFS, ISPRA with BAFU', 'Normalisation bounds adjusted per Swiss distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
+      ssiLink: 'transfer-protocol' },
+    { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
+      subtitle: 'From raw analytical outputs to four commercial product formats',
+      body: 'The SSI-ENN\'s analytical engine (Layers 1–3) produces a high-dimensional output vector per substation per BESS configuration. The product delivery pipeline transforms this into four distinct product formats: (1) the Explorer Dashboard — a self-service web interface where subscribers can filter, map, and compare substations across the full coverage universe; (2) the API — programmatic access for developers integrating SSI-ENN outputs into their own tools and financial models; (3) the Value-Add Card — a per-substation PDF report combining both value stacks for both BESS configurations, designed for investor presentations and regulatory submissions; (4) the Advisory Report — a bespoke multi-substation analysis for institutional clients (DNOs, investment funds, government agencies). Each format draws from the same analytical core but applies different levels of contextualisation, visualisation, and narrative.',
+      concepts: ['4 products: Dashboard, API, Value-Add Card, Advisory Report', 'Single analytical core, multiple delivery formats', 'Value-Add Card: per-substation investor-grade PDF', 'Advisory: bespoke multi-substation institutional analysis'],
+      ssiLink: 'platform' },
+    { layer: 5, ref: '§0.7.3', title: 'Revenue Model & Unit Economics',
+      subtitle: 'Three revenue channels with distinct scaling characteristics',
+      body: 'The SSI-ENN generates revenue through three channels with distinct economic characteristics. Subscriptions (recurring, scalable, high-margin): three tiers — Explorer (CHF 990/month, portfolio screening), Developer (CHF 4,900/month, full API access + Value-Add Cards), and Enterprise (custom pricing, white-label + advisory hours). Advisory services (project-based, relationship-building, moderate-margin): per-project fees for bespoke analysis, typically CHF 25K–150K depending on scope. Data licensing (passive, institutional): anonymised dataset licensing to energy data platforms, credit agencies, and research institutions, typically CHF 50K–200K/year. The platform exhibits extreme operating leverage: once the analytical engine and coverage infrastructure are built, the marginal cost of serving each additional subscriber approaches zero. The critical metric is subscriber retention — the LTV:CAC ratio must exceed 3:1 for sustainable growth.',
+      concepts: ['3 tiers: Explorer CHF 990/mo, Developer CHF 4,900/mo, Enterprise custom', 'Advisory: CHF 25K–150K per project', 'Data licensing: CHF 50K–200K/year to institutions', 'Operating leverage: near-zero marginal cost per subscriber'],
+      ssiLink: 'revenue-model' },
+    { layer: 1, ref: '§0.3.6', title: 'Data Flow Matrix — Traceability Register',
+      subtitle: 'For any output number, trace it back to the exact input variable and source',
+      body: 'The Data Flow Matrix maps every SSI component and sub-metric to the downstream valuation outputs it influences. This is the traceability register: for any number produced by the SSI-ENN — whether an R_median score, a DNO NPV, or a community value estimate — you can trace it backwards through the matrix to the specific input variables and data sources that determined it. This traceability is not an afterthought; it is a design requirement for investment-grade analytics. A CHF 10M BESS investment decision must withstand due diligence scrutiny, which means every assumption must be auditable. The matrix also serves a forward purpose: when a data source updates (e.g., ElCom publishes new reliability data), the matrix identifies exactly which outputs will change and which substations are affected — enabling targeted recomputation rather than full fleet recalculation.',
+      concepts: ['Every output traceable to specific inputs and sources', 'Investment-grade auditability for due diligence', 'Targeted recomputation when sources update', 'Bidirectional: input→output and output→input'],
+      ssiLink: 'traceability' },
+    { layer: 2, ref: '§0.4.3', title: 'Total Cost of Ownership Model',
+      subtitle: 'Stochastic cost modelling — because BESS economics are not deterministic',
+      body: 'The TCO model provides the cost side of the NPV calculation, and all costs are stochastic. CAPEX (CHF/kWh installed) follows a learning-curve distribution calibrated to Bloomberg NEF projections, with augmentation cost uncertainty reflecting supply-chain volatility. OPEX (fixed + variable) is modelled as a mean-reverting process with seasonal components reflecting temperature-dependent degradation. Battery degradation follows a non-linear capacity fade model: each charge-discharge cycle reduces usable capacity, with the rate depending on depth-of-discharge, temperature, and C-rate — all of which vary by substation location and dispatch profile. The SSI data feeds this directly: substations with high I1 (temperature trajectory from CMIP6 SSP2-4.5) face faster degradation, increasing lifetime replacement cost. The Monte Carlo engine propagates cost uncertainty alongside revenue uncertainty, producing a full NPV distribution rather than a single number.',
+      concepts: ['CAPEX learning curve calibrated to BNEF', 'Non-linear battery degradation: f(DoD, temperature, C-rate)', 'SSI I1 (climate trajectory) drives degradation forecast', 'Full NPV distribution, not point estimate'],
+      ssiLink: 'tco' },
+    { layer: 1, ref: '§0.3.2', title: 'Sub-Metric Definitions — Replicability Standard',
+      subtitle: 'Every sub-metric defined with sufficient precision for independent replication',
+      body: 'Each of the SSI\'s 20 sub-metrics is defined with sufficient precision for independent replication — a core requirement for academic credibility and regulatory acceptance. Take C1 (SAIDI proxy): it combines ElCom\'s cantonal quality classification with Eurostat unplanned SAIDI benchmarks, normalised against EU-wide reference distributions. Or I5 (Infrastructure Age): it uses a 4-state Markov degradation chain (Good → Acceptable → Degraded → Critical) calibrated to typical Swiss transformer lifespans, producing a stationary distribution that captures the long-term maintenance state. Each definition specifies: the mathematical formula, the data source and update frequency, the normalisation method, the relationship to upstream inputs, and the downstream components it feeds. This specification enables three things: peer review (academics can verify the calculations), regulatory audit (ElCom can confirm the data interpretation), and international transfer (the Layer 4 expansion protocol needs clear definitions to find country-equivalents).',
+      concepts: ['20 sub-metrics, each formally defined for replication', 'C1: SAIDI proxy from ElCom cantonal classification', 'I5: 4-state Markov degradation chain', 'Enables peer review, regulatory audit, and international transfer'],
+      ssiLink: 'sub-metrics' },
+    { layer: 5, ref: '§0.7.2', title: 'API & Computation Architecture',
+      subtitle: 'Serving batch fleet recomputation and interactive queries from a single platform',
+      body: 'The platform must serve two fundamentally different workloads: batch computation (recompute all ~500K substations during quarterly refresh — heavy, scheduled, GPU-intensive) and interactive query (serve a single substation lookup in <200ms — lightweight, latency-sensitive, CPU-bound). The architecture separates these: batch runs on GPU clusters (the NN inference + Monte Carlo propagation for all substations), producing pre-computed results stored in a columnar database. Interactive queries hit this pre-computed store, with real-time adjustments for user-specified parameters (custom BESS sizing, modified discount rates, scenario overrides). The API exposes endpoints for: single-substation lookup, multi-substation portfolio analysis, geographic filtering, scenario comparison, and bulk data export. Rate limits and access tiers map directly to subscription levels — Explorer gets 100 queries/day, Developer gets 10,000, Enterprise gets unlimited.',
+      concepts: ['Batch (GPU, quarterly) + Interactive (<200ms, CPU)', 'Pre-computed columnar store for low-latency queries', 'Explorer: 100/day, Developer: 10K/day, Enterprise: unlimited', 'Real-time parameter adjustment on pre-computed base'],
+      ssiLink: 'api' },
+    { layer: 4, ref: '§0.6.3', title: 'Substation Registry Construction',
+      subtitle: 'How to identify 500,000+ substations across 28 countries from open data',
+      body: 'Before any valuation can be computed, the substation population must be identified. Italy has a clean registry of 4,293 substations from SSI v4.0. For Switzerland, the registry was constructed from OpenStreetMap (primary geometry), Swissgrid/ElCom publications (validation), and supplementary data (gap-filling). The construction pipeline follows four steps: (1) OSM extraction — query all nodes/ways tagged power=substation within the Swiss boundary, filtering by voltage class; (2) deduplication — merge overlapping geometries and resolve naming conflicts; (3) attribute enrichment — assign voltage class, operator, and approximate capacity from OSM tags and national datasets; (4) validation — cross-reference against published grid statistics. For Switzerland, this pipeline produced 947 substations (147 HV ≥220kV, 776 MV, 24 junction substations for empty Bezirke), demonstrating strong OSM coverage for the Swiss grid.',
+      concepts: ['OSM extraction → deduplication → enrichment → validation', '947 substations: 147 HV + 776 MV + 24 junction', 'Voltage class, operator, capacity from OSM + Swissgrid data', 'Target: 500K+ substations across 28 countries'],
+      ssiLink: 'registry' }
+  ];
+
+  // ── Deterministic monthly pick (same seed as Substation in Focus) ──
+  var now = new Date();
+  var seed = now.getFullYear() * 100 + (now.getMonth() + 1);
+  function seededIndex(s, len) {
+    var h = s;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = (h >>> 16) ^ h;
+    return Math.abs(h) % len;
+  }
+  // Offset seed to avoid collision with Substation in Focus
+  var topicIdx = seededIndex(seed + 7777, topics.length);
+  var nextIdx = seededIndex((now.getFullYear() * 100 + (now.getMonth() + 2 > 12 ? 1 : now.getMonth() + 2)) + 7777, topics.length);
+  var topic = topics[topicIdx];
+  var nextTopic = topics[nextIdx];
+
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+
+  // ── Layer navigation ──
+  var layerDefs = [
+    { n: 1, label: 'Layer 1 — Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
+    { n: 2, label: 'Layer 2 — Valuation', color: '#c0392b', desc: 'DNO + Community value stacks, TCO, real options' },
+    { n: 3, label: 'Layer 3 — Neural Net', color: '#6c3483', desc: 'GBT+DNN ensemble, transfer learning, SHAP' },
+    { n: 4, label: 'Layer 4 — Coverage', color: '#1a6b4a', desc: 'Country prioritisation, DCI, registry, calibration' },
+    { n: 5, label: 'Layer 5 — Platform', color: '#0e7490', desc: 'Products, API, revenue model, unit economics' }
+  ];
+
+  var navHTML = '';
+  layerDefs.forEach(function(l) {
+    var isActive = l.n === topic.layer;
+    navHTML += '<div style="flex:1;min-width:120px;padding:8px 12px;border-radius:var(--radius);border:2px solid ' +
+      (isActive ? l.color : 'var(--card-border)') + ';background:' +
+      (isActive ? l.color : '#fff') + ';color:' + (isActive ? '#fff' : 'var(--warm-grey)') +
+      ';font-size:11px;text-align:center;transition:all 0.2s">' +
+      '<div style="font-weight:700">' + l.label + '</div>' +
+      '<div style="font-size:10px;opacity:0.7;margin-top:2px">' + l.desc + '</div></div>';
+  });
+  document.getElementById('enn-layer-nav').innerHTML = navHTML;
+
+  // ── Topic content ──
+  var activeLayer = layerDefs.filter(function(l){ return l.n === topic.layer; })[0];
+  var layerColor = activeLayer ? activeLayer.color : 'var(--ink)';
+
+  var conceptsHTML = topic.concepts.map(function(c) {
+    return '<div style="display:flex;align-items:baseline;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(44,36,32,0.04)">' +
+      '<span style="color:' + layerColor + ';font-weight:700;flex-shrink:0">→</span>' +
+      '<span>' + c + '</span></div>';
+  }).join('');
+
+  var editionNum = (now.getFullYear() - 2026) * 12 + (now.getMonth() + 1) - 2; // March 2026 = Ed 001
+  var editionStr = String(Math.max(1, editionNum)).padStart(3, '0');
+
+  document.getElementById('enn-topic').innerHTML =
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:' + layerColor + ';color:#fff;padding:4px 10px;border-radius:3px">Layer ' + topic.layer + '</span>' +
+      '<span style="font-size:10px;color:var(--warm-grey);letter-spacing:0.05em">' + topic.ref + ' · Edition ' + editionStr + ' · ' + monthYear + '</span></div>' +
+    '<h3 style="margin:0 0 4px;font-size:17px">' + topic.title + '</h3>' +
+    '<p style="font-size:12px;color:var(--warm-grey);margin:0 0 16px;font-style:italic">' + topic.subtitle + '</p>' +
+    '<p style="font-size:13px;line-height:1.7;margin-bottom:16px">' + topic.body + '</p>' +
+    '<div class="card" style="border-left:3px solid ' + layerColor + ';margin-bottom:16px">' +
+      '<div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:' + layerColor + ';margin-bottom:8px">Key Concepts</div>' +
+      conceptsHTML +
+    '</div>';
+
+  // ── SSI Data Connection — pull live stats to anchor the topic ──
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var n = fleet.length;
+    var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
+    var avgCI = fleet.reduce(function(a,s){ return a + s.CI_width; }, 0) / n;
+    var highCrit = fleet.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
+
+    // Component averages
+    var compAvgs = {};
+    ['C','V','I','E','S','T'].forEach(function(k) {
+      compAvgs[k] = fleet.reduce(function(a,s){ return a + s.components[k]; }, 0) / n;
+    });
+
+    // Pick a stat relevant to this topic's layer
+    var statHTML = '';
+    if (topic.layer === 1) {
+      statHTML = 'The SSI Index currently scores <strong>' + n.toLocaleString() + ' substations</strong> across 26 Swiss Cantons and 160 Bezirke. ' +
+        'Fleet mean R = ' + avgR.toFixed(3) + ', with an average confidence interval width of ' + avgCI.toFixed(3) +
+        ' from 10,000 MC iterations per substation. The dominant component is C (Continuity) at avg ' + compAvgs.C.toFixed(3) +
+        ' / 0.30 ceiling (' + (compAvgs.C / 0.30 * 100).toFixed(0) + '% utilisation).';
+    } else if (topic.layer === 2) {
+      var avgR3 = fleet.reduce(function(a,s){ return a + s.modifiers.R3_C_mult; }, 0) / n;
+      statHTML = 'Across the ' + n.toLocaleString() + '-substation Swiss fleet, the average consequence multiplier (R3) is ' +
+        avgR3.toFixed(3) + ', indicating significant socio-economic exposure. ' +
+        highCrit + ' substations (' + (highCrit/n*100).toFixed(1) + '%) are classified High or Critical — ' +
+        'these are the highest-priority candidates for BESS deployment where DNO and community value stacks are largest.';
+    } else if (topic.layer === 3) {
+      statHTML = 'The Swiss fleet comprises ' + n.toLocaleString() + ' substations with complete 95-feature vectors from 25 public data sources. ' +
+        'Average CI_width of ' + avgCI.toFixed(3) + ' across the fleet provides the uncertainty ground truth that the neural network\'s ' +
+        'quantile regression heads must calibrate against. The fleet\'s risk distribution — ' +
+        fleet.filter(function(s){ return s.classification === 'Low'; }).length + ' Low, ' +
+        fleet.filter(function(s){ return s.classification === 'Medium'; }).length + ' Medium, ' +
+        fleet.filter(function(s){ return s.classification === 'High'; }).length + ' High, ' +
+        fleet.filter(function(s){ return s.classification === 'Critical'; }).length + ' Critical — provides training signal across risk bands.';
+    } else if (topic.layer === 4) {
+      var regions = {};
+      fleet.forEach(function(s){ regions[s.region] = true; });
+      var provinces = {};
+      fleet.forEach(function(s){ provinces[s.province] = true; });
+      statHTML = 'Switzerland\'s coverage: ' + n.toLocaleString() + ' substations across ' +
+        Object.keys(regions).length + ' Cantons and ' + Object.keys(provinces).length + ' Bezirke. ' +
+        'This serves as one of the reference benchmarks for the Coverage Quality Scorecard alongside Italy\'s 4,293 substations — ' +
+        'any country achieving comparable granularity (DCI > 0.70) qualifies for production-grade valuations on the commercial platform.';
+    } else {
+      statHTML = 'The Swiss fleet of ' + n.toLocaleString() + ' substations generates the full analytical depth that the platform ' +
+        'delivers: R_median, P5/P95 bounds, 6 component scores, 5 modifier impacts, band classification, and confidence tier — ' +
+        'all computed per substation per BESS configuration. This output vector is the raw material for all four product formats.';
+    }
+
+    document.getElementById('enn-data-link').innerHTML =
+      '<div class="card" style="border-left:3px solid var(--sage);background:var(--cream)">' +
+        '<div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--sage);margin-bottom:6px">Live SSI Data Connection</div>' +
+        '<p style="font-size:13px;line-height:1.7;margin:0">' + statHTML + '</p></div>';
+  });
+
+  // ── Coming next ──
+  var nextLayer = layerDefs.filter(function(l){ return l.n === nextTopic.layer; })[0];
+  document.getElementById('enn-next').innerHTML =
+    '<p style="font-size:13px;line-height:1.7;margin:0"><strong>Coming next month:</strong> ' +
+    '<span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:' + nextLayer.color +
+    ';color:#fff;padding:2px 8px;border-radius:3px;margin:0 4px">Layer ' + nextTopic.layer + '</span> ' +
+    nextTopic.title + ' — <em>' + nextTopic.subtitle + '</em></p>';
+})();
+</script>
+</section>
+
+<div style="margin:32px 0"></div>
+
+
+<!-- ═══════════════════ G. LOOKING AHEAD ═══════════════════ -->
 <section id="ahead">
-<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F</span>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section G</span>
 <h2>Looking Ahead</h2>
 
 <div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-bottom:16px">
