@@ -129,6 +129,7 @@ function switchTab(btn, tabId) {
   document.getElementById(tabId).style.display = 'block';
 }
 
+// ── Color helpers ──
 function scoreColor(val) {
   if (val >= 0.75) return 'var(--crimson)';
   if (val >= 0.50) return 'var(--terracotta)';
@@ -136,9 +137,16 @@ function scoreColor(val) {
   return 'var(--sage)';
 }
 
+function deltaColor(d) {
+  if (d > 0.01) return 'var(--crimson)';
+  if (d < -0.01) return 'var(--sage)';
+  return 'var(--warm-grey)';
+}
+
 function fmt(v, dp) { return v.toFixed(dp === undefined ? 3 : dp); }
 function pct(v) { return v.toFixed(1) + '%'; }
 
+// ── Tab 1: Regional Ranking ──
 function renderRanking(data) {
   var regions = data.regions.slice().sort(function(a, b) { return b.median_R - a.median_R; });
   var tbody = document.getElementById('ranking-tbody');
@@ -166,6 +174,7 @@ function renderRanking(data) {
   }).join('');
 }
 
+// ── Tab 2: Bezirk Comparison ──
 function buildProvinceData(data) {
   var map = {};
   data.substations.forEach(function(s) {
@@ -174,6 +183,7 @@ function buildProvinceData(data) {
     }
     map[s.province].subs.push(s);
   });
+  // Compute aggregates
   Object.keys(map).forEach(function(p) {
     var arr = map[p].subs;
     var n = arr.length;
@@ -181,12 +191,26 @@ function buildProvinceData(data) {
     var mid = Math.floor(n / 2);
     map[p].median_R = n % 2 ? arr[mid].R_median : (arr[mid - 1].R_median + arr[mid].R_median) / 2;
     map[p].count = n;
+    // Average components
     var comps = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 };
+    var mods = { R3: 0, R4: 0, R6a: 0, R6b: 0, R7: 0 };
+    var epSum = 0, degSum = 0;
     arr.forEach(function(s) {
       Object.keys(comps).forEach(function(k) { comps[k] += s.components[k]; });
+      mods.R3 += s.modifiers.R3_C_mult;
+      mods.R4 += s.modifiers.R4_F_topo;
+      mods.R6a += s.modifiers.R6_restoration;
+      mods.R6b += (s.modifiers.R6_seismic || 1.0);
+      mods.R7 += s.modifiers.R7_cyber;
+      epSum += (s.socio_economic.EP_rate_region || s.socio_economic.unemployment_rate || 0);
+      degSum += (s.graph_topology ? s.graph_topology.degree : 0);
     });
     Object.keys(comps).forEach(function(k) { comps[k] /= n; });
+    Object.keys(mods).forEach(function(k) { mods[k] /= n; });
     map[p].components = comps;
+    map[p].modifiers = mods;
+    map[p].EP_rate = epSum / n;
+    map[p].avg_degree = degSum / n;
   });
   return map;
 }
@@ -200,9 +224,15 @@ function populateProvinceSelects() {
   }).join('');
   selA.innerHTML = html;
   selB.innerHTML = html;
+
+  // Smart defaults: pick a high-risk and low-risk Bezirk
   var sorted = provNames.slice().sort(function(a, b) { return provinceData[b].median_R - provinceData[a].median_R; });
-  selA.value = sorted[0] || provNames[0];
-  selB.value = sorted[sorted.length - 1];
+  selA.value = sorted[0] || provNames[0]; // worst Bezirk
+  // Find Zürich or best Bezirk
+  var bestIdx = sorted.length - 1;
+  var zhIdx = sorted.indexOf('Zürich');
+  selB.value = zhIdx >= 0 ? 'Zürich' : sorted[bestIdx];
+
   selA.addEventListener('change', updateComparison);
   selB.addEventListener('change', updateComparison);
   updateComparison();
@@ -219,26 +249,123 @@ function updateComparison() {
   document.getElementById('th-prov-b').textContent = nameB;
 
   var rows = [];
-  function addRow(label, va, vb) {
-    var fva = fmt(va);
-    var fvb = fmt(vb);
+  function addRow(label, va, vb, formatter, unit) {
+    var fva = formatter ? formatter(va) : fmt(va);
+    var fvb = formatter ? formatter(vb) : fmt(vb);
     var delta = va - vb;
-    var fdelta = (delta >= 0 ? '+' : '') + fmt(delta);
+    var fdelta;
+    if (unit === 'pp') fdelta = (delta >= 0 ? '+' : '') + delta.toFixed(1) + 'pp';
+    else if (unit === 'int') fdelta = (delta >= 0 ? '+' : '') + delta.toFixed(0);
+    else fdelta = (delta >= 0 ? '+' : '') + fmt(delta);
+    var dc = deltaColor(delta);
     rows.push('<tr><td' + (label === 'Median R' ? ' style="font-weight:500"' : '') + '>' + label + '</td>' +
       '<td class="num" style="color:' + scoreColor(va) + ';font-weight:' + (label === 'Median R' ? '600' : '400') + '">' + fva + '</td>' +
       '<td class="num" style="color:' + scoreColor(vb) + ';font-weight:' + (label === 'Median R' ? '600' : '400') + '">' + fvb + '</td>' +
-      '<td class="num">' + fdelta + '</td></tr>');
+      '<td class="num" style="color:' + dc + '">' + fdelta + '</td></tr>');
   }
 
   addRow('Median R', a.median_R, b.median_R);
   addRow('C Continuity', a.components.C, b.components.C);
   addRow('I Infrastructure', a.components.I, b.components.I);
   addRow('S Saturation', a.components.S, b.components.S);
+  addRow('V Voltage', a.components.V, b.components.V);
+  addRow('E Economic', a.components.E, b.components.E);
+  addRow('T Transition', a.components.T, b.components.T);
+
+  rows.push('<tr style="border-top:2px solid var(--card-border)"></tr>');
+  addRow('Energy Poverty', a.EP_rate, b.EP_rate, pct, 'pp');
+  addRow('Avg Graph Degree', a.avg_degree, b.avg_degree, function(v) { return v.toFixed(1); }, 'int');
+  addRow('Substations', a.count, b.count, function(v) { return v.toFixed(0); }, 'int');
 
   document.getElementById('compare-tbody').innerHTML = rows.join('');
+  drawRadar(a, b, nameA, nameB);
 }
 
+// ── SVG Radar Chart ──
+function drawRadar(a, b, nameA, nameB) {
+  var svg = document.getElementById('radar-svg');
+  var cx = 140, cy = 120, R = 100;
+  var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
+  var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
+
+  // Find max for scaling
+  var maxVal = 0;
+  comps.forEach(function(k) {
+    maxVal = Math.max(maxVal, a.components[k], b.components[k]);
+  });
+  maxVal = Math.max(maxVal, 0.05); // floor
+
+  function polar(i, val) {
+    var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+    var r = (1 - val / maxVal) * R;
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  }
+
+  var html = '';
+  // Grid rings
+  [0.33, 0.66, 1.0].forEach(function(frac) {
+    var pts = [];
+    for (var i = 0; i < 6; i++) {
+      var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+      pts.push((cx + frac * R * Math.cos(angle)).toFixed(1) + ',' + (cy + frac * R * Math.sin(angle)).toFixed(1));
+    }
+    html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="rgba(44,36,32,0.08)" stroke-width="1"/>';
+  });
+
+  // Axes
+  for (var i = 0; i < 6; i++) {
+    var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+    var x2 = cx + R * Math.cos(angle);
+    var y2 = cy + R * Math.sin(angle);
+    html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="rgba(44,36,32,0.06)" stroke-width="1"/>';
+  }
+
+  // Bezirk A polygon
+  var ptsA = comps.map(function(k, i) { var p = polar(i, a.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+  html += '<polygon points="' + ptsA + '" fill="rgba(148,25,20,0.12)" stroke="var(--crimson)" stroke-width="1.5"/>';
+
+  // Bezirk B polygon
+  var ptsB = comps.map(function(k, i) { var p = polar(i, b.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+  html += '<polygon points="' + ptsB + '" fill="rgba(93,133,99,0.12)" stroke="var(--sage)" stroke-width="1.5"/>';
+
+  // Vertex dots
+  comps.forEach(function(k, i) {
+    var pa = polar(i, a.components[k]);
+    html += '<circle cx="' + pa[0].toFixed(1) + '" cy="' + pa[1].toFixed(1) + '" r="3" fill="var(--crimson)"/>';
+    var pb = polar(i, b.components[k]);
+    html += '<circle cx="' + pb[0].toFixed(1) + '" cy="' + pb[1].toFixed(1) + '" r="3" fill="var(--sage)"/>';
+  });
+
+  // Labels
+  var labelOffset = 16;
+  comps.forEach(function(k, i) {
+    var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+    var lx = cx + (R + labelOffset) * Math.cos(angle);
+    var ly = cy + (R + labelOffset) * Math.sin(angle);
+    var anchor = 'middle';
+    if (lx < cx - 10) anchor = 'end';
+    else if (lx > cx + 10) anchor = 'start';
+    html += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--warm-grey)" font-family="DM Sans" font-weight="500">' + labels[i] + '</text>';
+  });
+
+  // Scale labels — center = worst (maxVal), edge = best (0)
+  html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">0 (best)</text>';
+  html += '<text x="' + (cx + 4) + '" y="' + (cy + 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
+
+  svg.innerHTML = html;
+
+  // Legend
+  document.getElementById('radar-legend').innerHTML =
+    '<div style="display:flex;justify-content:center;gap:16px">' +
+      '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--crimson);border-radius:2px"></div>' + nameA + '</div>' +
+      '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--sage);border-radius:2px"></div>' + nameB + '</div>' +
+    '</div>' +
+    '<div style="font-size:10px;color:var(--warm-grey);margin-top:6px;text-align:center">Larger area = lower risk = better resilience</div>';
+}
+
+// ── Tab 3: Component Decomposition ──
 function renderDecomposition(data) {
+  // Compute per-Canton average components
   var regionMap = {};
   data.substations.forEach(function(s) {
     if (!regionMap[s.region]) {
@@ -269,29 +396,33 @@ function renderDecomposition(data) {
     };
   }).sort(function(a, b) { return b.mean_R - a.mean_R; });
 
+  var maxR = regions[0].mean_R || 1;
+  var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
+  var colors = ['var(--crimson)', 'var(--terracotta)', 'var(--sage)', '#3b9eff', 'var(--bronze)', '#22d3ee'];
+
   var html = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey);padding-left:148px"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
   html += regions.map(function(r) {
     var total = r.C + r.V + r.I + r.E + r.S + r.T;
     if (total === 0) total = 1;
-    var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
-    var colors = ['var(--crimson)', 'var(--terracotta)', 'var(--sage)', '#3b9eff', 'var(--bronze)', '#22d3ee'];
+    var barWidth = Math.max(20, Math.min((1 - r.mean_R) * 100, 100));
     var segments = comps.map(function(k, idx) {
       var w = (r[k] / total * 100).toFixed(1);
-      return '<div style="width:' + w + '%;background:' + colors[idx] + '"></div>';
+      return '<div style="width:' + w + '%;background:' + colors[idx] + '" title="' + k + ': ' + r[k].toFixed(3) + '"></div>';
     }).join('');
 
     return '<div style="margin-bottom:14px">' +
       '<div style="display:flex;align-items:center;margin-bottom:4px">' +
-        '<span style="width:140px;font-size:12px;font-weight:500">' + r.region + '</span>' +
-        '<span style="margin-left:auto;font-size:11px;color:var(--warm-grey)">' + r.mean_R.toFixed(3) + '</span>' +
+        '<span style="width:140px;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + r.region + '</span>' +
+        '<span style="margin-left:auto;font-size:11px;color:var(--warm-grey);font-variant-numeric:tabular-nums">' + r.mean_R.toFixed(3) + '</span>' +
       '</div>' +
-      '<div style="display:flex;height:16px;border-radius:4px;overflow:hidden;width:' + Math.max(20, Math.min((1 - r.mean_R) * 100, 100)).toFixed(0) + '%">' + segments + '</div>' +
+      '<div style="display:flex;height:16px;border-radius:4px;overflow:hidden;width:' + barWidth.toFixed(0) + '%">' + segments + '</div>' +
     '</div>';
   }).join('');
 
   document.getElementById('decomp-bars').innerHTML = html;
 }
 
+// ── Load Data ──
 fetch('ssi-data.json?v=16').then(function(r) { return r.json(); }).then(function(data) {
   SSI = data;
   provinceData = buildProvinceData(data);
@@ -300,7 +431,7 @@ fetch('ssi-data.json?v=16').then(function(r) { return r.json(); }).then(function
   renderDecomposition(data);
 }).catch(function(err) {
   console.error('Failed to load SSI data:', err);
-  document.getElementById('ranking-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--crimson);padding:32px">Failed to load data.</td></tr>';
+  document.getElementById('ranking-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--crimson);padding:32px">Failed to load data. Check console.</td></tr>';
 });
 </script>
 </body>
