@@ -14,14 +14,17 @@
 
 <main class="page-shell" style="max-width:860px">
 
-<!-- PAGE HEADER -->
+<!-- ═══════════════════════════════════════════════════════
+     PAGE HEADER
+     ═══════════════════════════════════════════════════════ -->
 <div class="page-header animate-in">
   <h1>Monthly Intelligence Report</h1>
   <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">Edition 001 — Alpine Hydropower & Grid Transition</div>
   <p>Where the energy transition is outrunning the grid. Inaugural edition · [Month Year] · SSI v4.0.2</p>
 </div>
 
-<!-- TABLE OF CONTENTS -->
+
+<!-- ═══════════════════ TABLE OF CONTENTS ═══════════════════ -->
 <div class="card animate-in delay-1" style="margin-bottom:24px">
   <span class="label-xs" style="margin-bottom:12px;display:block">Contents</span>
   <div style="columns:2;column-gap:24px;font-size:13px;line-height:2">
@@ -34,7 +37,8 @@
   </div>
 </div>
 
-<!-- A. EXECUTIVE SUMMARY -->
+
+<!-- ═══════════════════ A. EXECUTIVE SUMMARY ═══════════════════ -->
 <section id="exec" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section A</span>
 <h2>Executive Summary</h2>
@@ -42,17 +46,17 @@
 <div class="kpi-grid" style="margin:20px 0">
   <div class="kpi-card">
     <div class="kpi-label">Substations Scored</div>
-    <div class="kpi-value" style="color:var(--ink)">923</div>
-    <div class="kpi-sub">160 HV · 160 MV · 160 Bezirke</div>
+    <div class="kpi-value" style="color:var(--ink)">947</div>
+    <div class="kpi-sub">147 HV (≥220 kV) · 776 MV · 24 junction</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">Grid Lines Mapped</div>
-    <div class="kpi-value" style="color:var(--ink)">6,915</div>
-    <div class="kpi-sub">~10,000 km coverage</div>
+    <div class="kpi-label">Power Lines Mapped</div>
+    <div class="kpi-value" style="color:var(--ink)">625</div>
+    <div class="kpi-sub">~8,000 km coverage · real OSM data</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">MC Simulations</div>
-    <div class="kpi-value" style="color:var(--ink)">9.23 M</div>
+    <div class="kpi-value" style="color:var(--ink)">9.47 M</div>
     <div class="kpi-sub">10,000 per substation</div>
   </div>
   <div class="kpi-card">
@@ -62,11 +66,11 @@
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score. Its engine processes 346,000+ source data points per run, executes 9.23 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and produces full uncertainty quantification across 923 substations spanning 160 Bezirke and 6,915 grid lines covering ~10,000 km.</p>
+<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score. Its engine processes 346,000+ source data points per run, executes 9.47 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and produces full uncertainty quantification across 947 real OSM substations spanning 160 Bezirke, 26 Cantons, and 625 power lines covering approximately 8,000 km.</p>
 
-<p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 25 verified public sources, making the methodology fully auditable and reproducible. The Index captures Switzerland's unique challenges: Alpine hydropower dependence, distributed generation integration, nuclear phase-out coordination, and cross-border trading complexities.</p>
+<p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 25 verified public sources — including BFE, ElCom, Swissgrid, Pronovo, BFS, SED, BAFU, Swisstopo, MeteoSwiss, and OpenStreetMap — making the methodology fully auditable and reproducible. Switzerland presents unique grid challenges: approximately 60% of electricity generated from Alpine hydropower, a multi-decade nuclear phase-out under the Energy Strategy 2050, distributed solar integration across diverse topography, and cross-border energy trading at the heart of the European interconnected grid.</p>
 
-<!-- Substation in Focus -->
+<!-- Substation in Focus — auto-populated from ssi-data.json -->
 <div class="card" style="border-left:3px solid var(--crimson);margin:20px 0" id="focus-card">
   <div style="display:flex;gap:24px;flex-wrap:wrap">
     <div style="flex:1;min-width:200px">
@@ -162,7 +166,7 @@
       { key: 'R3_C_mult', label: 'R3 Consequence' },
       { key: 'R4_F_topo', label: 'R4 Graph Criticality' },
       { key: 'R6_restoration', label: 'R6a Restoration' },
-      { key: 'R6_seismic', label: 'R6b Network Topology' },
+      { key: 'R6_seismic', label: 'R6b Seismic/Network' },
       { key: 'R7_cyber', label: 'R7 Digital Readiness' }
     ];
     var modHTML = modDefs.map(function(m){
@@ -174,12 +178,74 @@
     }).join('');
     document.getElementById('focus-modifiers').innerHTML = modHTML;
 
+    // Radar chart
+    var canvas = document.getElementById('focus-radar');
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var cx = W / 2, cy = H / 2 + 6;
+    var R = 68;
+    var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
+    var weights = [0.30, 0.10, 0.25, 0.10, 0.20, 0.05];
+    var vals = labels.map(function(k, i){ return s.components[k] / weights[i]; });
+    var n = labels.length;
+
+    ctx.strokeStyle = 'rgba(44,36,32,0.08)';
+    ctx.lineWidth = 1;
+    [0.25, 0.5, 0.75, 1.0].forEach(function(ring){
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) {
+        var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+        var x = cx + R * ring * Math.cos(angle);
+        var y = cy + R * ring * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+
+    for (var i = 0; i < n; i++) {
+      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(148,25,20,0.15)';
+    ctx.strokeStyle = 'rgba(148,25,20,0.7)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var v = Math.min(vals[i % n], 1);
+      var x = cx + R * v * Math.cos(angle);
+      var y = cy + R * v * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#2c2420';
+    ctx.font = '600 11px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (var i = 0; i < n; i++) {
+      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var lx = cx + (R + 16) * Math.cos(angle);
+      var ly = cy + (R + 16) * Math.sin(angle);
+      ctx.fillText(labels[i], lx, ly);
+    }
+
+    var dominant = compDefs.slice().sort(function(a,b){ return (s.components[b.key]/b.w) - (s.components[a.key]/a.w); });
+    var top1 = dominant[0], top2 = dominant[1];
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var d = new Date();
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
       ' — is <strong>' + s.name + '</strong> in ' + s.province + ', ' + s.region +
       '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
-      (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), this substation reflects critical transition challenges as Switzerland phases out nuclear capacity while balancing hydropower constraints and renewable integration.';
+      (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
+      top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
+      '% of its weight ceiling, followed by ' + top2.key + ' (' + top2.label + ') at ' +
+      (s.components[top2.key] / top2.w * 100).toFixed(0) + '%. This substation reflects critical transition challenges as Switzerland phases out nuclear capacity while balancing hydropower constraints and renewable integration.';
     document.getElementById('focus-narrative').innerHTML = narrative;
   });
 })();
@@ -188,17 +254,18 @@
 
 <div style="margin:32px 0"></div>
 
-<!-- B. CYBER & ECONOMIC EXPOSURE MONITOR -->
+
+<!-- ═══════════════════ B. CYBER & ECONOMIC EXPOSURE MONITOR ═══════════════════ -->
 <section id="cyber-econ" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section B — Standing Item</span>
 <h2>Cyber &amp; Economic Exposure Monitor</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Switzerland's grid faces unique vulnerabilities: Alpine terrain isolation, cross-border energy flows, nuclear phase-out coordination, and small population means high per-capita consequence. The SSI's R7 (Digital Readiness) modifier and E (Economic) component capture this—identifying substations where low digital resilience intersects with high economic consequence.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Switzerland's grid faces unique vulnerabilities: Alpine terrain isolation limits redundancy, cross-border energy flows create dependency on neighbours, the nuclear phase-out reduces baseload capacity, and a small population means high per-capita economic consequence per substation failure. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross silos — identifying substations where low digital resilience intersects with high economic consequence.</p>
 </div>
 
 <!-- B.1 KPI boxes -->
-<div class="kpi-grid" style="margin:16px 0">
+<div class="kpi-grid" style="margin:16px 0" id="b1-kpis">
   <div class="kpi-card">
     <div class="kpi-label">Cyber HIGH Exposure</div>
     <div class="kpi-value" style="color:var(--crimson)" id="b1-cyber-high">—</div>
@@ -207,7 +274,7 @@
   <div class="kpi-card">
     <div class="kpi-label">Blind Spots</div>
     <div class="kpi-value" style="color:var(--terracotta)" id="b1-blindspots">—</div>
-    <div class="kpi-sub">High risk + Low digital readiness</div>
+    <div class="kpi-sub" id="b1-blindspots-sub">High risk + Low digital readiness</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Avg R7 Modifier</div>
@@ -221,10 +288,46 @@
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7" id="b1-narrative">Loading cyber-physical data…</p>
+<h3>B.1 &ensp; Cyber-Physical Risk Matrix</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Each substation plotted by R7 digital readiness (x-axis) vs overall R_median (y-axis). The upper-left quadrant — high risk, low digital readiness — identifies <em>blind spots</em> where grid stress is high but monitoring/response capacity is weakest.</p>
+
+<canvas id="b1-matrix" style="width:100%;height:320px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff"></canvas>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0;font-size:11px;color:var(--warm-grey)">
+  <span>● <span style="color:var(--sage)">Low</span></span>
+  <span>● <span style="color:var(--bronze)">Medium</span></span>
+  <span>● <span style="color:var(--terracotta)">High</span></span>
+  <span>● <span style="color:var(--crimson)">Critical</span></span>
+  <span style="margin-left:auto">Dashed lines = fleet medians</span>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="b1-narrative">Loading cyber-physical matrix…</p>
+
+<!-- B.2 Economic Impact by Business Fabric -->
+<h3>B.2 &ensp; Economic Impact by Business Fabric</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Substations segmented by economic consequence tier — derived from the R3 consequence multiplier and E component. Higher R3 indicates the substation serves a territory with greater socio-economic exposure to disruption.</p>
+
+<div id="b2-tiers" style="margin:16px 0">Loading economic tiers…</div>
+
+<div class="card" style="margin:16px 0;border-left:3px solid var(--bronze);background:var(--cream)">
+  <p style="font-size:13px;line-height:1.7;margin:0" id="b2-voll-note"><strong>Value of Lost Load (VoLL) context:</strong> Loading…</p>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="b2-narrative">Loading economic impact analysis…</p>
+
+<!-- B.3 Bezirk Digital Readiness Ranking -->
+<h3>B.3 &ensp; Bezirk Digital Readiness Ranking</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Bezirke ranked by average R7 modifier — lower values indicate weaker digital infrastructure. Cross-referenced with average R_median to identify Bezirke combining digital exposure with high grid stress.</p>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
+  <canvas id="b3-map" style="flex:1;min-width:260px;height:300px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff"></canvas>
+  <div style="flex:1;min-width:260px" id="b3-ranking">Loading…</div>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="b3-narrative">Loading Bezirk digital readiness…</p>
 
 <!-- B.4 Monthly Pulse -->
-<h3>B.1 &ensp; Monthly Pulse</h3>
+<h3>B.4 &ensp; Monthly Pulse</h3>
 
 <div class="card" style="border-left:3px solid var(--sage);background:var(--cream)">
   <p style="font-size:13px;line-height:1.7;margin:0" id="b4-pulse"><strong>Edition 001 — Baseline Snapshot.</strong> Loading…</p>
@@ -236,18 +339,19 @@
     var fleet = data.substations;
     var n = fleet.length;
 
+    // ── Shared computations ──
     var avgR7 = fleet.reduce(function(a,s){ return a + s.modifiers.R7_cyber; }, 0) / n;
     var medianR7arr = fleet.map(function(s){ return s.modifiers.R7_cyber; }).sort(function(a,b){ return a-b; });
     var medianR7 = medianR7arr[Math.floor(n/2)];
+    var medianR = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; })[Math.floor(n/2)];
 
+    // Cyber classification
     var cyberCounts = { LOW: 0, MEDIUM: 0, HIGH: 0 };
     fleet.forEach(function(s){
       var r7 = s.modifiers.R7_cyber;
-      var cls;
-      if (r7 < 0.995) cls = 'HIGH';
-      else if (r7 <= 1.005) cls = 'MEDIUM';
-      else cls = 'LOW';
-      cyberCounts[cls]++;
+      if (r7 < 0.995) cyberCounts.HIGH++;
+      else if (r7 <= 1.005) cyberCounts.MEDIUM++;
+      else cyberCounts.LOW++;
     });
 
     var blindSpots = fleet.filter(function(s){
@@ -256,46 +360,702 @@
 
     var highConseq = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.12; });
 
+    // ── B.1 KPIs ──
     document.getElementById('b1-cyber-high').textContent = cyberCounts.HIGH;
     document.getElementById('b1-cyber-high-sub').textContent = (cyberCounts.HIGH / n * 100).toFixed(1) + '% of fleet';
     document.getElementById('b1-blindspots').textContent = blindSpots.length;
+    document.getElementById('b1-blindspots-sub').textContent = 'High/Critical + R7 < median';
+    document.getElementById('b1-avg-r7').textContent = avgR7.toFixed(4);
     document.getElementById('b1-high-conseq').textContent = highConseq.length.toLocaleString();
     document.getElementById('b1-high-conseq-sub').textContent = (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ 1.12';
-    document.getElementById('b1-avg-r7').textContent = avgR7.toFixed(4);
+
+    // ── B.1 Matrix canvas ──
+    var canvas = document.getElementById('b1-matrix');
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = canvas.offsetWidth * dpr;
+    canvas.height = canvas.offsetHeight * dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    var W = canvas.offsetWidth, H = canvas.offsetHeight;
+    var pad = { top: 20, right: 30, bottom: 40, left: 50 };
+
+    var r7Min = 0.98, r7Max = 1.02;
+    var rMin = 0.10, rMax = 0.85;
+
+    function xPos(r7) { return pad.left + (r7 - r7Min) / (r7Max - r7Min) * (W - pad.left - pad.right); }
+    function yPos(r)  { return pad.top + (1 - (r - rMin) / (rMax - rMin)) * (H - pad.top - pad.bottom); }
+
+    var bandColors = { Low: 'rgba(93,133,99,0.5)', Medium: 'rgba(184,134,58,0.5)', High: 'rgba(170,66,52,0.5)', Critical: 'rgba(148,25,20,0.7)' };
+
+    // Quadrant shading
+    ctx.fillStyle = 'rgba(148,25,20,0.04)';
+    ctx.fillRect(pad.left, pad.top, xPos(medianR7) - pad.left, yPos(medianR) - pad.top);
+
+    ctx.font = '600 10px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(148,25,20,0.35)';
+    ctx.fillText('BLIND SPOTS', (pad.left + xPos(medianR7)) / 2, pad.top + 14);
+    ctx.fillStyle = 'rgba(93,133,99,0.35)';
+    ctx.fillText('DIGITALLY RESILIENT', (xPos(medianR7) + W - pad.right) / 2, H - pad.bottom - 6);
+
+    ctx.strokeStyle = 'rgba(44,36,32,0.06)';
+    ctx.lineWidth = 1;
+    for (var g = r7Min; g <= r7Max; g += 0.005) {
+      var x = xPos(g);
+      ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, H - pad.bottom); ctx.stroke();
+    }
+    for (var g = rMin; g <= rMax; g += 0.1) {
+      var y = yPos(g);
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    }
+
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(44,36,32,0.3)';
+    ctx.lineWidth = 1;
+    var mx = xPos(medianR7);
+    ctx.beginPath(); ctx.moveTo(mx, pad.top); ctx.lineTo(mx, H - pad.bottom); ctx.stroke();
+    var my = yPos(medianR);
+    ctx.beginPath(); ctx.moveTo(pad.left, my); ctx.lineTo(W - pad.right, my); ctx.stroke();
+    ctx.setLineDash([]);
+
+    fleet.forEach(function(s) {
+      var x = xPos(s.modifiers.R7_cyber);
+      var y = yPos(s.R_median);
+      if (x < pad.left || x > W - pad.right || y < pad.top || y > H - pad.bottom) return;
+      ctx.beginPath();
+      ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = bandColors[s.classification] || 'rgba(100,100,100,0.3)';
+      ctx.fill();
+    });
+
+    ctx.fillStyle = '#2c2420';
+    ctx.font = '500 11px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('← Lower digital readiness    R7 Modifier    Higher digital readiness →', W / 2, H - 6);
+    ctx.save();
+    ctx.translate(12, H / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('← Lower risk    R_median    Higher risk →', 0, 0);
+    ctx.restore();
+
+    ctx.font = '400 10px DM Sans, sans-serif';
+    ctx.fillStyle = 'var(--warm-grey)';
+    ctx.textAlign = 'center';
+    for (var t = r7Min; t <= r7Max; t += 0.01) {
+      ctx.fillText(t.toFixed(2), xPos(t), H - pad.bottom + 14);
+    }
+    ctx.textAlign = 'right';
+    for (var t = rMin; t <= rMax; t += 0.1) {
+      ctx.fillText(t.toFixed(1), pad.left - 6, yPos(t) + 4);
+    }
+
+    // B.1 Narrative
+    var blindSpotRegions = {};
+    blindSpots.forEach(function(s){ blindSpotRegions[s.region] = (blindSpotRegions[s.region] || 0) + 1; });
+    var topBlindRegions = Object.keys(blindSpotRegions).map(function(r){ return { name: r, n: blindSpotRegions[r] }; })
+      .sort(function(a,b){ return b.n - a.n; }).slice(0, 3);
+    var blindRegionStr = topBlindRegions.map(function(r){ return r.name + ' (' + r.n + ')'; }).join(', ');
 
     document.getElementById('b1-narrative').innerHTML =
-      'The cyber-physical profile identifies <strong>' + blindSpots.length + ' substations</strong> at high overall risk with below-median digital readiness (R7 < ' + medianR7.toFixed(4) + '). ' +
-      'These are Switzerland\'s most vulnerable nodes to compound events — grid disturbances at locations where digital monitoring and remote diagnostic capacity are weakest. ' +
-      'Across the fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry HIGH cyber-exposure, while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are LOW—concentrated in urban transmission corridors.';
+      'The cyber-physical matrix identifies <strong>' + blindSpots.length + ' blind-spot substations</strong> — ' +
+      'scoring High or Critical on overall risk while sitting below the fleet median for digital readiness (R7 < ' + medianR7.toFixed(4) + '). ' +
+      'These substations are the most vulnerable to compound events: grid disturbances at locations where digital monitoring, ' +
+      'automated switching, and remote diagnostic capacity are weakest. ' +
+      'The blind spots concentrate in <strong>' + blindRegionStr + '</strong>. ' +
+      'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry HIGH cyber-exposure, ' +
+      'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier — ' +
+      'indicating strong digital infrastructure, concentrated in the Swiss Mittelland urban corridors.';
+
+    // ── B.2 Economic Impact by Business Fabric ──
+    var tiers = [
+      { label: 'Financial & Pharma / High-Consequence', desc: 'Banking centres, pharmaceutical manufacturing, precision engineering — highest economic loss per interruption',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏦',
+        voll: 'CHF 20–40/kWh' },
+      { label: 'Industrial / Medium-Large Enterprise', desc: 'Machinery, chemicals, food processing — significant continuity requirements',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
+        voll: 'CHF 10–20/kWh' },
+      { label: 'Commercial / Tourism-Dense', desc: 'Service economy, retail, Alpine tourism — moderate individual impact but high aggregate exposure',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏔️',
+        voll: 'CHF 4–10/kWh' },
+      { label: 'Rural / Agricultural', desc: 'Alpine farming, sparse population — lower VoLL but higher social vulnerability and longer restoration times',
+        filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
+        voll: 'CHF 1–4/kWh' }
+    ];
+
+    var tiersHTML = '';
+    tiers.forEach(function(tier){
+      var subs = fleet.filter(tier.filter);
+      var nTier = subs.length;
+      var highCrit = subs.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
+      var avgR = subs.length ? subs.reduce(function(a,s){ return a + s.R_median; }, 0) / subs.length : 0;
+      var avgE = subs.length ? subs.reduce(function(a,s){ return a + s.components.E; }, 0) / subs.length : 0;
+      var pctFleet = (nTier / n * 100).toFixed(1);
+
+      var tierBands = { Low:0, Medium:0, High:0, Critical:0 };
+      subs.forEach(function(s){ tierBands[s.classification]++; });
+      var bColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
+      var bandBar = '';
+      ['Low','Medium','High','Critical'].forEach(function(b){
+        if (tierBands[b] > 0) {
+          var w = (tierBands[b] / nTier * 100).toFixed(1);
+          bandBar += '<div style="width:' + w + '%;height:100%;background:' + bColors[b] + '" title="' + b + ': ' + tierBands[b] + '"></div>';
+        }
+      });
+
+      tiersHTML += '<div class="card" style="margin-bottom:12px;border-left:3px solid ' + tier.color + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">' +
+          '<span style="font-size:14px;font-weight:600">' + tier.icon + ' ' + tier.label + '</span>' +
+          '<span style="font-size:12px;color:var(--warm-grey)">Est. VoLL: ' + tier.voll + '</span></div>' +
+        '<p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">' + tier.desc + '</p>' +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">' +
+          '<span><strong>' + nTier.toLocaleString() + '</strong> substations (' + pctFleet + '%)</span>' +
+          '<span>High/Critical: <strong style="color:var(--crimson)">' + highCrit + '</strong> (' + (nTier ? (highCrit/nTier*100).toFixed(1) : 0) + '%)</span>' +
+          '<span>Avg R: <strong>' + avgR.toFixed(3) + '</strong></span>' +
+          '<span>Avg E: <strong>' + avgE.toFixed(3) + '</strong> / 0.10</span></div>' +
+        '<div style="height:8px;border-radius:4px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+        '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px">' +
+          '<span>Low ' + tierBands.Low + '</span><span>Med ' + tierBands.Medium + '</span>' +
+          '<span>High ' + tierBands.High + '</span><span>Crit ' + tierBands.Critical + '</span></div>' +
+      '</div>';
+    });
+    document.getElementById('b2-tiers').innerHTML = tiersHTML;
+
+    // VoLL context note
+    var totalHighConseqHighRisk = fleet.filter(function(s){
+      return s.modifiers.R3_C_mult >= 1.14 && (s.classification === 'High' || s.classification === 'Critical');
+    }).length;
+    document.getElementById('b2-voll-note').innerHTML =
+      '<strong>Value of Lost Load (VoLL) context:</strong> ElCom estimates Swiss average VoLL at CHF 16–25/kWh for commercial customers ' +
+      'and CHF 4–8/kWh for residential. Switzerland\'s high GDP per capita (CHF 87,000+) means per-substation economic exposure is among ' +
+      'the highest in Europe. The SSI\'s R3 consequence multiplier identifies which substations serve the most economically exposed territories. ' +
+      '<strong>' + totalHighConseqHighRisk + ' substations</strong> combine high-consequence economic fabric (R3 ≥ 1.14) with ' +
+      'High or Critical risk classification — the highest VoLL-weighted exposure in the fleet.';
+
+    // B.2 Narrative
+    var topTierSubs = fleet.filter(tiers[0].filter);
+    var topTierRegions = {};
+    topTierSubs.forEach(function(s){ topTierRegions[s.region] = (topTierRegions[s.region] || 0) + 1; });
+    var topEconRegions = Object.keys(topTierRegions).map(function(r){ return { name: r, n: topTierRegions[r] }; })
+      .sort(function(a,b){ return b.n - a.n; }).slice(0, 3);
+    var econRegionStr = topEconRegions.map(function(r){ return r.name + ' (' + r.n + ')'; }).join(', ');
+
+    document.getElementById('b2-narrative').innerHTML =
+      'The financial and pharmaceutical tier concentrates in <strong>' + econRegionStr + '</strong> — Cantons where banking, ' +
+      'precision manufacturing, and pharmaceutical industries depend on uninterrupted power for trading systems, clean rooms, and continuous processes. ' +
+      'A single hour of unplanned outage at these substations carries an estimated VoLL of CHF 20–40/kWh, compared to CHF 1–4/kWh in Alpine rural areas. ' +
+      'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
+      'to substation-level risk scores at this granularity.';
+
+    // ── B.3 Bezirk Digital Readiness ──
+    var provData = {};
+    fleet.forEach(function(s){
+      var p = s.province;
+      if (!provData[p]) provData[p] = { subs: [], sumR7: 0, sumR: 0, sumLon: 0, sumLat: 0 };
+      provData[p].subs.push(s);
+      provData[p].sumR7 += s.modifiers.R7_cyber;
+      provData[p].sumR += s.R_median;
+      provData[p].sumLon += s.lon;
+      provData[p].sumLat += s.lat;
+    });
+
+    var provList = Object.keys(provData).map(function(p){
+      var d = provData[p];
+      var nn = d.subs.length;
+      return { name: p, n: nn, avgR7: d.sumR7 / nn, avgR: d.sumR / nn, lon: d.sumLon / nn, lat: d.sumLat / nn };
+    });
+    provList.sort(function(a,b){ return a.avgR7 - b.avgR7; });
+
+    // Mini-map
+    var mapCanvas = document.getElementById('b3-map');
+    var dpr2 = window.devicePixelRatio || 1;
+    mapCanvas.width = mapCanvas.offsetWidth * dpr2;
+    mapCanvas.height = mapCanvas.offsetHeight * dpr2;
+    var mctx = mapCanvas.getContext('2d');
+    mctx.scale(dpr2, dpr2);
+    var mW = mapCanvas.offsetWidth, mH = mapCanvas.offsetHeight;
+
+    var allLons = fleet.map(function(s){ return s.lon; });
+    var allLats = fleet.map(function(s){ return s.lat; });
+    var lonMin = Math.min.apply(null, allLons) - 0.3, lonMax = Math.max.apply(null, allLons) + 0.3;
+    var latMin = Math.min.apply(null, allLats) - 0.2, latMax = Math.max.apply(null, allLats) + 0.2;
+
+    function mProj(lon, lat) {
+      return [30 + (lon - lonMin) / (lonMax - lonMin) * (mW - 60),
+              mH - 30 - (lat - latMin) / (latMax - latMin) * (mH - 60)];
+    }
+
+    var r7floor = 0.985, r7ceil = 1.012;
+    function r7Color(r7) {
+      var t = Math.max(0, Math.min(1, (r7 - r7floor) / (r7ceil - r7floor)));
+      var r = Math.round(180 - t * 100);
+      var g = Math.round(60 + t * 90);
+      var b = Math.round(40 + t * 20);
+      return 'rgba(' + r + ',' + g + ',' + b + ',0.6)';
+    }
+
+    fleet.forEach(function(s){
+      var p = mProj(s.lon, s.lat);
+      mctx.beginPath();
+      mctx.arc(p[0], p[1], 2.5, 0, Math.PI * 2);
+      mctx.fillStyle = r7Color(s.modifiers.R7_cyber);
+      mctx.fill();
+    });
+
+    mctx.font = '500 10px DM Sans, sans-serif';
+    mctx.textAlign = 'left';
+    mctx.fillStyle = '#2c2420';
+    mctx.fillText('R7 Digital Readiness', 8, 14);
+    var grd = mctx.createLinearGradient(8, 22, 108, 22);
+    grd.addColorStop(0, r7Color(r7floor));
+    grd.addColorStop(1, r7Color(r7ceil));
+    mctx.fillStyle = grd;
+    mctx.fillRect(8, 18, 100, 8);
+    mctx.fillStyle = 'var(--warm-grey)';
+    mctx.font = '400 9px DM Sans, sans-serif';
+    mctx.fillText('Low', 8, 36);
+    mctx.textAlign = 'right';
+    mctx.fillText('High', 108, 36);
+
+    // Bezirk ranking — top 15 worst + compact
+    var maxR7prov = provList[provList.length - 1].avgR7;
+    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Worst Digital Readiness — Top 15 Bezirke</div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:6px">Longer bar = higher R7 = better digital infrastructure.</div>';
+    provList.slice(0, 15).forEach(function(pv, idx){
+      var barPct = ((pv.avgR7 - r7floor) / (r7ceil - r7floor) * 100).toFixed(1);
+      var riskTag = pv.avgR > medianR ? '<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span>' : '';
+      rankHTML += '<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px">' +
+        '<span style="min-width:14px;color:var(--warm-grey);font-size:10px">' + (idx+1) + '</span>' +
+        '<span style="min-width:110px;font-weight:500">' + pv.name + riskTag + '</span>' +
+        '<div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">' +
+          '<div style="width:' + barPct + '%;height:100%;background:' + r7Color(pv.avgR7) + ';border-radius:3px"></div></div>' +
+        '<span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">' + pv.avgR7.toFixed(4) + '</span></div>';
+    });
+    document.getElementById('b3-ranking').innerHTML = rankHTML;
+
+    // B.3 Narrative
+    var worstProv = provList[0];
+    var bestProv = provList[provList.length - 1];
+    var dualExposed = provList.filter(function(pv){ return pv.avgR7 < medianR7 && pv.avgR > medianR; });
+    document.getElementById('b3-narrative').innerHTML =
+      'Bezirk-level analysis reveals geographic variation in digital infrastructure that mirrors Alpine topography constraints. ' +
+      '<strong>' + worstProv.name + '</strong> has the lowest average R7 (' + worstProv.avgR7.toFixed(4) + '), while ' +
+      '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
+      (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
+      '<strong>' + dualExposed.length + ' Bezirke</strong> combine below-median digital readiness with above-median grid risk, ' +
+      'making them priority targets for Swisscom fibre and smart-grid investment. ' +
+      'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open data — ' +
+      'as NIS2 transposition proceeds and ElCom enhances its digital monitoring requirements, future editions will expand R7\'s dynamic range.';
+
+    // ── B.4 Monthly Pulse ──
+    var highRiskLowDigital = fleet.filter(function(s){
+      return s.classification === 'Critical' && s.modifiers.R7_cyber < medianR7;
+    }).length;
+    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var now = new Date();
+    var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
 
     document.getElementById('b4-pulse').innerHTML =
-      '<strong>Edition 001 — Baseline Snapshot.</strong> With ' + n.toLocaleString() + ' substations across 26 Cantons, Switzerland\'s SSI baseline reveals ' +
-      'a fleet median R of ' + data.fleet_summary.median_R.toFixed(3) + ', with ' + data.fleet_summary.bands.Critical + ' substations (' + data.fleet_summary.band_pct.Critical.toFixed(1) + '%) in Critical band. ' +
-      'Alpine isolation, nuclear transition timing, and DER integration are the dominant drivers of localized risk concentrations.';
+      '<strong>Edition 001 — Baseline Snapshot (' + monthYear + ').</strong> ' +
+      'This edition establishes the baseline for the Cyber & Economic Exposure Monitor. Key reference points: ' +
+      'fleet average R7 = ' + avgR7.toFixed(4) + ', median = ' + medianR7.toFixed(4) + '; ' +
+      cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
+      blindSpots.length + ' blind-spot substations (High/Critical risk + below-median R7); ' +
+      highRiskLowDigital + ' Critical-band substations with below-median digital readiness. ' +
+      'Future editions will track deltas against this baseline, flagging Bezirke where smart-grid deployments ' +
+      'and broadband expansion translate into measurable R7 shifts.';
   });
 })();
 </script>
 </section>
 
-<!-- Remaining sections placeholder -->
+<div style="margin:32px 0"></div>
+
+
+<!-- ═══════════════════ C. DATA REFRESH & CHANGELOG ═══════════════════ -->
 <section id="data" style="margin-bottom:32px">
-  <h2>Data & Methodology</h2>
-  <p style="font-size:13px;line-height:1.7">Full technical changelog and source updates available on the <a href="methodology.html">Methodology</a> page.</p>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section C</span>
+<h2>Data Refresh &amp; Changelog</h2>
+
+<p style="font-size:13px;line-height:1.7" id="sec-c-intro">Loading data source registry…</p>
+
+<div class="kpi-grid" style="margin:16px 0">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Sources</div>
+    <div class="kpi-value" style="color:var(--ink)" id="c-total-src">—</div>
+    <div class="kpi-sub" id="c-total-vars"></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Weekly / Monthly</div>
+    <div class="kpi-value" style="color:var(--sage)" id="c-freq-fast">—</div>
+    <div class="kpi-sub">High-frequency feeds</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Quarterly / Annual</div>
+    <div class="kpi-value" style="color:var(--bronze)" id="c-freq-slow">—</div>
+    <div class="kpi-sub">Regular refresh cycle</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Static / Derived</div>
+    <div class="kpi-value" style="color:var(--warm-grey)" id="c-freq-static">—</div>
+    <div class="kpi-sub">Standards + scenarios</div>
+  </div>
+</div>
+
+<div class="card" style="margin:16px 0">
+  <div class="card-header" id="c-table-header"><h3 style="margin:0">Data Source Registry — Loading…</h3></div>
+  <div id="sec-c-source-list" style="display:flex;flex-direction:column;gap:0">
+    <div style="text-align:center;color:var(--warm-grey);padding:24px">Loading source registry…</div>
+  </div>
+</div>
+
+<!-- Fleet Score Summary -->
+<h3>C.1 &ensp; Fleet Score Snapshot</h3>
+<div id="sec-c-fleet" style="margin:16px 0">Loading…</div>
+<p style="font-size:13px;line-height:1.7" id="sec-c-fleet-narrative">Loading…</p>
+
+<script>
+(function(){
+  var meta = window.SSIMetadata;
+  if (!meta) return;
+
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var now = new Date();
+  var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+
+  document.getElementById('sec-c-intro').innerHTML =
+    'The SSI v4.0.2 draws on <strong>' + meta.stats.sources + ' verified public data sources</strong> feeding ' +
+    meta.stats.variables + ' variables across ' + meta.stats.components + ' components and ' + meta.stats.modifiers +
+    ' modifiers. All sources are publicly accessible — from BFE and ElCom reporting through to OSM infrastructure topology and SED seismic hazard data.';
+
+  var freq = meta.FREQ_DISTRIBUTION || {};
+  var weekly = (freq.Weekly ? freq.Weekly.count : 0);
+  var monthly = (freq.Monthly ? freq.Monthly.count : 0);
+  var quarterly = (freq.Quarterly ? freq.Quarterly.count : 0);
+  var annual = (freq.Annual ? freq.Annual.count : 0);
+  var staticC = (freq.Static ? freq.Static.count : 0);
+  var derived = (freq.Derived ? freq.Derived.count : 0);
+
+  document.getElementById('c-total-src').textContent = meta.stats.sources;
+  document.getElementById('c-total-vars').textContent = meta.stats.variables + ' variables';
+  document.getElementById('c-freq-fast').textContent = (weekly + monthly);
+  document.getElementById('c-freq-slow').textContent = (quarterly + annual);
+  document.getElementById('c-freq-static').textContent = (staticC + derived);
+
+  document.getElementById('c-table-header').innerHTML = '<h3 style="margin:0">Data Source Registry — ' + monthYear + '</h3>';
+
+  var sources = meta.DATA_SOURCES;
+  var catIcons = { Grid: '⚡', Economic: '🏛️', 'Socio-Econ': '📊', Standards: '📐', Climate: '🌍', Infrastructure: '🗺️', Transition: '☀️', Hazard: '🌊', Environment: '🌡️' };
+  var catColors = { Grid: '148,25,20', Economic: '184,134,58', 'Socio-Econ': '93,133,99', Standards: '170,66,52', Climate: '59,158,255', Infrastructure: '34,211,238', Transition: '255,140,66', Hazard: '255,140,66', Environment: '170,66,52' };
+
+  var srcHTML = sources.map(function(s){
+    var c = catColors[s.category] || '93,133,99';
+    var icon = catIcons[s.category] || '📊';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--card-border);font-size:12px">' +
+      '<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(' + c + ',0.1);border-radius:6px;font-size:14px;flex-shrink:0">' + icon + '</div>' +
+      '<div style="flex:1"><div style="font-weight:500">' + s.name + '</div>' +
+      '<div style="color:var(--warm-grey);font-size:11px">' + s.vars + ' variable' + (s.vars > 1 ? 's' : '') + ' · ' + s.freq + '</div></div></div>';
+  }).join('');
+  document.getElementById('sec-c-source-list').innerHTML = srcHTML;
+
+  // Fleet snapshot
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var n = fleet.length;
+    var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
+    var median = rVals[Math.floor(n/2)];
+    var mean = rVals.reduce(function(a,b){ return a+b; },0) / n;
+    var bands = { Low:0, Medium:0, High:0, Critical:0 };
+    fleet.forEach(function(s){ bands[s.classification]++; });
+
+    var fleetHTML = '<div class="kpi-grid">' +
+      '<div class="kpi-card"><div class="kpi-label">Fleet Size</div><div class="kpi-value" style="color:var(--ink)">' + n.toLocaleString() + '</div>' +
+      '<div class="kpi-sub">947 real OSM substations</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">' + median.toFixed(3) + '</div>' +
+      '<div class="kpi-sub">Mean: ' + mean.toFixed(3) + '</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">High + Critical</div><div class="kpi-value" style="color:var(--terracotta)">' + (bands.High + bands.Critical) + '</div>' +
+      '<div class="kpi-sub">' + ((bands.High + bands.Critical) / n * 100).toFixed(1) + '% of fleet</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">Low Band</div><div class="kpi-value" style="color:var(--sage)">' + bands.Low + '</div>' +
+      '<div class="kpi-sub">' + (bands.Low / n * 100).toFixed(1) + '% of fleet</div></div>' +
+    '</div>';
+    document.getElementById('sec-c-fleet').innerHTML = fleetHTML;
+
+    document.getElementById('sec-c-fleet-narrative').innerHTML =
+      'No primary data sources have been updated since the v4.0.2 launch baseline. All <strong>' + n.toLocaleString() +
+      ' substation scores remain unchanged</strong> this edition. The fleet median R of ' + median.toFixed(3) +
+      ' (mean ' + mean.toFixed(3) + ') reflects a distribution with ' +
+      (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
+      'The first material score changes are expected when ElCom publishes updated SAIDI/SAIFI statistics (affecting C1–C4 and R6a) ' +
+      'and when Pronovo refreshes the renewable generation registry (affecting T1). ' +
+      'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
+      'which have minimal impact on fleet-level score distribution.';
+  });
+})();
+</script>
 </section>
 
+<div style="margin:32px 0"></div>
+
+
+<!-- ═══════════════════ D. THEMATIC DEEP-DIVE ═══════════════════ -->
 <section id="deep" style="margin-bottom:32px">
-  <h2>Deep-Dive: Alpine Hydropower & Grid Transition</h2>
-  <p style="font-size:13px;line-height:1.7">Switzerland's grid resilience is inseparable from its hydropower reliance (≈60% generation), Alpine geography, and ongoing nuclear phase-out. The SSI v4.0.2 captures these systemic challenges through regionally-tuned modifiers and DER penetration metrics.</p>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section D — Monthly Deep-Dive</span>
+<h2>Alpine Hydropower &amp; Grid Transition: Where Geography Meets the Energy Transition</h2>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Alpine hydropower & grid transition · <strong>002</strong> Nuclear phase-out and baseload replacement · <strong>003</strong> DER saturation in the Swiss Mittelland · <strong>004</strong> Cross-border energy trading and interconnector risk · <strong>005</strong> Voltage quality in Alpine valleys · <strong>006</strong> Infrastructure age vs cantonal investment patterns · <strong>007</strong> Seismic hazard along the Alpine front · <strong>008</strong> T-component forward projections (Energy Strategy 2050+) · <strong>009</strong> Cantonal Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication progress · <strong>012</strong> Year in review.</p>
+</div>
+
+<h3>D.1 &ensp; Why Alpine Hydropower, Why Now</h3>
+
+<div class="kpi-grid" style="margin:16px 0" id="deep-kpis">
+  <div class="kpi-card">
+    <div class="kpi-label">Hydropower Share</div>
+    <div class="kpi-value" style="color:var(--ink)">~60%</div>
+    <div class="kpi-sub">Of Swiss electricity generation</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Alpine Cantons</div>
+    <div class="kpi-value" style="color:var(--ink)" id="deep-alpine-n">—</div>
+    <div class="kpi-sub" id="deep-alpine-sub">With elevation-dependent hydro</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Alpine Corridor Median R</div>
+    <div class="kpi-value" style="color:var(--crimson)" id="deep-median">—</div>
+    <div class="kpi-sub" id="deep-median-sub">vs fleet median</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Highest-Risk Canton</div>
+    <div class="kpi-value" style="color:var(--ink);font-size:18px" id="deep-worst">—</div>
+    <div class="kpi-sub" id="deep-worst-sub"></div>
+  </div>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="deep-narrative-d1">Loading Alpine corridor data…</p>
+
+<h3>D.2 &ensp; Alpine Corridor Scoring</h3>
+
+<table class="data-table" style="width:100%;border-collapse:collapse;font-size:13px;margin:16px 0">
+<thead style="background:var(--ink);color:#fff"><tr>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Canton</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">Subs</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">Med R</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">High</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">C</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">I</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">S</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">T</th>
+</tr></thead>
+<tbody id="deep-tbody">
+  <tr><td colspan="8" style="text-align:center;color:var(--warm-grey);padding:24px">Loading…</td></tr>
+</tbody>
+</table>
+
+<h3>D.3 &ensp; Component Analysis — Alpine vs Mittelland</h3>
+<div id="deep-comp-bars" style="margin:16px 0"></div>
+<p style="font-size:13px;line-height:1.7" id="deep-narrative-d3">Loading component comparison…</p>
+
+<h3>D.4 &ensp; Implications for the Energy Strategy 2050+</h3>
+<p style="font-size:13px;line-height:1.7" id="deep-narrative-d4">Loading implications…</p>
+
+<script>
+(function(){
+  // Alpine cantons — those with significant hydropower/mountain infrastructure
+  var alpineCantons = ['Valais', 'Graubünden', 'Uri', 'Ticino', 'Glarus', 'Obwalden', 'Nidwalden', 'Schwyz', 'Bern'];
+
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var n = fleet.length;
+    var alpine = fleet.filter(function(s){ return alpineCantons.indexOf(s.region) >= 0; });
+    var mittelland = fleet.filter(function(s){ return alpineCantons.indexOf(s.region) < 0; });
+
+    // ── D.1 KPIs ──
+    var uniqueCantons = {};
+    alpine.forEach(function(s){ uniqueCantons[s.region] = true; });
+    var nCantons = Object.keys(uniqueCantons).length;
+    document.getElementById('deep-alpine-n').textContent = nCantons;
+    document.getElementById('deep-alpine-sub').textContent = alpine.length + ' substations in Alpine corridor';
+
+    var alpineR = alpine.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
+    var alpineMedian = alpineR[Math.floor(alpineR.length/2)];
+    var fleetR = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
+    var fleetMedian = fleetR[Math.floor(n/2)];
+    document.getElementById('deep-median').textContent = alpineMedian.toFixed(3);
+    document.getElementById('deep-median-sub').textContent = 'Fleet median: ' + fleetMedian.toFixed(3);
+
+    // Worst canton
+    var cantonData = {};
+    alpine.forEach(function(s){
+      if (!cantonData[s.region]) cantonData[s.region] = { subs: [], sumR: 0 };
+      cantonData[s.region].subs.push(s);
+      cantonData[s.region].sumR += s.R_median;
+    });
+    var cantonList = Object.keys(cantonData).map(function(c){
+      var d = cantonData[c];
+      var rr = d.subs.map(function(s){return s.R_median;}).sort(function(a,b){return a-b;});
+      return { name: c, n: d.subs.length, medR: rr[Math.floor(rr.length/2)], avgR: d.sumR/d.subs.length, subs: d.subs };
+    });
+    cantonList.sort(function(a,b){ return b.medR - a.medR; });
+    var worst = cantonList[0];
+    document.getElementById('deep-worst').textContent = worst.name;
+    document.getElementById('deep-worst-sub').textContent = 'Med R: ' + worst.medR.toFixed(3) + ' · ' + worst.n + ' subs';
+
+    // D.1 Narrative
+    var alpineBands = { Low:0, Medium:0, High:0, Critical:0 };
+    alpine.forEach(function(s){ alpineBands[s.classification]++; });
+    var pctAbove = (alpine.filter(function(s){return s.R_median > fleetMedian;}).length / alpine.length * 100).toFixed(0);
+    document.getElementById('deep-narrative-d1').innerHTML =
+      'Switzerland generates approximately 60% of its electricity from hydropower, with the vast majority concentrated in Alpine cantons ' +
+      'where steep gradients and reservoir capacity provide both storage and generation. The SSI captures <strong>' + alpine.length +
+      ' substations</strong> across ' + nCantons + ' Alpine cantons. Their corridor median R of ' + alpineMedian.toFixed(3) +
+      ' sits ' + (alpineMedian > fleetMedian ? 'above' : 'at') + ' the fleet median of ' + fleetMedian.toFixed(3) +
+      ', with ' + pctAbove + '% of Alpine substations scoring above fleet median. ' +
+      '<strong>' + alpineBands.High + ' are classified High</strong>' +
+      (alpineBands.Critical ? ' and ' + alpineBands.Critical + ' Critical' : '') +
+      '. The combination of remote Alpine locations, long transmission distances, seismic exposure along the Alpine front, and seasonal demand fluctuation ' +
+      'from tourism creates a unique stress profile that single-metric indices cannot capture.';
+
+    // ── D.2 Table ──
+    var tbody = document.getElementById('deep-tbody');
+    tbody.innerHTML = cantonList.map(function(c){
+      var bands = { High:0, Critical:0 };
+      var comps = { C:0, I:0, S:0, T:0 };
+      c.subs.forEach(function(s){
+        if (s.classification === 'High') bands.High++;
+        if (s.classification === 'Critical') bands.Critical++;
+        comps.C += s.components.C; comps.I += s.components.I;
+        comps.S += s.components.S; comps.T += s.components.T;
+      });
+      var nn = c.subs.length;
+      return '<tr>' +
+        '<td style="font-weight:500">' + c.name + '</td>' +
+        '<td class="num">' + nn + '</td>' +
+        '<td class="num" style="font-weight:600;color:' + (c.medR >= 0.50 ? 'var(--terracotta)' : c.medR >= 0.25 ? 'var(--bronze)' : 'var(--sage)') + '">' + c.medR.toFixed(3) + '</td>' +
+        '<td class="num">' + (bands.High + bands.Critical) + '</td>' +
+        '<td class="num">' + (comps.C/nn).toFixed(3) + '</td>' +
+        '<td class="num">' + (comps.I/nn).toFixed(3) + '</td>' +
+        '<td class="num">' + (comps.S/nn).toFixed(3) + '</td>' +
+        '<td class="num">' + (comps.T/nn).toFixed(3) + '</td></tr>';
+    }).join('');
+
+    // ── D.3 Component comparison ──
+    function avgComps(arr) {
+      var s = {C:0,V:0,I:0,E:0,S:0,T:0};
+      arr.forEach(function(sub){ Object.keys(s).forEach(function(k){ s[k]+=sub.components[k]; }); });
+      var nn = arr.length;
+      Object.keys(s).forEach(function(k){ s[k]/=nn; });
+      return s;
+    }
+    var alpAvg = avgComps(alpine);
+    var mitAvg = avgComps(mittelland);
+    var compDefs = [
+      {key:'C',label:'C Continuity',w:0.30,color:'var(--crimson)'},
+      {key:'I',label:'I Infrastructure',w:0.25,color:'var(--sage)'},
+      {key:'S',label:'S Saturation',w:0.20,color:'var(--bronze)'},
+      {key:'V',label:'V Voltage',w:0.10,color:'var(--terracotta)'},
+      {key:'E',label:'E Economic',w:0.10,color:'#3b9eff'},
+      {key:'T',label:'T Transition',w:0.05,color:'#22d3ee'}
+    ];
+    var barHTML = '<div style="display:flex;gap:24px;flex-wrap:wrap">';
+    barHTML += '<div style="flex:1;min-width:260px"><div class="label-xs" style="margin-bottom:8px">Alpine Cantons (avg)</div>';
+    compDefs.forEach(function(c){
+      var pct = (alpAvg[c.key]/c.w*100).toFixed(1);
+      barHTML += '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>' + c.label + '</span><span>' + alpAvg[c.key].toFixed(3) + '</span></div>' +
+        '<div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:' + c.color + ';border-radius:3px"></div></div></div>';
+    });
+    barHTML += '</div>';
+    barHTML += '<div style="flex:1;min-width:260px"><div class="label-xs" style="margin-bottom:8px">Mittelland & Urban Cantons (avg)</div>';
+    compDefs.forEach(function(c){
+      var pct = (mitAvg[c.key]/c.w*100).toFixed(1);
+      barHTML += '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>' + c.label + '</span><span>' + mitAvg[c.key].toFixed(3) + '</span></div>' +
+        '<div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:' + c.color + ';border-radius:3px"></div></div></div>';
+    });
+    barHTML += '</div></div>';
+    document.getElementById('deep-comp-bars').innerHTML = barHTML;
+
+    // Determine dominant differences
+    var diffs = compDefs.map(function(c){ return {key:c.key, label:c.label, diff: alpAvg[c.key]-mitAvg[c.key]}; });
+    diffs.sort(function(a,b){return Math.abs(b.diff)-Math.abs(a.diff);});
+    var top1 = diffs[0], top2 = diffs[1];
+    document.getElementById('deep-narrative-d3').innerHTML =
+      'The component-level comparison reveals where Alpine grid stress diverges from the Swiss Mittelland. ' +
+      'The largest gap is in <strong>' + top1.label + '</strong> (' + (top1.diff > 0 ? '+' : '') + top1.diff.toFixed(3) + ' for Alpine), ' +
+      'followed by <strong>' + top2.label + '</strong> (' + (top2.diff > 0 ? '+' : '') + top2.diff.toFixed(3) + '). ' +
+      'Alpine substations face higher infrastructure stress (longer lines, older equipment, weather exposure) ' +
+      'and higher saturation pressure from seasonal tourism peaks, while Mittelland substations show higher economic consequence ' +
+      'density due to their proximity to financial and industrial centres.';
+
+    // ── D.4 Implications ──
+    document.getElementById('deep-narrative-d4').innerHTML =
+      'The Energy Strategy 2050+ sets ambitious targets: full nuclear phase-out by 2044, net-zero emissions by 2050, and a doubling of renewable capacity. ' +
+      'For the Alpine corridor, this creates three compounding pressures. First, the loss of baseload nuclear generation (currently ~35% of supply) ' +
+      'increases reliance on Alpine hydropower for load-balancing, placing additional stress on mountain transmission infrastructure. ' +
+      'Second, new solar and wind installations in Alpine valleys require grid reinforcement in precisely the locations where terrain makes construction most difficult and expensive. ' +
+      'Third, climate change is altering precipitation patterns and glacier melt timing, introducing new uncertainty into reservoir management. ' +
+      'The SSI captures these overlapping stresses through its T-component (transition pressure), I-component (infrastructure condition), ' +
+      'and R6b seismic modifier — providing a composite view that single-domain analyses cannot match. ' +
+      'For Swissgrid\'s Strategic Grid 2040 planning, the SSI identifies priority reinforcement corridors where multiple risk dimensions converge.';
+  });
+})();
+</script>
 </section>
 
+<div style="margin:32px 0"></div>
+
+
+<!-- ═══════════════════ E. EUROPEAN CONTEXT CARD ═══════════════════ -->
 <section id="eu" style="margin-bottom:32px">
-  <h2>European Context</h2>
-  <p style="font-size:13px;line-height:1.7">Switzerland integrates with European grid at multiple points. Cross-border flows, frequency stability, and emergency protocols factor into regional risk assessment.</p>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section E</span>
+<h2>European Context Card</h2>
+
+<div class="card" style="border-left:3px solid var(--sage);background:var(--cream);margin-bottom:16px">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Switzerland in the European grid:</strong> Despite not being an EU member, Switzerland is electrically embedded at the heart of the European interconnected system. Its grid connects to France, Germany, Austria, and Italy through 41 cross-border transmission lines, making it a critical transit corridor for north-south power flows. This integration creates both resilience (import capacity during domestic shortfalls) and vulnerability (exposure to continental frequency events and cascading failures).</p>
+</div>
+
+<div class="kpi-grid" style="margin:16px 0">
+  <div class="kpi-card">
+    <div class="kpi-label">Cross-Border Lines</div>
+    <div class="kpi-value" style="color:var(--ink)">41</div>
+    <div class="kpi-sub">To FR, DE, AT, IT</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Net Import (typical)</div>
+    <div class="kpi-value" style="color:var(--ink)">~5 TWh</div>
+    <div class="kpi-sub">Winter dependence on neighbours</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">SSI Countries Live</div>
+    <div class="kpi-value" style="color:var(--terracotta)">4</div>
+    <div class="kpi-sub">IT · DE · AT · CH</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">ENTSO-E Zone</div>
+    <div class="kpi-value" style="color:var(--ink)">CH</div>
+    <div class="kpi-sub">Synchronous Continental Europe</div>
+  </div>
+</div>
+
+<p style="font-size:13px;line-height:1.7">Switzerland's position as a European transit hub means that domestic grid stress cannot be assessed in isolation. The SSI v4.0.2 captures cross-border dependency through several channels: the R3 consequence multiplier reflects the economic importance of interconnection points, the R4 graph criticality modifier identifies substations whose failure would disrupt transit flows, and the E component incorporates import/export dependency into regional economic exposure. With four countries now live in the SSI — Italy, Germany, Austria, and Switzerland — cross-border analysis will become increasingly possible in future editions.</p>
+
+<p style="font-size:13px;line-height:1.7">Key European developments relevant to Swiss grid resilience this quarter include: the EU's revised Network Code on Cybersecurity (which Switzerland is expected to adopt bilaterally), ongoing negotiations on a new electricity agreement with the EU, and Swissgrid's participation in the ENTSO-E Winter Outlook process. The absence of a formal EU electricity agreement creates regulatory uncertainty that the SSI's confidence intervals partially capture through wider CI bands in border regions.</p>
 </section>
 
+
+<!-- ═══════════════════ F. LOOKING AHEAD ═══════════════════ -->
 <section id="ahead">
-  <h2>Looking Ahead</h2>
-  <p style="font-size:13px;line-height:1.7">Next edition will focus on post-summer 2026 grid stress scenarios and autumn storm resilience.</p>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F</span>
+<h2>Looking Ahead</h2>
+
+<div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-bottom:16px">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Edition 002 preview:</strong> The next edition will focus on <em>Nuclear Phase-Out and Baseload Replacement</em> — analysing how the scheduled decommissioning of Beznau I and II, Gösgen, and Leibstadt affects regional grid stress patterns. The SSI's T-component and I-component will be used to model replacement scenarios and identify substations most exposed to baseload shortfall.</p>
+</div>
+
+<p style="font-size:13px;line-height:1.7">Upcoming data refreshes expected to affect scores include ElCom's annual reliability statistics (SAIDI/SAIFI for 2025, expected Q2 2026), Pronovo's updated renewable generation registry, and BFS population/GDP revisions. The SSI pipeline will also incorporate the 2026 SED seismic hazard update, which may shift R6b values for substations along the Alpine front.</p>
+
+<p style="font-size:13px;line-height:1.7">Methodological enhancements under development for v4.1 include Kreis-level (rather than Bezirk-level) OSM topology metrics for Germany, live Overpass API integration for infrastructure freshness, and an enhanced neural network (ENN) module for pattern recognition across the growing multi-country fleet. Switzerland's compact size and high data quality make it an ideal validation ground for these enhancements before broader rollout.</p>
+
+<div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
+  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent a Swiss utility, cantonal energy office, or academic institution and would like to contribute data or methodology feedback, please contact us through the foundation. The SSI's credibility depends on open scrutiny.
+</div>
 </section>
 
 </main>
