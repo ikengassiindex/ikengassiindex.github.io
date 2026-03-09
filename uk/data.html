@@ -527,7 +527,7 @@ fetch('ssi-data.json?v=24').then(function(r) { return r.json(); }).then(function
       '<span class="hl-num">"population"</span>: ' + (s.socio_economic.population || 0) + ', ' +
       '<span class="hl-num">"gdp_per_capita"</span>: ' + (s.socio_economic.gdp_per_capita ? s.socio_economic.gdp_per_capita.toFixed(0) : '—') + ', ' +
       '<span class="hl-num">"unemployment_rate"</span>: ' + (s.socio_economic.unemployment_rate ? s.socio_economic.unemployment_rate.toFixed(1) : '—') + ' },\n' +
-    (s.graph_topology ? '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + s.graph_topology.BC_percentile.toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' : '') +
+    (s.graph_topology ? '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + (s.graph_topology.BC_percentile || s.graph_topology.betweenness_centrality || 0).toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' : '') +
     '  <span class="hl-var">"transition"</span>: { ' +
       '<span class="hl-num">"T1_score"</span>: ' + (s.transition && s.transition.T1_score ? s.transition.T1_score.toFixed(3) : '—') + ', ' +
       '<span class="hl-num">"solar_mw"</span>: ' + (s.transition && s.transition.solar_mw ? s.transition.solar_mw.toFixed(1) : '—') + ', ' +
