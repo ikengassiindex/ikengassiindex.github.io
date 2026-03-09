@@ -276,10 +276,10 @@
     <div class="ssi-map-controls">
       <button class="map-btn" onclick="mapZoom(1.5)" title="Zoom in">+</button>
       <button class="map-btn" onclick="mapZoom(0.67)" title="Zoom out">&minus;</button>
-      <button class="map-btn map-btn-reset" onclick="mapReset()" title="Re-centre on Europe">&#8962;</button>
+      <button class="map-btn map-btn-reset" onclick="mapReset()" title="Reset map view">&#8962;</button>
     </div>
     <div class="ssi-map-tooltip" id="map-tooltip"></div>
-    <svg id="world-map" viewBox="385 128 222 214" preserveAspectRatio="xMidYMid meet">
+    <svg id="world-map" viewBox="-519 70 1902 990" preserveAspectRatio="xMidYMid meet">
       <!-- Ocean background -->
       <rect x="-519" y="70" width="1902" height="990" fill="var(--cream)" />
     <path class="map-country map-inactive" d="M1366.0,665.4L1367.5,664.4L1368.9,666.2L1367.2,669.4L1363.7,670.3L1361.0,669.5L1361.2,666.8L1363.8,664.6ZM1377.3,659.6L1373.5,661.1L1369.9,662.4L1369.8,660.1L1372.7,658.8L1374.4,658.5L1378.0,656.5L1378.0,656.5L1377.3,659.6ZM-513.8,656.5L-513.8,656.5L-513.8,656.5L-512.8,656.3L-512.7,659.2L-513.1,659.6L-513.1,659.6L-513.8,656.5Z" data-name="Fiji" />
@@ -493,7 +493,7 @@
   var svg = document.getElementById('world-map');
   var tooltip = document.getElementById('map-tooltip');
   // ViewBox state — start zoomed on Europe
-  var vb = { x: 385, y: 128, w: 222, h: 214 };
+  var vb = { x: -519, y: 70, w: 1902, h: 990 };
   var worldVB = { x: -519, y: 70, w: 1902, h: 990 };
   var europeVB = { x: 385, y: 128, w: 222, h: 214 };
   var minW = 44, maxW = 1902;
@@ -515,10 +515,10 @@
   };
 
   window.mapReset = function() {
-    vb.x = europeVB.x;
-    vb.y = europeVB.y;
-    vb.w = europeVB.w;
-    vb.h = europeVB.h;
+    vb.x = worldVB.x;
+    vb.y = worldVB.y;
+    vb.w = worldVB.w;
+    vb.h = worldVB.h;
     setVB();
   };
 
