@@ -188,7 +188,7 @@ window.SSIMetadata = (function () {
   ];
 
   // ─── Processing Pipeline ──────────────────────────────────
-  const PIPELONS = [
+  const PIPELINE = [
     { step: 1, name: 'Ingest',     desc: '95 variables from 30 verified data sources', icon: '①' },
     { step: 2, name: 'Normalise',  desc: 'Methods A–D: fleet percentile, bounded, categorical → [0,1]', icon: '②' },
     { step: 3, name: 'Weight',     desc: '6-level hierarchy: component × intra-metric weights', icon: '③' },

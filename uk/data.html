@@ -314,7 +314,7 @@ fetch('ssi-data.json?v=24').then(function(r) { return r.json(); }).then(function
         head: [['ID', 'Name', 'Region', 'County', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6a', 'R6b', 'R7', 'Network', 'Output', 'Tier']],
         body: ssi.substations.map(function(s) {
           return [
-            s.internal_id, s.name, s.region, s.county, s.voltage_kv,
+            s.internal_id, s.name, s.region, s.province, s.voltage_kv,
             s.R_median.toFixed(3), s.R_P5.toFixed(3), s.R_P95.toFixed(3), s.CI_width.toFixed(3),
             s.classification, (s.fleet_percentile * 100).toFixed(0) + '%',
             s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
@@ -444,7 +444,7 @@ fetch('ssi-data.json?v=24').then(function(r) { return r.json(); }).then(function
         head: [['ID', 'Name', 'Region', 'County', 'Longitude', 'Latitude', 'kV', 'R_median', 'Band', 'C', 'V', 'I', 'E', 'S', 'T']],
         body: ssi.substations.map(function(s) {
           return [
-            s.internal_id, s.name, s.region, s.county,
+            s.internal_id, s.name, s.region, s.province,
             s.lon.toFixed(5), s.lat.toFixed(5), s.voltage_kv,
             s.R_median.toFixed(3), s.classification,
             s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
@@ -505,7 +505,7 @@ fetch('ssi-data.json?v=24').then(function(r) { return r.json(); }).then(function
     '  <span class="hl-var">"substation_id"</span>: <span class="hl-num">"' + s.substation_id + '"</span>,\n' +
     '  <span class="hl-var">"version"</span>: <span class="hl-num">"' + s.version + '"</span>,\n' +
     '  <span class="hl-var">"name"</span>: <span class="hl-num">"' + s.name + '"</span>,\n' +
-    '  <span class="hl-var">"region"</span>: <span class="hl-num">"' + s.region + '"</span>,  <span class="hl-var">"county"</span>: <span class="hl-num">"' + s.county + '"</span>,\n' +
+    '  <span class="hl-var">"region"</span>: <span class="hl-num">"' + s.region + '"</span>,  <span class="hl-var">"county"</span>: <span class="hl-num">"' + s.province + '"</span>,\n' +
     '  <span class="hl-var">"R_median"</span>: <span class="hl-num">' + s.R_median.toFixed(4) + '</span>,\n' +
     '  <span class="hl-var">"R_P5"</span>: <span class="hl-num">' + s.R_P5.toFixed(4) + '</span>,  <span class="hl-var">"R_P95"</span>: <span class="hl-num">' + s.R_P95.toFixed(4) + '</span>,\n' +
     '  <span class="hl-var">"classification"</span>: <span class="hl-num">"' + s.classification + '"</span>,\n' +

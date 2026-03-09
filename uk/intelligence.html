@@ -142,7 +142,7 @@
 
     // Basic info
     document.getElementById('focus-name').textContent = s.name;
-    document.getElementById('focus-location').textContent = s.county + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
+    document.getElementById('focus-location').textContent = s.province + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
     document.getElementById('focus-r').textContent = s.R_median.toFixed(3);
     document.getElementById('focus-band').textContent = s.classification;
     document.getElementById('focus-ci').textContent = s.CI_width.toFixed(3);
@@ -256,7 +256,7 @@
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var d = new Date();
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
-      ' — is <strong>' + s.name + '</strong> in ' + s.county + ', ' + s.region +
+      ' — is <strong>' + s.name + '</strong> in ' + s.province + ', ' + s.region +
       '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
       (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
       top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
@@ -582,7 +582,7 @@
     // ── B.3 County Digital Readiness ──
     var provData = {};
     fleet.forEach(function(s){
-      var p = s.county;
+      var p = s.province;
       if (!provData[p]) provData[p] = { subs: [], sumR7: 0, sumR: 0, sumLon: 0, sumLat: 0 };
       provData[p].subs.push(s);
       provData[p].sumR7 += s.modifiers.R7_cyber;
@@ -1056,9 +1056,9 @@
     // Worst county by mean R
     var provSums = {}, provCounts = {};
     puglia.forEach(function(s){
-      if (!provSums[s.county]) { provSums[s.county] = 0; provCounts[s.county] = 0; }
-      provSums[s.county] += s.R_median;
-      provCounts[s.county]++;
+      if (!provSums[s.province]) { provSums[s.province] = 0; provCounts[s.province] = 0; }
+      provSums[s.province] += s.R_median;
+      provCounts[s.province]++;
     });
     var provAvgs = Object.keys(provSums).map(function(p){ return { name: p, avg: provSums[p]/provCounts[p], n: provCounts[p] }; });
     provAvgs.sort(function(a,b){ return b.avg - a.avg; });
@@ -1133,7 +1133,7 @@
     ctx.fillStyle = 'rgba(44,36,32,0.5)';
     ctx.textAlign = 'center';
     provAvgs.forEach(function(pv){  // county iteration
-      var provSubs = puglia.filter(function(s){ return s.county === pv.name; });
+      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var avgLon = provSubs.reduce(function(a,s){ return a + s.lon; }, 0) / provSubs.length;
       var avgLat = provSubs.reduce(function(a,s){ return a + s.lat; }, 0) / provSubs.length;
       var p = proj(avgLon, avgLat);
@@ -1150,7 +1150,7 @@
       var alertStr = s.alert_components ? s.alert_components.join(', ') : '—';
       return '<tr>' +
         '<td style="' + thStyle + 'font-weight:500">' + s.name + '</td>' +
-        '<td style="' + thStyle + '">' + s.county + '</td>' +
+        '<td style="' + thStyle + '">' + s.province + '</td>' +
         '<td style="' + numStyle + 'color:' + bCol + ';font-weight:600">' + s.R_median.toFixed(3) + '</td>' +
         '<td style="' + thStyle + 'color:' + bCol + ';font-weight:600">' + s.classification + '</td>' +
         '<td style="' + numStyle + '">' + s.components.C.toFixed(3) + '</td>' +
@@ -1246,7 +1246,7 @@
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">County Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){  // county iteration
-      var provSubs = puglia.filter(function(s){ return s.county === pv.name; });
+      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var provBands = { Low:0, Medium:0, High:0, Critical:0 };
       provSubs.forEach(function(s){ provBands[s.classification]++; });
       var barPct = ((1 - pv.avg) * 100).toFixed(1);
@@ -1743,7 +1743,7 @@
       var regions = {};
       fleet.forEach(function(s){ regions[s.region] = true; });
       var counties = {};
-      fleet.forEach(function(s){ counties[s.county] = true; });
+      fleet.forEach(function(s){ counties[s.province] = true; });
       statHTML = 'UK coverage: ' + n.toLocaleString() + ' substations across ' +
         Object.keys(regions).length + ' regions and ' + Object.keys(counties).length + ' counties. ' +
         'This serves as the reference benchmark for the Coverage Quality Scorecard: any country achieving comparable ' +
@@ -1908,10 +1908,10 @@
     // 1. Most concentrated risk corridor
     var provData = {};
     fleet.forEach(function(s){
-      if (!provData[s.county]) provData[s.county] = { subs: [], sumR: 0, highCrit: 0 };
-      provData[s.county].subs.push(s);
-      provData[s.county].sumR += s.R_median;
-      if (s.classification === 'High' || s.classification === 'Critical') provData[s.county].highCrit++;
+      if (!provData[s.province]) provData[s.province] = { subs: [], sumR: 0, highCrit: 0 };
+      provData[s.province].subs.push(s);
+      provData[s.province].sumR += s.R_median;
+      if (s.classification === 'High' || s.classification === 'Critical') provData[s.province].highCrit++;
     });
     var provList = Object.keys(provData).map(function(p){
       var d = provData[p];
