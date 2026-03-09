@@ -14,7 +14,7 @@ window.SSIMetadata = (function () {
     { id: 'INE',    name: 'INE (Instituto Nacional de Estadística)',                     url: 'ine.es',                     freq: 'Annual',    res: 'Provincia',       vars: 8,  category: 'Socio-Econ',    feeds: 'R3 population, elderly, GDP, fiscal capacity' },
     { id: 'REE',    name: 'REE (Red Eléctrica de España) — Transparency',               url: 'ree.es',                     freq: 'Hourly',    res: 'Bidding zone',    vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'IGN',    name: 'IGN/IGME (Instituto Geográfico Nacional)',                    url: 'ign.es',                     freq: 'Static',    res: 'Provincia',       vars: 3,  category: 'Hazard',        feeds: 'NCSE-02 seismic hazard, PGA values' },
-    { id: 'OSM',    name: 'OSM Power Infrastructure',                                    url: 'overpass-api.de',            freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 3,793 substations' },
+    { id: 'OSM',    name: 'OSM Power Infrastructure',                                    url: 'overpass-api.de',            freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 3,529 substations' },
     { id: 'CDS',    name: 'Copernicus CDS / ERA5',                                       url: 'cds.climate.copernicus.eu',  freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
     { id: 'ENTSE',  name: 'ENTSO-E Transparency',                                        url: 'transparency.entsoe.eu',     freq: 'Hourly',    res: 'Bidding zone',    vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border flows', registration: true },
     { id: 'MITECO', name: 'MITECO (Ministerio para la Transición Ecológica)',            url: 'miteco.gob.es',              freq: 'Annual',    res: 'CCAA',            vars: 4,  category: 'Environment',   feeds: 'Energy poverty, environmental indicators' },
@@ -135,7 +135,7 @@ window.SSIMetadata = (function () {
     {
       id: 'R4', name: 'Graph-Theoretic Network Criticality',
       range: '[0.80, 1.35]', type: 'Multiplicative',
-      desc: 'Combines degree centrality, betweenness centrality, and topological bridge detection from OSM power graph. Built from 3,793 substations.',
+      desc: 'Combines degree centrality, betweenness centrality, and topological bridge detection from OSM power graph. Built from 3,529 substations.',
       formula: 'F_topo = clip(base_factor(degree) × (1 + 0.10 × BC_percentile + 0.15 × is_bridge), 0.80, 1.35)',
       sources: ['OSM Overpass API'],
       isEnhanced: true
@@ -165,7 +165,7 @@ window.SSIMetadata = (function () {
     {
       id: 'R7', name: 'Digital Readiness Proxy',
       range: '[0.99, 1.05]', type: 'Multiplicative',
-      desc: 'Provincia-level continuous model based on DESI regional digital readiness scores, CCN-CERT baseline, urban/rural adjustments. Unique values across 3,793 substations.',
+      desc: 'Provincia-level continuous model based on DESI regional digital readiness scores, CCN-CERT baseline, urban/rural adjustments. Unique values across 3,529 substations.',
       formula: 'R7_cyber(s) = clip( DESI_base(CCAA) + urban_adj(provincia) + HV_bonus(voltage) + noise, 0.99, 1.05 )',
       sources: ['DESI / Eurostat', 'CCN-CERT', 'JRC DSO Observatory'],
       isNew: true
@@ -262,7 +262,7 @@ window.SSIMetadata = (function () {
     { id: 'L5', section: '§8, §12', change: '95/95 variables operational (100%). 30 data sources total.', type: 'data' },
     { id: 'G1', section: '§12',    change: 'IDAE upgraded to quarterly registry — Provincia-level DER registry', type: 'data' },
     { id: 'G2', section: '§12',    change: 'IGN upgraded to live API — Provincia-level seismic data', type: 'data' },
-    { id: 'G3', section: '§12',    change: 'OSM upgraded to Overpass API — 3,793 real substations', type: 'data' },
+    { id: 'G3', section: '§12',    change: 'OSM upgraded to Overpass API — 3,529 real substations', type: 'data' },
     { id: 'G4', section: '§5',     change: 'R6b Seismic Hazard modifier — NCSE-02 classification from IGN', type: 'new' },
     { id: 'G5', section: '§12',    change: 'Network & Topology layer (H): 7 variables — REE Grid Plan, seismic analysis', type: 'new' },
     { id: 'G6', section: '§12',    change: 'Output Scores layer (I): 7 variables — risk_score, ETTC, stationary probs', type: 'new' },
@@ -301,7 +301,7 @@ window.SSIMetadata = (function () {
       components: 6,
       modifiers: 5,
       sources: 30,
-      substations: 3793,
+      substations: 3529,
       powerLines: 0,
       mcIterations: 10000,
       departements: 52,
