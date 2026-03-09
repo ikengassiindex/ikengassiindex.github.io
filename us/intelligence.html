@@ -32,7 +32,7 @@
     <a href="#cyber-econ" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">B</span> Cyber &amp; Economic Exposure Monitor</a>
     <a href="#data" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">C</span> Data Refresh &amp; Changelog</a>
     <a href="#deep" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">D</span> Deep-Dive: California Seismic Corridor &amp; Cascadia Subduction Zone</a>
-    <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> European Context Card</a>
+    <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> American Context Card</a>
     <a href="#enn" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F</span> SSI Enhanced Neural Network</a>
     <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">G</span> Looking Ahead</a>
   </div>
@@ -384,6 +384,7 @@ function adaptCompact(data) {
 <script>
 (function(){
   fetch('ssi-data.json?v=30').then(function(r){ return r.json(); }).then(function(data){
+    adaptCompact(data);
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -587,8 +588,8 @@ function adaptCompact(data) {
       return s.modifiers.R3_C_mult >= 1.14 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
-      '<strong>Value of Lost Load (VoLL) context:</strong> The ACER/CEPA 2022 pan-European VoLL study estimates the US\'s sector-weighted average at ' +
-      'approximately £8.0/kWh, with industrial customers at ~£14.2/kWh and residential at ~£4.5/kWh. The SSI\'s R3 consequence multiplier maps ' +
+      '<strong>Value of Lost Load (VoLL) context:</strong> DOE/LBNL estimates the US sector-weighted average VoLL at ' +
+      'approximately $20/kWh, with industrial customers at ~$35/kWh and residential at ~$7/kWh. The SSI\'s R3 consequence multiplier maps ' +
       'these sectoral weights to each substation\'s service territory. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive ' +
       'economic fabric (R3 ≥ 1.14) with High or Critical risk classification — the highest VoLL-weighted exposure in the fleet.';
 
@@ -880,6 +881,7 @@ function adaptCompact(data) {
 
   // ── C.2 Fleet Score Snapshot — from ssi-data.json ──
   fetch('ssi-data.json?v=30').then(function(r){ return r.json(); }).then(function(data){
+    adaptCompact(data);
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -1060,6 +1062,7 @@ function adaptCompact(data) {
 <script>
 (function(){
   fetch('ssi-data.json?v=30').then(function(r){ return r.json(); }).then(function(data){
+    adaptCompact(data);
     // ── Filter California ──
     var puglia = data.substations.filter(function(s){ return s.region === 'California' || s.region === 'California'; });
     var fleet = data.substations;
@@ -1323,17 +1326,17 @@ function adaptCompact(data) {
 <!-- ═══════════════════ E. EUROPEAN CONTEXT CARD ═══════════════════ -->
 <section id="eu" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section E — Recurring Module</span>
-<h2>European Context Card</h2>
+<h2>American Context Card</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one European Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the California corridor analysis hinges on the US's continuity performance relative to European peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Germany (003), CMIP6 climate hazard vs Nordic peers (004), etc. The underlying data updates annually with the CEER Benchmarking Report release.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one American Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the California corridor analysis hinges on the US's continuity performance relative to European peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Germany (003), CMIP6 climate hazard vs Nordic peers (004), etc. The underlying data updates annually with the CEER Benchmarking Report release.</p>
 </div>
 
 <!-- THE CARD ITSELF -->
 <div class="card" style="border-top:3px solid var(--terracotta);margin:20px 0">
   <div style="padding:0;margin:-20px -24px 16px;padding:12px 24px;background:var(--cream-deep);border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px">
     <span style="font-size:16px">🇪🇺</span>
-    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">European Context Card — SAIDI Benchmarking</span>
+    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">American Context Card — SAIDI Benchmarking</span>
     <span style="font-size:10px;color:var(--warm-grey)">Ed. 001 · [Month Year]</span>
   </div>
 
@@ -1433,9 +1436,9 @@ function adaptCompact(data) {
 </div>
 
 <!-- Key insight + regional ranking — auto-populated -->
-<p style="font-size:13px;line-height:1.7" id="eu-insight">Loading European context insight…</p>
+<p style="font-size:13px;line-height:1.7" id="eu-insight">Loading American context insight…</p>
 
-<h3 style="margin-top:20px">Regional Risk Ranking — All 17 Regions</h3>
+<h3 style="margin-top:20px">Regional Risk Ranking — All 52 States</h3>
 <p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does the California sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison.</p>
 
 <div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
@@ -1445,6 +1448,7 @@ function adaptCompact(data) {
 <script>
 (function(){
   fetch('ssi-data.json?v=30').then(function(r){ return r.json(); }).then(function(data){
+    adaptCompact(data);
     var fleet = data.substations;
     var puglia = fleet.filter(function(s){ return s.region === 'California' || s.region === 'California'; });
 
@@ -1460,11 +1464,11 @@ function adaptCompact(data) {
       ' substations</strong> (of ' + puglia.length + ') with C-component above 70% of its weight ceiling — ' +
       'indicating continuity-of-supply performance consistent with the US\'s rural territory classification.' +
       'The California\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
-      avgC_fleet.toFixed(3) + '. In European terms, these substations individually perform closer to Hungarian or ' +
-      'European SAIDI levels (~48–57 min/customer/year) than to the US\'s own national average (~36 min).' +
-      'The SSI reveals what aggregate CEER statistics conceal: that the US\'s mid-tier European position is not a national ' +
-      'condition but a statistical average of Dutch-quality urban performance and Eastern-European-level rural performance — ' +
-      'and the California corridor concentrates the worst of the latter.';
+      avgC_fleet.toFixed(3) + '. In national terms, these substations individually perform closer to states with ' +
+      'high SAIDI levels (~200–400 min/customer/year) than to the US national average (~120 min). ' +
+      'The SSI reveals what aggregate EIA statistics conceal: that the US\'s overall reliability position is not a uniform national ' +
+      'condition but a statistical average of Northeastern-quality urban performance and rural/Western-level outage exposure — ' +
+      'and the California seismic corridor concentrates the worst of the latter.';
 
     // ── Regional Ranking ──
     var regData = {};
@@ -1618,7 +1622,7 @@ function adaptCompact(data) {
       body: 'Investment-grade models require interpretability. A BESS developer considering a £10M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score — and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down. This directly connects to the SSI Index: if SHAP identifies C (Continuity) as the dominant positive driver, the client knows the BESS value depends primarily on the substation\'s poor reliability history — and can verify this against FERC (Office of Gas and Electricity Markets)\'s published EIA Form 861 data. Transparency is not optional; it is what converts model outputs into investment decisions.',
       concepts: ['SHAP: game-theoretic feature attribution per prediction', 'Waterfall visualisation: fleet average → substation prediction', 'Direct traceability to SSI components and data sources', 'Feature importance validated against domain expertise'],
       ssiLink: 'shap' },
-    { layer: 4, ref: '§0.6.1', title: 'European Expansion — Country Prioritisation',
+    { layer: 4, ref: '§0.6.1', title: 'Global Expansion — Country Prioritisation',
       subtitle: 'How 28 countries are ranked by expected commercial return per unit of expansion effort',
       body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). UK scores among the highest thanks to FERC/BEIS/DESNZ/ONS data quality, alongside Germany, Italy, France, Netherlands, and the US.',
       concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28 countries: EU-27 + UK', 'UK, DE, FR = highest DCI scores, then IT, NL, ES', 'Each country requires bespoke regulatory mapping'],
@@ -1737,6 +1741,7 @@ function adaptCompact(data) {
 
   // ── SSI Data Connection — pull live stats to anchor the topic ──
   fetch('ssi-data.json?v=30').then(function(r){ return r.json(); }).then(function(data){
+    adaptCompact(data);
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1881,7 +1886,7 @@ function adaptCompact(data) {
     '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
     '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
     'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, county breakdown. ' +
-    'European Context Card: ' + nextDive.contextDetail + '.</p>';
+    'American Context Card: ' + nextDive.contextDetail + '.</p>';
 
   // ── Card 2: Next Data Refresh — from SSIMetadata ──
   var meta = window.SSIMetadata;
@@ -1929,6 +1934,7 @@ function adaptCompact(data) {
 
   // ── Card 3: Fleet Spotlight — rotating stat ──
   fetch('ssi-data.json?v=30').then(function(r){ return r.json(); }).then(function(data){
+    adaptCompact(data);
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);
