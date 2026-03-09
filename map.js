@@ -1196,10 +1196,12 @@
         });
       }
 
-      // Build lookup: internal_id → ssi record
+      // Build lookup: name → ssi record (+ internal_id for backward compat)
       ssiMap = {};
       for (const sub of SSI.substations) {
-        ssiMap[sub.internal_id || sub.substation_id || ''] = sub;
+        if (sub.internal_id) ssiMap[sub.internal_id] = sub;
+        if (sub.substation_id) ssiMap[sub.substation_id] = sub;
+        if (sub.name) ssiMap[sub.name] = sub;
       }
 
       // Build lookup: line.i → line object (fast O(1) instead of O(n) find)
