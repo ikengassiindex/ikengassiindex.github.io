@@ -592,13 +592,15 @@
     // 7. Graph degree
     var degree = gt.degree != null ? gt.degree + (gt.is_bridge ? ' (bridge)' : '') : na;
     // 8. BC percentile
-    var bc = gt.BC_percentile != null ? gt.BC_percentile.toFixed(2) : na;
+    var bcVal = gt.BC_percentile != null ? gt.BC_percentile : gt.betweenness_centrality;
+    var bc = bcVal != null ? bcVal.toFixed(2) : na;
     // 9. Seismic zone
-    var seismic = sm.zone != null ? 'Zone ' + sm.zone + ' \u00B7 PGA ' + sm.pga_g.toFixed(3) + 'g' : na;
+    var seismic = sm.zone != null ? 'Zone ' + sm.zone + (sm.pga_g != null ? ' \u00B7 PGA ' + sm.pga_g.toFixed(3) + 'g' : '') : na;
     // 10. Markov risk
-    var markov = mk.risk_score != null ? mk.risk_score.toFixed(3) + ' \u00B7 ETTC ' + mk.ettc_years.toFixed(1) + 'y' : na;
+    var ettc = mk.ettc_years != null ? mk.ettc_years : mk.ETTC_years;
+    var markov = mk.risk_score != null ? mk.risk_score.toFixed(3) + (ettc != null ? ' \u00B7 ETTC ' + ettc.toFixed(1) + 'y' : '') : na;
     // 11. Corrosion
-    var corrosion = mk.corrosion_class != null ? mk.corrosion_class : na;
+    var corrosion = (mk.corrosion_class != null ? mk.corrosion_class : (ssi.corrosion_class != null ? ssi.corrosion_class : null)) != null ? (mk.corrosion_class || ssi.corrosion_class) : na;
     // 12. Confidence
     var confidence = ssi.confidence_tier || na;
     // 13. Fleet percentile
