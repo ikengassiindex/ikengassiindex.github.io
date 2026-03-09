@@ -135,7 +135,7 @@
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json?v=21').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=22').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -352,7 +352,7 @@
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=21').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=22').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -848,7 +848,7 @@
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
 
   // ── C.2 Fleet Score Snapshot — from ssi-data.json ──
-  fetch('ssi-data.json?v=21').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=22').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -1028,7 +1028,7 @@
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=21').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=22').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter Andalucía-Murcia ──
     var puglia = data.substations.filter(function(s){ return s.region === 'Andalucía' || s.region === 'Región de Murcia'; });
     var fleet = data.substations;
@@ -1413,7 +1413,7 @@
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=21').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=22').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var puglia = fleet.filter(function(s){ return s.region === 'Andalucía' || s.region === 'Región de Murcia'; });
 
@@ -1705,7 +1705,7 @@
     '</div>';
 
   // ── SSI Data Connection — pull live stats to anchor the topic ──
-  fetch('ssi-data.json?v=21').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=22').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1897,7 +1897,7 @@
   }
 
   // ── Card 3: Fleet Spotlight — rotating stat ──
-  fetch('ssi-data.json?v=21').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=22').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);
