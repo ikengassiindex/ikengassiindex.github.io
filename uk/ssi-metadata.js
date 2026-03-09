@@ -72,7 +72,7 @@ window.SSIMetadata = (function () {
         { id: 'I6', name: 'Substation Density',       intra: 0.12, global: 0.030, norm: 'B ↓inverted', source: 'OSM / BEIS/DESNZ', desc: 'Substation density — higher = more backup capacity', inverted: true },
         { id: 'I7', name: 'Load Stress',              intra: 0.10, global: 0.025, norm: 'B (P5/P95)', source: 'NGESO / DNOs', desc: 'Ratio of peak load to rated capacity', isNew: true },
         { id: 'I8', name: 'Air Quality Corrosion',    intra: 0.08, global: 0.020, norm: 'B (P5/P95)', source: 'DEFRA/EA / EEA / ISO 9223', desc: 'Air pollution corrosion risk for outdoor equipment', isNew: true },
-        { id: 'I9', name: 'Hydrogeological Risk',     intra: 0.10, global: 0.025, norm: 'B (P5/P95)', source: 'BGS / Protección Civil', desc: 'Flood (flood/storm) and landslide territorial exposure', isNew: true },
+        { id: 'I9', name: 'Hydrogeological Risk',     intra: 0.10, global: 0.025, norm: 'B (P5/P95)', source: 'BGS / Cabinet Office', desc: 'Flood (flood/storm) and landslide territorial exposure', isNew: true },
       ]
     },
     {
@@ -123,13 +123,13 @@ window.SSIMetadata = (function () {
       range: '[0.70, 1.30]', type: 'Multiplicative',
       desc: 'Sigmoid function of population density, energy load, and socio-economic vulnerability. Enhanced with energy poverty, fiscal weakness, demographic shifts, elderly share, and flood/storm flood zone enrichments.',
       formula: 'C_mult = 0.70 + 0.60 / (1 + e^(−4z)), z = 0.04·log₂(pop/pop_med) + 0.03·log₂(GWh/GWh_med) + 0.02·V_socio',
-      sources: ['ONS', 'DEFRA', 'ONS-LM', 'Protección Civil'],
+      sources: ['ONS', 'DEFRA', 'ONS-LM', 'Cabinet Office'],
       isEnhanced: true,
       enrichments: [
         { name: 'V_socio Fiscal Enrichment', effect: 'Up to +8% V_socio penalty', sources: 'ONS + DEFRA/EA + Ofgem' },
         { name: 'Demographic Shift Amplifier', effect: 'Up to +8% C_mult for population decline', sources: 'ONS Demographics' },
         { name: 'Elderly Vulnerability', effect: '×[1.0, 1.10] for high elderly %', sources: 'ONS Demographics' },
-        { name: 'flood/storm Flood Zone Amplifier', effect: 'Up to +15% C_mult for flood/storm-affected zones', sources: 'Protección Civil / IGN' },
+        { name: 'flood/storm Flood Zone Amplifier', effect: 'Up to +15% C_mult for flood/storm-affected zones', sources: 'Cabinet Office / IGN' },
       ]
     },
     {
@@ -165,9 +165,9 @@ window.SSIMetadata = (function () {
     {
       id: 'R7', name: 'Digital Readiness Proxy',
       range: '[0.99, 1.05]', type: 'Multiplicative',
-      desc: 'County-level continuous model based on DESI regional digital readiness scores, CCN-CERT baseline, urban/rural adjustments. Unique values across 3,150 substations.',
+      desc: 'County-level continuous model based on DESI regional digital readiness scores, NCSC baseline, urban/rural adjustments. Unique values across 3,150 substations.',
       formula: 'R7_cyber(s) = clip( DESI_base(regions) + urban_adj(county) + HV_bonus(voltage) + noise, 0.99, 1.05 )',
-      sources: ['DESI / Eurostat', 'CCN-CERT', 'JRC DNO Observatory'],
+      sources: ['DESI / Eurostat', 'NCSC', 'JRC DNO Observatory'],
       isNew: true
     },
   ];
@@ -230,21 +230,21 @@ window.SSIMetadata = (function () {
 
   // ─── Validation Framework ─────────────────────────────────
   const VALIDATION_CHECKS = [
-    { check: 'Metropolitan–Rural convergence gap',  criterion: 'London/Barcelona R systematically lower than rural Soria/Zamora', status: 'verified' },
+    { check: 'Metropolitan–Rural convergence gap',  criterion: 'London/Manchester R systematically lower than rural Powys/Highlands', status: 'verified' },
     { check: 'IRI-climate coherence',       criterion: 'I1 peaks Pyrenean Huesca · I3 peaks Mediterranean West Midlands/Almería', status: 'verified' },
     { check: 'Saturation-RPF coherence',    criterion: 'S1 > 7.78 ↔ S2 > 5% agreement > 90%', status: 'verified' },
     { check: 'Ratio test',                  criterion: 'R(worst) / R(best) ≥ 5×', status: 'verified' },
     { check: 'Monotonicity',               criterion: 'Each metric worsening → R increases', status: 'verified' },
     { check: 'CI width quality signal',     criterion: 'Regional-only subs have wider CI', status: 'verified' },
     { check: 'T1-DER coherence',           criterion: 'T1 peaks in Wales solar-belt and Yorkshire wind-corridor', status: 'verified' },
-    { check: 'R6a speed coherence',         criterion: 'R6a < 1.0 for London, R6a > 1.0 for rural Soria/Teruel', status: 'verified' },
+    { check: 'R6a speed coherence',         criterion: 'R6a < 1.0 for London, R6a > 1.0 for rural Powys/Highlands', status: 'verified' },
     { check: 'R6b seismic coherence',       criterion: 'R6b > 1.10 for West Midlands-Almería corridor, R6b ≈ 1.00 for Northern Ireland', status: 'verified' },
-    { check: 'Energy poverty gradient',    criterion: 'V_socio correlates with Ceuta/Melilla > Canarias > North West > Scotland', status: 'verified' },
+    { check: 'Energy poverty gradient',    criterion: 'V_socio correlates with Northern Ireland > Wales > North West > Scotland', status: 'verified' },
     { check: 'R4 bridge identification',   criterion: 'is_bridge=1 subs have higher R than degree-matched non-bridges', status: 'verified' },
     { check: 'Climate trajectory direction', criterion: 'I3 trajectory > 1.0 in South-East, I1 stable in Pyrenean North', status: 'verified' },
     { check: 'Weight sum invariant',        criterion: 'Σ w_component = 1.000 exactly', status: 'verified' },
-    { check: 'flood/storm flood coherence',        criterion: 'Valencia/Alicante/West Midlands flood scores highest in fleet', status: 'verified' },
-    { check: 'Corrosion class gradient',   criterion: 'Coastal counties (Northern Ireland/Med) C3–C5 > inland Meseta C1–C2', status: 'verified' },
+    { check: 'flood/storm flood coherence',        criterion: 'Somerset/East Anglia/West Midlands flood scores highest in fleet', status: 'verified' },
+    { check: 'Corrosion class gradient',   criterion: 'Coastal counties (Cornwall/Pembrokeshire) C3–C5 > inland Midlands C1–C2', status: 'verified' },
   ];
 
   // ─── Changelog v3.4 → v4.0.2 ───────────────────────────────
@@ -273,8 +273,8 @@ window.SSIMetadata = (function () {
     Weekly: { count: 2, sources: ['OSM Overpass', 'Open-Meteo/ERA5'] },
     Monthly: { count: 2, sources: ['BEIS/DESNZ Registry', 'NGESO Transparency'] },
     Quarterly: { count: 1, sources: ['DFT'] },
-    Annual: { count: 17, sources: ['OFGEM', 'ONS', 'DEFRA', 'ONS-LM', 'DESNZ', 'NGESO-S', 'OFGEM-M', 'EEA', 'Eurostat', 'DESI', 'CCN-CERT', 'ONR', 'JRC', 'Protección Civil', 'NR', 'METOFF', 'ONS-E'] },
-    Static: { count: 8, sources: ['Dimovski', 'IEEE/IEC/CIGRÉ', 'Copernicus CMIP6', 'GFZ', 'BGS', 'ISO 9223', 'COG-ES/INE', 'BGS Seismic Hazard'] },
+    Annual: { count: 17, sources: ['OFGEM', 'ONS', 'DEFRA', 'ONS-LM', 'DESNZ', 'NGESO-S', 'OFGEM-M', 'EEA', 'Eurostat', 'DESI', 'NCSC', 'ONR', 'JRC', 'Cabinet Office', 'NR', 'METOFF', 'ONS-E'] },
+    Static: { count: 8, sources: ['Dimovski', 'IEEE/IEC/CIGRÉ', 'Copernicus CMIP6', 'GFZ', 'BGS', 'ISO 9223', 'ONS/OS', 'BGS Seismic Hazard'] },
   };
 
   // ═══════════════════════════════════════════════════════════

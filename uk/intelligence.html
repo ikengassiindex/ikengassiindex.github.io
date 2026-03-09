@@ -278,7 +278,7 @@
 <h2>Cyber &amp; Economic Exposure Monitor</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that the UK's Plan de Digitalización / PNIEC 2030 planning requires.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that the UK's Digital Strategy / Net Zero Strategy planning requires.</p>
 </div>
 
 <!-- B.1 KPI boxes -->
@@ -491,7 +491,7 @@
       'The blind spots concentrate in <strong>' + blindRegionStr + '</strong>. ' +
       'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry a HIGH cyber-exposure classification, ' +
       'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier — indicating strong digital infrastructure coverage ' +
-      'but concentrated in major metropolitan areas (London, Barcelona, Bilbao).';
+      'but concentrated in major metropolitan areas (London, Manchester, Birmingham).';
 
     // ── B.2 Economic Impact by Business Fabric ──
     // Tier by R3 (consequence multiplier) and E component
@@ -499,16 +499,16 @@
     var tiers = [
       { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, large manufacturing — highest economic loss per interruption',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
-        voll: '€10–20/kWh' },
+        voll: '£10–20/kWh' },
       { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, food processing — significant continuity requirements',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
-        voll: '€8–15/kWh' },
+        voll: '£8–15/kWh' },
       { label: 'Commercial / SME-Dense', desc: 'Service economy, retail, tourism — moderate individual impact but high aggregate exposure',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏪',
-        voll: '€3–8/kWh' },
+        voll: '£3–8/kWh' },
       { label: 'Light / Agricultural / Rural', desc: 'Sparse economic activity, agricultural land — lower VoLL but higher social vulnerability',
         filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
-        voll: '€1–3/kWh' }
+        voll: '£1–3/kWh' }
     ];
 
     var tiersHTML = '';
@@ -557,7 +557,7 @@
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
       '<strong>Value of Lost Load (VoLL) context:</strong> The ACER/CEPA 2022 pan-European VoLL study estimates the UK\'s sector-weighted average at ' +
-      'approximately €6.4/kWh, with industrial customers at ~€11.8/kWh and residential at ~€3.5/kWh. The SSI\'s R3 consequence multiplier maps ' +
+      'approximately £8.0/kWh, with industrial customers at ~£14.2/kWh and residential at ~£4.5/kWh. The SSI\'s R3 consequence multiplier maps ' +
       'these sectoral weights to each substation\'s service territory. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive ' +
       'economic fabric (R3 ≥ 1.14) with High or Critical risk classification — the highest VoLL-weighted exposure in the fleet.';
 
@@ -573,7 +573,7 @@
     document.getElementById('b2-narrative').innerHTML =
       'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
       'depend on uninterrupted power for continuous processes (steel, glass, automotive). A single hour of unplanned outage at these ' +
-      'substations carries an estimated VoLL of €10–20/kWh, compared to €1–3/kWh in rural agricultural zones. ' +
+      'substations carries an estimated VoLL of £10–20/kWh, compared to £1–3/kWh in rural agricultural zones. ' +
       'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
       'Southern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
       'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
@@ -677,7 +677,7 @@
       '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
       (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
       '<strong>' + dualExposed.length + ' counties</strong> combine below-median digital readiness with above-median grid risk, ' +
-      'making them priority targets for España 2030 / Plan de Recuperación / PPE digitalisation investment. ' +
+      'making them priority targets for Net Zero 2050 / Levelling Up Fund digitalisation investment. ' +
       'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open DESI data — ' +
       'as NIS2 compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
 
@@ -902,7 +902,7 @@
       ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
       (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
       'The first material score changes are expected when Ofgem publishes the annual TIQE indicators (affecting C1–C4 and R6a) ' +
-      'and when BEIS/DESNZ refreshes the Registro de Instalaciones de producción de energía eléctrica (affecting T1). ' +
+      'and when BEIS/DESNZ refreshes the Renewable Energy Planning Database (affecting T1). ' +
       'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
       'which have minimal impact on fleet-level score distribution.';
   });
@@ -941,7 +941,7 @@
 <h2>The North West-West Midlands Seismic Corridor: Where Seismic Risk Meets Energy Transition Pressure</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001 North West-West Midlands seismic corridor · 002 DER saturation hotspots (Valencia/West Midlands) · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> Metropolitan-Rural economic impact disparity · <strong>005</strong> Nuclear fleet dependency and phase-out risk · <strong>006</strong> Infrastructure age vs smart meter rollout · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> County Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001 North West-West Midlands seismic corridor · 002 DER saturation hotspots (East Anglia/West Midlands) · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> Metropolitan-Rural economic impact disparity · <strong>005</strong> Nuclear fleet dependency and phase-out risk · <strong>006</strong> Infrastructure age vs smart meter rollout · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> County Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
 </div>
 
 <!-- D.1 KPI summary — auto-populated -->
@@ -1276,7 +1276,7 @@
     var pugAbove065 = puglia.filter(function(s){ return s.R_median >= 0.65; }).length;
     document.getElementById('pug-narrative-d5').innerHTML =
       '<strong>' + pugAbove065 + ' North West-West Midlands substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
-      'For PNIEC (Programmation Pluriannuelle de l\'Énergie) investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
+      'For Net Zero Strategy investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
       'where DER deployment is accelerating against ageing infrastructure with above-average continuity deficits and significant socio-economic exposure. ' +
       'The SSI\'s silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only because of their engineering condition, ' +
       'but because the communities they serve — characterised by service-economy dependence, tourism exposure, and above-average energy poverty — are disproportionately ' +
@@ -1500,7 +1500,7 @@
       aboveAvg + ' of 12 regions score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
       'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DNO or national statistics — ' +
       'reveals the true spatial distribution of grid stress across UK. ' +
-      'It is precisely this substation-level granularity that positions the SSI as a tool for PNIEC / España 2030 / Plan de Recuperación investment prioritisation: ' +
+      'It is precisely this substation-level granularity that positions the SSI as a tool for Net Zero Strategy / Levelling Up Fund investment prioritisation: ' +
       'not treating entire regions as monoliths, but identifying the specific corridors within each that demand attention.';
   });
 })();
@@ -1516,7 +1516,7 @@
 <h2>SSI Enhanced Neural Network — Monthly Topic</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to BESS valuation platform.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What is a BESS worth at this substation — to the REE/DNO and to the community?"</em> Each edition of this report explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to BESS valuation platform.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What is a BESS worth at this substation — to the NGESO/DNO and to the community?"</em> Each edition of this report explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
 </div>
 
 <!-- Architecture overview — always visible -->
@@ -1539,7 +1539,7 @@
   var topics = [
     { layer: 1, ref: '§0.3', title: 'Data Architecture — Component Taxonomy',
       subtitle: 'How the SSI\'s 6 components and 20 sub-metrics are sourced, validated, and scored',
-      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 30 public data sources in the SSI registry, validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither the BESS valuation engine nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs — for example, the C (Continuity) component feeds the REE/DNO\'s avoided-outage calculation (D1), while the E (Economic) component feeds the community value stack\'s energy poverty reduction estimate (W3).',
+      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 30 public data sources in the SSI registry, validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither the BESS valuation engine nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs — for example, the C (Continuity) component feeds the NGESO/DNO\'s avoided-outage calculation (D1), while the E (Economic) component feeds the community value stack\'s energy poverty reduction estimate (W3).',
       concepts: ['6 components, 20 sub-metrics, 95 variables', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T', 'Each sub-metric traceable to authoritative public source'],
       ssiLink: 'components' },
     { layer: 1, ref: '§0.3.4', title: 'Gaussian Copula Monte Carlo Engine',
@@ -1547,14 +1547,14 @@
       body: 'The SSI components are not independent — a substation with poor continuity (high C) often also has poor voltage quality (high V), aged infrastructure (high I5), and is located in a rural area with high economic vulnerability (high E). The Gaussian copula captures these dependencies through a 20×20 correlation matrix estimated from the British fleet, decomposed via Cholesky factorisation to generate correlated random draws. For each of 3,150 substations, 10,000 Monte Carlo iterations propagate uncertainty through the full scoring formula, producing not just a point estimate (R_median) but a complete posterior distribution — P5, P50, P95, confidence interval width, and skewness. This is the computational backbone: 35.3 million simulations, 794 million arithmetic operations, yielding the uncertainty quantification that distinguishes the SSI from deterministic indices.',
       concepts: ['20×20 Gaussian copula with Cholesky decomposition', '10,000 iterations per substation = 35.3M total', 'Full posterior: R_P5, R_median, R_P95, CI_width, skewness', 'Correlation captures systemic clustering of risk factors'],
       ssiLink: 'mc' },
-    { layer: 2, ref: '§0.4.1', title: 'REE/DNO Value Stack (D1–D5)',
+    { layer: 2, ref: '§0.4.1', title: 'NGESO/DNO Value Stack (D1–D5)',
       subtitle: 'What a BESS is worth to the distribution network operator in avoided or deferred costs',
-      body: 'The REE/DNO value stack quantifies five categories of value that a battery energy storage system creates for the distribution network operator at each substation. D1 (Avoided Outage Cost) uses the SSI\'s C component and SAIDI data to estimate the reduction in customer-minutes-lost. D2 (Deferred Reinforcement) leverages the S (Saturation) and I (Infrastructure) components to calculate how BESS deployment can postpone expensive grid upgrades. D3 (Reactive Power Support) draws on V (Voltage) data to value power quality improvement. D4 (Loss Reduction) uses graph topology (R4) to estimate reduced network losses. D5 (Fault Level Management) reflects the BESS\'s contribution to grid stability. Each component maps directly to one or more SSI v4.0 inputs — the Index doesn\'t just measure risk, it prices the economic case for intervention.',
+      body: 'The NGESO/DNO value stack quantifies five categories of value that a battery energy storage system creates for the distribution network operator at each substation. D1 (Avoided Outage Cost) uses the SSI\'s C component and SAIDI data to estimate the reduction in customer-minutes-lost. D2 (Deferred Reinforcement) leverages the S (Saturation) and I (Infrastructure) components to calculate how BESS deployment can postpone expensive grid upgrades. D3 (Reactive Power Support) draws on V (Voltage) data to value power quality improvement. D4 (Loss Reduction) uses graph topology (R4) to estimate reduced network losses. D5 (Fault Level Management) reflects the BESS\'s contribution to grid stability. Each component maps directly to one or more SSI v4.0 inputs — the Index doesn\'t just measure risk, it prices the economic case for intervention.',
       concepts: ['D1: Avoided Outage = f(C, SAIDI, customer count)', 'D2: Deferred Reinforcement = f(S, I, load growth)', 'D3: Reactive Power = f(V, network impedance)', 'D4 + D5: Loss Reduction + Fault Level = f(R4, topology)'],
       ssiLink: 'valuation' },
     { layer: 2, ref: '§0.4.2', title: 'Community Value Stack (W1–W5)',
       subtitle: 'Social and economic value to the local community — the case for public-interest investment',
-      body: 'While the REE/DNO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, España 2030 / Plan de Recuperación / PPE allocators, and EU structural fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per EU Commission CBA guidance), not the REE/DNO WACC.',
+      body: 'While the NGESO/DNO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, Net Zero 2050 / Levelling Up Fund / PPE allocators, and EU structural fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per EU Commission CBA guidance), not the NGESO/DNO WACC.',
       concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0% (EU CBA guidance)'],
       ssiLink: 'community' },
     { layer: 2, ref: '§0.4.5', title: 'Real Options Pricing Framework',
@@ -1569,7 +1569,7 @@
       ssiLink: 'revenue' },
     { layer: 3, ref: '§0.5.2', title: 'Neural Network — Ensemble Architecture',
       subtitle: 'GBT + DNN ensemble: why two model families outperform either alone on grid data',
-      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (region, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, REE/DNO NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously, forcing the network to learn representations useful for all tasks.',
+      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (region, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, NGESO/DNO NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously, forcing the network to learn representations useful for all tasks.',
       concepts: ['Ensemble: α·GBT + (1-α)·DNN, α learned during validation', '7 simultaneous outputs via multi-task learning', 'GBT dominates with sparse data, DNN with dense data', 'Shared representation = implicit regularisation'],
       ssiLink: 'nn' },
     { layer: 3, ref: '§0.5.3', title: 'Transfer Learning & Feature Missingness',
@@ -1579,18 +1579,18 @@
       ssiLink: 'transfer' },
     { layer: 3, ref: '§0.5.5', title: 'Uncertainty Quantification',
       subtitle: 'Investment-grade predictions require calibrated confidence intervals, not just point estimates',
-      body: 'A point estimate without uncertainty bounds is unusable for investment-grade analysis. The SSI-ENN produces calibrated P10/P50/P90 prediction intervals using two complementary approaches: quantile regression (the DNN head directly outputs multiple quantiles, trained with pinball loss) and conformal prediction (a distribution-free method that provides guaranteed coverage). The SSI\'s own Monte Carlo confidence intervals (CI_width, P5/P95) serve as the ground truth for calibration: the neural network\'s uncertainty estimates are validated against the analytical uncertainty from the 10,000-iteration copula engine. If the NN says "P90 NPV = €4.2M" for a substation, that bound must be calibrated — meaning 90% of true valuations (from the full analytical model) should indeed fall below €4.2M. This calibration is verified per country, per voltage class, and per risk band.',
+      body: 'A point estimate without uncertainty bounds is unusable for investment-grade analysis. The SSI-ENN produces calibrated P10/P50/P90 prediction intervals using two complementary approaches: quantile regression (the DNN head directly outputs multiple quantiles, trained with pinball loss) and conformal prediction (a distribution-free method that provides guaranteed coverage). The SSI\'s own Monte Carlo confidence intervals (CI_width, P5/P95) serve as the ground truth for calibration: the neural network\'s uncertainty estimates are validated against the analytical uncertainty from the 10,000-iteration copula engine. If the NN says "P90 NPV = £4.2M" for a substation, that bound must be calibrated — meaning 90% of true valuations (from the full analytical model) should indeed fall below £4.2M. This calibration is verified per country, per voltage class, and per risk band.',
       concepts: ['Quantile regression (pinball loss) + conformal prediction', 'Calibrated against SSI Monte Carlo ground truth', 'Per-country, per-voltage, per-band calibration verification', 'Investment-grade: P10/P50/P90 for all outputs'],
       ssiLink: 'uncertainty' },
     { layer: 3, ref: '§0.5.6', title: 'Explainability & SHAP Values',
       subtitle: 'Clients need to understand not just the prediction but WHY a substation ranks highly',
-      body: 'Investment-grade models require interpretability. A BESS developer considering a €10M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score — and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down. This directly connects to the SSI Index: if SHAP identifies C (Continuity) as the dominant positive driver, the client knows the BESS value depends primarily on the substation\'s poor reliability history — and can verify this against Ofgem (Commission de Régulation de l\'Énergie)\'s published TIQE data. Transparency is not optional; it is what converts model outputs into investment decisions.',
+      body: 'Investment-grade models require interpretability. A BESS developer considering a £10M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score — and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down. This directly connects to the SSI Index: if SHAP identifies C (Continuity) as the dominant positive driver, the client knows the BESS value depends primarily on the substation\'s poor reliability history — and can verify this against Ofgem (Office of Gas and Electricity Markets)\'s published TIQE data. Transparency is not optional; it is what converts model outputs into investment decisions.',
       concepts: ['SHAP: game-theoretic feature attribution per prediction', 'Waterfall visualisation: fleet average → substation prediction', 'Direct traceability to SSI components and data sources', 'Feature importance validated against domain expertise'],
       ssiLink: 'shap' },
     { layer: 4, ref: '§0.6.1', title: 'European Expansion — Country Prioritisation',
       subtitle: 'How 28 countries are ranked by expected commercial return per unit of expansion effort',
-      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). UK scores among the highest thanks to Ofgem/BEIS/DESNZ/ONS data quality, alongside Germany, Italy, UK, Netherlands, and UK.',
-      concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28 countries: EU-27 + UK', 'FR, DE, IT = highest DCI scores, then ES, NL, UK', 'Each country requires bespoke regulatory mapping'],
+      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). UK scores among the highest thanks to Ofgem/BEIS/DESNZ/ONS data quality, alongside Germany, Italy, France, Netherlands, and the UK.',
+      concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28 countries: EU-27 + UK', 'UK, DE, FR = highest DCI scores, then IT, NL, ES', 'Each country requires bespoke regulatory mapping'],
       ssiLink: 'expansion' },
     { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index',
       subtitle: 'Quantifying what fraction of the SSI feature vector is available for each country',
@@ -1600,26 +1600,26 @@
     { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
       subtitle: 'Adapting the SSI model across different national grid characteristics',
       body: 'The SSI v4.0 architecture was designed to be transferable across European grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., Ofgem/BEIS/DESNZ/NGESO for UK, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 30 British data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
-      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'Ofgem/BEIS/DESNZ (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
+      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'Ofgem/BEIS/DESNZ (UK), BNetzA (DE), ARERA (IT), CRE (FR) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
       ssiLink: 'transfer-protocol' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
       subtitle: 'From raw analytical outputs to four commercial product formats',
-      body: 'The SSI-ENN\'s analytical engine (Layers 1–3) produces a high-dimensional output vector per substation per BESS configuration. The product delivery pipeline transforms this into four distinct product formats: (1) the Explorer Dashboard — a self-service web interface where subscribers can filter, map, and compare substations across the full coverage universe; (2) the API — programmatic access for developers integrating SSI-ENN outputs into their own tools and financial models; (3) the Value-Add Card — a per-substation PDF report combining both value stacks for both BESS configurations, designed for investor presentations and regulatory submissions; (4) the Advisory Report — a bespoke multi-substation analysis for institutional clients (REE/DNOs, investment funds, government agencies). Each format draws from the same analytical core but applies different levels of contextualisation, visualisation, and narrative.',
+      body: 'The SSI-ENN\'s analytical engine (Layers 1–3) produces a high-dimensional output vector per substation per BESS configuration. The product delivery pipeline transforms this into four distinct product formats: (1) the Explorer Dashboard — a self-service web interface where subscribers can filter, map, and compare substations across the full coverage universe; (2) the API — programmatic access for developers integrating SSI-ENN outputs into their own tools and financial models; (3) the Value-Add Card — a per-substation PDF report combining both value stacks for both BESS configurations, designed for investor presentations and regulatory submissions; (4) the Advisory Report — a bespoke multi-substation analysis for institutional clients (NGESO/DNOs, investment funds, government agencies). Each format draws from the same analytical core but applies different levels of contextualisation, visualisation, and narrative.',
       concepts: ['4 products: Dashboard, API, Value-Add Card, Advisory Report', 'Single analytical core, multiple delivery formats', 'Value-Add Card: per-substation investor-grade PDF', 'Advisory: bespoke multi-substation institutional analysis'],
       ssiLink: 'platform' },
     { layer: 5, ref: '§0.7.3', title: 'Revenue Model & Unit Economics',
       subtitle: 'Three revenue channels with distinct scaling characteristics',
-      body: 'The SSI-ENN generates revenue through three channels with distinct economic characteristics. Subscriptions (recurring, scalable, high-margin): three tiers — Explorer (€990/month, portfolio screening), Developer (€4,900/month, full API access + Value-Add Cards), and Enterprise (custom pricing, white-label + advisory hours). Advisory services (project-based, relationship-building, moderate-margin): per-project fees for bespoke analysis, typically €25K–€150K depending on scope. Data licensing (passive, institutional): anonymised dataset licensing to energy data platforms, credit agencies, and research institutions, typically €50K–€200K/year. The platform exhibits extreme operating leverage: once the analytical engine and coverage infrastructure are built, the marginal cost of serving each additional subscriber approaches zero. The critical metric is subscriber retention — the LTV:CAC ratio must exceed 3:1 for sustainable growth.',
-      concepts: ['3 tiers: Explorer €990/mo, Developer €4,900/mo, Enterprise custom', 'Advisory: €25K–€150K per project', 'Data licensing: €50K–€200K/year to institutions', 'Operating leverage: near-zero marginal cost per subscriber'],
+      body: 'The SSI-ENN generates revenue through three channels with distinct economic characteristics. Subscriptions (recurring, scalable, high-margin): three tiers — Explorer (£990/month, portfolio screening), Developer (£4,900/month, full API access + Value-Add Cards), and Enterprise (custom pricing, white-label + advisory hours). Advisory services (project-based, relationship-building, moderate-margin): per-project fees for bespoke analysis, typically £25K–£150K depending on scope. Data licensing (passive, institutional): anonymised dataset licensing to energy data platforms, credit agencies, and research institutions, typically £50K–£200K/year. The platform exhibits extreme operating leverage: once the analytical engine and coverage infrastructure are built, the marginal cost of serving each additional subscriber approaches zero. The critical metric is subscriber retention — the LTV:CAC ratio must exceed 3:1 for sustainable growth.',
+      concepts: ['3 tiers: Explorer £990/mo, Developer £4,900/mo, Enterprise custom', 'Advisory: £25K–£150K per project', 'Data licensing: £50K–£200K/year to institutions', 'Operating leverage: near-zero marginal cost per subscriber'],
       ssiLink: 'revenue-model' },
     { layer: 1, ref: '§0.3.6', title: 'Data Flow Matrix — Traceability Register',
       subtitle: 'For any output number, trace it back to the exact input variable and source',
-      body: 'The Data Flow Matrix maps every SSI component and sub-metric to the downstream valuation outputs it influences. This is the traceability register: for any number produced by the SSI-ENN — whether an R_median score, a REE/DNO NPV, or a community value estimate — you can trace it backwards through the matrix to the specific input variables and data sources that determined it. This traceability is not an afterthought; it is a design requirement for investment-grade analytics. A €10M BESS investment decision must withstand due diligence scrutiny, which means every assumption must be auditable. The matrix also serves a forward purpose: when a data source updates (e.g., Ofgem (Commission de Régulation de l\'Énergie) publishes new TIQE data), the matrix identifies exactly which outputs will change and which substations are affected — enabling targeted recomputation rather than full fleet recalculation.',
+      body: 'The Data Flow Matrix maps every SSI component and sub-metric to the downstream valuation outputs it influences. This is the traceability register: for any number produced by the SSI-ENN — whether an R_median score, a NGESO/DNO NPV, or a community value estimate — you can trace it backwards through the matrix to the specific input variables and data sources that determined it. This traceability is not an afterthought; it is a design requirement for investment-grade analytics. A £10M BESS investment decision must withstand due diligence scrutiny, which means every assumption must be auditable. The matrix also serves a forward purpose: when a data source updates (e.g., Ofgem (Office of Gas and Electricity Markets) publishes new TIQE data), the matrix identifies exactly which outputs will change and which substations are affected — enabling targeted recomputation rather than full fleet recalculation.',
       concepts: ['Every output traceable to specific inputs and sources', 'Investment-grade auditability for due diligence', 'Targeted recomputation when sources update', 'Bidirectional: input→output and output→input'],
       ssiLink: 'traceability' },
     { layer: 2, ref: '§0.4.3', title: 'Total Cost of Ownership Model',
       subtitle: 'Stochastic cost modelling — because BESS economics are not deterministic',
-      body: 'The TCO model provides the cost side of the NPV calculation, and all costs are stochastic. CAPEX (€/kWh installed) follows a learning-curve distribution calibrated to Bloomberg NEF projections, with augmentation cost uncertainty reflecting supply-chain volatility. OPEX (fixed + variable) is modelled as a mean-reverting process with seasonal components reflecting temperature-dependent degradation. Battery degradation follows a non-linear capacity fade model: each charge-discharge cycle reduces usable capacity, with the rate depending on depth-of-discharge, temperature, and C-rate — all of which vary by substation location and dispatch profile. The SSI data feeds this directly: substations with high I1 (temperature trajectory from CMIP6 SSP2-4.5) face faster degradation, increasing lifetime replacement cost. The Monte Carlo engine propagates cost uncertainty alongside revenue uncertainty, producing a full NPV distribution rather than a single number.',
+      body: 'The TCO model provides the cost side of the NPV calculation, and all costs are stochastic. CAPEX (£/kWh installed) follows a learning-curve distribution calibrated to Bloomberg NEF projections, with augmentation cost uncertainty reflecting supply-chain volatility. OPEX (fixed + variable) is modelled as a mean-reverting process with seasonal components reflecting temperature-dependent degradation. Battery degradation follows a non-linear capacity fade model: each charge-discharge cycle reduces usable capacity, with the rate depending on depth-of-discharge, temperature, and C-rate — all of which vary by substation location and dispatch profile. The SSI data feeds this directly: substations with high I1 (temperature trajectory from CMIP6 SSP2-4.5) face faster degradation, increasing lifetime replacement cost. The Monte Carlo engine propagates cost uncertainty alongside revenue uncertainty, producing a full NPV distribution rather than a single number.',
       concepts: ['CAPEX learning curve calibrated to BNEF', 'Non-linear battery degradation: f(DoD, temperature, C-rate)', 'SSI I1 (climate trajectory) drives degradation forecast', 'Full NPV distribution, not point estimate'],
       ssiLink: 'tco' },
     { layer: 1, ref: '§0.3.2', title: 'Sub-Metric Definitions — Replicability Standard',
@@ -1661,7 +1661,7 @@
   // ── Layer navigation ──
   var layerDefs = [
     { n: 1, label: 'Layer 1 — Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
-    { n: 2, label: 'Layer 2 — Valuation', color: '#c0392b', desc: 'REE/DNO + Community value stacks, TCO, real options' },
+    { n: 2, label: 'Layer 2 — Valuation', color: '#c0392b', desc: 'NGESO/DNO + Community value stacks, TCO, real options' },
     { n: 3, label: 'Layer 3 — Neural Net', color: '#6c3483', desc: 'GBT+DNN ensemble, transfer learning, SHAP' },
     { n: 4, label: 'Layer 4 — Coverage', color: '#1a6b4a', desc: 'Country prioritisation, DCI, registry, calibration' },
     { n: 5, label: 'Layer 5 — Platform', color: '#0e7490', desc: 'Products, API, revenue model, unit economics' }
@@ -1730,7 +1730,7 @@
       statHTML = 'Across the ' + n.toLocaleString() + '-substation British fleet, the average consequence multiplier (R3) is ' +
         avgR3.toFixed(3) + ', indicating significant socio-economic exposure. ' +
         highCrit + ' substations (' + (highCrit/n*100).toFixed(1) + '%) are classified High or Critical — ' +
-        'these are the highest-priority candidates for BESS deployment where REE/DNO and community value stacks are largest.';
+        'these are the highest-priority candidates for BESS deployment where NGESO/DNO and community value stacks are largest.';
     } else if (topic.layer === 3) {
       statHTML = 'The British training set comprises ' + n.toLocaleString() + ' substations with complete 95-feature vectors. ' +
         'Average CI_width of ' + avgCI.toFixed(3) + ' across the fleet provides the uncertainty ground truth that the neural network\'s ' +
@@ -1831,12 +1831,12 @@
     { region: 'Greater London', theme: 'The London Metropolitan Load', context: 'Urban saturation dynamics', contextDetail: 'DER + EV penetration stress on the London metropolitan grid' },
     { region: 'South East', theme: 'The South East Industrial Arc', context: 'Industrial VoLL exposure', contextDetail: 'Industrial corridor where high energy demand meets grid congestion and ageing infrastructure' },
     { region: 'Scotland', theme: 'The Scotland Industrial Backbone', context: 'Heavy industry dependency', contextDetail: 'Steel and petrochemical baseload demand vs grid reinforcement investment' },
-    { region: 'East of England', theme: 'The Valenciana Mediterranean Grid', context: 'CMIP6 climate hazard', contextDetail: 'flood/storm exposure, coastal thermal stress, and Mediterranean climate trajectory' },
+    { region: 'East of England', theme: 'The East Anglian Coastal Grid', context: 'CMIP6 climate hazard', contextDetail: 'flood/storm exposure, coastal erosion, and North Sea climate trajectory' },
     { region: 'North East', theme: 'The North East Renewable Belt', context: 'DER saturation analysis', contextDetail: 'The UK\'s highest wind + solar density — grid absorption limits and curtailment risk' },
     { region: 'Wales', theme: 'The Wales Solar Frontier', context: 'Renewable integration stress', contextDetail: 'Massive PV build-out vs weak transmission capacity and rural grid topology' },
     { region: 'Northern Ireland', theme: 'The Northern Ireland Atlantic Grid', context: 'Island-like grid topology', contextDetail: 'Peninsular grid dependency, wind saturation, and interconnection vulnerability' },
     { region: 'Yorkshire', theme: 'The Yorkshire Wind Corridor', context: 'Renewable concentration risk', contextDetail: 'Ebro valley wind farms — grid absorption capacity and curtailment analysis' },
-    { region: 'Canarias', theme: 'The Canarias Insular Grid', context: 'Island grid resilience', contextDetail: 'Isolated power systems, submarine cable dependency, and renewable integration on islands' },
+    { region: 'Scottish Islands', theme: 'The Scottish Islands Grid', context: 'Island grid resilience', contextDetail: 'Isolated power systems, submarine cable dependency, and renewable integration on Scottish islands' },
     { region: 'East Midlands', theme: 'The East Midlands Heritage Grid', context: 'Infrastructure age profile', contextDetail: 'Markov degradation analysis on one of the UK\'s most extensive rural networks' },
     { region: 'Scotland', theme: 'The Scotland Post-Coal Transition', context: 'Energy transition stress', contextDetail: 'Coal plant closures, industrial reconversion, and grid readiness for clean energy' }
   ];
@@ -1891,7 +1891,7 @@
       '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
       '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
       '<strong>' + qtrSources + '</strong> are due for refresh in ' + qLabels[nextQ] + '. ' +
-      'Impact: BEIS/DESNZ (Registro de Instalaciones de producción de energía eléctrica) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
+      'Impact: BEIS/DESNZ (Renewable Energy Planning Database) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
       'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong> (' +
       (annualHighImpact ? annualHighImpact.vars : '?') + ' variables → ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
   }
@@ -2005,7 +2005,7 @@
 </script>
 
 <div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
-  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent a British utility, Ofgem, REE, regional DNO, municipal energy company, or academic institution and would like to contribute data or methodology feedback, please contact us through the foundation. The SSI's credibility depends on open scrutiny.
+  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent a British utility, Ofgem, NGESO, regional DNO, municipal energy company, or academic institution and would like to contribute data or methodology feedback, please contact us through the foundation. The SSI's credibility depends on open scrutiny.
 </div>
 </section>
 
@@ -2021,7 +2021,7 @@
 
 <footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
   © 2026 Altinium Invest · Corso Vittorio Emanuele 110/5, 80121 Napoli · P.IVA 10656441218<br>
-  USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 633/1941, Berne Convention, Copyright Act 1976<br>
+  USCO Registration pending · UK IPO Registration · Protected under CDPA 1988, Berne Convention, Copyright Act 1976<br>
   <a href="#" style="color:var(--warm-grey-light);text-decoration:none">Unsubscribe</a> · <a href="#" style="color:var(--warm-grey-light);text-decoration:none">Update preferences</a> · <a href="#" style="color:var(--warm-grey-light);text-decoration:none">View in browser</a>
 </footer>
 
