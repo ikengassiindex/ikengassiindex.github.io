@@ -575,20 +575,30 @@
       return '<div style="display:flex;justify-content:space-between"><span>' + label + '</span><span style="font-weight:500">' + val + '</span></div>';
     }
 
-    // 1. Unemployment
-    var unemployment = se.unemployment_rate != null ? se.unemployment_rate.toFixed(1) + '%' : na;
+    // 1. Unemployment / Population
+    var unemployment = se.unemployment_rate != null ? se.unemployment_rate.toFixed(1) + '%' :
+                       se.population != null ? Math.round(se.population).toLocaleString() : na;
+    var unemploymentLabel = se.unemployment_rate != null ? 'Unemployment' : se.population != null ? 'Population' : 'Unemployment';
     // 2. GDP per capita
-    var gdp = se.gdp_per_capita != null ? '\u20AC' + Math.round(se.gdp_per_capita).toLocaleString() : na;
-    // 3. Innovation (R&D % of GDP — GERD intensity)
-    var innovation = se.rd_pct_gdp != null ? se.rd_pct_gdp.toFixed(1) + '% of GDP' : na;
-    // 4. Energy poverty — V_socio
-    var epVal = se.EP_rate_region != null ? se.EP_rate_region + '%' : na;
-    var vsVal = se.V_socio != null ? ' — V_socio ' + se.V_socio.toFixed(2) : '';
-    var energyPoverty = se.EP_rate_region != null ? epVal + vsVal : na;
-    // 5. E2 Productivity
-    var e2 = se.E2_local != null ? se.E2_local.toFixed(3) : na;
-    // 6. DER Stress (T1)
-    var t1 = tr.T1_score != null ? tr.T1_score.toFixed(3) : na;
+    var currSymbol = (ssi.substation_id && ssi.substation_id.indexOf('UK_') === 0) ? '\u00A3' : '\u20AC';
+    var gdp = se.gdp_per_capita != null ? currSymbol + Math.round(se.gdp_per_capita).toLocaleString() : na;
+    // 3. Innovation (R&D) / Elderly pct
+    var innovation = se.rd_pct_gdp != null ? se.rd_pct_gdp.toFixed(1) + '% of GDP' :
+                     se.elderly_pct != null ? se.elderly_pct.toFixed(1) + '%' : na;
+    var innovationLabel = se.rd_pct_gdp != null ? 'Innovation (R&D)' : se.elderly_pct != null ? 'Elderly share' : 'Innovation (R&D)';
+    // 4. Energy poverty — V_socio / ep_rate
+    var epVal = se.EP_rate_region != null ? se.EP_rate_region + '%' : null;
+    var vsVal = se.V_socio != null ? ' \u2014 V_socio ' + se.V_socio.toFixed(2) : '';
+    var energyPoverty = epVal != null ? epVal + vsVal :
+                        se.ep_rate != null ? (se.ep_rate * 100).toFixed(1) + '%' : na;
+    // 5. E2 Productivity / EV density
+    var e2 = se.E2_local != null ? se.E2_local.toFixed(3) :
+             tr.ev_density != null ? tr.ev_density.toFixed(1) + ' EVs/km\u00B2' : na;
+    var e2Label = se.E2_local != null ? 'E2 Productivity' : tr.ev_density != null ? 'EV density' : 'E2 Productivity';
+    // 6. DER Stress (T1) / DER capacity
+    var t1 = tr.T1_score != null ? tr.T1_score.toFixed(3) :
+             tr.der_capacity_mw != null ? tr.der_capacity_mw.toFixed(1) + ' MW' : na;
+    var t1Label = tr.T1_score != null ? 'DER Stress (T1)' : tr.der_capacity_mw != null ? 'DER capacity' : 'DER Stress (T1)';
     // 7. Graph degree
     var degree = gt.degree != null ? gt.degree + (gt.is_bridge ? ' (bridge)' : '') : na;
     // 8. BC percentile
@@ -607,12 +617,12 @@
     var fpRaw = ssi.fleet_percentile;
     var fleetPct = fpRaw != null ? (fpRaw > 1 ? fpRaw.toFixed(1) : (fpRaw * 100).toFixed(1)) + '%' : na;
 
-    return row('Unemployment', unemployment) +
+    return row(unemploymentLabel, unemployment) +
       row('GDP per capita', gdp) +
-      row('Innovation (R&D)', innovation) +
+      row(innovationLabel, innovation) +
       row('Energy poverty', energyPoverty) +
-      row('E2 Productivity', e2) +
-      row('DER Stress (T1)', t1) +
+      row(e2Label, e2) +
+      row(t1Label, t1) +
       row('Graph degree', degree) +
       row('BC percentile', bc) +
       row('Seismic zone', seismic) +
