@@ -304,8 +304,8 @@ window.SSIMetadata = (function () {
       substations: 3529,
       powerLines: 0,
       mcIterations: 10000,
-      departements: 52,
-      regions: 19
+      provincias: 50,
+      regions: 17
     }
   };
 })();

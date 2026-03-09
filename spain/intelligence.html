@@ -499,7 +499,7 @@
     var tiers = [
       { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, large manufacturing — highest economic loss per interruption',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
-        voll: '€15–30/kWh' },
+        voll: '€10–20/kWh' },
       { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, food processing — significant continuity requirements',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
         voll: '€8–15/kWh' },
@@ -556,10 +556,10 @@
       return s.modifiers.R3_C_mult >= 1.14 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
-      '<strong>Value of Lost Load (VoLL) context:</strong> ACER\'s 2023 estimate for Spain places average VoLL at €13.1/kWh for industrial customers ' +
-      'and €3.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
-      'exposed territories. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ 1.14) with ' +
-      'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.';
+      '<strong>Value of Lost Load (VoLL) context:</strong> The ACER/CEPA 2022 pan-European VoLL study estimates Spain\'s sector-weighted average at ' +
+      'approximately €6.4/kWh, with industrial customers at ~€11.8/kWh and residential at ~€3.5/kWh. The SSI\'s R3 consequence multiplier maps ' +
+      'these sectoral weights to each substation\'s service territory. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive ' +
+      'economic fabric (R3 ≥ 1.14) with High or Critical risk classification — the highest VoLL-weighted exposure in the fleet.';
 
     // B.2 Narrative
     var topTierSubs = fleet.filter(tiers[0].filter);
@@ -573,7 +573,7 @@
     document.getElementById('b2-narrative').innerHTML =
       'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
       'depend on uninterrupted power for continuous processes (steel, glass, automotive). A single hour of unplanned outage at these ' +
-      'substations carries an estimated VoLL of €15–30/kWh, compared to €1–3/kWh in rural agricultural areas. ' +
+      'substations carries an estimated VoLL of €10–20/kWh, compared to €1–3/kWh in rural agricultural zones. ' +
       'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
       'Southern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
       'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
