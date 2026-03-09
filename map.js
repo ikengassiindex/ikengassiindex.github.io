@@ -604,7 +604,8 @@
     // 12. Confidence
     var confidence = ssi.confidence_tier || na;
     // 13. Fleet percentile
-    var fleetPct = ssi.fleet_percentile != null ? (ssi.fleet_percentile * 100).toFixed(1) + '%' : na;
+    var fpRaw = ssi.fleet_percentile;
+    var fleetPct = fpRaw != null ? (fpRaw > 1 ? fpRaw.toFixed(1) : (fpRaw * 100).toFixed(1)) + '%' : na;
 
     return row('Unemployment', unemployment) +
       row('GDP per capita', gdp) +
