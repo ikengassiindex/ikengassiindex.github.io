@@ -22,7 +22,7 @@
 
   <!-- Tabs -->
   <div class="tabs animate-in delay-1">
-    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">regions Ranking</button>
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regions Ranking</button>
     <button class="tab-btn" onclick="switchTab(this,'tab-compare')">County Comparison</button>
     <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
   </div>
@@ -32,7 +32,7 @@
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
         <h3>Regions Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">17 Regiones · sorted worst → best</span>
+        <span class="label-xs" id="ranking-count">12 Regions · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
@@ -99,7 +99,7 @@
     <div class="card animate-in">
       <div class="card-header">
         <h3>Average Component Contribution by Region</h3>
-        <span class="label-xs">Stacked horizontal bars · 17 Regiones</span>
+        <span class="label-xs">Stacked horizontal bars · 12 Regions</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
         <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
@@ -150,7 +150,7 @@ function pct(v) { return v.toFixed(1) + '%'; }
 function renderRanking(data) {
   var regions = data.regions.slice().sort(function(a, b) { return b.median_R - a.median_R; });
   var tbody = document.getElementById('ranking-tbody');
-  document.getElementById('ranking-count').textContent = regions.length + ' Regiones · sorted worst → best';
+  document.getElementById('ranking-count').textContent = regions.length + ' Regions · sorted worst → best';
 
   tbody.innerHTML = regions.map(function(r, i) {
     var total = r.count;

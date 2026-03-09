@@ -99,7 +99,7 @@ window.SSIMetadata = (function () {
       metrics: [
         { id: 'T1', name: 'DER Stress Index', intra: 1.00, global: 0.050, norm: 'B (composite)', source: 'Ofgem FIT/RO + NGESO + DGT', desc: 'Composite: α_DER(0.50) × N(DER_ratio) + α_VAR(0.30) × N(variability) + α_EV(0.20) × N(EV_load)', isNew: true,
           submetrics: [
-            { id: 'DER_ratio', name: 'DER Penetration Ratio', weight: 0.50, source: 'BEIS/DESNZ Registry + REE', desc: 'DER capacity / peak load by county' },
+            { id: 'DER_ratio', name: 'DER Penetration Ratio', weight: 0.50, source: 'BEIS/DESNZ Registry + NGESO', desc: 'DER capacity / peak load by county' },
             { id: 'DER_variability', name: 'DER Output Variability', weight: 0.30, source: 'ENTSO-E Transparency', desc: 'σ/μ of weekly DER output (coefficient of variation)' },
             { id: 'EV_load_ratio', name: 'EV Load Burden', weight: 0.20, source: 'DfT + BEIS/DESNZ', desc: 'EV count × 7.4kW / transformer capacity' },
           ]
@@ -129,7 +129,7 @@ window.SSIMetadata = (function () {
         { name: 'V_socio Fiscal Enrichment', effect: 'Up to +8% V_socio penalty', sources: 'ONS + DEFRA/EA + Ofgem' },
         { name: 'Demographic Shift Amplifier', effect: 'Up to +8% C_mult for population decline', sources: 'ONS Demographics' },
         { name: 'Elderly Vulnerability', effect: '×[1.0, 1.10] for high elderly %', sources: 'ONS Demographics' },
-        { name: 'flood/storm Flood Zone Amplifier', effect: 'Up to +15% C_mult for flood/storm-affected zones', sources: 'Cabinet Office / IGN' },
+        { name: 'flood/storm Flood Zone Amplifier', effect: 'Up to +15% C_mult for flood/storm-affected zones', sources: 'Cabinet Office / OS' },
       ]
     },
     {
@@ -157,7 +157,7 @@ window.SSIMetadata = (function () {
     {
       id: 'R6b', name: 'Seismic Hazard (BGS Seismic Hazard)',
       range: '[1.00, 1.25]', type: 'Multiplicative',
-      desc: 'Seismic zone modifier based on BGS Seismic Hazard classification. Penalises substations in high-PGA zones (West Midlands-Almería seismic corridor).',
+      desc: 'Seismic zone modifier based on BGS Seismic Hazard classification. Penalises substations in high-PGA zones (West Midlands seismic corridor).',
       formula: 'R6b_seis = clip(1.0 + (zone − 1) × 0.25, 1.00, 1.25)',
       sources: ['BGS', 'GFZ', 'BGS Seismic Hazard'],
       isNew: true
@@ -180,10 +180,10 @@ window.SSIMetadata = (function () {
     { id: 'B.3', name: 'Grid Telemetry: Fuzzy/Markov', vars: 12, status: 'LIVE (MARKOV)', sources: 'IEEE/CIGRÉ standards · BEIS/DESNZ · EEA' },
     { id: 'C',   name: 'Socio-Economic',               vars: 9,  status: 'LIVE',        sources: 'ONS · DEFRA/EA · Eurostat · DESI · ONS LMS' },
     { id: 'D',   name: 'Environmental Hazards',         vars: 7,  status: 'LIVE',        sources: 'EEA · GFZ · BGS · ISO 9223 · Copernicus CDS' },
-    { id: 'E',   name: 'British Open Data',              vars: 8,  status: 'LIVE',        sources: 'DEFRA/EA · BEIS/DESNZ · ONS · Ofgem · REE' },
+    { id: 'E',   name: 'British Open Data',              vars: 8,  status: 'LIVE',        sources: 'DEFRA/EA · BEIS/DESNZ · ONS · Ofgem · NGESO' },
     { id: 'F',   name: 'Network Transitions',           vars: 12, status: 'LIVE (BAYESIAN)', sources: 'DNO history OR IEEE/CIGRÉ + priors' },
     { id: 'G',   name: 'Modifier Inputs',               vars: 3,  status: 'LIVE',        sources: 'Ofgem Monitoring · OSM Power · JRC DNO', isNew: true },
-    { id: 'H',   name: 'Network & Topology',            vars: 7,  status: 'LIVE',        sources: 'NGESO Grid Plan · GFZ · OSM · IGN', isNew: true },
+    { id: 'H',   name: 'Network & Topology',            vars: 7,  status: 'LIVE',        sources: 'NGESO Grid Plan · GFZ · OSM · OS', isNew: true },
     { id: 'I',   name: 'Output Scores',                 vars: 7,  status: 'LIVE',        sources: 'Fleet Markov Chain · IEEE/CIGRÉ analysis', isNew: true },
   ];
 
@@ -231,17 +231,17 @@ window.SSIMetadata = (function () {
   // ─── Validation Framework ─────────────────────────────────
   const VALIDATION_CHECKS = [
     { check: 'Metropolitan–Rural convergence gap',  criterion: 'London/Manchester R systematically lower than rural Powys/Highlands', status: 'verified' },
-    { check: 'IRI-climate coherence',       criterion: 'I1 peaks Pyrenean Huesca · I3 peaks Mediterranean West Midlands/Almería', status: 'verified' },
+    { check: 'IRI-climate coherence',       criterion: 'I1 peaks Scottish Highlands · I3 peaks coastal South-East England', status: 'verified' },
     { check: 'Saturation-RPF coherence',    criterion: 'S1 > 7.78 ↔ S2 > 5% agreement > 90%', status: 'verified' },
     { check: 'Ratio test',                  criterion: 'R(worst) / R(best) ≥ 5×', status: 'verified' },
     { check: 'Monotonicity',               criterion: 'Each metric worsening → R increases', status: 'verified' },
     { check: 'CI width quality signal',     criterion: 'Regional-only subs have wider CI', status: 'verified' },
     { check: 'T1-DER coherence',           criterion: 'T1 peaks in Wales solar-belt and Yorkshire wind-corridor', status: 'verified' },
     { check: 'R6a speed coherence',         criterion: 'R6a < 1.0 for London, R6a > 1.0 for rural Powys/Highlands', status: 'verified' },
-    { check: 'R6b seismic coherence',       criterion: 'R6b > 1.10 for West Midlands-Almería corridor, R6b ≈ 1.00 for Northern Ireland', status: 'verified' },
+    { check: 'R6b seismic coherence',       criterion: 'R6b > 1.10 for West Midlands corridor, R6b ≈ 1.00 for Northern Ireland', status: 'verified' },
     { check: 'Energy poverty gradient',    criterion: 'V_socio correlates with Northern Ireland > Wales > North West > Scotland', status: 'verified' },
     { check: 'R4 bridge identification',   criterion: 'is_bridge=1 subs have higher R than degree-matched non-bridges', status: 'verified' },
-    { check: 'Climate trajectory direction', criterion: 'I3 trajectory > 1.0 in South-East, I1 stable in Pyrenean North', status: 'verified' },
+    { check: 'Climate trajectory direction', criterion: 'I3 trajectory > 1.0 in South-East, I1 stable in Scottish North', status: 'verified' },
     { check: 'Weight sum invariant',        criterion: 'Σ w_component = 1.000 exactly', status: 'verified' },
     { check: 'flood/storm flood coherence',        criterion: 'Somerset/East Anglia/West Midlands flood scores highest in fleet', status: 'verified' },
     { check: 'Corrosion class gradient',   criterion: 'Coastal counties (Cornwall/Pembrokeshire) C3–C5 > inland Midlands C1–C2', status: 'verified' },
@@ -263,7 +263,7 @@ window.SSIMetadata = (function () {
     { id: 'G1', section: '§12',    change: 'BEIS/DESNZ upgraded to quarterly registry — County-level DER registry', type: 'data' },
     { id: 'G2', section: '§12',    change: 'BGS upgraded to live API — County-level seismic data', type: 'data' },
     { id: 'G3', section: '§12',    change: 'OSM upgraded to Overpass API — 3,150 real substations', type: 'data' },
-    { id: 'G4', section: '§5',     change: 'R6b Seismic Hazard modifier — BGS Seismic Hazard classification from IGN', type: 'new' },
+    { id: 'G4', section: '§5',     change: 'R6b Seismic Hazard modifier — BGS Seismic Hazard classification from BGS', type: 'new' },
     { id: 'G5', section: '§12',    change: 'Network & Topology layer (H): 7 variables — NGESO Grid Plan, seismic analysis', type: 'new' },
     { id: 'G6', section: '§12',    change: 'Output Scores layer (I): 7 variables — risk_score, ETTC, stationary probs', type: 'new' },
   ];
