@@ -1142,8 +1142,8 @@
     // Load data
     const basePath = options.basePath || '';
     Promise.all([
-      fetch(basePath + 'grid-geo.json?v=12').then(r => r.json()),
-      fetch(basePath + 'ssi-data.json?v=17').then(r => r.json())
+      fetch(basePath + 'grid-geo.json?v=13').then(r => r.json()),
+      fetch(basePath + 'ssi-data.json?v=18').then(r => r.json())
     ]).then(([geo, ssi]) => {
       GEO = geo;
       SSI = ssi;
