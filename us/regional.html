@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare US states and counties by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Regional Analysis</title>
+<link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+<script src="../nav.js?v=15"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js"></script>
+<script>renderNav('regional');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Regional Analysis</h1>
+    <p>Compare US states and counties by SSI score, component breakdown, and socio-economic context across 5,004 substations in the US's 51 states.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs animate-in delay-1">
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">States Ranking</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">County Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
+  </div>
+
+  <!-- Tab: State Ranking -->
+  <div id="tab-ranking">
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">
+        <h3>States Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">51 States · sorted worst → best</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>State</th>
+            <th style="text-align:right">Median R</th>
+            <th style="text-align:right">Substations</th>
+            <th style="text-align:right">% Critical</th>
+            <th style="text-align:right">% High</th>
+            <th>Distribution</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: County Comparison -->
+  <div id="tab-compare" style="display:none">
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header"><h3>Select Counties to Compare</h3></div>
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">County A</div>
+            <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">County B</div>
+            <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+        </div>
+        <!-- Comparison Table -->
+        <table class="data-table" id="compare-table">
+          <thead>
+            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">—</th><th style="text-align:right" id="th-prov-b">—</th><th style="text-align:right">Delta</th></tr>
+          </thead>
+          <tbody id="compare-tbody">
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select counties above</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-header"><h3>Component Radar</h3></div>
+        <div id="radar-container" style="display:flex;flex-direction:column;align-items:center;color:var(--warm-grey);flex:1;min-height:0">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+            <svg id="radar-svg" width="320" height="300" viewBox="0 0 280 260"></svg>
+          </div>
+          <div id="radar-legend" style="display:flex;flex-direction:column;align-items:center;font-size:11px;padding-bottom:0px;margin-top:0px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Component Decomposition -->
+  <div id="tab-decomp" style="display:none">
+    <div class="card animate-in">
+      <div class="card-header">

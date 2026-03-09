@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(italy|germany|switzerland|austria|france|spain|uk)\//);
+  var match = path.match(/\/(italy|germany|switzerland|austria|france|spain|uk|us)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(italy|germany|switzerland|austria|france|spain|uk)\//);
+  var match = path.match(/\/(italy|germany|switzerland|austria|france|spain|uk|us)\//);
   return match ? match[1] : null;
 })();
 
@@ -23,7 +23,8 @@ var SSI_COUNTRY_LABELS = {
   austria: '🇦🇹 Austria',
   france: '🇫🇷 France',
   spain: '🇪🇸 Spain',
-  uk: '🇬🇧 United Kingdom'
+  uk: '🇬🇧 United Kingdom',
+  us: '🇺🇸 United States'
 };
 
 // Ikenga logo
@@ -198,7 +199,8 @@ function renderFooter() {
     austria: '95 variables · 35 sources · 1,406 substations (1,144 HV · 262 MV) across 9 Bundesländer',
     switzerland: '95 variables · 25 sources · 947 substations (147 HV · 776 MV) across 26 Cantons',
     france: '95 variables · 35 sources · 7,898 substations (996 EHV · 6,902 HV) across 13 Régions',
-    spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas'
+    spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas',
+    us: '95 variables · 40 sources · 5,004 substations (~175 EHV · ~4,830 HV) across 51 states'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
