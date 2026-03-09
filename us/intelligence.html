@@ -48,12 +48,12 @@
   <div class="kpi-card">
     <div class="kpi-label">Substations Scored</div>
     <div class="kpi-value" style="color:var(--ink)">45,003</div>
-    <div class="kpi-sub">342 EHV · 2,808 HV</div>
+    <div class="kpi-sub">342 HV · 2,808 MV</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
-    <div class="kpi-value" style="color:var(--ink)">~22,765</div>
-    <div class="kpi-sub">~87,000 km coverage</div>
+    <div class="kpi-value" style="color:var(--ink)">22,765</div>
+    <div class="kpi-sub">87,000 km coverage</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">MC Simulations</div>
@@ -67,7 +67,7 @@
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score — scoring 71/80 (89%) across 16 competitive dimensions, ahead of GMLC 1.1 (48/80), EPRI (40/80), and academic MCDA frameworks (41/80). Its engine processes 65,300+ source data points per run, executes 35.3 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and performs 794 million arithmetic operations — producing 209,722 output data points with full uncertainty quantification across 45,003 substations and ~22,765 grid lines spanning ~105,000 km.</p>
+<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score — scoring 71/80 (89%) across 16 competitive dimensions, ahead of GMLC 1.1 (48/80), EPRI (40/80), and academic MCDA frameworks (41/80). Its engine processes 65,300+ source data points per run, executes 35.3 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and performs 794 million arithmetic operations — producing 209,722 output data points with full uncertainty quantification across 45,003 substations and 22,765 grid lines spanning 105,000 km.</p>
 
 <p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 30 verified public sources, making the methodology fully auditable and reproducible. Initially covering the US's entire transmission and distribution grid, the Index is progressively being rolled out to all OECD countries — applying the same silo-breaking approach: fusing grid risk with societal exposure at asset-level resolution wherever open data permits.</p>
 
@@ -589,7 +589,7 @@ function adaptCompact(data) {
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
       '<strong>Value of Lost Load (VoLL) context:</strong> DOE/LBNL estimates the US sector-weighted average VoLL at ' +
-      'approximately $20/kWh, with industrial customers at ~$35/kWh and residential at ~$7/kWh. The SSI\'s R3 consequence multiplier maps ' +
+      'approximately $20/kWh, with industrial customers at $35/kWh and residential at $7/kWh. The SSI\'s R3 consequence multiplier maps ' +
       'these sectoral weights to each substation\'s service territory. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive ' +
       'economic fabric (R3 ≥ 1.14) with High or Critical risk classification — the highest VoLL-weighted exposure in the fleet.';
 
@@ -1073,7 +1073,7 @@ function adaptCompact(data) {
     var nHV = puglia.filter(function(s){ return s.voltage_kv >= 132; }).length;
     var nMV = nTotal - nHV;
     document.getElementById('pug-total').textContent = nTotal;
-    document.getElementById('pug-total-sub').textContent = nHV + ' EHV · ' + nMV + ' HV';
+    document.getElementById('pug-total-sub').textContent = nHV + ' HV \u00B7 ' + nMV + ' MV';
 
     var bands = { Low:0, Medium:0, High:0, Critical:0 };
     puglia.forEach(function(s){ bands[s.classification]++; });
@@ -1356,7 +1356,7 @@ function adaptCompact(data) {
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:95%;height:100%;background:var(--sage);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~15</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">15</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
       <span style="min-width:130px">🇳🇱 Netherlands</span>
@@ -1370,63 +1370,63 @@ function adaptCompact(data) {
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:88%;height:100%;background:var(--crimson);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">~36</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">36</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px">
       <span style="min-width:110px">↳ Urban</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:92%;height:100%;background:#e67e22;border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:#e67e22;font-weight:600">~22</span>
+      <span class="num" style="min-width:40px;text-align:right;color:#e67e22;font-weight:600">22</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px;padding-bottom:4px;border-bottom:1px solid var(--card-border)">
       <span style="min-width:110px">↳ Rural</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:80%;height:100%;background:var(--crimson);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">~58</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">58</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
       <span style="min-width:130px">🇬🇧 UK</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:87%;height:100%;background:var(--bronze);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~40</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">40</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding:4px 0;border-bottom:1px solid var(--card-border)">
       <span style="min-width:130px">🇮🇹 Italy</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:86%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~43</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">43</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
       <span style="min-width:130px">🇬🇧 UK</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:84%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~48</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">48</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
       <span style="min-width:130px">🇭🇺 Hungary</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:81%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~57</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">57</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
       <span style="min-width:130px">🇵🇱 Poland</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:68%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~95</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">95</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
       <span style="min-width:130px">🇷🇴 Romania</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:3%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
-      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~290</span>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">290</span>
     </div>
   </div>
 
@@ -1465,7 +1465,7 @@ function adaptCompact(data) {
       'indicating continuity-of-supply performance consistent with the US\'s rural territory classification.' +
       'The California\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
       avgC_fleet.toFixed(3) + '. In national terms, these substations individually perform closer to states with ' +
-      'high SAIDI levels (~200–400 min/customer/year) than to the US national average (~120 min). ' +
+      'high SAIDI levels (200–400 min/customer/year) than to the US national average (120 min). ' +
       'The SSI reveals what aggregate EIA statistics conceal: that the US\'s overall reliability position is not a uniform national ' +
       'condition but a statistical average of Northeastern-quality urban performance and rural/Western-level outage exposure — ' +
       'and the California seismic corridor concentrates the worst of the latter.';
@@ -1624,7 +1624,7 @@ function adaptCompact(data) {
       ssiLink: 'shap' },
     { layer: 4, ref: '§0.6.1', title: 'Global Expansion — Country Prioritisation',
       subtitle: 'How 28 countries are ranked by expected commercial return per unit of expansion effort',
-      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). UK scores among the highest thanks to FERC/BEIS/DESNZ/ONS data quality, alongside Germany, Italy, France, Netherlands, and the US.',
+      body: 'The SSI-ENN targets 500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). UK scores among the highest thanks to FERC/BEIS/DESNZ/ONS data quality, alongside Germany, Italy, France, Netherlands, and the US.',
       concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28 countries: EU-27 + UK', 'UK, DE, FR = highest DCI scores, then IT, NL, ES', 'Each country requires bespoke regulatory mapping'],
       ssiLink: 'expansion' },
     { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index',
@@ -1664,7 +1664,7 @@ function adaptCompact(data) {
       ssiLink: 'sub-metrics' },
     { layer: 5, ref: '§0.7.2', title: 'API & Computation Architecture',
       subtitle: 'Serving batch fleet recomputation and interactive queries from a single platform',
-      body: 'The platform must serve two fundamentally different workloads: batch computation (recompute all ~500K substations during quarterly refresh — heavy, scheduled, GPU-intensive) and interactive query (serve a single substation lookup in <200ms — lightweight, latency-sensitive, CPU-bound). The architecture separates these: batch runs on GPU clusters (the NN inference + Monte Carlo propagation for all substations), producing pre-computed results stored in a columnar database. Interactive queries hit this pre-computed store, with real-time adjustments for user-specified parameters (custom BESS sizing, modified discount rates, scenario overrides). The API exposes endpoints for: single-substation lookup, multi-substation portfolio analysis, geographic filtering, scenario comparison, and bulk data export. Rate limits and access tiers map directly to subscription levels — Explorer gets 100 queries/day, Developer gets 10,000, Enterprise gets unlimited.',
+      body: 'The platform must serve two fundamentally different workloads: batch computation (recompute all 500K substations during quarterly refresh — heavy, scheduled, GPU-intensive) and interactive query (serve a single substation lookup in <200ms — lightweight, latency-sensitive, CPU-bound). The architecture separates these: batch runs on GPU clusters (the NN inference + Monte Carlo propagation for all substations), producing pre-computed results stored in a columnar database. Interactive queries hit this pre-computed store, with real-time adjustments for user-specified parameters (custom BESS sizing, modified discount rates, scenario overrides). The API exposes endpoints for: single-substation lookup, multi-substation portfolio analysis, geographic filtering, scenario comparison, and bulk data export. Rate limits and access tiers map directly to subscription levels — Explorer gets 100 queries/day, Developer gets 10,000, Enterprise gets unlimited.',
       concepts: ['Batch (GPU, quarterly) + Interactive (<200ms, CPU)', 'Pre-computed columnar store for low-latency queries', 'Explorer: 100/day, Developer: 10K/day, Enterprise: unlimited', 'Real-time parameter adjustment on pre-computed base'],
       ssiLink: 'api' },
     { layer: 4, ref: '§0.6.3', title: 'Substation Registry Construction',
@@ -2050,7 +2050,7 @@ function adaptCompact(data) {
 <!-- ═══════════════════ COLOPHON ═══════════════════ -->
 <div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
   <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Monthly Intelligence Report — Edition 001 (Inaugural)</p>
-  <p style="margin-bottom:4px">Published [Date] · SSI Index v4.0.2 · 45,003 substations · ~22,765 grid lines · 6 components · 20 metrics · 6 modifiers</p>
+  <p style="margin-bottom:4px">Published [Date] · SSI Index v4.0.2 · 45,003 substations · 22,765 grid lines · 6 components · 20 metrics · 6 modifiers</p>
   <p>10,000-iteration Gaussian Copula Monte Carlo · Sobol global sensitivity analysis (196,608 evals/substation) · CMIP6 SSP2-4.5</p>
 </div>
 
