@@ -200,7 +200,7 @@ function renderFooter() {
     switzerland: '95 variables · 25 sources · 947 substations (147 HV · 776 MV) across 26 Cantons',
     france: '95 variables · 35 sources · 7,898 substations (996 EHV · 6,902 HV) across 13 Régions',
     spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas',
-    us: '95 variables · 40 sources · 5,004 substations (~175 EHV · ~4,830 HV) across 51 states'
+    us: '95 variables · 40 sources · 45,003 substations (~1,726 EHV · ~36,654 MV) across 52 states'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 

@@ -14,7 +14,7 @@ window.SSIMetadata = (function () {
     { id: 'Census',  name: 'Census Bureau (US Census Bureau)',                     url: 'census.gov',                     freq: 'Annual',    res: 'County',       vars: 8,  category: 'Socio-Econ',    feeds: 'R3 population, elderly, per-capita income, fiscal capacity' },
     { id: 'EIA-ISO', name: 'EIA/ISO-RTE (PJM/CAISO/MISO) — Data Portal',               url: 'eia.gov / pjm.com / caiso.com',              freq: 'Hourly',    res: 'Balancing Authority',    vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'USGS',    name: 'USGS (US Geological Survey)',                    url: 'usgs.gov',                     freq: 'Static',    res: 'County',       vars: 3,  category: 'Hazard',        feeds: 'USGS seismic hazard, PGA values' },
-    { id: 'OSM',     name: 'OSM Power Infrastructure',                                    url: 'overpass-api.de',            freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 5,004 substations' },
+    { id: 'OSM',     name: 'OSM Power Infrastructure',                                    url: 'overpass-api.de',            freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 45,003 substations' },
     { id: 'CDS',     name: 'Copernicus CDS / ERA5',                                       url: 'cds.climate.copernicus.eu',  freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
     { id: 'NERC',    name: 'NERC (North American Electric Reliability Corp)',             url: 'nerc.com',     freq: 'Annual',    res: 'Regional',    vars: 2,  category: 'Standards',     feeds: 'Reliability standards, regional compliance metrics' },
     { id: 'FEMA',    name: 'FEMA / EPA (Federal Emergency Management Agency)',            url: 'fema.gov / epa.gov',          freq: 'Annual',    res: 'County',            vars: 4,  category: 'Environment',   feeds: 'Energy poverty, flood risk, environmental indicators' },
@@ -141,7 +141,7 @@ window.SSIMetadata = (function () {
     {
       id: 'R4', name: 'Graph-Theoretic Network Criticality',
       range: '[0.80, 1.35]', type: 'Multiplicative',
-      desc: 'Combines degree centrality, betweenness centrality, and topological bridge detection from OSM power graph. Built from 5,004 substations.',
+      desc: 'Combines degree centrality, betweenness centrality, and topological bridge detection from OSM power graph. Built from 45,003 substations.',
       formula: 'F_topo = clip(base_factor(degree) × (1 + 0.10 × BC_percentile + 0.15 × is_bridge), 0.80, 1.35)',
       sources: ['OSM Overpass API'],
       isEnhanced: true
@@ -171,7 +171,7 @@ window.SSIMetadata = (function () {
     {
       id: 'R7', name: 'Digital Readiness Proxy',
       range: '[0.99, 1.05]', type: 'Multiplicative',
-      desc: 'County-level continuous model based on NTIA Broadband digital readiness scores, CISA baseline, urban/rural adjustments. Unique values across 5,004 substations.',
+      desc: 'County-level continuous model based on NTIA Broadband digital readiness scores, CISA baseline, urban/rural adjustments. Unique values across 45,003 substations.',
       formula: 'R7_cyber(s) = clip( NTIA_base(county) + urban_adj(county) + HV_bonus(voltage) + noise, 0.99, 1.05 )',
       sources: ['NTIA Broadband Map', 'CISA', 'DOE CESER'],
       isNew: true
@@ -268,7 +268,7 @@ window.SSIMetadata = (function () {
     { id: 'L5', section: '§8, §12', change: '95/95 variables operational (100%). 40 data sources total.', type: 'data' },
     { id: 'G1', section: '§12',    change: 'DOE upgraded to quarterly registry — County-level DER registry', type: 'data' },
     { id: 'G2', section: '§12',    change: 'USGS upgraded to live API — County-level seismic data', type: 'data' },
-    { id: 'G3', section: '§12',    change: 'OSM upgraded to Overpass API — 5,004 real substations (US)', type: 'data' },
+    { id: 'G3', section: '§12',    change: 'OSM upgraded to Overpass API — 45,003 real substations (US)', type: 'data' },
     { id: 'G4', section: '§5',     change: 'R6b Seismic Hazard modifier — USGS Seismic Hazard classification', type: 'new' },
     { id: 'G5', section: '§12',    change: 'Network & Topology layer (H): 7 variables — EIA Grid Plan, seismic analysis', type: 'new' },
     { id: 'G6', section: '§12',    change: 'Output Scores layer (I): 7 variables — risk_score, ETTC, stationary probs', type: 'new' },
@@ -308,11 +308,11 @@ window.SSIMetadata = (function () {
       components: 6,
       modifiers: 5,
       sources: 40,
-      substations: 5004,
-      powerLines: 0,
+      substations: 45003,
+      powerLines: 68400,
       mcIterations: 10000,
-      counties: 190,
-      regions: 51
+      counties: 1800,
+      regions: 52
     }
   };
 })();
