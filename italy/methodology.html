@@ -3,437 +3,1060 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 8 modifiers, 95 variables, 30 data sources, Monte Carlo uncertainty. Open, reproducible.">
-<meta name="theme-color" content="#941914">
-<title>SSI Index — Methodology</title>
-<link rel="stylesheet" href="../style.css?v=3">
+<title>DNO Italy — BESS Site Assessment Methodology v2.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --paper: #faf9f6;
+  --accent: #a0522d;
+  --accent2: #2c3e7a;
+  --accent3: #1a6b4a;
+  --accent4: #d4740e;
+  --muted: #6b7280;
+  --border: #d1cfc9;
+  --code-bg: #f0ede6;
+  --highlight: #fff8e1;
+  --tag-bg: #e8e6df;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+  --sans: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --teal: #0e7490;
+  --red: #c0392b;
+  --purple: #8e44ad;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--serif); color: var(--ink); background: var(--paper); line-height: 1.72; -webkit-font-smoothing: antialiased; }
+.page { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+/* HEADER */
+.header { text-align: center; padding: 3.5rem 0 2.5rem; border-bottom: 3px double var(--border); margin-bottom: 3rem; }
+.header .tag { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); background: rgba(160,82,45,0.08); padding: 0.3em 1em; border-radius: 2px; margin-bottom: 1rem; }
+.header h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0.5rem 0; }
+.header .subtitle { font-size: 1.1rem; color: var(--muted); font-weight: 300; font-style: italic; margin-top: 0.5rem; }
+.meta-row { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; font-family: var(--sans); font-size: 0.78rem; color: var(--muted); flex-wrap: wrap; }
+
+/* TOC */
+.toc { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 1.8rem 2.2rem; margin-bottom: 3rem; }
+.toc h3 { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.8rem; }
+.toc ol { columns: 2; column-gap: 2rem; padding-left: 1.2rem; font-size: 0.92rem; }
+.toc li { margin-bottom: 0.35rem; break-inside: avoid; }
+.toc a { color: var(--accent2); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* SECTIONS */
+.section { margin-bottom: 3.5rem; }
+.section-num { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--accent); display: block; margin-bottom: 0.3rem; }
+h2 { font-size: 1.65rem; font-weight: 700; line-height: 1.25; margin-bottom: 1.2rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.15rem; font-weight: 600; margin: 1.8rem 0 0.8rem; color: var(--accent2); }
+h4 { font-family: var(--sans); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 1.5rem 0 0.6rem; }
+p { margin-bottom: 1rem; }
+
+/* FORMULA BOXES */
+.formula-box { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 0 4px 4px 0; padding: 1.5rem 2rem; margin: 1.5rem 0; font-family: var(--mono); font-size: 0.85rem; line-height: 1.9; overflow-x: auto; }
+.formula-box .main-eq { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-bottom: 0.8rem; display: block; }
+.formula-box .where { color: var(--muted); font-size: 0.78rem; }
+.formula-box .label { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); display: block; margin-bottom: 0.5rem; }
+
+/* TABLES */
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 1.2rem 0 1.5rem; }
+thead { background: var(--ink); color: #fff; }
+thead th { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.7rem 0.8rem; text-align: left; font-weight: 600; }
+tbody td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+.td-mono { font-family: var(--mono); font-size: 0.82rem; }
+.td-num { text-align: right; font-family: var(--mono); font-weight: 500; }
+.td-accent { color: var(--accent); font-weight: 600; }
+.td-green { color: var(--accent3); font-weight: 600; }
+
+/* PIPELINE */
+.pipeline { display: flex; align-items: center; gap: 0; margin: 2rem 0; font-family: var(--sans); font-size: 0.72rem; overflow-x: auto; }
+.pipe-step { background: var(--code-bg); border: 1px solid var(--border); padding: 0.6rem 0.7rem; white-space: nowrap; text-align: center; position: relative; min-width: 80px; }
+.pipe-step:first-child { border-radius: 6px 0 0 6px; }
+.pipe-step:last-child { border-radius: 0 6px 6px 0; }
+.pipe-step strong { display: block; font-family: var(--mono); color: var(--accent); font-size: 0.82rem; }
+.pipe-step .count { font-family: var(--mono); font-weight: 700; font-size: 0.9rem; color: var(--accent3); }
+.pipe-arrow { width: 0; height: 0; border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-left: 10px solid var(--border); flex-shrink: 0; }
+
+/* NOTES */
+.note { background: var(--highlight); border-left: 3px solid #f39c12; padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.88rem; border-radius: 0 4px 4px 0; }
+.note strong { color: #d68910; }
+.note-blue { background: #eaf2f8; border-left: 3px solid var(--accent2); padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.88rem; border-radius: 0 4px 4px 0; }
+.note-blue strong { color: var(--accent2); }
+.note-green { background: #e8f8f0; border-left: 3px solid var(--accent3); padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.88rem; border-radius: 0 4px 4px 0; }
+.note-green strong { color: var(--accent3); }
+.note-red { background: #fdedec; border-left: 3px solid var(--red); padding: 0.8rem 1.2rem; margin: 1.2rem 0; font-size: 0.88rem; border-radius: 0 4px 4px 0; }
+.note-red strong { color: var(--red); }
+
+/* FILTER CARDS */
+.filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+.filter-card { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 1.2rem 1.4rem; position: relative; overflow: hidden; }
+.filter-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.filter-card.pass::before { background: var(--accent3); }
+.filter-card.flag::before { background: var(--purple); }
+.filter-card.elim::before { background: var(--red); }
+.filter-card .step-num { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 0.3rem; }
+.filter-card.pass .step-num { color: var(--accent3); }
+.filter-card.flag .step-num { color: var(--purple); }
+.filter-card.elim .step-num { color: var(--red); }
+.filter-card .step-title { font-family: var(--sans); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.4rem; }
+.filter-card .step-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.filter-card .step-result { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; margin-top: 0.5rem; }
+
+code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.15em 0.4em; border-radius: 3px; }
+.tag-live { font-family: var(--mono); font-size: 0.65rem; background: #d5f5e3; color: var(--accent3); padding: 0.15em 0.5em; border-radius: 2px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.tag-pending { font-family: var(--mono); font-size: 0.65rem; background: #fdebd0; color: #935116; padding: 0.15em 0.5em; border-radius: 2px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.tag-flag { font-family: var(--mono); font-size: 0.65rem; background: #ebdef0; color: var(--purple); padding: 0.15em 0.5em; border-radius: 2px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+/* BAR CHART */
+.bar-chart { margin: 1.5rem 0 2rem; }
+.bar-row { display: flex; align-items: center; margin-bottom: 0.35rem; gap: 0.5rem; }
+.bar-label { font-family: var(--sans); font-size: 0.72rem; width: 100px; text-align: right; flex-shrink: 0; color: var(--muted); }
+.bar-track { flex: 1; height: 22px; background: #f0ede6; border-radius: 3px; position: relative; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 0.5rem; transition: width 0.6s; }
+.bar-fill span { font-family: var(--mono); font-size: 0.65rem; font-weight: 600; color: #fff; white-space: nowrap; }
+
+/* FILTER CARD GRID — 3 columns */
+.filter-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+
+@media (max-width: 700px) {
+  .page { padding: 1.5rem 1rem 4rem; }
+  .header h1 { font-size: 1.8rem; }
+  .filter-grid { grid-template-columns: 1fr; }
+  .filter-grid-3 { grid-template-columns: 1fr; }
+  .toc ol { columns: 1; }
+  .meta-row { flex-direction: column; gap: 0.5rem; }
+}
+@media print {
+  body { font-size: 10pt; }
+  .page { max-width: 100%; padding: 0; }
+  .section { page-break-inside: avoid; }
+}
+</style>
 </head>
 <body>
-<script src="../nav.js?v=15"></script>
-<script src="../ssi-engine.js"></script>
-<script src="../ssi-metadata.js"></script>
-<script>renderNav('methodology');</script>
+<div class="page">
 
-<main class="page-shell" style="max-width:860px">
-  <div class="page-header animate-in">
-    <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+<!-- HEADER -->
+<header class="header">
+  <span class="tag">Ikenga Project &mdash; Technical Reference</span>
+  <h1>BESS Site Assessment Methodology</h1>
+  <p class="subtitle">MV Substation Capacity &amp; Suitability Screening for 9.9&nbsp;MW<sub>n</sub> Battery Energy Storage<br>
+  <em>Italy &mdash; Distribution Grid (Cabine Primarie)</em></p>
+  <div class="meta-row">
+    <span>&#x26A1; 2,501 substations assessed</span>
+    <span>&#x1F50D; 9 filter steps &middot; 1 flag layer</span>
+    <span>&#x1F4CA; 60+ variables per substation</span>
+    <span>&#x1F4C5; v2.2 &mdash; 10 March 2026</span>
   </div>
+</header>
 
-  <!-- Thesis -->
-  <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
-    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
-    <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A substation serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
-    </p>
+<!-- TOC -->
+<nav class="toc">
+<h3>Contents</h3>
+<ol>
+  <li><a href="#s1">Screening Objective &amp; Design Philosophy</a></li>
+  <li><a href="#s2">Processing Pipeline &amp; Filter Funnel</a></li>
+  <li><a href="#s3">Step 1 &mdash; Universe Definition</a></li>
+  <li><a href="#s4">Step 2 &mdash; Physical Space Assessment</a></li>
+  <li><a href="#s5">Step 3 &mdash; Electrical Headroom</a></li>
+  <li><a href="#s6">Land Radius Search &mdash; 500m Proximity Analysis</a></li>
+  <li><a href="#s7">Step 4 &mdash; Generation Saturation <em>[Informative]</em></a></li>
+  <li><a href="#s8">Step 5 &mdash; Flood Zone Exclusion</a></li>
+  <li><a href="#s9">Step 6 &mdash; Land Availability</a></li>
+  <li><a href="#s10">Step 7 &mdash; Terrain Slope Analysis</a></li>
+  <li><a href="#s11">Step 8 &mdash; Evacuation Route Assessment</a></li>
+  <li><a href="#s11b">Step 9 &mdash; Buffer Zone Analysis</a></li>
+  <li><a href="#s12">Grid Congestion Flag</a></li>
+  <li><a href="#s13">GSE Cabine Primarie Cross-Reference</a></li>
+  <li><a href="#s14">Data Source Registry</a></li>
+  <li><a href="#s15">Caveats, Limitations &amp; Assumptions</a></li>
+  <li><a href="#s16">Future Steps &amp; Roadmap</a></li>
+</ol>
+</nav>
+
+<!-- SECTION 1: OBJECTIVE -->
+<section class="section" id="s1">
+<span class="section-num">Section 01</span>
+<h2>Screening Objective &amp; Design Philosophy</h2>
+
+<p>This methodology describes a multi-layer screening process to identify Italian MV distribution substations (<em>cabine primarie</em>) suitable for connecting a <strong>9.9&nbsp;MW<sub>n</sub> grid-scale Battery Energy Storage System (BESS)</strong>. The 9.9&nbsp;MW threshold sits just below Italy's 10&nbsp;MW regulatory boundary for simplified connection procedures under CEI 0-16.</p>
+
+<h3>Design Principles</h3>
+
+<p><strong>Conservative-progressive funnel.</strong> Hard filters (Steps 1&ndash;9) eliminate substations that are clearly unsuitable on engineering, environmental, or geographic grounds. Soft flags (grid congestion) identify risk factors without eliminating &mdash; these inform due diligence at the site shortlisting stage. The philosophy is: <em>eliminate what is impossible, flag what is risky, rank what remains.</em></p>
+
+<p><strong>Open data only.</strong> Every dataset used in this methodology is publicly available at no cost. This ensures reproducibility and independence from proprietary DSO data. Where DSO data would be superior (e.g., actual transformer ratings, real-time load measurements), we note the gap and use the best available open proxy.</p>
+
+<p><strong>Living document.</strong> This methodology is versioned and designed to grow. New filters, enrichments, and data sources will be added over time as the project progresses from screening to site shortlisting to connection application.</p>
+
+<div class="note-blue">
+  <strong>Regulatory context:</strong> Italy's electricity distribution is governed by ARERA (Autorit&agrave; di Regolazione per Energia Reti e Ambiente). Connection procedures for generation &gt;10&nbsp;MW require a full TICA process; below 10&nbsp;MW, a simplified Econnextion procedure applies. Our 9.9&nbsp;MW<sub>n</sub> target is deliberately sized to benefit from the simplified regime.
+</div>
+</section>
+</section>
+<!-- SECTION 2: PIPELINE -->
+<section class="section" id="s2">
+<span class="section-num">Section 02</span>
+<h2>Processing Pipeline &amp; Filter Funnel</h2>
+
+<h3>Pipeline Overview</h3>
+<div class="pipeline">
+  <div class="pipe-step"><strong>&oplus;</strong>Ingest<br>28,342 subs</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;1</strong>Type<br><span class="count">2,501</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;2</strong>Space<br><span class="count">2,303</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;3</strong>Headroom<br><span class="count">1,924</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;4</strong>Saturation<br><span class="count">1,789</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;5</strong>Flood<br><span class="count">1,701</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;6</strong>Land<br><span class="count">1,658</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;7</strong>Slope<br><span class="count">1,401</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;8</strong>Evac<br><span class="count">748</span></div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step"><strong>&sect;9</strong>Buffer<br><span class="count">702</span></div>
+</div>
+
+<h3>Filter Funnel &mdash; Quantitative Summary</h3>
+<table>
+<thead><tr><th>Step</th><th>Criterion</th><th>Type</th><th>Remaining</th><th>% of Total</th><th>Eliminated</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">1</td><td>Distribution substations (OSM + GSE)</td><td><span class="tag-live">HARD</span></td><td class="td-num td-accent">2,501</td><td class="td-num">100%</td><td class="td-num">&mdash;</td></tr>
+<tr><td class="td-mono">2</td><td>Physical space (Scenario A or B fit)</td><td><span class="tag-live">HARD</span></td><td class="td-num">2,303</td><td class="td-num">95.8%</td><td class="td-num">102</td></tr>
+<tr><td class="td-mono">3</td><td>Electrical headroom &ge; 10 MVA (N-1 basis)</td><td><span class="tag-live">HARD</span></td><td class="td-num">1,924</td><td class="td-num">80.0%</td><td class="td-num">379</td></tr>
+<tr><td class="td-mono">4</td><td>Net headroom &ge; 10 MVA (after existing generation)</td><td><span class="tag-live">HARD</span></td><td class="td-num">1,789</td><td class="td-num">74.4%</td><td class="td-num">135</td></tr>
+<tr><td class="td-mono">5</td><td>Not in P3 flood zone (ISPRA mosaic)</td><td><span class="tag-live">HARD</span></td><td class="td-num">1,701</td><td class="td-num">70.7%</td><td class="td-num">88</td></tr>
+<tr><td class="td-mono">6</td><td>Land availability (Category A/B/C parcel)</td><td><span class="tag-live">HARD</span></td><td class="td-num">1,658</td><td class="td-num">68.9%</td><td class="td-num">43</td></tr>
+<tr><td class="td-mono">7</td><td>Terrain slope &le; 6% (Copernicus DEM)</td><td><span class="tag-live">HARD</span></td><td class="td-num">1,401</td><td class="td-num">58.3%</td><td class="td-num">257</td></tr>
+<tr><td class="td-mono">8</td><td>Evacuation route &le; 450m (OSM road network)</td><td><span class="tag-live">HARD</span></td><td class="td-num">748</td><td class="td-num">29.9%</td><td class="td-num">653</td></tr>
+<tr><td class="td-mono">9</td><td>Buffer zones (acoustic &amp; infrastructure DSP compliance)</td><td><span class="tag-live">HARD</span></td><td class="td-num td-green">702</td><td class="td-num td-green">28.1%</td><td class="td-num">46</td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Grid congestion (Terna critical areas)</td><td><span class="tag-flag">FLAG</span></td><td class="td-num">748</td><td class="td-num">&mdash;</td><td class="td-num">0 (461 flagged)</td></tr>
+</tbody>
+</table>
+
+<h3>Funnel Visualisation</h3>
+<div class="bar-chart">
+  <div class="bar-row"><span class="bar-label">Step 1</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--accent);"><span>2,501 (100%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 2</span><div class="bar-track"><div class="bar-fill" style="width:92.1%;background:var(--accent);"><span>2,303 (92.1%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 3</span><div class="bar-track"><div class="bar-fill" style="width:76.9%;background:var(--accent);"><span>1,924 (76.9%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 4</span><div class="bar-track"><div class="bar-fill" style="width:71.5%;background:var(--accent);"><span>1,789 (71.5%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 5</span><div class="bar-track"><div class="bar-fill" style="width:68.0%;background:var(--accent);"><span>1,701 (68.0%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 6</span><div class="bar-track"><div class="bar-fill" style="width:66.3%;background:var(--accent);"><span>1,658 (66.3%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 7</span><div class="bar-track"><div class="bar-fill" style="width:56.0%;background:var(--accent);"><span>1,401 (56.0%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 8</span><div class="bar-track"><div class="bar-fill" style="width:29.9%;background:var(--accent);"><span>748 (29.9%)</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">Step 9</span><div class="bar-track"><div class="bar-fill" style="width:28.1%;background:var(--accent3);"><span>702 (28.1%) &mdash; Final Candidates</span></div></div></div>
+</div>
+
+<div class="note-green">
+  <strong>Result:</strong> 702 distribution substations pass all nine screening filters and are shortlisted as candidates for a 9.9&nbsp;MW<sub>n</sub> BESS connection request. Of these, 127 carry a grid congestion flag (advisory only).
+</div>
+</section>
+</section>
+<!-- SECTION 3: STEP 1 -->
+<section class="section" id="s3">
+<span class="section-num">Section 03</span>
+<h2>Step 1 &mdash; Universe Definition</h2>
+
+<h3>Objective</h3>
+<p>Define the universe of candidate substations: all Italian <code>distribution</code>-type substations (cabine primarie) from OpenStreetMap, augmented with GSE (Gestore dei Servizi Energetici) cabine primarie data.</p>
+
+<div class="formula-box">
+  <span class="label">Inclusion Rule</span>
+  <span class="main-eq">substation.type = 'distribution' AND substation.country = 'IT'</span>
+  <span class="where">Excludes: minor_distribution (25,937 cabine secondarie), transmission (Terna RTN), industrial, traction, generation, converter substations.<br>
+  Augmented with: 96 GSE-identified substations not present in OSM (see Section 12).</span>
+</div>
+
+<h3>Rationale</h3>
+<p>Distribution substations are the natural connection point for MV-connected BESS. They receive HV power from Terna's transmission grid (typically 132&ndash;150&nbsp;kV) and step it down to MV (10&ndash;20&nbsp;kV). In Italy, these are the <em>cabine primarie</em>, operated primarily by e-distribuzione S.p.A. (~76%) and local distributors.</p>
+
+<p>Minor distribution substations (cabine secondarie) are excluded because: (a) they operate at LV (400V), too low for a 9.9&nbsp;MW connection; (b) their transformer capacity is typically 160&ndash;630&nbsp;kVA, far below 10&nbsp;MVA; (c) they have no spare HV/MV switchgear bays.</p>
+
+<h4>Data Sources</h4>
+<table>
+<thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Records</th><th>Format</th></tr></thead>
+<tbody>
+<tr><td>OpenStreetMap</td><td>power=substation, Italy bounding box</td><td>March 2026 (live)</td><td>28,342 (2,405 distribution)</td><td>OSM Overpass JSON</td></tr>
+<tr><td>GSE</td><td>Mappa Interattiva Cabine Primarie (2025&ndash;2027)</td><td>2025</td><td>2,143 service areas (96 new subs)</td><td>ArcGIS FeatureServer</td></tr>
+</tbody>
+</table>
+
+<h4>Classification Engine</h4>
+<p>The 2,405 OSM distribution substations are classified into four size categories using proxy variables (transformer count, HV line count, polygon area, voltage diversity):</p>
+
+<table>
+<thead><tr><th>Category</th><th>Criteria (any match)</th><th>Count</th><th>%</th><th>Est. Installed MVA</th><th>Firm N-1 MVA</th></tr></thead>
+<tbody>
+<tr><td><strong>Hub</strong></td><td>&ge;5 transformers OR &ge;4 voltage levels OR &ge;8 HV lines OR (area &gt;20k sqm + &ge;6 HV lines)</td><td class="td-num">354</td><td class="td-num">14.7%</td><td class="td-num">240</td><td class="td-num">200</td></tr>
+<tr><td><strong>Large</strong></td><td>&ge;3 transformers OR &ge;5 HV lines OR (area &gt;10k sqm + &ge;3 HV lines)</td><td class="td-num">518</td><td class="td-num">21.5%</td><td class="td-num">120</td><td class="td-num">80</td></tr>
+<tr><td><strong>Medium</strong></td><td>&ge;1 transformer OR &ge;3 HV lines OR area &gt;5k sqm</td><td class="td-num">1,094</td><td class="td-num">45.5%</td><td class="td-num">50</td><td class="td-num">25</td></tr>
+<tr><td><strong>Small</strong></td><td>All remaining</td><td class="td-num">439</td><td class="td-num">18.3%</td><td class="td-num">16</td><td class="td-num">0</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+  <strong>GSE augmentation:</strong> 96 additional substations from the GSE cross-reference (see Section 12) are categorised as <code>gse_new</code> and require Steps 2&ndash;4 assessment before entering the filter pipeline. The total Step 1 universe is 2,501 substations.
+</div>
+</section>
+</section>
+<!-- SECTION 4: STEP 2 -->
+<section class="section" id="s4">
+<span class="section-num">Section 04</span>
+<h2>Step 2 &mdash; Physical Space Assessment</h2>
+
+<h3>Objective</h3>
+<p>Determine whether each substation has sufficient physical space within its fenced perimeter to accommodate the equipment needed for a BESS connection.</p>
+
+<h3>Connection Scenarios</h3>
+
+<div class="filter-grid">
+  <div class="filter-card pass">
+    <div class="step-num">Scenario A &mdash; New Transformer Bay</div>
+    <div class="step-title">299 m&sup2; required</div>
+    <div class="step-desc">Full new HV/MV transformer bay including: power transformer (60 m&sup2;), oil containment bund (45 m&sup2;), HV circuit breaker bay (72 m&sup2;), fire wall (15 m&sup2;), MV switchgear (12 m&sup2;), cable trenches (20 m&sup2;), access road (60 m&sup2;), protection room (15 m&sup2;).</div>
+    <div class="step-result" style="color:var(--accent3);">2,250 substations fit (93.6%)</div>
   </div>
-
-  <!-- Pipeline -->
-  <div class="animate-in delay-2" style="margin-bottom:40px">
-    <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
-    <div class="method-step">
-      <div class="method-step-num">1</div>
-      <div class="method-step-content">
-        <h3>Ingest</h3>
-        <p>95 variables from 30 verified public data sources — E-Distribuzione, ARERA, ISTAT, Copernicus CDS, OSM, GSE, ENTSO-E, and 23 others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">2</div>
-      <div class="method-step-content">
-        <h3>Normalise</h3>
-        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">3</div>
-      <div class="method-step-content">
-        <h3>Weight</h3>
-        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">4</div>
-      <div class="method-step-content">
-        <h3>Compose R_base</h3>
-        <p>Weighted sum of 6 normalised component scores produces the base resilience score.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">5</div>
-      <div class="method-step-content">
-        <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (seismic hazard), R7 (cyber-exposure proxy). Plus 5 micro-enrichments for elderly vulnerability, flood zones, landslides, digital readiness, and healthcare criticality.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">6</div>
-      <div class="method-step-content">
-        <h3>Monte Carlo</h3>
-        <p>10,000 iterations per substation using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">7</div>
-      <div class="method-step-content">
-        <h3>Classify</h3>
-        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
-      </div>
-    </div>
+  <div class="filter-card pass">
+    <div class="step-num">Scenario B &mdash; MV Feeder Bay</div>
+    <div class="step-title">23 m&sup2; required</div>
+    <div class="step-desc">Minimal MV connection where spare transformer capacity exists: MV circuit breaker bay (8 m&sup2;), cable trench (10 m&sup2;), protection/metering panel (5 m&sup2;).</div>
+    <div class="step-result" style="color:var(--accent3);">53 additional (Scenario B only)</div>
   </div>
+</div>
 
-  <!-- Master Equation -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Master Equation</h3>
-      <span class="label-xs">v4.0.2</span>
-    </div>
-    <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_seis × Cyber_factor )
+<div class="formula-box">
+  <span class="label">Space Assessment Logic</span>
+  <span class="main-eq">available_area = fenced_area &times; (1 &minus; equipment_density)</span>
+  pass_A &nbsp;= available_area &ge; 299 m&sup2;<br>
+  pass_B &nbsp;= available_area &ge; 23 m&sup2;<br>
+  pass &nbsp;&nbsp;&nbsp;= pass_A OR pass_B<br><br>
+  <span class="where">Equipment density by category: Hub 60%, Large 50%, Medium 45%, Small 35%.<br>
+  Fenced area from OSM polygon footprint. Validated against Bing Maps aerial imagery at zoom 19+.</span>
+</div>
 
-<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+<h4>Result</h4>
+<table>
+<thead><tr><th>Outcome</th><th>Count</th><th>%</th></tr></thead>
+<tbody>
+<tr><td>Fits Scenario A (new transformer bay)</td><td class="td-num">2,250</td><td class="td-num">93.6%</td></tr>
+<tr><td>Fits Scenario B only (MV feeder)</td><td class="td-num">53</td><td class="td-num">2.2%</td></tr>
+<tr><td class="td-accent">Cannot fit either &rarr; ELIMINATED</td><td class="td-num td-accent">102</td><td class="td-num td-accent">4.2%</td></tr>
+</tbody>
+</table>
+</section>
+</section>
+<!-- SECTION 5: STEP 3 -->
+<section class="section" id="s5">
+<span class="section-num">Section 05</span>
+<h2>Step 3 &mdash; Electrical Headroom Assessment</h2>
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
-<span class="hl-var">R6b_seis</span> = <span class="hl-fn">seismic_hazard</span>(PGA_g, zone)              <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">province_DESI_cyber</span>(region, province, voltage) <span class="hl-comment">// R7 — [0.99, 1.05]</span>
-    </div>
+<h3>Objective</h3>
+<p>Estimate whether each substation has &ge;10&nbsp;MVA of spare firm capacity (on N-1 basis) to accommodate a 9.9&nbsp;MW BESS connection without triggering overload.</p>
+
+<div class="formula-box">
+  <span class="label">Headroom Calculation</span>
+  <span class="main-eq">headroom_MVA = firm_capacity_MVA &minus; estimated_load_MVA</span>
+  firm_capacity &nbsp;= (n_transformers &minus; 1) &times; rating_per_tx<br>
+  estimated_load = CS_count &times; 150 kW / (0.9 PF &times; 1000)<br>
+  pass &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= headroom_MVA &ge; 10<br><br>
+  <span class="where">CS_count: cabine secondarie assigned via Voronoi nearest-neighbour to each CP.<br>
+  150 kW per CS: ~70 households &times; 2.5 kW peak &times; 0.7 diversity factor.<br>
+  N-1: loss of largest single transformer &mdash; standard CEI 0-16 planning criterion.</span>
+</div>
+
+<h4>Data Sources</h4>
+<table>
+<thead><tr><th>Input</th><th>Source</th><th>Method</th></tr></thead>
+<tbody>
+<tr><td>Transformer count &amp; rating</td><td>OSM + category-based estimates</td><td>OSM actual where mapped; ENEL standard assumptions by category</td></tr>
+<tr><td>Downstream CS count</td><td>OSM minor_distribution (25,937)</td><td>Voronoi spatial assignment to nearest CP</td></tr>
+<tr><td>Peak load per CS</td><td>ENEL engineering practice</td><td>150 kW (250 kVA transformer at 60% utilisation)</td></tr>
+</tbody>
+</table>
+
+<h4>Result</h4>
+<p><strong>1,924 substations pass</strong> (&ge;10 MVA headroom). All 439 small substations eliminated &mdash; with a single transformer, they have zero firm capacity on N-1 basis. This is the correct engineering conclusion: a 9.9&nbsp;MW BESS cannot safely connect to a single-transformer substation.</p>
+</section>
+</section>
+<!-- SECTION 6: LAND RADIUS SEARCH -->
+<section class="section" id="s6">
+<span class="section-num">Section 06</span>
+<h2>Land Radius Search &mdash; 500m Proximity Analysis</h2>
+
+<h3>Objective</h3>
+<p>Define the candidate land search area around each substation for BESS installation. Any suitable land parcel within 500m of a substation centroid is a potential BESS site.</p>
+
+<div class="formula-box">
+  <span class="label">Buffer Generation</span>
+  <span class="main-eq">buffer(lat, lon, r=500m) &rarr; 64-point geodesic polygon</span>
+  &Delta;lat = (r &times; cos(&theta;)) / 111,320<br>
+  &Delta;lon = (r &times; sin(&theta;)) / (111,320 &times; cos(lat &times; &pi;/180))<br>
+  &theta; = 0, 2&pi;/64, 4&pi;/64, ..., 2&pi;<br><br>
+  <span class="where">WGS84 ellipsoidal approximation. 500m radius = maximum practical MV cable run<br>
+  without requiring additional distribution infrastructure.</span>
+</div>
+
+<h4>Output</h4>
+<table>
+<thead><tr><th>Parameter</th><th>Value</th><th>Rationale</th></tr></thead>
+<tbody>
+<tr><td>Radius</td><td class="td-mono">500 m</td><td>Maximum practical MV cable run without additional infrastructure</td></tr>
+<tr><td>Points per circle</td><td class="td-mono">64</td><td>Smooth polygon for spatial intersection accuracy</td></tr>
+<tr><td>Output format</td><td class="td-mono">GeoJSON</td><td>2,405 features, 4.1 MB</td></tr>
+<tr><td>Next use</td><td colspan="2">Intersect with cadastral data for Step 6 land availability</td></tr>
+</tbody>
+</table>
+</section>
+</section>
+<!-- SECTION 7: STEP 4 INFORMATIVE -->
+<section class="section" id="s7">
+<span class="section-num">Section 07</span>
+<h2>Step 4 &mdash; Generation Saturation <span style="font-size:0.7em;color:var(--muted);font-weight:400;">[Informative]</span></h2>
+
+<h3>Objective</h3>
+<p>Assess whether existing renewable generation already connected to a substation has consumed the available reverse-flow capacity, leaving insufficient room for an additional BESS export.</p>
+
+<div class="formula-box">
+  <span class="label">Saturation Model</span>
+  <span class="main-eq">net_headroom_MVA = headroom_MVA &minus; existing_generation_MW</span>
+  existing_gen = &Sigma; (solar_MW + wind_MW) assigned to this CP<br>
+  saturation_ratio = existing_gen / headroom_MVA<br>
+  BESS_eligible = (net_headroom &ge; 10) AND (space_pass = true)<br><br>
+  <span class="where">Renewable plants assigned to nearest CP by spatial proximity.<br>
+  Solar default: 2 MW per plant (where OSM capacity tag missing).<br>
+  Wind default: 10 MW per plant (where OSM capacity tag missing).<br>
+  Only 72 of 5,653 plants have explicit OSM capacity tags.</span>
+</div>
+
+<h4>Saturation Distribution</h4>
+<table>
+<thead><tr><th>Saturation Level</th><th>Count</th><th>%</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>No generation</td><td class="td-num">1,343</td><td class="td-num">55.8%</td><td>No OSM-mapped renewable plants nearby</td></tr>
+<tr><td>Low (&le;30%)</td><td class="td-num">652</td><td class="td-num">27.1%</td><td>Plenty of room for BESS</td></tr>
+<tr><td>Moderate (30&ndash;50%)</td><td class="td-num">105</td><td class="td-num">4.4%</td><td>Viable but tighter</td></tr>
+<tr><td>High (50&ndash;100%)</td><td class="td-num">86</td><td class="td-num">3.6%</td><td>DNO may push back</td></tr>
+<tr><td>Saturated (&gt;100%)</td><td class="td-num">219</td><td class="td-num">9.1%</td><td>Generation exceeds headroom</td></tr>
+</tbody>
+</table>
+
+<h4>Result</h4>
+<p><strong>1,789 substations are BESS-eligible</strong> after Step 4 (net headroom &ge;10 MVA and space available). 135 eliminated due to generation saturation consuming the available headroom.</p>
+</section>
+</section>
+<!-- SECTION 8: STEP 5 -->
+<section class="section" id="s8">
+<span class="section-num">Section 08</span>
+<h2>Step 5 &mdash; Flood Zone Exclusion</h2>
+
+<h3>Objective</h3>
+<p>Exclude substations located in high-probability flood zones that pose unacceptable risk to a 25+ year BESS asset.</p>
+
+<h3>Decision Rule</h3>
+
+<div class="formula-box">
+  <span class="label">Flood Filter Logic</span>
+  <span class="main-eq">IF centroid &isin; P3_polygon &rarr; EXCLUDE (floodRisk = 'high')</span>
+  IF centroid &isin; P2_polygon AND &notin; P3 &rarr; FLAG (floodRisk = 'moderate')<br>
+  ELSE &rarr; PASS (floodRisk = 'none')<br><br>
+  <span class="where">P3 (elevata): 20&ndash;50 year return period. Unacceptable for BESS.<br>
+  P2 (media): 100&ndash;200 year return. Flagged for site-specific assessment.<br>
+  P1 (bassa): &gt;200 year return. Acceptable residual risk.</span>
+</div>
+
+<h4>Data Source</h4>
+<table>
+<thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Projection</th><th>Size</th></tr></thead>
+<tbody>
+<tr><td>ISPRA (Istituto Superiore per la Protezione e la Ricerca Ambientale)</td><td>Mosaicatura Nazionale Pericolosit&agrave; Idraulica v5.0</td><td>2020</td><td>ETRS89 LAEA (EPSG:3035)</td><td>P3: 28,791 polygons (328 MB); P2: 29,493 polygons (369 MB)</td></tr>
+</tbody>
+</table>
+
+<div class="note-green">
+  <strong>Why ISPRA mosaic as single source:</strong> The national mosaic harmonises flood hazard maps from all 7 District Basin Authorities into a consistent classification, reconciling PAI (older Law 183/89 maps) and PGRA (EU Floods Directive 2007/60/EC maps). Using a single authoritative source avoids conflicts and vintage discrepancies that arise from cross-referencing multiple regional datasets at the screening stage.
+</div>
+
+<h4>Method</h4>
+<p>GeoPandas spatial join of substation centroid points (reprojected to EPSG:3035) against P3 and P2 polygon shapefiles using R-tree spatial indexing.</p>
+
+<h4>Result</h4>
+<table>
+<thead><tr><th>Flood Status</th><th>All Subs</th><th>%</th><th>BESS-Eligible Impact</th></tr></thead>
+<tbody>
+<tr><td class="td-accent">P3 HIGH &rarr; EXCLUDE</td><td class="td-num td-accent">121</td><td class="td-num">5.0%</td><td>88 eliminated from 1,789 &rarr; 1,701</td></tr>
+<tr><td>P2 MODERATE &rarr; flag</td><td class="td-num">218</td><td class="td-num">9.1%</td><td>168 flagged (remain in pool)</td></tr>
+<tr><td class="td-green">Clean</td><td class="td-num td-green">2,066</td><td class="td-num">85.9%</td><td>&mdash;</td></tr>
+</tbody>
+</table>
+</section>
+</section>
+<!-- SECTION 9: STEP 6 -->
+<section class="section" id="s9">
+<span class="section-num">Section 09</span>
+<h2>Step 6 &mdash; Land Availability</h2>
+
+<h3>Objective</h3>
+<p>Identify whether each substation has at least one suitable cadastral parcel within 500m for BESS installation. Step 6 uses a three-category classification system to capture different land assembly strategies.</p>
+
+<h4>Data Source</h4>
+<table>
+<thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td>Agenzia delle Entrate</td><td>WFS 2.0.0 &mdash; INSPIRE CP:CadastralParcel</td><td>Current (live)</td><td>Free / CC BY 4.0</td></tr>
+</tbody>
+</table>
+
+<h3>Cadastral Reference &mdash; Three-Part Identifier</h3>
+
+<p>Each parcel returned by the WFS carries the <strong>complete Italian cadastral identifier</strong> via the <code>NATIONALCADASTRALREFERENCE</code> attribute. The format encodes three mandatory components, ensuring full traceability to the official catasto:</p>
+
+<div class="formula-box">
+  <span class="label">Cadastral Reference Format</span>
+  <span class="main-eq">{ComuneCode}_{Foglio}.{Particella}</span>
+  <span class="where">
+  <strong>Comune</strong> &mdash; ISTAT belfiore code of the municipality (e.g., A001 = Abano Terme)<br>
+  <strong>Foglio</strong> &mdash; Land register sheet number within the comune (e.g., 000100)<br>
+  <strong>Particella</strong> &mdash; Individual parcel number within the foglio (e.g., 104)</span>
+</div>
+
+<table>
+<thead><tr><th>Example Reference</th><th>Comune</th><th>Foglio</th><th>Particella</th><th>Substation</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">A001_000100.104</td><td>A001 (Abano Terme)</td><td>000100</td><td>104</td><td>Abano</td></tr>
+<tr><td class="td-mono">D965_006600.1077</td><td>D965 (Genga)</td><td>006600</td><td>1077</td><td>FS Genga</td></tr>
+<tr><td class="td-mono">L762_005400.54</td><td>L762 (Vergato)</td><td>005400</td><td>54</td><td>Vergato</td></tr>
+</tbody>
+</table>
+
+<div class="note blue">
+  <strong>Completeness note:</strong> The <code>ADMINISTRATIVEUNIT</code> field (comune code) is also stored separately, providing a cross-check. This three-part identifier is sufficient to uniquely locate any parcel in the Italian catasto and to request official documentation (<em>visura catastale</em>) from the Agenzia delle Entrate.
+</div>
+
+<h3>Three-Category Classification</h3>
+
+<div class="filter-grid-3">
+  <div class="filter-card pass">
+    <div class="step-num">Category A &mdash; Perfect Target</div>
+    <div class="step-title">4,000&ndash;6,000 m&sup2;</div>
+    <div class="step-desc">Single parcel of ideal size for a 9.9&nbsp;MW BESS. Requires one land acquisition, minimal legal complexity.</div>
+    <div class="step-result" style="color:var(--accent3);">16,023 parcels &middot; 1,619 subs</div>
   </div>
-
-  <!-- Components -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>6 Components · 20 Metrics</h3>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Component</th>
-          <th>Weight</th>
-          <th>Metrics</th>
-          <th>Domain</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
-          <td class="num">0.30</td>
-          <td>4 — Duration, Count, MT exceed, Planned</td>
-          <td>Outage frequency and duration</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
-          <td class="num">0.10</td>
-          <td>1 — Severity-weighted dips</td>
-          <td>Power quality events</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
-          <td class="num">0.25</td>
-          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
-          <td>Physical asset condition & environment</td>
-        </tr>
-        <tr>
-          <td><strong style="color:#3b9eff">E</strong> Economic</td>
-          <td class="num">0.10</td>
-          <td>2 — ARERA penalties, productivity loss</td>
-          <td>Economic impact of interruptions</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
-          <td class="num">0.20</td>
-          <td>3 — Municipal KPI, reverse power flow, criticality class</td>
-          <td>Grid capacity utilisation</td>
-        </tr>
-        <tr>
-          <td><strong style="color:#22d3ee">T</strong> Transition</td>
-          <td class="num">0.05</td>
-          <td>1 — DER Stress Index (DER penetration + variability + EV load)</td>
-          <td>Energy transition exposure</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="filter-card pass">
+    <div class="step-num">Category B &mdash; Land Bundle</div>
+    <div class="step-title">Contiguous group &ge; 5,000 m&sup2;</div>
+    <div class="step-desc">Multiple adjacent parcels (each &ge;500 m&sup2;) with total area &ge;5,000 m&sup2; and compactness ratio &ge;0.4. Requires multi-parcel acquisition.</div>
+    <div class="step-result" style="color:var(--accent3);">4,899 bundles &middot; 30 subs (B-only)</div>
   </div>
-
-  <!-- Modifiers -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
-      <span class="label-xs">Context multipliers</span>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="font-weight:500">R2</td>
-          <td>Adaptive IRI + Climate</td>
-          <td class="num">internal</td>
-          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R3</td>
-          <td>Consequence + Poverty</td>
-          <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for substations serving large/energy-poor populations with high economic dependency. Includes fiscal, migration, elderly, and flood enrichments.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R4</td>
-          <td>Graph Criticality</td>
-          <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6a</td>
-          <td>Restoration Speed</td>
-          <td class="num">[0.90, 1.10]</td>
-          <td>CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two substations with identical SAIDI can have different risk profiles.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6b</td>
-          <td>Seismic Hazard</td>
-          <td class="num">[1.00, 1.25]</td>
-          <td>INGV MPS04 seismic hazard. Penalises substations in high-PGA zones (Zone 1–2). Uses 475-year return period peak ground acceleration. ISO 9223 corrosion classification enriches exposure assessment.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R7</td>
-          <td>Cyber-Exposure</td>
-          <td class="num">[0.99, 1.05]</td>
-          <td>Province-level continuous model based on DESI regional digital readiness, urban/rural adjustments, and HV voltage class bonus. 556 unique values. Indicative — awaiting NIS2 compliance data.</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="filter-card pass">
+    <div class="step-num">Category C &mdash; Too Large</div>
+    <div class="step-title">6,000&ndash;10,000 m&sup2;</div>
+    <div class="step-desc">Single parcel larger than ideal but still worth pursuing. May require partial acquisition or lease of a portion.</div>
+    <div class="step-result" style="color:var(--accent3);">14,683 parcels &middot; 9 subs (C-only)</div>
   </div>
+</div>
 
-  <!-- Classification -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Classification Bands</h3>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
-      </div>
-    </div>
-  </div>
+<div class="formula-box">
+  <span class="label">Land Availability Logic</span>
+  <span class="main-eq">passStep6 = hasCategory_A OR hasCategory_B OR hasCategory_C</span>
+  Category A: single parcel with area &isin; [4,000, 6,000] m&sup2;<br>
+  Category B: contiguous group of parcels (&ge;500 m&sup2; each, shared edges &lt;3m gap), total &ge;5,000 m&sup2;, compactness &ge;0.4<br>
+  Category C: single parcel with area &isin; [6,000, 10,000] m&sup2;<br>
+  Priority: A &gt; B &gt; C<br><br>
+  <span class="where">Parcels queried via WFS BBOX filter (500m around substation centroid).<br>
+  Area computed from GML polygon geometry using shoelace formula with latitude correction (&lt;1% error).<br>
+  Contiguity analysed via BFS on adjacency graph (vertex distance &lt;3m threshold).</span>
+</div>
 
-  <!-- MC & Confidence -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Uncertainty Quantification</h3>
-      <span class="label-xs">Monte Carlo engine</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
-    </p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
-        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per sub</div>
-      </div>
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
-      </div>
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">67s</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
-      </div>
-    </div>
-  </div>
+<h4>Method</h4>
+<p>For each of the 1,701 BESS-eligible substations, all cadastral parcels within 500m were retrieved from the Agenzia delle Entrate WFS. Parcels between 500&ndash;10,000 m&sup2; were retained and classified. Contiguity analysis identified connected components of smaller parcels that together form viable BESS sites.</p>
 
-  <!-- Detailed Metrics -->
-  <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
+<h4>Result</h4>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Substations queried</td><td class="td-num">1,701</td></tr>
+<tr><td>Unique parcels found (500&ndash;10,000 m&sup2;)</td><td class="td-num">154,319</td></tr>
+<tr><td>Category A parcels</td><td class="td-num">16,023</td></tr>
+<tr><td>Category B bundles</td><td class="td-num">4,899</td></tr>
+<tr><td>Category C parcels</td><td class="td-num">14,683</td></tr>
+<tr><td class="td-green">Substations passing Step 6</td><td class="td-num td-green">1,658 (97.5%)</td></tr>
+<tr><td class="td-accent">Eliminated (no suitable land)</td><td class="td-num td-accent">43</td></tr>
+</tbody>
+</table>
 
-  <!-- Normalisation Methods -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Normalisation Methods</h3>
-    </div>
-    <div id="method-norm"></div>
-  </div>
+<div class="note">
+  <strong>Elimination pattern:</strong> The 43 eliminated substations concentrate in Alpine valleys (Trentino-Alto Adige) and dense urban centres where even small parcels are scarce within 500m of the substation.
+</div>
+</section>
+</section>
+<!-- SECTION 10: STEP 7 -->
+<section class="section" id="s10">
+<span class="section-num">Section 10</span>
+<h2>Step 7 &mdash; Terrain Slope Analysis</h2>
 
-  <!-- Data Layers -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Data Layers — 95 Variables</h3>
-      <span class="label-xs">11 layers</span>
-    </div>
-    <table class="data-table" id="method-layers">
-      <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<h3>Objective</h3>
+<p>Filter candidate parcels by terrain slope. BESS installations require relatively flat ground (&le;6% slope) to minimise grading costs and ensure safe, stable foundations for containerised battery modules.</p>
 
-  <!-- Data Sources -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>30 Verified Data Sources</h3>
-      <!-- Note: All P2 variables derive from existing sources (INGV, ISO 9223, IEEE/CIGRÉ) -->
-      <span class="label-xs">28 open + 2 free registration</span>
-    </div>
-    <table class="data-table" id="method-sources">
-      <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<h4>Data Source</h4>
+<table>
+<thead><tr><th>Source</th><th>Dataset</th><th>Resolution</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td>ESA / Airbus</td><td>Copernicus DEM GLO-30 (TanDEM-X derived)</td><td>30m (~1 arc-second)</td><td>Free / AWS S3 public bucket</td></tr>
+</tbody>
+</table>
 
-  <!-- Validation -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Validation Framework</h3>
-      <span class="label-xs" id="method-val-count"></span>
-    </div>
-    <table class="data-table" id="method-validation">
-      <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<h3>Method</h3>
+<p>For each of the 59,498 candidate parcels identified in Step 6, terrain slope was computed from the Copernicus DEM using Horn's 3&times;3 kernel (Sobel operator) for gradient estimation. Eight directional slopes were computed along compass bearings (N, NE, E, SE, S, SW, W, NW) plus an omnidirectional aggregate. The best (flattest) orientation is recorded for each parcel.</p>
 
-  <!-- Changelog -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>v3.4 → v4.0.2 Changelog</h3>
-    </div>
-    <table class="data-table" id="method-changelog">
-      <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<div class="formula-box">
+  <span class="label">Slope Computation</span>
+  <span class="main-eq">slope_omni = &radic;(dz/dx&sup2; + dz/dy&sup2;) &times; 100 &nbsp;[%]</span>
+  dz/dx, dz/dy: Horn's method (3&times;3 Sobel kernel) on DEM elevation grid<br>
+  slope_dir(&theta;) = |dz/dx &middot; sin(&theta;) + dz/dy &middot; cos(&theta;)| &times; 100<br>
+  pass = mean_omnidirectional_slope &le; 6%<br><br>
+  <span class="where">DEM tiles: Cloud-Optimized GeoTIFF, 3600&times;3600 pixels, float32, EPSG:4326.<br>
+  67 tiles covering Italian parcel locations (~1.2 GB total).<br>
+  Small parcels (&lt;3 DEM pixels): centroid + 3&times;3 neighbourhood fallback.</span>
+</div>
 
-  <!-- Competitive Positioning Note -->
-  <div class="card animate-in" style="border-left:3px solid var(--sage)">
-    <div class="card-header">
-      <h3>Competitive Positioning</h3>
-      <span class="label-xs">v4.0.2</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only cybersecurity (crude proxy, awaiting NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
-    </p>
-  </div>
-</main>
+<h4>Result</h4>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Parcels analysed</td><td class="td-num">59,498</td></tr>
+<tr><td>Pass slope (&le;6%)</td><td class="td-num">35,799 (60.2%)</td></tr>
+<tr><td>Fail slope (&gt;6%)</td><td class="td-num">23,699 (39.8%)</td></tr>
+<tr><td>Median slope</td><td class="td-num">4.4%</td></tr>
+<tr><td>Mean slope</td><td class="td-num">9.0%</td></tr>
+<tr><td class="td-green">Substations passing Step 7</td><td class="td-num td-green">1,401 (84.5% of Step 6)</td></tr>
+<tr><td class="td-accent">Eliminated by slope</td><td class="td-num td-accent">257</td></tr>
+</tbody>
+</table>
 
-<script>
-(function() {
-  const M = window.SSIMetadata;
-  if (!M) return;
+<h4>Slope Distribution</h4>
+<div class="bar-chart">
+  <div class="bar-row"><span class="bar-label">0&ndash;2%</span><div class="bar-track"><div class="bar-fill" style="width:17.4%;background:var(--accent3);"><span>10,361</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">2&ndash;4%</span><div class="bar-track"><div class="bar-fill" style="width:28.2%;background:var(--accent3);"><span>16,787</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">4&ndash;6%</span><div class="bar-track"><div class="bar-fill" style="width:14.5%;background:var(--accent3);"><span>8,626</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">6&ndash;8%</span><div class="bar-track"><div class="bar-fill" style="width:7.0%;background:var(--accent4);"><span>4,167</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">8&ndash;10%</span><div class="bar-track"><div class="bar-fill" style="width:4.8%;background:var(--accent4);"><span>2,881</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">10&ndash;15%</span><div class="bar-track"><div class="bar-fill" style="width:9.0%;background:var(--accent);"><span>5,379</span></div></div></div>
+  <div class="bar-row"><span class="bar-label">&gt;15%</span><div class="bar-track"><div class="bar-fill" style="width:19.0%;background:var(--red);"><span>11,297</span></div></div></div>
+</div>
 
-  // Detailed metrics per component
-  const detailEl = document.getElementById('method-metrics-detail');
-  if (detailEl) {
-    let html = '<div class="card-header"><h3>Metric Detail — 20 Metrics</h3></div>';
-    M.COMPONENTS.forEach(comp => {
-      html += '<div style="margin:16px 0 8px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + comp.color + ';margin-right:6px"></span><strong style="color:' + comp.color + '">' + comp.id + '</strong> ' + comp.name + ' — <strong>' + comp.weight.toFixed(2) + '</strong>';
-      if (comp.isNew) html += ' <span style="font-size:10px;color:#0e7490;background:#e0f7fa;padding:1px 6px;border-radius:2px;font-weight:600">NEW v4.0</span>';
-      html += '</div>';
-      html += '<table class="data-table" style="margin-bottom:12px"><thead><tr><th>Metric</th><th style="text-align:right">Intra</th><th style="text-align:right">Global</th><th>Norm</th><th>Source</th></tr></thead><tbody>';
-      comp.metrics.forEach(m => {
-        html += '<tr' + (m.isNew ? ' style="background:#e0f7fa11"' : '') + '>';
-        html += '<td><strong>' + m.id + '</strong> ' + m.name;
-        if (m.isNew) html += ' <span style="font-size:9px;color:#0e7490;font-weight:600">NEW</span>';
-        if (m.inverted) html += ' <span style="font-size:9px;color:var(--sage);font-weight:600">↓INV</span>';
-        if (m.adaptive) html += ' <span style="font-size:9px;color:var(--terracotta);font-weight:600">R2</span>';
-        html += '</td>';
-        html += '<td class="num">' + m.intra.toFixed(m.intra < 0.1 ? 3 : 2) + '</td>';
-        html += '<td class="num">' + m.global.toFixed(3) + '</td>';
-        html += '<td style="font-size:11px">' + m.norm + '</td>';
-        html += '<td style="font-size:11px;color:var(--warm-grey)">' + m.source + '</td>';
-        html += '</tr>';
-      });
-      html += '</tbody></table>';
-    });
-    detailEl.innerHTML = html;
-  }
+<div class="note">
+  <strong>Multi-directional output:</strong> Each parcel record includes slope measurements along 8 compass bearings. The &ldquo;best orientation&rdquo; field identifies the compass direction with the lowest mean slope &mdash; useful for determining optimal BESS pad alignment on sloped terrain.
+</div>
+</section>
+</section>
+<!-- SECTION 11: STEP 8 -->
+<section class="section" id="s11">
+<span class="section-num">Section 11</span>
+<h2>Step 8 &mdash; Evacuation Route Assessment</h2>
 
-  // Normalisation methods
-  const normEl = document.getElementById('method-norm');
-  if (normEl) {
-    normEl.innerHTML = M.NORM_METHODS.map(n =>
-      '<div style="margin-bottom:12px;padding:12px 16px;background:var(--cream);border-radius:var(--radius-sm);border-left:2px solid var(--terracotta)">' +
-      '<div style="font-weight:600;font-size:13px;margin-bottom:4px">Method ' + n.id + ' — ' + n.name + '</div>' +
-      '<div class="formula-block" style="margin:8px 0;padding:8px 12px;font-size:12px">' + n.formula + '</div>' +
-      '<div style="font-size:11px;color:var(--warm-grey)">Applies to: ' + n.applies + '</div>' +
-      '</div>'
-    ).join('');
-  }
+<h3>Objective</h3>
+<p>Verify that each candidate parcel has a viable cable evacuation route to its nearest substation, routed along public roads and paths, with total distance &le;450 metres. This is the final hard elimination step.</p>
 
-  // Data layers
-  const layerTbody = document.querySelector('#method-layers tbody');
-  if (layerTbody) {
-    layerTbody.innerHTML = M.DATA_LAYERS.map(l => {
-      const statusColor = l.status === 'LIVE' ? 'var(--sage)' : l.status.includes('NEW') ? '#0e7490' : 'var(--bronze)';
-      return '<tr' + (l.isNew ? ' style="background:#e0f7fa11"' : '') + '>' +
-        '<td><strong>' + l.id + '</strong> ' + l.name + '</td>' +
-        '<td class="num">' + l.vars + '</td>' +
-        '<td style="font-size:11px;font-weight:600;color:' + statusColor + '">' + l.status + '</td>' +
-        '<td style="font-size:11px;color:var(--warm-grey)">' + l.sources + '</td></tr>';
-    }).join('') +
-    '<tr style="border-top:2px solid var(--ink)"><td><strong>Total</strong></td><td class="num"><strong>95</strong></td><td colspan="2"></td></tr>';
-  }
+<h4>Data Source</h4>
+<table>
+<thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td>OpenStreetMap</td><td>Highway ways (Overpass API)</td><td>March 2026 (live)</td><td>Free / ODbL</td></tr>
+</tbody>
+</table>
 
-  // Data sources
-  const srcTbody = document.querySelector('#method-sources tbody');
-  if (srcTbody) {
-    srcTbody.innerHTML = M.DATA_SOURCES.map(s =>
-      '<tr><td style="font-size:12px"><strong>' + s.name + '</strong>' +
-      (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">⚠ registration</span>' : '') +
-      '</td><td style="font-size:11px">' + s.category + '</td>' +
-      '<td style="font-size:11px">' + s.freq + '</td>' +
-      '<td style="font-size:11px">' + s.res + '</td>' +
-      '<td class="num">' + s.vars + '</td>' +
-      '<td style="font-size:11px;color:var(--warm-grey)">' + s.feeds + '</td></tr>'
-    ).join('');
-  }
+<h3>Method</h3>
 
-  // Validation
-  const valTbody = document.querySelector('#method-validation tbody');
-  const valCount = document.getElementById('method-val-count');
-  if (valTbody) {
-    valTbody.innerHTML = M.VALIDATION_CHECKS.map(v => {
-      const statusIcon = v.status === 'verified' ? '✓' : v.status === 'expected' ? '✓ expected' : '⏳ new';
-      const statusColor = v.status === 'verified' ? 'var(--sage)' : v.status === 'expected' ? 'var(--sage)' : '#0e7490';
-      return '<tr' + (v.isNew ? ' style="background:#e0f7fa11"' : '') + '>' +
-        '<td style="font-weight:500">' + v.check + '</td>' +
-        '<td style="font-size:12px">' + v.criterion + '</td>' +
-        '<td style="font-size:12px;font-weight:600;color:' + statusColor + '">' + statusIcon + '</td></tr>';
-    }).join('');
-    if (valCount) valCount.textContent = M.VALIDATION_CHECKS.length + ' checks';
-  }
+<div class="formula-box">
+  <span class="label">Evacuation Route Logic</span>
+  <span class="main-eq">total_distance = snap_parcel + network_path + snap_substation</span>
+  1. Query Overpass API for highway ways within ~8.9 km tiles (16 highway types, excluding private access)<br>
+  2. Build undirected weighted graph (NetworkX): nodes = OSM road nodes, edges = Haversine-weighted segments<br>
+  3. Snap parcel centroid and substation to nearest graph nodes (max 100m snap distance)<br>
+  4. Dijkstra shortest path between snap points<br>
+  5. pass = total_distance &le; 450m<br><br>
+  <span class="where">~930 Overpass tiles cached for all of Italy. Grid-cell spatial indexing (~220m cells) for fast nearest-node lookup.<br>
+  If snap distance &gt;100m for either endpoint, parcel fails (too far from road network).</span>
+</div>
 
-  // Changelog
-  const clTbody = document.querySelector('#method-changelog tbody');
-  if (clTbody) {
-    const typeColors = { new: '#0e7490', enhanced: 'var(--terracotta)', data: 'var(--bronze)' };
-    clTbody.innerHTML = M.CHANGELOG.map(c =>
-      '<tr><td style="font-family:monospace;font-weight:600">' + c.id + '</td>' +
-      '<td style="font-size:12px">' + c.change + '</td>' +
-      '<td><span style="font-size:10px;font-weight:600;color:' + (typeColors[c.type] || 'var(--ink)') +
-      ';background:' + (typeColors[c.type] || 'var(--ink)') + '15;padding:1px 8px;border-radius:2px">' +
-      c.type.toUpperCase() + '</span></td></tr>'
-    ).join('');
-  }
-})();
-</script>
+<h4>Result</h4>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Route computations</td><td class="td-num">36,759</td></tr>
+<tr><td>Parcels pass (&le;450m route)</td><td class="td-num">3,312 (9.0%)</td></tr>
+<tr><td>Parcels fail</td><td class="td-num">33,447 (91.0%)</td></tr>
+<tr><td class="td-green">Substations passing Step 8</td><td class="td-num td-green">748 (53.4% of Step 7)</td></tr>
+<tr><td class="td-accent">Eliminated</td><td class="td-num td-accent">653</td></tr>
+</tbody>
+</table>
 
-<script>renderFooter();</script>
+<h4>Route Length Distribution (passing parcels)</h4>
+<table>
+<thead><tr><th>Metric</th><th>Distance</th></tr></thead>
+<tbody>
+<tr><td>Minimum</td><td class="td-num">11 m</td></tr>
+<tr><td>Median</td><td class="td-num">316 m</td></tr>
+<tr><td>Mean</td><td class="td-num">297 m</td></tr>
+<tr><td>P90</td><td class="td-num">427 m</td></tr>
+<tr><td>Maximum</td><td class="td-num">450 m</td></tr>
+</tbody>
+</table>
+
+<div class="note-blue">
+  <strong>Why 450m?</strong> The 450m threshold represents the maximum practical MV cable run for a BESS connection without requiring intermediate infrastructure (junction boxes, cable joints, or booster stations). Beyond this distance, cable losses increase, voltage drop becomes significant, and installation costs rise disproportionately. The threshold is conservative: longer runs are technically possible but economically challenging.
+</div>
+</section>
+</section>
+<!-- SECTION 12: CONGESTION FLAG -->
+<section class="section" id="s12">
+<span class="section-num">Section 12</span>
+<h2>Grid Congestion Flag</h2>
+
+<h3>Objective</h3>
+<p>Flag substations located in Terna-designated critical AT areas where HV/EHV grid congestion may impede new generation connections. This is a <strong>flag only</strong>, not an elimination step &mdash; congestion is dynamic and depends on grid reinforcement plans.</p>
+
+<h4>Data Source</h4>
+<table>
+<thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Format</th></tr></thead>
+<tbody>
+<tr><td>Terna S.p.A. (Italian TSO)</td><td>Elenco Aree e Linee Critiche</td><td>1 June 2025</td><td>PDF (5 pages)</td></tr>
+</tbody>
+</table>
+
+<h3>Terna Critical AT Areas</h3>
+<p>Critical areas are defined per Resolution ARG/elt 173/10 as portions of the HV/EHV grid with limitations for transport of new local electricity production.</p>
+
+<table>
+<thead><tr><th>Region</th><th>Status</th><th>Substations</th><th>BESS-Eligible Flagged</th></tr></thead>
+<tbody>
+<tr><td><strong>Basilicata</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">53</td><td class="td-num">45</td></tr>
+<tr><td><strong>Calabria</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">96</td><td class="td-num">74</td></tr>
+<tr><td><strong>Molise</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">24</td><td class="td-num">17</td></tr>
+<tr><td><strong>Puglia</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">159</td><td class="td-num">86</td></tr>
+<tr><td><strong>Sardegna</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">91</td><td class="td-num">74</td></tr>
+<tr><td><strong>Sicilia</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">177</td><td class="td-num">145</td></tr>
+<tr><td><strong>Campania (Avellino)</strong></td><td>PROVINCIA CRITICA</td><td class="td-num">&mdash;</td><td class="td-num">15</td></tr>
+<tr><td><strong>Lazio (Viterbo)</strong></td><td>PROVINCIA CRITICA</td><td class="td-num">&mdash;</td><td class="td-num">5</td></tr>
+</tbody>
+</table>
+
+<div class="formula-box">
+  <span class="label">Congestion Flag Logic</span>
+  <span class="main-eq">congestionFlag = 'critical_region' IF region &isin; {Basilicata, Calabria, Molise, Puglia, Sardegna, Sicilia}</span>
+  congestionFlag = 'critical_province' IF (region, province) &isin; {(Campania, Avellino), (Lazio, Viterbo)}<br>
+  congestionFlag = 'none' OTHERWISE<br><br>
+  <span class="where">Region/province assigned via offline reverse geocoding of substation centroid coordinates.<br>
+  No substations are eliminated &mdash; congestion flag is advisory for due diligence.</span>
+</div>
+
+<h4>Result</h4>
+<p>Of the <strong>748 final candidates</strong>: <strong>461 (27.1%)</strong> are flagged for grid congestion (441 in critical regions, 20 in critical provinces). <strong>287 (72.9%)</strong> are in non-critical areas.</p>
+
+<div class="note-red">
+  <strong>Interpretation:</strong> A congestion flag does not mean connection is impossible. A BESS in a critical area may still connect if it provides grid services (frequency regulation, congestion relief) rather than pure export. Terna's TE.R.R.A. portal (76 microzones, quarterly) and Econnextion dashboard (monthly connection queue) provide additional granularity for site-specific assessment.
+</div>
+</section>
+</section>
+<!-- SECTION 13: GSE CROSS-REFERENCE -->
+<section class="section" id="s13">
+<span class="section-num">Section 13</span>
+<h2>GSE Cabine Primarie Cross-Reference</h2>
+
+<h3>Objective</h3>
+<p>Cross-reference the OSM substation dataset with GSE's official cabine primarie registry to: (a) assign GSE area codes (COD_AC) to existing substations, enabling linkage to the regulatory framework; and (b) identify substations present in the GSE database but missing from OSM.</p>
+
+<h4>Data Source</h4>
+<table>
+<thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Format</th><th>Records</th></tr></thead>
+<tbody>
+<tr><td>GSE (Gestore dei Servizi Energetici)</td><td>Mappa Interattiva delle Cabine Primarie (2025&ndash;2027)</td><td>2025</td><td>ArcGIS FeatureServer (EU1)</td><td>Layer 0: 2,145; Layer 5: 245</td></tr>
+</tbody>
+</table>
+
+<p>Each GSE polygon represents the <em>service territory</em> (Area Convenzionale) of one cabina primaria &mdash; not the physical substation location. After deduplication by COD_AC (11-character area code), 2,143 unique areas remain, operated by 24 distribution companies (e-distribuzione: 1,842 areas, 85.9%).</p>
+
+<h3>Cross-Reference Methodology</h3>
+<p>GSE polygon centroids (service area centres, not substation locations) were matched to OSM substations by nearest-neighbour proximity. Since centroids can be several kilometres from the actual substation, distance thresholds were analysed to find the optimal balance:</p>
+
+<table>
+<thead><tr><th>Threshold</th><th>Match Rate</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">3 km</td><td class="td-num">60.8%</td><td>Too restrictive &mdash; many valid matches missed</td></tr>
+<tr><td class="td-mono">5 km</td><td class="td-num">82.4%</td><td>Moderate coverage</td></tr>
+<tr><td class="td-mono">8 km</td><td class="td-num">92.8%</td><td>Good coverage</td></tr>
+<tr><td class="td-mono td-green">10 km</td><td class="td-num td-green">95.5%</td><td class="td-green">Optimal balance (selected)</td></tr>
+<tr><td class="td-mono">15 km</td><td class="td-num">98.6%</td><td>Diminishing returns, risk of false matches</td></tr>
+</tbody>
+</table>
+
+<h4>Result</h4>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>GSE areas matched to OSM (&le;10 km)</td><td class="td-num">2,047 (95.5%)</td></tr>
+<tr><td>OSM substations with GSE COD_AC</td><td class="td-num">1,881 (78.2%)</td></tr>
+<tr><td>New substations from GSE (unmatched)</td><td class="td-num">96</td></tr>
+<tr><td>Match distance (median)</td><td class="td-num">1,520 m</td></tr>
+<tr><td>Match distance (P90)</td><td class="td-num">2,621 m</td></tr>
+<tr><td class="td-green">Final Step 1 universe</td><td class="td-num td-green">2,501 substations</td></tr>
+</tbody>
+</table>
+
+<div class="note-blue">
+  <strong>524 unmatched OSM substations</strong> are primarily Terna/RFI transmission substations (142) not covered by GSE distribution data, plus substations in areas not included in the 2025 GSE map. These remain in the dataset with no GSE linkage.
+</div>
+
+<div class="note">
+  <strong>Impact on pipeline:</strong> Steps 2&ndash;8 counts remain at 748 passing substations because the 96 new GSE subs lack Steps 2&ndash;4 data (physical space, electrical headroom, BESS eligibility). Once assessed, they will enter the pipeline and may increase the final candidate count.
+</div>
+</section>
+</section>
+
+<!-- SECTION 11b: STEP 9 - BUFFER ZONES -->
+<section class="section" id="s11b">
+<span class="section-num">Section 11b</span>
+<h2>Step 9 &mdash; Buffer Zone Analysis</h2>
+
+<h3>Objective</h3>
+<p>Assess each candidate parcel against Italian DSP (Dichiarazione di Sostenibilit&agrave; Paesaggistica) buffer zone requirements. A BESS site must maintain minimum distances from residential buildings, roads, railways, and power infrastructure to comply with acoustic and safety regulations.</p>
+
+<h3>DSP Buffer Distance Specifications</h3>
+
+<h4>Acoustic Buffer (Buildings)</h4>
+<table>
+<thead><tr><th>Distance Range</th><th>Classification</th><th>Rationale</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">&lt; 150 m</td><td class="td-accent">Not suitable</td><td>Below regulatory minimum; noise abatement impractical</td></tr>
+<tr><td class="td-mono">150&ndash;300 m</td><td style="color:#d68910;font-weight:600">Conditional</td><td>Feasible with acoustic barriers / enhanced insulation</td></tr>
+<tr><td class="td-mono">&gt; 300 m</td><td class="td-green">Suitable</td><td>No acoustic constraints expected</td></tr>
+</tbody>
+</table>
+
+<h4>Infrastructure Buffer Distances</h4>
+<table>
+<thead><tr><th>Infrastructure</th><th>Minimum Buffer</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Major roads (motorway, trunk, primary)</td><td class="td-mono">60 m</td><td>DSP / D.Lgs. 285/1992</td></tr>
+<tr><td>Secondary roads</td><td class="td-mono">40 m</td><td>DSP / D.Lgs. 285/1992</td></tr>
+<tr><td>Tertiary roads</td><td class="td-mono">20 m</td><td>DSP / D.Lgs. 285/1992</td></tr>
+<tr><td>Railways</td><td class="td-mono">30 m</td><td>DSP / DPR 753/1980</td></tr>
+<tr><td>HV power lines (&ge; 132 kV)</td><td class="td-mono">25 m</td><td>DSP / CEI 11-4</td></tr>
+<tr><td>MV power lines (10&ndash;60 kV)</td><td class="td-mono">10 m</td><td>DSP / CEI 11-4</td></tr>
+<tr><td>LV power lines (&lt; 1 kV)</td><td class="td-mono">3 m</td><td>DSP / CEI 11-4</td></tr>
+</tbody>
+</table>
+
+<h3>Analysis Method</h3>
+<p>For each candidate parcel (those passing Steps 1&ndash;8 with slope &le; 6% and evacuation route &le; 450m), we query the OpenStreetMap Overpass API to find nearby buildings, roads, railways, and power lines within a search radius of 500m. The Haversine formula computes exact distances from each parcel centroid to the nearest feature in each category.</p>
+
+<div class="formula-box">
+  <span class="label">Acoustic Classification</span>
+  <span class="main-eq">acoustic(p) = { suitable if d<sub>bld</sub> &gt; 300m, conditional if 150m &le; d<sub>bld</sub> &le; 300m, not_suitable if d<sub>bld</sub> &lt; 150m }</span>
+  <span class="where">where d<sub>bld</sub> = min distance from parcel centroid to nearest building (OSM building=*)</span>
+</div>
+
+<div class="formula-box">
+  <span class="label">Infrastructure Compliance</span>
+  <span class="main-eq">infra_ok(p) = NOT(road_violation OR rail_violation OR power_violation)</span>
+  <span class="where">where each violation = d<sub>feature</sub> &lt; buffer<sub>type</sub> for the nearest feature of that type</span>
+</div>
+
+<h3>Results Summary (191 parcels assessed)</h3>
+<table>
+<thead><tr><th>Category</th><th>Count</th><th>%</th></tr></thead>
+<tbody>
+<tr><td>Acoustic: Suitable (&gt; 300m)</td><td class="td-num">55</td><td class="td-num">28.8%</td></tr>
+<tr><td>Acoustic: Conditional (150&ndash;300m)</td><td class="td-num">29</td><td class="td-num">15.2%</td></tr>
+<tr><td>Acoustic: Not suitable (&lt; 150m)</td><td class="td-num td-accent">107</td><td class="td-num td-accent">56.0%</td></tr>
+<tr><td>Road buffer violation</td><td class="td-num">5</td><td class="td-num">2.6%</td></tr>
+<tr><td>Railway buffer violation</td><td class="td-num">1</td><td class="td-num">0.5%</td></tr>
+<tr><td>Power line buffer violation</td><td class="td-num">9</td><td class="td-num">4.7%</td></tr>
+<tr><td class="td-green">All clear (acoustic + infra)</td><td class="td-num td-green">50</td><td class="td-num td-green">26.2%</td></tr>
+<tr><td class="td-green">OK including conditional acoustic</td><td class="td-num td-green">78</td><td class="td-num td-green">40.8%</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+  <strong>Partial coverage:</strong> Buffer zone data was collected for 191 of 1,103 fully-passing parcels via the Overpass API. The remaining 912 parcels require offline OSM data processing (PBF download) to avoid API rate limits. Substations without buffer data are conservatively kept in the funnel pending future assessment.
+</div>
+
+<div class="note-blue">
+  <strong>Dashboard integration:</strong> Buffer zone results are displayed in the per-substation checklist (Step 9), parcel table (Acoustic &amp; Infra columns), and map marker colours (orange = buffer concern, green = all clear).
+</div>
+</section>
+
+<!-- SECTION 12: STEP 10 - CADASTRAL DOCUMENT HARVESTING -->
+<section class="section" id="s12">
+<span class="section-num">Section 12</span>
+<h2>Cadastral Document Harvesting</h2>
+
+<h3>Objective</h3>
+<p>Systematically download official cadastral documents for candidate parcels from the Italian Catasto via the OpenAPI platform. These documents enrich the BESS site assessment with ownership data (visura catastale), boundary maps (estratto mappa), and building floor plans (elaborato planimetrico).</p>
+
+<h3>Document Types</h3>
+<table>
+<thead><tr><th>Document</th><th>Content</th><th>Use in BESS Assessment</th></tr></thead>
+<tbody>
+<tr><td>Visura Catastale</td><td>Ownership, land category, cadastral income (rendita)</td><td>Land acquisition strategy, owner identification</td></tr>
+<tr><td>Estratto Mappa</td><td>Official cadastral boundary map with parcel outlines</td><td>Accurate parcel geometry, boundary verification</td></tr>
+<tr><td>Elaborato Planimetrico</td><td>Building floor plans and technical drawings</td><td>Identify existing structures, building constraints</td></tr>
+</tbody>
+</table>
+
+<h3>Pipeline Architecture</h3>
+<p>The harvester (<code>catasto_harvester.py</code>) uses an asynchronous POST &rarr; poll &rarr; GET workflow against the OpenAPI Catasto endpoints. Each cadastral reference is parsed into its constituent parts (provincia, comune, foglio, particella) from the NATIONALCADASTRALREFERENCE format used in Step 6.</p>
+
+<div class="formula-box">
+  <span class="label">Cadastral Reference Parsing</span>
+  <span class="main-eq">A263_002000.41 &rarr; provincia=CS, comune=A263, foglio=2000, particella=41</span>
+  <span class="where">where provincia is resolved from the ISTAT comune code via a lookup table</span>
+</div>
+
+<p>The pipeline includes state management (JSON checkpoint files per endpoint), daily request limits, consecutive error breaker (stops after 5 sequential failures), and resume capability for interrupted runs.</p>
+
+<h3>Sandbox Validation Results (10 March 2026)</h3>
+<table>
+<thead><tr><th>Endpoint</th><th>Status</th><th>Avg PDF Size</th><th>Cost (sandbox)</th></tr></thead>
+<tbody>
+<tr><td>Visura Catastale</td><td class="td-green">Working</td><td class="td-mono">58 KB</td><td class="td-mono">&euro;0.99/req</td></tr>
+<tr><td>Estratto Mappa</td><td class="td-green">Working</td><td class="td-mono">114 KB</td><td class="td-mono">&euro;6.90/req</td></tr>
+<tr><td>Elaborato Planimetrico</td><td class="td-green">Working</td><td class="td-mono">152 KB</td><td class="td-mono">&euro;6.90/req</td></tr>
+<tr><td>Ispezione Ipotecaria</td><td class="td-accent">401 &mdash; requires additional scope</td><td class="td-mono">&mdash;</td><td class="td-mono">&euro;6.90/req</td></tr>
+</tbody>
+</table>
+
+<h3>Dashboard Integration</h3>
+<p>Harvested documents are indexed by <code>gen_catasto_docs_index.py</code> and embedded in the dashboard as a <code>CATASTO_DOCS</code> JavaScript constant. Three integration points expose document availability to users:</p>
+<table>
+<thead><tr><th>Feature</th><th>Location</th><th>Behaviour</th></tr></thead>
+<tbody>
+<tr><td><strong>Docs column</strong></td><td>Parcel table (detail view)</td><td>V/M/P colour badges &mdash; green (available), grey (not harvested)</td></tr>
+<tr><td><strong>Document panel</strong></td><td>Slide-out overlay (right)</td><td>Click badges to open panel showing type, size, and &ldquo;Open PDF&rdquo; button per document</td></tr>
+<tr><td><strong>Popup links</strong></td><td>Map parcel marker popup</td><td>Colour-coded Visura / Mappa / Plan links appear when documents exist for that parcel</td></tr>
+</tbody>
+</table>
+
+<div class="note-blue">
+  <strong>Current coverage:</strong> 5 cadastral references indexed (13 PDFs) from the sandbox test run (Amendolara substation). Full harvesting of all 1,339 candidate parcels is a pending next step.
+</div>
+</section>
+
+<!-- SECTION 14: DATA SOURCES -->
+<section class="section" id="s14">
+<span class="section-num">Section 14</span>
+<h2>Data Source Registry</h2>
+
+<table>
+<thead><tr><th>#</th><th>Source</th><th>Dataset</th><th>Vintage</th><th>Used In</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">D1</td><td>OpenStreetMap</td><td>power=substation (Italy)</td><td>Mar 2026</td><td>Steps 1&ndash;4</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D2</td><td>OpenStreetMap</td><td>power=line (Italy)</td><td>Mar 2026</td><td>Step 1 classification</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D3</td><td>OpenStreetMap</td><td>power=transformer (Italy)</td><td>Mar 2026</td><td>Step 1 classification</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D4</td><td>OpenStreetMap</td><td>power=compensator (Italy)</td><td>Mar 2026</td><td>Infrastructure map</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D5</td><td>OpenStreetMap</td><td>power=plant + generator (solar, wind)</td><td>Mar 2026</td><td>Step 4</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D6</td><td>Bing Maps</td><td>Aerial imagery (zoom 19+)</td><td>2023&ndash;2025</td><td>Steps 1&ndash;2 validation</td><td>Free (visual only)</td></tr>
+<tr><td class="td-mono">D7</td><td>ISPRA</td><td>Mosaicatura Pericolosit&agrave; Idraulica v5.0</td><td>2020</td><td>Step 5</td><td>Free / CC BY-SA</td></tr>
+<tr><td class="td-mono">D8</td><td>Terna S.p.A.</td><td>Elenco Aree e Linee Critiche</td><td>Jun 2025</td><td>Congestion flag</td><td>Free / Public</td></tr>
+<tr><td class="td-mono">D9</td><td>ENEL</td><td>GST001 Rev.03 (transformer standards)</td><td>2018</td><td>Steps 1, 3</td><td>Public specification</td></tr>
+<tr><td class="td-mono">D10</td><td>CEI</td><td>CEI 0-16 (MV connection rules)</td><td>2022</td><td>Design basis</td><td>Italian standard</td></tr>
+<tr><td class="td-mono">D11</td><td>IEC</td><td>IEC 61936 (HV installation clearances)</td><td>2021</td><td>Step 2 footprint</td><td>International standard</td></tr>
+<tr><td class="td-mono">D12</td><td>EU</td><td>Floods Directive 2007/60/EC + D.Lgs. 49/2010</td><td>2007/2010</td><td>Step 5 legal basis</td><td>EU legislation</td></tr>
+<tr><td class="td-mono">D13</td><td>Agenzia delle Entrate</td><td>WFS INSPIRE CP:CadastralParcel</td><td>Current (live)</td><td>Step 6</td><td>Free / CC BY 4.0</td></tr>
+<tr><td class="td-mono">D14</td><td>ESA / Airbus</td><td>Copernicus DEM GLO-30 (TanDEM-X)</td><td>2021</td><td>Step 7</td><td>Free / AWS S3</td></tr>
+<tr><td class="td-mono">D15</td><td>OpenStreetMap</td><td>Highway ways (Overpass API)</td><td>Mar 2026</td><td>Step 8</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D16</td><td>GSE</td><td>Mappa Interattiva Cabine Primarie (2025&ndash;2027)</td><td>2025</td><td>Step 1 (GSE xref)</td><td>Free / ArcGIS FeatureServer</td></tr>
+<tr><td class="td-mono">D17</td><td>OpenStreetMap</td><td>building=* (Italy, Overpass API)</td><td>Mar 2026</td><td>Step 9 (acoustic)</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D18</td><td>OpenStreetMap</td><td>railway=rail, power=line, highway=* (Overpass API)</td><td>Mar 2026</td><td>Step 9 (infra buffers)</td><td>Free / ODbL</td></tr>
+<tr><td class="td-mono">D19</td><td>OpenAPI (Catasto)</td><td>Visura, Estratto Mappa, Elaborato Planimetrico APIs</td><td>Mar 2026</td><td>Cadastral docs</td><td>Sandbox free / Prod paid</td></tr>
+</tbody>
+</table>
+</section>
+</section>
+<!-- SECTION 15: CAVEATS -->
+<section class="section" id="s15">
+<span class="section-num">Section 15</span>
+<h2>Caveats, Limitations &amp; Assumptions</h2>
+
+<h3>Data Quality</h3>
+<table>
+<thead><tr><th>Issue</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td>96.7% of cabine secondarie lack voltage tags</td><td>Cannot determine MV voltage directly</td><td>Infer from region (15 kV south/centre, 20 kV north)</td></tr>
+<tr><td>94% of cabine secondarie lack operator data</td><td>Cannot identify non-ENEL substations</td><td>Assume ENEL standard unless contradicted</td></tr>
+<tr><td>Only 20 of 3,281 OSM transformers have rating data</td><td>Cannot use actual transformer ratings</td><td>Category-based ENEL standard assumptions</td></tr>
+<tr><td>Only 72 of 5,653 renewable plants have capacity tags</td><td>Generation estimates use defaults (2/10 MW)</td><td>Conservative but individual plants may differ greatly</td></tr>
+<tr><td>ISPRA mosaic vintage is 2020</td><td>May not reflect most recent PGRA updates</td><td>Site-specific due diligence at shortlisting stage</td></tr>
+<tr><td>OSM road network incomplete in rural areas</td><td>Some parcels may fail Step 8 due to missing roads</td><td>Site visits for borderline candidates</td></tr>
+<tr><td>30m DEM resolution limits small parcel analysis</td><td>Parcels 500&ndash;1,000 m&sup2; may have only 1&ndash;3 pixels</td><td>3&times;3 neighbourhood fallback for small parcels</td></tr>
+<tr><td>Buffer zone data covers 191/1,103 parcels</td><td>Most parcels lack acoustic/infra assessment</td><td>Offline PBF processing planned for full coverage</td></tr>
+</tbody>
+</table>
+
+<h3>Methodological Assumptions</h3>
+<table>
+<thead><tr><th>Assumption</th><th>Value</th><th>Sensitivity</th></tr></thead>
+<tbody>
+<tr><td>Peak load per cabina secondaria</td><td>150 kW</td><td>Urban CS may be 2&ndash;3&times; higher; rural CS may be lower</td></tr>
+<tr><td>Equipment density (Hub/Large/Medium/Small)</td><td>60% / 50% / 45% / 35%</td><td>Validated against satellite imagery for one hub station</td></tr>
+<tr><td>BESS connection threshold</td><td>10 MVA on N-1 basis</td><td>9.9 MW at ~1.0 PF; some DNOs may accept lower margin</td></tr>
+<tr><td>Renewable capacity defaults</td><td>Solar 2 MW, Wind 10 MW</td><td>Italy average; individual plants vary 0.5&ndash;50+ MW</td></tr>
+<tr><td>Buffer radius for land search</td><td>500 m</td><td>Longer cable runs technically possible but costlier</td></tr>
+<tr><td>Slope threshold</td><td>6%</td><td>Screening-level; actual grading feasibility depends on soil and drainage</td></tr>
+<tr><td>Evacuation route threshold</td><td>450 m</td><td>Conservative; longer runs possible with higher cost</td></tr>
+<tr><td>Contiguity threshold (bundles)</td><td>3 m vertex distance</td><td>Accounts for coordinate precision and minor gaps</td></tr>
+<tr><td>Compactness threshold (bundles)</td><td>0.4 (area/bbox)</td><td>Ensures roughly rectangular, usable bundle shapes</td></tr>
+<tr><td>Acoustic exclusion distance</td><td>150 m (hard), 300 m (conditional)</td><td>Based on DSP norms; actual limits depend on BESS noise profile</td></tr>
+<tr><td>Infrastructure buffer distances</td><td>20&ndash;60 m roads, 30 m rail, 3&ndash;25 m power</td><td>Based on DSP / D.Lgs. 285/1992, DPR 753/1980, CEI 11-4</td></tr>
+</tbody>
+</table>
+
+<h3>What This Methodology Does Not Cover</h3>
+<p>This screening explicitly does not address: actual transformer nameplate data (requires DSO disclosure), real-time load measurements, DNO connection queue status, detailed geotechnical or planning constraints, grid reinforcement costs, BESS commercial viability, environmental impact assessment, land-use zoning classification, or road access for heavy transport (transformer delivery). These are deferred to the site shortlisting and connection application phases.</p>
+</section>
+</section>
+<!-- SECTION 16: ROADMAP -->
+<section class="section" id="s16">
+<span class="section-num">Section 16</span>
+<h2>Future Steps &amp; Roadmap</h2>
+
+<table>
+<thead><tr><th>Step</th><th>Description</th><th>Data Source</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">9</td><td>Buffer zone analysis &mdash; acoustic &amp; infrastructure DSP compliance (191 of 1,103 parcels assessed)</td><td>OSM Overpass API</td><td><span class="tag-live">LIVE</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Cadastral document harvesting &mdash; pipeline validated on sandbox (3/4 endpoints), dashboard integration complete</td><td>OpenAPI Catasto</td><td><span class="tag-live">LIVE</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Full cadastral harvest for 1,339 candidate parcels (visura + mappa + planimetrico)</td><td>OpenAPI Catasto</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Complete buffer zone analysis for remaining 912 parcels (offline PBF processing)</td><td>OSM PBF extract</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Steps 2&ndash;4 assessment for 96 new GSE substations (physical space, electrical headroom, BESS eligibility)</td><td>Bing aerial + load model</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">11</td><td>Road access assessment &mdash; can heavy transport (transformer delivery) reach the substation and BESS site?</td><td>OSM highway network</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">12</td><td>Environmental restrictions &mdash; Natura 2000, SIC/ZPS, landscape constraints</td><td>EU Natura 2000, regional data</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Land-use classification of candidate parcels (agricultural, industrial, etc.)</td><td>Corine Land Cover, OSM</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Operator name normalisation (e-distribuzione variant spellings across OSM and GSE)</td><td>Internal</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>MV voltage inference by region (15 kV south vs 20 kV north)</td><td>ENEL/regional practice</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Terna Econnextion connection queue data &mdash; pending connection applications</td><td>Terna dati.terna.it</td><td><span class="tag-pending">DEFERRED</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Terna TE.R.R.A. microzone congestion analysis (76 zones, quarterly)</td><td>Terna</td><td><span class="tag-pending">DEFERRED</span></td></tr>
+</tbody>
+</table>
+
+<hr class="divider">
+
+<p style="text-align:center; font-family: var(--sans); font-size: 0.78rem; color: var(--muted); margin-top: 2rem;">
+  <strong>Document version:</strong> 2.3 &mdash; 10 March 2026<br>
+  <strong>Repository:</strong> IkengaTest/dno-italy-process-engineering-automation (private)<br>
+  <strong>Knowledge Base:</strong> v10.5 (28 sections)<br>
+  <strong>Authors:</strong> Cedric B&eacute;rard &amp; Claude (Anthropic)
+</p>
+</section>
+</section>
+
+</div>
 </body>
 </html>
