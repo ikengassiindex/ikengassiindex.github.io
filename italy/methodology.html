@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DNO Italy — BESS Site Assessment Methodology v2.3</title>
+<title>DNO Italy — BESS Site Assessment Methodology v2.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -149,7 +149,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
     <span>&#x26A1; 2,501 substations assessed</span>
     <span>&#x1F50D; 9 filter steps &middot; 1 flag layer</span>
     <span>&#x1F4CA; 60+ variables per substation</span>
-    <span>&#x1F4C5; v2.3 &mdash; 10 March 2026</span>
+    <span>&#x1F4C5; v2.4 &mdash; 10 March 2026</span>
   </div>
 </header>
 
@@ -170,6 +170,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
   <li><a href="#s11">Step 8 &mdash; Evacuation Route Assessment</a></li>
   <li><a href="#s11b">Step 9 &mdash; Buffer Zone Analysis</a></li>
   <li><a href="#s11c">Cadastral Document Harvesting</a></li>
+  <li><a href="#s11d">Step 10 &mdash; Environmental Restrictions</a></li>
   <li><a href="#s12">Grid Congestion Flag</a></li>
   <li><a href="#s13">GSE Cabine Primarie Cross-Reference</a></li>
   <li><a href="#s14">Data Source Registry</a></li>
@@ -951,6 +952,64 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 </div>
 </section>
 
+<!-- SECTION 11d: ENVIRONMENTAL RESTRICTIONS -->
+<section class="section" id="s11d">
+<span class="section-num">Section 11d</span>
+<h2>Step 10 &mdash; Environmental Restrictions</h2>
+
+<h3>Objective</h3>
+<p>Eliminate or flag candidate parcels that fall within legally protected environmental zones where BESS installation is prohibited, requires extended permitting (6&ndash;12+ months), or faces a high probability of refusal. This is a spatial overlay step: each parcel&rsquo;s coordinates are tested against multiple environmental constraint layers to produce a pass/flag/eliminate classification.</p>
+
+<h3>Italian Environmental Protection Regimes</h3>
+<p>Five distinct legal frameworks govern environmental land-use restrictions relevant to BESS siting in Italy. Each operates under a different legislative basis, spatial dataset, and permitting consequence.</p>
+
+<table>
+<thead><tr><th>Regime</th><th>Legal Basis</th><th>Coverage</th><th>Consequence for BESS</th></tr></thead>
+<tbody>
+<tr><td><strong>Natura 2000</strong> (SIC/ZSC + ZPS)</td><td>Habitats Directive 92/43/EEC; Birds Directive 2009/147/EC; DPR 357/1997</td><td>~2,600 sites, ~19% of Italy</td><td>Mandatory VINCA screening (6&ndash;12 months); high refusal risk</td></tr>
+<tr><td><strong>Protected Areas (EUAP)</strong></td><td>Law 394/1991</td><td>871 areas, ~11% of territory</td><td>Zone A: prohibited; Zone B/C: heavily restricted</td></tr>
+<tr><td><strong>Landscape Constraints</strong> (Vincoli Paesaggistici)</td><td>D.Lgs. 42/2004 (Codice Urbani), Art. 136, 142, 157</td><td>Automatic buffers: 150m rivers, 300m lakes/coast, forests, mountains &gt;1,200m</td><td>Requires autorizzazione paesaggistica from Soprintendenza (3&ndash;6 months)</td></tr>
+<tr><td><strong>Regional Non-Suitable Areas</strong> (Aree Non Idonee)</td><td>D.M. 10/09/2010; D.Lgs. 199/2021; D.M. 21/06/2024 (Decreto Aree Idonee)</td><td>Region-specific; national buffer: 500m PV / 3km wind from protected assets</td><td>Construction not permitted in designated zones</td></tr>
+<tr><td><strong>Hydrogeological Constraint</strong> (Vincolo Idrogeologico)</td><td>R.D.L. 3267/1923; Regional PAI plans</td><td>620,000+ landslide phenomena (IFFI inventory)</td><td>Requires forestry authority authorisation; high-risk zones (R4/P4) = eliminate</td></tr>
+</tbody>
+</table>
+
+<h3>Filter Logic</h3>
+<div class="formula-box">
+  <span class="label">Environmental Classification</span>
+  <span class="main-eq">ELIMINATE &rarr; parcel &isin; (Natura 2000 core) &cup; (EUAP Zone A) &cup; (PAI R4/P4)</span>
+  <span class="main-eq">FLAG &rarr; parcel &isin; (EUAP Zone B/C) &cup; (Vincolo Paesaggistico) &cup; (PAI R3/P3) &cup; (500m buffer from protected area)</span>
+  <span class="main-eq">PASS &rarr; parcel &notin; any environmental constraint layer</span>
+  <span class="where">where R4/P4 = very high risk/hazard, R3/P3 = high risk/hazard per ISPRA classification</span>
+</div>
+
+<h3>Data Sources</h3>
+<table>
+<thead><tr><th>#</th><th>Layer</th><th>Source</th><th>Format</th><th>Vintage</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td class="td-mono">E1</td><td>Natura 2000 (SIC/ZSC + ZPS)</td><td>MASE Geoportale</td><td>Shapefile (UTM32/WGS84)</td><td>Jan 2026</td><td>Direct download &mdash; <code>download.mase.gov.it</code></td></tr>
+<tr><td class="td-mono">E2</td><td>Protected Areas (EUAP)</td><td>Protected Planet / WDPA</td><td>Shapefile + Geodatabase</td><td>Monthly updates</td><td><code>protectedplanet.net/country/ITA</code></td></tr>
+<tr><td class="td-mono">E3</td><td>Landscape Constraints</td><td>SITAP &mdash; Min. Cultura</td><td>WFS/WMS (GeoServer)</td><td>Current</td><td>WFS: <code>sitap.cultura.gov.it/geoserver/wfs</code></td></tr>
+<tr><td class="td-mono">E4</td><td>Landslide Inventory (IFFI)</td><td>ISPRA IdroGEO</td><td>Shapefile + WFS + JSON</td><td>Continuous</td><td>CC BY-SA 4.0 &mdash; <code>idrogeo.isprambiente.it</code></td></tr>
+<tr><td class="td-mono">E5</td><td>Flood &amp; Landslide Hazard</td><td>ISPRA IdroGEO</td><td>Shapefile + WMS</td><td>Current</td><td>CC BY-SA 4.0 &mdash; same portal as E4</td></tr>
+<tr><td class="td-mono">E6</td><td>Regional PAI (Calabria)</td><td>Autorit&agrave; di Bacino Calabria</td><td>Shapefile + WebGIS</td><td>2016</td><td><code>geoportale.regione.calabria.it</code></td></tr>
+</tbody>
+</table>
+
+<h3>Implementation Priority</h3>
+<p><strong>Tier 1 &mdash; Hard eliminators</strong> (parcel fully inside = eliminate): Natura 2000 (E1) and EUAP Protected Areas (E2). These carry the highest permitting risk and longest timelines. The MASE shapefiles are authoritative and freshly updated (January 2026).</p>
+<p><strong>Tier 2 &mdash; Strong constraints</strong> (parcel inside = flag): Vincoli Paesaggistici (E3), Landslide/Flood Hazard R3/P3 (E4/E5). Landscape authorisation is technically possible but adds 3&ndash;6 months and uncertainty.</p>
+<p><strong>Tier 3 &mdash; Regional specifics</strong>: Calabria PAI (E6) provides legally binding regional hydrogeological zonation; overlaps with E4/E5 but gives the official classification. Geoportal currently under maintenance but legacy site available.</p>
+
+<div class="note">
+  <strong>Decreto Aree Idonee (D.M. 21 June 2024):</strong> This decree establishes national buffer distances of 500&thinsp;m for photovoltaic/BESS installations and 3&thinsp;km for wind turbines from protected natural assets. For our BESS pipeline, the 500&thinsp;m buffer is applied around Natura 2000 and EUAP boundaries before intersection.
+</div>
+
+<div class="note-blue">
+  <strong>Status:</strong> Research and data source identification complete. Implementation (shapefile download, spatial intersection, dashboard integration) is a pending next step.
+</div>
+</section>
+
 <!-- SECTION 14: DATA SOURCES -->
 <section class="section" id="s14">
 <span class="section-num">Section 14</span>
@@ -978,6 +1037,12 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <tr><td class="td-mono">D17</td><td>OpenStreetMap</td><td>building=* (Italy, Overpass API)</td><td>Mar 2026</td><td>Step 9 (acoustic)</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D18</td><td>OpenStreetMap</td><td>railway=rail, power=line, highway=* (Overpass API)</td><td>Mar 2026</td><td>Step 9 (infra buffers)</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D19</td><td>OpenAPI (Catasto)</td><td>Visura, Estratto Mappa, Elaborato Planimetrico APIs</td><td>Mar 2026</td><td>Cadastral docs</td><td>Sandbox free / Prod paid</td></tr>
+<tr><td class="td-mono">D20</td><td>MASE</td><td>Natura 2000 SIC/ZSC + ZPS shapefiles (EU transmission Dec 2025)</td><td>Jan 2026</td><td>Step 10</td><td>Free / <code>download.mase.gov.it</code></td></tr>
+<tr><td class="td-mono">D21</td><td>UNEP-WCMC</td><td>WDPA &mdash; Protected Planet Italy (EUAP)</td><td>Monthly</td><td>Step 10</td><td>Free / WDPA terms</td></tr>
+<tr><td class="td-mono">D22</td><td>Min. Cultura</td><td>SITAP Vincoli Paesaggistici (WFS/WMS)</td><td>Current</td><td>Step 10</td><td>Free / GeoServer WFS</td></tr>
+<tr><td class="td-mono">D23</td><td>ISPRA</td><td>IdroGEO IFFI Landslide Inventory + Hazard Maps</td><td>Current</td><td>Step 10</td><td>Free / CC BY-SA 4.0</td></tr>
+<tr><td class="td-mono">D24</td><td>ABR Calabria</td><td>PAI Piano di Assetto Idrogeologico (regional)</td><td>2016</td><td>Step 10</td><td>Regional geoportal</td></tr>
+<tr><td class="td-mono">D25</td><td>EU / Italy</td><td>Decreto Aree Idonee (D.M. 21/06/2024) &mdash; buffer criteria</td><td>Jun 2024</td><td>Step 10</td><td>Gazzetta Ufficiale</td></tr>
 </tbody>
 </table>
 </section>
@@ -1021,7 +1086,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 </table>
 
 <h3>What This Methodology Does Not Cover</h3>
-<p>This screening explicitly does not address: actual transformer nameplate data (requires DSO disclosure), real-time load measurements, DNO connection queue status, detailed geotechnical or planning constraints, grid reinforcement costs, BESS commercial viability, environmental impact assessment, land-use zoning classification, or road access for heavy transport (transformer delivery). These are deferred to the site shortlisting and connection application phases.</p>
+<p>This screening explicitly does not address: actual transformer nameplate data (requires DSO disclosure), real-time load measurements, DNO connection queue status, detailed geotechnical or planning constraints, grid reinforcement costs, BESS commercial viability, full environmental impact assessment (EIA/VIA), land-use zoning classification, or road access for heavy transport (transformer delivery). These are deferred to the site shortlisting and connection application phases.</p>
 </section>
 </section>
 <!-- SECTION 16: ROADMAP -->
@@ -1038,7 +1103,8 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <tr><td class="td-mono">&mdash;</td><td>Complete buffer zone analysis for remaining 912 parcels (offline PBF processing)</td><td>OSM PBF extract</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Steps 2&ndash;4 assessment for 96 new GSE substations (physical space, electrical headroom, BESS eligibility)</td><td>Bing aerial + load model</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">11</td><td>Road access assessment &mdash; can heavy transport (transformer delivery) reach the substation and BESS site?</td><td>OSM highway network</td><td><span class="tag-pending">PENDING</span></td></tr>
-<tr><td class="td-mono">12</td><td>Environmental restrictions &mdash; Natura 2000, SIC/ZPS, landscape constraints</td><td>EU Natura 2000, regional data</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">10</td><td>Environmental restrictions &mdash; 5 regimes researched, 6 data sources identified (Natura 2000, EUAP, SITAP, IFFI, PAI, Aree Idonee)</td><td>MASE, ISPRA, SITAP, WDPA</td><td><span class="tag-live">RESEARCH</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Environmental spatial overlay &mdash; shapefile download, parcel intersection, dashboard integration</td><td>D20&ndash;D25</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Land-use classification of candidate parcels (agricultural, industrial, etc.)</td><td>Corine Land Cover, OSM</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Operator name normalisation (e-distribuzione variant spellings across OSM and GSE)</td><td>Internal</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>MV voltage inference by region (15 kV south vs 20 kV north)</td><td>ENEL/regional practice</td><td><span class="tag-pending">PENDING</span></td></tr>
@@ -1050,9 +1116,9 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <hr class="divider">
 
 <p style="text-align:center; font-family: var(--sans); font-size: 0.78rem; color: var(--muted); margin-top: 2rem;">
-  <strong>Document version:</strong> 2.3 &mdash; 10 March 2026<br>
+  <strong>Document version:</strong> 2.4 &mdash; 11 March 2026<br>
   <strong>Repository:</strong> IkengaTest/dno-italy-process-engineering-automation (private)<br>
-  <strong>Knowledge Base:</strong> v10.5 (28 sections)<br>
+  <strong>Knowledge Base:</strong> v10.6 (29 sections)<br>
   <strong>Authors:</strong> Cedric B&eacute;rard &amp; Claude (Anthropic)
 </p>
 </section>
