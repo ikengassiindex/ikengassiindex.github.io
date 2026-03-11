@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DNO Italy — BESS Site Assessment Methodology v2.4</title>
+<title>DNO Italy — BESS Site Assessment Methodology v2.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -149,7 +149,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
     <span>&#x26A1; 2,501 substations assessed</span>
     <span>&#x1F50D; 9 filter steps &middot; 1 flag layer</span>
     <span>&#x1F4CA; 60+ variables per substation</span>
-    <span>&#x1F4C5; v2.4 &mdash; 10 March 2026</span>
+    <span>&#x1F4C5; v2.5 &mdash; 11 March 2026</span>
   </div>
 </header>
 
@@ -1005,8 +1005,36 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
   <strong>Decreto Aree Idonee (D.M. 21 June 2024):</strong> This decree establishes national buffer distances of 500&thinsp;m for photovoltaic/BESS installations and 3&thinsp;km for wind turbines from protected natural assets. For our BESS pipeline, the 500&thinsp;m buffer is applied around Natura 2000 and EUAP boundaries before intersection.
 </div>
 
+<h3>Implementation Status (11 March 2026)</h3>
+<p>Two of the six environmental data sources have been processed and integrated into the live dashboard:</p>
+<table>
+<thead><tr><th>Layer</th><th>Source</th><th>Features</th><th>Status</th><th>Impact</th></tr></thead>
+<tbody>
+<tr><td><strong>WDPA Protected Areas</strong> (E1+E2)</td><td>Protected Planet / UNEP-WCMC</td><td>3,958 polygons</td><td><span class="tag-live">LIVE</span></td><td>Tier 1 &mdash; ELIMINATE (core) + FLAG (500m buffer)</td></tr>
+<tr><td><strong>SITAP Vincoli Paesaggistici</strong> (E3)</td><td>Min. Cultura WFS</td><td>5,329 polygons</td><td><span class="tag-live">LIVE</span></td><td>Tier 2 &mdash; FLAG (landscape authorisation required)</td></tr>
+<tr><td><strong>ISPRA IFFI Landslides</strong> (E4)</td><td>IdroGEO</td><td>684,444 features</td><td>Pending</td><td>WFS disabled; WMS-only (no bulk download)</td></tr>
+<tr><td><strong>Regional PAI</strong> (E5/E6)</td><td>Regional authorities</td><td>Variable</td><td>Pending</td><td>Requires per-region shapefile acquisition</td></tr>
+</tbody>
+</table>
+
+<p><strong>WDPA (March 2026)</strong> supersedes the original Natura 2000-only (MASE) dataset. The WDPA includes Natura 2000 sites, EUAP national/regional parks, Ramsar wetlands, and other IUCN-designated areas &mdash; providing comprehensive Tier 1 coverage in a single dataset of 3,958 polygons.</p>
+
+<p><strong>SITAP vincoli</strong> were downloaded via WFS from the Ministry of Culture&rsquo;s GeoServer (<code>sitap.cultura.gov.it/geoserver/wfs</code>), layer <code>v1497pol_wgs84</code>, with explicit <code>srsName=EPSG:4326</code> reprojection (the server stores data in EPSG:32632 despite the layer name). All 5,693 features were paginated in batches of 1,000; 5,329 had valid geometries.</p>
+
+<p><strong>Parcel-level results (59,498 parcels):</strong></p>
+<table>
+<thead><tr><th>Classification</th><th>Count</th><th>%</th></tr></thead>
+<tbody>
+<tr><td>PASS (no environmental constraint)</td><td>47,546</td><td>79.9%</td></tr>
+<tr><td>FLAG (in WDPA 500m buffer or SITAP vincolo)</td><td>9,673</td><td>16.3%</td></tr>
+<tr><td>ELIMINATE (in WDPA core protected area)</td><td>2,279</td><td>3.8%</td></tr>
+</tbody>
+</table>
+
+<p><strong>Substation-level funnel result:</strong> 642 substations pass Step 10 (25.7%), down from 702 at Step 9. The environmental filter eliminates 60 substations whose only viable parcels fall within protected area cores.</p>
+
 <div class="note-blue">
-  <strong>Status:</strong> Research and data source identification complete. Implementation (shapefile download, spatial intersection, dashboard integration) is a pending next step.
+  <strong>Remaining:</strong> ISPRA IFFI (Tier 3) cannot be bulk-downloaded &mdash; WFS is disabled on IdroGEO, and the REST API only supports individual feature queries. Regional PAI shapefiles require per-region acquisition. These will be addressed in a future iteration.
 </div>
 </section>
 
@@ -1037,9 +1065,9 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <tr><td class="td-mono">D17</td><td>OpenStreetMap</td><td>building=* (Italy, Overpass API)</td><td>Mar 2026</td><td>Step 9 (acoustic)</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D18</td><td>OpenStreetMap</td><td>railway=rail, power=line, highway=* (Overpass API)</td><td>Mar 2026</td><td>Step 9 (infra buffers)</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D19</td><td>OpenAPI (Catasto)</td><td>Visura, Estratto Mappa, Elaborato Planimetrico APIs</td><td>Mar 2026</td><td>Cadastral docs</td><td>Sandbox free / Prod paid</td></tr>
-<tr><td class="td-mono">D20</td><td>MASE</td><td>Natura 2000 SIC/ZSC + ZPS shapefiles (EU transmission Dec 2025)</td><td>Jan 2026</td><td>Step 10</td><td>Free / <code>download.mase.gov.it</code></td></tr>
-<tr><td class="td-mono">D21</td><td>UNEP-WCMC</td><td>WDPA &mdash; Protected Planet Italy (EUAP)</td><td>Monthly</td><td>Step 10</td><td>Free / WDPA terms</td></tr>
-<tr><td class="td-mono">D22</td><td>Min. Cultura</td><td>SITAP Vincoli Paesaggistici (WFS/WMS)</td><td>Current</td><td>Step 10</td><td>Free / GeoServer WFS</td></tr>
+<tr><td class="td-mono">D20</td><td>UNEP-WCMC</td><td>WDPA Mar 2026 &mdash; Protected Planet Italy (N2K + EUAP + Ramsar, 3,958 polygons)</td><td>Mar 2026</td><td>Step 10</td><td>Free / WDPA terms / CloudFront CDN</td></tr>
+<tr><td class="td-mono">D21</td><td>MASE</td><td>Natura 2000 SIC/ZSC + ZPS shapefiles (superseded by D20)</td><td>Jan 2026</td><td>Step 10 (legacy)</td><td>Free / <code>download.mase.gov.it</code></td></tr>
+<tr><td class="td-mono">D22</td><td>Min. Cultura</td><td>SITAP Vincoli Paesaggistici &mdash; 5,329 polygons via WFS (<code>v1497pol_wgs84</code>)</td><td>Mar 2026</td><td>Step 10</td><td>Free / GeoServer WFS</td></tr>
 <tr><td class="td-mono">D23</td><td>ISPRA</td><td>IdroGEO IFFI Landslide Inventory + Hazard Maps</td><td>Current</td><td>Step 10</td><td>Free / CC BY-SA 4.0</td></tr>
 <tr><td class="td-mono">D24</td><td>ABR Calabria</td><td>PAI Piano di Assetto Idrogeologico (regional)</td><td>2016</td><td>Step 10</td><td>Regional geoportal</td></tr>
 <tr><td class="td-mono">D25</td><td>EU / Italy</td><td>Decreto Aree Idonee (D.M. 21/06/2024) &mdash; buffer criteria</td><td>Jun 2024</td><td>Step 10</td><td>Gazzetta Ufficiale</td></tr>
@@ -1103,7 +1131,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <tr><td class="td-mono">&mdash;</td><td>Complete buffer zone analysis for remaining 912 parcels (offline PBF processing)</td><td>OSM PBF extract</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Steps 2&ndash;4 assessment for 96 new GSE substations (physical space, electrical headroom, BESS eligibility)</td><td>Bing aerial + load model</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">11</td><td>Road access assessment &mdash; can heavy transport (transformer delivery) reach the substation and BESS site?</td><td>OSM highway network</td><td><span class="tag-pending">PENDING</span></td></tr>
-<tr><td class="td-mono">10</td><td>Environmental restrictions &mdash; 5 regimes researched, 6 data sources identified (Natura 2000, EUAP, SITAP, IFFI, PAI, Aree Idonee)</td><td>MASE, ISPRA, SITAP, WDPA</td><td><span class="tag-live">RESEARCH</span></td></tr>
+<tr><td class="td-mono">10</td><td>Environmental restrictions &mdash; WDPA (3,958 areas) + SITAP vincoli (5,329 polygons) live; ISPRA IFFI pending</td><td>WDPA, SITAP, MASE</td><td><span class="tag-live">LIVE</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Environmental spatial overlay &mdash; shapefile download, parcel intersection, dashboard integration</td><td>D20&ndash;D25</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Land-use classification of candidate parcels (agricultural, industrial, etc.)</td><td>Corine Land Cover, OSM</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Operator name normalisation (e-distribuzione variant spellings across OSM and GSE)</td><td>Internal</td><td><span class="tag-pending">PENDING</span></td></tr>
@@ -1116,7 +1144,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <hr class="divider">
 
 <p style="text-align:center; font-family: var(--sans); font-size: 0.78rem; color: var(--muted); margin-top: 2rem;">
-  <strong>Document version:</strong> 2.4 &mdash; 11 March 2026<br>
+  <strong>Document version:</strong> 2.5 &mdash; 11 March 2026<br>
   <strong>Repository:</strong> IkengaTest/dno-italy-process-engineering-automation (private)<br>
   <strong>Knowledge Base:</strong> v10.6 (29 sections)<br>
   <strong>Authors:</strong> Cedric B&eacute;rard &amp; Claude (Anthropic)
