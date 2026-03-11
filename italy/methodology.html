@@ -149,7 +149,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
     <span>&#x26A1; 2,501 substations assessed</span>
     <span>&#x1F50D; 9 filter steps &middot; 1 flag layer</span>
     <span>&#x1F4CA; 60+ variables per substation</span>
-    <span>&#x1F4C5; v2.5 &mdash; 11 March 2026</span>
+    <span>&#x1F4C5; v2.6 v2.5 &mdash; 11 March 2026mdash; 11 March 2026</span>
   </div>
 </header>
 
@@ -1012,8 +1012,11 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <tbody>
 <tr><td><strong>WDPA Protected Areas</strong> (E1+E2)</td><td>Protected Planet / UNEP-WCMC</td><td>3,958 polygons</td><td><span class="tag-live">LIVE</span></td><td>Tier 1 &mdash; ELIMINATE (core) + FLAG (500m buffer)</td></tr>
 <tr><td><strong>SITAP Vincoli Paesaggistici</strong> (E3)</td><td>Min. Cultura WFS</td><td>5,329 polygons</td><td><span class="tag-live">LIVE</span></td><td>Tier 2 &mdash; FLAG (landscape authorisation required)</td></tr>
-<tr><td><strong>ISPRA IFFI Landslides</strong> (E4)</td><td>IdroGEO</td><td>684,444 features</td><td>Pending</td><td>WFS disabled; WMS-only (no bulk download)</td></tr>
-<tr><td><strong>Regional PAI</strong> (E5/E6)</td><td>Regional authorities</td><td>Variable</td><td>Pending</td><td>Requires per-region shapefile acquisition</td></tr>
+<tr><td><strong>SITAP Art. 142 Ope Legis</strong> (E3b)</td><td>Min. Cultura WFS</td><td>22,934 polygons (14 layers)</td><td><span class="tag-live">LIVE</span></td><td>Tier 2 &mdash; Rivers 150m, lakes 300m, coasts 300m, woodlands, mountains, archaeology (Campania/Sardinia/Puglia)</td></tr>
+<tr><td><strong>ISPRA IFFI Landslides</strong> (E4)</td><td>IdroGEO</td><td>684,444 features</td><td>Blocked</td><td>WFS disabled; REST API no bulk query; shapefile downloads 404</td></tr>
+<tr><td><strong>Regional PAI</strong> (E5/E6)</td><td>Regional authorities</td><td>Variable</td><td>Blocked</td><td>ISPRA services unreachable; requires per-region shapefile acquisition</td></tr>
+<tr><td><strong>EFFIS Fire-Affected Areas</strong> (E7)</td><td>Copernicus EMS</td><td>Variable</td><td>Blocked</td><td>EFFIS WFS redirected to new domain; no bulk download available</td></tr>
+<tr><td><strong>Puglia FER Unsuitable Areas</strong> (E8)</td><td>SIT Puglia</td><td>Variable</td><td>Blocked</td><td>FERAreeNonIdonee service returns 0 layers</td></tr>
 </tbody>
 </table>
 
@@ -1021,20 +1024,35 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 
 <p><strong>SITAP vincoli</strong> were downloaded via WFS from the Ministry of Culture&rsquo;s GeoServer (<code>sitap.cultura.gov.it/geoserver/wfs</code>), layer <code>v1497pol_wgs84</code>, with explicit <code>srsName=EPSG:4326</code> reprojection (the server stores data in EPSG:32632 despite the layer name). All 5,693 features were paginated in batches of 1,000; 5,329 had valid geometries.</p>
 
-<p><strong>Parcel-level results (59,498 parcels):</strong></p>
+<p><strong>SITAP Art. 142 Ope Legis</strong> layers were downloaded from the same WFS for three of the five target regions (Campania, Sardinia, Puglia). Lazio and Sicily Art. 142 layers are not available on SITAP WFS and require regional portal access. 14 layers were downloaded covering: rivers/torrents 150m buffer (of), lakes 300m buffer (ol), coastlines 300m (oc), woodlands (og), mountains (od), and archaeological zones (om). Total: 22,934 polygons. Each parcel now carries per-layer codes indicating which specific constraint triggered the flag.</p>
+
+<p><strong>Parcel-level results (59,498 parcels, 7 active layers):</strong></p>
 <table>
 <thead><tr><th>Classification</th><th>Count</th><th>%</th></tr></thead>
 <tbody>
-<tr><td>PASS (no environmental constraint)</td><td>47,546</td><td>79.9%</td></tr>
-<tr><td>FLAG (in WDPA 500m buffer or SITAP vincolo)</td><td>9,673</td><td>16.3%</td></tr>
-<tr><td>ELIMINATE (in WDPA core protected area)</td><td>2,279</td><td>3.8%</td></tr>
+<tr><td>PASS (no environmental constraint)</td><td>46,750</td><td>78.6%</td></tr>
+<tr><td>FLAG (in buffer zone or constraint area)</td><td>10,263</td><td>17.2%</td></tr>
+<tr><td>ELIMINATE (in WDPA core or woodland)</td><td>2,485</td><td>4.2%</td></tr>
 </tbody>
 </table>
 
-<p><strong>Substation-level funnel result:</strong> 642 substations pass Step 10 (25.7%), down from 702 at Step 9. The environmental filter eliminates 60 substations whose only viable parcels fall within protected area cores.</p>
+<p><strong>Per-layer hit breakdown:</strong></p>
+<table>
+<thead><tr><th>Code</th><th>Layer</th><th>Parcels Hit</th></tr></thead>
+<tbody>
+<tr><td>wf</td><td>WDPA 500m buffer</td><td>9,673</td></tr>
+<tr><td>we</td><td>WDPA core protected area</td><td>2,279</td></tr>
+<tr><td>sf</td><td>SITAP vincoli decretati</td><td>5,608</td></tr>
+<tr><td>of</td><td>Art. 142 rivers/torrents 150m</td><td>821</td></tr>
+<tr><td>og</td><td>Art. 142 woodlands</td><td>247</td></tr>
+<tr><td>ol</td><td>Art. 142 lakes 300m</td><td>168</td></tr>
+<tr><td>om</td><td>Art. 142 archaeological zones</td><td>32</td></tr>
+<tr><td>oc</td><td>Art. 142 coastlines 300m</td><td>17</td></tr>
+</tbody>
+</table>
 
 <div class="note-blue">
-  <strong>Remaining:</strong> ISPRA IFFI (Tier 3) cannot be bulk-downloaded &mdash; WFS is disabled on IdroGEO, and the REST API only supports individual feature queries. Regional PAI shapefiles require per-region acquisition. These will be addressed in a future iteration.
+  <strong>Data source gaps (Phase 2 blocked):</strong> ISPRA IFFI (WFS disabled, REST API no bulk query, shapefile downloads returning 404), EFFIS fire data (WFS redirected to new domain, no bulk download), Puglia FERAreeNonIdonee (returns 0 layers), ISPRA PAI geomorphological services (unreachable). Lazio and Sicily Art. 142 layers require regional portal access. These will be addressed when data services become available.
 </div>
 </section>
 
@@ -1067,7 +1085,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <tr><td class="td-mono">D19</td><td>OpenAPI (Catasto)</td><td>Visura, Estratto Mappa, Elaborato Planimetrico APIs</td><td>Mar 2026</td><td>Cadastral docs</td><td>Sandbox free / Prod paid</td></tr>
 <tr><td class="td-mono">D20</td><td>UNEP-WCMC</td><td>WDPA Mar 2026 &mdash; Protected Planet Italy (N2K + EUAP + Ramsar, 3,958 polygons)</td><td>Mar 2026</td><td>Step 10</td><td>Free / WDPA terms / CloudFront CDN</td></tr>
 <tr><td class="td-mono">D21</td><td>MASE</td><td>Natura 2000 SIC/ZSC + ZPS shapefiles (superseded by D20)</td><td>Jan 2026</td><td>Step 10 (legacy)</td><td>Free / <code>download.mase.gov.it</code></td></tr>
-<tr><td class="td-mono">D22</td><td>Min. Cultura</td><td>SITAP Vincoli Paesaggistici &mdash; 5,329 polygons via WFS (<code>v1497pol_wgs84</code>)</td><td>Mar 2026</td><td>Step 10</td><td>Free / GeoServer WFS</td></tr>
+<tr><td class="td-mono">D22</td><td>Min. Cultura</td><td>SITAP Vincoli Paesaggistici SITAP Vincoli Paesaggistici &mdash; 5,329 polygons via WFS (<code>v1497pol_wgs84</code>)mdash; 5,329 polygons via WFS + Art. 142 Ope Legis 22,934 polygons (14 layers)</td><td>Mar 2026</td><td>Step 10</td><td>Free / GeoServer WFS</td></tr>
 <tr><td class="td-mono">D23</td><td>ISPRA</td><td>IdroGEO IFFI Landslide Inventory + Hazard Maps</td><td>Current</td><td>Step 10</td><td>Free / CC BY-SA 4.0</td></tr>
 <tr><td class="td-mono">D24</td><td>ABR Calabria</td><td>PAI Piano di Assetto Idrogeologico (regional)</td><td>2016</td><td>Step 10</td><td>Regional geoportal</td></tr>
 <tr><td class="td-mono">D25</td><td>EU / Italy</td><td>Decreto Aree Idonee (D.M. 21/06/2024) &mdash; buffer criteria</td><td>Jun 2024</td><td>Step 10</td><td>Gazzetta Ufficiale</td></tr>
@@ -1131,7 +1149,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <tr><td class="td-mono">&mdash;</td><td>Complete buffer zone analysis for remaining 912 parcels (offline PBF processing)</td><td>OSM PBF extract</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Steps 2&ndash;4 assessment for 96 new GSE substations (physical space, electrical headroom, BESS eligibility)</td><td>Bing aerial + load model</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">11</td><td>Road access assessment &mdash; can heavy transport (transformer delivery) reach the substation and BESS site?</td><td>OSM highway network</td><td><span class="tag-pending">PENDING</span></td></tr>
-<tr><td class="td-mono">10</td><td>Environmental restrictions &mdash; WDPA (3,958 areas) + SITAP vincoli (5,329 polygons) live; ISPRA IFFI pending</td><td>WDPA, SITAP, MASE</td><td><span class="tag-live">LIVE</span></td></tr>
+<tr><td class="td-mono">10</td><td>Environmental restrictions Environmental restrictions &mdash; WDPA (3,958 areas) + SITAP vincoli (5,329 polygons) live; ISPRA IFFI pendingmdash; 7 layers live (WDPA + SITAP vincoli + Art. 142 Ope Legis, 28,263 polygons); IFFI/EFFIS/PAI blocked</td><td>WDPA, SITAP, MASE</td><td><span class="tag-live">LIVE</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Environmental spatial overlay &mdash; shapefile download, parcel intersection, dashboard integration</td><td>D20&ndash;D25</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Land-use classification of candidate parcels (agricultural, industrial, etc.)</td><td>Corine Land Cover, OSM</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Operator name normalisation (e-distribuzione variant spellings across OSM and GSE)</td><td>Internal</td><td><span class="tag-pending">PENDING</span></td></tr>
@@ -1144,7 +1162,7 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); 
 <hr class="divider">
 
 <p style="text-align:center; font-family: var(--sans); font-size: 0.78rem; color: var(--muted); margin-top: 2rem;">
-  <strong>Document version:</strong> 2.5 &mdash; 11 March 2026<br>
+  <strong>Document version:</strong> 2.6 &mdash; 11 March 2026<br>
   <strong>Repository:</strong> IkengaTest/dno-italy-process-engineering-automation (private)<br>
   <strong>Knowledge Base:</strong> v10.6 (29 sections)<br>
   <strong>Authors:</strong> Cedric B&eacute;rard &amp; Claude (Anthropic)
