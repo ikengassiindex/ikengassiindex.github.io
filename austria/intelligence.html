@@ -335,7 +335,7 @@
 <h3>B.4 &ensp; Monthly Pulse</h3>
 
 <div class="card" style="border-left:3px solid var(--sage);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0" id="b4-pulse"><strong>Edition 001 — Baseline Snapshot.</strong> Loading…</p>
+  <p style="font-size:13px;line-height:1.7;margin:0" id="b4-pulse"><strong>Inaugural edition — Baseline Snapshot.</strong> Loading…</p>
 </div>
 
 <script>
@@ -643,10 +643,10 @@
     }).length;
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var now = new Date();
-    var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+    var monthYear = 'April 2026';
 
     document.getElementById('b4-pulse').innerHTML =
-      '<strong>Edition 001 — Baseline Snapshot (' + monthYear + ').</strong> ' +
+      '<strong>Inaugural edition — Baseline Snapshot (' + monthYear + ').</strong> ' +
       'This edition establishes the baseline for the Cyber & Economic Exposure Monitor across the Austrian fleet. Key reference points: ' +
       'fleet average R7 = ' + avgR7.toFixed(4) + ', median = ' + medianR7.toFixed(4) + '; ' +
       cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
@@ -721,7 +721,7 @@
 
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var now = new Date();
-  var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+  var monthYear = 'April 2026';
 
   document.getElementById('sec-c-intro').innerHTML =
     'The SSI v4.0.2 draws on <strong>' + meta.stats.sources + ' verified public data sources</strong> feeding ' +
@@ -1337,7 +1337,7 @@
   var nextTopic = topics[nextIdx];
 
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+  var monthYear = 'April 2026';
 
   var layerDefs = [
     { n: 1, label: 'Layer 1 — Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
@@ -1427,50 +1427,206 @@
 
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0">
   <!-- Card 1: Next Edition — deterministic deep-dive rotation -->
-  <div class="card" style="border-top:3px solid var(--bronze)" id="g-next-edition">
-    <span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Edition 002</span>
-    <h3 style="margin-top:0;font-size:15px">Oberösterreich</h3>
-    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Industrial grid focus: VOEST steelworks, chemical processing, automotive — highest capital-intensive DSO load. Examine continuity deficits and economic consequence concentration.</p>
-  </div>
-  <!-- Card 2: Next Data Refresh — from SSIMetadata source frequencies -->
-  <div class="card" style="border-top:3px solid var(--sage)" id="g-data-refresh">
-    <span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Q2 2026</span>
-    <h3 style="margin-top:0;font-size:15px">Next Data Update</h3>
-    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Expected: E-Control TIQE refresh (April 2026) affecting Continuity and Restoration components. OSM and weather data update weekly. First material fleet score changes anticipated May 2026.</p>
-  </div>
-  <!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json -->
-  <div class="card" style="border-top:3px solid var(--crimson)" id="g-spotlight">
-    <span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Insight</span>
-    <h3 style="margin-top:0;font-size:15px" id="g-spotlight-title">Loading…</h3>
-    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0" id="g-spotlight-text">Loading…</p>
-  </div>
-</div>
-
-<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream);margin-top:24px">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>About this intelligence report:</strong> The SSI Monthly Intelligence Edition 001 is the inaugural edition for Austria. The report cycles through 12 editions per year, each featuring a new deep-dive on one of Austria's 9 Bundesländer (or special topics like annual review or methodology). All data is drawn from 35 verified public sources. The SSI Index serves no proprietary interest — published as a non-profit resource for energy policy makers, grid operators, investors, and researchers. Next edition: 8 April 2026.</p>
-</div>
+  <p style="font-size:13px;line-height:1.7" id="g-closing">Loading…</p>
 
 <script>
-fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
-  var fleet = data.substations;
-  var n = fleet.length;
+(function(){
+  var now = new Date();
+  var month = now.getMonth(); // 0-indexed
+  var year = now.getFullYear();
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-  var bands = { Low:0, Medium:0, High:0, Critical:0 };
-  fleet.forEach(function(s){ bands[s.classification]++; });
+  // Next month
+  var nextMonth = month + 1 > 11 ? 0 : month + 1;
+  var nextYear = month + 1 > 11 ? year + 1 : year;
+  var editionNum = (year - 2026) * 12 + (month + 1) - 2; // March 2026 = 1
+  var nextEdition = String(Math.max(1, editionNum)).padStart(3, '0');
 
-  document.getElementById('g-spotlight-title').textContent = 'Austrian Fleet Health';
-  document.getElementById('g-spotlight-text').innerHTML =
-    '<strong>' + bands.Low + ' Low</strong> (' + (bands.Low/n*100).toFixed(1) + '%), ' +
-    '<strong>' + bands.Medium + ' Medium</strong> (' + (bands.Medium/n*100).toFixed(1) + '%), ' +
-    '<strong>' + bands.High + ' High</strong> (' + (bands.High/n*100).toFixed(1) + '%), ' +
-    '<strong>' + bands.Critical + ' Critical</strong> (' + (bands.Critical/n*100).toFixed(1) + '%). ' +
-    'The fleet skews toward Low and Medium bands, but the High + Critical tier (' + (bands.High + bands.Critical) + ' substations) ' +
-    'represents the priority cohort for investment and modernisation planning.';
-});
+  // Deterministic seed
+  function seededIndex(s, len) {
+    var h = s;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = (h >>> 16) ^ h;
+    return Math.abs(h) % len;
+  }
+  var nextSeed = nextYear * 100 + (nextMonth + 1);
+
+  // ── Card 1: Next Edition deep-dive topics ──
+  var deepDives = [
+    { region: 'Oberösterreich', theme: 'Upper Austrian Industrial Grid Stress', detail: 'Examining how concentrated steel and chemicals demand in Linz–Wels creates seasonal congestion patterns on the 110kV network.' },
+    { region: 'Steiermark', theme: 'Styrian Green Hydrogen Corridor', detail: 'Analysing the grid infrastructure needed to support electrolyser deployment along the Mur valley industrial axis.' },
+    { region: 'Tirol', theme: 'Tyrolean Alpine Hydro Backbone', detail: 'Mapping how run-of-river and pumped storage hydro in the Inn valley sustains grid stability during winter peak demand.' },
+    { region: 'Kärnten', theme: 'Carinthian Cross-Border Flows', detail: 'Evaluating how Slovenian and Italian interconnections create bidirectional flow patterns at southern Austrian substations.' },
+    { region: 'Salzburg', theme: 'Salzburg Tourism Load Variability', detail: 'Assessing how seasonal tourism demand in the Salzburg–Pinzgau corridor challenges substation capacity planning.' },
+    { region: 'Vorarlberg', theme: 'Vorarlberg Swiss Interconnection', detail: 'Studying the Feldkirch–Buchs cross-border tie-line capacity and its role in balancing western Austrian supply.' },
+    { region: 'Niederösterreich', theme: 'Wind Integration in the Weinviertel', detail: 'Analysing how concentrated wind generation north of Vienna stresses the regional 110kV distribution grid.' },
+    { region: 'Wien', theme: 'Vienna Urban Grid Modernisation', detail: 'Tracking how heat pump adoption and EV charging reshape demand profiles across Vienna’s dense substation network.' },
+    { region: 'Burgenland', theme: 'Burgenland Renewable Surplus', detail: 'Examining how Austria’s highest per-capita wind and solar capacity creates export congestion at eastern border points.' }
+  ];
+
+  var nextDiveIdx = seededIndex(nextSeed + 3333, deepDives.length);
+  var nextDive = deepDives[nextDiveIdx];
+
+  var card1 = document.getElementById('g-next-edition');
+  card1.innerHTML =
+    '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
+    '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
+    '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, province breakdown. ' +
+    'European Context Card: ' + nextDive.contextDetail + '.</p>';
+
+  // ── Card 2: Next Data Refresh — from SSIMetadata ──
+  var meta = window.SSIMetadata;
+  if (meta) {
+    // Determine which frequency cadence is next due
+    // Q1=Jan-Mar, Q2=Apr-Jun, Q3=Jul-Sep, Q4=Oct-Dec
+    var currentQ = Math.floor(month / 3) + 1;
+    var nextQ = currentQ >= 4 ? 1 : currentQ + 1;
+    var nextQYear = currentQ >= 4 ? year + 1 : year;
+    var qLabels = { 1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4' };
+
+    // Build refresh schedule
+    var refreshes = [];
+    // Weekly sources — always upcoming
+    if (meta.FREQ_DISTRIBUTION.Weekly) {
+      refreshes.push({ urgency: 1, label: 'Weekly', sources: meta.FREQ_DISTRIBUTION.Weekly.sources, impact: 'R4 topology + I5 thermal proxy', color: 'var(--sage)' });
+    }
+    // Monthly
+    if (meta.FREQ_DISTRIBUTION.Monthly) {
+      refreshes.push({ urgency: 2, label: 'Monthly', sources: meta.FREQ_DISTRIBUTION.Monthly.sources, impact: 'Grid load profiles + procurement data', color: 'var(--sage)' });
+    }
+    // Quarterly — next quarter
+    if (meta.FREQ_DISTRIBUTION.Quarterly) {
+      refreshes.push({ urgency: 3, label: qLabels[nextQ] + ' ' + nextQYear, sources: meta.FREQ_DISTRIBUTION.Quarterly.sources, impact: 'DER registry (T1) + business data (E2) + macro indicators', color: 'var(--bronze)' });
+    }
+    // Annual — flag the highest-impact upcoming annual sources
+    var annualSources = meta.FREQ_DISTRIBUTION.Annual ? meta.FREQ_DISTRIBUTION.Annual.sources : [];
+
+    // Find highest-impact annual source by feeds
+    var annualHighImpact = meta.DATA_SOURCES.filter(function(s){ return s.freq === 'Annual'; })
+      .sort(function(a,b){ return b.vars - a.vars; })[0];
+
+    var card2 = document.getElementById('g-data-refresh');
+    var qtrSources = meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.sources.join(', ') : 'none';
+
+    card2.innerHTML =
+      '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
+      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+      '<strong>' + qtrSources + '</strong> are due for refresh in ' + qLabels[nextQ] + '. ' +
+      'Impact: DER registry updates (T1), business fabric indicators (E2), macro-economic data. ' +
+      'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong> (' +
+      (annualHighImpact ? annualHighImpact.vars : '?') + ' variables → ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
+  }
+
+  // ── Card 3: Fleet Spotlight — rotating stat ──
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var n = fleet.length;
+    var seed = year * 100 + (month + 1);
+
+    // Build a roster of spotlight insights
+    var spotlights = [];
+
+    // 1. Most concentrated risk corridor
+    var provData = {};
+    fleet.forEach(function(s){
+      if (!provData[s.province]) provData[s.province] = { subs: [], sumR: 0, highCrit: 0 };
+      provData[s.province].subs.push(s);
+      provData[s.province].sumR += s.R_median;
+      if (s.classification === 'High' || s.classification === 'Critical') provData[s.province].highCrit++;
+    });
+    var provList = Object.keys(provData).map(function(p){
+      var d = provData[p];
+      return { name: p, n: d.subs.length, avg: d.sumR / d.subs.length, highCrit: d.highCrit, pctHC: d.highCrit / d.subs.length };
+    });
+    provList.sort(function(a,b){ return b.pctHC - a.pctHC; });
+    var riskiest = provList[0];
+    spotlights.push({
+      title: riskiest.name + ': Highest Risk Concentration',
+      body: riskiest.name + ' has the highest concentration of High/Critical substations: <strong>' +
+        riskiest.highCrit + ' of ' + riskiest.n + ' (' + (riskiest.pctHC * 100).toFixed(0) + '%)</strong> are in the upper risk bands — ' +
+        'avg R = ' + riskiest.avg.toFixed(3) + '. This makes it the most acute risk corridor in the fleet.'
+    });
+
+    // 2. Widest uncertainty — highest optionality
+    var byCIDesc = fleet.slice().sort(function(a,b){ return b.CI_width - a.CI_width; });
+    var topUncertain = byCIDesc.slice(0, 10);
+    var avgCItop = topUncertain.reduce(function(a,s){ return a + s.CI_width; }, 0) / 10;
+    var topRegions = {};
+    topUncertain.forEach(function(s){ topRegions[s.region] = (topRegions[s.region] || 0) + 1; });
+    var topRegionStr = Object.keys(topRegions).sort(function(a,b){ return topRegions[b] - topRegions[a]; }).slice(0, 3).join(', ');
+    spotlights.push({
+      title: 'Highest Uncertainty = Highest Optionality',
+      body: 'The 10 substations with the widest confidence intervals (avg CI = ' + avgCItop.toFixed(3) +
+        ') represent the highest <em>option value</em> for BESS investment — uncertainty creates optionality. ' +
+        'They concentrate in <strong>' + topRegionStr + '</strong>. In the SSI-ENN framework, these substations ' +
+        'would generate the largest real-options premium above base DCF valuation.'
+    });
+
+    // 3. Bridge substations — critical topology nodes
+    var bridges = fleet.filter(function(s){ return s.graph_topology && s.graph_topology.is_bridge; });
+    var bridgeHighCrit = bridges.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
+    spotlights.push({
+      title: bridges.length + ' Bridge Substations — Single Points of Failure',
+      body: '<strong>' + bridges.length + ' substations</strong> are topological bridges — their failure disconnects ' +
+        'part of the network. Of these, <strong>' + bridgeHighCrit.length + '</strong> are classified High or Critical. ' +
+        'These are the fleet\'s single points of failure: high graph centrality (R4) combined with elevated risk ' +
+        'makes them priority candidates for both grid reinforcement and BESS deployment.'
+    });
+
+    // 4. Seismic hotspot
+    var seismicHigh = fleet.filter(function(s){ return s.seismic && s.seismic.zone <= 1; });
+    var seismicHighRisk = seismicHigh.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
+    spotlights.push({
+      title: 'Seismic Zone 3: ' + seismicHigh.length + ' Substations in Highest Hazard',
+      body: '<strong>' + seismicHigh.length + ' substations</strong> sit in Italy\'s highest seismic hazard zone ' +
+        '(Zone 1, PGA > 0.25g). Of these, <strong>' + seismicHighRisk.length + '</strong> already score High/Critical — ' +
+        'meaning their grid condition is poor <em>before</em> considering earthquake risk. ' +
+        'The R6b seismic modifier (INGV MPS04) captures this compound vulnerability.'
+    });
+
+    // 5. Energy poverty double jeopardy
+    var highEP = fleet.filter(function(s){ return s.socio_economic && s.socio_economic.EP_rate_region > 14; });
+    var highEP_highRisk = highEP.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
+    spotlights.push({
+      title: 'Energy Poverty Double Jeopardy',
+      body: '<strong>' + highEP.length + ' substations</strong> serve regions with energy poverty rates above 14% — ' +
+        'and <strong>' + highEP_highRisk.length + '</strong> of these are in the High/Critical risk bands. ' +
+        'These communities face a double burden: poor grid reliability and limited capacity to absorb the economic impact of outages. ' +
+        'The SSI\'s E component + R3 modifier make this invisible correlation visible.'
+    });
+
+    // 6. Markov degradation — substations approaching critical state
+    var markovCrit = fleet.filter(function(s){ return s.markov && s.markov.stationary_critical > 0.7; });
+    spotlights.push({
+      title: markovCrit.length + ' Substations Approaching Critical Degradation',
+      body: 'The SSI\'s 4-state Markov degradation model identifies <strong>' + markovCrit.length +
+        ' substations</strong> with a stationary critical probability above 70% — meaning their long-term equilibrium state ' +
+        'is dominated by degraded or critical condition. Without intervention, these substations will trend toward failure. ' +
+        'Average estimated time-to-critical: ' +
+        (markovCrit.length ? (markovCrit.reduce(function(a,s){ return a + s.markov.ettc_years; }, 0) / markovCrit.length).toFixed(1) : '?') + ' years.'
+    });
+
+    // Pick this month's spotlight
+    var spotIdx = seededIndex(seed + 5555, spotlights.length);
+    var spot = spotlights[spotIdx];
+
+    var card3 = document.getElementById('g-spotlight');
+    card3.innerHTML =
+      '<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span>' +
+      '<h3 style="margin-top:0;font-size:15px">' + spot.title + '</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' + spot.body + '</p>';
+
+    // Closing line
+    document.getElementById('g-closing').innerHTML =
+      'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
+      '. Deep-dive region: <strong>' + nextDive.region + '</strong>. ' +
+      'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) via the link in your welcome email.';
+  });
+})();
 </script>
-
-</section>
-
 <div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
   <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent an Austrian utility, E-Control, Stadtwerk, or academic institution and would like to contribute data or methodology feedback, please contact us through the foundation. The SSI's credibility depends on open scrutiny.
 </div>
