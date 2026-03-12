@@ -2025,5 +2025,34 @@
   <a href="#" style="color:var(--warm-grey-light);text-decoration:none">View in browser</a>
 </footer>
 
+
+<!-- ======= EDITION AUTO-PATCHER ======= -->
+<script>
+(function(){
+  var now=new Date(), m=now.getMonth(), y=now.getFullYear();
+  var MN=['January','February','March','April','May','June',
+         'July','August','September','October','November','December'];
+  var edN=Math.max(1,(y-2026)*12+(m+1)-2);
+  var curEd=Math.max(1,edN-1);
+  var eS=('00'+curEd).slice(-3), MY=MN[m]+' '+y;
+  var pm=m-1<0?11:m-1, py=m-1<0?y-1:y, pMY=MN[pm]+' '+py;
+  var d1=new Date(y,m,1).getDay(), thu2=((4-d1+7)%7)+8;
+  var pub=thu2+' '+MN[m]+' '+y;
+  function R(o,n){
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false),t;
+    while(t=w.nextNode()) if(t.nodeValue.indexOf(o)!==-1) t.nodeValue=t.nodeValue.split(o).join(n);
+  }
+  R('[Month Year]',MY);
+  if(curEd>1){
+    document.title=document.title.replace(/Edition \\d{3}/,'Edition '+eS);
+    R('Published 9 April 2026','Published '+pub);
+    R('Edition 001','Edition '+eS);
+    R('April 2026',MY);
+    R('March 2026',pMY);
+    R(' (Inaugural)','');R('(Inaugural)','');
+    R('inaugural edition','edition');R('inaugural ','');R('Inaugural ','');
+  }
+})();
+</script>
 </body>
 </html>
