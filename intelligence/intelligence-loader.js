@@ -41,18 +41,17 @@
   fetch('../intelligence/edition-config.json?v=' + Date.now())
     .then(function(r) { return r.json(); })
     .then(function(config) {
-      var key = currentEditionKey();
-      var rotation = config.rotation[key];
-
-      // Fallback: find the latest available rotation
-      if (!rotation) {
-        var keys = Object.keys(config.rotation).sort();
-        key = keys[keys.length - 1] || keys[0];
-        rotation = config.rotation[key];
+      // Use the active edition key set by the workflow (null = no edition yet)
+      var key = config.active_edition_key;
+      if (!key) {
+        console.log('[SSI-Loader] No active edition yet (pre-launch)');
+        document.dispatchEvent(new CustomEvent('ssi-config-ready', { detail: null }));
+        return;
       }
-
+      var rotation = config.rotation[key];
       if (!rotation) {
-        console.warn('[SSI-Loader] No rotation found for', key);
+        console.warn('[SSI-Loader] No rotation found for active key:', key);
+        document.dispatchEvent(new CustomEvent('ssi-config-ready', { detail: null }));
         return;
       }
 
