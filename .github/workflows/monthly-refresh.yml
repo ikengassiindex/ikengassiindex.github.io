@@ -1,69 +1,67 @@
-name: Monthly SSI Data Refresh
+name: Monthly Intelligence Refresh
 on:
   schedule:
-    # 2nd Thursday of each month at 10:00 UTC
+    # Second Thursday of each month at 10:00 UTC
     - cron: '0 10 8-14 * 4'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      force_edition:
+        description: 'Force a specific edition number (leave empty for auto-increment)'
+        required: false
+        type: string
 
 permissions:
   contents: write
 
 jobs:
-  refresh-metadata:
+  refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
-      - name: Checkout dashboard
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update ssi-data.json generated dates
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Update edition config
+        run: python3 scripts/update-edition.py
+
+      - name: Override edition if forced
+        if: ${{ github.event.inputs.force_edition != '' }}
         run: |
-          TODAY=$(date -u +%Y-%m-%d)
-          echo "Refreshing meta.generated to $TODAY for all 8 countries..."
-
-          for COUNTRY in france uk us spain switzerland austria italy germany; do
-            FILE="$COUNTRY/ssi-data.json"
-            if [ -f "$FILE" ]; then
-              python3 -c "
+          python3 -c "
           import json
-          with open('$FILE', 'r') as f:
-              data = json.load(f)
-          data['meta']['generated'] = '$TODAY'
-          with open('$FILE', 'w') as f:
-              json.dump(data, f, separators=(',', ':'))
-          print(f'  Updated $COUNTRY: generated -> $TODAY')
+          with open('intelligence/edition-config.json', 'r') as f:
+              config = json.load(f)
+          config['current_edition'] = int('${{ github.event.inputs.force_edition }}')
+          with open('intelligence/edition-config.json', 'w') as f:
+              json.dump(config, f, indent=2, ensure_ascii=False)
+              f.write('\\n')
+          print(f'Edition forced to {config[\"current_edition\"]:03d}')
           "
-            else
-              echo "  SKIP: $FILE not found"
+
+      - name: Cache-bust intelligence assets
+        run: |
+          # Update version query params on intelligence-loader.js references
+          STAMP=$(date +%s)
+          for country in france italy uk us germany spain switzerland austria; do
+            if [ -f "${country}/intelligence.html" ]; then
+              sed -i "s|intelligence-loader\.js?v=[0-9]*|intelligence-loader.js?v=${STAMP}|g" "${country}/intelligence.html"
             fi
           done
 
-      - name: Bump nav.js + map.js cache versions
-        run: |
-          CURRENT_V=$(grep -oP 'nav\.js\?v=\K\d+' index.html | head -1)
-          NEW_V=$((CURRENT_V + 1))
-          sed -i "s/nav\.js?v=$CURRENT_V/nav.js?v=$NEW_V/g" *.html */*.html
-          CURRENT_MAP_V=$(grep -oP 'map\.js\?v=\K\d+' map.html | head -1)
-          if [ -n "$CURRENT_MAP_V" ]; then
-            NEW_MAP_V=$((CURRENT_MAP_V + 1))
-            sed -i "s/map\.js?v=$CURRENT_MAP_V/map.js?v=$NEW_MAP_V/g" *.html */*.html
-          fi
-
       - name: Commit and push
         run: |
-          git config user.name "SSI Pipeline Bot"
-          git config user.email "ssi-bot@ikenga.eu"
-          git add */ssi-data.json *.html */*.html
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No changes to commit"
           else
-            git commit -m "[auto] Monthly SSI data refresh — $(date -u +%Y-%m-%d)"
+            EDITION=$(python3 -c "import json; print(json.load(open('intelligence/edition-config.json'))['current_edition'])")
+            git commit -m "chore: monthly intelligence refresh — Edition $(printf '%03d' $EDITION) [$(date +%Y-%m-%d)]"
             git push
           fi
-
-      - name: Summary
-        run: |
-          echo "### Monthly SSI Data Refresh" >> $GITHUB_STEP_SUMMARY
-          echo "- **Date**: $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Countries**: france, uk, us, spain, switzerland, austria, italy, germany" >> $GITHUB_STEP_SUMMARY
-          echo "- **Dashboard**: https://ikengassiindex.github.io" >> $GITHUB_STEP_SUMMARY
