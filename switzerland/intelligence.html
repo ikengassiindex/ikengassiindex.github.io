@@ -187,7 +187,9 @@
     var R = 68;
     var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
     var weights = [0.30, 0.10, 0.25, 0.10, 0.20, 0.05];
-    var vals = labels.map(function(k, i){ return s.components[k] / weights[i]; });
+    var _compSum = labels.reduce(function(sum, k) { return sum + (s.components[k] || 0); }, 0);
+        var _isWeighted = _compSum <= 1.0;
+        var vals = labels.map(function(k, i){ return _isWeighted ? s.components[k] / weights[i] : s.components[k]; });
     var n = labels.length;
 
     ctx.strokeStyle = 'rgba(44,36,32,0.08)';
