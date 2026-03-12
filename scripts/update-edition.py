@@ -3,8 +3,9 @@
 SSI Intelligence Edition Auto-Updater
 Runs monthly via GitHub Actions to:
 1. Increment edition number in edition-config.json
-2. Add next month's rotation entry if missing
-3. Update ssi-data.json timestamps
+2. Set active_edition_key to current month
+3. Add next month's rotation entry if missing
+4. Update ssi-data.json timestamps
 """
 import json
 import sys
@@ -27,23 +28,33 @@ def main():
     next_month = now.replace(day=1) + timedelta(days=32)
     next_key = f"{next_month.year}-{next_month.month:02d}"
 
+    # Store previous active key for archival reference
+    prev_active_key = config.get('active_edition_key')
+    if prev_active_key:
+        print(f"Previous active edition: {prev_active_key}")
+        # Write prev key to file so workflow can read it
+        Path('prev_edition_key.txt').write_text(prev_active_key)
+
     # Increment edition
-    config['current_edition'] = config.get('current_edition', 0) + 1
-    new_edition = config['current_edition']
-    new_label = f"{new_edition:03d}"
+    old_ed = config.get('current_edition', 0)
+    new_ed = old_ed + 1
+    config['current_edition'] = new_ed
+    new_label = f"{new_ed:03d}"
+    print(f"Edition incremented: {old_ed:03d} -> {new_label}")
 
-    print(f"Edition updated to {new_label} for {current_key}")
+    # Set active_edition_key to current month
+    config['active_edition_key'] = current_key
+    print(f"Active edition key set to: {current_key}")
 
-    # Ensure current month has a rotation entry
-    if current_key not in config['rotation']:
-        # Clone from previous month or create default
-        prev_keys = sorted(config['rotation'].keys())
+    # Create rotation entry for current month if missing
+    if current_key not in config.get('rotation', {}):
+        prev_keys = sorted(config.get('rotation', {}).keys())
         if prev_keys:
             prev = config['rotation'][prev_keys[-1]]
             config['rotation'][current_key] = {
                 'edition_label': new_label,
                 'theme_index': (prev.get('theme_index', 0) % 12) + 1,
-                'countries': prev['countries']  # Same corridors until manually updated
+                'countries': prev['countries']
             }
         print(f"Created rotation entry for {current_key}")
     else:
@@ -66,7 +77,6 @@ def main():
         try:
             with open(data_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            # Update generated date in metadata
             if 'metadata' in data:
                 data['metadata']['generated'] = today
             elif 'meta' in data:
