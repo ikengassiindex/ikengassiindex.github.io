@@ -1,0 +1,66 @@
+name: Monthly SSI Data Refresh
+on:
+  schedule:
+    # 2nd Thursday of each month at 10:00 UTC
+    - cron: '0 10 8-14 * 4'
+  workflow_dispatch: {}
+
+jobs:
+  refresh-metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout dashboard
+        uses: actions/checkout@v4
+
+      - name: Update ssi-data.json generated dates
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          echo "Refreshing meta.generated to $TODAY for all 8 countries..."
+
+          for COUNTRY in france uk us spain switzerland austria italy germany; do
+            FILE="$COUNTRY/ssi-data.json"
+            if [ -f "$FILE" ]; then
+              python3 -c "
+          import json
+          with open('$FILE', 'r') as f:
+              data = json.load(f)
+          data['meta']['generated'] = '$TODAY'
+          with open('$FILE', 'w') as f:
+              json.dump(data, f, separators=(',', ':'))
+          print(f'  Updated $COUNTRY: generated -> $TODAY')
+          "
+            else
+              echo "  SKIP: $FILE not found"
+            fi
+          done
+
+      - name: Bump nav.js + map.js cache versions
+        run: |
+          CURRENT_V=$(grep -oP 'nav\.js\?v=\K\d+' index.html | head -1)
+          NEW_V=$((CURRENT_V + 1))
+          sed -i "s/nav\.js?v=$CURRENT_V/nav.js?v=$NEW_V/g" *.html */*.html
+          CURRENT_MAP_V=$(grep -oP 'map\.js\?v=\K\d+' map.html | head -1)
+          if [ -n "$CURRENT_MAP_V" ]; then
+            NEW_MAP_V=$((CURRENT_MAP_V + 1))
+            sed -i "s/map\.js?v=$CURRENT_MAP_V/map.js?v=$NEW_MAP_V/g" *.html */*.html
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name "SSI Pipeline Bot"
+          git config user.email "ssi-bot@ikenga.eu"
+          git add */ssi-data.json *.html */*.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "[auto] Monthly SSI data refresh — $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          echo "### Monthly SSI Data Refresh" >> $GITHUB_STEP_SUMMARY
+          echo "- **Date**: $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Countries**: france, uk, us, spain, switzerland, austria, italy, germany" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dashboard**: https://ikengassiindex.github.io" >> $GITHUB_STEP_SUMMARY
