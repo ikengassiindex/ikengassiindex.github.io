@@ -418,7 +418,9 @@
     }
 
     // Normalize: component / weight gives 0..1 (capped)
-    function norm(k, val) { return Math.min(val / weights[k], 1); }
+    var _compSum = keys.reduce(function(s,k){ return s + (ssi.components[k]||0); }, 0);
+    var _isWeighted = _compSum <= 1.0;
+    function norm(k, val) { return Math.min(_isWeighted ? val / weights[k] : val, 1); }
 
     // Fleet median polygon (faint reference)
     cx2.beginPath();
@@ -648,10 +650,11 @@
     const R_final = ssi.R_median;
 
     // Component rows with sub-metric expansion
+    const _artIsWeighted = ['C','V','I','E','S','T'].reduce((s,k) => s + (ssi.components[k]||0), 0) <= 1.0;
     const compRows = ['C', 'V', 'I', 'E', 'S', 'T'].map(k => {
       const val = ssi.components[k];
       const w = weights[k];
-      const normPct = Math.min(val / w * 100, 100).toFixed(0);
+      const normPct = Math.min((_artIsWeighted ? val / w : val) * 100, 100).toFixed(0);
 
       // Build sub-metric rows
       var subRows = (SUB_METRICS[k] || []).map(function(m) {
@@ -774,7 +777,8 @@
     ['C', 'V', 'I', 'E', 'S', 'T'].map(k => {
       const w = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 }[k];
       const val = ssi.components[k];
-      const pct = val * 100;
+      const _barIsWeighted = ['C','V','I','E','S','T'].reduce((s2,k2) => s2 + (ssi.components[k2]||0), 0) <= 1.0;
+      const pct = (_barIsWeighted ? val / w : val) * 100;
       const labels = { C: 'C Continuity', V: 'V Voltage', I: 'I Infrastructure', E: 'E Economic', S: 'S Saturation', T: 'T Transition' };
       const cols = { C: 'var(--crimson)', V: 'var(--terracotta)', I: 'var(--sage)', E: '#3b9eff', S: 'var(--bronze)', T: '#22d3ee' };
       return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
