@@ -9,6 +9,11 @@ on:
         description: 'Force a specific edition number (leave empty for auto-increment)'
         required: false
         type: string
+      skip_archive:
+        description: 'Skip PDF archival and email (true/false)'
+        required: false
+        default: 'false'
+        type: string
 
 permissions:
   contents: write
@@ -26,6 +31,24 @@ jobs:
         with:
           python-version: '3.11'
 
+      # ── Step 1: Archive previous edition as PDF + email ──
+      - name: Install Playwright for PDF capture
+        if: ${{ github.event.inputs.skip_archive != 'true' }}
+        run: |
+          pip install playwright
+          playwright install chromium --with-deps
+
+      - name: Archive previous edition (PDF + email)
+        if: ${{ github.event.inputs.skip_archive != 'true' }}
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ARCHIVE_EMAIL: ssi_index@ikenga.eu
+        run: python3 scripts/archive-and-email.py
+
+      # ── Step 2: Update edition config ──
       - name: Update edition config
         run: python3 scripts/update-edition.py
 
@@ -39,13 +62,13 @@ jobs:
           config['current_edition'] = int('${{ github.event.inputs.force_edition }}')
           with open('intelligence/edition-config.json', 'w') as f:
               json.dump(config, f, indent=2, ensure_ascii=False)
-              f.write('\\n')
+              f.write('\n')
           print(f'Edition forced to {config[\"current_edition\"]:03d}')
           "
 
+      # ── Step 3: Cache-bust and commit ──
       - name: Cache-bust intelligence assets
         run: |
-          # Update version query params on intelligence-loader.js references
           STAMP=$(date +%s)
           for country in france italy uk us germany spain switzerland austria; do
             if [ -f "${country}/intelligence.html" ]; then
