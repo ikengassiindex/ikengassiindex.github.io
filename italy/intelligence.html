@@ -177,11 +177,10 @@
       { key: 'R3_C_mult', label: 'R3 Consequence' },
       { key: 'R4_F_topo', label: 'R4 Graph Criticality' },
       { key: 'R6_restoration', label: 'R6a Restoration' },
-      { key: 'R6_seismic', label: 'R6b Seismic' },
       { key: 'R7_cyber', label: 'R7 Digital Readiness' }
     ];
     var modHTML = modDefs.map(function(m){
-      var val = s.modifiers[m.key];
+      var val = s.modifiers[m.key]; if(val===undefined) return '';
       var dir = val > 1.01 ? '↑ amplifies' : val < 0.99 ? '↓ dampens' : '→ neutral';
       var col = val > 1.05 ? 'var(--crimson)' : val < 0.95 ? 'var(--sage)' : 'var(--warm-grey)';
       return '<div><strong>' + m.label + ':</strong> <span style="color:' + col + '">' + val.toFixed(3) + '</span> ' + dir + '</div>';
@@ -1206,7 +1205,7 @@
       { key: 'R3_C_mult', label: 'R3 Consequence', range: '[0.70, 1.30]' },
       { key: 'R4_F_topo', label: 'R4 Graph Crit.', range: '[0.80, 1.35]' },
       { key: 'R6_restoration', label: 'R6a Restoration', range: '[0.90, 1.10]' },
-      { key: 'R6_seismic', label: 'R6b Seismic', range: '[1.00, 1.25]' },
+      
       { key: 'R7_cyber', label: 'R7 Digital Read.', range: '[0.99, 1.05]' }
     ];
     var modBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Modifier Averages — Puglia vs Fleet</div>';
@@ -1239,7 +1238,7 @@
       'Among modifiers, the R3 consequence multiplier averages ' + avgMod(puglia, 'R3_C_mult').toFixed(3) +
       ' (fleet: ' + avgMod(fleet, 'R3_C_mult').toFixed(3) + '), reflecting the socio-economic fragility of ' +
       'Puglia\'s service-oriented, tourism-dependent economy. The R6b seismic modifier averages ' +
-      avgMod(puglia, 'R6_seismic').toFixed(3) + ', capturing the region\'s moderate but non-negligible seismic exposure — ' +
+      (avgMod(puglia, 'R6_seismic')||1).toFixed(3) + ', capturing the region\'s moderate but non-negligible seismic exposure — ' +
       'a dimension invisible to every competing framework.';
 
     // ── D.4 Province breakdown ──
