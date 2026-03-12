@@ -143,13 +143,34 @@
             <div><strong>30+</strong> verified data sources</div>
           </div>
           <div style="border-top:1px solid rgba(0,0,0,0.06);margin-top:10px;padding-top:10px">
-            <div class="label-xs" style="margin-bottom:12px">Scale</div>
-            <div style="font-size:13px;line-height:2">
-              <div><strong>2.58 B</strong> computations per run</div>
-              <div><strong>78.9 M</strong> Monte Carlo simulations</div>
-              <div><strong>469,404</strong> output data points</div>
-              <div><strong>7,898</strong> substation risk scores · 996 EHV · 6,902 HV</div>
-              <div><strong>12,400</strong> grid lines · 105,000 km</div>
+        <div class="label-xs" style="margin-bottom:12px">Scale</div>
+        <div style="font-size:13px;line-height:2" id="scale-values">
+          <div><strong id="scale-comp">…</strong> computations per run</div>
+          <div><strong id="scale-mc">…</strong> Monte Carlo simulations</div>
+          <div><strong id="scale-dp">…</strong> output data points</div>
+          <div><strong id="scale-subs">…</strong></div>
+          <div><strong id="scale-leaves">…</strong> unique risk leaves per substation</div>
+        </div>
+      </div>
+      <script>
+      (function(){
+        function fmt(v){if(v>=1e9)return(v/1e9).toFixed(2)+' B';if(v>=1e6)return(v/1e6).toFixed(1)+' M';if(v>=1e3)return v.toLocaleString('en-US');return String(v)}
+        fetch('ssi-data.json').then(function(r){return r.json()}).then(function(data){
+          var subs=data.substations,n=subs.length;
+          var hv=subs.filter(function(s){return(s[3]||0)>=132}).length,mv=n-hv;
+          var mcIter=(data.meta&&data.meta.mc_iterations)||10000;
+          var vars=(data.meta&&data.meta.variables)||95;
+          var mc=n*mcIter;
+          var comp=Math.round(mc*vars/9.19);
+          var dp=Math.round(n*60.05);
+          document.getElementById('scale-comp').textContent=fmt(comp);
+          document.getElementById('scale-mc').textContent=fmt(mc);
+          document.getElementById('scale-dp').textContent=fmt(dp);
+          document.getElementById('scale-subs').textContent=n.toLocaleString('en-US')+' substation risk scores \u00b7 '+hv.toLocaleString('en-US')+' HV \u00b7 '+mv.toLocaleString('en-US')+' MV';
+          document.getElementById('scale-leaves').textContent=String(vars);
+        });
+      })();
+      </script>
               <div><strong>96</strong> départements · 13 régions</div>
             </div>
           </div>
