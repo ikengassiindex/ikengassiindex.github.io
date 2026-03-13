@@ -3,11 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index v4.0.2 — Regional Analysis for Japan. Compare 47 prefectures and 10 EPCO territories by SSI score, component breakdown, and socio-economic context across 6,003 substations.">
+<meta name="description" content="Compare Japanese prefectures by SSI resilience score, component breakdown, and socio-economic context.">
 <meta name="theme-color" content="#941914">
-<meta property="og:title" content="SSI Index — Regional Analysis">
-<meta property="og:description" content="Prefecture and EPCO territory comparison for Japan's electrical grid resilience.">
-<meta property="og:type" content="website">
 <title>SSI Index — Regional Analysis</title>
 <link rel="stylesheet" href="../style.css?v=3">
 </head>
@@ -20,52 +17,78 @@
 <main class="page-shell">
   <div class="page-header animate-in">
     <h1>Regional Analysis</h1>
-    <p>Compare Japanese prefectures by SSI score, component breakdown, and socio-economic context across 6,003 substations in Japan's 47 prefectures and 10 EPCO territories.</p>
+    <p>Compare Japanese prefectures by SSI score, component breakdown, and socio-economic context across 6,003 substations in Japan's 47 prefectures.</p>
   </div>
 
   <!-- Tabs -->
   <div class="tabs animate-in delay-1">
-    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Prefecture Ranking</button>
-    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">EPCO Territory Comparison</button>
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regional Ranking</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Prefecture Comparison</button>
     <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
   </div>
 
   <!-- Tab: Regional Ranking -->
   <div id="tab-ranking">
     <div class="card animate-in delay-2" style="margin-bottom:24px">
-      <div class="card-header">Prefecture Ranking by Mean SSI Score <span class="label-xs" id="ranking-count"></span></div>
-      <div style="overflow-x:auto">
-        <table class="data-table" style="width:100%;font-size:12px">
-          <thead><tr><th>#</th><th>Prefecture</th><th>EPCO</th><th>Freq</th><th>Subs</th><th>Mean SSI</th><th>Band</th><th>C</th><th>V</th><th>I</th><th>E</th><th>S</th><th>T</th></tr></thead>
-          <tbody id="ranking-tbody"></tbody>
-        </table>
+      <div class="card-header">
+        <h3>Prefectures Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">47 Prefectures · sorted worst → best</span>
       </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>Prefecture</th>
+            <th style="text-align:right">Median R</th>
+            <th style="text-align:right">Substations</th>
+            <th style="text-align:right">% Critical</th>
+            <th style="text-align:right">% High</th>
+            <th>Distribution</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <!-- Tab: EPCO Territory Comparison -->
+  <!-- Tab: Prefecture Comparison -->
   <div id="tab-compare" style="display:none">
-    <div class="card animate-in delay-2" style="margin-bottom:24px">
-      <div class="card-header">EPCO Territory Comparison</div>
-      <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap">
-        <div>
-          <label style="font-size:12px;color:var(--warm-grey)">Territory A</label>
-          <select id="prov-a" style="display:block;margin-top:4px;padding:6px 10px;border:1px solid var(--cream-deep);border-radius:4px;font-size:13px" onchange="updateCompare()"></select>
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header"><h3>Select Prefectures to Compare</h3></div>
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">Prefecture A</div>
+            <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">Prefecture B</div>
+            <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
         </div>
-        <div>
-          <label style="font-size:12px;color:var(--warm-grey)">Territory B</label>
-          <select id="prov-b" style="display:block;margin-top:4px;padding:6px 10px;border:1px solid var(--cream-deep);border-radius:4px;font-size:13px" onchange="updateCompare()"></select>
-        </div>
+        <!-- Comparison Table -->
+        <table class="data-table" id="compare-table">
+          <thead>
+            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">—</th><th style="text-align:right" id="th-prov-b">—</th><th style="text-align:right">Delta</th></tr>
+          </thead>
+          <tbody id="compare-tbody">
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select prefectures above</td></tr>
+          </tbody>
+        </table>
       </div>
-      <table class="data-table" style="width:100%;font-size:12px" id="compare-table">
-        <thead><tr><th>Metric</th><th id="th-prov-a">—</th><th id="th-prov-b">—</th><th>Delta</th></tr></thead>
-        <tbody id="compare-tbody"></tbody>
-      </table>
-      <div style="margin-top:24px">
-        <div class="card-header" style="font-size:14px">Radar Comparison</div>
-        <div id="radar-container" style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">
-          <svg id="radar-svg" width="320" height="320" viewBox="0 0 320 320"></svg>
-          <div id="radar-legend" style="font-size:12px;color:var(--slate)"></div>
+
+      <!-- Radar Chart -->
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-header"><h3>Component Radar</h3></div>
+        <div id="radar-container" style="display:flex;flex-direction:column;align-items:center;color:var(--warm-grey);flex:1;min-height:0">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+            <svg id="radar-svg" width="320" height="300" viewBox="0 0 280 260"></svg>
+          </div>
+          <div id="radar-legend" style="display:flex;flex-direction:column;align-items:center;font-size:11px;padding-bottom:0px;margin-top:0px"></div>
         </div>
       </div>
     </div>
@@ -73,232 +96,342 @@
 
   <!-- Tab: Component Decomposition -->
   <div id="tab-decomp" style="display:none">
-    <div class="card animate-in delay-2" style="margin-bottom:24px">
-      <div class="card-header">Component Decomposition by Prefecture</div>
-      <div id="decomp-bars" style="margin-top:12px"></div>
+    <div class="card animate-in">
+      <div class="card-header">
+        <h3>Average Component Contribution by Prefecture</h3>
+        <span class="label-xs">Stacked horizontal bars · 47 Prefectures</span>
+      </div>
+      <div id="decomp-bars" style="margin-top:16px">
+        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:11px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--crimson);border-radius:2px"></div>C Continuity</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--terracotta);border-radius:2px"></div>V Voltage</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--sage);border-radius:2px"></div>I Infrastructure</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#3b9eff;border-radius:2px"></div>E Economic</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--bronze);border-radius:2px"></div>S Saturation</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#22d3ee;border-radius:2px"></div>T Transition</div>
+      </div>
     </div>
   </div>
 </main>
 
 <script>
-  function switchTab(btn, tabId) {
-    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
-    btn.classList.add('active');
-    document.querySelectorAll('[id^="tab-"]').forEach(function(t){t.style.display='none';});
-    document.getElementById(tabId).style.display='';
+renderFooter();
+
+var SSI = null;
+var prefectureData = {};
+
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(function(t) { t.style.display = 'none'; });
+  document.getElementById(tabId).style.display = 'block';
+}
+
+// ── Color helpers ──
+function scoreColor(val) {
+  if (val >= 0.75) return 'var(--crimson)';
+  if (val >= 0.50) return 'var(--terracotta)';
+  if (val >= 0.25) return 'var(--bronze)';
+  return 'var(--sage)';
+}
+
+function deltaColor(d) {
+  if (d > 0.01) return 'var(--crimson)';
+  if (d < -0.01) return 'var(--sage)';
+  return 'var(--warm-grey)';
+}
+
+function fmt(v, dp) { return v.toFixed(dp === undefined ? 3 : dp); }
+function pct(v) { return v.toFixed(1) + '%'; }
+
+// ── Tab 1: Regional Ranking ──
+function renderRanking(data) {
+  var regions = (Array.isArray(data.regions) ? data.regions : Object.values(data.regions)).slice().sort(function(a, b) { return b.median_R - a.median_R; });
+  var tbody = document.getElementById('ranking-tbody');
+  document.getElementById('ranking-count').textContent = regions.length + ' Prefectures · sorted worst → best';
+
+  tbody.innerHTML = regions.map(function(r, i) {
+    var total = r.count;
+    var pLow = ((r.bands.Low / total) * 100).toFixed(0);
+    var pMed = ((r.bands.Medium / total) * 100).toFixed(0);
+    var pHigh = ((r.bands.High / total) * 100).toFixed(0);
+    var pCrit = ((r.bands.Critical / total) * 100).toFixed(0);
+    return '<tr>' +
+      '<td style="color:var(--warm-grey)">' + (i + 1) + '</td>' +
+      '<td style="font-weight:500">' + r.region + '</td>' +
+      '<td class="num" style="color:' + scoreColor(r.median_R) + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
+      '<td class="num">' + r.count + '</td>' +
+      '<td class="num">' + pct(r.pct_critical) + '</td>' +
+      '<td class="num">' + pct(r.pct_high) + '</td>' +
+      '<td><div class="dist-bar" style="margin:0;width:140px;height:6px">' +
+        '<div style="width:' + pLow + '%;background:var(--band-low)"></div>' +
+        '<div style="width:' + pMed + '%;background:var(--band-medium)"></div>' +
+        '<div style="width:' + pHigh + '%;background:var(--band-high)"></div>' +
+        '<div style="width:' + pCrit + '%;background:var(--band-critical)"></div>' +
+      '</div></td></tr>';
+  }).join('');
+}
+
+// ── Tab 2: Prefecture Comparison ──
+function buildPrefectureData(data) {
+  var map = {};
+  data.substations.forEach(function(s) {
+    if (!map[s.prefecture]) {
+      map[s.prefecture] = { prefecture: s.prefecture, region: s.region, subs: [] };
+    }
+    map[s.prefecture].subs.push(s);
+  });
+  // Compute aggregates
+  Object.keys(map).forEach(function(p) {
+    var arr = map[p].subs;
+    var n = arr.length;
+    arr.sort(function(a, b) { return a.R_median - b.R_median; });
+    var mid = Math.floor(n / 2);
+    map[p].median_R = n % 2 ? arr[mid].R_median : (arr[mid - 1].R_median + arr[mid].R_median) / 2;
+    map[p].count = n;
+    // Average components
+    var comps = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 };
+    var mods = { R3: 0, R4: 0, R6a: 0, R6b: 0, R7: 0 };
+    var epSum = 0, degSum = 0;
+    arr.forEach(function(s) {
+      Object.keys(comps).forEach(function(k) { comps[k] += (s.components || {})[k] || 0; });
+      mods.R3 += (s.modifiers || {}).R3_C_mult || 0;
+      mods.R4 += (s.modifiers || {}).R4_F_topo || 0;
+      mods.R6a += (s.modifiers || {}).R6_restoration || 0;
+      mods.R6b += ((s.modifiers || {}).R6_seismic || 1.0);
+      mods.R7 += (s.modifiers || {}).R7_cyber || 0;
+      epSum += ((s.socio_economic || {}).EP_rate_region || (s.socio_economic || {}).unemployment_rate || 0);
+      degSum += (s.graph_topology ? s.graph_topology.degree : 0);
+    });
+    Object.keys(comps).forEach(function(k) { comps[k] /= n; });
+    Object.keys(mods).forEach(function(k) { mods[k] /= n; });
+    map[p].components = comps;
+    map[p].modifiers = mods;
+    map[p].EP_rate = epSum / n;
+    map[p].avg_degree = degSum / n;
+  });
+  return map;
+}
+
+function populatePrefectureSelects() {
+  var provNames = Object.keys(prefectureData).sort();
+  var selA = document.getElementById('prov-a');
+  var selB = document.getElementById('prov-b');
+  var html = provNames.map(function(p) {
+    return '<option value="' + p + '">' + p + ' (' + prefectureData[p].count + ')</option>';
+  }).join('');
+  selA.innerHTML = html;
+  selB.innerHTML = html;
+
+  // Smart defaults: pick a high-risk and low-risk census division
+  var sorted = provNames.slice().sort(function(a, b) { return prefectureData[b].median_R - prefectureData[a].median_R; });
+  selA.value = sorted[0] || provNames[0]; // worst census division
+  // Find best census division
+  var bestIdx = sorted.length - 1;
+  selB.value = sorted[bestIdx];
+
+  selA.addEventListener('change', updateComparison);
+  selB.addEventListener('change', updateComparison);
+  updateComparison();
+}
+
+function updateComparison() {
+  var nameA = document.getElementById('prov-a').value;
+  var nameB = document.getElementById('prov-b').value;
+  var a = prefectureData[nameA];
+  var b = prefectureData[nameB];
+  if (!a || !b) return;
+
+  document.getElementById('th-prov-a').textContent = nameA;
+  document.getElementById('th-prov-b').textContent = nameB;
+
+  var rows = [];
+  function addRow(label, va, vb, formatter, unit) {
+    var fva = formatter ? formatter(va) : fmt(va);
+    var fvb = formatter ? formatter(vb) : fmt(vb);
+    var delta = va - vb;
+    var fdelta;
+    if (unit === 'pp') fdelta = (delta >= 0 ? '+' : '') + delta.toFixed(1) + 'pp';
+    else if (unit === 'int') fdelta = (delta >= 0 ? '+' : '') + delta.toFixed(0);
+    else fdelta = (delta >= 0 ? '+' : '') + fmt(delta);
+    var dc = deltaColor(delta);
+    rows.push('<tr><td' + (label === 'Median R' ? ' style="font-weight:500"' : '') + '>' + label + '</td>' +
+      '<td class="num" style="color:' + scoreColor(va) + ';font-weight:' + (label === 'Median R' ? '600' : '400') + '">' + fva + '</td>' +
+      '<td class="num" style="color:' + scoreColor(vb) + ';font-weight:' + (label === 'Median R' ? '600' : '400') + '">' + fvb + '</td>' +
+      '<td class="num" style="color:' + dc + '">' + fdelta + '</td></tr>');
   }
 
-  var _regionData = {};
-  var _epcoData = {};
+  addRow('Median R', a.median_R, b.median_R);
+  addRow('C Continuity', a.components.C, b.components.C);
+  addRow('I Infrastructure', a.components.I, b.components.I);
+  addRow('S Saturation', a.components.S, b.components.S);
+  addRow('V Voltage', a.components.V, b.components.V);
+  addRow('E Economic', a.components.E, b.components.E);
+  addRow('T Transition', a.components.T, b.components.T);
 
-  function updateCompare() {
-    var a = document.getElementById('prov-a').value;
-    var b = document.getElementById('prov-b').value;
-    document.getElementById('th-prov-a').textContent = a;
-    document.getElementById('th-prov-b').textContent = b;
-    var da = _epcoData[a], db = _epcoData[b];
-    if (!da || !db) return;
+  rows.push('<tr style="border-top:2px solid var(--card-border)"></tr>');
+  addRow('Unemployment Rate', a.EP_rate, b.EP_rate, pct, 'pp');
+  addRow('Avg Graph Degree', a.avg_degree, b.avg_degree, function(v) { return v.toFixed(1); }, 'int');
+  addRow('Substations', a.count, b.count, function(v) { return v.toFixed(0); }, 'int');
 
-    var rows = [
-      {label:'Substations', va:da.count, vb:db.count, fmt:function(v){return v.toLocaleString();}},
-      {label:'Mean SSI', va:da.meanSSI, vb:db.meanSSI, fmt:function(v){return v.toFixed(3);}},
-      {label:'Continuity (C)', va:da.C, vb:db.C, fmt:function(v){return v.toFixed(3);}},
-      {label:'Voltage (V)', va:da.V, vb:db.V, fmt:function(v){return v.toFixed(3);}},
-      {label:'Infrastructure (I)', va:da.I, vb:db.I, fmt:function(v){return v.toFixed(3);}},
-      {label:'Economic (E)', va:da.E, vb:db.E, fmt:function(v){return v.toFixed(3);}},
-      {label:'Societal (S)', va:da.S, vb:db.S, fmt:function(v){return v.toFixed(3);}},
-      {label:'Temporal (T)', va:da.T, vb:db.T, fmt:function(v){return v.toFixed(3);}},
-      {label:'% Critical', va:da.critPct, vb:db.critPct, fmt:function(v){return v.toFixed(1)+'%';}}
-    ];
-    document.getElementById('compare-tbody').innerHTML = rows.map(function(r) {
-      var delta = r.va - r.vb;
-      var deltaStr = (delta >= 0 ? '+' : '') + r.fmt(Math.abs(delta));
-      var color = delta > 0 ? 'var(--crimson)' : delta < 0 ? 'var(--sage)' : 'var(--warm-grey)';
-      return '<tr><td style="font-weight:500">' + r.label + '</td><td class="num">' + r.fmt(r.va) + '</td><td class="num">' + r.fmt(r.vb) + '</td><td class="num" style="color:' + color + '">' + deltaStr + '</td></tr>';
+  document.getElementById('compare-tbody').innerHTML = rows.join('');
+  drawRadar(a, b, nameA, nameB);
+}
+
+// ── SVG Radar Chart ──
+function drawRadar(a, b, nameA, nameB) {
+  var svg = document.getElementById('radar-svg');
+  var cx = 140, cy = 120, R = 100;
+  var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
+  var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
+
+  // Find max for scaling
+  var maxVal = 0;
+  comps.forEach(function(k) {
+    maxVal = Math.max(maxVal, a.components[k], b.components[k]);
+  });
+  maxVal = Math.max(maxVal, 0.05); // floor
+
+  function polar(i, val) {
+    var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+    var r = (1 - val / maxVal) * R;
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  }
+
+  var html = '';
+  // Grid rings
+  [0.33, 0.66, 1.0].forEach(function(frac) {
+    var pts = [];
+    for (var i = 0; i < 6; i++) {
+      var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+      pts.push((cx + frac * R * Math.cos(angle)).toFixed(1) + ',' + (cy + frac * R * Math.sin(angle)).toFixed(1));
+    }
+    html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="rgba(44,36,32,0.08)" stroke-width="1"/>';
+  });
+
+  // Axes
+  for (var i = 0; i < 6; i++) {
+    var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+    var x2 = cx + R * Math.cos(angle);
+    var y2 = cy + R * Math.sin(angle);
+    html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="rgba(44,36,32,0.06)" stroke-width="1"/>';
+  }
+
+  // Prefecture A polygon
+  var ptsA = comps.map(function(k, i) { var p = polar(i, a.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+  html += '<polygon points="' + ptsA + '" fill="rgba(148,25,20,0.12)" stroke="var(--crimson)" stroke-width="1.5"/>';
+
+  // Prefecture B polygon
+  var ptsB = comps.map(function(k, i) { var p = polar(i, b.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+  html += '<polygon points="' + ptsB + '" fill="rgba(93,133,99,0.12)" stroke="var(--sage)" stroke-width="1.5"/>';
+
+  // Vertex dots
+  comps.forEach(function(k, i) {
+    var pa = polar(i, a.components[k]);
+    html += '<circle cx="' + pa[0].toFixed(1) + '" cy="' + pa[1].toFixed(1) + '" r="3" fill="var(--crimson)"/>';
+    var pb = polar(i, b.components[k]);
+    html += '<circle cx="' + pb[0].toFixed(1) + '" cy="' + pb[1].toFixed(1) + '" r="3" fill="var(--sage)"/>';
+  });
+
+  // Labels
+  var labelOffset = 16;
+  comps.forEach(function(k, i) {
+    var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
+    var lx = cx + (R + labelOffset) * Math.cos(angle);
+    var ly = cy + (R + labelOffset) * Math.sin(angle);
+    var anchor = 'middle';
+    if (lx < cx - 10) anchor = 'end';
+    else if (lx > cx + 10) anchor = 'start';
+    html += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--warm-grey)" font-family="DM Sans" font-weight="500">' + labels[i] + '</text>';
+  });
+
+  // Scale labels — center = worst (maxVal), edge = best (0)
+  html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">0 (best)</text>';
+  html += '<text x="' + (cx + 4) + '" y="' + (cy + 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
+
+  svg.innerHTML = html;
+
+  // Legend
+  document.getElementById('radar-legend').innerHTML =
+    '<div style="display:flex;justify-content:center;gap:16px">' +
+      '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--crimson);border-radius:2px"></div>' + nameA + '</div>' +
+      '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--sage);border-radius:2px"></div>' + nameB + '</div>' +
+    '</div>' +
+    '<div style="font-size:10px;color:var(--warm-grey);margin-top:6px;text-align:center">Larger area = lower risk = better resilience</div>';
+}
+
+// ── Tab 3: Component Decomposition ──
+function renderDecomposition(data) {
+  // Compute per-Prefecture average components
+  var regionMap = {};
+  data.substations.forEach(function(s) {
+    if (!regionMap[s.region]) {
+      regionMap[s.region] = { region: s.region, count: 0, C: 0, V: 0, I: 0, E: 0, S: 0, T: 0, R_sum: 0 };
+    }
+    var rm = regionMap[s.region];
+    rm.count++;
+    rm.C += s.components.C;
+    rm.V += s.components.V;
+    rm.I += s.components.I;
+    rm.E += s.components.E;
+    rm.S += s.components.S;
+    rm.T += s.components.T;
+    rm.R_sum += s.R_median;
+  });
+
+  var regions = Object.keys(regionMap).map(function(k) {
+    var rm = regionMap[k];
+    return {
+      region: k,
+      mean_R: rm.R_sum / rm.count,
+      C: rm.C / rm.count,
+      V: rm.V / rm.count,
+      I: rm.I / rm.count,
+      E: rm.E / rm.count,
+      S: rm.S / rm.count,
+      T: rm.T / rm.count
+    };
+  }).sort(function(a, b) { return b.mean_R - a.mean_R; });
+
+  var maxR = regions[0].mean_R || 1;
+  var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
+  var colors = ['var(--crimson)', 'var(--terracotta)', 'var(--sage)', '#3b9eff', 'var(--bronze)', '#22d3ee'];
+
+  var html = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey);padding-left:148px"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
+  html += regions.map(function(r) {
+    var total = r.C + r.V + r.I + r.E + r.S + r.T;
+    if (total === 0) total = 1;
+    var barWidth = Math.max(20, Math.min((1 - r.mean_R) * 100, 100));
+    var segments = comps.map(function(k, idx) {
+      var w = (r[k] / total * 100).toFixed(1);
+      return '<div style="width:' + w + '%;background:' + colors[idx] + '" title="' + k + ': ' + r[k].toFixed(3) + '"></div>';
     }).join('');
 
-    // Radar chart
-    drawRadar(da, db, a, b);
-  }
+    return '<div style="margin-bottom:14px">' +
+      '<div style="display:flex;align-items:center;margin-bottom:4px">' +
+        '<span style="width:140px;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + r.region + '</span>' +
+        '<span style="margin-left:auto;font-size:11px;color:var(--warm-grey);font-variant-numeric:tabular-nums">' + r.mean_R.toFixed(3) + '</span>' +
+      '</div>' +
+      '<div style="display:flex;height:16px;border-radius:4px;overflow:hidden;width:' + barWidth.toFixed(0) + '%">' + segments + '</div>' +
+    '</div>';
+  }).join('');
 
-  function drawRadar(da, db, nameA, nameB) {
-    var svg = document.getElementById('radar-svg');
-    var cx = 160, cy = 160, R = 120;
-    var dims = ['C','V','I','E','S','T'];
-    var labels = ['Continuity','Voltage','Infrastructure','Economic','Societal','Temporal'];
-    var n = dims.length;
-    var html = '';
+  document.getElementById('decomp-bars').innerHTML = html;
+}
 
-    // Grid
-    [0.25, 0.50, 0.75, 1.0].forEach(function(frac) {
-      var pts = [];
-      for (var i = 0; i < n; i++) {
-        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-        pts.push((cx + R * frac * Math.cos(angle)).toFixed(1) + ',' + (cy + R * frac * Math.sin(angle)).toFixed(1));
-      }
-      html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="var(--cream-deep)" stroke-width="1"/>';
-    });
-
-    // Axes + labels
-    for (var i = 0; i < n; i++) {
-      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-      var x2 = cx + R * Math.cos(angle);
-      var y2 = cy + R * Math.sin(angle);
-      html += '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="var(--cream-deep)" stroke-width="1"/>';
-      var lx = cx + (R + 18) * Math.cos(angle);
-      var ly = cy + (R + 18) * Math.sin(angle);
-      html += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="var(--slate)">'+labels[i]+'</text>';
-    }
-
-    // Data polygons
-    function makePolygon(d, color, opacity) {
-      var pts = [];
-      for (var i = 0; i < n; i++) {
-        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-        var val = Math.min(d[dims[i]] || 0, 1);
-        pts.push((cx + R * val * Math.cos(angle)).toFixed(1) + ',' + (cy + R * val * Math.sin(angle)).toFixed(1));
-      }
-      return '<polygon points="' + pts.join(' ') + '" fill="' + color + '" fill-opacity="' + opacity + '" stroke="' + color + '" stroke-width="2"/>';
-    }
-    html += makePolygon(da, 'var(--crimson)', 0.2);
-    html += makePolygon(db, '#2980b9', 0.2);
-
-    svg.innerHTML = html;
-    document.getElementById('radar-legend').innerHTML =
-      '<div style="margin-bottom:4px"><span style="display:inline-block;width:12px;height:12px;background:var(--crimson);border-radius:2px;margin-right:6px"></span>' + nameA + '</div>' +
-      '<div><span style="display:inline-block;width:12px;height:12px;background:#2980b9;border-radius:2px;margin-right:6px"></span>' + nameB + '</div>';
-  }
-
-  fetch('ssi-data.json?v=1')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var subs = data.substations || data;
-
-      // Aggregate by prefecture
-      var prefs = {};
-      subs.forEach(function(s) {
-        var p = s.prefecture || s.region || 'Unknown';
-        if (!prefs[p]) prefs[p] = {name:p, epco:s.epco||'', freq:s.freq||60, subs:[], scoreSum:0, C:0, V:0, I:0, E:0, S:0, T:0, critCount:0};
-        prefs[p].subs.push(s);
-        prefs[p].scoreSum += s.score;
-        prefs[p].C += (s.C_raw || 0);
-        prefs[p].V += (s.V_raw || 0);
-        prefs[p].I += (s.I_raw || 0);
-        prefs[p].E += (s.E_raw || 0);
-        prefs[p].S += (s.S_raw || 0);
-        prefs[p].T += (s.T_raw || 0);
-        if (s.band === 'Critical') prefs[p].critCount++;
-      });
-
-      // Sort by mean SSI descending
-      var prefList = Object.values(prefs).map(function(p) {
-        var n = p.subs.length;
-        return {
-          name: p.name, epco: p.epco, freq: p.freq, count: n,
-          meanSSI: p.scoreSum / n,
-          C: p.C / n, V: p.V / n, I: p.I / n, E: p.E / n, S: p.S / n, T: p.T / n,
-          critPct: p.critCount / n * 100
-        };
-      }).sort(function(a,b) { return b.meanSSI - a.meanSSI; });
-
-      _regionData = {};
-      prefList.forEach(function(p) { _regionData[p.name] = p; });
-
-      document.getElementById('ranking-count').textContent = prefList.length + ' prefectures';
-      document.getElementById('ranking-tbody').innerHTML = prefList.map(function(p, i) {
-        var band = p.meanSSI < 0.25 ? 'Low' : p.meanSSI < 0.50 ? 'Medium' : p.meanSSI < 0.75 ? 'High' : 'Critical';
-        var bc = band === 'Critical' ? 'var(--crimson)' : band === 'High' ? '#e74c3c' : band === 'Medium' ? '#f39c12' : 'var(--sage)';
-        return '<tr>' +
-          '<td>' + (i+1) + '</td>' +
-          '<td style="font-weight:500">' + p.name + '</td>' +
-          '<td>' + p.epco + '</td>' +
-          '<td>' + p.freq + ' Hz</td>' +
-          '<td class="num">' + p.count.toLocaleString() + '</td>' +
-          '<td class="num" style="font-weight:600">' + p.meanSSI.toFixed(3) + '</td>' +
-          '<td><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:' + bc + ';color:#fff;font-size:11px">' + band + '</span></td>' +
-          '<td class="num">' + p.C.toFixed(3) + '</td>' +
-          '<td class="num">' + p.V.toFixed(3) + '</td>' +
-          '<td class="num">' + p.I.toFixed(3) + '</td>' +
-          '<td class="num">' + p.E.toFixed(3) + '</td>' +
-          '<td class="num">' + p.S.toFixed(3) + '</td>' +
-          '<td class="num">' + p.T.toFixed(3) + '</td>' +
-        '</tr>';
-      }).join('');
-
-      // EPCO aggregation
-      var epcos = {};
-      subs.forEach(function(s) {
-        var e = s.epco || 'Unknown';
-        if (!epcos[e]) epcos[e] = {count:0, scoreSum:0, C:0, V:0, I:0, E:0, S:0, T:0, critCount:0};
-        epcos[e].count++;
-        epcos[e].scoreSum += s.score;
-        epcos[e].C += (s.C_raw || 0);
-        epcos[e].V += (s.V_raw || 0);
-        epcos[e].I += (s.I_raw || 0);
-        epcos[e].E += (s.E_raw || 0);
-        epcos[e].S += (s.S_raw || 0);
-        epcos[e].T += (s.T_raw || 0);
-        if (s.band === 'Critical') epcos[e].critCount++;
-      });
-      var epcoNames = Object.keys(epcos).sort();
-      epcoNames.forEach(function(e) {
-        var d = epcos[e];
-        _epcoData[e] = {
-          count: d.count, meanSSI: d.scoreSum/d.count,
-          C: d.C/d.count, V: d.V/d.count, I: d.I/d.count,
-          E: d.E/d.count, S: d.S/d.count, T: d.T/d.count,
-          critPct: d.critCount/d.count*100
-        };
-      });
-
-      // Populate selects
-      var selA = document.getElementById('prov-a');
-      var selB = document.getElementById('prov-b');
-      epcoNames.forEach(function(e, i) {
-        selA.add(new Option(e, e));
-        selB.add(new Option(e, e));
-      });
-      if (epcoNames.length >= 2) {
-        selA.value = epcoNames[0];
-        selB.value = epcoNames[1];
-        updateCompare();
-      }
-
-      // Component decomposition
-      var decompHTML = '';
-      var compDefs = [
-        {key:'C', label:'C', color:'var(--crimson)'},
-        {key:'V', label:'V', color:'#e67e22'},
-        {key:'I', label:'I', color:'#8e44ad'},
-        {key:'E', label:'E', color:'#2980b9'},
-        {key:'S', label:'S', color:'#27ae60'},
-        {key:'T', label:'T', color:'#7f8c8d'}
-      ];
-      prefList.forEach(function(p) {
-        decompHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
-          '<span style="width:90px;font-size:11px;font-weight:500;text-align:right">' + p.name + '</span>' +
-          '<div style="flex:1;display:flex;height:14px;border-radius:3px;overflow:hidden">';
-        var total = p.C + p.V + p.I + p.E + p.S + p.T;
-        compDefs.forEach(function(c) {
-          var pct = total > 0 ? (p[c.key] / total * 100).toFixed(1) : 0;
-          decompHTML += '<div style="width:' + pct + '%;background:' + c.color + '" title="' + c.label + ': ' + p[c.key].toFixed(3) + '"></div>';
-        });
-        decompHTML += '</div><span style="width:45px;font-size:11px;color:var(--warm-grey);text-align:right">' + p.meanSSI.toFixed(3) + '</span></div>';
-      });
-      // Legend
-      decompHTML += '<div style="display:flex;gap:12px;margin-top:12px;font-size:11px;color:var(--slate)">';
-      compDefs.forEach(function(c) {
-        decompHTML += '<span><span style="display:inline-block;width:10px;height:10px;background:' + c.color + ';border-radius:2px;margin-right:4px"></span>' + c.label + '</span>';
-      });
-      decompHTML += '</div>';
-      document.getElementById('decomp-bars').innerHTML = decompHTML;
-    })
-    .catch(function(err) {
-      console.error('SSI regional data load error:', err);
-      document.getElementById('ranking-count').textContent = 'Data pending';
-      document.getElementById('ranking-tbody').innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--warm-grey)">Awaiting ssi-data.json \u2014 run scoring pipeline to generate</td></tr>';
-    });
+// ── Load Data ──
+fetch('ssi-data.json?v=41').then(function(r) { return r.json(); }).then(function(data) {
+  SSI = data;
+  prefectureData = buildPrefectureData(data);
+  renderRanking(data);
+  populatePrefectureSelects();
+  renderDecomposition(data);
+}).catch(function(err) {
+  console.error('Failed to load SSI data:', err);
+  document.getElementById('ranking-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--crimson);padding:32px">Failed to load data. Check console.</td></tr>';
+});
 </script>
-<script>renderFooter();</script>
 </body>
 </html>
