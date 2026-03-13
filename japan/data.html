@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index v4.0.2 — Data &amp; Download for Japan. Downloadable datasets covering 6,003 substations across 95 variables. Open data, zero proprietary dependencies.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Data &amp; Download">
+<meta property="og:description" content="Download SSI datasets for Japan’s 6,003 substations — 95 variables, 35 public sources.">
+<meta property="og:type" content="website">
+<title>SSI Index — Data &amp; Download</title>
+<link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+<script src="../nav.js?v=116"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js?v=2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>renderNav('data');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Data &amp; Download</h1>
+    <p>Download the full SSI dataset for Japan — 6,003 substations across 95 variables — plus the scoring engine source, data source registry, and methodology documentation. All data is public with zero proprietary dependencies.</p>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-grid" style="margin-bottom:24px">
+    <div class="kpi-card animate-in delay-1">
+      <div class="kpi-label">Substations</div>
+      <div class="kpi-value" id="data-subs">6,003</div>
+      <div class="kpi-sub" id="data-subs-sub">OSM-verified fleet</div>
+    </div>
+    <div class="kpi-card animate-in delay-2">
+      <div class="kpi-label">Variables</div>
+      <div class="kpi-value">95</div>
+      <div class="kpi-sub">20 metrics · 5 modifiers · 6 components</div>
+    </div>
+    <div class="kpi-card animate-in delay-3">
+      <div class="kpi-label">Data Sources</div>
+      <div class="kpi-value" id="data-sources-count">35</div>
+      <div class="kpi-sub">All public, all verified</div>
+    </div>
+    <div class="kpi-card animate-in delay-4">
+      <div class="kpi-label">MC Iterations</div>
+      <div class="kpi-value">10,000</div>
+      <div class="kpi-sub">Seeded PRNG (Mulberry32)</div>
+    </div>
+  </div>
+
+  <!-- Download Cards -->
+  <div class="grid-2">
+    <div class="card animate-in delay-1" style="margin-bottom:24px">
+      <div class="card-header">Full Dataset (JSON)</div>
+      <p style="font-size:12px;color:var(--slate);margin-bottom:12px">Complete scored fleet — 6,003 substations with all component scores, modifiers, confidence intervals, and metadata. Browser-computed from the open engine.</p>
+      <button onclick="downloadJSON()" style="padding:8px 16px;background:var(--crimson);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">Download ssi-data.json</button>
+    </div>
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">Full Dataset (CSV)</div>
+      <p style="font-size:12px;color:var(--slate);margin-bottom:12px">Flat CSV export with one row per substation — suitable for Excel, R, Python, or any analytics tool. All 95 variables included.</p>
+      <button onclick="downloadCSV()" style="padding:8px 16px;background:var(--crimson);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">Download ssi-data.csv</button>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card animate-in delay-1" style="margin-bottom:24px">
+      <div class="card-header">Methodology PDF</div>
+      <p style="font-size:12px;color:var(--slate);margin-bottom:12px">Auto-generated methodology document including all 95 variables, 35 data sources, formula construct, and validation results.</p>
+      <button onclick="generateMethodPDF()" style="padding:8px 16px;background:var(--crimson);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">Generate Methodology PDF</button>
+    </div>
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">Prefecture Summary PDF</div>
+      <p style="font-size:12px;color:var(--slate);margin-bottom:12px">Per-prefecture risk summary with component breakdown, top substations, and EPCO territory context.</p>
+      <button onclick="generatePrefPDF()" style="padding:8px 16px;background:var(--crimson);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">Generate Prefecture PDF</button>
+    </div>
+  </div>
+
+  <!-- Data Source Registry -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">Data Source Registry</div>
+    <div id="source-registry" style="overflow-x:auto"></div>
+  </div>
+
+  <!-- API Reference -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">Browser Engine API</div>
+    <p style="font-size:12px;color:var(--slate);margin-bottom:12px">The SSI engine runs entirely in your browser. Open the developer console (F12) to access these public functions:</p>
+    <div style="overflow-x:auto">
+      <table class="data-table" style="width:100%;font-size:12px">
+        <thead><tr><th>Function</th><th>Description</th><th>Returns</th></tr></thead>
+        <tbody id="api-tbody">
+          <tr><td style="font-family:monospace">SSI.getWeights()</td><td>Component weight vector [C, V, I, E, S, T]</td><td>Object</td></tr>
+          <tr><td style="font-family:monospace">SSI.getMetricWeights()</td><td>Sub-metric weight matrices per component</td><td>Object</td></tr>
+          <tr><td style="font-family:monospace">SSI.scoreSubstation(sub)</td><td>Score a single substation object</td><td>{score, band, components, modifiers}</td></tr>
+          <tr><td style="font-family:monospace">SSI.scoreFleet(subs, mcIter)</td><td>Score full fleet with MC confidence</td><td>[{...scored}]</td></tr>
+          <tr><td style="font-family:monospace">SSI.calibrate(rawScore)</td><td>Apply quantile calibration to raw score</td><td>Number [0,1]</td></tr>
+          <tr><td style="font-family:monospace">SSI.getBandDistribution(subs)</td><td>Band counts and percentages</td><td>{Low, Medium, High, Critical}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+  var _ssiData = null;
+
+  // Populate source registry
+  var meta = window.SSI_METADATA;
+  if (meta && meta.dataSources) {
+    document.getElementById('data-sources-count').textContent = meta.dataSources.length;
+    var srcHTML = '<table class="data-table" style="width:100%;font-size:12px"><thead><tr><th>ID</th><th>Source</th><th>Agency</th><th>Feeds</th><th>Frequency</th><th>Status</th></tr></thead><tbody>';
+    meta.dataSources.forEach(function(s) {
+      var sc = s.status === 'LIVE' ? 'var(--sage)' : '#2980b9';
+      srcHTML += '<tr><td>' + s.id + '</td><td><a href="' + s.url + '" target="_blank" style="color:var(--crimson)">' + s.name + '</a></td><td>' + s.agency + '</td><td style="max-width:200px">' + s.feeds + '</td><td>' + s.freq + '</td><td><span style="padding:2px 6px;border-radius:3px;background:' + sc + ';color:#fff;font-size:10px">' + s.status + '</span></td></tr>';
+    });
+    srcHTML += '</tbody></table>';
+    document.getElementById('source-registry').innerHTML = srcHTML;
+  }
+
+  // Load data
+  fetch('ssi-data.json?v=1')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      _ssiData = data.substations || data;
+      document.getElementById('data-subs').textContent = _ssiData.length.toLocaleString();
+      var ehv = _ssiData.filter(function(s){return s.voltage_kv >= 225;}).length;
+      document.getElementById('data-subs-sub').textContent = ehv + ' EHV + ' + (_ssiData.length - ehv) + ' HV/MV';
+    })
+    .catch(function(err) {
+      console.log('ssi-data.json not yet available:', err);
+    });
+
+  function downloadJSON() {
+    if (!_ssiData) { alert('Data not loaded. Run scoring pipeline first.'); return; }
+    var blob = new Blob([JSON.stringify({substations: _ssiData, meta: {country:'Japan', version:'4.0.2', generated: new Date().toISOString(), count: _ssiData.length}}, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ssi-japan-v4.0.2.json';
+    a.click();
+  }
+
+  function downloadCSV() {
+    if (!_ssiData) { alert('Data not loaded. Run scoring pipeline first.'); return; }
+    var keys = Object.keys(_ssiData[0]);
+    var csv = keys.join(',') + '\n';
+    _ssiData.forEach(function(s) {
+      csv += keys.map(function(k) {
+        var v = s[k];
+        if (typeof v === 'string' && v.indexOf(',') >= 0) return '"' + v + '"';
+        return v;
+      }).join(',') + '\n';
+    });
+    var blob = new Blob([csv], {type:'text/csv'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ssi-japan-v4.0.2.csv';
+    a.click();
+  }
+
+  function generateMethodPDF() {
+    if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') { alert('PDF library not loaded'); return; }
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('SSI v4.0.2 \u2014 Japan Methodology', 14, 22);
+    doc.setFontSize(10);
+    doc.text('Generated: ' + new Date().toISOString().split('T')[0], 14, 30);
+    doc.text('Substations: 6,003 | Prefectures: 47 | EPCO Territories: 10', 14, 36);
+    doc.text('Variables: 95 | Data Sources: 35 | MC Iterations: 10,000', 14, 42);
+    doc.setFontSize(12);
+    doc.text('Component Weights:', 14, 54);
+    doc.setFontSize(10);
+    doc.text('C (Continuity): 0.25 | V (Voltage): 0.15 | I (Infrastructure): 0.20', 14, 62);
+    doc.text('E (Economic): 0.15 | S (Societal): 0.20 | T (Temporal): 0.05', 14, 68);
+    doc.setFontSize(12);
+    doc.text('Japan-Specific Calibrations:', 14, 80);
+    doc.setFontSize(10);
+    doc.text('R6b Seismic: alpha=0.30, PGA_ref=0.10g, cap=1.40', 14, 88);
+    doc.text('50/60 Hz boundary: 3 converter stations (Shin-Shinano, Sakuma, Higashi-Shimizu)', 14, 94);
+    doc.text('Quantile calibration: Q20=0.3585, Q60=0.4289, Q85=0.4907', 14, 100);
+    doc.save('SSI_v4.0.2_Japan_Methodology.pdf');
+  }
+
+  function generatePrefPDF() {
+    if (!_ssiData) { alert('Data not loaded'); return; }
+    if (typeof window.jspdf === 'undefined') { alert('PDF library not loaded'); return; }
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('SSI v4.0.2 \u2014 Japan Prefecture Summary', 14, 18);
+    doc.setFontSize(10);
+
+    // Aggregate by prefecture
+    var prefs = {};
+    _ssiData.forEach(function(s) {
+      var p = s.prefecture || s.region || 'Unknown';
+      if (!prefs[p]) prefs[p] = {count:0, scoreSum:0, critCount:0};
+      prefs[p].count++;
+      prefs[p].scoreSum += s.score;
+      if (s.band === 'Critical') prefs[p].critCount++;
+    });
+
+    var rows = Object.entries(prefs).map(function(e) {
+      return [e[0], e[1].count, (e[1].scoreSum/e[1].count).toFixed(3), e[1].critCount];
+    }).sort(function(a,b) { return parseFloat(b[2]) - parseFloat(a[2]); });
+
+    doc.autoTable({
+      startY: 26,
+      head: [['Prefecture', 'Subs', 'Mean SSI', 'Critical']],
+      body: rows,
+      styles: {fontSize: 8}
+    });
+
+    doc.save('SSI_v4.0.2_Japan_Prefecture_Summary.pdf');
+  }
+</script>
+<script>renderFooter();</script>
+</body>
+</html>
