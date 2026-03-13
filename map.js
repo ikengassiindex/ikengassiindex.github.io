@@ -624,29 +624,8 @@
 
     
     // Fallback context from components & modifiers when no nested data objects exist
-    if (!hasNested) {
-      unemployment = co.E != null ? co.E.toFixed(4) : na;
-      unemploymentLabel = 'E Economic';
-      gdp = co.V != null ? co.V.toFixed(4) : na;
-      innovation = co.S != null ? co.S.toFixed(4) : na;
-      innovationLabel = 'S Saturation';
-      energyPoverty = co.C != null ? co.C.toFixed(4) : na;
-      e2 = co.I != null ? co.I.toFixed(4) : na;
-      e2Label = 'I Infrastructure';
-      t1 = co.T != null ? co.T.toFixed(4) : na;
-      t1Label = 'T Transition';
-      degree = mo.R4_F_topo != null ? '\u00D7' + mo.R4_F_topo.toFixed(4) : na;
-      bc = mo.R3_C_mult != null ? '\u00D7' + mo.R3_C_mult.toFixed(4) : na;
-      seismic = mo.R6_seismic != null ? (mo.R6_seismic === 1 ? 'None' : '\u00D7' + mo.R6_seismic.toFixed(3)) : na;
-      markov = mo.R6_restoration != null ? '\u00D7' + mo.R6_restoration.toFixed(4) : na;
-      corrosion = mo.R7_cyber != null ? '\u00D7' + mo.R7_cyber.toFixed(4) : na;
-    }
-    if (!hasNested) {
-      unemploymentLabel = 'E Economic';
-      innovationLabel = 'S Saturation';
-      e2Label = 'I Infrastructure';
-      t1Label = 'T Transition';
-    }
+    if (!hasNested) { return ''; }
+    
 
 if (!hasNested) {
       return row('E Economic', unemployment) +
