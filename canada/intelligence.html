@@ -501,7 +501,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'The blind spots concentrate in <strong>' + blindRegionStr + '</strong>. ' +
       'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry a HIGH cyber-exposure classification, ' +
       'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier — indicating strong digital infrastructure coverage ' +
-      'but concentrated in the northern urban grid.';
+      'but concentrated in the southern urban grid.';
 
     // ── B.2 Economic Impact by Business Fabric ──
     // Tier by R3 (consequence multiplier) and E component
@@ -585,7 +585,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'depend on uninterrupted power for continuous processes (steel, glass, automotive). A single hour of unplanned outage at these ' +
       'substations carries an estimated VoLL of C$20–40/kWh, compared to C$1–4/kWh in rural agricultural areas. ' +
       'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
-      'Southern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
+      'Remote and northern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
       'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
       'to substation-level risk scores.';
 
@@ -687,7 +687,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
       (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
       '<strong>' + dualExposed.length + ' census divisions</strong> combine below-median digital readiness with above-median grid risk, ' +
-      'making them priority targets for Canada 2030 / Canada Relance / PPE digitalisation investment. ' +
+      'making them priority targets for Canada 2030 / Canada CIB / IRP digitalisation investment. ' +
       'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open DESI data — ' +
       'as NIS2 compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
 
@@ -1286,7 +1286,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var pugAbove065 = puglia.filter(function(s){ return s.R_median >= 0.65; }).length;
     document.getElementById('pug-narrative-d5').innerHTML =
       '<strong>' + pugAbove065 + ' Ontario–Quebec substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
-      'For PPE (Programmation Pluriannuelle de l\'Énergie) investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
+      'For IRP (Integrated Resource Planning) investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
       'where DER deployment is accelerating against ageing infrastructure with above-average continuity deficits and significant socio-economic exposure. ' +
       'The SSI\'s silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only because of their engineering condition, ' +
       'but because the communities they serve — characterised by service-economy dependence, tourism exposure, and above-average energy poverty — are disproportionately ' +
@@ -1316,7 +1316,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     <span style="font-size:10px;color:var(--warm-grey)">Ed. 001 · April 2026</span>
   </div>
 
-  <h3 style="margin-top:0;font-size:14px">Unplanned SAIDI (min/customer/year) — Selected EU Countries</h3>
+  <h3 style="margin-top:0;font-size:14px">Unplanned SAIDI (min/customer/year) — Selected International Peers</h3>
   <p style="font-size:11px;color:var(--warm-grey);margin:0 0 10px">Longer bar = lower SAIDI = better reliability. Values in min/customer/year.</p>
 
   <div style="display:flex;flex-direction:column;gap:6px">
@@ -1342,7 +1342,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">23.9</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding:4px 0;border-bottom:1px solid var(--card-border)">
-      <span style="min-width:130px">🇫🇷 Canada (national)</span>
+      <span style="min-width:130px">🇨🇦 Canada (national)</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:88%;height:100%;background:var(--crimson);border-radius:4px"></div>
       </div>
@@ -1510,7 +1510,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       aboveAvg + ' of 13 provinces score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
       'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DSO or national statistics — ' +
       'reveals the true spatial distribution of grid stress across Canada. ' +
-      'It is precisely this substation-level granularity that positions the SSI as a tool for PPE / Canada 2030 / Canada Relance investment prioritisation: ' +
+      'It is precisely this substation-level granularity that positions the SSI as a tool for IRP / Canada 2030 / Canada CIB investment prioritisation: ' +
       'not treating entire provinces as monoliths, but identifying the specific corridors within each that demand attention.';
   });
 })();
@@ -1564,8 +1564,8 @@ document.addEventListener("ssi-config-ready", function(e) {
       ssiLink: 'valuation' },
     { layer: 2, ref: '§0.4.2', title: 'Community Value Stack (W1–W5)',
       subtitle: 'Social and economic value to the local community — the case for public-interest investment',
-      body: 'While the Hydro One/IESO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, Canada 2030 / Canada Relance / PPE allocators, and EU structural fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per EU Commission CBA guidance), not the Hydro One/IESO WACC.',
-      concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0% (EU CBA guidance)'],
+      body: 'While the Hydro One/IESO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, Canada 2030 / Canada CIB / IRP allocators, and federal infrastructure fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per Treasury Board CBA guidance), not the Hydro One/IESO WACC.',
+      concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0% (Treasury Board CBA guidance)'],
       ssiLink: 'community' },
     { layer: 2, ref: '§0.4.5', title: 'Real Options Pricing Framework',
       subtitle: 'Why traditional DCF systematically undervalues BESS — and how six embedded options fix this',
@@ -1574,7 +1574,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       ssiLink: 'options' },
     { layer: 2, ref: '§0.4.4', title: 'Revenue Stack & Dispatch Optimisation',
       subtitle: 'Up to 11 revenue streams from a single battery — subject to one physical constraint',
-      body: 'A grid-connected BESS generates revenue from up to 11 streams (R1–R11), but is physically constrained to one full charge-discharge cycle per day. The dispatch optimiser allocates this single cycle across competing revenue opportunities: energy arbitrage (R1), frequency containment reserve (R2), automatic frequency restoration (R3), replacement reserve (R4), capacity market (R5), reactive power (R6), peak shaving (R7), backup power (R8), and three emerging streams — locational marginal pricing (R9), power quality as a service (R10), and carbon reduction services (R11). The optimiser is location-specific because the SSI data determines which streams are most valuable at each substation: a substation with high S (Saturation) generates more R7 peak-shaving value, while one with high C (Continuity) deficit generates more R2/R3 frequency reserve value. The revenue stack varies by country — the model accommodates all EU market designs.',
+      body: 'A grid-connected BESS generates revenue from up to 11 streams (R1–R11), but is physically constrained to one full charge-discharge cycle per day. The dispatch optimiser allocates this single cycle across competing revenue opportunities: energy arbitrage (R1), frequency containment reserve (R2), automatic frequency restoration (R3), replacement reserve (R4), capacity market (R5), reactive power (R6), peak shaving (R7), backup power (R8), and three emerging streams — locational marginal pricing (R9), power quality as a service (R10), and carbon reduction services (R11). The optimiser is location-specific because the SSI data determines which streams are most valuable at each substation: a substation with high S (Saturation) generates more R7 peak-shaving value, while one with high C (Continuity) deficit generates more R2/R3 frequency reserve value. The revenue stack varies by country — the model accommodates all North American market designs.',
       concepts: ['11 revenue streams (R1–R11), 1-cycle/day constraint', 'Location-specific optimisation from SSI component data', 'R9–R11: Emerging streams modelled as forward-looking options', 'Country-adaptive market design accommodation'],
       ssiLink: 'revenue' },
     { layer: 3, ref: '§0.5.2', title: 'Neural Network — Ensemble Architecture',
@@ -1585,7 +1585,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     { layer: 3, ref: '§0.5.3', title: 'Transfer Learning & Feature Missingness',
       subtitle: 'How Canadian ground truth enables valuation across 28 countries with incomplete data',
       body: 'Transfer learning is the mechanism that enables the SSI-ENN to value substations in countries where the full feature vector is not available. The core insight: grid physics is universal — topology determines load flow, weather drives thermal degradation, population density correlates with outage impact — even though data availability varies dramatically across jurisdictions. The network is first trained on the complete Canadian dataset (24,986 substations with all 95 SSI variables plus valuation outputs from Layers 1–2). Then, for each new country, available features are mapped to the Canadian feature schema. Missing features are handled through a learned missingness embedding: the network learns not just to predict from available data, but to quantify how much accuracy it loses from each missing feature. This creates a concrete data-value function: for any country, we can estimate how much prediction accuracy improves per additional data source acquired.',
-      concepts: ['Train on Canada (full data), transfer to EU (partial data)', 'Learned missingness embedding quantifies data value', 'Grid physics universality enables cross-border transfer', 'Accuracy convergence: f(Data Completeness Index)'],
+      concepts: ['Train on Canada (full data), transfer to OECD peers (partial data)', 'Learned missingness embedding quantifies data value', 'Grid physics universality enables cross-border transfer', 'Accuracy convergence: f(Data Completeness Index)'],
       ssiLink: 'transfer' },
     { layer: 3, ref: '§0.5.5', title: 'Uncertainty Quantification',
       subtitle: 'Investment-grade predictions require calibrated confidence intervals, not just point estimates',
