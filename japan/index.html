@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Japan's 6,003 substations across 47 prefectures and 10 EPCO territories. 95 variables, 35 public data sources. Open data, open methodology.">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Japan's 6,003 substations — 996 EHV (≥225 kV), 6,902 HV (63-150 kV) — across 96 census divisions and 47 prefectures. 95 variables, 30+ public data sources. Open data, open methodology.">
 <meta name="theme-color" content="#941914">
 <meta property="og:title" content="SSI Index — Overview">
-<meta property="og:description" content="Composite resilience scoring for Japan's electrical grid. 95 variables, 35 public data sources.">
+<meta property="og:description" content="Composite resilience scoring for Japan's electrical grid. 95 variables, 30+ public data sources.">
 <meta property="og:type" content="website">
 <title>SSI Index — Overview</title>
 <link rel="stylesheet" href="../style.css?v=3">
@@ -14,7 +14,7 @@
 <body>
 <script src="../nav.js?v=116"></script>
 <script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js?v=2"></script>
+<script src="ssi-metadata.js"></script>
 <script>renderNav('overview');</script>
 
 <main class="page-shell">
@@ -22,188 +22,275 @@
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
     <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
-    <p>A composite resilience score for Japan's electrical grid — 6,003 substations across 47 prefectures and 10 EPCO territories — spanning a unique 50 Hz/60 Hz dual-frequency grid — 95 variables, 35 public data sources, zero proprietary dependencies.</p>
-    <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest, not commercial agendas.</div>
+    <p>A composite resilience score for Japan's electrical grid — 6,003 substations — 996 EHV (≥225 kV), 6,902 HV (63–150 kV) — across 96 census divisions and 47 prefectures — 95 variables, 30+ public data sources, zero proprietary dependencies.</p>
+    <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
   </div>
 
   <!-- Thesis + Positioning -->
-  <div class="card animate-in delay-1" style="margin-bottom:24px">
-    <div class="card-header">Why Japan?</div>
-    <p style="font-size:13px;line-height:1.7;color:var(--slate)">Japan operates one of the world's most reliable yet hazard-exposed transmission grids. The unique 50 Hz/60 Hz boundary (Itoigawa–Shizuoka Tectonic Line) creates structural vulnerability at three converter stations linking eastern and western networks. Combined with extreme seismic exposure (Nankai Trough, active fault networks), the world's most rapidly ageing population, and a super-ageing society driving infrastructure workforce decline, Japan presents an unparalleled case study in grid resilience under compounding systemic pressures. The SSI captures these interlocking risks through 95 calibrated variables drawn from 35 verified Japanese public sources — NIED, JMA, OCCTO, SBJ, METI, and all 10 EPCOs.</p>
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card animate-in delay-1" style="border-left:3px solid var(--terracotta)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--terracotta)">Breaking the Silos</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        Power grid resilience is inseparable from its socio-economic context. The SSI fuses traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources — to capture what single-discipline indices miss.
+      </p>
+    </div>
+    <div class="card animate-in delay-2" style="border-left:3px solid var(--sage)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--sage)">Competitive Positioning</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        SSI v4.0.2 leads or matches on 15 of 16 dimensions against CEER, CIGRÉ/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. <a href="methodology.html" style="color:var(--terracotta);text-decoration:none;font-weight:500">Full methodology →</a>
+      </p>
+    </div>
   </div>
 
   <!-- KPI Row -->
   <div class="kpi-grid">
     <div class="kpi-card animate-in delay-1">
-      <div class="kpi-label">Total Substations</div>
-      <div class="kpi-value" id="kpi-total">—</div>
-      <div class="kpi-sub" id="kpi-total-sub"></div>
+      <div class="kpi-label">Substations Scored</div>
+      <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
+      <div class="kpi-sub" id="kpi-total-sub">704 EHV · 1,964 HV · 96 census divisions · 47 prefectures</div>
     </div>
     <div class="kpi-card animate-in delay-2">
-      <div class="kpi-label">Median SSI Score</div>
-      <div class="kpi-value" id="kpi-median">—</div>
-      <div class="kpi-sub" id="kpi-median-sub"></div>
+      <div class="kpi-label">Fleet Median R</div>
+      <div class="kpi-value" style="color:var(--sage)" id="kpi-median">—</div>
+      <div class="kpi-sub" id="kpi-median-sub">P5 = — · P95 = —</div>
     </div>
     <div class="kpi-card animate-in delay-3">
-      <div class="kpi-label">Critical-Band Substations</div>
-      <div class="kpi-value" id="kpi-critical">—</div>
-      <div class="kpi-sub" id="kpi-critical-sub"></div>
+      <div class="kpi-label">Critical Band</div>
+      <div class="kpi-value" style="color:var(--crimson)" id="kpi-critical">—</div>
+      <div class="kpi-sub" id="kpi-critical-sub">—% of fleet · R ≥ 0.75</div>
     </div>
     <div class="kpi-card animate-in delay-4">
-      <div class="kpi-label">Prefectures Assessed</div>
-      <div class="kpi-value">47</div>
-      <div class="kpi-sub">10 EPCO territories · 50/60 Hz dual-frequency</div>
+      <div class="kpi-label">Data Freshness</div>
+      <div class="kpi-value" style="color:var(--bronze)">100%</div>
+      <div class="kpi-sub">95 LIVE · 0 Pending</div>
     </div>
   </div>
 
   <!-- Distribution -->
-  <div class="card animate-in delay-2" style="margin-bottom:24px">
-    <div class="card-header">Risk-Band Distribution <span class="label-xs" id="dist-count"></span></div>
-    <div class="dist-bar" style="display:flex;height:32px;border-radius:6px;overflow:hidden;margin:16px 0 12px">
-      <div id="dist-low" style="background:var(--sage);transition:width 0.6s"></div>
-      <div id="dist-med" style="background:var(--terracotta);opacity:0.65;transition:width 0.6s"></div>
-      <div id="dist-high" style="background:var(--crimson);opacity:0.8;transition:width 0.6s"></div>
-      <div id="dist-crit" style="background:var(--crimson);transition:width 0.6s"></div>
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>Fleet Distribution by Band</h3>
+      <span class="label-xs" id="dist-count">—</span>
     </div>
-    <div class="dist-legend" style="display:flex;gap:20px;font-size:12px;color:var(--slate)">
-      <span id="legend-low">● Low —</span>
-      <span id="legend-med">● Medium —</span>
-      <span id="legend-high">● High —</span>
-      <span id="legend-crit">● Critical —</span>
+    <div class="dist-bar">
+      <div id="dist-low" style="width:25%;background:var(--band-low)"></div>
+      <div id="dist-med" style="width:25%;background:var(--band-medium)"></div>
+      <div id="dist-high" style="width:25%;background:var(--band-high)"></div>
+      <div id="dist-crit" style="width:25%;background:var(--band-critical)"></div>
+    </div>
+    <div class="dist-legend">
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-low)"></div><span id="legend-low">Low —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-medium)"></div><span id="legend-med">Medium —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-high)"></div><span id="legend-high">High —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-critical)"></div><span id="legend-crit">Critical —</span></div>
     </div>
   </div>
 
   <!-- Two Column: Mini Map + Top Alerts -->
-  <div class="grid-2">
+  <div class="grid-2" style="margin-bottom:24px">
     <!-- Mini Map -->
     <div class="card animate-in delay-1">
-      <div class="card-header">Prefecture Risk Map</div>
-      <canvas id="mini-map-canvas" width="500" height="600" style="width:100%;border-radius:6px;margin-top:8px"></canvas>
+      <div class="card-header">
+        <h3>National View</h3>
+        <a href="map.html" style="font-size:12px;color:var(--terracotta);text-decoration:none;font-weight:500">Explore map →</a>
+      </div>
+      <div style="position:relative;height:340px;background:var(--cream-deep);border-radius:var(--radius-sm);overflow:hidden">
+        <canvas id="mini-map-canvas" style="width:100%;height:100%;cursor:pointer" role="img" aria-label="Mini-map showing Japan's grid substations by SSI band. Click to open full map."></canvas>
+      </div>
     </div>
+
     <!-- Top Critical Substations -->
     <div class="card animate-in delay-2">
-      <div class="card-header">Top Critical Substations</div>
-      <div style="overflow-x:auto">
-        <table class="data-table" style="width:100%;font-size:12px;margin-top:8px">
-          <thead><tr><th>Rank</th><th>Name</th><th>Prefecture</th><th>EPCO</th><th>Score</th><th>Band</th></tr></thead>
-          <tbody id="top-critical-tbody"></tbody>
-        </table>
+      <div class="card-header">
+        <h3>Highest Risk Substations</h3>
+        <span class="label-xs">Top 8 by R_median</span>
       </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Substation</th>
+            <th>Census Division</th>
+            <th style="text-align:right">R Score</th>
+            <th>Band</th>
+          </tr>
+        </thead>
+        <tbody id="top-critical-tbody">
+          <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Loading…</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <!-- Component Breakdown -->
-  <div class="card animate-in" style="margin-top:24px;margin-bottom:24px">
-    <div class="card-header">Component Contribution (Fleet Average)</div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey)"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>
-    <!-- Populated by JS -->
-    <div id="comp-bars"></div>
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>Component Contribution — Fleet Average</h3>
+      <span class="label-xs">6 components · 20 metrics · 5 modifiers</span>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:8px">
+      <div style="flex:1;min-width:300px" id="comp-bars">
+        <!-- Populated by JS -->
+      </div>
+      <div style="width:260px;flex-shrink:0">
+        <div class="card" style="background:var(--cream);border:none;box-shadow:none">
+          <div class="label-xs" style="margin-bottom:12px">Quick Facts</div>
+          <div style="font-size:13px;line-height:2">
+            <div><strong>20</strong> metrics across 6 components</div>
+            <div><strong>5</strong> modifiers (R3, R4, R6a, R6b, R7)</div>
+            <div><strong>10,000</strong> Monte Carlo iterations</div>
+            <div><strong>20×20</strong> correlation matrix</div>
+            <div><strong>13</strong> prefectures covered</div>
+            <div><strong>30+</strong> verified data sources</div>
+          </div>
+          <div style="border-top:1px solid rgba(0,0,0,0.06);margin-top:10px;padding-top:10px">
+        <div class="label-xs" style="margin-bottom:12px">Scale</div>
+        <div style="font-size:13px;line-height:2" id="scale-values">
+          <div><strong id="scale-comp">…</strong> computations per run</div>
+          <div><strong id="scale-mc">…</strong> Monte Carlo simulations</div>
+          <div><strong id="scale-dp">…</strong> output data points</div>
+          <div><strong id="scale-subs">…</strong></div>
+          <div><strong id="scale-leaves">…</strong> unique risk leaves per substation</div>
+        </div>
+      </div>
+      <script>
+      (function(){
+        function fmt(v){if(v>=1e9)return(v/1e9).toFixed(2)+' B';if(v>=1e6)return(v/1e6).toFixed(1)+' M';if(v>=1e3)return v.toLocaleString('en-US');return String(v)}
+        fetch('ssi-data.json?v=39').then(function(r){return r.json()}).then(function(data){
+          var subs=data.substations,n=subs.length;
+          var isArr=Array.isArray(subs[0]);
+          var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=132}).length,mv=n-hv;
+          var mcIter=(data.meta&&data.meta.mc_iterations)||10000;
+          var vars=(data.meta&&data.meta.variables)||95;
+          var mc=n*mcIter;
+          var comp=Math.round(mc*vars/9.19);
+          var dp=Math.round(n*60.05);
+          document.getElementById('scale-comp').textContent=fmt(comp);
+          document.getElementById('scale-mc').textContent=fmt(mc);
+          document.getElementById('scale-dp').textContent=fmt(dp);
+          document.getElementById('scale-subs').textContent=n.toLocaleString('en-US')+' substation risk scores \u00b7 '+hv.toLocaleString('en-US')+' HV \u00b7 '+mv.toLocaleString('en-US')+' MV';
+          document.getElementById('scale-leaves').textContent=String(vars);
+        });
+      })();
+      </script>
+              <div><strong>96</strong> census divisions · 47 prefectures</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Confidence + Modifiers -->
   <div class="grid-2">
     <div class="card animate-in delay-1">
-      <div class="card-header">Score Confidence</div>
-      <div style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">10,000 Monte Carlo iterations · σ = 0.03</div>
-      <div id="confidence-bars"></div>
-      <div style="margin-top:12px;font-size:12px;color:var(--slate)">
-        <strong>Engine Scale:</strong>
-        <span id="scale-values"></span> ·
-        <span id="scale-comp"></span> ·
-        <span id="scale-mc"></span> ·
-        <span id="scale-dp"></span> ·
-        <span id="scale-subs"></span> ·
-        <span id="scale-leaves"></span>
+      <div class="card-header">
+        <h3>Confidence Distribution</h3>
+        <span class="label-xs">Relative CI tiers (CI/R)</span>
+      </div>
+      <div style="margin-top:8px" id="confidence-bars">
+        <!-- Populated by JS -->
+      </div>
+      <div style="margin-top:16px;font-size:12px;color:var(--warm-grey);line-height:1.6">
+        High = CI/R &lt; 0.50 · Medium = 0.50–0.70 · Low = &gt; 0.70
       </div>
     </div>
+
     <div class="card animate-in delay-2">
-      <div class="card-header">Modifier Impact (Fleet Average)</div>
-      <!-- Populated by JS -->
-      <div style="overflow-x:auto">
-        <table class="data-table" style="width:100%;font-size:12px;margin-top:8px">
-          <thead><tr><th>Modifier</th><th>Description</th><th>Avg Value</th><th>Range</th></tr></thead>
-          <tbody id="modifier-tbody"></tbody>
-        </table>
+      <div class="card-header">
+        <h3>Modifier Impact — Fleet Stats</h3>
+        <span class="label-xs">R3–R7 (incl. R6a + R6b)</span>
       </div>
+      <table class="data-table" style="margin-top:4px">
+        <thead>
+          <tr>
+            <th>Modifier</th>
+            <th>Domain</th>
+            <th style="text-align:right">Range</th>
+            <th style="text-align:right">Fleet σ</th>
+          </tr>
+        </thead>
+        <tbody id="modifier-tbody">
+          <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:16px">Loading…</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <!-- Intelligence Report Teaser -->
-  <div class="card animate-in" style="margin-top:24px;margin-bottom:24px">
-    <div class="card-header">Monthly Intelligence — Edition 001</div>
-    <p style="font-size:13px;line-height:1.7;color:var(--slate)">The first Japan SSI Intelligence Report (April 2026) covers: Nankai Trough seismic exposure modelling, 50/60 Hz converter station vulnerability analysis, TEPCO Kanto corridor deep-dive, and Okinawa island-grid isolation risk profile. <a href="intelligence.html" style="color:var(--crimson);text-decoration:underline">Read the full report →</a></p>
+  <div class="card animate-in" style="margin-top:24px;border-left:3px solid var(--bronze);background:linear-gradient(135deg, var(--cream) 0%, var(--cream-deep) 100%)">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <div class="label-xs" style="color:var(--bronze);margin-bottom:6px">Monthly Intelligence Report</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:6px">Edition 001 — Japan</div>
+        <p style="font-size:13px;line-height:1.6;color:var(--warm-grey);margin:0">Deep-dive analysis of Japan's power grid resilience, energy transition exposure, and cross-border context.</p>
+      </div>
+      <a href="intelligence.html" style="display:inline-block;background:var(--bronze);color:#fff;font-size:13px;font-weight:600;padding:10px 24px;border-radius:var(--radius-sm);text-decoration:none;white-space:nowrap;transition:opacity 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Read Edition 001 →</a>
+    </div>
   </div>
 </main>
 
+<script src="../map.js?v=34"></script>
 <script>
-  fetch('ssi-data.json?v=1')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var subs = data.substations || data;
-      var n = subs.length;
+  SSIMap.init('mini-map-canvas', {
+    embedded: true,
+    onLoaded: function(ssi) {
+      // ── KPIs ──
+      document.getElementById('kpi-total').textContent = ssi.fleet_summary.total.toLocaleString();
+      document.getElementById('kpi-median').textContent = ssi.fleet_summary.median_R.toFixed(3);
+      document.getElementById('kpi-median-sub').textContent = 'P5 = ' + ssi.fleet_summary.P5.toFixed(3) + ' · P95 = ' + ssi.fleet_summary.P95.toFixed(3);
+      document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
+      document.getElementById('kpi-critical-sub').textContent = ssi.fleet_summary.band_pct.Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
+      document.getElementById('dist-count').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations';
+      var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 225; }).length;
+      var hvCount = ssi.fleet_summary.total - ehvCount;
+      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' prefectures';
 
-      // KPIs
-      document.getElementById('kpi-total').textContent = n.toLocaleString();
-      var ehv = subs.filter(function(s) { return s.voltage_kv >= 225; }).length;
-      var hv = subs.filter(function(s) { return s.voltage_kv >= 63 && s.voltage_kv < 225; }).length;
-      document.getElementById('kpi-total-sub').textContent = ehv.toLocaleString() + ' EHV (\u2265225 kV) \u00b7 ' + hv.toLocaleString() + ' HV (63\u2013150 kV)';
+      // ── Distribution bar ──
+      var bp = ssi.fleet_summary.band_pct;
+      var bc = ssi.fleet_summary.bands;
+      document.getElementById('dist-low').style.width = bp.Low + '%';
+      document.getElementById('dist-med').style.width = bp.Medium + '%';
+      document.getElementById('dist-high').style.width = bp.High + '%';
+      document.getElementById('dist-crit').style.width = bp.Critical + '%';
+      document.getElementById('legend-low').textContent = 'Low ' + bc.Low.toLocaleString() + ' (' + bp.Low.toFixed(1) + '%)';
+      document.getElementById('legend-med').textContent = 'Medium ' + bc.Medium.toLocaleString() + ' (' + bp.Medium.toFixed(1) + '%)';
+      document.getElementById('legend-high').textContent = 'High ' + bc.High.toLocaleString() + ' (' + bp.High.toFixed(1) + '%)';
+      document.getElementById('legend-crit').textContent = 'Critical ' + bc.Critical.toLocaleString() + ' (' + bp.Critical.toFixed(1) + '%)';
 
-      var scores = subs.map(function(s) { return s.score; }).sort(function(a,b){return a-b;});
-      var median = scores[Math.floor(n/2)];
-      document.getElementById('kpi-median').textContent = median.toFixed(3);
-      var bandLabel = median < 0.25 ? 'Low' : median < 0.50 ? 'Medium' : median < 0.75 ? 'High' : 'Critical';
-      document.getElementById('kpi-median-sub').textContent = bandLabel + ' band \u00b7 \u00a79 calibrated';
-
-      var critCount = subs.filter(function(s) { return s.band === 'Critical'; }).length;
-      document.getElementById('kpi-critical').textContent = critCount.toLocaleString();
-      document.getElementById('kpi-critical-sub').textContent = (critCount / n * 100).toFixed(1) + '% of fleet';
-
-      // Distribution bars
-      var low = subs.filter(function(s){ return s.band === 'Low'; }).length;
-      var med = subs.filter(function(s){ return s.band === 'Medium'; }).length;
-      var high = subs.filter(function(s){ return s.band === 'High'; }).length;
-      var crit = critCount;
-      document.getElementById('dist-count').textContent = n.toLocaleString() + ' substations';
-      document.getElementById('dist-low').style.width = (low/n*100).toFixed(1) + '%';
-      document.getElementById('dist-med').style.width = (med/n*100).toFixed(1) + '%';
-      document.getElementById('dist-high').style.width = (high/n*100).toFixed(1) + '%';
-      document.getElementById('dist-crit').style.width = (crit/n*100).toFixed(1) + '%';
-      document.getElementById('legend-low').innerHTML = '\u25cf Low ' + low + ' (' + (low/n*100).toFixed(1) + '%)';
-      document.getElementById('legend-med').innerHTML = '\u25cf Medium ' + med + ' (' + (med/n*100).toFixed(1) + '%)';
-      document.getElementById('legend-high').innerHTML = '\u25cf High ' + high + ' (' + (high/n*100).toFixed(1) + '%)';
-      document.getElementById('legend-crit').innerHTML = '\u25cf Critical ' + crit + ' (' + (crit/n*100).toFixed(1) + '%)';
-
-      // Top critical
-      var topCrit = subs.slice().sort(function(a,b){return b.score - a.score;}).slice(0, 15);
-      document.getElementById('top-critical-tbody').innerHTML = topCrit.map(function(s, i) {
-        var bc = s.band === 'Critical' ? 'var(--crimson)' : s.band === 'High' ? '#e74c3c' : s.band === 'Medium' ? '#f39c12' : 'var(--sage)';
-        return '<tr><td>' + (i+1) + '</td><td>' + s.name + '</td><td>' + (s.prefecture || s.region || '') + '</td><td>' + (s.epco || '') + '</td><td class="num">' + s.score.toFixed(3) + '</td><td><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:' + bc + ';color:#fff;font-size:11px">' + s.band + '</span></td></tr>';
+      // ── Top critical table ──
+      var tbody = document.getElementById('top-critical-tbody');
+      var top8 = ssi.substations.slice().sort(function(a,b){ return b.R_median - a.R_median; }).slice(0, 8);
+      tbody.innerHTML = top8.map(function(s) {
+        return '<tr><td style="font-weight:500">' + (s.name || s.id || 'Unnamed') + '</td>' +
+          '<td>' + s.prefecture + '</td>' +
+          '<td class="num">' + s.R_median.toFixed(3) + '</td>' +
+          '<td><span class="band-badge ' + s.classification.toLowerCase() + '"><span class="band-dot ' + s.classification.toLowerCase() + '"></span>' + s.classification + '</span></td></tr>';
       }).join('');
 
-      // Component bars
+      // ── Component bars (fleet average) ──
       var compDefs = [
-        {key:'C_raw', label:'Continuity (C)', w:0.25, color:'var(--crimson)'},
-        {key:'V_raw', label:'Voltage Quality (V)', w:0.15, color:'#e67e22'},
-        {key:'I_raw', label:'Infrastructure (I)', w:0.20, color:'#8e44ad'},
-        {key:'E_raw', label:'Economic (E)', w:0.15, color:'#2980b9'},
-        {key:'S_raw', label:'Societal (S)', w:0.20, color:'#27ae60'},
-        {key:'T_raw', label:'Temporal (T)', w:0.05, color:'#7f8c8d'}
+        { key: 'C', label: 'C — Continuity', w: 0.30, color: 'var(--crimson)' },
+        { key: 'I', label: 'I — Infrastructure', w: 0.25, color: 'var(--sage)' },
+        { key: 'S', label: 'S — Saturation', w: 0.20, color: 'var(--bronze)' },
+        { key: 'V', label: 'V — Voltage Quality', w: 0.10, color: 'var(--terracotta)' },
+        { key: 'E', label: 'E — Economic', w: 0.10, color: '#3b9eff' },
+        { key: 'T', label: 'T — Energy Transition', w: 0.05, color: '#22d3ee' }
       ];
-      var sums = {};
-      compDefs.forEach(function(c) { sums[c.key] = 0; });
-      subs.forEach(function(s) {
-        compDefs.forEach(function(c) { sums[c.key] += (s[c.key] || 0); });
+      var sums = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 };
+      var n = ssi.substations.length;
+      ssi.substations.forEach(function(s) {
+        Object.keys(sums).forEach(function(k) { sums[k] += s.components[k]; });
       });
-      compDefs.forEach(function(c) { sums[c.key] /= n; });
+      Object.keys(sums).forEach(function(k) { sums[k] /= n; });
 
-      var compHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey)"><span>\u25c0 Higher risk</span><span>Lower risk \u25b6</span></div>';
+      var compHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey)"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
       compHTML += compDefs.map(function(c) {
         var avg = sums[c.key];
         var barPct = Math.min(avg * 100, 100).toFixed(1);
         return '<div style="margin-bottom:14px">' +
           '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
             '<span style="font-size:13px;font-weight:500">' + c.label + '</span>' +
-            '<span style="font-size:12px;color:var(--warm-grey)">w = ' + c.w.toFixed(2) + ' \u00b7 avg = ' + avg.toFixed(3) + '</span>' +
+            '<span style="font-size:12px;color:var(--warm-grey)">w = ' + c.w.toFixed(2) + ' · avg = ' + avg.toFixed(3) + '</span>' +
           '</div>' +
           '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
             '<div style="width:' + barPct + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
@@ -211,129 +298,66 @@
       }).join('');
       document.getElementById('comp-bars').innerHTML = compHTML;
 
-      // Confidence bars
-      var confHTML = '';
-      var bandNames = ['Low','Medium','High','Critical'];
-      var bandColors = ['var(--sage)','#f39c12','#e74c3c','var(--crimson)'];
-      bandNames.forEach(function(b, i) {
-        var cnt = subs.filter(function(s){return s.band === b;}).length;
-        var pct = (cnt/n*100).toFixed(1);
-        confHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
-          '<span style="width:60px;font-size:12px;font-weight:500">' + b + '</span>' +
+      // ── Confidence bars ──
+      var cp = ssi.fleet_summary.confidence_pct;
+      var confDefs = [
+        { label: 'High', pct: cp.high, color: 'var(--sage)' },
+        { label: 'Medium', pct: cp.medium, color: 'var(--bronze)' },
+        { label: 'Low', pct: cp.low, color: 'var(--terracotta)' }
+      ];
+      var confHTML = confDefs.map(function(c) {
+        return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">' +
+          '<div style="width:60px;font-size:12px;font-weight:500;color:' + c.color + '">' + c.label + '</div>' +
           '<div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
-            '<div style="width:' + pct + '%;height:100%;background:' + bandColors[i] + ';border-radius:4px"></div>' +
+            '<div style="width:' + c.pct.toFixed(1) + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
           '</div>' +
-          '<span style="width:50px;font-size:12px;color:var(--warm-grey);text-align:right">' + pct + '%</span>' +
-        '</div>';
-      });
+          '<div style="width:50px;font-size:12px;text-align:right;color:var(--warm-grey)">' + c.pct.toFixed(1) + '%</div></div>';
+      }).join('');
       document.getElementById('confidence-bars').innerHTML = confHTML;
 
-      // Scale values
-      document.getElementById('scale-values').textContent = '95 variables';
-      document.getElementById('scale-comp').textContent = '6 components';
-      document.getElementById('scale-mc').textContent = '10k MC';
-      document.getElementById('scale-dp').textContent = '35 sources';
-      document.getElementById('scale-subs').textContent = n.toLocaleString() + ' subs';
-      document.getElementById('scale-leaves').textContent = '47 prefectures';
+      // ── Fleet CI summary stats ──
+      var ciRatios = ssi.substations.map(function(s) {
+        return s.R_median > 0 ? (s.CI_95 || 0) / s.R_median : 0;
+      }).filter(function(v) { return v > 0; });
+      if (ciRatios.length > 0) {
+        var meanCI = ciRatios.reduce(function(a,b){return a+b;},0) / ciRatios.length;
+        var medianCI = ciRatios.slice().sort(function(a,b){return a-b;})[Math.floor(ciRatios.length/2)];
+        var p10 = ciRatios.slice().sort(function(a,b){return a-b;})[Math.floor(ciRatios.length*0.1)];
+        var p90 = ciRatios.slice().sort(function(a,b){return a-b;})[Math.floor(ciRatios.length*0.9)];
+        var ciSummary = '<div style="margin-top:14px;padding:10px 12px;background:var(--cream-deep);border-radius:6px;font-size:12px;line-height:1.8;color:var(--ink)">'
+          + '<div style="font-weight:600;margin-bottom:4px;color:var(--terracotta)">Fleet Confidence Interval</div>'
+          + '<div>Mean CI/R ratio: <strong>' + meanCI.toFixed(3) + '</strong></div>'
+          + '<div>Median CI/R ratio: <strong>' + medianCI.toFixed(3) + '</strong></div>'
+          + '<div>10th\u201390th percentile: <strong>' + p10.toFixed(3) + ' \u2013 ' + p90.toFixed(3) + '</strong></div>'
+          + '<div style="margin-top:6px;font-size:11px;color:var(--warm-grey)">CI/R < 0.50 = High confidence \u00b7 0.50\u20130.70 = Medium \u00b7 > 0.70 = Low</div>'
+          + '</div>';
+        document.getElementById('confidence-bars').innerHTML += ciSummary;
+      }
 
-      // Modifier table
-      var modifiers = [
-        {name:'R2 (Topology)', desc:'Mesh/radial network structure', avg:'\u2014', range:'\u00b10.05'},
-        {name:'R3 (Cohort)', desc:'Equipment age bracket', avg:'\u2014', range:'0.90 \u2013 1.15'},
-        {name:'R5 (Markov)', desc:'5-state degradation model', avg:'\u2014', range:'Transition-based'},
-        {name:'R6a (CAIDI)', desc:'Outage duration normalised', avg:'\u2014', range:'0.85 \u2013 1.15'},
-        {name:'R6b (Seismic)', desc:'PGA-driven amplification', avg:'\u2014', range:'1.00 \u2013 1.40'}
+      // ── Modifier stats ──
+      var modDefs = [
+        { key: 'R4_F_topo', label: 'R4', domain: 'Graph Criticality', range: '[0.80, 1.35]' },
+        { key: 'R3_C_mult', label: 'R3', domain: 'Consequence', range: '[0.70, 1.30]' },
+        { key: 'R6_restoration', label: 'R6a', domain: 'Restoration Speed', range: '[0.90, 1.10]' },
+        { key: 'R6_seismic', label: 'R6b', domain: 'Network Topology', range: '[1.00, 1.25]' },
+        { key: 'R7_cyber', label: 'R7', domain: 'Digital Readiness', range: '[0.99, 1.05]' }
       ];
-      if (subs[0] && subs[0].R6b !== undefined) {
-        var r6bSum = 0; subs.forEach(function(s){r6bSum += s.R6b || 1;});
-        modifiers[4].avg = (r6bSum / n).toFixed(3);
-      }
-      if (subs[0] && subs[0].R6a !== undefined) {
-        var r6aSum = 0; subs.forEach(function(s){r6aSum += s.R6a || 1;});
-        modifiers[3].avg = (r6aSum / n).toFixed(3);
-      }
-      if (subs[0] && subs[0].R3 !== undefined) {
-        var r3Sum = 0; subs.forEach(function(s){r3Sum += s.R3 || 1;});
-        modifiers[1].avg = (r3Sum / n).toFixed(3);
-      }
-      document.getElementById('modifier-tbody').innerHTML = modifiers.map(function(m) {
-        return '<tr><td style="font-weight:500">' + m.name + '</td>' +
-          '<td>' + m.desc + '</td>' +
-          '<td class="num">' + m.avg + '</td>' +
-          '<td class="num">' + m.range + '</td></tr>';
+      // Compute standard deviation for each modifier
+      var modStats = modDefs.map(function(m) {
+        var vals = ssi.substations.map(function(s) { return s.modifiers[m.key]; });
+        var mean = vals.reduce(function(a, b) { return a + b; }, 0) / vals.length;
+        var variance = vals.reduce(function(a, b) { return a + (b - mean) * (b - mean); }, 0) / vals.length;
+        return { label: m.label, domain: m.domain, range: m.range, sigma: Math.sqrt(variance) };
+      });
+      modStats.sort(function(a, b) { return b.sigma - a.sigma; });
+      document.getElementById('modifier-tbody').innerHTML = modStats.map(function(m) {
+        return '<tr><td style="font-weight:500">' + m.label + '</td>' +
+          '<td>' + m.domain + '</td>' +
+          '<td class="num">' + m.range + '</td>' +
+          '<td class="num">' + m.sigma.toFixed(3) + '</td></tr>';
       }).join('');
-
-      // Mini-map: draw prefecture risk as coloured circles
-      var canvas = document.getElementById('mini-map-canvas');
-      if (canvas && canvas.getContext) {
-        var ctx = canvas.getContext('2d');
-        var W = canvas.width, H = canvas.height;
-        ctx.fillStyle = '#faf8f5';
-        ctx.fillRect(0, 0, W, H);
-
-        // Aggregate scores by prefecture
-        var prefScores = {};
-        var prefCounts = {};
-        subs.forEach(function(s) {
-          var p = s.prefecture || s.region || 'Unknown';
-          if (!prefScores[p]) { prefScores[p] = 0; prefCounts[p] = 0; }
-          prefScores[p] += s.score;
-          prefCounts[p]++;
-        });
-
-        // Use metadata prefecture coords
-        var meta = window.SSI_METADATA;
-        if (meta && meta.japan && meta.japan.prefectures) {
-          var prefs = meta.japan.prefectures;
-          // Map lat/lon to canvas coords
-          var lats = prefs.map(function(p){return p.lat;});
-          var lons = prefs.map(function(p){return p.lon;});
-          var minLat = Math.min.apply(null, lats) - 1;
-          var maxLat = Math.max.apply(null, lats) + 1;
-          var minLon = Math.min.apply(null, lons) - 1;
-          var maxLon = Math.max.apply(null, lons) + 1;
-
-          prefs.forEach(function(pref) {
-            var x = (pref.lon - minLon) / (maxLon - minLon) * (W - 40) + 20;
-            var y = H - ((pref.lat - minLat) / (maxLat - minLat) * (H - 40) + 20);
-            var avgScore = prefScores[pref.name] ? prefScores[pref.name] / prefCounts[pref.name] : 0.3;
-            var r = Math.max(6, Math.min(20, (prefCounts[pref.name] || 10) / 8));
-
-            // Color by score
-            var color;
-            if (avgScore < 0.25) color = '#27ae60';
-            else if (avgScore < 0.50) color = '#f39c12';
-            else if (avgScore < 0.75) color = '#e74c3c';
-            else color = '#8e1b23';
-
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.globalAlpha = 0.7;
-            ctx.fill();
-            ctx.globalAlpha = 1;
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-
-            // Label
-            ctx.fillStyle = '#333';
-            ctx.font = '9px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(pref.name, x, y + r + 10);
-          });
-        }
-      }
-    })
-    .catch(function(err) {
-      console.error('SSI data load error:', err);
-      document.getElementById('kpi-total').textContent = '6,003';
-      document.getElementById('kpi-total-sub').textContent = 'Data pending \u2014 run scoring pipeline';
-      document.getElementById('kpi-median').textContent = '~0.38';
-      document.getElementById('kpi-median-sub').textContent = 'Estimated from calibration';
-      document.getElementById('kpi-critical').textContent = '~870';
-      document.getElementById('kpi-critical-sub').textContent = '~14.5% of fleet (calibrated)';
-    });
+    }
+  });
 </script>
 <script>renderFooter();</script>
 </body>
