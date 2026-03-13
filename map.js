@@ -572,6 +572,9 @@
     var sm = ssi.seismic || {};
     var mk = ssi.markov || {};
     var na = '<span style="opacity:0.35">—</span>';
+    var co = ssi.components || {};
+    var mo = ssi.modifiers || {};
+    var hasNested = !!(ssi.socio_economic || ssi.transition || ssi.graph_topology || ssi.seismic || ssi.markov);
 
     function row(label, val) {
       return '<div style="display:flex;justify-content:space-between"><span>' + label + '</span><span style="font-weight:500">' + val + '</span></div>';
@@ -619,6 +622,47 @@
     var fpRaw = ssi.fleet_percentile;
     var fleetPct = fpRaw != null ? (fpRaw > 1 ? fpRaw.toFixed(1) : (fpRaw * 100).toFixed(1)) + '%' : na;
 
+    
+    // Fallback context from components & modifiers when no nested data objects exist
+    if (!hasNested) {
+      unemployment = co.E != null ? co.E.toFixed(4) : na;
+      unemploymentLabel = 'E Economic';
+      gdp = co.V != null ? co.V.toFixed(4) : na;
+      innovation = co.S != null ? co.S.toFixed(4) : na;
+      innovationLabel = 'S Saturation';
+      energyPoverty = co.C != null ? co.C.toFixed(4) : na;
+      e2 = co.I != null ? co.I.toFixed(4) : na;
+      e2Label = 'I Infrastructure';
+      t1 = co.T != null ? co.T.toFixed(4) : na;
+      t1Label = 'T Transition';
+      degree = mo.R4_F_topo != null ? '\u00D7' + mo.R4_F_topo.toFixed(4) : na;
+      bc = mo.R3_C_mult != null ? '\u00D7' + mo.R3_C_mult.toFixed(4) : na;
+      seismic = mo.R6_seismic != null ? (mo.R6_seismic === 1 ? 'None' : '\u00D7' + mo.R6_seismic.toFixed(3)) : na;
+      markov = mo.R6_restoration != null ? '\u00D7' + mo.R6_restoration.toFixed(4) : na;
+      corrosion = mo.R7_cyber != null ? '\u00D7' + mo.R7_cyber.toFixed(4) : na;
+    }
+    if (!hasNested) {
+      unemploymentLabel = 'E Economic';
+      innovationLabel = 'S Saturation';
+      e2Label = 'I Infrastructure';
+      t1Label = 'T Transition';
+    }
+
+if (!hasNested) {
+      return row('E Economic', unemployment) +
+        row('V Voltage', gdp) +
+        row('S Saturation', innovation) +
+        row('C Continuity', energyPoverty) +
+        row('I Infrastructure', e2) +
+        row('T Transition', t1) +
+        row('R4 Graph topology', degree) +
+        row('R3 Consequence', bc) +
+        row('R6 Seismic', seismic) +
+        row('R6 Restoration', markov) +
+        row('R7 Cyber', corrosion) +
+        row('Confidence', confidence) +
+        row('Fleet percentile', fleetPct);
+    }
     return row(unemploymentLabel, unemployment) +
       row('GDP per capita', gdp) +
       row(innovationLabel, innovation) +
