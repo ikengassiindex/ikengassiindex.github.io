@@ -1,9 +1,9 @@
-/* âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-   SSI Dashboard â Shared Navigation Component
-   v4.1 â Multi-country support (landing page + country subfolders)
-   âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
+/* ═══════════════════════════════════════════════════════════
+   SSI Dashboard — Shared Navigation Component
+   v4.1 — Multi-country support (landing page + country subfolders)
+   ═══════════════════════════════════════════════════════════ */
 
-// Detect base path â are we in a country subfolder?
+// Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
   var match = path.match(/\/(canada|italy|germany|switzerland|austria|france|spain|uk|us)\//);
@@ -17,14 +17,14 @@ var SSI_COUNTRY = (function() {
 })();
 
 var SSI_COUNTRY_LABELS = {
-  italy: 'ð®ð¹ Italy',
-  germany: 'ð©ðª Germany',
-  switzerland: 'ð¨ð­ Switzerland',
-  austria: 'ð¦ð¹ Austria',
-  france: 'ð«ð· France',
-  spain: 'ðªð¸ Spain',
-  uk: 'ð¬ð§ United Kingdom',
-  us: 'ðºð¸ United States',
+  italy: '🇮🇹 Italy',
+  germany: '🇩🇪 Germany',
+  switzerland: '🇨🇭 Switzerland',
+  austria: '🇦🇹 Austria',
+  france: '🇫🇷 France',
+  spain: '🇪🇸 Spain',
+  uk: '🇬🇧 United Kingdom',
+  us: '🇺🇸 United States',
   canada: '🇨🇦 Canada'
 };
 
@@ -54,14 +54,14 @@ function renderNav(activePage) {
   document.body.prepend(noscript);
 
   var countryLabel = SSI_COUNTRY ? SSI_COUNTRY_LABELS[SSI_COUNTRY] || SSI_COUNTRY : '';
-  var backLink = SSI_COUNTRY ? '<a href="' + SSI_BASE + 'index.html" class="nav-back" aria-label="Back to country selection">â All Countries</a>' : '';
+  var backLink = SSI_COUNTRY ? '<a href="' + SSI_BASE + 'index.html" class="nav-back" aria-label="Back to country selection">← All Countries</a>' : '';
 
   var nav = document.createElement('nav');
   nav.className = 'topnav';
   nav.setAttribute('role', 'navigation');
   nav.setAttribute('aria-label', 'Main navigation');
   nav.innerHTML =
-    '<a class="topnav-brand" href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga â Visit website" style="gap:10px">' +
+    '<a class="topnav-brand" href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga — Visit website" style="gap:10px">' +
       SSI_LOGO +
       '<div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15">' +
         '<h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0.2</span></h1>' +
@@ -97,7 +97,7 @@ function renderNav(activePage) {
   if (main) main.id = 'main-content';
 }
 
-// ââ Registration Gate ââ
+// ── Registration Gate ──
 var SSI_REGISTRATION_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyxWmA3HaVqFbF-OQQGJWRUmdVE4ciRI9ZgDavJ8ZJ21Irgq9fuUmUEgRmAqbL1BzLJ2g/exec';
 
 function isRegistered() {
@@ -195,21 +195,21 @@ function requireRegistration(callback) {
 
 function renderFooter() {
   var countryStats = {
-    italy: '95 variables Â· 30 sources Â· 4,293 substations (475 HV Â· 3,818 MV)',
-    germany: '95 variables Â· 35 sources Â· 401 Kreise across 16 BundeslÃ¤nder',
-    austria: '95 variables Â· 35 sources Â· 1,406 substations (1,144 HV Â· 262 MV) across 9 BundeslÃ¤nder',
-    switzerland: '95 variables Â· 25 sources Â· 947 substations (147 HV Â· 776 MV) across 26 Cantons',
-    france: '95 variables Â· 35 sources Â· 7,898 substations (996 HV Â· 6,902 MV) across 13 RÃ©gions',
-    spain: '95 variables Â· 30 sources Â· 3,793 substations across 52 Provincias Â· 19 Comunidades AutÃ³nomas',
-    us: '95 variables Â· 40 sources Â· 45,003 substations (1,726 HV Â· 36,654 MV) across 52 states'
+    italy: '95 variables · 30 sources · 4,293 substations (475 HV · 3,818 MV)',
+    germany: '95 variables · 35 sources · 401 Kreise across 16 Bundesländer',
+    austria: '95 variables · 35 sources · 1,406 substations (1,144 HV · 262 MV) across 9 Bundesländer',
+    switzerland: '95 variables · 25 sources · 947 substations (147 HV · 776 MV) across 26 Cantons',
+    france: '95 variables · 35 sources · 7,898 substations (996 HV · 6,902 MV) across 13 Régions',
+    spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas',
+    us: '95 variables · 40 sources · 45,003 substations (1,726 HV · 36,654 MV) across 52 states'
   };
-  var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology Â· Pan-European grid resilience';
+  var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
   var footer = document.createElement('footer');
   footer.className = 'site-footer';
   footer.setAttribute('role', 'contentinfo');
   footer.innerHTML =
-    '<div>SSI Index v4.0.2 Â· Systemic System Infrastructure Index Â· <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>' +
+    '<div>SSI Index v4.0.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>' +
     '<div>' + stats + '</div>' +
     '<div class="copyright-notice">Copyright &copy; 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Societ&agrave; Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div>';
   document.body.appendChild(footer);
