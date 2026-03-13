@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 CONFIG_PATH = Path('intelligence/edition-config.json')
-COUNTRIES = ['france','italy','uk','us','germany','spain','switzerland','austria']
+COUNTRIES = ['france','italy','uk','us','germany','spain','switzerland','austria','canada']
 
 def main():
     if not CONFIG_PATH.exists():
