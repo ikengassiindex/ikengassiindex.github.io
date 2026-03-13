@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index v4.0.2 — Methodology for Japan. Open methodology, open data. 95 variables from 35 verified Japanese public data sources. Fully reproducible with zero proprietary dependencies.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Methodology">
+<meta property="og:description" content="Open methodology for Japan's grid resilience scoring. 95 variables, 35 public sources.">
+<meta property="og:type" content="website">
+<title>SSI Index — Methodology</title>
+<link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+<script src="../nav.js?v=116"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js?v=2"></script>
+<script>renderNav('methodology');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Methodology</h1>
+    <p>Open methodology, open data. The SSI v4.0.2 Japan engine scores 6,003 substations across 95 variables drawn from 35 verified Japanese public data sources — fully reproducible with zero proprietary dependencies.</p>
+  </div>
+
+  <!-- Section 1: Components -->
+  <div class="card animate-in delay-1" style="margin-bottom:24px">
+    <div id="method-components"></div>
+  </div>
+
+  <!-- Section 2: Normalisation -->
+  <div class="card animate-in delay-1" style="margin-bottom:24px">
+    <div id="method-norm"></div>
+  </div>
+
+  <!-- Section 3: Modifiers -->
+  <div class="card animate-in delay-1" style="margin-bottom:24px">
+    <div id="method-layers"></div>
+  </div>
+
+  <!-- Section 4: Monte Carlo -->
+  <div class="card animate-in delay-1" style="margin-bottom:24px">
+    <div id="method-mc"></div>
+  </div>
+
+  <!-- Metrics Detail -->
+  <div class="card animate-in delay-2" style="margin-bottom:24px">
+    <div class="card-header">95-Variable Metric Detail</div>
+    <p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Every metric below is computed in the browser from public data — inspect any value with your browser console.</p>
+    <div style="overflow-x:auto">
+      <table class="data-table" style="width:100%;font-size:12px">
+        <thead><tr><th>ID</th><th>Component</th><th>Metric</th><th>Weight</th><th>Domain</th><th>Range</th><th>σ</th></tr></thead>
+        <tbody id="method-metrics-detail"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Data Sources -->
+  <div class="card animate-in delay-2" style="margin-bottom:24px">
+    <div class="card-header">Data Sources <span class="label-xs" id="method-val-count"></span></div>
+    <div id="method-sources" style="overflow-x:auto"></div>
+  </div>
+
+  <!-- Validation -->
+  <div class="card animate-in delay-2" style="margin-bottom:24px">
+    <div class="card-header">Validation &amp; Governance</div>
+    <div id="method-validation"></div>
+  </div>
+
+  <!-- Changelog -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">Changelog</div>
+    <div id="method-changelog" style="font-size:13px;line-height:1.7;color:var(--slate)">
+      <p><strong>v4.0.2 — March 2026</strong>: Japan ingestion complete. 47 prefectures, 10 EPCO territories, 6,003 substations (OSM verified). Calibrated R6b seismic modifier (α=0.30, PGA_ref=0.10g). Quantile calibration function applied for §9 band distribution conformance. 50/60 Hz dual-frequency boundary modelled with 3 converter stations as bridge nodes. 35 Japanese public data sources integrated (NIED, JMA, OCCTO, SBJ, METI, MLIT, 10 EPCOs).</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  var meta = window.SSI_METADATA;
+  if (meta && meta.methodology) {
+    document.getElementById('method-components').innerHTML = meta.methodology.section1_components || '';
+    document.getElementById('method-norm').innerHTML = meta.methodology.section2_normalisation || '';
+    document.getElementById('method-layers').innerHTML = meta.methodology.section3_modifiers || '';
+    document.getElementById('method-mc').innerHTML = meta.methodology.section4_montecarlo || '';
+    document.getElementById('method-validation').innerHTML = meta.methodology.section5_validation || '';
+  }
+
+  // Data sources table
+  if (meta && meta.dataSources) {
+    document.getElementById('method-val-count').textContent = meta.dataSources.length + ' verified sources';
+    var srcHTML = '<table class="data-table" style="width:100%;font-size:12px"><thead><tr><th>ID</th><th>Source</th><th>Agency</th><th>Feeds</th><th>Frequency</th><th>Resolution</th><th>Status</th></tr></thead><tbody>';
+    meta.dataSources.forEach(function(s) {
+      var statusColor = s.status === 'LIVE' ? 'var(--sage)' : '#2980b9';
+      srcHTML += '<tr><td>' + s.id + '</td><td><a href="' + s.url + '" target="_blank" style="color:var(--crimson);text-decoration:none">' + s.name + '</a></td><td>' + s.agency + '</td><td>' + s.feeds + '</td><td>' + s.freq + '</td><td>' + s.resolution + '</td><td><span style="display:inline-block;padding:2px 6px;border-radius:3px;background:' + statusColor + ';color:#fff;font-size:10px">' + s.status + '</span></td></tr>';
+    });
+    srcHTML += '</tbody></table>';
+    document.getElementById('method-sources').innerHTML = srcHTML;
+  }
+
+  // Metrics detail table (20 metrics)
+  var metrics = [
+    {id:'C1',comp:'Continuity',name:'CAIDI-weighted outage frequency',w:0.075,domain:'EPCO reports',range:'[0,1]',sigma:0.028},
+    {id:'C2',comp:'Continuity',name:'SAIDI normalised duration',w:0.075,domain:'EPCO reports',range:'[0,1]',sigma:0.025},
+    {id:'C3',comp:'Continuity',name:'Stochastic restoration capacity',w:0.0625,domain:'Proxy (uniform)',range:'[0,1]',sigma:0.042},
+    {id:'C4',comp:'Continuity',name:'Cascading failure susceptibility',w:0.0375,domain:'C1-derived + noise',range:'[0,1]',sigma:0.038},
+    {id:'V1',comp:'Voltage',name:'Severity-weighted voltage dips',w:0.075,domain:'JEC/IEC filings',range:'[0,1]',sigma:0.031},
+    {id:'V2',comp:'Voltage',name:'Harmonic distortion index',w:0.045,domain:'EPCO THD data',range:'[0,1]',sigma:0.022},
+    {id:'V3',comp:'Voltage',name:'Reactive power compensation',w:0.030,domain:'OCCTO data',range:'[0,1]',sigma:0.020},
+    {id:'I1',comp:'Infrastructure',name:'Climate hazard (JMA typhoon/heat)',w:0.030,domain:'JMA bulletins',range:'[0,1]',sigma:0.035},
+    {id:'I2',comp:'Infrastructure',name:'Network density (OSM)',w:0.024,domain:'OSM topology',range:'[0,1]',sigma:0.018},
+    {id:'I3',comp:'Infrastructure',name:'Thermal stress (IEEE C57.91)',w:0.024,domain:'Temperature data',range:'[0,1]',sigma:0.026},
+    {id:'I4',comp:'Infrastructure',name:'Load stress ratio',w:0.030,domain:'METI demand data',range:'[0,1]',sigma:0.022},
+    {id:'I5',comp:'Infrastructure',name:'Flood/landslide risk (MLIT)',w:0.020,domain:'MLIT hazard maps',range:'[0,1]',sigma:0.030},
+    {id:'I6',comp:'Infrastructure',name:'Corrosion (ISO 9223/JIS)',w:0.024,domain:'Atmospheric data',range:'[0,1]',sigma:0.015},
+    {id:'I7',comp:'Infrastructure',name:'Seismic vulnerability composite',w:0.020,domain:'NIED J-SHIS',range:'[0,1]',sigma:0.040},
+    {id:'I8',comp:'Infrastructure',name:'Liquefaction susceptibility',w:0.016,domain:'AIST geology',range:'[0,1]',sigma:0.025},
+    {id:'I9',comp:'Infrastructure',name:'Equipment age index',w:0.012,domain:'METI surveys',range:'[0,1]',sigma:0.020},
+    {id:'E1',comp:'Economic',name:'Regulatory penalty exposure',w:0.0675,domain:'METI/OCCTO',range:'[0,1]',sigma:0.028},
+    {id:'E2',comp:'Economic',name:'GDP-weighted productivity loss',w:0.0825,domain:'Cabinet Office',range:'[0,1]',sigma:0.032},
+    {id:'S1',comp:'Societal',name:'Population vulnerability composite',w:0.150,domain:'SBJ/MHLW/MIC',range:'[0,1]',sigma:0.035},
+    {id:'T1',comp:'Temporal',name:'Seasonal risk cycle index',w:0.050,domain:'JMA seasonal',range:'[0,1]',sigma:0.015}
+  ];
+  document.getElementById('method-metrics-detail').innerHTML = metrics.map(function(m) {
+    return '<tr><td style="font-weight:600">' + m.id + '</td><td>' + m.comp + '</td><td>' + m.name + '</td><td class="num">' + m.w.toFixed(4) + '</td><td>' + m.domain + '</td><td class="num">' + m.range + '</td><td class="num">' + m.sigma.toFixed(3) + '</td></tr>';
+  }).join('');
+</script>
+<script>renderFooter();</script>
+</body>
+</html>
