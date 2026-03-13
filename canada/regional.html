@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Compare Canadian rÃ©gions and dÃ©partements by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="description" content="Compare Canadian provinces and census divisions by SSI resilience score, component breakdown, and socio-economic context.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index â Provincesal Analysis</title>
+<title>SSI Index — Regional Analysis</title>
 <link rel="stylesheet" href="../style.css?v=3">
 </head>
 <body>
@@ -16,29 +16,29 @@
 
 <main class="page-shell">
   <div class="page-header animate-in">
-    <h1>Provincesal Analysis</h1>
-    <p>Compare Canadian rÃ©gions and dÃ©partements by SSI score, component breakdown, and socio-economic context across 19,920 substations in Canada's 13 rÃ©gions.</p>
+    <h1>Regional Analysis</h1>
+    <p>Compare Canadian provinces and census divisions by SSI score, component breakdown, and socio-economic context across 7,898 substations in Canada's 13 provinces.</p>
   </div>
 
   <!-- Tabs -->
   <div class="tabs animate-in delay-1">
-    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Provincesal Ranking</button>
-    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">DÃ©partement Comparison</button>
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regional Ranking</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Census Division Comparison</button>
     <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
   </div>
 
-  <!-- Tab: Provincesal Ranking -->
+  <!-- Tab: Regional Ranking -->
   <div id="tab-ranking">
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
-        <h3>RÃ©gions Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">13 RÃ©gions Â· sorted worst â best</span>
+        <h3>Provinces Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">13 Provinces · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
           <tr>
             <th style="width:30px">#</th>
-            <th>RÃ©gion</th>
+            <th>Province</th>
             <th style="text-align:right">Median R</th>
             <th style="text-align:right">Substations</th>
             <th style="text-align:right">% Critical</th>
@@ -47,25 +47,25 @@
           </tr>
         </thead>
         <tbody id="ranking-tbody">
-          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading dataâ¦</td></tr>
+          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Tab: DÃ©partement Comparison -->
+  <!-- Tab: Census Division Comparison -->
   <div id="tab-compare" style="display:none">
     <div class="grid-2" style="margin-bottom:24px">
       <div class="card">
-        <div class="card-header"><h3>Select DÃ©partements to Compare</h3></div>
+        <div class="card-header"><h3>Select Census Divisions to Compare</h3></div>
         <div style="display:flex;gap:12px;margin-bottom:16px">
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">DÃ©partement A</div>
+            <div class="label-xs" style="margin-bottom:6px">Census Division A</div>
             <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">DÃ©partement B</div>
+            <div class="label-xs" style="margin-bottom:6px">Census Division B</div>
             <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
@@ -73,10 +73,10 @@
         <!-- Comparison Table -->
         <table class="data-table" id="compare-table">
           <thead>
-            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">â</th><th style="text-align:right" id="th-prov-b">â</th><th style="text-align:right">Delta</th></tr>
+            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">—</th><th style="text-align:right" id="th-prov-b">—</th><th style="text-align:right">Delta</th></tr>
           </thead>
           <tbody id="compare-tbody">
-            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select dÃ©partements above</td></tr>
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select census divisions above</td></tr>
           </tbody>
         </table>
       </div>
@@ -98,11 +98,11 @@
   <div id="tab-decomp" style="display:none">
     <div class="card animate-in">
       <div class="card-header">
-        <h3>Average Component Contribution by RÃ©gion</h3>
-        <span class="label-xs">Stacked horizontal bars Â· 13 RÃ©gions</span>
+        <h3>Average Component Contribution by Province</h3>
+        <span class="label-xs">Stacked horizontal bars · 13 Provinces</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
-        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading dataâ¦</div>
+        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
       </div>
       <div style="display:flex;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:11px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--crimson);border-radius:2px"></div>C Continuity</div>
@@ -129,7 +129,7 @@ function switchTab(btn, tabId) {
   document.getElementById(tabId).style.display = 'block';
 }
 
-// ââ Color helpers ââ
+// ── Color helpers ──
 function scoreColor(val) {
   if (val >= 0.75) return 'var(--crimson)';
   if (val >= 0.50) return 'var(--terracotta)';
@@ -146,11 +146,11 @@ function deltaColor(d) {
 function fmt(v, dp) { return v.toFixed(dp === undefined ? 3 : dp); }
 function pct(v) { return v.toFixed(1) + '%'; }
 
-// ââ Tab 1: Provincesal Ranking ââ
+// ── Tab 1: Regional Ranking ──
 function renderRanking(data) {
   var regions = data.regions.slice().sort(function(a, b) { return b.median_R - a.median_R; });
   var tbody = document.getElementById('ranking-tbody');
-  document.getElementById('ranking-count').textContent = regions.length + ' RÃ©gions Â· sorted worst â best';
+  document.getElementById('ranking-count').textContent = regions.length + ' Provinces · sorted worst → best';
 
   tbody.innerHTML = regions.map(function(r, i) {
     var total = r.count;
@@ -174,7 +174,7 @@ function renderRanking(data) {
   }).join('');
 }
 
-// ââ Tab 2: DÃ©partement Comparison ââ
+// ── Tab 2: Census Division Comparison ──
 function buildProvinceData(data) {
   var map = {};
   data.substations.forEach(function(s) {
@@ -225,10 +225,10 @@ function populateProvinceSelects() {
   selA.innerHTML = html;
   selB.innerHTML = html;
 
-  // Smart defaults: pick a high-risk and low-risk dÃ©partement
+  // Smart defaults: pick a high-risk and low-risk census division
   var sorted = provNames.slice().sort(function(a, b) { return provinceData[b].median_R - provinceData[a].median_R; });
-  selA.value = sorted[0] || provNames[0]; // worst dÃ©partement
-  // Find best dÃ©partement
+  selA.value = sorted[0] || provNames[0]; // worst census division
+  // Find best census division
   var bestIdx = sorted.length - 1;
   selB.value = sorted[bestIdx];
 
@@ -280,7 +280,7 @@ function updateComparison() {
   drawRadar(a, b, nameA, nameB);
 }
 
-// ââ SVG Radar Chart ââ
+// ── SVG Radar Chart ──
 function drawRadar(a, b, nameA, nameB) {
   var svg = document.getElementById('radar-svg');
   var cx = 140, cy = 120, R = 100;
@@ -319,11 +319,11 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="rgba(44,36,32,0.06)" stroke-width="1"/>';
   }
 
-  // DÃ©partement A polygon
+  // Census Division A polygon
   var ptsA = comps.map(function(k, i) { var p = polar(i, a.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsA + '" fill="rgba(148,25,20,0.12)" stroke="var(--crimson)" stroke-width="1.5"/>';
 
-  // DÃ©partement B polygon
+  // Census Division B polygon
   var ptsB = comps.map(function(k, i) { var p = polar(i, b.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsB + '" fill="rgba(93,133,99,0.12)" stroke="var(--sage)" stroke-width="1.5"/>';
 
@@ -347,7 +347,7 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--warm-grey)" font-family="DM Sans" font-weight="500">' + labels[i] + '</text>';
   });
 
-  // Scale labels â center = worst (maxVal), edge = best (0)
+  // Scale labels — center = worst (maxVal), edge = best (0)
   html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">0 (best)</text>';
   html += '<text x="' + (cx + 4) + '" y="' + (cy + 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
 
@@ -362,9 +362,9 @@ function drawRadar(a, b, nameA, nameB) {
     '<div style="font-size:10px;color:var(--warm-grey);margin-top:6px;text-align:center">Larger area = lower risk = better resilience</div>';
 }
 
-// ââ Tab 3: Component Decomposition ââ
+// ── Tab 3: Component Decomposition ──
 function renderDecomposition(data) {
-  // Compute per-RÃ©gion average components
+  // Compute per-Province average components
   var regionMap = {};
   data.substations.forEach(function(s) {
     if (!regionMap[s.region]) {
@@ -399,7 +399,7 @@ function renderDecomposition(data) {
   var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
   var colors = ['var(--crimson)', 'var(--terracotta)', 'var(--sage)', '#3b9eff', 'var(--bronze)', '#22d3ee'];
 
-  var html = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey);padding-left:148px"><span>â Higher risk</span><span>Lower risk â¶</span></div>';
+  var html = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey);padding-left:148px"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
   html += regions.map(function(r) {
     var total = r.C + r.V + r.I + r.E + r.S + r.T;
     if (total === 0) total = 1;
@@ -421,7 +421,7 @@ function renderDecomposition(data) {
   document.getElementById('decomp-bars').innerHTML = html;
 }
 
-// ââ Load Data ââ
+// ── Load Data ──
 fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(data) {
   SSI = data;
   provinceData = buildProvinceData(data);
