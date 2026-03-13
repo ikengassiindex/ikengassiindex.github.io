@@ -17,7 +17,7 @@
 <main class="page-shell">
   <div class="page-header animate-in">
     <h1>Regional Analysis</h1>
-    <p>Compare Canadian provinces and census divisions by SSI score, component breakdown, and socio-economic context across 7,898 substations in Canada's 13 provinces.</p>
+    <p>Compare Canadian provinces and census divisions by SSI score, component breakdown, and socio-economic context across 24,986 substations in Canada's 13 provinces.</p>
   </div>
 
   <!-- Tabs -->
@@ -148,7 +148,7 @@ function pct(v) { return v.toFixed(1) + '%'; }
 
 // ── Tab 1: Regional Ranking ──
 function renderRanking(data) {
-  var regions = data.regions.slice().sort(function(a, b) { return b.median_R - a.median_R; });
+  var regions = (Array.isArray(data.regions) ? data.regions : Object.values(data.regions)).slice().sort(function(a, b) { return b.median_R - a.median_R; });
   var tbody = document.getElementById('ranking-tbody');
   document.getElementById('ranking-count').textContent = regions.length + ' Provinces · sorted worst → best';
 
@@ -422,7 +422,7 @@ function renderDecomposition(data) {
 }
 
 // ── Load Data ──
-fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(data) {
+fetch('ssi-data.json?v=41').then(function(r) { return r.json(); }).then(function(data) {
   SSI = data;
   provinceData = buildProvinceData(data);
   renderRanking(data);
