@@ -579,7 +579,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       .sort(function(a,b){ return b.n - a.n; }).slice(0, 3);
     var econRegionStr = topEconRegions.map(function(r){ return r.name + ' (' + r.n + ')'; }).join(', ');
 
-    var avgEP = fleet.reduce(function(a,s){ return a + s.socio_economic.EP_rate_region; }, 0) / n;
+    var avgEP = fleet.reduce(function(a,s){ return a + (s.socio_economic || {}).EP_rate_region; }, 0) / n;
     document.getElementById('b2-narrative').innerHTML =
       'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
       'depend on uninterrupted power for continuous processes (steel, glass, automotive). A single hour of unplanned outage at these ' +
@@ -1974,7 +1974,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     });
 
     // 5. Energy poverty double jeopardy
-    var highEP = fleet.filter(function(s){ return s.socio_economic && s.socio_economic.EP_rate_region > 14; });
+    var highEP = fleet.filter(function(s){ return s.socio_economic && (s.socio_economic || {}).EP_rate_region > 14; });
     var highEP_highRisk = highEP.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
     spotlights.push({
       title: 'Energy Poverty Double Jeopardy',

@@ -524,9 +524,9 @@ fetch('ssi-data.json?v=41').then(function(r) { return r.json(); }).then(function
       '<span class="hl-num">"R6b"</span>: ' + (s.modifiers.R6_seismic || 1.0).toFixed(3) + ', ' +
       '<span class="hl-num">"R7"</span>: ' + s.modifiers.R7_cyber.toFixed(3) + ' },\n' +
     '  <span class="hl-var">"socio_economic"</span>: { ' +
-      '<span class="hl-num">"population"</span>: ' + (s.socio_economic.population || 0) + ', ' +
-      '<span class="hl-num">"gdp_per_capita"</span>: ' + (s.socio_economic.gdp_per_capita ? s.socio_economic.gdp_per_capita.toFixed(0) : '—') + ', ' +
-      '<span class="hl-num">"unemployment_rate"</span>: ' + (s.socio_economic.unemployment_rate ? s.socio_economic.unemployment_rate.toFixed(1) : '—') + ' },\n' +
+      '<span class="hl-num">"population"</span>: ' + ((s.socio_economic || {}).population || 0) + ', ' +
+      '<span class="hl-num">"gdp_per_capita"</span>: ' + ((s.socio_economic || {}).gdp_per_capita ? (s.socio_economic || {}).gdp_per_capita.toFixed(0) : '—') + ', ' +
+      '<span class="hl-num">"unemployment_rate"</span>: ' + ((s.socio_economic || {}).unemployment_rate ? (s.socio_economic || {}).unemployment_rate.toFixed(1) : '—') + ' },\n' +
     (s.graph_topology ? '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + s.graph_topology.BC_percentile.toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' : '') +
     '  <span class="hl-var">"transition"</span>: { ' +
       '<span class="hl-num">"T1_score"</span>: ' + (s.transition && s.transition.T1_score ? s.transition.T1_score.toFixed(3) : '—') + ', ' +
