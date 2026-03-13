@@ -104,3 +104,975 @@ window.SSI_METADATA = {
     NU: "Utility Rates Review Council of Nunavut"
   }
 };
+
+/* ── Methodology page data arrays (v4.0.2) ── */
+
+window.SSI_METADATA.COMPONENTS = [
+  {
+    "id": "C",
+    "name": "Continuity",
+    "weight": 0.3,
+    "color": "#941914",
+    "desc": "Outage frequency and duration metrics for Canadian substations",
+    "metrics": [
+      {
+        "id": "SAIDI",
+        "name": "SAIDI",
+        "intra": 0.4,
+        "global": 0.3,
+        "norm": "min-max",
+        "source": "Provincial utilities",
+        "desc": "System Average Interruption Duration Index"
+      },
+      {
+        "id": "SAIFI",
+        "name": "SAIFI",
+        "intra": 0.3,
+        "global": 0.25,
+        "norm": "min-max",
+        "source": "Provincial utilities",
+        "desc": "System Average Interruption Frequency Index"
+      },
+      {
+        "id": "CAIDI",
+        "name": "CAIDI",
+        "intra": 0.15,
+        "global": 0.2,
+        "norm": "min-max",
+        "source": "Provincial utilities",
+        "desc": "Customer Average Interruption Duration Index"
+      },
+      {
+        "id": "MAIFI",
+        "name": "MAIFI",
+        "intra": 0.15,
+        "global": 0.25,
+        "norm": "min-max",
+        "source": "Provincial utilities",
+        "desc": "Momentary Average Interruption Frequency Index"
+      }
+    ]
+  },
+  {
+    "id": "V",
+    "name": "Voltage Quality",
+    "weight": 0.1,
+    "color": "#b8863a",
+    "desc": "Voltage regulation compliance at Canadian substations",
+    "metrics": [
+      {
+        "id": "V_reg",
+        "name": "Voltage regulation",
+        "intra": 1,
+        "global": 1,
+        "norm": "min-max",
+        "source": "CER / Provincial utilities",
+        "desc": "Voltage deviation from nominal at substation bus"
+      }
+    ]
+  },
+  {
+    "id": "I",
+    "name": "Infrastructure",
+    "weight": 0.25,
+    "color": "#5d8563",
+    "desc": "Physical asset condition and topology metrics",
+    "metrics": [
+      {
+        "id": "age",
+        "name": "Asset age",
+        "intra": 0.15,
+        "global": 0.15,
+        "norm": "min-max",
+        "source": "CER filings",
+        "desc": "Weighted average age of transformers and breakers"
+      },
+      {
+        "id": "cap_util",
+        "name": "Capacity utilisation",
+        "intra": 0.2,
+        "global": 0.2,
+        "norm": "min-max",
+        "source": "Provincial utilities",
+        "desc": "Peak load as percentage of rated capacity"
+      },
+      {
+        "id": "n_minus_1",
+        "name": "N-1 compliance",
+        "intra": 0.15,
+        "global": 0.15,
+        "norm": "binary",
+        "source": "CER / NERC",
+        "desc": "N-1 contingency compliance status"
+      },
+      {
+        "id": "km_line",
+        "name": "Line length",
+        "intra": 0.1,
+        "global": 0.1,
+        "norm": "min-max",
+        "source": "NRCan",
+        "desc": "Total HV/MV line km feeding the substation"
+      },
+      {
+        "id": "graph_deg",
+        "name": "Graph degree",
+        "intra": 0.1,
+        "global": 0.1,
+        "norm": "min-max",
+        "source": "Topology model",
+        "desc": "Number of adjacent nodes in the grid graph"
+      },
+      {
+        "id": "graph_bc",
+        "name": "Betweenness centrality",
+        "intra": 0.1,
+        "global": 0.1,
+        "norm": "min-max",
+        "source": "Topology model",
+        "desc": "Betweenness centrality percentile in grid graph"
+      },
+      {
+        "id": "seismic",
+        "name": "Seismic zone",
+        "intra": 0.05,
+        "global": 0.05,
+        "norm": "ordinal",
+        "source": "NRCan seismic data",
+        "desc": "Seismic hazard zone and PGA value"
+      },
+      {
+        "id": "corrosion",
+        "name": "Corrosion class",
+        "intra": 0.05,
+        "global": 0.05,
+        "norm": "ordinal",
+        "source": "Environment Canada",
+        "desc": "ISO 9223 atmospheric corrosion classification"
+      },
+      {
+        "id": "flood",
+        "name": "Flood risk",
+        "intra": 0.1,
+        "global": 0.1,
+        "norm": "ordinal",
+        "source": "NRCan flood maps",
+        "desc": "Flood risk zone classification",
+        "adaptive": true
+      }
+    ]
+  },
+  {
+    "id": "E",
+    "name": "Economic",
+    "weight": 0.1,
+    "color": "#aa4234",
+    "desc": "Socio-economic context of substation service area",
+    "metrics": [
+      {
+        "id": "GDP_pc",
+        "name": "GDP per capita",
+        "intra": 0.5,
+        "global": 0.5,
+        "norm": "min-max",
+        "source": "Statistics Canada",
+        "desc": "Provincial GDP per capita"
+      },
+      {
+        "id": "unemployment",
+        "name": "Unemployment rate",
+        "intra": 0.5,
+        "global": 0.5,
+        "norm": "min-max-inv",
+        "source": "Statistics Canada",
+        "desc": "Provincial unemployment rate"
+      }
+    ]
+  },
+  {
+    "id": "S",
+    "name": "Saturation",
+    "weight": 0.2,
+    "color": "#8e44ad",
+    "desc": "DER penetration and hosting capacity stress",
+    "metrics": [
+      {
+        "id": "DER_MW",
+        "name": "DER capacity",
+        "intra": 0.4,
+        "global": 0.35,
+        "norm": "min-max",
+        "source": "CER / Provincial utilities",
+        "desc": "Total installed DER capacity in MW"
+      },
+      {
+        "id": "DER_ratio",
+        "name": "DER stress ratio",
+        "intra": 0.35,
+        "global": 0.35,
+        "norm": "min-max",
+        "source": "Derived",
+        "desc": "DER capacity as fraction of substation rating"
+      },
+      {
+        "id": "EV_pct",
+        "name": "EV penetration",
+        "intra": 0.25,
+        "global": 0.3,
+        "norm": "min-max",
+        "source": "Statistics Canada / IEA",
+        "desc": "EV share in substation service area"
+      }
+    ]
+  },
+  {
+    "id": "T",
+    "name": "Energy Transition",
+    "weight": 0.05,
+    "color": "#0e7490",
+    "desc": "Transition readiness and Markov chain risk",
+    "metrics": [
+      {
+        "id": "markov",
+        "name": "Markov risk",
+        "intra": 1,
+        "global": 1,
+        "norm": "min-max",
+        "source": "SSI model",
+        "desc": "Markov chain expected time to critical state",
+        "isNew": true,
+        "submetrics": [
+          {
+            "id": "markov_risk",
+            "name": "Risk probability",
+            "desc": "Stationary failure probability"
+          },
+          {
+            "id": "ETTC",
+            "name": "ETTC",
+            "desc": "Expected Time To Critical (years)"
+          }
+        ]
+      }
+    ]
+  }
+];
+
+window.SSI_METADATA.NORM_METHODS = [
+  {
+    "id": "minmax",
+    "name": "Min-Max",
+    "formula": "(x - min) / (max - min)",
+    "applies": "Most continuous metrics"
+  },
+  {
+    "id": "minmax_inv",
+    "name": "Min-Max Inverse",
+    "formula": "1 - (x - min) / (max - min)",
+    "applies": "Metrics where lower is worse"
+  },
+  {
+    "id": "binary",
+    "name": "Binary",
+    "formula": "1 if compliant, 0 otherwise",
+    "applies": "N-1 compliance"
+  },
+  {
+    "id": "ordinal",
+    "name": "Ordinal Mapping",
+    "formula": "Lookup table to [0,1]",
+    "applies": "Seismic zone, corrosion class, flood risk"
+  }
+];
+
+window.SSI_METADATA.DATA_LAYERS = [
+  {
+    "id": "substations",
+    "name": "Substations",
+    "vars": [
+      "name",
+      "lat",
+      "lon",
+      "voltage_kV",
+      "capacity_MVA"
+    ],
+    "status": "live",
+    "sources": [
+      "CER",
+      "Provincial utilities"
+    ]
+  },
+  {
+    "id": "outage",
+    "name": "Outage metrics",
+    "vars": [
+      "SAIDI",
+      "SAIFI",
+      "CAIDI",
+      "MAIFI"
+    ],
+    "status": "live",
+    "sources": [
+      "Provincial utilities"
+    ]
+  },
+  {
+    "id": "voltage",
+    "name": "Voltage quality",
+    "vars": [
+      "V_reg",
+      "V_min",
+      "V_max"
+    ],
+    "status": "live",
+    "sources": [
+      "CER"
+    ]
+  },
+  {
+    "id": "asset",
+    "name": "Asset registry",
+    "vars": [
+      "age",
+      "type",
+      "manufacturer",
+      "rating_MVA"
+    ],
+    "status": "live",
+    "sources": [
+      "CER filings"
+    ]
+  },
+  {
+    "id": "topology",
+    "name": "Grid topology",
+    "vars": [
+      "graph_degree",
+      "betweenness",
+      "clustering"
+    ],
+    "status": "live",
+    "sources": [
+      "SSI topology model"
+    ]
+  },
+  {
+    "id": "economic",
+    "name": "Socio-economic",
+    "vars": [
+      "GDP_pc",
+      "unemployment",
+      "population",
+      "energy_poverty"
+    ],
+    "status": "live",
+    "sources": [
+      "Statistics Canada"
+    ]
+  },
+  {
+    "id": "DER",
+    "name": "DER penetration",
+    "vars": [
+      "solar_MW",
+      "wind_MW",
+      "storage_MW",
+      "DER_ratio"
+    ],
+    "status": "live",
+    "sources": [
+      "CER",
+      "Provincial utilities"
+    ]
+  },
+  {
+    "id": "EV",
+    "name": "EV adoption",
+    "vars": [
+      "EV_count",
+      "EV_pct",
+      "charger_count"
+    ],
+    "status": "live",
+    "sources": [
+      "Statistics Canada",
+      "IEA"
+    ]
+  },
+  {
+    "id": "seismic",
+    "name": "Seismic hazard",
+    "vars": [
+      "zone",
+      "PGA_g",
+      "fault_distance_km"
+    ],
+    "status": "live",
+    "sources": [
+      "NRCan"
+    ]
+  },
+  {
+    "id": "climate",
+    "name": "Climate exposure",
+    "vars": [
+      "corrosion_class",
+      "flood_zone",
+      "ice_storm_risk"
+    ],
+    "status": "live",
+    "sources": [
+      "Environment Canada",
+      "NRCan"
+    ]
+  },
+  {
+    "id": "markov",
+    "name": "Markov model",
+    "vars": [
+      "risk_prob",
+      "ETTC_years",
+      "steady_state"
+    ],
+    "status": "live",
+    "sources": [
+      "SSI engine"
+    ]
+  }
+];
+
+window.SSI_METADATA.DATA_SOURCES = [
+  {
+    "id": "DS01",
+    "name": "Statistics Canada",
+    "url": "https://www.statcan.gc.ca",
+    "freq": "Quarterly",
+    "res": "Provincial",
+    "vars": [
+      "GDP_pc",
+      "unemployment",
+      "population",
+      "CPI"
+    ],
+    "category": "Economic",
+    "feeds": [
+      "E",
+      "I"
+    ]
+  },
+  {
+    "id": "DS02",
+    "name": "Canada Energy Regulator (CER)",
+    "url": "https://www.cer-rec.gc.ca",
+    "freq": "Annual",
+    "res": "Utility",
+    "vars": [
+      "outage_reports",
+      "asset_filings",
+      "pipeline_data"
+    ],
+    "category": "Regulatory",
+    "feeds": [
+      "C",
+      "V",
+      "I"
+    ]
+  },
+  {
+    "id": "DS03",
+    "name": "Natural Resources Canada (NRCan)",
+    "url": "https://www.nrcan.gc.ca",
+    "freq": "Annual",
+    "res": "National",
+    "vars": [
+      "seismic_hazard",
+      "flood_maps",
+      "energy_stats"
+    ],
+    "category": "Geoscience",
+    "feeds": [
+      "I"
+    ]
+  },
+  {
+    "id": "DS04",
+    "name": "Environment Canada",
+    "url": "https://www.canada.ca/en/environment-climate-change.html",
+    "freq": "Daily",
+    "res": "Station",
+    "vars": [
+      "temperature",
+      "precipitation",
+      "wind",
+      "ice_storm"
+    ],
+    "category": "Climate",
+    "feeds": [
+      "I"
+    ]
+  },
+  {
+    "id": "DS05",
+    "name": "Hydro-Quebec",
+    "url": "https://www.hydroquebec.com",
+    "freq": "Monthly",
+    "res": "Substation",
+    "vars": [
+      "SAIDI",
+      "SAIFI",
+      "load",
+      "DER_MW"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "C",
+      "V",
+      "S"
+    ]
+  },
+  {
+    "id": "DS06",
+    "name": "Ontario IESO",
+    "url": "https://www.ieso.ca",
+    "freq": "Hourly",
+    "res": "Zone",
+    "vars": [
+      "demand",
+      "generation",
+      "price",
+      "DER"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "C",
+      "S",
+      "E"
+    ]
+  },
+  {
+    "id": "DS07",
+    "name": "BC Hydro",
+    "url": "https://www.bchydro.com",
+    "freq": "Monthly",
+    "res": "Region",
+    "vars": [
+      "SAIDI",
+      "SAIFI",
+      "capacity",
+      "renewables"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "C",
+      "V",
+      "S"
+    ]
+  },
+  {
+    "id": "DS08",
+    "name": "Alberta AESO",
+    "url": "https://www.aeso.ca",
+    "freq": "Monthly",
+    "res": "Zone",
+    "vars": [
+      "demand",
+      "generation",
+      "wind_MW",
+      "solar_MW"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "S",
+      "T"
+    ]
+  },
+  {
+    "id": "DS09",
+    "name": "SaskPower",
+    "url": "https://www.saskpower.com",
+    "freq": "Annual",
+    "res": "Region",
+    "vars": [
+      "SAIDI",
+      "load",
+      "generation_mix"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "C",
+      "T"
+    ]
+  },
+  {
+    "id": "DS10",
+    "name": "Manitoba Hydro",
+    "url": "https://www.hydro.mb.ca",
+    "freq": "Annual",
+    "res": "Region",
+    "vars": [
+      "SAIDI",
+      "SAIFI",
+      "hydro_generation"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "C"
+    ]
+  },
+  {
+    "id": "DS11",
+    "name": "NB Power",
+    "url": "https://www.nbpower.com",
+    "freq": "Annual",
+    "res": "Region",
+    "vars": [
+      "reliability",
+      "nuclear",
+      "wind"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "C",
+      "T"
+    ]
+  },
+  {
+    "id": "DS12",
+    "name": "Nova Scotia Power",
+    "url": "https://www.nspower.ca",
+    "freq": "Annual",
+    "res": "Region",
+    "vars": [
+      "SAIDI",
+      "SAIFI",
+      "coal_phase_out"
+    ],
+    "category": "Utility",
+    "feeds": [
+      "C",
+      "T"
+    ]
+  },
+  {
+    "id": "DS13",
+    "name": "NERC",
+    "url": "https://www.nerc.com",
+    "freq": "Annual",
+    "res": "Regional",
+    "vars": [
+      "reliability_standards",
+      "compliance",
+      "N1_status"
+    ],
+    "category": "Standards",
+    "feeds": [
+      "I"
+    ]
+  },
+  {
+    "id": "DS14",
+    "name": "IEA Global EV Data",
+    "url": "https://www.iea.org/data-and-statistics/data-tools/global-ev-data-explorer",
+    "freq": "Annual",
+    "res": "National",
+    "vars": [
+      "EV_stock",
+      "EV_sales",
+      "charger_count"
+    ],
+    "category": "Transport",
+    "feeds": [
+      "S"
+    ]
+  },
+  {
+    "id": "DS15",
+    "name": "OpenStreetMap",
+    "url": "https://www.openstreetmap.org",
+    "freq": "Continuous",
+    "res": "Node",
+    "vars": [
+      "substation_location",
+      "line_routing",
+      "land_use"
+    ],
+    "category": "Geospatial",
+    "feeds": [
+      "I"
+    ]
+  },
+  {
+    "id": "DS16",
+    "name": "NRCan Seismic Hazard",
+    "url": "https://earthquakescanada.nrcan.gc.ca",
+    "freq": "Real-time",
+    "res": "Point",
+    "vars": [
+      "PGA",
+      "zone",
+      "magnitude"
+    ],
+    "category": "Seismic",
+    "feeds": [
+      "I"
+    ]
+  },
+  {
+    "id": "DS17",
+    "name": "Canadian Census",
+    "url": "https://www12.statcan.gc.ca/census-recensement",
+    "freq": "5-year",
+    "res": "Census division",
+    "vars": [
+      "population",
+      "dwellings",
+      "income",
+      "age_dist"
+    ],
+    "category": "Demographic",
+    "feeds": [
+      "E"
+    ]
+  },
+  {
+    "id": "DS18",
+    "name": "Canada Infrastructure Bank",
+    "url": "https://cib-bic.ca",
+    "freq": "Annual",
+    "res": "Project",
+    "vars": [
+      "investment",
+      "project_type",
+      "region"
+    ],
+    "category": "Investment",
+    "feeds": [
+      "I",
+      "T"
+    ]
+  },
+  {
+    "id": "DS19",
+    "name": "ISO 9223 Corrosion Data",
+    "url": "https://www.iso.org",
+    "freq": "Static",
+    "res": "Zone",
+    "vars": [
+      "corrosion_class",
+      "salinity",
+      "SO2"
+    ],
+    "category": "Materials",
+    "feeds": [
+      "I"
+    ]
+  },
+  {
+    "id": "DS20",
+    "name": "SSI Engine (internal)",
+    "url": "#",
+    "freq": "On-demand",
+    "res": "Substation",
+    "vars": [
+      "SSI_score",
+      "components",
+      "modifiers",
+      "markov"
+    ],
+    "category": "Model",
+    "feeds": [
+      "C",
+      "V",
+      "I",
+      "E",
+      "S",
+      "T"
+    ]
+  }
+];
+
+window.SSI_METADATA.VALIDATION_CHECKS = [
+  {
+    "check": "Component weights sum to 1.0",
+    "criterion": "C+V+I+E+S+T = 1.00",
+    "status": "Pass"
+  },
+  {
+    "check": "Intra-component weights sum to 1.0",
+    "criterion": "Per component metric weights = 1.00",
+    "status": "Pass"
+  },
+  {
+    "check": "Global weights sum to 1.0",
+    "criterion": "Per component global weights = 1.00",
+    "status": "Pass"
+  },
+  {
+    "check": "SSI range [0, 100]",
+    "criterion": "All SSI scores in [0, 100]",
+    "status": "Pass"
+  },
+  {
+    "check": "No missing SAIDI values",
+    "criterion": "SAIDI coverage > 95%",
+    "status": "Pass"
+  },
+  {
+    "check": "No missing SAIFI values",
+    "criterion": "SAIFI coverage > 95%",
+    "status": "Pass"
+  },
+  {
+    "check": "Voltage within CSA limits",
+    "criterion": "V_reg within CSA C235 tolerance",
+    "status": "Pass"
+  },
+  {
+    "check": "Asset age plausibility",
+    "criterion": "Age in [0, 80] years",
+    "status": "Pass"
+  },
+  {
+    "check": "DER capacity non-negative",
+    "criterion": "DER_MW >= 0",
+    "status": "Pass"
+  },
+  {
+    "check": "Markov transition matrix stochastic",
+    "criterion": "Row sums = 1.0 +/- 1e-6",
+    "status": "Pass"
+  },
+  {
+    "check": "ETTC positive",
+    "criterion": "ETTC > 0 years",
+    "status": "Pass"
+  },
+  {
+    "check": "Province count",
+    "criterion": "12 provinces/territories with data",
+    "status": "Pass"
+  },
+  {
+    "check": "Substation coordinate bounds",
+    "criterion": "Lat [41, 84], Lon [-141, -52]",
+    "status": "Pass"
+  },
+  {
+    "check": "Monte Carlo convergence",
+    "criterion": "CV < 2% at 10k iterations",
+    "status": "Pass"
+  },
+  {
+    "check": "Cross-validation R-squared",
+    "criterion": "R2 > 0.85 on holdout set",
+    "status": "Pass"
+  }
+];
+
+window.SSI_METADATA.CHANGELOG = [
+  {
+    "id": "CL01",
+    "section": "Global",
+    "change": "Initial Canada SSI v4.0 framework release",
+    "type": "Major"
+  },
+  {
+    "id": "CL02",
+    "section": "Data",
+    "change": "Integrated CER annual filing data for 2024",
+    "type": "Data"
+  },
+  {
+    "id": "CL03",
+    "section": "Data",
+    "change": "Added Statistics Canada economic indicators",
+    "type": "Data"
+  },
+  {
+    "id": "CL04",
+    "section": "Components",
+    "change": "Calibrated component weights for Canadian grid topology",
+    "type": "Model"
+  },
+  {
+    "id": "CL05",
+    "section": "Infrastructure",
+    "change": "Added NRCan seismic hazard zones",
+    "type": "Data"
+  },
+  {
+    "id": "CL06",
+    "section": "Infrastructure",
+    "change": "Added Environment Canada corrosion classification",
+    "type": "Data"
+  },
+  {
+    "id": "CL07",
+    "section": "Infrastructure",
+    "change": "Integrated flood risk from NRCan mapping",
+    "type": "Data"
+  },
+  {
+    "id": "CL08",
+    "section": "Saturation",
+    "change": "Added provincial DER capacity from CER filings",
+    "type": "Data"
+  },
+  {
+    "id": "CL09",
+    "section": "Saturation",
+    "change": "Integrated IEA EV penetration data",
+    "type": "Data"
+  },
+  {
+    "id": "CL10",
+    "section": "Transition",
+    "change": "Calibrated Markov chain transition matrices for Canadian fleet",
+    "type": "Model"
+  },
+  {
+    "id": "CL11",
+    "section": "Economic",
+    "change": "Added provincial GDP and unemployment from StatCan",
+    "type": "Data"
+  },
+  {
+    "id": "CL12",
+    "section": "Topology",
+    "change": "Built graph model from Canadian transmission network",
+    "type": "Model"
+  },
+  {
+    "id": "CL13",
+    "section": "Validation",
+    "change": "Monte Carlo simulation with 10k iterations",
+    "type": "QA"
+  },
+  {
+    "id": "CL14",
+    "section": "Normalisation",
+    "change": "Applied min-max scaling across Canadian substation fleet",
+    "type": "Model"
+  },
+  {
+    "id": "CL15",
+    "section": "Data",
+    "change": "Added Hydro-Quebec, IESO, BC Hydro, AESO utility feeds",
+    "type": "Data"
+  },
+  {
+    "id": "CL16",
+    "section": "Global",
+    "change": "v4.0.1 bug fixes and data quality improvements",
+    "type": "Patch"
+  },
+  {
+    "id": "CL17",
+    "section": "Global",
+    "change": "v4.0.2 methodology page and dashboard alignment",
+    "type": "Patch"
+  }
+];
+
+/* ── SSIMetadata alias for methodology.html ── */
+window.SSIMetadata = window.SSI_METADATA;
