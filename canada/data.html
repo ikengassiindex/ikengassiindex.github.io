@@ -297,7 +297,7 @@ fetch('ssi-data.json?v=41').then(function(r) { return r.json(); }).then(function
 
   // Update KPI
   document.getElementById('data-subs').textContent = n.toLocaleString();
-  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + (ssi.meta.total_departments || 0) + ' census divisions · ' + (ssi.regions ? ssi.regions.length : new Set(ssi.substations.map(function(s){return s.province})).size) + ' provinces';
+  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + (ssi.meta.total_departments || 0) + ' census divisions · ' + (Array.isArray(ssi.regions) ? ssi.regions.length : (ssi.regions ? Object.keys(ssi.regions).length : new Set(ssi.substations.map(function(s){return s.province})).size)) + ' provinces';
   document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' substations · all fields';
 
   // ── Full Dataset PDF (registration-gated) ──
