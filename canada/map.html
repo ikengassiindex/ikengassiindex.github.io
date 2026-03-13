@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Interactive map of Canada's electrical grid with SSI v4.0.2 resilience scores for 19,920 substations across 96 dÃ©partements. 95 variables, topology network + ODRÃ registry risk.">
+<meta name="description" content="Interactive map of Canada's electrical grid with SSI v4.0.2 resilience scores for 7,898 substations across 96 census divisions. 95 variables, topology network + ODRÉ registry risk.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index â Map Explorer</title>
+<title>SSI Index — Map Explorer</title>
 <link rel="stylesheet" href="../style.css?v=3">
 <style>
   .map-container {
@@ -142,7 +142,7 @@
 <main class="page-shell" style="max-width:1440px">
   <div class="page-header animate-in">
     <h1>Map Explorer</h1>
-    <p>Explore 19,920 substations across Canada's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
+    <p>Explore 7,898 substations across Canada's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
   </div>
 
   <!-- Filter Bar -->
@@ -150,34 +150,34 @@
     <label>Band</label>
     <select id="filter-band">
       <option value="all">All Bands</option>
-      <option value="Low">Low (0.00â0.25)</option>
-      <option value="Medium">Medium (0.25â0.50)</option>
-      <option value="High">High (0.50â0.75)</option>
-      <option value="Critical">Critical (0.75â1.00)</option>
+      <option value="Low">Low (0.00–0.25)</option>
+      <option value="Medium">Medium (0.25–0.50)</option>
+      <option value="High">High (0.50–0.75)</option>
+      <option value="Critical">Critical (0.75–1.00)</option>
     </select>
-    <label>RÃ©gion</label>
+    <label>Province</label>
     <select id="filter-region">
-      <option value="all">All RÃ©gions</option>
+      <option value="all">All Provinces</option>
     </select>
     <label>Power Voltage</label>
     <select id="filter-voltage">
       <option value="all">All Voltages</option>
-      <option value="400">â¥ 400 kV</option>
+      <option value="400">≥ 400 kV</option>
       <option value="225">225 kV</option>
-      <option value="110">110â150 kV</option>
+      <option value="110">110–150 kV</option>
       <option value="other">&lt; 110 kV</option>
     </select>
     <label>Component Focus</label>
     <select id="filter-component">
       <option value="overall">Overall R Score</option>
-      <option value="C">C â Continuity</option>
-      <option value="V">V â Voltage Quality</option>
-      <option value="I">I â Infrastructure</option>
-      <option value="E">E â Economic</option>
-      <option value="S">S â Saturation</option>
-      <option value="T">T â Energy Transition</option>
+      <option value="C">C — Continuity</option>
+      <option value="V">V — Voltage Quality</option>
+      <option value="I">I — Infrastructure</option>
+      <option value="E">E — Economic</option>
+      <option value="S">S — Saturation</option>
+      <option value="T">T — Energy Transition</option>
     </select>
-    <input type="search" id="filter-search" placeholder="Search substationâ¦" style="margin-left:auto;width:180px">
+    <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
   </div>
 
   <!-- Map + Detail Panel -->
@@ -190,23 +190,23 @@
 
         <div class="map-legend">
           <h4>SSI Band</h4>
-          <div class="map-legend-item"><div class="band-dot low"></div> Low (0.00â0.25)</div>
-          <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25â0.50)</div>
-          <div class="map-legend-item"><div class="band-dot high"></div> High (0.50â0.75)</div>
-          <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75â1.00)</div>
+          <div class="map-legend-item"><div class="band-dot low"></div> Low (0.00–0.25)</div>
+          <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25–0.50)</div>
+          <div class="map-legend-item"><div class="band-dot high"></div> High (0.50–0.75)</div>
+          <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75–1.00)</div>
           <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(44,36,32,0.08);font-size:10px;color:var(--warm-grey);line-height:1.5">
-            Scroll to zoom Â· Drag to pan<br>Click substation to inspect
+            Scroll to zoom · Drag to pan<br>Click substation to inspect
           </div>
         </div>
 
         <div class="map-zoom">
           <button id="zoomIn" title="Zoom in">+</button>
-          <button id="zoomOut" title="Zoom out">â</button>
-          <button id="zoomFit" title="Fit Canada" style="font-size:13px">â</button>
+          <button id="zoomOut" title="Zoom out">−</button>
+          <button id="zoomFit" title="Fit Canada" style="font-size:13px">⟐</button>
         </div>
 
         <div class="map-stats" id="map-stats">
-          Loading dataâ¦
+          Loading data…
         </div>
       </div>
     </div>
@@ -222,12 +222,12 @@
 <script>
   SSIMap.init('ssi-map-canvas', {
     center: { lat: 46.6, lon: 2.3 },
-    zoom: 4,
+    zoom: 6,
     onLoaded: function(ssi) {
       var stats = document.getElementById('map-stats');
       if (stats) {
-        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations Â· ' + ssi.meta.total_departments + ' dÃ©partements Â· ' + ssi.regions.length + ' rÃ©gions Â· ' +
-          '<b>' + ssi.fleet_summary.bands.Critical + '</b> critical Â· ' +
+        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + ssi.meta.total_departments + ' census divisions · ' + ssi.regions.length + ' provinces · ' +
+          '<b>' + ssi.fleet_summary.bands.Critical + '</b> critical · ' +
           'median R = <b>' + ssi.fleet_summary.median_R.toFixed(3) + '</b>';
       }
     }
