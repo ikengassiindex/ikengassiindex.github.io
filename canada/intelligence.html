@@ -18,6 +18,18 @@ document.addEventListener("ssi-config-ready", function(e) {
   if (e.detail) { window.SSI_EDITION = e.detail; }
 });
 </script>
+<script>
+// Canada-specific metadata extensions for intelligence page
+if (window.SSI_METADATA) {
+  window.SSI_METADATA.stats = { sources: 32, variables: 95, components: 5, modifiers: 5 };
+  window.SSI_METADATA.FREQ_DISTRIBUTION = {
+    Weekly:    { count: 8,  sources: ['IESO real-time grid', 'Hydro-Québec OASIS', 'ECCC weather stations', 'BC Hydro load data', 'AESO grid topology', 'NB Power system map', 'NS Power outage feed', 'SaskPower grid status'] },
+    Monthly:  { count: 12, sources: ['ECCC climate normals', 'StatCan energy supply', 'NRCAN fuel prices', 'CER pipeline flow', 'IESO monthly reports', 'Hydro-Québec demand', 'BC Hydro generation', 'AESO market data', 'Manitoba Hydro load', 'Provincial DER registries', 'Wildfire risk indices', 'Grid congestion reports'] },
+    Quarterly:{ count: 6,  sources: ['CER energy futures', 'Provincial utility filings', 'DER interconnection queues', 'Grid investment plans', 'NERC reliability assessments', 'StatCan business registry'] },
+    Annual:   { count: 6,  sources: ['Census population data', 'StatCan economic accounts', 'NRCAN Energy Factbook', 'ECCC GHG inventory', 'Provincial energy plans', 'Infrastructure Canada asset registry'] }
+  };
+  if (window.SSIMetadata) { Object.assign(window.SSIMetadata, window.SSI_METADATA); }
+}
 <script>renderNav('intelligence');</script>
 
 <main class="page-shell" style="max-width:860px">
@@ -505,16 +517,16 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // ── B.2 Economic Impact by Business Fabric ──
     // Tier by R3 (consequence multiplier) and E component
-    // R3 tiers: Capital-intensive (>= 1.15), Industrial (1.10-1.15), Commercial (1.05-1.10), Light/Rural (<1.05)
+    // R3 tiers: Capital-intensive (>= 0.99), Industrial (0.955-0.99), Commercial (0.92-0.955), Light/Rural (<0.92)
     var tiers = [
       { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, large manufacturing — highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.99; }, color: '#941914', icon: '🏭',
         voll: 'C$20–40/kWh' },
       { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, food processing — significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.955 && s.modifiers.R3_C_mult < 0.99; }, color: '#aa4234', icon: '🔧',
         voll: 'C$10–20/kWh' },
       { label: 'Commercial / SME-Dense', desc: 'Service economy, retail, tourism — moderate individual impact but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏪',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.92 && s.modifiers.R3_C_mult < 0.955; }, color: '#b8863a', icon: '🏪',
         voll: 'C$4–10/kWh' },
       { label: 'Light / Agricultural / Rural', desc: 'Sparse economic activity, agricultural land — lower VoLL but higher social vulnerability',
         filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
@@ -1040,7 +1052,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   fetch('ssi-data.json?v=41').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter Ontario–Quebec ──
-    var puglia = data.substations.filter(function(s){ return s.region === 'Auvergne-Ontario–Quebec-Alpes'; });
+    var puglia = data.substations.filter(function(s){ return s.region === 'Ontario' || s.region === 'Quebec'; });
     var fleet = data.substations;
     puglia.sort(function(a,b){ return b.R_median - a.R_median; });
 
