@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-SSI Intelligence — Archive Previous Edition as PDF & Email
+SSI Intelligence â Archive Previous Edition as PDF & Email
 Uses Playwright to capture each country's intelligence page as PDF,
 then sends all PDFs as email attachments via SMTP.
 
 Environment variables required:
-  SMTP_SERVER   — SMTP host (e.g. smtp.ikenga.eu)
-  SMTP_PORT     — SMTP port (default 587)
-  SMTP_USER     — SMTP username
-  SMTP_PASSWORD — SMTP password
-  ARCHIVE_EMAIL — Recipient (default: ssi_index@ikenga.eu)
+  SMTP_SERVER   â SMTP host (e.g. smtp.ikenga.eu)
+  SMTP_PORT     â SMTP port (default 587)
+  SMTP_USER     â SMTP username
+  SMTP_PASSWORD â SMTP password
+  ARCHIVE_EMAIL â Recipient (default: ssi_index@ikenga.eu)
 """
 import json
 import os
@@ -23,7 +23,7 @@ from pathlib import Path
 from datetime import datetime
 
 BASE_URL = "https://ikengassiindex.github.io"
-COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain", "switzerland", "austria"]
+COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain", "switzerland", "austria", "canada"]
 PDF_DIR = Path("archive_pdfs")
 
 
@@ -81,17 +81,17 @@ def send_email(pdfs, edition_label, edition_key):
     recipient = os.environ.get("ARCHIVE_EMAIL", "ssi_index@ikenga.eu")
 
     if not smtp_server or not smtp_user or not smtp_pass:
-        print("WARNING: SMTP not configured — skipping email.")
+        print("WARNING: SMTP not configured â skipping email.")
         print("  Set SMTP_SERVER, SMTP_USER, SMTP_PASSWORD secrets in GitHub.")
         return False
 
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = recipient
-    msg["Subject"] = f"SSI Intelligence Archive — Edition {edition_label} ({edition_key})"
+    msg["Subject"] = f"SSI Intelligence Archive â Edition {edition_label} ({edition_key})"
 
     body = (
-        f"SSI Monthly Intelligence — Edition {edition_label}\n"
+        f"SSI Monthly Intelligence â Edition {edition_label}\n"
         f"Period: {edition_key}\n"
         f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n\n"
         f"Attached: {len(pdfs)} country intelligence reports (PDF).\n"
