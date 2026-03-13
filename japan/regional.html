@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index v4.0.2 — Regional Analysis for Japan. Compare 47 prefectures and 10 EPCO territories by SSI score, component breakdown, and socio-economic context across 6,003 substations.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Regional Analysis">
+<meta property="og:description" content="Prefecture and EPCO territory comparison for Japan's electrical grid resilience.">
+<meta property="og:type" content="website">
+<title>SSI Index — Regional Analysis</title>
+<link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+<script src="../nav.js?v=116"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js?v=2"></script>
+<script>renderNav('regional');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Regional Analysis</h1>
+    <p>Compare Japanese prefectures by SSI score, component breakdown, and socio-economic context across 6,003 substations in Japan's 47 prefectures and 10 EPCO territories.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs animate-in delay-1">
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Prefecture Ranking</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">EPCO Territory Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
+  </div>
+
+  <!-- Tab: Regional Ranking -->
+  <div id="tab-ranking">
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">Prefecture Ranking by Mean SSI Score <span class="label-xs" id="ranking-count"></span></div>
+      <div style="overflow-x:auto">
+        <table class="data-table" style="width:100%;font-size:12px">
+          <thead><tr><th>#</th><th>Prefecture</th><th>EPCO</th><th>Freq</th><th>Subs</th><th>Mean SSI</th><th>Band</th><th>C</th><th>V</th><th>I</th><th>E</th><th>S</th><th>T</th></tr></thead>
+          <tbody id="ranking-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: EPCO Territory Comparison -->
+  <div id="tab-compare" style="display:none">
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">EPCO Territory Comparison</div>
+      <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+        <div>
+          <label style="font-size:12px;color:var(--warm-grey)">Territory A</label>
+          <select id="prov-a" style="display:block;margin-top:4px;padding:6px 10px;border:1px solid var(--cream-deep);border-radius:4px;font-size:13px" onchange="updateCompare()"></select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--warm-grey)">Territory B</label>
+          <select id="prov-b" style="display:block;margin-top:4px;padding:6px 10px;border:1px solid var(--cream-deep);border-radius:4px;font-size:13px" onchange="updateCompare()"></select>
+        </div>
+      </div>
+      <table class="data-table" style="width:100%;font-size:12px" id="compare-table">
+        <thead><tr><th>Metric</th><th id="th-prov-a">—</th><th id="th-prov-b">—</th><th>Delta</th></tr></thead>
+        <tbody id="compare-tbody"></tbody>
+      </table>
+      <div style="margin-top:24px">
+        <div class="card-header" style="font-size:14px">Radar Comparison</div>
+        <div id="radar-container" style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">
+          <svg id="radar-svg" width="320" height="320" viewBox="0 0 320 320"></svg>
+          <div id="radar-legend" style="font-size:12px;color:var(--slate)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Component Decomposition -->
+  <div id="tab-decomp" style="display:none">
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">Component Decomposition by Prefecture</div>
+      <div id="decomp-bars" style="margin-top:12px"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function switchTab(btn, tabId) {
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    document.querySelectorAll('[id^="tab-"]').forEach(function(t){t.style.display='none';});
+    document.getElementById(tabId).style.display='';
+  }
+
+  var _regionData = {};
+  var _epcoData = {};
+
+  function updateCompare() {
+    var a = document.getElementById('prov-a').value;
+    var b = document.getElementById('prov-b').value;
+    document.getElementById('th-prov-a').textContent = a;
+    document.getElementById('th-prov-b').textContent = b;
+    var da = _epcoData[a], db = _epcoData[b];
+    if (!da || !db) return;
+
+    var rows = [
+      {label:'Substations', va:da.count, vb:db.count, fmt:function(v){return v.toLocaleString();}},
+      {label:'Mean SSI', va:da.meanSSI, vb:db.meanSSI, fmt:function(v){return v.toFixed(3);}},
+      {label:'Continuity (C)', va:da.C, vb:db.C, fmt:function(v){return v.toFixed(3);}},
+      {label:'Voltage (V)', va:da.V, vb:db.V, fmt:function(v){return v.toFixed(3);}},
+      {label:'Infrastructure (I)', va:da.I, vb:db.I, fmt:function(v){return v.toFixed(3);}},
+      {label:'Economic (E)', va:da.E, vb:db.E, fmt:function(v){return v.toFixed(3);}},
+      {label:'Societal (S)', va:da.S, vb:db.S, fmt:function(v){return v.toFixed(3);}},
+      {label:'Temporal (T)', va:da.T, vb:db.T, fmt:function(v){return v.toFixed(3);}},
+      {label:'% Critical', va:da.critPct, vb:db.critPct, fmt:function(v){return v.toFixed(1)+'%';}}
+    ];
+    document.getElementById('compare-tbody').innerHTML = rows.map(function(r) {
+      var delta = r.va - r.vb;
+      var deltaStr = (delta >= 0 ? '+' : '') + r.fmt(Math.abs(delta));
+      var color = delta > 0 ? 'var(--crimson)' : delta < 0 ? 'var(--sage)' : 'var(--warm-grey)';
+      return '<tr><td style="font-weight:500">' + r.label + '</td><td class="num">' + r.fmt(r.va) + '</td><td class="num">' + r.fmt(r.vb) + '</td><td class="num" style="color:' + color + '">' + deltaStr + '</td></tr>';
+    }).join('');
+
+    // Radar chart
+    drawRadar(da, db, a, b);
+  }
+
+  function drawRadar(da, db, nameA, nameB) {
+    var svg = document.getElementById('radar-svg');
+    var cx = 160, cy = 160, R = 120;
+    var dims = ['C','V','I','E','S','T'];
+    var labels = ['Continuity','Voltage','Infrastructure','Economic','Societal','Temporal'];
+    var n = dims.length;
+    var html = '';
+
+    // Grid
+    [0.25, 0.50, 0.75, 1.0].forEach(function(frac) {
+      var pts = [];
+      for (var i = 0; i < n; i++) {
+        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        pts.push((cx + R * frac * Math.cos(angle)).toFixed(1) + ',' + (cy + R * frac * Math.sin(angle)).toFixed(1));
+      }
+      html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="var(--cream-deep)" stroke-width="1"/>';
+    });
+
+    // Axes + labels
+    for (var i = 0; i < n; i++) {
+      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var x2 = cx + R * Math.cos(angle);
+      var y2 = cy + R * Math.sin(angle);
+      html += '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="var(--cream-deep)" stroke-width="1"/>';
+      var lx = cx + (R + 18) * Math.cos(angle);
+      var ly = cy + (R + 18) * Math.sin(angle);
+      html += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="var(--slate)">'+labels[i]+'</text>';
+    }
+
+    // Data polygons
+    function makePolygon(d, color, opacity) {
+      var pts = [];
+      for (var i = 0; i < n; i++) {
+        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        var val = Math.min(d[dims[i]] || 0, 1);
+        pts.push((cx + R * val * Math.cos(angle)).toFixed(1) + ',' + (cy + R * val * Math.sin(angle)).toFixed(1));
+      }
+      return '<polygon points="' + pts.join(' ') + '" fill="' + color + '" fill-opacity="' + opacity + '" stroke="' + color + '" stroke-width="2"/>';
+    }
+    html += makePolygon(da, 'var(--crimson)', 0.2);
+    html += makePolygon(db, '#2980b9', 0.2);
+
+    svg.innerHTML = html;
+    document.getElementById('radar-legend').innerHTML =
+      '<div style="margin-bottom:4px"><span style="display:inline-block;width:12px;height:12px;background:var(--crimson);border-radius:2px;margin-right:6px"></span>' + nameA + '</div>' +
+      '<div><span style="display:inline-block;width:12px;height:12px;background:#2980b9;border-radius:2px;margin-right:6px"></span>' + nameB + '</div>';
+  }
+
+  fetch('ssi-data.json?v=1')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var subs = data.substations || data;
+
+      // Aggregate by prefecture
+      var prefs = {};
+      subs.forEach(function(s) {
+        var p = s.prefecture || s.region || 'Unknown';
+        if (!prefs[p]) prefs[p] = {name:p, epco:s.epco||'', freq:s.freq||60, subs:[], scoreSum:0, C:0, V:0, I:0, E:0, S:0, T:0, critCount:0};
+        prefs[p].subs.push(s);
+        prefs[p].scoreSum += s.score;
+        prefs[p].C += (s.C_raw || 0);
+        prefs[p].V += (s.V_raw || 0);
+        prefs[p].I += (s.I_raw || 0);
+        prefs[p].E += (s.E_raw || 0);
+        prefs[p].S += (s.S_raw || 0);
+        prefs[p].T += (s.T_raw || 0);
+        if (s.band === 'Critical') prefs[p].critCount++;
+      });
+
+      // Sort by mean SSI descending
+      var prefList = Object.values(prefs).map(function(p) {
+        var n = p.subs.length;
+        return {
+          name: p.name, epco: p.epco, freq: p.freq, count: n,
+          meanSSI: p.scoreSum / n,
+          C: p.C / n, V: p.V / n, I: p.I / n, E: p.E / n, S: p.S / n, T: p.T / n,
+          critPct: p.critCount / n * 100
+        };
+      }).sort(function(a,b) { return b.meanSSI - a.meanSSI; });
+
+      _regionData = {};
+      prefList.forEach(function(p) { _regionData[p.name] = p; });
+
+      document.getElementById('ranking-count').textContent = prefList.length + ' prefectures';
+      document.getElementById('ranking-tbody').innerHTML = prefList.map(function(p, i) {
+        var band = p.meanSSI < 0.25 ? 'Low' : p.meanSSI < 0.50 ? 'Medium' : p.meanSSI < 0.75 ? 'High' : 'Critical';
+        var bc = band === 'Critical' ? 'var(--crimson)' : band === 'High' ? '#e74c3c' : band === 'Medium' ? '#f39c12' : 'var(--sage)';
+        return '<tr>' +
+          '<td>' + (i+1) + '</td>' +
+          '<td style="font-weight:500">' + p.name + '</td>' +
+          '<td>' + p.epco + '</td>' +
+          '<td>' + p.freq + ' Hz</td>' +
+          '<td class="num">' + p.count.toLocaleString() + '</td>' +
+          '<td class="num" style="font-weight:600">' + p.meanSSI.toFixed(3) + '</td>' +
+          '<td><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:' + bc + ';color:#fff;font-size:11px">' + band + '</span></td>' +
+          '<td class="num">' + p.C.toFixed(3) + '</td>' +
+          '<td class="num">' + p.V.toFixed(3) + '</td>' +
+          '<td class="num">' + p.I.toFixed(3) + '</td>' +
+          '<td class="num">' + p.E.toFixed(3) + '</td>' +
+          '<td class="num">' + p.S.toFixed(3) + '</td>' +
+          '<td class="num">' + p.T.toFixed(3) + '</td>' +
+        '</tr>';
+      }).join('');
+
+      // EPCO aggregation
+      var epcos = {};
+      subs.forEach(function(s) {
+        var e = s.epco || 'Unknown';
+        if (!epcos[e]) epcos[e] = {count:0, scoreSum:0, C:0, V:0, I:0, E:0, S:0, T:0, critCount:0};
+        epcos[e].count++;
+        epcos[e].scoreSum += s.score;
+        epcos[e].C += (s.C_raw || 0);
+        epcos[e].V += (s.V_raw || 0);
+        epcos[e].I += (s.I_raw || 0);
+        epcos[e].E += (s.E_raw || 0);
+        epcos[e].S += (s.S_raw || 0);
+        epcos[e].T += (s.T_raw || 0);
+        if (s.band === 'Critical') epcos[e].critCount++;
+      });
+      var epcoNames = Object.keys(epcos).sort();
+      epcoNames.forEach(function(e) {
+        var d = epcos[e];
+        _epcoData[e] = {
+          count: d.count, meanSSI: d.scoreSum/d.count,
+          C: d.C/d.count, V: d.V/d.count, I: d.I/d.count,
+          E: d.E/d.count, S: d.S/d.count, T: d.T/d.count,
+          critPct: d.critCount/d.count*100
+        };
+      });
+
+      // Populate selects
+      var selA = document.getElementById('prov-a');
+      var selB = document.getElementById('prov-b');
+      epcoNames.forEach(function(e, i) {
+        selA.add(new Option(e, e));
+        selB.add(new Option(e, e));
+      });
+      if (epcoNames.length >= 2) {
+        selA.value = epcoNames[0];
+        selB.value = epcoNames[1];
+        updateCompare();
+      }
+
+      // Component decomposition
+      var decompHTML = '';
+      var compDefs = [
+        {key:'C', label:'C', color:'var(--crimson)'},
+        {key:'V', label:'V', color:'#e67e22'},
+        {key:'I', label:'I', color:'#8e44ad'},
+        {key:'E', label:'E', color:'#2980b9'},
+        {key:'S', label:'S', color:'#27ae60'},
+        {key:'T', label:'T', color:'#7f8c8d'}
+      ];
+      prefList.forEach(function(p) {
+        decompHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+          '<span style="width:90px;font-size:11px;font-weight:500;text-align:right">' + p.name + '</span>' +
+          '<div style="flex:1;display:flex;height:14px;border-radius:3px;overflow:hidden">';
+        var total = p.C + p.V + p.I + p.E + p.S + p.T;
+        compDefs.forEach(function(c) {
+          var pct = total > 0 ? (p[c.key] / total * 100).toFixed(1) : 0;
+          decompHTML += '<div style="width:' + pct + '%;background:' + c.color + '" title="' + c.label + ': ' + p[c.key].toFixed(3) + '"></div>';
+        });
+        decompHTML += '</div><span style="width:45px;font-size:11px;color:var(--warm-grey);text-align:right">' + p.meanSSI.toFixed(3) + '</span></div>';
+      });
+      // Legend
+      decompHTML += '<div style="display:flex;gap:12px;margin-top:12px;font-size:11px;color:var(--slate)">';
+      compDefs.forEach(function(c) {
+        decompHTML += '<span><span style="display:inline-block;width:10px;height:10px;background:' + c.color + ';border-radius:2px;margin-right:4px"></span>' + c.label + '</span>';
+      });
+      decompHTML += '</div>';
+      document.getElementById('decomp-bars').innerHTML = decompHTML;
+    })
+    .catch(function(err) {
+      console.error('SSI regional data load error:', err);
+      document.getElementById('ranking-count').textContent = 'Data pending';
+      document.getElementById('ranking-tbody').innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--warm-grey)">Awaiting ssi-data.json \u2014 run scoring pipeline to generate</td></tr>';
+    });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>
