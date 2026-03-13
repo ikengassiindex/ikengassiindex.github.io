@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index v4.0.2 — Monthly Intelligence for Japan. Edition 001 (April 2026). Deep-dive analysis of Japan’s grid resilience, Nankai Trough exposure, 50/60 Hz vulnerability, and EPCO territory risk profiles.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Monthly Intelligence">
+<meta property="og:description" content="Japan grid resilience intelligence — Edition 001, April 2026.">
+<meta property="og:type" content="website">
+<title>SSI Index — Monthly Intelligence</title>
+<link rel="stylesheet" href="../style.css?v=3">
+</head>
+<body>
+<script src="../nav.js?v=116"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js?v=2"></script>
+<script>
+  // Edition config
+  window.SSI_EDITION = {
+    number: 1,
+    label: "Edition 001",
+    month: "April 2026",
+    focus_region: "Nankai Trough Zone",
+    focus_substation: "Hamaoka Nuclear Corridor (Shizuoka)",
+    sections: ['A','B','C','D','E','F','G']
+  };
+</script>
+<script>renderNav('intelligence');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Monthly Intelligence</h1>
+    <p>Edition 001 — April 2026. Deep-dive analysis of Japan’s grid resilience across 6,003 substations, 47 prefectures, and 10 EPCO territories. This edition focuses on the Nankai Trough seismic zone and the 50/60 Hz boundary vulnerability.</p>
+  </div>
+
+  <!-- Edition Header -->
+  <div class="card animate-in delay-1" style="margin-bottom:24px;border-left:4px solid var(--crimson)">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:12px;color:var(--warm-grey);letter-spacing:0.5px;text-transform:uppercase">SSI Monthly Intelligence</div>
+        <div style="font-size:20px;font-weight:600;color:var(--slate);margin-top:4px">Edition 001 — April 2026</div>
+        <div style="font-size:13px;color:var(--terracotta);margin-top:2px">Japan 🇯🇵 · 6,003 substations · 47 prefectures · 10 EPCO territories</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--warm-grey)">Refresh cycle: Monthly</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Data vintage: March 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section A: Executive Summary -->
+  <div class="card animate-in delay-1" style="margin-bottom:24px">
+    <div class="card-header">A: Executive Summary</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--slate)">
+      <p>Japan enters the SSI framework as the 10th country, bringing unique structural challenges: a <strong>50 Hz/60 Hz dual-frequency grid</strong> bisected by the Itoigawa-Shizuoka Tectonic Line, connected only through three frequency converter stations (combined 1,200 MW capacity). The initial scoring of 6,003 substations across 47 prefectures reveals a fleet distribution of approximately <strong>15% Low, 46% Medium, 24% High, and 15% Critical</strong> — broadly consistent with §9 targets but reflecting Japan’s extreme natural hazard exposure.</p>
+      <p>The top risk drivers are: (1) <strong>Seismic amplification</strong> via R6b modifier, with Shizuoka (PGA=0.65g), Mie (0.55g), and Kochi (0.55g) in the Nankai Trough zone receiving 20-40% score amplification; (2) <strong>CAIDI-driven isolation penalties</strong> for Okinawa (CAIDI=32 min) and Hokkaido (CAIDI=22 min), reflecting island/peninsular grid isolation; (3) <strong>Super-ageing society pressure</strong> through the Societal (S) component, with 23 of 47 prefectures having elderly ratios above 0.32, increasing both demand vulnerability and workforce constraints.</p>
+      <p>Key finding: The 50/60 Hz boundary represents a <strong>systemic single point of failure</strong>. Combined converter station capacity (1,200 MW) represents less than 1% of Japan’s peak demand (~160 GW), making cross-boundary resilience operationally negligible during large-scale events.</p>
+    </div>
+  </div>
+
+  <!-- Section B: Fleet Risk Profile -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">B: Fleet Risk Profile</div>
+    <div id="fleet-profile" style="margin-top:12px">
+      <canvas id="fleet-canvas" width="700" height="200" style="width:100%;border-radius:6px"></canvas>
+      <div id="fleet-stats" style="font-size:12px;color:var(--slate);margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- Section C: Cyber-Economic Monitor -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">C: Cyber-Economic Intelligence</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--slate)">
+      <p><strong>Cyber Landscape:</strong> NISC reported a 23% year-on-year increase in critical infrastructure cyber incidents for FY2025, with energy sector targeting up 18%. The March 2026 NISC advisory flagged increased reconnaissance activity against SCADA/ICS systems in the Kanto (TEPCO) and Kansai (KEPCO) regions. Japan’s mandatory cybersecurity reporting framework under the Electricity Business Act (amended 2024) now requires all 10 EPCOs to submit quarterly vulnerability assessments to METI.</p>
+      <p><strong>Economic Signals:</strong> BOJ Sakura Report (January 2026) noted regional economic divergence widening — Kanto and Kansai regions showing moderate recovery, while Tohoku, Hokuriku, and Shikoku continue contraction. JEPX spot prices remained elevated in February 2026 (avg ¥12.3/kWh vs ¥9.8/kWh five-year mean), reflecting tight supply-demand balance and LNG cost pass-through. The economic stress index feeds directly into the E1/E2 components.</p>
+    </div>
+  </div>
+  <!-- Section D: Data Refresh Log -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">D: Data Refresh Log</div>
+    <div style="overflow-x:auto">
+      <table class="data-table" style="width:100%;font-size:12px">
+        <thead><tr><th>Source</th><th>Last Refresh</th><th>Variables Affected</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>NIED J-SHIS PGA Maps</td><td>2026-02-15</td><td>I7, R6b (seismic)</td><td><span style="padding:2px 6px;border-radius:3px;background:var(--sage);color:#fff;font-size:10px">CURRENT</span></td></tr>
+          <tr><td>JMA Seismic Bulletin</td><td>2026-03-01</td><td>I7, R6b, T1 (seasonal)</td><td><span style="padding:2px 6px;border-radius:3px;background:var(--sage);color:#fff;font-size:10px">CURRENT</span></td></tr>
+          <tr><td>OCCTO Supply-Demand</td><td>2026-02-28</td><td>V3, E1 (grid balance)</td><td><span style="padding:2px 6px;border-radius:3px;background:var(--sage);color:#fff;font-size:10px">CURRENT</span></td></tr>
+          <tr><td>SBJ Population Survey</td><td>2025-10-01</td><td>S1 (population)</td><td><span style="padding:2px 6px;border-radius:3px;background:#f39c12;color:#fff;font-size:10px">6 MONTHS</span></td></tr>
+          <tr><td>TEPCO Reliability Report</td><td>2025-07-31</td><td>C1-C4, R6a (CAIDI)</td><td><span style="padding:2px 6px;border-radius:3px;background:#f39c12;color:#fff;font-size:10px">8 MONTHS</span></td></tr>
+          <tr><td>MLIT Hazard Maps</td><td>2025-12-20</td><td>I5 (flood/landslide)</td><td><span style="padding:2px 6px;border-radius:3px;background:var(--sage);color:#fff;font-size:10px">CURRENT</span></td></tr>
+          <tr><td>OSM Overpass (substations)</td><td>2026-03-10</td><td>I2 (network density), fleet</td><td><span style="padding:2px 6px;border-radius:3px;background:var(--sage);color:#fff;font-size:10px">CURRENT</span></td></tr>
+          <tr><td>MIC Digital Index</td><td>2025-09-30</td><td>S1 (digital readiness)</td><td><span style="padding:2px 6px;border-radius:3px;background:#f39c12;color:#fff;font-size:10px">6 MONTHS</span></td></tr>
+          <tr><td>NISC Cyber Report</td><td>2026-01-15</td><td>Qualitative (Sec C)</td><td><span style="padding:2px 6px;border-radius:3px;background:var(--sage);color:#fff;font-size:10px">CURRENT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section E: Deep Dive — Nankai Trough Zone -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">E: Deep Dive — Nankai Trough Seismic Zone</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--slate)">
+      <p>The Nankai Trough runs along the Pacific coast from Shizuoka to Miyazaki, posing the highest seismic risk to Japan’s grid infrastructure. Four prefectures in the direct impact zone — <strong>Shizuoka</strong> (PGA=0.65g), <strong>Mie</strong> (0.55g), <strong>Kochi</strong> (0.55g), and <strong>Wakayama</strong> (0.45g) — receive significant R6b seismic amplification, placing them consistently in the top-10 highest-risk prefectures.</p>
+      <p><strong>Shizuoka</strong> is of particular concern: it sits directly on the projected Tokai earthquake rupture zone and hosts the Hamaoka Nuclear Power Plant corridor. With PGA=0.65g (highest in the fleet), the R6b modifier amplifies Shizuoka substations by up to 34%. The prefecture also spans the 50/60 Hz boundary, making its grid infrastructure a critical node for national resilience. Chubu Electric Power (60 Hz side) and TEPCO (50 Hz side) both serve parts of Shizuoka, creating jurisdictional complexity during emergency response.</p>
+      <p><strong>Kochi</strong> combines high seismic exposure (0.55g) with the lowest population density among Shikoku prefectures (97/km²), the highest elderly ratio in Shikoku (0.362), and severe typhoon exposure (2.0 typhoon days/year average). This compounding of natural hazard, demographic decline, and infrastructure isolation makes Kochi the archetypal high-risk prefecture in the Japanese context.</p>
+    </div>
+    <div id="nankai-chart" style="margin-top:16px">
+      <canvas id="nankai-canvas" width="700" height="250" style="width:100%;border-radius:6px"></canvas>
+    </div>
+  </div>
+
+  <!-- Section F: Substation in Focus -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">F: Substation in Focus — Okinawa Grid Isolation</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--slate)">
+      <p>Okinawa Electric Power Company operates Japan’s most isolated grid — a 60 Hz island network with <strong>no interconnection to the mainland</strong>. With a CAIDI of 32 minutes (nearly 3x the national average of ~12 minutes), Okinawa substations consistently score highest on Continuity (C) components. The isolation means any major outage requires fully local restoration with no import capacity from adjacent EPCO territories.</p>
+      <p>Compounding factors include: extreme typhoon exposure (3.5 typhoon days/year, highest nationally), coastal atmospheric corrosion (C3 classification), and relatively low digital infrastructure readiness (0.45 MIC index vs 0.78 for Tokyo). However, Okinawa benefits from the lowest seismic risk in Japan (PGA=0.10g, Z-factor=0.7) and the youngest population profile (elderly ratio 0.228, lowest nationally).</p>
+      <p>The SSI correctly identifies Okinawa as a <strong>CAIDI-driven high-risk territory</strong> rather than a seismic risk zone — a differentiation that validates the multi-component scoring approach. Risk mitigation priorities for Okinawa focus on typhoon-hardening, BESS deployment for islanded operation, and smart grid modernisation rather than seismic reinforcement.</p>
+    </div>
+  </div>
+
+  <!-- Section G: Looking Ahead -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">G: Looking Ahead — Edition 002 (May 2026)</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--slate)">
+      <p><strong>Next month’s deep-dive:</strong> TEPCO Kanto Corridor — Tokyo, Saitama, Chiba, Kanagawa. The world’s largest urban load centre (~35% of Japan’s electricity demand) with extreme population density (up to 6,410/km² in Tokyo) and significant seismic exposure (PGA range 0.35-0.45g). Focus areas will include: cascading failure risk modelling for the Kanto mesh network, cyber-physical threat assessment for TEPCO’s SCADA infrastructure, and the impact of Japan’s 2025 Electricity Business Act amendments on TEPCO’s grid reliability mandates.</p>
+      <p><strong>Data refresh targets:</strong> TEPCO FY2025 annual reliability report (expected April 2026), SBJ 2026 Current Population Survey (expected April), and JMA spring typhoon forecast (April 1).</p>
+      <p><strong>Methodology update:</strong> Integration of METI’s March 2026 smart grid deployment survey data into the MIC Digital Transformation Index, potentially affecting S1 scores for early-adopter prefectures (Fukuoka, Aichi, Tokyo).</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Fleet profile chart
+  fetch('ssi-data.json?v=1')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var subs = data.substations || data;
+
+      // Fleet histogram
+      var canvas = document.getElementById('fleet-canvas');
+      if (canvas && canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+        var W = canvas.width, H = canvas.height;
+        ctx.fillStyle = '#faf8f5';
+        ctx.fillRect(0, 0, W, H);
+
+        // Build histogram
+        var bins = 40;
+        var counts = new Array(bins).fill(0);
+        subs.forEach(function(s) {
+          var idx = Math.min(Math.floor(s.score * bins), bins - 1);
+          counts[idx]++;
+        });
+        var maxCount = Math.max.apply(null, counts);
+        var barW = (W - 60) / bins;
+
+        counts.forEach(function(c, i) {
+          var x = 40 + i * barW;
+          var barH = maxCount > 0 ? (c / maxCount) * (H - 40) : 0;
+          var val = (i + 0.5) / bins;
+          ctx.fillStyle = val < 0.25 ? '#27ae60' : val < 0.50 ? '#f39c12' : val < 0.75 ? '#e74c3c' : '#8e1b23';
+          ctx.fillRect(x, H - 20 - barH, barW - 1, barH);
+        });
+
+        // Axes
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(40, 10);
+        ctx.lineTo(40, H - 20);
+        ctx.lineTo(W - 20, H - 20);
+        ctx.stroke();
+
+        // Band boundaries
+        [0.25, 0.50, 0.75].forEach(function(v) {
+          var x = 40 + v * (W - 60);
+          ctx.strokeStyle = '#999';
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(x, 10);
+          ctx.lineTo(x, H - 20);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        });
+
+        // Labels
+        ctx.fillStyle = '#666';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('0.00', 40, H - 6);
+        ctx.fillText('0.25', 40 + 0.25*(W-60), H - 6);
+        ctx.fillText('0.50', 40 + 0.50*(W-60), H - 6);
+        ctx.fillText('0.75', 40 + 0.75*(W-60), H - 6);
+        ctx.fillText('1.00', W - 20, H - 6);
+      }
+
+      // Stats
+      var low = subs.filter(function(s){return s.band==='Low';}).length;
+      var med = subs.filter(function(s){return s.band==='Medium';}).length;
+      var high = subs.filter(function(s){return s.band==='High';}).length;
+      var crit = subs.filter(function(s){return s.band==='Critical';}).length;
+      var n = subs.length;
+      document.getElementById('fleet-stats').innerHTML =
+        'Fleet: <strong>' + n.toLocaleString() + '</strong> substations \u00b7 ' +
+        'Low ' + (low/n*100).toFixed(1) + '% \u00b7 Medium ' + (med/n*100).toFixed(1) + '% \u00b7 High ' + (high/n*100).toFixed(1) + '% \u00b7 Critical ' + (crit/n*100).toFixed(1) + '%';
+
+      // Nankai chart \u2014 top prefectures by PGA
+      var nankaiCanvas = document.getElementById('nankai-canvas');
+      if (nankaiCanvas && nankaiCanvas.getContext) {
+        var ctx2 = nankaiCanvas.getContext('2d');
+        var W2 = nankaiCanvas.width, H2 = nankaiCanvas.height;
+        ctx2.fillStyle = '#faf8f5';
+        ctx2.fillRect(0, 0, W2, H2);
+
+        // Aggregate by prefecture
+        var prefScores = {};
+        subs.forEach(function(s) {
+          var p = s.prefecture || s.region;
+          if (!prefScores[p]) prefScores[p] = {sum:0, count:0};
+          prefScores[p].sum += s.score;
+          prefScores[p].count++;
+        });
+
+        // Get top 15 prefectures by mean score
+        var topPrefs = Object.entries(prefScores).map(function(e) {
+          return {name: e[0], mean: e[1].sum / e[1].count, count: e[1].count};
+        }).sort(function(a,b){return b.mean - a.mean;}).slice(0, 15);
+
+        var barH2 = (H2 - 40) / topPrefs.length;
+        var maxMean = Math.max.apply(null, topPrefs.map(function(p){return p.mean;}));
+
+        topPrefs.forEach(function(p, i) {
+          var y = 20 + i * barH2;
+          var barW2 = (p.mean / maxMean) * (W2 - 160);
+          var color = p.mean < 0.25 ? '#27ae60' : p.mean < 0.50 ? '#f39c12' : p.mean < 0.75 ? '#e74c3c' : '#8e1b23';
+          ctx2.fillStyle = color;
+          ctx2.globalAlpha = 0.8;
+          ctx2.fillRect(120, y, barW2, barH2 - 4);
+          ctx2.globalAlpha = 1;
+          ctx2.fillStyle = '#333';
+          ctx2.font = '10px sans-serif';
+          ctx2.textAlign = 'right';
+          ctx2.fillText(p.name, 115, y + barH2/2 + 3);
+          ctx2.textAlign = 'left';
+          ctx2.fillText(p.mean.toFixed(3), 125 + barW2, y + barH2/2 + 3);
+        });
+      }
+    })
+    .catch(function(err) {
+      console.log('Intelligence data pending:', err);
+      document.getElementById('fleet-stats').innerHTML = 'Awaiting ssi-data.json \u2014 charts will render once scoring pipeline completes.';
+    });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>
