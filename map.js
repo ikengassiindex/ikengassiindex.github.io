@@ -1281,6 +1281,7 @@
       }
 
       resize();
+      if (SSI.regions && !Array.isArray(SSI.regions)) SSI.regions = Object.values(SSI.regions);
       wireFilters();
       clearDetailPanel();
 
