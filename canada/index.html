@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Canada's 7,898 substations — 996 EHV (≥225 kV), 6,902 HV (63-150 kV) — across 96 census divisions and 13 provinces. 95 variables, 30+ public data sources. Open data, open methodology.">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Canada's 24,986 substations — 996 EHV (≥225 kV), 6,902 HV (63-150 kV) — across 96 census divisions and 13 provinces. 95 variables, 30+ public data sources. Open data, open methodology.">
 <meta name="theme-color" content="#941914">
 <meta property="og:title" content="SSI Index — Overview">
 <meta property="og:description" content="Composite resilience scoring for Canada's electrical grid. 95 variables, 30+ public data sources.">
@@ -22,7 +22,7 @@
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
     <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
-    <p>A composite resilience score for Canada's electrical grid — 7,898 substations — 996 EHV (≥225 kV), 6,902 HV (63–150 kV) — across 96 census divisions and 13 provinces — 95 variables, 30+ public data sources, zero proprietary dependencies.</p>
+    <p>A composite resilience score for Canada's electrical grid — 24,986 substations — 996 EHV (≥225 kV), 6,902 HV (63–150 kV) — across 96 census divisions and 13 provinces — 95 variables, 30+ public data sources, zero proprietary dependencies.</p>
     <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
   </div>
 
@@ -155,7 +155,7 @@
       <script>
       (function(){
         function fmt(v){if(v>=1e9)return(v/1e9).toFixed(2)+' B';if(v>=1e6)return(v/1e6).toFixed(1)+' M';if(v>=1e3)return v.toLocaleString('en-US');return String(v)}
-        fetch('ssi-data.json').then(function(r){return r.json()}).then(function(data){
+        fetch('ssi-data.json?v=39').then(function(r){return r.json()}).then(function(data){
           var subs=data.substations,n=subs.length;
           var isArr=Array.isArray(subs[0]);
           var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=132}).length,mv=n-hv;
@@ -243,7 +243,7 @@
       document.getElementById('dist-count').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations';
       var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 225; }).length;
       var hvCount = ssi.fleet_summary.total - ehvCount;
-      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + ssi.meta.total_departments + ' census divisions · ' + ssi.regions.length + ' provinces';
+      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' provinces';
 
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;
