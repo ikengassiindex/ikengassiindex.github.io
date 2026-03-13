@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SSI v4.0.2 — XLSX Audit Processor</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<style>
+body{font-family:-apple-system,sans-serif;max-width:1000px;margin:40px auto;padding:20px;background:#f8f9fa;color:#1a1a2e}
+h1{font-size:1.4rem}
+.sub{color:#6b7280;margin-bottom:1.5rem;font-size:.9rem}
+.dz{border:2px dashed #2c3e7a;border-radius:8px;padding:2rem;text-align:center;background:#fff;margin-bottom:1rem;cursor:pointer}
+.dz:hover{background:#eaf2f8}
+.dz input{display:none}
+#out{font-family:monospace;font-size:11px;white-space:pre-wrap;background:#fff;border:1px solid #ddd;padding:1rem;border-radius:6px;max-height:70vh;overflow:auto}
+.ok{color:#1a6b4a;font-weight:700}
+.err{color:#c0392b;font-weight:700}
+</style>
+</head>
+<body>
+<h1>SSI v4.0.2 — XLSX Audit Processor (Canada)</h1>
+<p class="sub">Upload your 5 XLSX files. Content is extracted as CSV for audit. Nothing leaves your browser.</p>
+<div class="dz" onclick="document.getElementById('fi').click()">
+<input type="file" id="fi" accept=".xlsx,.xls" multiple>
+<p><strong>Click or drag &amp; drop</strong> all 5 XLSX files</p>
+</div>
+<div id="out">Waiting for files...</div>
+<script>
+window._data={};
+function proc(files){
+var o=document.getElementById('out');o.textContent='Processing '+files.length+' files...\n';
+var done=0;
+Array.from(files).forEach(function(f){
+var r=new FileReader();
+r.onload=function(e){
+try{
+var d=new Uint8Array(e.target.result);
+var wb=XLSX.read(d,{type:'array'});
+var fd={};
+wb.SheetNames.forEach(function(s){fd[s]=XLSX.utils.sheet_to_csv(wb.Sheets[s]);});
+window._data[f.name]={ok:true,sheets:wb.SheetNames,csv:fd};
+o.textContent+='\n=== '+f.name+' === ('+wb.SheetNames.length+' sheets)\n';
+wb.SheetNames.forEach(function(s){
+var lines=fd[s].split('\n');
+o.textContent+='  ['+s+'] '+lines.length+' rows\n';
+for(var i=0;i<Math.min(5,lines.length);i++){
+o.textContent+='    '+lines[i].substring(0,200)+'\n';
+}
+});
+}catch(ex){
+window._data[f.name]={ok:false,error:ex.message};
+o.textContent+='\nERROR: '+f.name+': '+ex.message+'\n';
+}
+done++;
+if(done===files.length){
+o.textContent+='\n--- ALL DONE: '+done+' files ---\n';
+document.title='XLSXDONE:'+done+'files|'+Object.keys(window._data).filter(function(k){return window._data[k].ok}).length+'ok';
+}
+};
+r.onerror=function(){
+window._data[f.name]={ok:false,error:'read error'};done++;
+};
+r.readAsArrayBuffer(f);
+});
+}
+document.getElementById('fi').addEventListener('change',function(e){if(e.target.files.length)proc(e.target.files);});
+var dz=document.querySelector('.dz');
+dz.addEventListener('dragover',function(e){e.preventDefault();});
+dz.addEventListener('drop',function(e){e.preventDefault();if(e.dataTransfer.files.length)proc(e.dataTransfer.files);});
+</script>
+</body>
+</html>
