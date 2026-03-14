@@ -599,7 +599,7 @@
                        se.population != null ? Math.round(se.population).toLocaleString() : na;
     var unemploymentLabel = se.unemployment_rate != null ? 'Unemployment' : se.population != null ? 'Population' : 'Unemployment';
     // 2. GDP per capita
-    var currSymbol = (ssi.substation_id && ssi.substation_id.indexOf('UK_') === 0) ? '\u00A3' : (ssi.substation_id && ssi.substation_id.indexOf('US_') === 0) ? '$' : '\u20AC';
+    var currSymbol = (ssi.substation_id && ssi.substation_id.indexOf('UK_') === 0) ? '\u00A3' : (ssi.substation_id && ssi.substation_id.indexOf('US_') === 0) ? '$' : (ssi.substation_id && ssi.substation_id.indexOf('CA_') === 0) ? 'C$' : '\u20AC';
     var gdp = se.gdp_per_capita != null ? currSymbol + Math.round(se.gdp_per_capita).toLocaleString() : na;
     // 3. Innovation (R&D) / Elderly pct
     var innovation = se.rd_pct_gdp != null ? se.rd_pct_gdp.toFixed(1) + '% of GDP' :
