@@ -47,7 +47,7 @@
     <div class="kpi-card animate-in delay-1">
       <div class="kpi-label">Substations Scored</div>
       <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
-      <div class="kpi-sub" id="kpi-total-sub">704 EHV · 1,964 HV · 47 prefectures · 47 prefectures</div>
+      <div class="kpi-sub" id="kpi-total-sub">299 EHV · 5,682 HV · 47 prefectures · 10 EPCO regions</div>
     </div>
     <div class="kpi-card animate-in delay-2">
       <div class="kpi-label">Fleet Median R</div>
@@ -139,7 +139,7 @@
             <div><strong>5</strong> modifiers (R3, R4, R6a, R6b, R7)</div>
             <div><strong>10,000</strong> Monte Carlo iterations</div>
             <div><strong>20×20</strong> correlation matrix</div>
-            <div><strong>13</strong> prefectures covered</div>
+            <div><strong>47</strong> prefectures covered</div>
             <div><strong>30+</strong> verified data sources</div>
           </div>
           <div style="border-top:1px solid rgba(0,0,0,0.06);margin-top:10px;padding-top:10px">
@@ -172,7 +172,7 @@
         });
       })();
       </script>
-              <div><strong>96</strong> prefectures · 47 prefectures</div>
+              <div><strong>47</strong> prefectures · 10 EPCO regions</div>
             </div>
           </div>
         </div>
@@ -243,7 +243,7 @@
       document.getElementById('dist-count').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations';
       var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 225; }).length;
       var hvCount = ssi.fleet_summary.total - ehvCount;
-      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' prefectures';
+      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + ssi.meta.total_departments + ' prefectures \u00b7 ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' EPCO regions';
 
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;
@@ -262,7 +262,7 @@
       var top8 = ssi.substations.slice().sort(function(a,b){ return b.R_median - a.R_median; }).slice(0, 8);
       tbody.innerHTML = top8.map(function(s) {
         return '<tr><td style="font-weight:500">' + (s.name || s.id || 'Unnamed') + '</td>' +
-          '<td>' + s.prefecture + '</td>' +
+          '<td>' + s.province + '</td>' +
           '<td class="num">' + s.R_median.toFixed(3) + '</td>' +
           '<td><span class="band-badge ' + s.classification.toLowerCase() + '"><span class="band-dot ' + s.classification.toLowerCase() + '"></span>' + s.classification + '</span></td></tr>';
       }).join('');
