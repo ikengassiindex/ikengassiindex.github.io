@@ -294,7 +294,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   <div class="kpi-card">
     <div class="kpi-label">High-Consequence Subs</div>
     <div class="kpi-value" style="color:var(--ink)" id="b1-high-conseq">—</div>
-    <div class="kpi-sub" id="b1-high-conseq-sub">R3 ≥ 1.12</div>
+    <div class="kpi-sub" id="b1-high-conseq-sub">R3 ≥ 0.94</div>
   </div>
 </div>
 
@@ -368,7 +368,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       return (s.classification === 'High' || s.classification === 'Critical') && s.modifiers.R7_cyber < medianR7;
     });
 
-    var highConseq = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.12; });
+    var highConseq = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 0.94; });
 
     // ── B.1 KPIs ──
     document.getElementById('b1-cyber-high').textContent = cyberCounts.HIGH;
@@ -377,7 +377,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('b1-blindspots-sub').textContent = 'High/Critical + R7 < median';
     document.getElementById('b1-avg-r7').textContent = avgR7.toFixed(4);
     document.getElementById('b1-high-conseq').textContent = highConseq.length.toLocaleString();
-    document.getElementById('b1-high-conseq-sub').textContent = (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ 1.12';
+    document.getElementById('b1-high-conseq-sub').textContent = (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ 0.94';
 
     // ── B.1 Matrix canvas ──
     var canvas = document.getElementById('b1-matrix');
@@ -479,16 +479,16 @@ document.addEventListener("ssi-config-ready", function(e) {
     // ── B.2 Economic Impact by Business Fabric ──
     var tiers = [
       { label: 'Financial & Pharma / High-Consequence', desc: 'Banking centres, pharmaceutical manufacturing, precision engineering — highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏦',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.94; }, color: '#941914', icon: '🏦',
         voll: 'CHF 20–40/kWh' },
       { label: 'Industrial / Medium-Large Enterprise', desc: 'Machinery, chemicals, food processing — significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.91 && s.modifiers.R3_C_mult < 0.94; }, color: '#aa4234', icon: '🔧',
         voll: 'CHF 10–20/kWh' },
       { label: 'Commercial / Tourism-Dense', desc: 'Service economy, retail, Alpine tourism — moderate individual impact but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏔️',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.88 && s.modifiers.R3_C_mult < 0.91; }, color: '#b8863a', icon: '🏔️',
         voll: 'CHF 4–10/kWh' },
       { label: 'Rural / Agricultural', desc: 'Alpine farming, sparse population — lower VoLL but higher social vulnerability and longer restoration times',
-        filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
+        filter: function(s){ return s.modifiers.R3_C_mult < 0.88; }, color: '#5d8563', icon: '🌾',
         voll: 'CHF 1–4/kWh' }
     ];
 
@@ -532,13 +532,13 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // VoLL context note
     var totalHighConseqHighRisk = fleet.filter(function(s){
-      return s.modifiers.R3_C_mult >= 1.14 && (s.classification === 'High' || s.classification === 'Critical');
+      return s.modifiers.R3_C_mult >= 0.94 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
       '<strong>Value of Lost Load (VoLL) context:</strong> ElCom estimates Swiss average VoLL at CHF 16–25/kWh for commercial customers ' +
       'and CHF 4–8/kWh for residential. Switzerland\'s high GDP per capita (CHF 87,000+) means per-substation economic exposure is among ' +
       'the highest in Europe. The SSI\'s R3 consequence multiplier identifies which substations serve the most economically exposed territories. ' +
-      '<strong>' + totalHighConseqHighRisk + ' substations</strong> combine high-consequence economic fabric (R3 ≥ 1.14) with ' +
+      '<strong>' + totalHighConseqHighRisk + ' substations</strong> combine high-consequence economic fabric (R3 ≥ 0.94) with ' +
       'High or Critical risk classification — the highest VoLL-weighted exposure in the fleet.';
 
     // B.2 Narrative
