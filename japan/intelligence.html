@@ -69,7 +69,7 @@ if (window.SSI_METADATA) {
   <div class="kpi-card">
     <div class="kpi-label">Substations Scored</div>
     <div class="kpi-value" style="color:var(--ink)">5,981</div>
-    <div class="kpi-sub">996 EHV · 6,902 HV</div>
+    <div class="kpi-sub">299 EHV · 5,682 HV</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
@@ -163,7 +163,7 @@ if (window.SSI_METADATA) {
 
     // Basic info
     document.getElementById('focus-name').textContent = s.name;
-    document.getElementById('focus-location').textContent = s.prefecture + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
+    document.getElementById('focus-location').textContent = s.province + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
     document.getElementById('focus-r').textContent = s.R_median.toFixed(3);
     document.getElementById('focus-band').textContent = s.classification;
     document.getElementById('focus-ci').textContent = s.CI_width.toFixed(3);
@@ -279,7 +279,7 @@ if (window.SSI_METADATA) {
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var d = new Date();
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
-      ' — is <strong>' + s.name + '</strong> in ' + s.prefecture + ', ' + s.region +
+      ' — is <strong>' + s.name + '</strong> in ' + s.province + ', ' + s.region +
       '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
       (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
       top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
@@ -605,7 +605,7 @@ if (window.SSI_METADATA) {
     // ── B.3 Prefecture Digital Readiness ──
     var provData = {};
     fleet.forEach(function(s){
-      var p = s.prefecture;
+      var p = s.province;
       if (!provData[p]) provData[p] = { subs: [], sumR7: 0, sumR: 0, sumLon: 0, sumLat: 0 };
       provData[p].subs.push(s);
       provData[p].sumR7 += s.modifiers.R7_cyber;
@@ -925,7 +925,7 @@ if (window.SSI_METADATA) {
       ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
       (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
       'The first material score changes are expected when METI publishes the annual SAIDI/SAIFI indicators (affecting C1–C4 and R6a) ' +
-      'and when ODRÉ refreshes the Registre National des Installations (affecting T1). ' +
+      'and when OSM refreshes the Registre National des Installations (affecting T1). ' +
       'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
       'which have minimal impact on fleet-level score distribution.';
   });
@@ -1079,9 +1079,9 @@ if (window.SSI_METADATA) {
     // Worst prefecture by mean R
     var provSums = {}, provCounts = {};
     puglia.forEach(function(s){
-      if (!provSums[s.prefecture]) { provSums[s.prefecture] = 0; provCounts[s.prefecture] = 0; }
-      provSums[s.prefecture] += s.R_median;
-      provCounts[s.prefecture]++;
+      if (!provSums[s.province]) { provSums[s.province] = 0; provCounts[s.province] = 0; }
+      provSums[s.province] += s.R_median;
+      provCounts[s.province]++;
     });
     var provAvgs = Object.keys(provSums).map(function(p){ return { name: p, avg: provSums[p]/provCounts[p], n: provCounts[p] }; });
     provAvgs.sort(function(a,b){ return b.avg - a.avg; });
@@ -1156,7 +1156,7 @@ if (window.SSI_METADATA) {
     ctx.fillStyle = 'rgba(44,36,32,0.5)';
     ctx.textAlign = 'center';
     provAvgs.forEach(function(pv){  // prefecture iteration
-      var provSubs = puglia.filter(function(s){ return s.prefecture === pv.name; });
+      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var avgLon = provSubs.reduce(function(a,s){ return a + s.lon; }, 0) / provSubs.length;
       var avgLat = provSubs.reduce(function(a,s){ return a + s.lat; }, 0) / provSubs.length;
       var p = proj(avgLon, avgLat);
@@ -1173,7 +1173,7 @@ if (window.SSI_METADATA) {
       var alertStr = s.alert_components ? s.alert_components.join(', ') : '—';
       return '<tr>' +
         '<td style="' + thStyle + 'font-weight:500">' + s.name + '</td>' +
-        '<td style="' + thStyle + '">' + s.prefecture + '</td>' +
+        '<td style="' + thStyle + '">' + s.province + '</td>' +
         '<td style="' + numStyle + 'color:' + bCol + ';font-weight:600">' + s.R_median.toFixed(3) + '</td>' +
         '<td style="' + thStyle + 'color:' + bCol + ';font-weight:600">' + s.classification + '</td>' +
         '<td style="' + numStyle + '">' + s.components.C.toFixed(3) + '</td>' +
@@ -1269,7 +1269,7 @@ if (window.SSI_METADATA) {
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">Prefecture Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){  // prefecture iteration
-      var provSubs = puglia.filter(function(s){ return s.prefecture === pv.name; });
+      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var provBands = { Low:0, Medium:0, High:0, Critical:0 };
       provSubs.forEach(function(s){ provBands[s.classification]++; });
       var barPct = ((1 - pv.avg) * 100).toFixed(1);
@@ -1612,7 +1612,7 @@ if (window.SSI_METADATA) {
       ssiLink: 'shap' },
     { layer: 4, ref: '§0.6.1', title: 'Global Expansion — Country Prioritisation',
       subtitle: 'How 28 countries are ranked by expected commercial return per unit of expansion effort',
-      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). Japan scores among the highest thanks to METI/ODRÉ/Statistics Japan data quality, alongside Germany, Italy, Spain, Netherlands, and UK.',
+      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). Japan scores among the highest thanks to METI/OSM/Statistics Japan data quality, alongside Germany, Italy, Spain, Netherlands, and UK.',
       concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28 countries: EU-27 + UK', 'FR, DE, IT = highest DCI scores, then ES, NL, UK', 'Each country requires bespoke regulatory mapping'],
       ssiLink: 'expansion' },
     { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index',
@@ -1622,8 +1622,8 @@ if (window.SSI_METADATA) {
       ssiLink: 'dci' },
     { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
       subtitle: 'Adapting the SSI model across different national grid characteristics',
-      body: 'The SSI v4.0 architecture was designed to be transferable across North American grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., METI/ODRÉ for Japan, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Japanese data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
-      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'METI/ODRÉ (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
+      body: 'The SSI v4.0 architecture was designed to be transferable across North American grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., METI/OSM for Japan, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Japanese data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
+      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'METI/OSM (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
       ssiLink: 'transfer-protocol' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
       subtitle: 'From raw analytical outputs to four commercial product formats',
@@ -1657,8 +1657,8 @@ if (window.SSI_METADATA) {
       ssiLink: 'api' },
     { layer: 4, ref: '§0.6.3', title: 'Substation Registry Construction',
       subtitle: 'How to identify 500,000+ substations across 28 countries from open data',
-      body: 'Before any valuation can be computed, the substation population must be identified. Japan has a clean registry of 5,981 substations from SSI v4.0, validated against OCCTO and TEPCO publications. The construction pipeline follows four steps: (1) OSM extraction — query all nodes/ways tagged power=substation within the country boundary, filtering by voltage class; (2) deduplication — merge overlapping geometries and resolve naming conflicts; (3) attribute enrichment — assign voltage class, operator, and approximate capacity from OSM tags and national datasets (ODRÉ, OCCTO Open Data); (4) validation — cross-reference against published grid statistics (total number of substations, installed capacity by voltage level) and flag discrepancies. For Japan, this pipeline recovered 97.3% of the official OCCTO registry, giving confidence in its applicability to other well-mapped OECD countries.',
-      concepts: ['OSM extraction → deduplication → enrichment → validation', '97.3% recovery rate against official OCCTO registry', 'Voltage class, operator, capacity from OSM + ODRÉ + OCCTO data', 'Target: 500K+ substations across 28 countries'],
+      body: 'Before any valuation can be computed, the substation population must be identified. Japan has a clean registry of 5,981 substations from SSI v4.0, validated against OCCTO and TEPCO publications. The construction pipeline follows four steps: (1) OSM extraction — query all nodes/ways tagged power=substation within the country boundary, filtering by voltage class; (2) deduplication — merge overlapping geometries and resolve naming conflicts; (3) attribute enrichment — assign voltage class, operator, and approximate capacity from OSM tags and national datasets (OSM, OCCTO Open Data); (4) validation — cross-reference against published grid statistics (total number of substations, installed capacity by voltage level) and flag discrepancies. For Japan, this pipeline recovered 97.3% of the official OCCTO registry, giving confidence in its applicability to other well-mapped OECD countries.',
+      concepts: ['OSM extraction → deduplication → enrichment → validation', '97.3% recovery rate against official OCCTO registry', 'Voltage class, operator, capacity from OSM + OSM + OCCTO data', 'Target: 500K+ substations across 28 countries'],
       ssiLink: 'registry' }
   ];
 
@@ -1766,7 +1766,7 @@ if (window.SSI_METADATA) {
       var regions = {};
       fleet.forEach(function(s){ regions[s.region] = true; });
       var prefectures = {};
-      fleet.forEach(function(s){ prefectures[s.prefecture] = true; });
+      fleet.forEach(function(s){ prefectures[s.province] = true; });
       statHTML = 'Japan\'s coverage: ' + n.toLocaleString() + ' substations across ' +
         Object.keys(regions).length + ' prefectures and ' + Object.keys(prefectures).length + ' prefectures. ' +
         'This serves as the reference benchmark for the Coverage Quality Scorecard: any country achieving comparable ' +
@@ -1914,7 +1914,7 @@ if (window.SSI_METADATA) {
       '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
       '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
       '<strong>' + qtrSources + '</strong> are due for refresh in ' + qLabels[nextQ] + '. ' +
-      'Impact: ODRÉ (Registre National des Installations) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
+      'Impact: OSM (Registre National des Installations) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
       'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong> (' +
       (annualHighImpact ? annualHighImpact.vars : '?') + ' variables → ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
   }
@@ -1931,10 +1931,10 @@ if (window.SSI_METADATA) {
     // 1. Most concentrated risk corridor
     var provData = {};
     fleet.forEach(function(s){
-      if (!provData[s.prefecture]) provData[s.prefecture] = { subs: [], sumR: 0, highCrit: 0 };
-      provData[s.prefecture].subs.push(s);
-      provData[s.prefecture].sumR += s.R_median;
-      if (s.classification === 'High' || s.classification === 'Critical') provData[s.prefecture].highCrit++;
+      if (!provData[s.province]) provData[s.province] = { subs: [], sumR: 0, highCrit: 0 };
+      provData[s.province].subs.push(s);
+      provData[s.province].sumR += s.R_median;
+      if (s.classification === 'High' || s.classification === 'Critical') provData[s.province].highCrit++;
     });
     var provList = Object.keys(provData).map(function(p){
       var d = provData[p];
