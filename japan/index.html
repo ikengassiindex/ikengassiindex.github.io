@@ -300,6 +300,8 @@
 
       // ── Confidence bars ──
       var cp = ssi.fleet_summary.confidence_pct;
+          if (cp && !cp.medium && cp.moderate !== undefined) cp.medium = cp.moderate;
+          if (cp && !cp.moderate && cp.medium !== undefined) cp.moderate = cp.medium;
       var confDefs = [
         { label: 'High', pct: cp.high, color: 'var(--sage)' },
         { label: 'Medium', pct: cp.medium, color: 'var(--bronze)' },
@@ -309,9 +311,9 @@
         return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">' +
           '<div style="width:60px;font-size:12px;font-weight:500;color:' + c.color + '">' + c.label + '</div>' +
           '<div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
-            '<div style="width:' + c.pct.toFixed(1) + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
+            '<div style="width:' + (c.pct||0).toFixed(1) + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
           '</div>' +
-          '<div style="width:50px;font-size:12px;text-align:right;color:var(--warm-grey)">' + c.pct.toFixed(1) + '%</div></div>';
+          '<div style="width:50px;font-size:12px;text-align:right;color:var(--warm-grey)">' + (c.pct||0).toFixed(1) + '%</div></div>';
       }).join('');
       document.getElementById('confidence-bars').innerHTML = confHTML;
 
