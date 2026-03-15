@@ -9,7 +9,7 @@
 </head>
 <body>
 <script src="../nav.js?v=116"></script>
-<script src="ssi-metadata.js?v=6"></script>
+<script src="ssi-metadata.js?v=7"></script>
 <script src="../intelligence/intelligence-loader.js" data-country="japan"></script>
 <script>
 // Config-ready bridge: SSI_EDITION available for all inline scripts
@@ -518,19 +518,19 @@ if (window.SSI_METADATA) {
 
     // ── B.2 Economic Impact by Business Fabric ──
     // Tier by R3 (consequence multiplier) and E component
-    // R3 tiers: Capital-intensive (>= 0.99), Industrial (0.955-0.99), Commercial (0.92-0.955), Light/Rural (<0.92)
+    // Tiers from confidence_tier field (voltage-based classification in ssi-data.json)
     var tiers = [
       { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, large manufacturing — highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 0.99; }, color: '#941914', icon: '🏭',
+        filter: function(s){ return s.confidence_tier === 'Capital-Intensive'; }, color: '#941914', icon: '🏭',
         voll: '¥20–40/kWh' },
       { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, food processing — significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 0.955 && s.modifiers.R3_C_mult < 0.99; }, color: '#aa4234', icon: '🔧',
+        filter: function(s){ return s.confidence_tier === 'Industrial'; }, color: '#aa4234', icon: '🔧',
         voll: '¥10–20/kWh' },
       { label: 'Commercial / SME-Dense', desc: 'Service economy, retail, tourism — moderate individual impact but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 0.92 && s.modifiers.R3_C_mult < 0.955; }, color: '#b8863a', icon: '🏪',
+        filter: function(s){ return s.confidence_tier === 'Commercial'; }, color: '#b8863a', icon: '🏪',
         voll: '¥4–10/kWh' },
       { label: 'Light / Agricultural / Rural', desc: 'Sparse economic activity, agricultural land — lower VoLL but higher social vulnerability',
-        filter: function(s){ return s.modifiers.R3_C_mult < 0.92; }, color: '#5d8563', icon: '🌾',
+        filter: function(s){ return s.confidence_tier === 'Light'; }, color: '#5d8563', icon: '🌾',
         voll: '¥1–4/kWh' }
     ];
 
