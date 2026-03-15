@@ -757,9 +757,9 @@ document.addEventListener("ssi-config-ready", function(e) {
   var catIcons = { Grid: '⚡', Economic: '🏛️', 'Socio-Econ': '📊', Standards: '📐', Climate: '🌍', Infrastructure: '🗺️', Transition: '☀️', Hazard: '🌊', Environment: '🌡️' };
   var catColors = { Grid: '148,25,20', Economic: '184,134,58', 'Socio-Econ': '93,133,99', Standards: '170,66,52', Climate: '59,158,255', Infrastructure: '34,211,238', Transition: '255,140,66', Hazard: '255,140,66', Environment: '170,66,52' };
 
-  var freqColors = { Hourly: 'var(--sage)', Weekly: 'var(--sage)', Monthly: 'var(--sage)', Quarterly: 'var(--bronze)', Annual: 'var(--bronze)', Continuous: 'var(--sage)', Static: 'var(--warm-grey)', Derived: 'var(--warm-grey)' };
+  var freqOrder = { Hourly: 0, Weekly: 1, Monthly: 2, Quarterly: 3, Annual: 4, Static: 5, Derived: 6, Continuous: 2 }; var sorted = sources.slice().sort(function(a,b){ return (freqOrder[a.freq] || 9) - (freqOrder[b.freq] || 9); }); var freqColors = { Hourly: 'var(--sage)', Weekly: 'var(--sage)', Monthly: 'var(--sage)', Quarterly: 'var(--bronze)', Annual: 'var(--bronze)', Continuous: 'var(--sage)', Static: 'var(--warm-grey)', Derived: 'var(--warm-grey)' };
     var freqBgs = { Hourly: 'rgba(111,128,105,0.10)', Weekly: 'rgba(111,128,105,0.10)', Monthly: 'rgba(111,128,105,0.10)', Quarterly: 'rgba(166,142,111,0.10)', Annual: 'rgba(166,142,111,0.10)', Continuous: 'rgba(111,128,105,0.10)', Static: 'rgba(44,36,32,0.06)', Derived: 'rgba(44,36,32,0.06)' };
-    var srcHTML = sources.map(function(s, i){
+    var srcHTML = sorted.map(function(s, i){
     var fCol = freqColors[s.freq] || 'var(--warm-grey)';
     var fBg = freqBgs[s.freq] || 'rgba(44,36,32,0.06)';
     var border = i < sorted.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
