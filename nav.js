@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|italy|germany|switzerland|austria|france|spain|uk|us)\//);
+  var match = path.match(/\/(canada|italy|germany|switzerland|austria|france|spain|uk|us|japan)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|italy|germany|switzerland|austria|france|spain|uk|us)\//);
+  var match = path.match(/\/(canada|italy|germany|switzerland|austria|france|spain|uk|us|japan)\//);
   return match ? match[1] : null;
 })();
 
@@ -22,6 +22,7 @@ var SSI_COUNTRY_LABELS = {
   switzerland: '🇨🇭 Switzerland',
   austria: '🇦🇹 Austria',
   france: '🇫🇷 France',
+    japan: '🇯🇵 Japan',
   spain: '🇪🇸 Spain',
   uk: '🇬🇧 United Kingdom',
   us: '🇺🇸 United States',
@@ -199,6 +200,7 @@ function renderFooter() {
     germany: '95 variables · 35 sources · 401 Kreise across 16 Bundesländer',
     austria: '95 variables · 35 sources · 1,406 substations (1,144 HV · 262 MV) across 9 Bundesländer',
     switzerland: '95 variables · 25 sources · 947 substations (147 HV · 776 MV) across 26 Cantons',
+    japan: '95 variables \u00b7 30+ sources \u00b7 5,981 substations (299 EHV \u00b7 5,682 HV) across 10 EPCO territories',
     france: '95 variables · 35 sources · 7,898 substations (996 HV · 6,902 MV) across 13 Régions',
     spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas',
     us: '95 variables · 40 sources · 45,003 substations (1,726 HV · 36,654 MV) across 52 states'
