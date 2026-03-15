@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="description" content="SSI v4.0.2 methodology â master equation, 6 components, 5 modifiers, 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Methodology</title>
+<title>SSI Index â Methodology</title>
 <link rel="stylesheet" href="../style.css?v=3">
 </head>
 <body>
 <script src="../nav.js?v=116"></script>
 <script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js?v=3"></script>
+<script src="ssi-metadata.js?v=4"></script>
 <script>renderNav('methodology');</script>
 
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
     <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+    <p>How the SSI v4.0.2 is calculated â from raw data to final classification. Open methodology, open data, fully reproducible.</p>
   </div>
 
   <!-- Thesis -->
   <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
     <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
     <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A prefecture serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+      Power grid resilience is inseparable from its socio-economic context. A prefecture serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data â all from public sources.
     </p>
   </div>
 
@@ -35,7 +35,7 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 30+ verified public data sources — METI (SAIDI/SAIFI), OCCTO Open Data, OCCTO Grid Monitor, Statistics Japan (e-Stat), JMA (Japan Meteorological Agency), METI ANRE/GSC, METI ANRE, Copernicus CDS, OpenStreetMap, GSI (Geospatial Information Authority), NIED, J-SHIS, Prefectural Regulator, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
+        <p>95 variables from 30+ verified public data sources â METI (SAIDI/SAIFI), OCCTO Open Data, OCCTO Grid Monitor, Statistics Japan (e-Stat), JMA (Japan Meteorological Agency), METI ANRE/GSC, METI ANRE, Copernicus CDS, OpenStreetMap, GSI (Geospatial Information Authority), NIED, J-SHIS, Prefectural Regulator, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
       </div>
     </div>
     <div class="method-step">
@@ -70,14 +70,14 @@
       <div class="method-step-num">6</div>
       <div class="method-step-content">
         <h3>Monte Carlo</h3>
-        <p>10,000 iterations per prefecture using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each prefecture.</p>
+        <p>10,000 iterations per prefecture using a 20Ã20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each prefecture.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">7</div>
       <div class="method-step-content">
         <h3>Classify</h3>
-        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+        <p>Four bands: Low (0.00â0.25), Medium (0.25â0.50), High (0.50â0.75), Critical (0.75â1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
       </div>
     </div>
   </div>
@@ -89,22 +89,22 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base Ã F_topo Ã C_mult Ã R6a_mult Ã R6b_net Ã Cyber_factor )
 
-<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>Â·C + <span class="hl-num">0.10</span>Â·V + <span class="hl-num">0.25</span>Â·I + <span class="hl-num">0.10</span>Â·E + <span class="hl-num">0.20</span>Â·S + <span class="hl-num">0.05</span>Â·T
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
-<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">mic_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 â [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 â [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a â [0.90, 1.10]</span>
+<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b â [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">mic_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 â [0.99, 1.05]</span>
     </div>
   </div>
 
   <!-- Components -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>6 Components · 20 Metrics</h3>
+      <h3>6 Components Â· 20 Metrics</h3>
     </div>
     <table class="data-table">
       <thead>
@@ -119,37 +119,37 @@
         <tr>
           <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
           <td class="num">0.30</td>
-          <td>4 — Duration, Count, MT exceed, Planned</td>
+          <td>4 â Duration, Count, MT exceed, Planned</td>
           <td>Outage frequency and duration</td>
         </tr>
         <tr>
           <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
           <td class="num">0.10</td>
-          <td>1 — Severity-weighted dips</td>
+          <td>1 â Severity-weighted dips</td>
           <td>Power quality events</td>
         </tr>
         <tr>
           <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
           <td class="num">0.25</td>
-          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
+          <td>9 â Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
           <td>Physical asset condition & environment</td>
         </tr>
         <tr>
           <td><strong style="color:#3b9eff">E</strong> Economic</td>
           <td class="num">0.10</td>
-          <td>2 — Regulatory penalties, productivity loss</td>
+          <td>2 â Regulatory penalties, productivity loss</td>
           <td>Economic impact of interruptions</td>
         </tr>
         <tr>
           <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
           <td class="num">0.20</td>
-          <td>3 — Regional KPI, reverse power flow, criticality class</td>
+          <td>3 â Regional KPI, reverse power flow, criticality class</td>
           <td>Grid capacity utilisation</td>
         </tr>
         <tr>
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
-          <td>1 — DER Stress Index (DER penetration + variability + EV load)</td>
+          <td>1 â DER Stress Index (DER penetration + variability + EV load)</td>
           <td>Energy transition exposure</td>
         </tr>
       </tbody>
@@ -159,7 +159,7 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
+      <h3>Modifiers R2âR7 (incl. R6a + R6b)</h3>
       <span class="label-xs">Context multipliers</span>
     </div>
     <table class="data-table">
@@ -215,22 +215,22 @@
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 â 0.25</div>
         <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 â 0.50</div>
         <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 â 0.75</div>
         <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 â 1.00</div>
         <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
       </div>
     </div>
@@ -243,7 +243,7 @@
       <span class="label-xs">Monte Carlo engine</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every prefecture score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+      Every prefecture score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20Ã20 Gaussian copula to preserve empirical correlations between metrics (e.g., Ï(C1, E1) â 0.70â0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
     </p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
@@ -251,7 +251,7 @@
         <div style="font-size:11px;color:var(--warm-grey)">MC iterations per prefecture</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20Ã20</div>
         <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
@@ -275,7 +275,7 @@
   <!-- Data Layers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Data Layers — 95 Variables</h3>
+      <h3>Data Layers â 95 Variables</h3>
       <span class="label-xs">11 layers</span>
     </div>
     <table class="data-table" id="method-layers">
@@ -311,7 +311,7 @@
   <!-- Changelog -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>v3.4 → v4.0.2 Changelog</h3>
+      <h3>v3.4 â v4.0.2 Changelog</h3>
     </div>
     <table class="data-table" id="method-changelog">
       <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
@@ -339,9 +339,9 @@
   // Detailed metrics per component
   const detailEl = document.getElementById('method-metrics-detail');
   if (detailEl) {
-    let html = '<div class="card-header"><h3>Metric Detail — 20 Metrics</h3></div>';
+    let html = '<div class="card-header"><h3>Metric Detail â 20 Metrics</h3></div>';
     M.COMPONENTS.forEach(comp => {
-      html += '<div style="margin:16px 0 8px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + comp.color + ';margin-right:6px"></span><strong style="color:' + comp.color + '">' + comp.id + '</strong> ' + comp.name + ' — <strong>' + comp.weight.toFixed(2) + '</strong>';
+      html += '<div style="margin:16px 0 8px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + comp.color + ';margin-right:6px"></span><strong style="color:' + comp.color + '">' + comp.id + '</strong> ' + comp.name + ' â <strong>' + comp.weight.toFixed(2) + '</strong>';
       if (comp.isNew) html += ' <span style="font-size:10px;color:#0e7490;background:#e0f7fa;padding:1px 6px;border-radius:2px;font-weight:600">NEW v4.0</span>';
       html += '</div>';
       html += '<table class="data-table" style="margin-bottom:12px"><thead><tr><th>Metric</th><th style="text-align:right">Intra</th><th style="text-align:right">Global</th><th>Norm</th><th>Source</th></tr></thead><tbody>';
@@ -349,7 +349,7 @@
         html += '<tr' + (m.isNew ? ' style="background:#e0f7fa11"' : '') + '>';
         html += '<td><strong>' + m.id + '</strong> ' + m.name;
         if (m.isNew) html += ' <span style="font-size:9px;color:#0e7490;font-weight:600">NEW</span>';
-        if (m.inverted) html += ' <span style="font-size:9px;color:var(--sage);font-weight:600">↓INV</span>';
+        if (m.inverted) html += ' <span style="font-size:9px;color:var(--sage);font-weight:600">âINV</span>';
         if (m.adaptive) html += ' <span style="font-size:9px;color:var(--terracotta);font-weight:600">R2</span>';
         html += '</td>';
         html += '<td class="num">' + m.intra.toFixed(m.intra < 0.1 ? 3 : 2) + '</td>';
@@ -368,7 +368,7 @@
   if (normEl) {
     normEl.innerHTML = M.NORM_METHODS.map(n =>
       '<div style="margin-bottom:12px;padding:12px 16px;background:var(--cream);border-radius:var(--radius-sm);border-left:2px solid var(--terracotta)">' +
-      '<div style="font-weight:600;font-size:13px;margin-bottom:4px">Method ' + n.id + ' — ' + n.name + '</div>' +
+      '<div style="font-weight:600;font-size:13px;margin-bottom:4px">Method ' + n.id + ' â ' + n.name + '</div>' +
       '<div class="formula-block" style="margin:8px 0;padding:8px 12px;font-size:12px">' + n.formula + '</div>' +
       '<div style="font-size:11px;color:var(--warm-grey)">Applies to: ' + n.applies + '</div>' +
       '</div>'
@@ -394,7 +394,7 @@
   if (srcTbody) {
     srcTbody.innerHTML = M.DATA_SOURCES.map(s =>
       '<tr><td style="font-size:12px"><strong>' + s.name + '</strong>' +
-      (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">⚠ registration</span>' : '') +
+      (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">â  registration</span>' : '') +
       '</td><td style="font-size:11px">' + s.category + '</td>' +
       '<td style="font-size:11px">' + s.freq + '</td>' +
       '<td style="font-size:11px">' + s.res + '</td>' +
@@ -408,7 +408,7 @@
   const valCount = document.getElementById('method-val-count');
   if (valTbody) {
     valTbody.innerHTML = M.VALIDATION_CHECKS.map(v => {
-      const statusIcon = v.status === 'verified' ? '✓' : v.status === 'expected' ? '✓ expected' : '⏳ new';
+      const statusIcon = v.status === 'verified' ? 'â' : v.status === 'expected' ? 'â expected' : 'â³ new';
       const statusColor = v.status === 'verified' ? 'var(--sage)' : v.status === 'expected' ? 'var(--sage)' : '#0e7490';
       return '<tr' + (v.isNew ? ' style="background:#e0f7fa11"' : '') + '>' +
         '<td style="font-weight:500">' + v.check + '</td>' +
