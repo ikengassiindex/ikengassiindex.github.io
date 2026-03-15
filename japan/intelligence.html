@@ -53,7 +53,7 @@ if (window.SSI_METADATA) {
     <a href="#cyber-econ" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">B</span> Cyber &amp; Economic Exposure Monitor</a>
     <a href="#data" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">C</span> Data Refresh &amp; Changelog</a>
     <a href="#deep" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">D</span> Deep-Dive: The Osaka–Aichi Corridor</a>
-    <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> North American Context Card</a>
+    <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> International Peer Benchmarking Card</a>
     <a href="#enn" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F</span> SSI Enhanced Neural Network</a>
     <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">G</span> Looking Ahead</a>
   </div>
@@ -301,7 +301,7 @@ if (window.SSI_METADATA) {
 <h2>Cyber &amp; Economic Exposure Monitor</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that Japan Numérique / Japan 2030 digitalisation planning requires.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that Society 5.0 / Japan 2030 digitalisation planning requires.</p>
 </div>
 
 <!-- B.1 KPI boxes -->
@@ -357,7 +357,7 @@ if (window.SSI_METADATA) {
 
 <!-- B.3 Prefecture Digital Readiness Heatmap -->
 <h3>B.3 &ensp; Prefecture Digital Readiness Ranking</h3>
-<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Prefectures ranked by average R7 modifier — lower values indicate weaker digital infrastructure (DESI sub-dimensions). Cross-referenced with average R_median to identify prefectures combining digital exposure with high grid stress.</p>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Prefectures ranked by average R7 modifier — lower values indicate weaker digital infrastructure (MIC digital infrastructure sub-dimensions). Cross-referenced with average R_median to identify prefectures combining digital exposure with high grid stress.</p>
 
 <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
   <canvas id="b3-map" style="flex:1;min-width:260px;height:300px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff"></canvas>
@@ -695,14 +695,14 @@ if (window.SSI_METADATA) {
     var bestProv = provList[provList.length - 1];
     var dualExposed = provList.filter(function(pv){ return pv.avgR7 < medianR7 && pv.avgR > medianR; });
     document.getElementById('b3-narrative').innerHTML =
-      'Prefecture-level analysis reveals a clear digital divide mirroring the broader DESI pattern. ' +
+      'Prefecture-level analysis reveals a clear digital divide mirroring the broader digital divide pattern. ' +
       '<strong>' + worstProv.name + '</strong> has the lowest average R7 (' + worstProv.avgR7.toFixed(4) + '), while ' +
       '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
       (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
       '<strong>' + dualExposed.length + ' prefectures</strong> combine below-median digital readiness with above-median grid risk, ' +
-      'making them priority targets for Japan 2030 / Japan CIB / IRP digitalisation investment. ' +
-      'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open DESI data — ' +
-      'as NIS2 compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
+      'making them priority targets for Japan 2030 / OCCTO / OCCTO digitalisation investment. ' +
+      'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open MIC/METI digital data — ' +
+      'as Cybersecurity Basic Act compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
 
     // ── B.4 Monthly Pulse ──
     var highRiskLowDigital = fleet.filter(function(s){
@@ -719,9 +719,9 @@ if (window.SSI_METADATA) {
       cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
       blindSpots.length + ' blind-spot substations (High/Critical risk + below-median R7); ' +
       highRiskLowDigital + ' Critical-band substations with below-median digital readiness. ' +
-      'Future editions will track deltas against this baseline, flagging prefectures where DESI improvements ' +
+      'Future editions will track deltas against this baseline, flagging prefectures where digital infrastructure improvements ' +
       '(broadband rollout, smart meter deployment, OT upgrades) translate into measurable R7 shifts. ' +
-      'The next material R7 update is expected when Eurostat publishes the 2025 DESI sub-indices (anticipated Q3 2026).';
+      'The next material R7 update is expected when MIC publishes the 2025 MIC digital infrastructure indices (anticipated Q3 2026).';
   });
 })();
 </script>
@@ -964,7 +964,7 @@ if (window.SSI_METADATA) {
 <h2>The Osaka–Aichi Corridor: Where Hydroelectric Dominance Meets Grid Modernization</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Osaka–Aichi corridor · <strong>002</strong> DER saturation hotspots (Tokyo/Fukuoka) · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> Metropolitan-Rural economic impact disparity · <strong>005</strong> Nuclear fleet dependency and transition risk · <strong>006</strong> Infrastructure age vs smart meter rollout · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> Prefecture Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> North American replication feasibility · <strong>012</strong> Year in review.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Osaka–Aichi corridor · <strong>002</strong> DER saturation hotspots (Tokyo/Fukuoka) · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> Metropolitan-Rural economic impact disparity · <strong>005</strong> Nuclear fleet dependency and transition risk · <strong>006</strong> Infrastructure age vs smart meter rollout · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> Prefecture Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> Asia-Pacific replication feasibility · <strong>012</strong> Year in review.</p>
 </div>
 
 <!-- D.1 KPI summary — auto-populated -->
@@ -1299,7 +1299,7 @@ if (window.SSI_METADATA) {
     var pugAbove065 = puglia.filter(function(s){ return s.R_median >= 0.65; }).length;
     document.getElementById('pug-narrative-d5').innerHTML =
       '<strong>' + pugAbove065 + ' Osaka–Aichi substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
-      'For IRP (Integrated Resource Planning) investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
+      'For OCCTO (Integrated Resource Planning) investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
       'where DER deployment is accelerating against ageing infrastructure with above-average continuity deficits and significant socio-economic exposure. ' +
       'The SSI\'s silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only because of their engineering condition, ' +
       'but because the communities they serve — characterised by service-economy dependence, tourism exposure, and above-average energy poverty — are disproportionately ' +
@@ -1312,20 +1312,20 @@ if (window.SSI_METADATA) {
 <div style="margin:32px 0"></div>
 
 
-<!-- ═══════════════════ E. NORTH AMERICAN CONTEXT CARD ═══════════════════ -->
+<!-- ═══════════════════ E. INTERNATIONAL PEER BENCHMARKING CARD ═══════════════════ -->
 <section id="eu" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section E — Recurring Module</span>
-<h2>North American Context Card</h2>
+<h2>International Peer Benchmarking Card</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one North American Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Osaka–Aichi corridor analysis hinges on Japan's continuity performance relative to international peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs US (003), CMIP6 climate hazard vs Northern US peers (004), etc. The underlying data updates annually with the OCCTO Benchmarking Report release.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one International Peer Benchmarking Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Osaka–Aichi corridor analysis hinges on Japan's continuity performance relative to international peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Asia-Pacific (003), CMIP6 climate hazard vs East Asian peers (004), etc. The underlying data updates annually with the OCCTO Benchmarking Report release.</p>
 </div>
 
 <!-- THE CARD ITSELF -->
 <div class="card" style="border-top:3px solid var(--terracotta);margin:20px 0">
   <div style="padding:0;margin:-20px -24px 16px;padding:12px 24px;background:var(--cream-deep);border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px">
     <span style="font-size:16px">🇪🇺</span>
-    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">North American Context Card — SAIDI Benchmarking</span>
+    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">International Peer Benchmarking Card — SAIDI Benchmarking</span>
     <span style="font-size:10px;color:var(--warm-grey)">Ed. 001 · April 2026</span>
   </div>
 
@@ -1425,9 +1425,9 @@ if (window.SSI_METADATA) {
 </div>
 
 <!-- Key insight + regional ranking — auto-populated -->
-<p style="font-size:13px;line-height:1.7" id="eu-insight">Loading North American context insight…</p>
+<p style="font-size:13px;line-height:1.7" id="eu-insight">Loading International Peer context insight…</p>
 
-<h3 style="margin-top:20px">Regional Risk Ranking — All 13 Japanese Prefectures</h3>
+<h3 style="margin-top:20px">Regional Risk Ranking — All 10 EPCO Regions</h3>
 <p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does the Osaka–Aichi sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison.</p>
 
 <div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
@@ -1523,7 +1523,7 @@ if (window.SSI_METADATA) {
       aboveAvg + ' of 47 prefectures score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
       'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DSO or national statistics — ' +
       'reveals the true spatial distribution of grid stress across Japan. ' +
-      'It is precisely this substation-level granularity that positions the SSI as a tool for IRP / Japan 2030 / Japan CIB investment prioritisation: ' +
+      'It is precisely this substation-level granularity that positions the SSI as a tool for OCCTO / Japan 2030 / OCCTO investment prioritisation: ' +
       'not treating entire prefectures as monoliths, but identifying the specific corridors within each that demand attention.';
   });
 })();
@@ -1577,7 +1577,7 @@ if (window.SSI_METADATA) {
       ssiLink: 'valuation' },
     { layer: 2, ref: '§0.4.2', title: 'Community Value Stack (W1–W5)',
       subtitle: 'Social and economic value to the local community — the case for public-interest investment',
-      body: 'While the TEPCO/OCCTO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, Japan 2030 / Japan CIB / IRP allocators, and federal infrastructure fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per METI CBA guidance), not the TEPCO/OCCTO WACC.',
+      body: 'While the TEPCO/OCCTO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, Japan 2030 / OCCTO / OCCTO allocators, and federal infrastructure fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per METI CBA guidance), not the TEPCO/OCCTO WACC.',
       concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0% (METI CBA guidance)'],
       ssiLink: 'community' },
     { layer: 2, ref: '§0.4.5', title: 'Real Options Pricing Framework',
@@ -1587,7 +1587,7 @@ if (window.SSI_METADATA) {
       ssiLink: 'options' },
     { layer: 2, ref: '§0.4.4', title: 'Revenue Stack & Dispatch Optimisation',
       subtitle: 'Up to 11 revenue streams from a single battery — subject to one physical constraint',
-      body: 'A grid-connected BESS generates revenue from up to 11 streams (R1–R11), but is physically constrained to one full charge-discharge cycle per day. The dispatch optimiser allocates this single cycle across competing revenue opportunities: energy arbitrage (R1), frequency containment reserve (R2), automatic frequency restoration (R3), replacement reserve (R4), capacity market (R5), reactive power (R6), peak shaving (R7), backup power (R8), and three emerging streams — locational marginal pricing (R9), power quality as a service (R10), and carbon reduction services (R11). The optimiser is location-specific because the SSI data determines which streams are most valuable at each substation: a substation with high S (Saturation) generates more R7 peak-shaving value, while one with high C (Continuity) deficit generates more R2/R3 frequency reserve value. The revenue stack varies by country — the model accommodates all North American market designs.',
+      body: 'A grid-connected BESS generates revenue from up to 11 streams (R1–R11), but is physically constrained to one full charge-discharge cycle per day. The dispatch optimiser allocates this single cycle across competing revenue opportunities: energy arbitrage (R1), frequency containment reserve (R2), automatic frequency restoration (R3), replacement reserve (R4), capacity market (R5), reactive power (R6), peak shaving (R7), backup power (R8), and three emerging streams — locational marginal pricing (R9), power quality as a service (R10), and carbon reduction services (R11). The optimiser is location-specific because the SSI data determines which streams are most valuable at each substation: a substation with high S (Saturation) generates more R7 peak-shaving value, while one with high C (Continuity) deficit generates more R2/R3 frequency reserve value. The revenue stack varies by country — the model accommodates all International Peer market designs.',
       concepts: ['11 revenue streams (R1–R11), 1-cycle/day constraint', 'Location-specific optimisation from SSI component data', 'R9–R11: Emerging streams modelled as forward-looking options', 'Country-adaptive market design accommodation'],
       ssiLink: 'revenue' },
     { layer: 3, ref: '§0.5.2', title: 'Neural Network — Ensemble Architecture',
@@ -1622,7 +1622,7 @@ if (window.SSI_METADATA) {
       ssiLink: 'dci' },
     { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
       subtitle: 'Adapting the SSI model across different national grid characteristics',
-      body: 'The SSI v4.0 architecture was designed to be transferable across North American grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., METI/OSM for Japan, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Japanese data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
+      body: 'The SSI v4.0 architecture was designed to be transferable across International Peer grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., METI/OSM for Japan, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Japanese data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
       concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'METI/OSM (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
       ssiLink: 'transfer-protocol' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
@@ -1647,7 +1647,7 @@ if (window.SSI_METADATA) {
       ssiLink: 'tco' },
     { layer: 1, ref: '§0.3.2', title: 'Sub-Metric Definitions — Replicability Standard',
       subtitle: 'Every sub-metric defined with sufficient precision for independent replication',
-      body: 'Each of the SSI\'s 20 sub-metrics is defined with sufficient precision for independent replication — a core requirement for academic credibility and regulatory acceptance. Take C1 (SAIDI proxy): it combines METI\'s SAIDI/SAIFI territorial quality classification with Eurostat unplanned SAIDI benchmarks, normalised against EU-wide reference distributions. Or I5 (Infrastructure Age): it uses a 4-state Markov degradation chain (Good → Acceptable → Degraded → Critical) calibrated to typical Japanese transformer lifespans, producing a stationary distribution that captures the long-term maintenance state. Each definition specifies: the mathematical formula, the data source and update frequency, the normalisation method, the relationship to upstream inputs, and the downstream components it feeds. This specification enables three things: peer review (academics can verify the calculations), regulatory audit (METI can confirm the data interpretation), and international transfer (the Layer 4 expansion protocol needs clear definitions to find country-equivalents).',
+      body: 'Each of the SSI\'s 20 sub-metrics is defined with sufficient precision for independent replication — a core requirement for academic credibility and regulatory acceptance. Take C1 (SAIDI proxy): it combines METI\'s SAIDI/SAIFI territorial quality classification with MIC Statistics Bureau unplanned SAIDI benchmarks, normalised against EU-wide reference distributions. Or I5 (Infrastructure Age): it uses a 4-state Markov degradation chain (Good → Acceptable → Degraded → Critical) calibrated to typical Japanese transformer lifespans, producing a stationary distribution that captures the long-term maintenance state. Each definition specifies: the mathematical formula, the data source and update frequency, the normalisation method, the relationship to upstream inputs, and the downstream components it feeds. This specification enables three things: peer review (academics can verify the calculations), regulatory audit (METI can confirm the data interpretation), and international transfer (the Layer 4 expansion protocol needs clear definitions to find country-equivalents).',
       concepts: ['20 sub-metrics, each formally defined for replication', 'C1: SAIDI proxy from METI SAIDI/SAIFI territorial classification', 'I5: 4-state Markov degradation chain (3.4M operations)', 'Enables peer review, regulatory audit, and international transfer'],
       ssiLink: 'sub-metrics' },
     { layer: 5, ref: '§0.7.2', title: 'API & Computation Architecture',
@@ -1873,7 +1873,7 @@ if (window.SSI_METADATA) {
     '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
     '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
     'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, prefecture breakdown. ' +
-    'North American Context Card: ' + nextDive.contextDetail + '.</p>';
+    'International Peer Benchmarking Card: ' + nextDive.contextDetail + '.</p>';
 
   // ── Card 2: Next Data Refresh — from SSIMetadata ──
   var meta = window.SSIMetadata;
