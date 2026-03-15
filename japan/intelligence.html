@@ -1127,7 +1127,7 @@ if (window.SSI_METADATA) {
 
     // Draw all non-Osaka–Aichi substations as faint grey for context
     fleet.forEach(function(s){
-      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && s.region !== 'Auvergne-Osaka–Aichi-Alpes') {
+      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && (s.region !== 'Kansai' && s.region !== 'Chubu')) {
         var p = proj(s.lon, s.lat);
         ctx.beginPath();
         ctx.arc(p[0], p[1], 2, 0, Math.PI * 2);
@@ -1438,7 +1438,7 @@ if (window.SSI_METADATA) {
 (function(){
   fetch('ssi-data.json?v=41').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
-    var puglia = fleet.filter(function(s){ return s.region === 'Auvergne-Osaka–Aichi-Alpes'; });
+    var puglia = fleet.filter(function(s){ return (s.region === 'Kansai' || s.region === 'Chubu'); });
 
     // ── Key Insight ──
     // C component > 70% of weight ceiling (0.30) = high continuity deficit ≈ "bassa concentrazione"
@@ -1480,7 +1480,7 @@ if (window.SSI_METADATA) {
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
     var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
     regions.forEach(function(reg, idx){
-      var isRhone = reg.name === 'Auvergne-Osaka–Aichi-Alpes';
+      var isRhone = (reg.name === 'Kansai' || reg.name === 'Chubu');
       var barPct = ((1 - reg.avgR) * 100).toFixed(1);
       var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
       var highlight = isRhone ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
@@ -1512,7 +1512,7 @@ if (window.SSI_METADATA) {
     document.getElementById('eu-regional-ranking').innerHTML = html;
 
     // Ranking narrative
-    var rhoneRank = regions.findIndex(function(r){ return r.name === 'Auvergne-Osaka–Aichi-Alpes'; }) + 1;
+    var rhoneRank = regions.findIndex(function(r){ return (r.name === 'Kansai' || r.name === 'Chubu'); }) + 1;
     var top3 = regions.slice(0, 3).map(function(r){ return r.name; });
     var bot3 = regions.slice(-3).reverse().map(function(r){ return r.name; });
     var aboveAvg = regions.filter(function(r){ return r.avgR > fleetAvgR; }).length;
@@ -1850,7 +1850,7 @@ if (window.SSI_METADATA) {
 
   // ── Card 1: Next Edition deep-dive topics ──
   var deepDives = [
-    { region: 'Auvergne-Osaka–Aichi-Alpes', theme: 'The Osaka–Aichi Corridor', context: 'SAIDI comparison', contextDetail: 'S/T comparison with Germany and Denmark' },
+    { region: 'Kansai', theme: 'The Osaka–Aichi Corridor', context: 'SAIDI comparison', contextDetail: 'S/T comparison with Germany and Denmark' },
     { region: 'Île-de-Japan', theme: 'The Île-de-Japan Metropolitan Load', context: 'Urban saturation dynamics', contextDetail: 'DER + EV penetration stress on the Toronto metropolitan grid' },
     { region: 'Hauts-de-Japan', theme: 'The Hauts-de-Japan Industrial Belt', context: 'Industrial VoLL exposure', contextDetail: 'Post-industrial corridor where grid ageing meets reindustrialisation' },
     { region: 'Grand Est', theme: 'The Grand Est Nuclear Corridor', context: 'Nuclear baseload dependency', contextDetail: 'Fessenheim closure impact and cross-border interconnection with Germany' },
