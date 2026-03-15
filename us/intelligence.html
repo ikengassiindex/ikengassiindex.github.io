@@ -1178,7 +1178,17 @@ function adaptCompact(data) {
     ctx.font = '600 11px DM Sans, sans-serif';
     ctx.fillStyle = 'rgba(44,36,32,0.5)';
     ctx.textAlign = 'center';
-    provAvgs.forEach(function(pv){  // county iteration
+
+            var provSums = {}, provCounts = {};
+            puglia.forEach(function(s){
+              var p = s.county || 'Unknown';
+              if(!provSums[p]) { provSums[p] = 0; provCounts[p] = 0; }
+              provSums[p] += s.R_median;
+              provCounts[p]++;
+            });
+            var provAvgs = Object.keys(provSums).map(function(p){ return { name: p, avg: provSums[p]/provCounts[p], n: provCounts[p] }; });
+            provAvgs.sort(function(a,b){ return b.avg - a.avg; });
+                provAvgs.forEach(function(pv){  // county iteration
       var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var avgLon = provSubs.reduce(function(a,s){ return a + s.lon; }, 0) / provSubs.length;
       var avgLat = provSubs.reduce(function(a,s){ return a + s.lat; }, 0) / provSubs.length;
