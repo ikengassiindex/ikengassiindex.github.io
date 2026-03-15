@@ -110,7 +110,7 @@
           <td>Grid Telemetry: Proxy</td>
           <td class="num">4</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">IEEE C57.91 · OCCTO · TIQE</td>
+          <td style="font-size:12px">IEEE C57.91 · OCCTO · SAIDI/SAIFI</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:var(--sage)">B.3</td>
@@ -131,14 +131,14 @@
           <td>Environmental Hazards</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">EEA · NRCan/GSC · Copernicus · Cerema</td>
+          <td style="font-size:12px">EEA · METI ANRE/GSC · Copernicus · Cerema</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#3b9eff">E</td>
           <td>Japanese Open Data</td>
           <td class="num">8</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">NRCan · CSE · Cerema · Provincial Regulator</td>
+          <td style="font-size:12px">METI ANRE · CSE · Cerema · Prefectural Regulator</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:var(--sage)">F</td>
@@ -152,14 +152,14 @@
           <td>Modifier Inputs</td>
           <td class="num">3</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">METI TIQE · OSM Power · JRC DSO</td>
+          <td style="font-size:12px">METI SAIDI/SAIFI · OSM Power · JRC DSO</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#e67e22">H</td>
           <td>Network & Topology</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">OCCTO Data · NRCan/GSC · OSM</td>
+          <td style="font-size:12px">OCCTO Data · METI ANRE/GSC · OSM</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#8e44ad">I</td>
@@ -473,7 +473,7 @@ fetch('ssi-data.json?v=41').then(function(r) { return r.json(); }).then(function
         { title: 'Modifier Functions', text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence prefectures\nR4 — Graph criticality: betweenness centrality & bridge status from network topology\nR6a — Restoration speed: DSO historical MTTR or Bayesian estimate\nR6b — Network topology: Centrality and ring topology from physical network analysis\nR7 — Digital readiness: DESI digital index & smart meter penetration proxy' },
         { title: 'Monte Carlo Uncertainty', text: '1,000 iterations per prefecture (browser mode)\nEach metric perturbed ± based on confidence tier:\n  Tier A (measured): σ = 5%\n  Tier B (proxy): σ = 12%\n  Tier C (fuzzy): σ = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
         { title: 'Classification Bands', text: 'LOW risk: R_median < 0.35\nMEDIUM-LOW: 0.35 ≤ R < 0.45\nMEDIUM: 0.45 ≤ R < 0.55\nMEDIUM-HIGH: 0.55 ≤ R < 0.65\nHIGH risk: R_median ≥ 0.65' },
-        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, METI monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): floods, landslides, corrosion, wildfire\nE — Japanese Open Data (8 vars): NRCan, CSE, Cerema, Provincial Regulator public indicators\nF — Network Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): METI quality, topology, JRC DSO data\nH — Network & Topology (7 vars): OCCTO data, NRCan/GSC, ring analysis\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities' },
+        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, METI monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): floods, landslides, corrosion, wildfire\nE — Japanese Open Data (8 vars): METI ANRE, CSE, Cerema, Prefectural Regulator public indicators\nF — Network Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): METI quality, topology, JRC DSO data\nH — Network & Topology (7 vars): OCCTO data, METI ANRE/GSC, ring analysis\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities' },
         { title: 'Normalisation', text: 'All metrics normalised to [0, 1] using min-max scaling across the fleet.\nHigher score = higher risk. Inverted metrics (where high raw value = low risk) are flipped: x_norm = 1 - (x - min) / (max - min).' }
       ];
 
