@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Compare Japanese prefectures by SSI resilience score, component breakdown, and socio-economic context.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index â Regional Analysis</title>
+<title>SSI Index Ã¢ÂÂ Regional Analysis</title>
 <link rel="stylesheet" href="../style.css?v=3">
 </head>
 <body>
 <script src="../nav.js?v=116"></script>
 <script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js?v=3"></script>
+<script src="ssi-metadata.js?v=4"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
@@ -32,7 +32,7 @@
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
         <h3>EPCO Regions Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">10 EPCO Regions Â· sorted worst â best</span>
+        <span class="label-xs" id="ranking-count">10 EPCO Regions ÃÂ· sorted worst Ã¢ÂÂ best</span>
       </div>
       <table class="data-table">
         <thead>
@@ -47,7 +47,7 @@
           </tr>
         </thead>
         <tbody id="ranking-tbody">
-          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading dataâ¦</td></tr>
+          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading dataÃ¢ÂÂ¦</td></tr>
         </tbody>
       </table>
     </div>
@@ -73,7 +73,7 @@
         <!-- Comparison Table -->
         <table class="data-table" id="compare-table">
           <thead>
-            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">â</th><th style="text-align:right" id="th-prov-b">â</th><th style="text-align:right">Delta</th></tr>
+            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">Ã¢ÂÂ</th><th style="text-align:right" id="th-prov-b">Ã¢ÂÂ</th><th style="text-align:right">Delta</th></tr>
           </thead>
           <tbody id="compare-tbody">
             <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select prefectures above</td></tr>
@@ -99,10 +99,10 @@
     <div class="card animate-in">
       <div class="card-header">
         <h3>Average Component Contribution by EPCO Region</h3>
-        <span class="label-xs">Stacked horizontal bars Â· 47 EPCO Regions</span>
+        <span class="label-xs">Stacked horizontal bars ÃÂ· 47 EPCO Regions</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
-        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading dataâ¦</div>
+        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading dataÃ¢ÂÂ¦</div>
       </div>
       <div style="display:flex;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:11px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--crimson);border-radius:2px"></div>C Continuity</div>
@@ -129,7 +129,7 @@ function switchTab(btn, tabId) {
   document.getElementById(tabId).style.display = 'block';
 }
 
-// ââ Color helpers ââ
+// Ã¢ÂÂÃ¢ÂÂ Color helpers Ã¢ÂÂÃ¢ÂÂ
 function scoreColor(val) {
   if (val >= 0.75) return 'var(--crimson)';
   if (val >= 0.50) return 'var(--terracotta)';
@@ -146,11 +146,11 @@ function deltaColor(d) {
 function fmt(v, dp) { return v.toFixed(dp === undefined ? 3 : dp); }
 function pct(v) { return v.toFixed(1) + '%'; }
 
-// ââ Tab 1: Regional Ranking ââ
+// Ã¢ÂÂÃ¢ÂÂ Tab 1: Regional Ranking Ã¢ÂÂÃ¢ÂÂ
 function renderRanking(data) {
   var regions = (Array.isArray(data.regions) ? data.regions : Object.values(data.regions)).slice().sort(function(a, b) { return b.median_R - a.median_R; });
   var tbody = document.getElementById('ranking-tbody');
-  document.getElementById('ranking-count').textContent = regions.length + ' EPCO Regions Â· sorted worst â best';
+  document.getElementById('ranking-count').textContent = regions.length + ' EPCO Regions ÃÂ· sorted worst Ã¢ÂÂ best';
 
   tbody.innerHTML = regions.map(function(r, i) {
     var total = r.count;
@@ -174,7 +174,7 @@ function renderRanking(data) {
   }).join('');
 }
 
-// ââ Tab 2: Prefecture Comparison ââ
+// Ã¢ÂÂÃ¢ÂÂ Tab 2: Prefecture Comparison Ã¢ÂÂÃ¢ÂÂ
 function buildPrefectureData(data) {
   var map = {};
   data.substations.forEach(function(s) {
@@ -280,7 +280,7 @@ function updateComparison() {
   drawRadar(a, b, nameA, nameB);
 }
 
-// ââ SVG Radar Chart ââ
+// Ã¢ÂÂÃ¢ÂÂ SVG Radar Chart Ã¢ÂÂÃ¢ÂÂ
 function drawRadar(a, b, nameA, nameB) {
   var svg = document.getElementById('radar-svg');
   var cx = 140, cy = 120, R = 100;
@@ -347,7 +347,7 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--warm-grey)" font-family="DM Sans" font-weight="500">' + labels[i] + '</text>';
   });
 
-  // Scale labels â center = worst (maxVal), edge = best (0)
+  // Scale labels Ã¢ÂÂ center = worst (maxVal), edge = best (0)
   html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">0 (best)</text>';
   html += '<text x="' + (cx + 4) + '" y="' + (cy + 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
 
@@ -362,7 +362,7 @@ function drawRadar(a, b, nameA, nameB) {
     '<div style="font-size:10px;color:var(--warm-grey);margin-top:6px;text-align:center">Larger area = lower risk = better resilience</div>';
 }
 
-// ââ Tab 3: Component Decomposition ââ
+// Ã¢ÂÂÃ¢ÂÂ Tab 3: Component Decomposition Ã¢ÂÂÃ¢ÂÂ
 function renderDecomposition(data) {
   // Compute per-Prefecture average components
   var regionMap = {};
@@ -399,7 +399,7 @@ function renderDecomposition(data) {
   var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
   var colors = ['var(--crimson)', 'var(--terracotta)', 'var(--sage)', '#3b9eff', 'var(--bronze)', '#22d3ee'];
 
-  var html = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey);padding-left:148px"><span>â Higher risk</span><span>Lower risk â¶</span></div>';
+  var html = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey);padding-left:148px"><span>Ã¢ÂÂ Higher risk</span><span>Lower risk Ã¢ÂÂ¶</span></div>';
   html += regions.map(function(r) {
     var total = r.C + r.V + r.I + r.E + r.S + r.T;
     if (total === 0) total = 1;
@@ -421,7 +421,7 @@ function renderDecomposition(data) {
   document.getElementById('decomp-bars').innerHTML = html;
 }
 
-// ââ Load Data ââ
+// Ã¢ÂÂÃ¢ÂÂ Load Data Ã¢ÂÂÃ¢ÂÂ
 fetch('ssi-data.json?v=41').then(function(r) { return r.json(); }).then(function(data) {
   SSI = data;
   prefectureData = buildPrefectureData(data);
