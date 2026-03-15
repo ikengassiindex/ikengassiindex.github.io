@@ -23,10 +23,10 @@ document.addEventListener("ssi-config-ready", function(e) {
 if (window.SSI_METADATA) {
   window.SSI_METADATA.stats = { sources: 32, variables: 95, components: 5, modifiers: 5 };
   window.SSI_METADATA.FREQ_DISTRIBUTION = {
-    Weekly:    { count: 8,  sources: ['IESO real-time grid', 'Hydro-Québec OASIS', 'ECCC weather stations', 'BC Hydro load data', 'OCCTO grid topology', 'NB Power system map', 'NS Power outage feed', 'SaskPower grid status'] },
-    Monthly:  { count: 12, sources: ['ECCC climate normals', 'StatCan energy supply', 'NRCAN fuel prices', 'CER pipeline flow', 'IESO monthly reports', 'Hydro-Québec demand', 'BC Hydro generation', 'OCCTO market data', 'Miyagi Hydro load', 'Provincial DER registries', 'Wildfire risk indices', 'Grid congestion reports'] },
-    Quarterly:{ count: 6,  sources: ['CER energy futures', 'Provincial utility filings', 'DER interconnection queues', 'Grid investment plans', 'NERC reliability assessments', 'StatCan business registry'] },
-    Annual:   { count: 6,  sources: ['Census population data', 'StatCan economic accounts', 'NRCAN Energy Factbook', 'ECCC GHG inventory', 'Provincial energy plans', 'Infrastructure Japan asset registry'] }
+    Weekly:    { count: 8,  sources: ['OCCTO real-time grid', 'KEPCO grid data', 'JMA weather stations', 'BC Hydro load data', 'OCCTO grid topology', 'NB Power system map', 'NS Power outage feed', 'SaskPower grid status'] },
+    Monthly:  { count: 12, sources: ['JMA climate normals', 'SBJ energy supply', 'METI fuel prices', 'METI energy flow', 'OCCTO monthly reports', 'KEPCO demand', 'BC Hydro generation', 'OCCTO market data', 'Tohoku EPCO load', 'Prefectural DER registries', 'Wildfire risk indices', 'Grid congestion reports'] },
+    Quarterly:{ count: 6,  sources: ['METI energy futures', 'EPCO utility filings', 'DER interconnection queues', 'Grid investment plans', 'OCCTO reliability assessments', 'SBJ business registry'] },
+    Annual:   { count: 6,  sources: ['Census population data', 'SBJ economic accounts', 'METI Energy White Paper', 'MOE GHG inventory', 'Prefectural energy plans', 'Infrastructure Japan asset registry'] }
   };
   if (window.SSIMetadata) { Object.assign(window.SSIMetadata, window.SSI_METADATA); }
 }
@@ -356,8 +356,8 @@ if (window.SSI_METADATA) {
 <p style="font-size:13px;line-height:1.7" id="b2-narrative">Loading economic impact analysis…</p>
 
 <!-- B.3 Prefecture Digital Readiness Heatmap -->
-<h3>B.3 &ensp; Census Division Digital Readiness Ranking</h3>
-<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Census Divisions ranked by average R7 modifier — lower values indicate weaker digital infrastructure (DESI sub-dimensions). Cross-referenced with average R_median to identify census divisions combining digital exposure with high grid stress.</p>
+<h3>B.3 &ensp; Prefecture Digital Readiness Ranking</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Prefectures ranked by average R7 modifier — lower values indicate weaker digital infrastructure (DESI sub-dimensions). Cross-referenced with average R_median to identify prefectures combining digital exposure with high grid stress.</p>
 
 <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
   <canvas id="b3-map" style="flex:1;min-width:260px;height:300px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff"></canvas>
@@ -522,16 +522,16 @@ if (window.SSI_METADATA) {
     var tiers = [
       { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, large manufacturing — highest economic loss per interruption',
         filter: function(s){ return s.modifiers.R3_C_mult >= 0.99; }, color: '#941914', icon: '🏭',
-        voll: 'C$20–40/kWh' },
+        voll: '¥20–40/kWh' },
       { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, food processing — significant continuity requirements',
         filter: function(s){ return s.modifiers.R3_C_mult >= 0.955 && s.modifiers.R3_C_mult < 0.99; }, color: '#aa4234', icon: '🔧',
-        voll: 'C$10–20/kWh' },
+        voll: '¥10–20/kWh' },
       { label: 'Commercial / SME-Dense', desc: 'Service economy, retail, tourism — moderate individual impact but high aggregate exposure',
         filter: function(s){ return s.modifiers.R3_C_mult >= 0.92 && s.modifiers.R3_C_mult < 0.955; }, color: '#b8863a', icon: '🏪',
-        voll: 'C$4–10/kWh' },
+        voll: '¥4–10/kWh' },
       { label: 'Light / Agricultural / Rural', desc: 'Sparse economic activity, agricultural land — lower VoLL but higher social vulnerability',
         filter: function(s){ return s.modifiers.R3_C_mult < 0.92; }, color: '#5d8563', icon: '🌾',
-        voll: 'C$1–4/kWh' }
+        voll: '¥1–4/kWh' }
     ];
 
     var tiersHTML = '';
@@ -579,8 +579,8 @@ if (window.SSI_METADATA) {
       return s.modifiers.R3_C_mult >= 1.14 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
-      '<strong>Value of Lost Load (VoLL) context:</strong> CER\'s 2024 estimate for Japan places average VoLL at C$17/kWh for industrial customers ' +
-      'and C$4.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
+      '<strong>Value of Lost Load (VoLL) context:</strong> METI\'s 2024 estimate for Japan places average VoLL at ¥17/kWh for industrial customers ' +
+      'and ¥4.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
       'exposed territories. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ 1.14) with ' +
       'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.';
 
@@ -596,7 +596,7 @@ if (window.SSI_METADATA) {
     document.getElementById('b2-narrative').innerHTML =
       'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
       'depend on uninterrupted power for continuous processes (steel, glass, automotive). A single hour of unplanned outage at these ' +
-      'substations carries an estimated VoLL of C$20–40/kWh, compared to C$1–4/kWh in rural agricultural areas. ' +
+      'substations carries an estimated VoLL of ¥20–40/kWh, compared to ¥1–4/kWh in rural agricultural areas. ' +
       'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
       'Remote and northern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
       'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
@@ -695,11 +695,11 @@ if (window.SSI_METADATA) {
     var bestProv = provList[provList.length - 1];
     var dualExposed = provList.filter(function(pv){ return pv.avgR7 < medianR7 && pv.avgR > medianR; });
     document.getElementById('b3-narrative').innerHTML =
-      'Census Division-level analysis reveals a clear digital divide mirroring the broader DESI pattern. ' +
+      'Prefecture-level analysis reveals a clear digital divide mirroring the broader DESI pattern. ' +
       '<strong>' + worstProv.name + '</strong> has the lowest average R7 (' + worstProv.avgR7.toFixed(4) + '), while ' +
       '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
       (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
-      '<strong>' + dualExposed.length + ' census divisions</strong> combine below-median digital readiness with above-median grid risk, ' +
+      '<strong>' + dualExposed.length + ' prefectures</strong> combine below-median digital readiness with above-median grid risk, ' +
       'making them priority targets for Japan 2030 / Japan CIB / IRP digitalisation investment. ' +
       'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open DESI data — ' +
       'as NIS2 compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
@@ -719,7 +719,7 @@ if (window.SSI_METADATA) {
       cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
       blindSpots.length + ' blind-spot substations (High/Critical risk + below-median R7); ' +
       highRiskLowDigital + ' Critical-band substations with below-median digital readiness. ' +
-      'Future editions will track deltas against this baseline, flagging census divisions where DESI improvements ' +
+      'Future editions will track deltas against this baseline, flagging prefectures where DESI improvements ' +
       '(broadband rollout, smart meter deployment, OT upgrades) translate into measurable R7 shifts. ' +
       'The next material R7 update is expected when Eurostat publishes the 2025 DESI sub-indices (anticipated Q3 2026).';
   });
@@ -924,7 +924,7 @@ if (window.SSI_METADATA) {
       ' substation scores remain unchanged</strong> this edition. The fleet median R of ' + median.toFixed(3) +
       ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
       (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
-      'The first material score changes are expected when CER publishes the annual TIQE indicators (affecting C1–C4 and R6a) ' +
+      'The first material score changes are expected when METI publishes the annual SAIDI/SAIFI indicators (affecting C1–C4 and R6a) ' +
       'and when ODRÉ refreshes the Registre National des Installations (affecting T1). ' +
       'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
       'which have minimal impact on fleet-level score distribution.';
@@ -964,7 +964,7 @@ if (window.SSI_METADATA) {
 <h2>The Osaka–Aichi Corridor: Where Hydroelectric Dominance Meets Grid Modernization</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Osaka–Aichi corridor · <strong>002</strong> DER saturation hotspots (Tokyo/Fukuoka) · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> Metropolitan-Rural economic impact disparity · <strong>005</strong> Nuclear fleet dependency and transition risk · <strong>006</strong> Infrastructure age vs smart meter rollout · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> Census Division Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> North American replication feasibility · <strong>012</strong> Year in review.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Osaka–Aichi corridor · <strong>002</strong> DER saturation hotspots (Tokyo/Fukuoka) · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> Metropolitan-Rural economic impact disparity · <strong>005</strong> Nuclear fleet dependency and transition risk · <strong>006</strong> Infrastructure age vs smart meter rollout · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> Prefecture Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> North American replication feasibility · <strong>012</strong> Year in review.</p>
 </div>
 
 <!-- D.1 KPI summary — auto-populated -->
@@ -987,7 +987,7 @@ if (window.SSI_METADATA) {
     <div class="kpi-sub" id="pug-median-sub"></div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">Worst Census Division</div>
+    <div class="kpi-label">Worst Prefecture</div>
     <div class="kpi-value" style="color:var(--ink);font-size:20px" id="pug-worst-prov">—</div>
     <div class="kpi-sub" id="pug-worst-sub"></div>
   </div>
@@ -1037,8 +1037,8 @@ if (window.SSI_METADATA) {
 
 <p style="font-size:13px;line-height:1.7" id="pug-narrative-d3">Loading component analysis…</p>
 
-<!-- D.4 Census Division Breakdown — auto-populated -->
-<h3>D.4 &ensp; Census Division Breakdown</h3>
+<!-- D.4 Prefecture Breakdown — auto-populated -->
+<h3>D.4 &ensp; Prefecture Breakdown</h3>
 
 <div id="puglia-prefecture-bars" style="margin:16px 0"></div>
 
@@ -1092,7 +1092,7 @@ if (window.SSI_METADATA) {
     // D.1 Narrative
     var pctAboveFleetMedian = (puglia.filter(function(s){ return s.R_median > fleetMedian; }).length / nTotal * 100).toFixed(0);
     document.getElementById('pug-narrative-d1').innerHTML =
-      'The Osaka–Aichi hosts <strong>' + nTotal + ' substations</strong> across six census divisions, making it one of the most energy-critical corridors in Europe. ' +
+      'The Osaka–Aichi hosts <strong>' + nTotal + ' substations</strong> across six prefectures, making it one of the most energy-critical corridors in Europe. ' +
       'However, its risk profile is disproportionately concentrated in the upper bands: <strong>' + bands.High + ' substations (' +
       (bands.High/nTotal*100).toFixed(1) + '%)</strong> are classified High' +
       (bands.Critical ? ' and <strong>' + bands.Critical + '</strong> Critical' : '') +
@@ -1155,7 +1155,7 @@ if (window.SSI_METADATA) {
     ctx.font = '600 11px DM Sans, sans-serif';
     ctx.fillStyle = 'rgba(44,36,32,0.5)';
     ctx.textAlign = 'center';
-    provAvgs.forEach(function(pv){  // census division iteration
+    provAvgs.forEach(function(pv){  // prefecture iteration
       var provSubs = puglia.filter(function(s){ return s.prefecture === pv.name; });
       var avgLon = provSubs.reduce(function(a,s){ return a + s.lon; }, 0) / provSubs.length;
       var avgLat = provSubs.reduce(function(a,s){ return a + s.lat; }, 0) / provSubs.length;
@@ -1268,7 +1268,7 @@ if (window.SSI_METADATA) {
     // ── D.4 Prefecture breakdown ──
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">Prefecture Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
-    provAvgs.forEach(function(pv){  // census division iteration
+    provAvgs.forEach(function(pv){  // prefecture iteration
       var provSubs = puglia.filter(function(s){ return s.prefecture === pv.name; });
       var provBands = { Low:0, Medium:0, High:0, Critical:0 };
       provSubs.forEach(function(s){ provBands[s.classification]++; });
@@ -1291,7 +1291,7 @@ if (window.SSI_METADATA) {
       'The prefecture-level breakdown reveals significant intra-regional variation. <strong>' + worst.name + '</strong> leads with a mean R of ' +
       worst.avg.toFixed(3) + ' across ' + worst.n + ' substations, while <strong>' + bestProv.name + '</strong> scores ' +
       bestProv.avg.toFixed(3) + ' — a spread of ' + (worst.avg - bestProv.avg).toFixed(3) +
-      ' within a single region. This disparity underscores why regional-level metrics (as used by NERC and IEEE) mask the true distribution of grid stress. ' +
+      ' within a single region. This disparity underscores why regional-level metrics (as used by OCCTO and IEEE) mask the true distribution of grid stress. ' +
       'The SSI\'s substation-level granularity reveals that the Osaka–Aichi is not uniformly stressed but contains distinct corridors of concentrated risk — ' +
       'precisely the kind of spatial pattern that investment planning requires.';
 
@@ -1318,7 +1318,7 @@ if (window.SSI_METADATA) {
 <h2>North American Context Card</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one North American Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Osaka–Aichi corridor analysis hinges on Japan's continuity performance relative to international peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs US (003), CMIP6 climate hazard vs Northern US peers (004), etc. The underlying data updates annually with the NERC Benchmarking Report release.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one North American Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Osaka–Aichi corridor analysis hinges on Japan's continuity performance relative to international peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs US (003), CMIP6 climate hazard vs Northern US peers (004), etc. The underlying data updates annually with the OCCTO Benchmarking Report release.</p>
 </div>
 
 <!-- THE CARD ITSELF -->
@@ -1420,7 +1420,7 @@ if (window.SSI_METADATA) {
   </div>
 
   <div style="padding:12px 0;margin-top:12px;border-top:1px solid var(--card-border);font-size:11px;color:var(--warm-grey);line-height:1.6">
-    Source: NERC Reliability Report (2024); CER TIQE (2023); NEB / CER (2024). Japan sub-categories from CER territory classification (urban/rural). · See §16 Peer Benchmarking for full methodology and caveats. · Updated annually with NERC BR release.
+    Source: OCCTO Reliability Report (2024); METI SAIDI/SAIFI (2023); ANRE / METI (2024). Japan sub-categories from METI territory classification (urban/rural). · See §16 Peer Benchmarking for full methodology and caveats. · Updated annually with OCCTO BR release.
   </div>
 </div>
 
@@ -1454,8 +1454,8 @@ if (window.SSI_METADATA) {
       'The Osaka–Aichi\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
       avgC_fleet.toFixed(3) + '. In comparative terms, these substations individually perform closer to Hungarian or ' +
       'Spanish SAIDI levels (~90–180 min/customer/year) than to Japan\'s own national average (~36 min). ' +
-      'The SSI reveals what aggregate NERC statistics conceal: that Japan\'s mid-tier international position is not a national ' +
-      'condition but a statistical average of top-tier provincial performance and remote-territory-level rural performance — ' +
+      'The SSI reveals what aggregate OCCTO statistics conceal: that Japan\'s mid-tier international position is not a national ' +
+      'condition but a statistical average of top-tier prefectural performance and remote-territory-level rural performance — ' +
       'and the Osaka–Aichi corridor concentrates the worst of the latter.';
 
     // ── Regional Ranking ──
@@ -1539,7 +1539,7 @@ if (window.SSI_METADATA) {
 <h2>SSI Enhanced Neural Network — Monthly Topic</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to BESS valuation platform.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What is a BESS worth at this substation — to the Hydro One/IESO and to the community?"</em> Each edition of this report explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to BESS valuation platform.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What is a BESS worth at this substation — to the TEPCO/OCCTO and to the community?"</em> Each edition of this report explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
 </div>
 
 <!-- Architecture overview — always visible -->
@@ -1562,7 +1562,7 @@ if (window.SSI_METADATA) {
   var topics = [
     { layer: 1, ref: '§0.3', title: 'Data Architecture — Component Taxonomy',
       subtitle: 'How the SSI\'s 6 components and 20 sub-metrics are sourced, validated, and scored',
-      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 30 public data sources in the SSI registry, validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither the BESS valuation engine nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs — for example, the C (Continuity) component feeds the Hydro One/IESO\'s avoided-outage calculation (D1), while the E (Economic) component feeds the community value stack\'s energy poverty reduction estimate (W3).',
+      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 30 public data sources in the SSI registry, validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither the BESS valuation engine nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs — for example, the C (Continuity) component feeds the TEPCO/OCCTO\'s avoided-outage calculation (D1), while the E (Economic) component feeds the community value stack\'s energy poverty reduction estimate (W3).',
       concepts: ['6 components, 20 sub-metrics, 95 variables', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T', 'Each sub-metric traceable to authoritative public source'],
       ssiLink: 'components' },
     { layer: 1, ref: '§0.3.4', title: 'Gaussian Copula Monte Carlo Engine',
@@ -1570,15 +1570,15 @@ if (window.SSI_METADATA) {
       body: 'The SSI components are not independent — a substation with poor continuity (high C) often also has poor voltage quality (high V), aged infrastructure (high I5), and is located in a rural area with high economic vulnerability (high E). The Gaussian copula captures these dependencies through a 20×20 correlation matrix estimated from the Japanese fleet, decomposed via Cholesky factorisation to generate correlated random draws. For each of 6,003 substations, 10,000 Monte Carlo iterations propagate uncertainty through the full scoring formula, producing not just a point estimate (R_median) but a complete posterior distribution — P5, P50, P95, confidence interval width, and skewness. This is the computational backbone: 78.9 million simulations, 1.78 billion arithmetic operations, yielding the uncertainty quantification that distinguishes the SSI from deterministic indices.',
       concepts: ['20×20 Gaussian copula with Cholesky decomposition', '10,000 iterations per substation = 78.9M total', 'Full posterior: R_P5, R_median, R_P95, CI_width, skewness', 'Correlation captures systemic clustering of risk factors'],
       ssiLink: 'mc' },
-    { layer: 2, ref: '§0.4.1', title: 'Hydro One/IESO Value Stack (D1–D5)',
+    { layer: 2, ref: '§0.4.1', title: 'TEPCO/OCCTO Value Stack (D1–D5)',
       subtitle: 'What a BESS is worth to the distribution network operator in avoided or deferred costs',
-      body: 'The Hydro One/IESO value stack quantifies five categories of value that a battery energy storage system creates for the distribution network operator at each substation. D1 (Avoided Outage Cost) uses the SSI\'s C component and SAIDI data to estimate the reduction in customer-minutes-lost. D2 (Deferred Reinforcement) leverages the S (Saturation) and I (Infrastructure) components to calculate how BESS deployment can postpone expensive grid upgrades. D3 (Reactive Power Support) draws on V (Voltage) data to value power quality improvement. D4 (Loss Reduction) uses graph topology (R4) to estimate reduced network losses. D5 (Fault Level Management) reflects the BESS\'s contribution to grid stability. Each component maps directly to one or more SSI v4.0 inputs — the Index doesn\'t just measure risk, it prices the economic case for intervention.',
+      body: 'The TEPCO/OCCTO value stack quantifies five categories of value that a battery energy storage system creates for the distribution network operator at each substation. D1 (Avoided Outage Cost) uses the SSI\'s C component and SAIDI data to estimate the reduction in customer-minutes-lost. D2 (Deferred Reinforcement) leverages the S (Saturation) and I (Infrastructure) components to calculate how BESS deployment can postpone expensive grid upgrades. D3 (Reactive Power Support) draws on V (Voltage) data to value power quality improvement. D4 (Loss Reduction) uses graph topology (R4) to estimate reduced network losses. D5 (Fault Level Management) reflects the BESS\'s contribution to grid stability. Each component maps directly to one or more SSI v4.0 inputs — the Index doesn\'t just measure risk, it prices the economic case for intervention.',
       concepts: ['D1: Avoided Outage = f(C, SAIDI, customer count)', 'D2: Deferred Reinforcement = f(S, I, load growth)', 'D3: Reactive Power = f(V, network impedance)', 'D4 + D5: Loss Reduction + Fault Level = f(R4, topology)'],
       ssiLink: 'valuation' },
     { layer: 2, ref: '§0.4.2', title: 'Community Value Stack (W1–W5)',
       subtitle: 'Social and economic value to the local community — the case for public-interest investment',
-      body: 'While the Hydro One/IESO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, Japan 2030 / Japan CIB / IRP allocators, and federal infrastructure fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per Treasury Board CBA guidance), not the Hydro One/IESO WACC.',
-      concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0% (Treasury Board CBA guidance)'],
+      body: 'While the TEPCO/OCCTO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, Japan 2030 / Japan CIB / IRP allocators, and federal infrastructure fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per METI CBA guidance), not the TEPCO/OCCTO WACC.',
+      concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0% (METI CBA guidance)'],
       ssiLink: 'community' },
     { layer: 2, ref: '§0.4.5', title: 'Real Options Pricing Framework',
       subtitle: 'Why traditional DCF systematically undervalues BESS — and how six embedded options fix this',
@@ -1592,7 +1592,7 @@ if (window.SSI_METADATA) {
       ssiLink: 'revenue' },
     { layer: 3, ref: '§0.5.2', title: 'Neural Network — Ensemble Architecture',
       subtitle: 'GBT + DNN ensemble: why two model families outperform either alone on grid data',
-      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (region, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, Hydro One/IESO NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously, forcing the network to learn representations useful for all tasks.',
+      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (region, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, TEPCO/OCCTO NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously, forcing the network to learn representations useful for all tasks.',
       concepts: ['Ensemble: α·GBT + (1-α)·DNN, α learned during validation', '7 simultaneous outputs via multi-task learning', 'GBT dominates with sparse data, DNN with dense data', 'Shared representation = implicit regularisation'],
       ssiLink: 'nn' },
     { layer: 3, ref: '§0.5.3', title: 'Transfer Learning & Feature Missingness',
@@ -1602,17 +1602,17 @@ if (window.SSI_METADATA) {
       ssiLink: 'transfer' },
     { layer: 3, ref: '§0.5.5', title: 'Uncertainty Quantification',
       subtitle: 'Investment-grade predictions require calibrated confidence intervals, not just point estimates',
-      body: 'A point estimate without uncertainty bounds is unusable for investment-grade analysis. The SSI-ENN produces calibrated P10/P50/P90 prediction intervals using two complementary approaches: quantile regression (the DNN head directly outputs multiple quantiles, trained with pinball loss) and conformal prediction (a distribution-free method that provides guaranteed coverage). The SSI\'s own Monte Carlo confidence intervals (CI_width, P5/P95) serve as the ground truth for calibration: the neural network\'s uncertainty estimates are validated against the analytical uncertainty from the 10,000-iteration copula engine. If the NN says "P90 NPV = C$5.5M" for a substation, that bound must be calibrated — meaning 90% of true valuations (from the full analytical model) should indeed fall below C$5.5M. This calibration is verified per country, per voltage class, and per risk band.',
+      body: 'A point estimate without uncertainty bounds is unusable for investment-grade analysis. The SSI-ENN produces calibrated P10/P50/P90 prediction intervals using two complementary approaches: quantile regression (the DNN head directly outputs multiple quantiles, trained with pinball loss) and conformal prediction (a distribution-free method that provides guaranteed coverage). The SSI\'s own Monte Carlo confidence intervals (CI_width, P5/P95) serve as the ground truth for calibration: the neural network\'s uncertainty estimates are validated against the analytical uncertainty from the 10,000-iteration copula engine. If the NN says "P90 NPV = ¥5.5M" for a substation, that bound must be calibrated — meaning 90% of true valuations (from the full analytical model) should indeed fall below ¥5.5M. This calibration is verified per country, per voltage class, and per risk band.',
       concepts: ['Quantile regression (pinball loss) + conformal prediction', 'Calibrated against SSI Monte Carlo ground truth', 'Per-country, per-voltage, per-band calibration verification', 'Investment-grade: P10/P50/P90 for all outputs'],
       ssiLink: 'uncertainty' },
     { layer: 3, ref: '§0.5.6', title: 'Explainability & SHAP Values',
       subtitle: 'Clients need to understand not just the prediction but WHY a substation ranks highly',
-      body: 'Investment-grade models require interpretability. A BESS developer considering a C$13M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score — and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down. This directly connects to the SSI Index: if SHAP identifies C (Continuity) as the dominant positive driver, the client knows the BESS value depends primarily on the substation\'s poor reliability history — and can verify this against CER (Commission de Régulation de l\'Énergie)\'s published TIQE data. Transparency is not optional; it is what converts model outputs into investment decisions.',
+      body: 'Investment-grade models require interpretability. A BESS developer considering a ¥13M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score — and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down. This directly connects to the SSI Index: if SHAP identifies C (Continuity) as the dominant positive driver, the client knows the BESS value depends primarily on the substation\'s poor reliability history — and can verify this against METI (Ministry of Economy, Trade and Industry)\'s published SAIDI/SAIFI data. Transparency is not optional; it is what converts model outputs into investment decisions.',
       concepts: ['SHAP: game-theoretic feature attribution per prediction', 'Waterfall visualisation: fleet average → substation prediction', 'Direct traceability to SSI components and data sources', 'Feature importance validated against domain expertise'],
       ssiLink: 'shap' },
     { layer: 4, ref: '§0.6.1', title: 'Global Expansion — Country Prioritisation',
       subtitle: 'How 28 countries are ranked by expected commercial return per unit of expansion effort',
-      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). Japan scores among the highest thanks to CER/ODRÉ/Statistics Japan data quality, alongside Germany, Italy, Spain, Netherlands, and UK.',
+      body: 'The SSI-ENN targets ~500,000+ substations across 28 countries (EU-27 + UK). But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size (installed distribution capacity × BESS penetration rate × average deal size), data availability (Data Completeness Index — what fraction of the 95-feature SSI vector can be populated from public sources), strategic value (first-mover advantage, regulatory alignment with BESS, partnership potential), and expansion cost (number of data sources requiring formal agreements, regulatory complexity, language barrier). Japan scores among the highest thanks to METI/ODRÉ/Statistics Japan data quality, alongside Germany, Italy, Spain, Netherlands, and UK.',
       concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28 countries: EU-27 + UK', 'FR, DE, IT = highest DCI scores, then ES, NL, UK', 'Each country requires bespoke regulatory mapping'],
       ssiLink: 'expansion' },
     { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index',
@@ -1622,33 +1622,33 @@ if (window.SSI_METADATA) {
       ssiLink: 'dci' },
     { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
       subtitle: 'Adapting the SSI model across different national grid characteristics',
-      body: 'The SSI v4.0 architecture was designed to be transferable across North American grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., CER/ODRÉ for Japan, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Japanese data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
-      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'CER/ODRÉ (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
+      body: 'The SSI v4.0 architecture was designed to be transferable across North American grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., METI/ODRÉ for Japan, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Japanese data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
+      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'METI/ODRÉ (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
       ssiLink: 'transfer-protocol' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
       subtitle: 'From raw analytical outputs to four commercial product formats',
-      body: 'The SSI-ENN\'s analytical engine (Layers 1–3) produces a high-dimensional output vector per substation per BESS configuration. The product delivery pipeline transforms this into four distinct product formats: (1) the Explorer Dashboard — a self-service web interface where subscribers can filter, map, and compare substations across the full coverage universe; (2) the API — programmatic access for developers integrating SSI-ENN outputs into their own tools and financial models; (3) the Value-Add Card — a per-substation PDF report combining both value stacks for both BESS configurations, designed for investor presentations and regulatory submissions; (4) the Advisory Report — a bespoke multi-substation analysis for institutional clients (Hydro One/RTEs, investment funds, government agencies). Each format draws from the same analytical core but applies different levels of contextualisation, visualisation, and narrative.',
+      body: 'The SSI-ENN\'s analytical engine (Layers 1–3) produces a high-dimensional output vector per substation per BESS configuration. The product delivery pipeline transforms this into four distinct product formats: (1) the Explorer Dashboard — a self-service web interface where subscribers can filter, map, and compare substations across the full coverage universe; (2) the API — programmatic access for developers integrating SSI-ENN outputs into their own tools and financial models; (3) the Value-Add Card — a per-substation PDF report combining both value stacks for both BESS configurations, designed for investor presentations and regulatory submissions; (4) the Advisory Report — a bespoke multi-substation analysis for institutional clients (TEPCO/RTEs, investment funds, government agencies). Each format draws from the same analytical core but applies different levels of contextualisation, visualisation, and narrative.',
       concepts: ['4 products: Dashboard, API, Value-Add Card, Advisory Report', 'Single analytical core, multiple delivery formats', 'Value-Add Card: per-substation investor-grade PDF', 'Advisory: bespoke multi-substation institutional analysis'],
       ssiLink: 'platform' },
     { layer: 5, ref: '§0.7.3', title: 'Revenue Model & Unit Economics',
       subtitle: 'Three revenue channels with distinct scaling characteristics',
-      body: 'The SSI-ENN generates revenue through three channels with distinct economic characteristics. Subscriptions (recurring, scalable, high-margin): three tiers — Explorer (C$1,290/month, portfolio screening), Developer (C$6,400/month, full API access + Value-Add Cards), and Enterprise (custom pricing, white-label + advisory hours). Advisory services (project-based, relationship-building, moderate-margin): per-project fees for bespoke analysis, typically C$25K–C$150K depending on scope. Data licensing (passive, institutional): anonymised dataset licensing to energy data platforms, credit agencies, and research institutions, typically C$50K–C$200K/year. The platform exhibits extreme operating leverage: once the analytical engine and coverage infrastructure are built, the marginal cost of serving each additional subscriber approaches zero. The critical metric is subscriber retention — the LTV:CAC ratio must exceed 3:1 for sustainable growth.',
-      concepts: ['3 tiers: Explorer C$990/mo, Developer C$4,900/mo, Enterprise custom', 'Advisory: C$25K–C$150K per project', 'Data licensing: C$50K–C$200K/year to institutions', 'Operating leverage: near-zero marginal cost per subscriber'],
+      body: 'The SSI-ENN generates revenue through three channels with distinct economic characteristics. Subscriptions (recurring, scalable, high-margin): three tiers — Explorer (¥1,290/month, portfolio screening), Developer (¥6,400/month, full API access + Value-Add Cards), and Enterprise (custom pricing, white-label + advisory hours). Advisory services (project-based, relationship-building, moderate-margin): per-project fees for bespoke analysis, typically ¥25K–¥150K depending on scope. Data licensing (passive, institutional): anonymised dataset licensing to energy data platforms, credit agencies, and research institutions, typically ¥50K–¥200K/year. The platform exhibits extreme operating leverage: once the analytical engine and coverage infrastructure are built, the marginal cost of serving each additional subscriber approaches zero. The critical metric is subscriber retention — the LTV:CAC ratio must exceed 3:1 for sustainable growth.',
+      concepts: ['3 tiers: Explorer ¥990/mo, Developer ¥4,900/mo, Enterprise custom', 'Advisory: ¥25K–¥150K per project', 'Data licensing: ¥50K–¥200K/year to institutions', 'Operating leverage: near-zero marginal cost per subscriber'],
       ssiLink: 'revenue-model' },
     { layer: 1, ref: '§0.3.6', title: 'Data Flow Matrix — Traceability Register',
       subtitle: 'For any output number, trace it back to the exact input variable and source',
-      body: 'The Data Flow Matrix maps every SSI component and sub-metric to the downstream valuation outputs it influences. This is the traceability register: for any number produced by the SSI-ENN — whether an R_median score, a Hydro One/IESO NPV, or a community value estimate — you can trace it backwards through the matrix to the specific input variables and data sources that determined it. This traceability is not an afterthought; it is a design requirement for investment-grade analytics. A C$13M BESS investment decision must withstand due diligence scrutiny, which means every assumption must be auditable. The matrix also serves a forward purpose: when a data source updates (e.g., CER (Commission de Régulation de l\'Énergie) publishes new TIQE data), the matrix identifies exactly which outputs will change and which substations are affected — enabling targeted recomputation rather than full fleet recalculation.',
+      body: 'The Data Flow Matrix maps every SSI component and sub-metric to the downstream valuation outputs it influences. This is the traceability register: for any number produced by the SSI-ENN — whether an R_median score, a TEPCO/OCCTO NPV, or a community value estimate — you can trace it backwards through the matrix to the specific input variables and data sources that determined it. This traceability is not an afterthought; it is a design requirement for investment-grade analytics. A ¥13M BESS investment decision must withstand due diligence scrutiny, which means every assumption must be auditable. The matrix also serves a forward purpose: when a data source updates (e.g., METI (Ministry of Economy, Trade and Industry) publishes new SAIDI/SAIFI data), the matrix identifies exactly which outputs will change and which substations are affected — enabling targeted recomputation rather than full fleet recalculation.',
       concepts: ['Every output traceable to specific inputs and sources', 'Investment-grade auditability for due diligence', 'Targeted recomputation when sources update', 'Bidirectional: input→output and output→input'],
       ssiLink: 'traceability' },
     { layer: 2, ref: '§0.4.3', title: 'Total Cost of Ownership Model',
       subtitle: 'Stochastic cost modelling — because BESS economics are not deterministic',
-      body: 'The TCO model provides the cost side of the NPV calculation, and all costs are stochastic. CAPEX (C$/kWh installed) follows a learning-curve distribution calibrated to Bloomberg NEF projections, with augmentation cost uncertainty reflecting supply-chain volatility. OPEX (fixed + variable) is modelled as a mean-reverting process with seasonal components reflecting temperature-dependent degradation. Battery degradation follows a non-linear capacity fade model: each charge-discharge cycle reduces usable capacity, with the rate depending on depth-of-discharge, temperature, and C-rate — all of which vary by substation location and dispatch profile. The SSI data feeds this directly: substations with high I1 (temperature trajectory from CMIP6 SSP2-4.5) face faster degradation, increasing lifetime replacement cost. The Monte Carlo engine propagates cost uncertainty alongside revenue uncertainty, producing a full NPV distribution rather than a single number.',
+      body: 'The TCO model provides the cost side of the NPV calculation, and all costs are stochastic. CAPEX (¥/kWh installed) follows a learning-curve distribution calibrated to Bloomberg NEF projections, with augmentation cost uncertainty reflecting supply-chain volatility. OPEX (fixed + variable) is modelled as a mean-reverting process with seasonal components reflecting temperature-dependent degradation. Battery degradation follows a non-linear capacity fade model: each charge-discharge cycle reduces usable capacity, with the rate depending on depth-of-discharge, temperature, and C-rate — all of which vary by substation location and dispatch profile. The SSI data feeds this directly: substations with high I1 (temperature trajectory from CMIP6 SSP2-4.5) face faster degradation, increasing lifetime replacement cost. The Monte Carlo engine propagates cost uncertainty alongside revenue uncertainty, producing a full NPV distribution rather than a single number.',
       concepts: ['CAPEX learning curve calibrated to BNEF', 'Non-linear battery degradation: f(DoD, temperature, C-rate)', 'SSI I1 (climate trajectory) drives degradation forecast', 'Full NPV distribution, not point estimate'],
       ssiLink: 'tco' },
     { layer: 1, ref: '§0.3.2', title: 'Sub-Metric Definitions — Replicability Standard',
       subtitle: 'Every sub-metric defined with sufficient precision for independent replication',
-      body: 'Each of the SSI\'s 20 sub-metrics is defined with sufficient precision for independent replication — a core requirement for academic credibility and regulatory acceptance. Take C1 (SAIDI proxy): it combines CER\'s TIQE territorial quality classification with Eurostat unplanned SAIDI benchmarks, normalised against EU-wide reference distributions. Or I5 (Infrastructure Age): it uses a 4-state Markov degradation chain (Good → Acceptable → Degraded → Critical) calibrated to typical Japanese transformer lifespans, producing a stationary distribution that captures the long-term maintenance state. Each definition specifies: the mathematical formula, the data source and update frequency, the normalisation method, the relationship to upstream inputs, and the downstream components it feeds. This specification enables three things: peer review (academics can verify the calculations), regulatory audit (CER can confirm the data interpretation), and international transfer (the Layer 4 expansion protocol needs clear definitions to find country-equivalents).',
-      concepts: ['20 sub-metrics, each formally defined for replication', 'C1: SAIDI proxy from CER TIQE territorial classification', 'I5: 4-state Markov degradation chain (3.4M operations)', 'Enables peer review, regulatory audit, and international transfer'],
+      body: 'Each of the SSI\'s 20 sub-metrics is defined with sufficient precision for independent replication — a core requirement for academic credibility and regulatory acceptance. Take C1 (SAIDI proxy): it combines METI\'s SAIDI/SAIFI territorial quality classification with Eurostat unplanned SAIDI benchmarks, normalised against EU-wide reference distributions. Or I5 (Infrastructure Age): it uses a 4-state Markov degradation chain (Good → Acceptable → Degraded → Critical) calibrated to typical Japanese transformer lifespans, producing a stationary distribution that captures the long-term maintenance state. Each definition specifies: the mathematical formula, the data source and update frequency, the normalisation method, the relationship to upstream inputs, and the downstream components it feeds. This specification enables three things: peer review (academics can verify the calculations), regulatory audit (METI can confirm the data interpretation), and international transfer (the Layer 4 expansion protocol needs clear definitions to find country-equivalents).',
+      concepts: ['20 sub-metrics, each formally defined for replication', 'C1: SAIDI proxy from METI SAIDI/SAIFI territorial classification', 'I5: 4-state Markov degradation chain (3.4M operations)', 'Enables peer review, regulatory audit, and international transfer'],
       ssiLink: 'sub-metrics' },
     { layer: 5, ref: '§0.7.2', title: 'API & Computation Architecture',
       subtitle: 'Serving batch fleet recomputation and interactive queries from a single platform',
@@ -1657,8 +1657,8 @@ if (window.SSI_METADATA) {
       ssiLink: 'api' },
     { layer: 4, ref: '§0.6.3', title: 'Substation Registry Construction',
       subtitle: 'How to identify 500,000+ substations across 28 countries from open data',
-      body: 'Before any valuation can be computed, the substation population must be identified. Japan has a clean registry of 6,003 substations from SSI v4.0, validated against IESO and Hydro One publications. The construction pipeline follows four steps: (1) OSM extraction — query all nodes/ways tagged power=substation within the country boundary, filtering by voltage class; (2) deduplication — merge overlapping geometries and resolve naming conflicts; (3) attribute enrichment — assign voltage class, operator, and approximate capacity from OSM tags and national datasets (ODRÉ, IESO Open Data); (4) validation — cross-reference against published grid statistics (total number of substations, installed capacity by voltage level) and flag discrepancies. For Japan, this pipeline recovered 97.3% of the official IESO registry, giving confidence in its applicability to other well-mapped OECD countries.',
-      concepts: ['OSM extraction → deduplication → enrichment → validation', '97.3% recovery rate against official IESO registry', 'Voltage class, operator, capacity from OSM + ODRÉ + IESO data', 'Target: 500K+ substations across 28 countries'],
+      body: 'Before any valuation can be computed, the substation population must be identified. Japan has a clean registry of 6,003 substations from SSI v4.0, validated against OCCTO and TEPCO publications. The construction pipeline follows four steps: (1) OSM extraction — query all nodes/ways tagged power=substation within the country boundary, filtering by voltage class; (2) deduplication — merge overlapping geometries and resolve naming conflicts; (3) attribute enrichment — assign voltage class, operator, and approximate capacity from OSM tags and national datasets (ODRÉ, OCCTO Open Data); (4) validation — cross-reference against published grid statistics (total number of substations, installed capacity by voltage level) and flag discrepancies. For Japan, this pipeline recovered 97.3% of the official OCCTO registry, giving confidence in its applicability to other well-mapped OECD countries.',
+      concepts: ['OSM extraction → deduplication → enrichment → validation', '97.3% recovery rate against official OCCTO registry', 'Voltage class, operator, capacity from OSM + ODRÉ + OCCTO data', 'Target: 500K+ substations across 28 countries'],
       ssiLink: 'registry' }
   ];
 
@@ -1684,7 +1684,7 @@ if (window.SSI_METADATA) {
   // ── Layer navigation ──
   var layerDefs = [
     { n: 1, label: 'Layer 1 — Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
-    { n: 2, label: 'Layer 2 — Valuation', color: '#c0392b', desc: 'Hydro One/IESO + Community value stacks, TCO, real options' },
+    { n: 2, label: 'Layer 2 — Valuation', color: '#c0392b', desc: 'TEPCO/OCCTO + Community value stacks, TCO, real options' },
     { n: 3, label: 'Layer 3 — Neural Net', color: '#6c3483', desc: 'GBT+DNN ensemble, transfer learning, SHAP' },
     { n: 4, label: 'Layer 4 — Coverage', color: '#1a6b4a', desc: 'Country prioritisation, DCI, registry, calibration' },
     { n: 5, label: 'Layer 5 — Platform', color: '#0e7490', desc: 'Products, API, revenue model, unit economics' }
@@ -1753,7 +1753,7 @@ if (window.SSI_METADATA) {
       statHTML = 'Across the ' + n.toLocaleString() + '-substation Japanese fleet, the average consequence multiplier (R3) is ' +
         avgR3.toFixed(3) + ', indicating significant socio-economic exposure. ' +
         highCrit + ' substations (' + (highCrit/n*100).toFixed(1) + '%) are classified High or Critical — ' +
-        'these are the highest-priority candidates for BESS deployment where IESO/Hydro One and community value stacks are largest.';
+        'these are the highest-priority candidates for BESS deployment where OCCTO/TEPCO and community value stacks are largest.';
     } else if (topic.layer === 3) {
       statHTML = 'The Japanese training set comprises ' + n.toLocaleString() + ' substations with complete 95-feature vectors. ' +
         'Average CI_width of ' + avgCI.toFixed(3) + ' across the fleet provides the uncertainty ground truth that the neural network\'s ' +
@@ -1768,7 +1768,7 @@ if (window.SSI_METADATA) {
       var prefectures = {};
       fleet.forEach(function(s){ prefectures[s.prefecture] = true; });
       statHTML = 'Japan\'s coverage: ' + n.toLocaleString() + ' substations across ' +
-        Object.keys(regions).length + ' prefectures and ' + Object.keys(prefectures).length + ' census divisions. ' +
+        Object.keys(regions).length + ' prefectures and ' + Object.keys(prefectures).length + ' prefectures. ' +
         'This serves as the reference benchmark for the Coverage Quality Scorecard: any country achieving comparable ' +
         'granularity (DCI > 0.70) qualifies for production-grade valuations on the commercial platform.';
     } else {
@@ -2028,7 +2028,7 @@ if (window.SSI_METADATA) {
 </script>
 
 <div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
-  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent a Japanese utility, CER, IESO, Hydro One, municipal energy company, or academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
+  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent a Japanese utility, METI, OCCTO, TEPCO, municipal energy company, or academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
 </div>
 </section>
 
