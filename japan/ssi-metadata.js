@@ -1,7 +1,7 @@
 // SSI v4.0.2 — Japan Metadata
 // Generated 2026-03-13 by Ikenga Project
 
-window.SSI_METADATA = {
+window.SSIMetadata = {
 
   country: "Japan",
   country_code: "JP",
