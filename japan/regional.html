@@ -31,14 +31,14 @@
   <div id="tab-ranking">
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
-        <h3>Prefectures Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">47 Prefectures · sorted worst → best</span>
+        <h3>EPCO Regions Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">10 EPCO Regions · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
           <tr>
             <th style="width:30px">#</th>
-            <th>Prefecture</th>
+            <th>EPCO Region</th>
             <th style="text-align:right">Median R</th>
             <th style="text-align:right">Substations</th>
             <th style="text-align:right">% Critical</th>
@@ -98,8 +98,8 @@
   <div id="tab-decomp" style="display:none">
     <div class="card animate-in">
       <div class="card-header">
-        <h3>Average Component Contribution by Prefecture</h3>
-        <span class="label-xs">Stacked horizontal bars · 47 Prefectures</span>
+        <h3>Average Component Contribution by EPCO Region</h3>
+        <span class="label-xs">Stacked horizontal bars · 47 EPCO Regions</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
         <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
@@ -150,7 +150,7 @@ function pct(v) { return v.toFixed(1) + '%'; }
 function renderRanking(data) {
   var regions = (Array.isArray(data.regions) ? data.regions : Object.values(data.regions)).slice().sort(function(a, b) { return b.median_R - a.median_R; });
   var tbody = document.getElementById('ranking-tbody');
-  document.getElementById('ranking-count').textContent = regions.length + ' Prefectures · sorted worst → best';
+  document.getElementById('ranking-count').textContent = regions.length + ' EPCO Regions · sorted worst → best';
 
   tbody.innerHTML = regions.map(function(r, i) {
     var total = r.count;
