@@ -23,7 +23,7 @@ from pathlib import Path
 from datetime import datetime
 
 BASE_URL = "https://ikengassiindex.github.io"
-COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain", "switzerland", "austria", "canada"]
+COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain", "switzerland", "austria", "canada", "japan"]
 PDF_DIR = Path("archive_pdfs")
 
 
