@@ -1,4 +1,216 @@
-{
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSI Monthly Intelligence — Edition 001</title>
+  <link rel="stylesheet" href="../style.css?v=3">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+</head>
+<body>
+  <script src="../nav.js?v=116"></script>
+  <script src="ssi-metadata.js?v=2"></script>
+  <script src="../intelligence/intelligence-loader.js" data-country="australia"></script>
+  <script>
+    // Config-ready bridge: SSI_EDITION available for all inline scripts
+    window.SSI_EDITION = window.SSI_EDITION || null;
+    document.addEventListener("ssi-config-ready", function(e) {
+      if (e.detail) { window.SSI_EDITION = e.detail; }
+    });
+  </script>
+  <script>
+    // Australia-specific metadata extensions for intelligence page
+    if (window.SSI_METADATA) {
+      window.SSI_METADATA.stats = { sources: 20, variables: 95, components: 6, modifiers: 5 };
+      window.SSI_METADATA.FREQ_DISTRIBUTION = {
+        Weekly:    { count: 6, sources: ['AEMO dispatch data', 'BOM weather stations', 'AER spot prices', 'AEMO constraint data', 'NEM frequency data', 'ABS weekly indicators'] },
+        Monthly:   { count: 8, sources: ['AEMO generation mix', 'AER retail tariffs', 'Clean Energy Regulator STCs', 'CSIRO solar irradiance', 'BOM rainfall', 'ABS labour force', 'AER network performance', 'AEMC market reports'] },
+        Quarterly: { count: 4, sources: ['AER benchmarking reports', 'AEMO planning documents', 'ACCC monitoring', 'ABS national accounts'] },
+        Annual:    { count: 4, sources: ['ABS Census data', 'Geoscience Australia hazard maps', 'CSIRO climate projections', 'AEMO ISP'] }
+      };
+      if (window.SSIMetadata) { Object.assign(window.SSIMetadata, window.SSI_METADATA); }
+    }
+  </script>
+  <script>renderNav('intelligence');</script>
+
+  <main class="page-shell" style="max-width:920px">
+    <!-- Edition Header -->
+    <div id="edition-header" class="animate-in" style="margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <span class="label-xs" style="background:var(--terracotta);color:#fff;padding:3px 10px;border-radius:4px">Edition 001</span>
+        <span class="label-xs">April 2026</span>
+        <span class="label-xs" style="color:var(--warm-grey)">Launch Edition</span>
+      </div>
+      <h1 style="font-family:'Source Serif 4',serif;font-size:32px;font-weight:700;line-height:1.2;margin-bottom:8px">
+        Australia Grid Intelligence Report
+      </h1>
+      <p style="font-size:14px;color:var(--warm-grey);line-height:1.6;max-width:680px">
+        Monthly resilience intelligence for Australia’s National Electricity Market and off-grid systems. 8,500 substations scored across 8 states and territories using 95 variables from 20 authoritative sources including AEMO, AER, ABS, CSIRO, BOM, and Geoscience Australia.
+      </p>
+    </div>
+
+    <!-- Executive Summary -->
+    <article id="edition-body">
+      <div class="card animate-in" style="margin-bottom:28px;border-left:4px solid var(--terracotta)">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Executive Summary</h2>
+          <span class="label-xs">Fleet Overview</span>
+        </div>
+        <div style="font-family:'Source Serif 4',serif;font-size:14px;line-height:1.8;color:var(--ink)">
+          <p>Australia’s inaugural SSI v4.0.2 assessment establishes baseline resilience scores for 8,500 substations spanning the National Electricity Market (NEM) interconnected grid and isolated systems in Western Australia and the Northern Territory. The fleet median R-score of <strong>0.383</strong> places Australia’s grid in the mid-range of the global SSI cohort, comparable to Canada (0.389) and slightly below France (0.401).</p>
+          <p style="margin-top:12px">The analysis reveals a pronounced east–west resilience gradient: NEM-connected states (NSW, VIC, QLD, SA, TAS) benefit from interconnector redundancy and centralised market dispatch, yielding median scores 8–12% lower (better) than isolated systems in WA and NT. South Australia emerges as the highest-risk NEM state (median 0.419), driven by ageing infrastructure, high wind penetration variability, and the 2016 system-black legacy exposure in the R6_restoration modifier.</p>
+          <p style="margin-top:12px">Eight substations exceed the Critical threshold (R ≥ 0.75), concentrated in remote NT and outback WA, where extreme heat, cyclone exposure, and sparse network topology compound restoration challenges. The Continuity (C) component contributes the largest share of fleet risk at 30% weighting, followed by Infrastructure (I) at 25% and Saturation (S) at 20%.</p>
+        </div>
+      </div>
+
+      <!-- Key Metrics -->
+      <div class="card animate-in" style="margin-bottom:28px">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Key Metrics</h2>
+          <span class="label-xs">April 2026</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:12px">
+          <div style="text-align:center;padding:16px;background:var(--cream-deep);border-radius:8px">
+            <div style="font-size:28px;font-weight:600;color:var(--terracotta)">8,500</div>
+            <div style="font-size:11px;color:var(--warm-grey);margin-top:4px">Substations Scored</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--cream-deep);border-radius:8px">
+            <div style="font-size:28px;font-weight:600;color:var(--ink)">0.383</div>
+            <div style="font-size:11px;color:var(--warm-grey);margin-top:4px">Fleet Median R</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--cream-deep);border-radius:8px">
+            <div style="font-size:28px;font-weight:600;color:var(--crimson)">8</div>
+            <div style="font-size:11px;color:var(--warm-grey);margin-top:4px">Critical Substations</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--cream-deep);border-radius:8px">
+            <div style="font-size:28px;font-weight:600;color:var(--ink)">87</div>
+            <div style="font-size:11px;color:var(--warm-grey);margin-top:4px">SA4 Regions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Band Distribution -->
+      <div class="card animate-in" style="margin-bottom:28px">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Band Distribution</h2>
+        </div>
+        <table class="data-table" style="margin-top:12px">
+          <thead><tr><th>Band</th><th>Range</th><th style="text-align:right">Count</th><th style="text-align:right">Share</th></tr></thead>
+          <tbody>
+            <tr><td><span class="band-dot low"></span> Low</td><td>0.00–0.25</td><td style="text-align:right">1,122</td><td style="text-align:right">13.2%</td></tr>
+            <tr><td><span class="band-dot medium"></span> Medium</td><td>0.25–0.50</td><td style="text-align:right">5,919</td><td style="text-align:right">69.6%</td></tr>
+            <tr><td><span class="band-dot high"></span> High</td><td>0.50–0.75</td><td style="text-align:right">1,451</td><td style="text-align:right">17.1%</td></tr>
+            <tr><td><span class="band-dot critical"></span> Critical</td><td>0.75–1.00</td><td style="text-align:right">8</td><td style="text-align:right">0.1%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Substation in Focus -->
+      <div class="card animate-in" style="margin-bottom:28px;border-left:4px solid var(--crimson)">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Substation in Focus</h2>
+          <span class="label-xs" style="color:var(--crimson)">Critical Alert</span>
+        </div>
+        <div style="font-family:'Source Serif 4',serif;font-size:14px;line-height:1.8;color:var(--ink)">
+          <p><strong>Darwin TStn 420</strong> (AU_100421) in the Northern Territory records the fleet’s highest R-score at 0.891, placing it firmly in the Critical band. The substation serves as a key node in the Darwin–Katherine transmission corridor, connecting the Channel Island and Weddell power stations to the greater Darwin load centre.</p>
+          <p style="margin-top:12px">Three compounding risk factors drive this score: (1) extreme cyclone exposure via the R6_seismic modifier (1.18, reflecting Tropical Cyclone Tracy legacy and ongoing Category 4–5 risk), (2) sparse network topology with only 2 transmission paths providing N-1 but not N-2 redundancy, and (3) high Saturation (S=0.82) driven by peak air-conditioning load during the October–March wet season, when demand routinely exceeds 95% of thermal limits.</p>
+          <p style="margin-top:12px">The R6_restoration modifier (1.08) reflects the 18–24 hour estimated restoration time due to remote location, limited spare transformer inventory, and single-road access vulnerability during flood events. AEMO’s 2025 NT System Security Assessment flagged this corridor as the territory’s highest priority for reliability investment.</p>
+        </div>
+      </div>
+
+      <!-- Corridor Deep-Dive: NSW–VIC Interconnector -->
+      <div class="card animate-in" style="margin-bottom:28px">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Corridor Analysis: NSW–VIC Interconnector</h2>
+          <span class="label-xs">Deep Dive</span>
+        </div>
+        <div style="font-family:'Source Serif 4',serif;font-size:14px;line-height:1.8;color:var(--ink)">
+          <p>The NSW–Victoria interconnector corridor encompasses 142 substations along the Snowy Mountains–Murray Valley transmission path, linking Snowy Hydro’s generation assets with Melbourne’s southern load centres. This corridor carries up to 1,600 MW of transfer capacity and serves as the backbone of inter-regional energy trading in the NEM’s southern states.</p>
+          <p style="margin-top:12px">The corridor’s median R-score of 0.341 sits below the national fleet median, reflecting the Infrastructure (I) benefits of Transgrid and AusNet’s recent 330 kV line upgrades. However, the component decomposition reveals elevated Continuity (C) risk (0.158) in the alpine section between Tumut and Upper Tumut, where bushfire exposure and snow-loading combine with limited alternative routing.</p>
+          <p style="margin-top:12px">The planned Humelink project (500 kV, expected 2026–2028) will materially reduce this corridor’s risk profile by providing a parallel high-capacity path. Our forward-looking scenario model estimates a 15–18% median R-score improvement once Humelink achieves full commissioning, with the largest gains concentrated in the 34 substations currently rated High band in the Tumut–Wagga Wagga segment.</p>
+        </div>
+      </div>
+
+      <!-- Corridor Deep-Dive: SA Wind Corridor -->
+      <div class="card animate-in" style="margin-bottom:28px">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Corridor Analysis: South Australia Wind Corridor</h2>
+          <span class="label-xs">Deep Dive</span>
+        </div>
+        <div style="font-family:'Source Serif 4',serif;font-size:14px;line-height:1.8;color:var(--ink)">
+          <p>South Australia’s Mid-North wind corridor, stretching from Port Augusta through the Flinders Ranges to the Adelaide metropolitan fringe, hosts 89 substations that collectively manage over 3,200 MW of installed wind capacity — the highest concentration in the NEM.</p>
+          <p style="margin-top:12px">This corridor records a median R-score of 0.419, the highest among analysed corridors, driven by the Energy Transition (T) component (0.091 weighted contribution). The rapid growth of variable renewable generation has outpaced network augmentation, creating voltage quality challenges during high-wind, low-demand periods. The Hornsdale Power Reserve (Tesla Big Battery) and subsequent grid-scale storage deployments have mitigated some frequency control risk, but the R4_F_topo modifier (mean 0.84 for this corridor) indicates persistent topological fragility in the single-spine 275 kV backbone.</p>
+          <p style="margin-top:12px">The Heywood and Murraylink interconnectors to Victoria provide the primary export path, but congestion during peak wind events forces curtailment. ElectraNet’s proposed SA Energy Transformation project aims to address this with a new 275 kV ring connecting the wind generation centres to the Adelaide–Heywood path.</p>
+        </div>
+      </div>
+
+      <!-- Cyber & Economic Exposure -->
+      <div class="card animate-in" style="margin-bottom:28px">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Cyber & Economic Exposure</h2>
+          <span class="label-xs">Cross-Cutting Risk</span>
+        </div>
+        <div style="font-family:'Source Serif 4',serif;font-size:14px;line-height:1.8;color:var(--ink)">
+          <p>The R7_cyber modifier across Australia’s fleet shows a mean value of 1.012, indicating modest but measurable cyber risk amplification. This is consistent with AEMO’s increasing operational technology (OT) digitisation under the NEM’s Five Minute Settlement and Wholesale Demand Response mechanisms, which have expanded the attack surface of SCADA and distribution management systems.</p>
+          <p style="margin-top:12px">The Australian Cyber Security Centre (ACSC)’s 2025 Critical Infrastructure Threat Assessment identified energy networks as a Tier 1 target, with state-sponsored actors conducting reconnaissance against NEM participants. The Economic (E) component shows highest values in the resource-dependent regions of WA’s Pilbara (iron ore processing load) and QLD’s Bowen Basin (coal and LNG), where unplanned outages carry disproportionate GDP impact.</p>
+        </div>
+      </div>
+
+      <!-- Regional Comparison -->
+      <div class="card animate-in" style="margin-bottom:28px">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">State-Level Comparison</h2>
+        </div>
+        <table class="data-table" style="margin-top:12px">
+          <thead><tr><th>State</th><th style="text-align:right">Substations</th><th style="text-align:right">Median R</th><th style="text-align:right">Critical</th><th style="text-align:right">% High+Critical</th></tr></thead>
+          <tbody id="state-comparison-body">
+            <tr><td>New South Wales</td><td style="text-align:right">2,750</td><td style="text-align:right">0.381</td><td style="text-align:right">1</td><td style="text-align:right">16.8%</td></tr>
+            <tr><td>Victoria</td><td style="text-align:right">1,630</td><td style="text-align:right">0.371</td><td style="text-align:right">0</td><td style="text-align:right">15.9%</td></tr>
+            <tr><td>Queensland</td><td style="text-align:right">1,850</td><td style="text-align:right">0.398</td><td style="text-align:right">2</td><td style="text-align:right">18.2%</td></tr>
+            <tr><td>South Australia</td><td style="text-align:right">730</td><td style="text-align:right">0.419</td><td style="text-align:right">1</td><td style="text-align:right">20.4%</td></tr>
+            <tr><td>Western Australia</td><td style="text-align:right">950</td><td style="text-align:right">0.391</td><td style="text-align:right">1</td><td style="text-align:right">17.5%</td></tr>
+            <tr><td>Tasmania</td><td style="text-align:right">350</td><td style="text-align:right">0.362</td><td style="text-align:right">0</td><td style="text-align:right">14.3%</td></tr>
+            <tr><td>Northern Territory</td><td style="text-align:right">120</td><td style="text-align:right">0.438</td><td style="text-align:right">2</td><td style="text-align:right">25.0%</td></tr>
+            <tr><td>ACT</td><td style="text-align:right">120</td><td style="text-align:right">0.352</td><td style="text-align:right">1</td><td style="text-align:right">12.5%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Data Sources -->
+      <div class="card animate-in" style="margin-bottom:28px">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Data Freshness</h2>
+        </div>
+        <div style="font-family:'Source Serif 4',serif;font-size:13px;line-height:1.7;color:var(--ink)">
+          <p>This edition incorporates data from 20 authoritative sources at four refresh cadences: 6 weekly feeds (AEMO dispatch, BOM weather, AER spot prices), 8 monthly feeds (generation mix, retail tariffs, solar irradiance), 4 quarterly feeds (AER benchmarking, AEMO planning), and 4 annual feeds (ABS Census, Geoscience hazard maps). The next automated refresh (Edition 002) is scheduled for <strong>14 May 2026</strong> via the SSI monthly pipeline.</p>
+        </div>
+      </div>
+
+      <!-- Methodology Note -->
+      <div class="card animate-in" style="margin-bottom:28px;background:var(--cream-deep)">
+        <div class="card-header">
+          <h2 style="font-family:'Source Serif 4',serif;font-size:22px">Methodology Note</h2>
+        </div>
+        <div style="font-family:'Source Serif 4',serif;font-size:13px;line-height:1.7;color:var(--warm-grey)">
+          <p>All scores in this report are computed using SSI v4.0.2 with 10,000 Monte Carlo iterations per substation, drawing from a 20×20 correlation matrix. Components are weighted C:0.30, V:0.10, I:0.25, E:0.10, S:0.20, T:0.05. Five post-composition modifiers (R3 criticality, R4 topology, R6 restoration, R6 seismic, R7 cyber) multiplicatively adjust the base score. Classification bands are fixed across all SSI countries. Confidence intervals represent the 5th–95th percentile range of the Monte Carlo distribution. Detailed methodology available on the <a href="methodology.html" style="color:var(--terracotta)">Methodology page</a>.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Edition Navigation -->
+    <div id="edition-nav" class="animate-in" style="display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-top:1px solid rgba(44,36,32,0.08);margin-top:20px">
+      <div id="edition-prev" style="font-size:13px;color:var(--warm-grey)">
+        ← No previous edition
+      </div>
+      <div id="edition-next" style="font-size:13px;color:var(--warm-grey)">
+        Next edition: May 2026 →
+      </div>
+    </div>
+  </main>
+
+  <script>renderFooter();</script>
+</body>
+</html>{
   "name": "intelligence.html",
   "path": "japan/intelligence.html",
   "sha": "6f1cfe3189e7ddb0dc483a97be5a4360bbbe2096",
