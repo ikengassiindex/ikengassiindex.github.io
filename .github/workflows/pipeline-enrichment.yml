@@ -1,0 +1,134 @@
+name: SSI Pipeline — Data Enrichment
+
+# Runs monthly (1st Thursday, 06:00 UTC — well before Intelligence refresh at 10:00 UTC)
+# Also supports manual trigger with country selection
+on:
+  schedule:
+    - cron: '0 6 1-7 * 4'  # 1st Thursday of each month
+  workflow_dispatch:
+    inputs:
+      countries:
+        description: 'Countries to process (comma-separated, or "all")'
+        required: false
+        default: 'all'
+      skip_rescore:
+        description: 'Skip Monte Carlo rescoring (faster, data-only)'
+        required: false
+        type: boolean
+        default: false
+      dry_run:
+        description: 'Dry run (preview only, no writes)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  CDS_API_KEY: ${{ secrets.CDS_API_KEY }}
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          # Optional: netCDF4 for real CDS data processing
+          # pip install netCDF4 cdsapi
+          echo "Pipeline uses stdlib only — no external dependencies required"
+
+      - name: Restore ingestion cache
+        uses: actions/cache@v4
+        with:
+          path: scripts/pipeline/.cache
+          key: ssi-pipeline-cache-${{ github.run_number }}
+          restore-keys: |
+            ssi-pipeline-cache-
+
+      - name: Determine countries
+        id: countries
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            COUNTRIES="${{ github.event.inputs.countries }}"
+          else
+            COUNTRIES="all"
+          fi
+          echo "countries=$COUNTRIES" >> $GITHUB_OUTPUT
+
+      - name: Run pipeline
+        run: |
+          COUNTRIES="${{ steps.countries.outputs.countries }}"
+          FLAGS=""
+
+          if [ "$COUNTRIES" = "all" ]; then
+            FLAGS="--all"
+          else
+            FLAGS=$(echo "$COUNTRIES" | tr ',' ' ')
+          fi
+
+          if [ "${{ github.event.inputs.skip_rescore }}" = "true" ]; then
+            FLAGS="$FLAGS --skip-rescore"
+          fi
+
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+          fi
+
+          python -m scripts.pipeline.run $FLAGS --output-report pipeline-report.json -v
+
+      - name: Upload pipeline report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-report-${{ github.run_number }}
+          path: pipeline-report.json
+
+      - name: Cache-bust ESG report assets
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          STAMP=$(date +%s)
+          for DIR in italy germany france spain uk us switzerland austria canada japan; do
+            if [ -f "$DIR/esg-report.html" ]; then
+              sed -i "s|intelligence-loader\.js[^\"]*|intelligence-loader.js?v=${STAMP}|g" "$DIR/esg-report.html"
+              sed -i "s|nav\.js[^\"]*|nav.js?v=${STAMP}|g" "$DIR/esg-report.html"
+              sed -i "s|style\.css[^\"]*|style.css?v=${STAMP}|g" "$DIR/esg-report.html"
+            fi
+          done
+
+      - name: Commit enriched data
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name "SSI Pipeline Bot"
+          git config user.email "pipeline@ikengassiindex.github.io"
+          git add -A
+          CHANGES=$(git diff --cached --stat)
+          if [ -n "$CHANGES" ]; then
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+            git commit -m "pipeline: data enrichment run — ${TIMESTAMP}
+
+          Automated ingestion + scoring pipeline:
+          - Seismic PGA overlay (INGV MPS04 / national sources)
+          - Climate trajectory (CMIP6 SSP2-4.5)
+          - Socio-economic enrichment (national statistics)
+          - Monte Carlo rescoring (10k iterations)
+
+          See pipeline-report artifact for full diff."
+            git push
+            echo "✓ Committed and pushed enriched data"
+          else
+            echo "No changes to commit"
+          fi
