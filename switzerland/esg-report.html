@@ -318,32 +318,11 @@ p  { margin-bottom: 14px; }
   <div id="esgReportsContainer"></div>
 
   <!-- ══════════════════════════════════════════════════════════
-       SECTION C: DATA SOURCE REGISTRY
-       ══════════════════════════════════════════════════════════ -->
-  <div class="section-block" id="sources">
-    <div class="section-header">
-      <span class="section-number">C</span>
-      <div class="section-title-group">
-        <h2>Data Source Registry</h2>
-        <div class="section-sub">All open-source institutional data feeding this ESG report, with vintage and refresh cadence</div>
-      </div>
-    </div>
-    <div class="card">
-      <table class="data-table" id="sourceRegistryTable">
-        <thead>
-          <tr><th>Source</th><th>Provider</th><th>Vintage</th><th>Refresh</th><th>License</th><th>Reports</th></tr>
-        </thead>
-        <tbody id="sourceRegistryBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════
-       SECTION D: AUDIT TRAIL
+       SECTION C: AUDIT TRAIL
        ══════════════════════════════════════════════════════════ -->
   <div class="section-block" id="audit">
     <div class="section-header">
-      <span class="section-number">D</span>
+      <span class="section-number">C</span>
       <div class="section-title-group">
         <h2>Audit Trail & Methodology Note</h2>
         <div class="section-sub">Traceability for CSRD Article 29a limited assurance</div>
@@ -838,6 +817,34 @@ function readinessText(score) {
    RENDERING FUNCTIONS
    ══════════════════════════════════════════════════ */
 
+/* ── Helper: get data sources filtered for a specific report ── */
+function getReportSources(reportNum) {
+  const country = SSI_COUNTRY || 'italy';
+  const sources = COUNTRY_SOURCES[country] || COUNTRY_SOURCES.italy;
+  const tag = 'R' + reportNum;
+  const filtered = sources.filter(row => {
+    const reports = row[5] || '';
+    return reports.indexOf(tag) >= 0;
+  });
+  if (filtered.length === 0) {
+    return '<div style="font-size:12px;color:var(--warm-grey);padding:4px 0;">No dedicated data sources for this report.</div>';
+  }
+  return filtered.map(row => {
+    const isBlocked = row[6];
+    const nameStyle = isBlocked ? 'color:var(--terracotta);' : 'color:var(--ink);';
+    const subStyle = isBlocked ? 'color:var(--terracotta);' : 'color:var(--warm-grey);';
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;">
+      <div style="flex:1;min-width:0;">
+        <div style="${nameStyle}font-weight:500;">${row[0]}</div>
+        <div style="${subStyle}font-size:11px;">${row[1]}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+        <span class="source-tag"><span class="vintage">${row[2]}</span> ${row[3]}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 let radarChart = null;
 let componentChart = null;
 
@@ -848,7 +855,6 @@ function renderAll(data) {
   renderMarkov(data);
   renderRadar(data);
   renderESGReports(data);
-  renderSourceRegistry(data);
   renderAuditTrail(data);
   renderESGFooter(data);
 }
@@ -1119,7 +1125,7 @@ function renderESGReports(d) {
       <div class="grid-2">
         <div class="card">
           <div class="card-header"><h3>Data Sources & Vintage</h3></div>
-          <div style="font-size:12px;color:var(--warm-grey);">See Section C for complete data source registry with vintage and licensing.</div>
+          ${getReportSources(r.num)}
         </div>
         <div class="method-box">
           <div class="method-label">Technical Validity</div>
@@ -1127,21 +1133,6 @@ function renderESGReports(d) {
         </div>
       </div>
     </div>`;
-  }).join('');
-}
-
-function renderSourceRegistry(d) {
-  const country = SSI_COUNTRY || 'italy';
-  const sources = COUNTRY_SOURCES[country] || COUNTRY_SOURCES.italy;
-  const tbody = document.getElementById('sourceRegistryBody');
-  tbody.innerHTML = sources.map(row => {
-    const isBlocked = row[6];
-    const style = isBlocked ? ' style="color:var(--terracotta);"' : '';
-    return `<tr>
-      <td${style}>${row[0]}</td><td${style}>${row[1]}</td>
-      <td class="num"${style}>${row[2]}</td><td${style}>${row[3]}</td>
-      <td>${row[4]}</td><td${style}>${row[5]}</td>
-    </tr>`;
   }).join('');
 }
 
