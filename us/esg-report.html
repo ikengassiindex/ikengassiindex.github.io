@@ -380,7 +380,7 @@ const ESG_REPORTS = [
         ['I2', 'Tree-fall IRI', '—', 'TCFD Strategy (b): Physical risk impact', d.components?.I ? 'ready' : 'gap'],
         ['I3', 'Heat-wave IRI', '—', 'EU Taxonomy Annex A: Heat stress', d.components?.I ? 'ready' : 'gap'],
         ['I5', 'Thermal stress', '—', 'ESRS E1-4: Climate mitigation targets', d.components?.I ? 'ready' : 'gap'],
-        ['R2', 'Climate trajectory', 'N/A', 'TCFD Strategy (c): Scenario analysis', 'gap'],
+        ['R2', 'Climate trajectory', (d.markov?.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr)' : 'N/A'), 'TCFD Strategy (c): Scenario analysis', d.markov?.p_crit_20yr !== undefined ? 'ready' : 'gap'],
         ['R6b', 'Seismic PGA', (d.seismic?.pga_g || '—') + 'g', 'EU Taxonomy Annex A: Geophysical hazards', d.seismic?.pga_g ? 'ready' : 'gap'],
         ['Markov', 'p_critical_10yr', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—'), 'TCFD Risk Management: Risk identification', d.markov ? 'ready' : 'gap'],
         ['Markov', 'p_critical_20yr', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—'), 'ESRS E1-9: Time horizons', d.markov?.p_critical_20yr === 0 ? 'partial' : 'ready']
@@ -422,8 +422,8 @@ const ESG_REPORTS = [
         ['V_socio', 'Energy poverty index', se.V_socio?.toFixed(2) || '—', 'ESRS S2-4: Impacts on affected communities', se.V_socio ? 'ready' : 'gap'],
         ['EP_rate', 'Energy poverty rate', (se.EP_rate_region || '—') + '%', 'SFDR PAI #14: Fossil fuel exposure proxy', se.EP_rate_region ? 'ready' : 'gap'],
         ['R3', 'Social multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—', 'ESRS S1-6: Workforce characteristics', d.modifiers?.R3_C_mult ? 'ready' : 'gap'],
-        ['Elderly', 'Elderly vulnerability', '—', 'SFDR PAI: Vulnerable populations', 'gap'],
-        ['Migration', 'Migration score', '—', 'ESRS S2: Community impact', 'gap']
+        ['Elderly', 'Elderly vulnerability', (d.socio_economic?.elderly_pct ? d.socio_economic.elderly_pct + '%' : '—'), 'SFDR PAI: Vulnerable populations', d.socio_economic?.elderly_pct ? 'ready' : 'gap'],
+        ['Community', 'Catchment population', (d.socio_economic?.population ? d.socio_economic.population.toLocaleString() : '—'), 'ESRS S2: Community impact', d.socio_economic?.population ? 'ready' : 'gap']
       ];
     },
     validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using national statistical office household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, elderly concentration, and net outward migration. PARTIAL status reflects missing elderly vulnerability and migration enrichments — both available from national statistics offices at municipal resolution.'
