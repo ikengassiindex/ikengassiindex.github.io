@@ -1,0 +1,62 @@
+name: Monthly ESG Report Refresh
+on:
+  schedule:
+    # Second Thursday of each month at 11:00 UTC (1 hour after intelligence refresh)
+    - cron: '0 11 8-14 * 4'
+  workflow_dispatch:
+    inputs:
+      cache_bust_only:
+        description: 'Only cache-bust ESG pages (no other changes)'
+        required: false
+        default: 'true'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Step 1: Cache-bust ESG report pages ──
+      - name: Cache-bust ESG report assets
+        run: |
+          STAMP=$(date +%s)
+          for country in france italy uk us germany spain switzerland austria canada japan; do
+            if [ -f "${country}/esg-report.html" ]; then
+              # Cache-bust the intelligence-loader.js reference
+              sed -i "s|intelligence-loader\.js?v=[0-9]*|intelligence-loader.js?v=${STAMP}|g" "${country}/esg-report.html"
+              # Cache-bust nav.js reference
+              sed -i "s|nav\.js?v=[0-9]*|nav.js?v=${STAMP}|g" "${country}/esg-report.html"
+              # Cache-bust style.css reference
+              sed -i "s|style\.css?v=[0-9]*|style.css?v=${STAMP}|g" "${country}/esg-report.html"
+              echo "Cache-busted ${country}/esg-report.html with timestamp ${STAMP}"
+            fi
+          done
+
+      # ── Step 2: Update reporting period date in footer ──
+      - name: Update report generation date
+        run: |
+          REPORT_DATE=$(date +"%d %B %Y")
+          for country in france italy uk us germany spain switzerland austria canada japan; do
+            if [ -f "${country}/esg-report.html" ]; then
+              sed -i "s|Report generated [0-9]* [A-Za-z]* [0-9]*|Report generated ${REPORT_DATE}|g" "${country}/esg-report.html"
+            fi
+          done
+
+      # ── Step 3: Commit and push ──
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: monthly ESG report refresh [$(date +%Y-%m-%d)]"
+            git push
+          fi

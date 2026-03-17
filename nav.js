@@ -41,6 +41,7 @@ function renderNav(activePage) {
     { id: 'methodology', label: 'Methodology', href: 'methodology.html' },
     { id: 'data', label: 'Data & Download', href: 'data.html' },
     { id: 'intelligence', label: 'Intelligence', href: 'intelligence.html' },
+    { id: 'esg-report', label: 'ESG Report', href: 'esg-report.html' },
   ];
 
   // Skip-link for keyboard/screen-reader users
