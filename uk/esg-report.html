@@ -360,7 +360,7 @@ const ESG_REPORTS = [
     legendColor: '#aa4234',
     why: 'ESRS E1 (Climate Change) is material for 98% of CSRD-reporting companies. TCFD physical risk disclosure is mandatory in 36+ jurisdictions. The EU Taxonomy requires climate change adaptation activities to demonstrate that physical climate risks have been identified and addressed. This report quantifies acute and chronic climate hazard exposure at substation level using ERA5 reanalysis and Markov degradation modelling.',
     sdgRationale: function(d) {
-      return `Target 13.1 calls for strengthening resilience and adaptive capacity to climate-related hazards. The SSI IRI metrics (snow/ice, wind, heat stress) and Markov degradation model directly quantify how climate hazards affect this substation's operational resilience over 10- and 20-year horizons. With a Markov risk score of ${d.markov?.risk_score?.toFixed(3) || '—'} and ETTC of ${d.markov?.ettc_years || '—'} years, this substation's climate trajectory can be assessed against TCFD physical risk and EU Taxonomy adaptation screening requirements.`;
+      return `Target 13.1 calls for strengthening resilience and adaptive capacity to climate-related hazards. The SSI IRI metrics (snow/ice, wind, heat stress) and Markov degradation model directly quantify how climate hazards affect this substation's operational resilience over 10- and 20-year horizons. With a Markov risk score of ${d.markov?.risk_score?.toFixed(3) || '—'} and ETTC of ${(d.markov?.ettc_years || d.markov?.ETTC_years) || '—'} years, this substation's climate trajectory can be assessed against TCFD physical risk and EU Taxonomy adaptation screening requirements.`;
     },
     getProfile: function(d) {
       return [
@@ -368,7 +368,7 @@ const ESG_REPORTS = [
         ['Environment Component (E)', d.components?.E?.toFixed(3) || '—'],
         ['Seismic PGA', (d.seismic?.pga_g || '—') + 'g (Zone ' + (d.seismic?.zone || '—') + ')'],
         ['Markov Risk Score', d.markov?.risk_score?.toFixed(3) || '—'],
-        ['ETTC (time to criticality)', (d.markov?.ettc_years || '—') + ' years'],
+        ['ETTC (time to criticality)', ((d.markov?.ettc_years || d.markov?.ETTC_years) || '—') + ' years'],
         ['P(critical) at 20 years', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—')],
         ['Corrosion Class', d.markov?.corrosion_class || '—'],
         ['Climate Trajectory (R2)', '||NOT ACTIVE||']
@@ -752,7 +752,7 @@ function computeESGScores(d) {
   if (d.components?.E) r1 += 0.15;
   if (d.seismic?.pga_g) r1 += 0.15;
   if (d.markov?.risk_score) r1 += 0.20;
-  if (d.markov?.ettc_years) r1 += 0.10;
+  if ((d.markov?.ettc_years || d.markov?.ETTC_years)) r1 += 0.10;
   // R2 trajectory always missing = max 0.85
   r1 = Math.min(r1 + 0.15, 0.85); // cap without trajectory
 
@@ -885,7 +885,7 @@ function renderKPIs(d) {
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Markov ETTC</div>
-      <div class="kpi-value">${d.markov?.ettc_years || '—'} <span style="font-size:16px;font-weight:400;">yr</span></div>
+      <div class="kpi-value">${(d.markov?.ettc_years || d.markov?.ETTC_years) || '—'} <span style="font-size:16px;font-weight:400;">yr</span></div>
       <div class="kpi-sub">Expected time to criticality</div>
     </div>
     <div class="kpi-card">
@@ -969,7 +969,7 @@ function renderComponentBar(d) {
 function renderMarkov(d) {
   const mk = d.markov;
   document.getElementById('markovRiskScore').textContent = mk?.risk_score?.toFixed(3) || '—';
-  document.getElementById('markovETTC').textContent = mk?.ettc_years ? mk.ettc_years + ' yr' : '—';
+  document.getElementById('markovETTC').textContent = (mk?.ettc_years || mk?.ETTC_years) ? (mk.ettc_years || mk.ETTC_years) + ' yr' : '—';
   document.getElementById('markovPCrit').textContent = mk?.p_critical_20yr !== undefined ? (mk.p_critical_20yr * 100).toFixed(1) + '%' : '—';
   document.getElementById('markovCorrosion').textContent = mk?.corrosion_class || '—';
 
