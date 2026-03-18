@@ -129,8 +129,10 @@ document.addEventListener("ssi-config-ready", function(e) {
 <script>
 (function(){
   function monthSeed() {
-    var d = new Date();
-    return d.getFullYear() * 100 + (d.getMonth() + 1);
+    // Monthly rotation starts May 2026; keep March substation until then
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth() + 1;
+    if (y < 2026 || (y === 2026 && m < 5)) return 202603;
+    return y * 100 + m;
   }
   function seededIndex(seed, len) {
     var h = seed;
