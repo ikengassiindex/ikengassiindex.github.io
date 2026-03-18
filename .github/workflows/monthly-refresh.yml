@@ -1,4 +1,4 @@
-name: Monthly Intelligence Refresh
+name: Monthly Intelligence & ESG Refresh
 on:
   schedule:
     # Second Thursday of each month at 10:00 UTC
@@ -10,7 +10,7 @@ on:
         required: false
         type: string
       skip_archive:
-        description: 'Skip PDF archival and email (true/false)'
+        description: 'Skip PDF/HTML archival and email (true/false)'
         required: false
         default: 'false'
         type: string
@@ -31,14 +31,14 @@ jobs:
         with:
           python-version: '3.11'
 
-      # ── Step 1: Archive previous edition as PDF + email ──
-      - name: Install Playwright for PDF capture
+      # ── Step 1: Archive current pages (before rotation) as PDF + HTML + email ──
+      - name: Install Playwright for PDF/HTML capture
         if: ${{ github.event.inputs.skip_archive != 'true' }}
         run: |
           pip install playwright
           playwright install chromium --with-deps
 
-      - name: Archive previous edition (PDF + email)
+      - name: Archive Intelligence + ESG pages (PDF + HTML + email)
         if: ${{ github.event.inputs.skip_archive != 'true' }}
         env:
           SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
@@ -66,17 +66,20 @@ jobs:
           print(f'Edition forced to {config[\"current_edition\"]:03d}')
           "
 
-      # ── Step 3: Cache-bust and commit ──
-      - name: Cache-bust intelligence assets
+      # ── Step 3: Cache-bust and commit (includes archive/ folder) ──
+      - name: Cache-bust intelligence + ESG assets
         run: |
           STAMP=$(date +%s)
-          for country in france italy uk us germany spain switzerland austria canada japan australia; do
+          for country in france italy uk us germany spain switzerland austria canada japan; do
             if [ -f "${country}/intelligence.html" ]; then
               sed -i "s|intelligence-loader\.js?v=[0-9]*|intelligence-loader.js?v=${STAMP}|g" "${country}/intelligence.html"
             fi
+            if [ -f "${country}/esg-report.html" ]; then
+              sed -i "s|ssi-data\.json?v=[0-9]*|ssi-data.json?v=${STAMP}|g" "${country}/esg-report.html"
+            fi
           done
 
-      - name: Commit and push
+      - name: Commit and push (edition update + archive files)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -85,6 +88,6 @@ jobs:
             echo "No changes to commit"
           else
             EDITION=$(python3 -c "import json; print(json.load(open('intelligence/edition-config.json'))['current_edition'])")
-            git commit -m "chore: monthly intelligence refresh — Edition $(printf '%03d' $EDITION) [$(date +%Y-%m-%d)]"
+            git commit -m "chore: monthly refresh — Edition $(printf '%03d' $EDITION) + archive [$(date +%Y-%m-%d)]"
             git push
           fi
