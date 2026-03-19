@@ -1321,6 +1321,17 @@ if (!hasNested) {
 
       resize();
       if (SSI.regions && !Array.isArray(SSI.regions)) SSI.regions = Object.values(SSI.regions);
+
+      if (!SSI.regions) {
+        var regionMap = {};
+        (SSI.substations || []).forEach(function(s) {
+          var r = s.region || s.province || 'Unknown';
+          if (!regionMap[r]) regionMap[r] = {region: r, name: r, count: 0, R_median: 0, _sum: 0};
+          regionMap[r].count++;
+          regionMap[r]._sum += (s.R_median || 0);
+        });
+        SSI.regions = Object.values(regionMap).map(function(r) { r.R_median = r.count ? r._sum / r.count : 0; delete r._sum; return r; });
+      }
       wireFilters();
       clearDetailPanel();
 
