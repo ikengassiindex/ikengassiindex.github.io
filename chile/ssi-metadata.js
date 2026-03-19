@@ -1,7 +1,7 @@
 /*  SSI v4.0.2 — Metadata Registry · Chile
     Loaded by every page in /chile/.
     ──────────────────────────────────────────────
-    Exports:  window.SSIMetadata   (structured, matches Australia/France format exactly)
+    Exports:  window.SSIMetadata   (structured, matches Chile/France format exactly)
               window.SSI_METADATA  (legacy flat, backward-compat)              */
 
 window.SSIMetadata = {
@@ -110,7 +110,7 @@ window.SSIMetadata = {
     { id:"R3", name:"Consequence + Energy Poverty + Mining Criticality", range:"[0.70, 1.35]", type:"Multiplicative", desc:"Amplifies risk for communes serving large populations or energy-poor communities with high economic dependency. Includes vulnerability indices (PNUD, CASEN), elderly exposure, and mining industry proximity.", formula:"C_mult = sigmoid(pop_weight × load_weight × V_socio × mining_factor)", sources:["INE","CASEN","PNUD","DINEM","MINSAL"], isEnhanced:true },
     { id:"R4", name:"Graph Criticality + Network Constraint", range:"[0.80, 1.40]", type:"Multiplicative", desc:"Penalises topological bottlenecks in SIC/SING networks: high betweenness centrality, bridge nodes, low degree, and north-south transmission congestion. Built from OSM power graph and CEN transmission constraints.", formula:"F_topo = f(degree, BC_percentile, is_bridge, sic_sing_tier)", sources:["OSM","CEN"], isEnhanced:true },
     { id:"R6a", name:"Restoration Speed", range:"[0.90, 1.10]", type:"Multiplicative", desc:"SEC-CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two substations with identical SAIDI can have different risk profiles based on how quickly power is restored in remote regions.", formula:"R6a = sigmoid_bounded(CAIDI_local / CAIDI_fleet_median)", sources:["SEC","CEN"], isEnhanced:true },
-    { id:"R6b", name:"Seismic + Tsunami Overlay (CRITICAL FOR CHILE)", range:"[1.00, 1.50]", type:"Multiplicative", desc:"CSN PGA + SHOA tsunami hazard overlay. Penalises substations in high-seismic zones (subduction zone proximity) or coastal inundation risk areas. Range higher than Australia due to Chile's seismic/tsunami prominence. Integration of ONEMI emergency declarations.", formula:"R6b = f(CSN_PGA_percentile, SHOA_tsunami_hazard, subduction_zone_proximity)", sources:["CSN","SHOA","SERNA","ONEMI"], isEnhanced:true },
+    { id:"R6b", name:"Seismic + Tsunami Overlay (CRITICAL FOR CHILE)", range:"[1.00, 1.50]", type:"Multiplicative", desc:"CSN PGA + SHOA tsunami hazard overlay. Penalises substations in high-seismic zones (subduction zone proximity) or coastal inundation risk areas. Range higher than Chile due to Chile's seismic/tsunami prominence. Integration of ONEMI emergency declarations.", formula:"R6b = f(CSN_PGA_percentile, SHOA_tsunami_hazard, subduction_zone_proximity)", sources:["CSN","SHOA","SERNA","ONEMI"], isEnhanced:true },
     { id:"R7", name:"Digital Readiness + Cyber-Physical Resilience", range:"[0.99, 1.05]", type:"Multiplicative", desc:"Cyber-physical security baseline, SCADA maturity proxy, and microgrid/islanding capability. Indicates digital resilience capability at the grid edge for earthquake/tsunami recovery scenarios.", formula:"Cyber = f(SCADA_maturity, microgrid_pct, islanding_capability)", sources:["CEN","SEC"], isEnhanced:false }
   ],
 
