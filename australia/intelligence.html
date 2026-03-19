@@ -172,7 +172,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var compHTML = compDefs.map(function(c){
       var val = s.components[c.key] || 0;
       var rawScore = _isRaw ? val : val / c.w;
-      var pct = (Math.min(rawScore, 1) * 100).toFixed(0);
+      var pct = (rawScore * 100).toFixed(0);
       var isAlert = s.alert_components && s.alert_components.indexOf(c.key) >= 0;
       return '<div><strong style="color:' + c.color + '">' + c.key + '</strong> ' + c.label + ': ' +
         (_isRaw ? rawScore.toFixed(2) : val.toFixed(3)) + ' / ' + c.w.toFixed(2) + ' (' + pct + '%)' +
@@ -462,11 +462,11 @@ document.addEventListener("ssi-config-ready", function(e) {
     ctx.fillStyle = '#2c2420';
     ctx.font = '500 11px DM Sans, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('\u2190 Lower digital readiness    R7 Modifier    Higher digital readiness \u2192', W / 2, H - 6);
+    ctx.fillText('← Lower digital readiness    R7 Modifier    Higher digital readiness →', W / 2, H - 6);
     ctx.save();
     ctx.translate(12, H / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText('\u2190 Lower risk    R_median    Higher risk \u2192', 0, 0);
+    ctx.fillText('← Lower risk    R_median    Higher risk →', 0, 0);
     ctx.restore();
 
     ctx.font = '400 10px DM Sans, sans-serif';
@@ -490,29 +490,29 @@ document.addEventListener("ssi-config-ready", function(e) {
     var blindRegionStr = topBlindRegions.map(function(r){ return r.name + ' (' + r.n + ')'; }).join(', ');
 
     document.getElementById('b1-narrative').innerHTML =
-      'The cyber-physical matrix identifies <strong>' + blindSpots.length + ' blind-spot substations</strong> \u2014 ' +
+      'The cyber-physical matrix identifies <strong>' + blindSpots.length + ' blind-spot substations</strong> — ' +
       'scoring High or Critical on overall risk while sitting below the fleet median for digital readiness (R7 < ' + medianR7.toFixed(4) + '). ' +
       'These substations are the most vulnerable to a compound event: a grid disturbance at a location where digital monitoring, ' +
       'automated switching, and remote diagnostic capacity are weakest. ' +
       'The blind spots concentrate in <strong>' + blindRegionStr + '</strong>. ' +
       'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry a HIGH cyber-exposure classification, ' +
-      'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier \u2014 indicating robust digital infrastructure coverage ' +
+      'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier — indicating robust digital infrastructure coverage ' +
       'concentrated in metropolitan networks (Ausgrid, CitiPower, Jemena).';
 
     // ── B.2 Economic Impact by Business Fabric ──
     var tiers = [
-      { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, LNG processing, mining operations \u2014 highest economic loss per interruption',
+      { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, LNG processing, mining operations — highest economic loss per interruption',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
-        voll: 'A$20\u201340/kWh' },
-      { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics hubs, agri-processing \u2014 significant continuity requirements',
+        voll: 'A$20–40/kWh' },
+      { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics hubs, agri-processing — significant continuity requirements',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
-        voll: 'A$10\u201320/kWh' },
-      { label: 'Commercial / SME-Dense', desc: 'Service economy, retail corridors, tourism \u2014 moderate individual impact but high aggregate exposure',
+        voll: 'A$10–20/kWh' },
+      { label: 'Commercial / SME-Dense', desc: 'Service economy, retail corridors, tourism — moderate individual impact but high aggregate exposure',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏪',
-        voll: 'A$4\u201310/kWh' },
-      { label: 'Light / Agricultural / Remote', desc: 'Pastoral stations, remote communities \u2014 lower VoLL but higher social vulnerability and longer restoration',
+        voll: 'A$4–10/kWh' },
+      { label: 'Light / Agricultural / Remote', desc: 'Pastoral stations, remote communities — lower VoLL but higher social vulnerability and longer restoration',
         filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
-        voll: 'A$1\u20134/kWh' }
+        voll: 'A$1–4/kWh' }
     ];
 
     var tiersHTML = '';
@@ -560,8 +560,8 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('b2-voll-note').innerHTML =
       '<strong>Value of Lost Load (VoLL) context:</strong> AEMO\'s 2024 Value of Customer Reliability (VCR) report places average VoLL at A$33.46/kWh for commercial/industrial ' +
       'and A$19.37/kWh for residential customers across the NEM. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
-      'exposed territories. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive economic fabric (R3 \u2265 1.14) with ' +
-      'High or Critical risk classification \u2014 representing the highest VoLL-weighted exposure in the fleet.';
+      'exposed territories. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ 1.14) with ' +
+      'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.';
 
     // B.2 Narrative
     var topTierSubs = fleet.filter(tiers[0].filter);
@@ -573,12 +573,12 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     var avgEP = fleet.reduce(function(a,s){ return a + (s.socio_economic && s.socio_economic.EP_rate_region ? s.socio_economic.EP_rate_region : 0); }, 0) / n;
     document.getElementById('b2-narrative').innerHTML =
-      'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> \u2014 regions where industrial corridors ' +
+      'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
       'depend on uninterrupted power for continuous processes (aluminium smelting, LNG liquefaction, mining beneficiation). A single hour of unplanned outage at these ' +
-      'substations carries an estimated VoLL of A$20\u201340/kWh, compared to A$1\u20134/kWh in remote pastoral areas. ' +
+      'substations carries an estimated VoLL of A$20–40/kWh, compared to A$1–4/kWh in remote pastoral areas. ' +
       'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp state-level variation: ' +
       'South Australia and Tasmania combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
-      'This cross-referencing of economic fabric with grid condition is unique to the SSI \u2014 no competing framework links VoLL exposure ' +
+      'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
       'to substation-level risk scores.';
 
     // ── B.3 SA4 Digital Readiness ──
@@ -652,11 +652,11 @@ document.addEventListener("ssi-config-ready", function(e) {
     mctx.fillText('High', 108, 36);
 
     // SA4 ranking — top 15 worst + best
-    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Worst Digital Readiness \u2014 Top 15 SA4 Regions</div>' +
+    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Worst Digital Readiness — Top 15 SA4 Regions</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:6px">Longer bar = higher R7 = better digital infrastructure.</div>';
     provList.slice(0, 15).forEach(function(pv, idx){
       var barPct = ((pv.avgR7 - r7floor) / (r7ceil - r7floor) * 100).toFixed(1);
-      var riskTag = pv.avgR > medianR ? '<span style="color:var(--crimson);font-weight:600;font-size:10px"> \u26A0 high R</span>' : '';
+      var riskTag = pv.avgR > medianR ? '<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span>' : '';
       rankHTML += '<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px">' +
         '<span style="min-width:14px;color:var(--warm-grey);font-size:10px">' + (idx+1) + '</span>' +
         '<span style="min-width:110px;font-weight:500">' + pv.name + riskTag + '</span>' +
@@ -673,11 +673,11 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('b3-narrative').innerHTML =
       'SA4-level analysis reveals a clear digital divide mirroring Australia\'s metropolitan-regional connectivity gap. ' +
       '<strong>' + worstProv.name + '</strong> has the lowest average R7 (' + worstProv.avgR7.toFixed(4) + '), while ' +
-      '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' \u2014 a spread of ' +
+      '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
       (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
       '<strong>' + dualExposed.length + ' SA4 regions</strong> combine below-median digital readiness with above-median grid risk, ' +
       'making them priority targets for DNSP digitalisation investment and the Australian Government\'s Rewiring the Nation programme. ' +
-      'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open broadband/smart meter data \u2014 ' +
+      'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open broadband/smart meter data — ' +
       'as ACSC/SOCI Act compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
 
     // ── B.4 Monthly Pulse ──
@@ -687,7 +687,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var monthYear = 'April 2026';
 
     document.getElementById('b4-pulse').innerHTML =
-      '<strong>Inaugural edition \u2014 Baseline Snapshot (' + monthYear + ').</strong> ' +
+      '<strong>Inaugural edition — Baseline Snapshot (' + monthYear + ').</strong> ' +
       'This edition establishes the baseline for the Cyber & Economic Exposure Monitor. Key reference points: ' +
       'fleet average R7 = ' + avgR7.toFixed(4) + ', median = ' + medianR7.toFixed(4) + '; ' +
       cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
@@ -788,7 +788,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   document.getElementById('c-freq-static').textContent = (staticC + derived);
 
   // ── Source Registry Table ──
-  document.getElementById('c-table-header').innerHTML = '<h3 style="margin:0">Data Source Registry \u2014 ' + monthYear + '</h3>';
+  document.getElementById('c-table-header').innerHTML = '<h3 style="margin:0">Data Source Registry — ' + monthYear + '</h3>';
 
   var sources = meta.DATA_SOURCES;
   var freqOrder = { Hourly: 0, Weekly: 1, Monthly: 2, Quarterly: 3, Annual: 4, Static: 5, Derived: 6, Continuous: 2 };
@@ -839,7 +839,7 @@ document.addEventListener("ssi-config-ready", function(e) {
         '<span style="color:var(--warm-grey);font-size:11px">' + t.note + '</span></div>' +
       '<div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden">' +
         '<div style="width:' + barW + '%;height:100%;background:' + t.color + ';border-radius:3px;opacity:0.7"></div></div>' +
-      '<div style="font-size:11px;color:var(--warm-grey);margin-top:2px">' + t.sources.join(' \u00B7 ') + '</div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-top:2px">' + t.sources.join(' · ') + '</div>' +
     '</div>';
   });
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
@@ -874,9 +874,9 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     var fleetHTML = '<div class="kpi-grid" style="margin-bottom:16px">' +
       '<div class="kpi-card"><div class="kpi-label">Fleet Size</div><div class="kpi-value" style="color:var(--ink)">' + n.toLocaleString() + '</div><div class="kpi-sub">substations scored</div></div>' +
-      '<div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">' + median.toFixed(3) + '</div><div class="kpi-sub">P5=' + p5.toFixed(3) + ' \u00B7 P95=' + p95.toFixed(3) + '</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">' + median.toFixed(3) + '</div><div class="kpi-sub">P5=' + p5.toFixed(3) + ' · P95=' + p95.toFixed(3) + '</div></div>' +
       '<div class="kpi-card"><div class="kpi-label">High + Critical</div><div class="kpi-value" style="color:var(--crimson)">' + (bands.High + bands.Critical) + '</div><div class="kpi-sub">' + ((bands.High + bands.Critical) / n * 100).toFixed(1) + '% of fleet</div></div>' +
-      '<div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">' + (confTiers.high / n * 100).toFixed(0) + '%</div><div class="kpi-sub">' + confTiers.high + ' subs \u00B7 CI/R &lt; 0.50</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">' + (confTiers.high / n * 100).toFixed(0) + '%</div><div class="kpi-sub">' + confTiers.high + ' subs · CI/R &lt; 0.50</div></div>' +
     '</div>';
 
     fleetHTML += '<div style="margin-bottom:8px"><div class="label-xs" style="margin-bottom:6px">Band Distribution</div>' +
@@ -895,7 +895,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       ' substation scores remain unchanged</strong> this edition. The fleet median R of ' + median.toFixed(3) +
       ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
       (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
-      'The first material score changes are expected when AEMO publishes MT SCADA updates (affecting C1\u2013C4 and R6a) ' +
+      'The first material score changes are expected when AEMO publishes MT SCADA updates (affecting C1–C4 and R6a) ' +
       'and when the Clean Energy Regulator refreshes the Small-scale Installations Registry (affecting T1). ' +
       'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
       'which have minimal impact on fleet-level score distribution.';
@@ -1036,7 +1036,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var nHV = puglia.filter(function(s){ return s.voltage_kv >= 132; }).length;
     var nMV = nTotal - nHV;
     document.getElementById('pug-total').textContent = nTotal;
-    document.getElementById('pug-total-sub').textContent = nHV + ' HV \u00B7 ' + nMV + ' MV';
+    document.getElementById('pug-total-sub').textContent = nHV + ' HV · ' + nMV + ' MV';
 
     var bands = { Low:0, Medium:0, High:0, Critical:0 };
     puglia.forEach(function(s){ bands[s.classification]++; });
@@ -1063,7 +1063,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     provAvgs.sort(function(a,b){ return b.avg - a.avg; });
     var worst = provAvgs[0];
     document.getElementById('pug-worst-prov').textContent = worst.name;
-    document.getElementById('pug-worst-sub').textContent = 'Avg R: ' + worst.avg.toFixed(3) + ' \u00B7 ' + worst.n + ' substations';
+    document.getElementById('pug-worst-sub').textContent = 'Avg R: ' + worst.avg.toFixed(3) + ' · ' + worst.n + ' substations';
 
     // D.1 Narrative
     var pctAboveFleetMedian = (puglia.filter(function(s){ return s.R_median > fleetMedian; }).length / nTotal * 100).toFixed(0);
@@ -1149,7 +1149,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var numStyle = thStyle + 'text-align:right;font-family:"Playfair Display",serif;font-weight:500;';
     tbody.innerHTML = top10.map(function(s){
       var bCol = bandColors[s.classification] || 'var(--ink)';
-      var alertStr = s.alert_components ? s.alert_components.join(', ') : '\u2014';
+      var alertStr = s.alert_components ? s.alert_components.join(', ') : '—';
       var sa4 = s[provField] || s.region || '';
       return '<tr>' +
         '<td style="' + thStyle + 'font-weight:500">' + s.name + '</td>' +
@@ -1164,8 +1164,8 @@ document.addEventListener("ssi-config-ready", function(e) {
         '<td style="' + numStyle + '">' + s.components.T.toFixed(3) + '</td>' +
         '<td style="' + thStyle + 'color:var(--crimson);font-weight:600">' + alertStr + '</td></tr>';
     }).join('') +
-      '<tr><td colspan="11" style="text-align:center;color:var(--warm-grey);font-style:italic;font-size:12px;padding:8px 10px">\u2026 ' +
-      (nTotal - 10) + ' additional substations \u2014 <a href="map.html" style="color:var(--terracotta)">explore full corridor in Digital Twin \u2192</a></td></tr>';
+      '<tr><td colspan="11" style="text-align:center;color:var(--warm-grey);font-style:italic;font-size:12px;padding:8px 10px">… ' +
+      (nTotal - 10) + ' additional substations — <a href="map.html" style="color:var(--terracotta)">explore full corridor in Digital Twin →</a></td></tr>';
 
     // ── D.3 Component Analysis ──
     var compDefs = [
@@ -1180,7 +1180,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     function avgComp(subs, key) { return subs.reduce(function(a,s){ return a + s.components[key]; }, 0) / subs.length; }
     function avgMod(subs, key) { return subs.reduce(function(a,s){ return a + s.modifiers[key]; }, 0) / subs.length; }
 
-    var compBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Component Averages \u2014 NSW Corridor vs Fleet</div>';
+    var compBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Component Averages — NSW Corridor vs Fleet</div>';
     compDefs.forEach(function(c){
       var pugAvg = avgComp(puglia, c.key);
       var fltAvg = avgComp(fleet, c.key);
@@ -1190,7 +1190,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       var sign = delta > 0 ? '+' : '';
       compBarsHTML += '<div style="margin-bottom:10px">' +
         '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
-          '<span style="font-weight:500">' + c.key + ' \u2014 ' + c.label + '</span>' +
+          '<span style="font-weight:500">' + c.key + ' — ' + c.label + '</span>' +
           '<span style="color:var(--warm-grey)">' + pugAvg.toFixed(3) + ' vs ' + fltAvg.toFixed(3) + ' (' + sign + delta + '%)</span></div>' +
         '<div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative">' +
           '<div style="position:absolute;width:' + fltPct + '%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div>' +
@@ -1207,11 +1207,11 @@ document.addEventListener("ssi-config-ready", function(e) {
       { key: 'R6_hazard', label: 'R6b Climate Hazard', range: '[1.00, 1.25]' },
       { key: 'R7_cyber', label: 'R7 Digital Read.', range: '[0.99, 1.05]' }
     ];
-    var modBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Modifier Averages \u2014 NSW Corridor vs Fleet</div>';
+    var modBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Modifier Averages — NSW Corridor vs Fleet</div>';
     modDefs.forEach(function(m){
       var pugAvg = avgMod(puglia, m.key);
       var fltAvg = avgMod(fleet, m.key);
-      var dir = pugAvg > 1.01 ? '\u2191' : pugAvg < 0.99 ? '\u2193' : '\u2192';
+      var dir = pugAvg > 1.01 ? '↑' : pugAvg < 0.99 ? '↓' : '→';
       var col = pugAvg > fltAvg * 1.01 ? 'var(--crimson)' : pugAvg < fltAvg * 0.99 ? 'var(--sage)' : 'var(--warm-grey)';
       modBarsHTML += '<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px">' +
         '<span style="min-width:120px;font-weight:500">' + m.label + '</span>' +
@@ -1230,18 +1230,18 @@ document.addEventListener("ssi-config-ready", function(e) {
     var c2pug = avgComp(puglia, c2.key), c2flt = avgComp(fleet, c2.key);
     document.getElementById('pug-narrative-d3').innerHTML =
       'The dominant risk driver across the NSW corridor is <strong>' + c1.key + ' (' + c1.label + ')</strong>, averaging ' +
-      c1pug.toFixed(3) + ' against a fleet average of ' + c1flt.toFixed(3) + ' \u2014 occupying ' +
+      c1pug.toFixed(3) + ' against a fleet average of ' + c1flt.toFixed(3) + ' — occupying ' +
       (c1pug / c1.w * 100).toFixed(0) + '% of its weight ceiling (w = ' + c1.w.toFixed(2) + '). ' +
       'The second contributor is <strong>' + c2.key + ' (' + c2.label + ')</strong> at ' +
       c2pug.toFixed(3) + ' vs fleet ' + c2flt.toFixed(3) + ' (' + (c2pug / c2.w * 100).toFixed(0) + '% of ceiling). ' +
       'Among modifiers, the R3 consequence multiplier averages ' + avgMod(puglia, 'R3_C_mult').toFixed(3) +
       ' (fleet: ' + avgMod(fleet, 'R3_C_mult').toFixed(3) + '), reflecting the economic significance of ' +
-      'NSW\'s industrial base \u2014 from the Hunter Valley coal chain to Western Sydney logistics corridors. The R6b climate hazard modifier averages ' +
-      avgMod(puglia, 'R6_hazard').toFixed(3) + ', capturing the corridor\'s increasing exposure to extreme heat events and bushfire risk \u2014 ' +
+      'NSW\'s industrial base — from the Hunter Valley coal chain to Western Sydney logistics corridors. The R6b climate hazard modifier averages ' +
+      avgMod(puglia, 'R6_hazard').toFixed(3) + ', capturing the corridor\'s increasing exposure to extreme heat events and bushfire risk — ' +
       'a dimension invisible to every competing framework.';
 
     // ── D.4 SA4 Breakdown ──
-    var provHTML = '<div class="label-xs" style="margin-bottom:10px">SA4 Region Risk Profile \u2014 Sorted by Mean R</div>' +
+    var provHTML = '<div class="label-xs" style="margin-bottom:10px">SA4 Region Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){
       var provSubs = puglia.filter(function(s){ return (s[provField] || s.region) === pv.name; });
@@ -1252,8 +1252,8 @@ document.addEventListener("ssi-config-ready", function(e) {
       provHTML += '<div style="margin-bottom:12px">' +
         '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
           '<span style="font-weight:600">' + pv.name + '</span>' +
-          '<span style="color:var(--warm-grey)">' + pv.n + ' subs \u00B7 avg R = ' + pv.avg.toFixed(3) +
-          ' \u00B7 H:' + provBands.High + (provBands.Critical ? ' C:' + provBands.Critical : '') + ' M:' + provBands.Medium + '</span></div>' +
+          '<span style="color:var(--warm-grey)">' + pv.n + ' subs · avg R = ' + pv.avg.toFixed(3) +
+          ' · H:' + provBands.High + (provBands.Critical ? ' C:' + provBands.Critical : '') + ' M:' + provBands.Medium + '</span></div>' +
         '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">' +
           '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:4px;opacity:0.7"></div>' +
         '</div></div>';
@@ -1265,19 +1265,19 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('pug-narrative-d4').innerHTML =
       'The SA4-level breakdown reveals significant intra-state variation. <strong>' + worst.name + '</strong> leads with a mean R of ' +
       worst.avg.toFixed(3) + ' across ' + worst.n + ' substations, while <strong>' + bestProv.name + '</strong> scores ' +
-      bestProv.avg.toFixed(3) + ' \u2014 a spread of ' + (worst.avg - bestProv.avg).toFixed(3) +
+      bestProv.avg.toFixed(3) + ' — a spread of ' + (worst.avg - bestProv.avg).toFixed(3) +
       ' within a single state. This disparity underscores why state-level metrics (as used by AER performance reports) mask the true distribution of grid stress. ' +
-      'The SSI\'s substation-level granularity reveals that NSW is not uniformly stressed but contains distinct corridors of concentrated risk \u2014 ' +
+      'The SSI\'s substation-level granularity reveals that NSW is not uniformly stressed but contains distinct corridors of concentrated risk — ' +
       'precisely the kind of spatial pattern that AEMO\'s Integrated System Plan and DNSP capital expenditure planning requires.';
 
     // D.5 Implications
     var pugAbove065 = puglia.filter(function(s){ return s.R_median >= 0.65; }).length;
     document.getElementById('pug-narrative-d5').innerHTML =
-      '<strong>' + pugAbove065 + ' NSW substations</strong> score R \u2265 0.650, placing them in the upper quartile of national risk. ' +
-      'For AEMO ISP investment prioritisation and Rewiring the Nation funding allocation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target \u2014 ' +
+      '<strong>' + pugAbove065 + ' NSW substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
+      'For AEMO ISP investment prioritisation and Rewiring the Nation funding allocation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
       'where DER deployment is accelerating against ageing infrastructure with above-average continuity deficits and significant socio-economic exposure. ' +
       'The SSI\'s silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only because of their engineering condition, ' +
-      'but because the communities they serve \u2014 characterised by coal transition dependency, growing Western Sydney demand, and bushfire-prone supply corridors \u2014 are disproportionately ' +
+      'but because the communities they serve — characterised by coal transition dependency, growing Western Sydney demand, and bushfire-prone supply corridors — are disproportionately ' +
       'vulnerable to disruption. This is precisely the anticipatory grid planning capability that the SSI was built to provide.';
   });
 })();
@@ -1342,14 +1342,14 @@ document.addEventListener("ssi-config-ready", function(e) {
       <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">~80</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px">
-      <span style="min-width:110px">\u21B3 Urban</span>
+      <span style="min-width:110px">↳ Urban</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:88%;height:100%;background:#e67e22;border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:#e67e22;font-weight:600">~45</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px;padding-bottom:4px;border-bottom:1px solid var(--card-border)">
-      <span style="min-width:110px">\u21B3 Rural/Remote</span>
+      <span style="min-width:110px">↳ Rural/Remote</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:50%;height:100%;background:var(--crimson);border-radius:4px"></div>
       </div>
@@ -1415,13 +1415,13 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     document.getElementById('eu-insight').innerHTML =
       '<strong>This month\'s key insight:</strong> The NSW corridor deep-dive shows <strong>' + highC +
-      ' substations</strong> (of ' + puglia.length + ') with C-component above 70% of its weight ceiling \u2014 ' +
+      ' substations</strong> (of ' + puglia.length + ') with C-component above 70% of its weight ceiling — ' +
       'indicating continuity-of-supply performance consistent with Australia\'s rural/remote territory classification. ' +
-      'The NSW corridor\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '\u00D7 the fleet average</strong> of ' +
+      'The NSW corridor\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
       avgC_fleet.toFixed(3) + '. In Asia-Pacific terms, these substations individually perform closer to Malaysian or ' +
-      'Thai SAIDI levels (~70\u2013115 min/customer/year) than to Australia\'s own NEM urban average (~45 min). ' +
+      'Thai SAIDI levels (~70–115 min/customer/year) than to Australia\'s own NEM urban average (~45 min). ' +
       'The SSI reveals what aggregate AER statistics conceal: that Australia\'s mid-tier Asia-Pacific position is not a national ' +
-      'condition but a statistical average of Singapore-quality urban performance and developing-nation-level remote performance \u2014 ' +
+      'condition but a statistical average of Singapore-quality urban performance and developing-nation-level remote performance — ' +
       'and the NSW corridor concentrates significant pockets of the latter.';
 
     // ── State Ranking ──
@@ -1444,7 +1444,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var maxAvgR = regions[0].avgR;
 
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
-    var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst \u2192 best.</div>';
+    var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
     regions.forEach(function(reg, idx){
       var isNSW = reg.name === 'New South Wales' || reg.name.indexOf('NSW') >= 0;
       var barPct = ((1 - reg.avgR) * 100).toFixed(1);
@@ -1465,8 +1465,8 @@ document.addEventListener("ssi-config-ready", function(e) {
           '<span style="font-weight:' + (isNSW ? '700' : '500') + ';min-width:180px">' +
             '<span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#' + (idx + 1) + '</span>' +
             reg.name + '</span>' +
-          '<span style="color:var(--warm-grey);font-size:11px">' + reg.n + ' subs \u00B7 avg R = ' + reg.avgR.toFixed(3) +
-          ' \u00B7 H:' + reg.bands.High + (reg.bands.Critical ? ' C:' + reg.bands.Critical : '') + '</span></div>' +
+          '<span style="color:var(--warm-grey);font-size:11px">' + reg.n + ' subs · avg R = ' + reg.avgR.toFixed(3) +
+          ' · H:' + reg.bands.High + (reg.bands.Critical ? ' C:' + reg.bands.Critical : '') + '</span></div>' +
         '<div style="display:flex;gap:4px;align-items:center">' +
           '<div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">' +
             '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:3px;opacity:0.7"></div>' +
@@ -1487,7 +1487,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'New South Wales ranks <strong>#' + nswRank + ' of ' + regions.length + ' states/territories</strong> by mean R_median. ' +
       'The three most stressed states are ' + top3.join(', ') + ', while the three most resilient are ' + bot3.join(', ') + '. ' +
       aboveAvg + ' of ' + regions.length + ' states score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
-      'This ranking \u2014 possible only because the SSI scores every substation individually rather than relying on aggregate DNSP or national statistics \u2014 ' +
+      'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DNSP or national statistics — ' +
       'reveals the true spatial distribution of grid stress across Australia. ' +
       'It is precisely this substation-level granularity that positions the SSI as a tool for AEMO ISP / Rewiring the Nation / CER investment prioritisation: ' +
       'not treating entire states as monoliths, but identifying the specific corridors within each that demand attention.';
@@ -1525,105 +1525,105 @@ document.addEventListener("ssi-config-ready", function(e) {
 <script>
 (function(){
   var topics = [
-    { layer: 1, ref: '\u00A70.3', title: 'Data Architecture \u2014 Component Taxonomy',
+    { layer: 1, ref: '§0.3', title: 'Data Architecture — Component Taxonomy',
       subtitle: 'How the SSI\'s 6 components and 20 sub-metrics are sourced, validated, and scored',
-      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index \u2014 its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 20+ public data sources in the SSI registry, validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither the BESS valuation engine nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs \u2014 for example, the C (Continuity) component feeds the DNSP/TNSP\'s avoided-outage calculation (D1), while the E (Economic) component feeds the community value stack\'s energy poverty reduction estimate (W3).',
-      concepts: ['6 components, 20 sub-metrics, 95 variables', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30\u00B7C + 0.10\u00B7V + 0.25\u00B7I + 0.10\u00B7E + 0.20\u00B7S + 0.05\u00B7T', 'Each sub-metric traceable to authoritative public source'],
+      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 20+ public data sources in the SSI registry, validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither the BESS valuation engine nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs — for example, the C (Continuity) component feeds the DNSP/TNSP\'s avoided-outage calculation (D1), while the E (Economic) component feeds the community value stack\'s energy poverty reduction estimate (W3).',
+      concepts: ['6 components, 20 sub-metrics, 95 variables', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T', 'Each sub-metric traceable to authoritative public source'],
       ssiLink: 'components' },
-    { layer: 1, ref: '\u00A70.3.4', title: 'Gaussian Copula Monte Carlo Engine',
+    { layer: 1, ref: '§0.3.4', title: 'Gaussian Copula Monte Carlo Engine',
       subtitle: 'How 85.0 million simulations capture the correlation structure across grid risk factors',
-      body: 'The SSI components are not independent \u2014 a substation with poor continuity (high C) often also has poor voltage quality (high V), aged infrastructure (high I5), and is located in a rural area with high economic vulnerability (high E). The Gaussian copula captures these dependencies through a 20\u00D720 correlation matrix estimated from the Australian fleet, decomposed via Cholesky factorisation to generate correlated random draws. For each of 8,500 substations, 10,000 Monte Carlo iterations propagate uncertainty through the full scoring formula, producing not just a point estimate (R_median) but a complete posterior distribution \u2014 P5, P50, P95, confidence interval width, and skewness. This is the computational backbone: 85.0 million simulations, 1.78 billion arithmetic operations, yielding the uncertainty quantification that distinguishes the SSI from deterministic indices.',
-      concepts: ['20\u00D720 Gaussian copula with Cholesky decomposition', '10,000 iterations per substation = 85.0M total', 'Full posterior: R_P5, R_median, R_P95, CI_width, skewness', 'Correlation captures systemic clustering of risk factors'],
+      body: 'The SSI components are not independent — a substation with poor continuity (high C) often also has poor voltage quality (high V), aged infrastructure (high I5), and is located in a rural area with high economic vulnerability (high E). The Gaussian copula captures these dependencies through a 20×20 correlation matrix estimated from the Australian fleet, decomposed via Cholesky factorisation to generate correlated random draws. For each of 8,500 substations, 10,000 Monte Carlo iterations propagate uncertainty through the full scoring formula, producing not just a point estimate (R_median) but a complete posterior distribution — P5, P50, P95, confidence interval width, and skewness. This is the computational backbone: 85.0 million simulations, 1.78 billion arithmetic operations, yielding the uncertainty quantification that distinguishes the SSI from deterministic indices.',
+      concepts: ['20×20 Gaussian copula with Cholesky decomposition', '10,000 iterations per substation = 85.0M total', 'Full posterior: R_P5, R_median, R_P95, CI_width, skewness', 'Correlation captures systemic clustering of risk factors'],
       ssiLink: 'mc' },
-    { layer: 2, ref: '\u00A70.4.1', title: 'DNSP/TNSP Value Stack (D1\u2013D5)',
+    { layer: 2, ref: '§0.4.1', title: 'DNSP/TNSP Value Stack (D1–D5)',
       subtitle: 'What a BESS is worth to the distribution/transmission network operator in avoided or deferred costs',
-      body: 'The DNSP/TNSP value stack quantifies five categories of value that a battery energy storage system creates for the network operator at each substation. D1 (Avoided Outage Cost) uses the SSI\'s C component and SAIDI data to estimate the reduction in customer-minutes-lost. D2 (Deferred Reinforcement) leverages the S (Saturation) and I (Infrastructure) components to calculate how BESS deployment can postpone expensive grid upgrades. D3 (Reactive Power Support) draws on V (Voltage) data to value power quality improvement. D4 (Loss Reduction) uses graph topology (R4) to estimate reduced network losses. D5 (Fault Level Management) reflects the BESS\'s contribution to grid stability. Each component maps directly to one or more SSI v4.0 inputs \u2014 the Index doesn\'t just measure risk, it prices the economic case for intervention.',
+      body: 'The DNSP/TNSP value stack quantifies five categories of value that a battery energy storage system creates for the network operator at each substation. D1 (Avoided Outage Cost) uses the SSI\'s C component and SAIDI data to estimate the reduction in customer-minutes-lost. D2 (Deferred Reinforcement) leverages the S (Saturation) and I (Infrastructure) components to calculate how BESS deployment can postpone expensive grid upgrades. D3 (Reactive Power Support) draws on V (Voltage) data to value power quality improvement. D4 (Loss Reduction) uses graph topology (R4) to estimate reduced network losses. D5 (Fault Level Management) reflects the BESS\'s contribution to grid stability. Each component maps directly to one or more SSI v4.0 inputs — the Index doesn\'t just measure risk, it prices the economic case for intervention.',
       concepts: ['D1: Avoided Outage = f(C, SAIDI, customer count)', 'D2: Deferred Reinforcement = f(S, I, load growth)', 'D3: Reactive Power = f(V, network impedance)', 'D4 + D5: Loss Reduction + Fault Level = f(R4, topology)'],
       ssiLink: 'valuation' },
-    { layer: 2, ref: '\u00A70.4.2', title: 'Community Value Stack (W1\u2013W5)',
-      subtitle: 'Social and economic value to the local community \u2014 the case for public-interest investment',
-      body: 'While the DNSP/TNSP value stack speaks the language of regulated returns, the community value stack addresses a different audience: state governments, ARENA / CEFC / Rewiring the Nation allocators, and institutional investors. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO\u2082 using marginal emissions factors. W5 (Resilience Value) \u2014 perhaps the most novel \u2014 uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real), not the DNSP WACC.',
+    { layer: 2, ref: '§0.4.2', title: 'Community Value Stack (W1–W5)',
+      subtitle: 'Social and economic value to the local community — the case for public-interest investment',
+      body: 'While the DNSP/TNSP value stack speaks the language of regulated returns, the community value stack addresses a different audience: state governments, ARENA / CEFC / Rewiring the Nation allocators, and institutional investors. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real), not the DNSP WACC.',
       concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0%'],
       ssiLink: 'community' },
-    { layer: 2, ref: '\u00A70.4.5', title: 'Real Options Pricing Framework',
-      subtitle: 'Why traditional DCF systematically undervalues BESS \u2014 and how six embedded options fix this',
+    { layer: 2, ref: '§0.4.5', title: 'Real Options Pricing Framework',
+      subtitle: 'Why traditional DCF systematically undervalues BESS — and how six embedded options fix this',
       body: 'Traditional discounted cashflow analysis treats a BESS investment as a fixed sequence of revenues and costs over 30 years. In reality, the asset owner has options: to expand capacity if market conditions improve, to repurpose for different services as regulations evolve, to delay investment until uncertainty resolves. The SSI-ENN prices six embedded real options for each substation-BESS pair: capacity expansion option (Black-Scholes on future demand growth), technology refresh option (call on next-generation battery chemistry), revenue-stream switching option (American option on emerging market mechanisms like 5MS or PQaaS), grid-connection upgrade option, decommissioning timing option, and a regulatory windfall option capturing the value of favorable policy changes. The SSI data drives the underlying volatility: substations with wider confidence intervals (high CI_width) have higher option value because uncertainty creates optionality.',
       concepts: ['6 embedded options per substation-BESS pair', 'Black-Scholes for capacity expansion, American options for switching', 'Higher SSI uncertainty (CI_width) = higher option value', 'Option-adjusted NPV typically 15-40% above base DCF'],
       ssiLink: 'options' },
-    { layer: 2, ref: '\u00A70.4.4', title: 'Revenue Stack & Dispatch Optimisation',
-      subtitle: 'Up to 11 revenue streams from a single battery \u2014 subject to one physical constraint',
-      body: 'A grid-connected BESS generates revenue from up to 11 streams (R1\u2013R11), but is physically constrained to one full charge-discharge cycle per day. The dispatch optimiser allocates this single cycle across competing revenue opportunities: energy arbitrage (R1), frequency containment (R2), regulation FCAS (R3), contingency FCAS (R4), capacity credits (R5), reactive power (R6), peak shaving (R7), backup power (R8), and three emerging streams \u2014 five-minute settlement arbitrage (R9), power quality as a service (R10), and carbon reduction services (R11). The optimiser is location-specific because the SSI data determines which streams are most valuable at each substation.',
-      concepts: ['11 revenue streams (R1\u2013R11), 1-cycle/day constraint', 'Location-specific optimisation from SSI component data', 'R9\u2013R11: Emerging streams modelled as forward-looking options', 'NEM 5-minute settlement creates new arbitrage opportunities'],
+    { layer: 2, ref: '§0.4.4', title: 'Revenue Stack & Dispatch Optimisation',
+      subtitle: 'Up to 11 revenue streams from a single battery — subject to one physical constraint',
+      body: 'A grid-connected BESS generates revenue from up to 11 streams (R1–R11), but is physically constrained to one full charge-discharge cycle per day. The dispatch optimiser allocates this single cycle across competing revenue opportunities: energy arbitrage (R1), frequency containment (R2), regulation FCAS (R3), contingency FCAS (R4), capacity credits (R5), reactive power (R6), peak shaving (R7), backup power (R8), and three emerging streams — five-minute settlement arbitrage (R9), power quality as a service (R10), and carbon reduction services (R11). The optimiser is location-specific because the SSI data determines which streams are most valuable at each substation.',
+      concepts: ['11 revenue streams (R1–R11), 1-cycle/day constraint', 'Location-specific optimisation from SSI component data', 'R9–R11: Emerging streams modelled as forward-looking options', 'NEM 5-minute settlement creates new arbitrage opportunities'],
       ssiLink: 'revenue' },
-    { layer: 3, ref: '\u00A70.5.2', title: 'Neural Network \u2014 Ensemble Architecture',
+    { layer: 3, ref: '§0.5.2', title: 'Neural Network — Ensemble Architecture',
       subtitle: 'GBT + DNN ensemble: why two model families outperform either alone on grid data',
-      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features \u2014 they handle the mix of continuous (voltage, load), categorical (region, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight \u03B1 is learned during validation: \u03B1\u00B7GBT + (1-\u03B1)\u00B7DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, DNSP NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously.',
-      concepts: ['Ensemble: \u03B1\u00B7GBT + (1-\u03B1)\u00B7DNN, \u03B1 learned during validation', '7 simultaneous outputs via multi-task learning', 'GBT dominates with sparse data, DNN with dense data', 'Shared representation = implicit regularisation'],
+      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (region, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, DNSP NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously.',
+      concepts: ['Ensemble: α·GBT + (1-α)·DNN, α learned during validation', '7 simultaneous outputs via multi-task learning', 'GBT dominates with sparse data, DNN with dense data', 'Shared representation = implicit regularisation'],
       ssiLink: 'nn' },
-    { layer: 3, ref: '\u00A70.5.3', title: 'Transfer Learning & Feature Missingness',
+    { layer: 3, ref: '§0.5.3', title: 'Transfer Learning & Feature Missingness',
       subtitle: 'How ground truth from data-rich countries enables valuation across 28+ countries with incomplete data',
-      body: 'Transfer learning is the mechanism that enables the SSI-ENN to value substations in countries where the full feature vector is not available. The core insight: grid physics is universal \u2014 topology determines load flow, weather drives thermal degradation, population density correlates with outage impact \u2014 even though data availability varies dramatically across jurisdictions. The network is first trained on data-rich countries (France, Australia, US) with complete feature vectors, then transferred. For each new country, available features are mapped to the training schema. Missing features are handled through a learned missingness embedding: the network learns not just to predict from available data, but to quantify how much accuracy it loses from each missing feature.',
+      body: 'Transfer learning is the mechanism that enables the SSI-ENN to value substations in countries where the full feature vector is not available. The core insight: grid physics is universal — topology determines load flow, weather drives thermal degradation, population density correlates with outage impact — even though data availability varies dramatically across jurisdictions. The network is first trained on data-rich countries (France, Australia, US) with complete feature vectors, then transferred. For each new country, available features are mapped to the training schema. Missing features are handled through a learned missingness embedding: the network learns not just to predict from available data, but to quantify how much accuracy it loses from each missing feature.',
       concepts: ['Train on data-rich countries (full data), transfer to others (partial data)', 'Learned missingness embedding quantifies data value', 'Grid physics universality enables cross-border transfer', 'Accuracy convergence: f(Data Completeness Index)'],
       ssiLink: 'transfer' },
-    { layer: 3, ref: '\u00A70.5.5', title: 'Uncertainty Quantification',
+    { layer: 3, ref: '§0.5.5', title: 'Uncertainty Quantification',
       subtitle: 'Investment-grade predictions require calibrated confidence intervals, not just point estimates',
       body: 'A point estimate without uncertainty bounds is unusable for investment-grade analysis. The SSI-ENN produces calibrated P10/P50/P90 prediction intervals using two complementary approaches: quantile regression (the DNN head directly outputs multiple quantiles, trained with pinball loss) and conformal prediction (a distribution-free method that provides guaranteed coverage). The SSI\'s own Monte Carlo confidence intervals (CI_width, P5/P95) serve as the ground truth for calibration: the neural network\'s uncertainty estimates are validated against the analytical uncertainty from the 10,000-iteration copula engine.',
       concepts: ['Quantile regression (pinball loss) + conformal prediction', 'Calibrated against SSI Monte Carlo ground truth', 'Per-country, per-voltage, per-band calibration verification', 'Investment-grade: P10/P50/P90 for all outputs'],
       ssiLink: 'uncertainty' },
-    { layer: 3, ref: '\u00A70.5.6', title: 'Explainability & SHAP Values',
+    { layer: 3, ref: '§0.5.6', title: 'Explainability & SHAP Values',
       subtitle: 'Clients need to understand not just the prediction but WHY a substation ranks highly',
-      body: 'Investment-grade models require interpretability. A BESS developer considering an A$15M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score \u2014 and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down.',
-      concepts: ['SHAP: game-theoretic feature attribution per prediction', 'Waterfall visualisation: fleet average \u2192 substation prediction', 'Direct traceability to SSI components and data sources', 'Feature importance validated against domain expertise'],
+      body: 'Investment-grade models require interpretability. A BESS developer considering an A$15M commitment needs to understand not just that a substation scores highly, but which specific factors drive that score — and whether those factors are likely to persist. SHAP (SHapley Additive exPlanations) provides a rigorous, game-theoretic attribution of each feature\'s contribution to each prediction. For every substation, the SSI-ENN produces a SHAP waterfall: starting from the fleet-average valuation and showing how each feature pushes the estimate up or down.',
+      concepts: ['SHAP: game-theoretic feature attribution per prediction', 'Waterfall visualisation: fleet average → substation prediction', 'Direct traceability to SSI components and data sources', 'Feature importance validated against domain expertise'],
       ssiLink: 'shap' },
-    { layer: 4, ref: '\u00A70.6.1', title: 'Global Expansion \u2014 Country Prioritisation',
+    { layer: 4, ref: '§0.6.1', title: 'Global Expansion — Country Prioritisation',
       subtitle: 'How 28+ countries are ranked by expected commercial return per unit of expansion effort',
-      body: 'The SSI-ENN targets ~500,000+ substations across 28+ countries. But expansion resources are finite \u2014 each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size, data availability (Data Completeness Index), strategic value, and expansion cost. Australia scores among the highest thanks to AEMO/AER/ABS data quality, alongside France, Germany, Italy, and the UK.',
-      concepts: ['Priority = Market Size \u00D7 Data Completeness \u00D7 Strategic Value / Cost', '28+ countries targeted', 'AU, FR, DE, IT = highest DCI scores', 'Each country requires bespoke regulatory mapping'],
+      body: 'The SSI-ENN targets ~500,000+ substations across 28+ countries. But expansion resources are finite — each country requires data acquisition, regulatory mapping, source substitution, and calibration. The country prioritisation score ranks markets by expected commercial return per unit of effort, balancing four dimensions: market size, data availability (Data Completeness Index), strategic value, and expansion cost. Australia scores among the highest thanks to AEMO/AER/ABS data quality, alongside France, Germany, Italy, and the UK.',
+      concepts: ['Priority = Market Size × Data Completeness × Strategic Value / Cost', '28+ countries targeted', 'AU, FR, DE, IT = highest DCI scores', 'Each country requires bespoke regulatory mapping'],
       ssiLink: 'expansion' },
-    { layer: 4, ref: '\u00A70.6.2', title: 'Data Completeness Index',
+    { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index',
       subtitle: 'Quantifying what fraction of the SSI feature vector is available for each country',
-      body: 'The Data Completeness Index (DCI) quantifies what fraction of the SSI-ENN\'s feature vector can be populated for a given country, weighted by each feature\'s contribution to prediction accuracy. Not all missing features matter equally \u2014 grid topology data (available globally via OpenStreetMap) matters more than hyper-local socio-economic variables. A country with DCI > 0.70 can produce production-quality valuations; DCI 0.50\u20130.70 produces indicative estimates; below 0.50, the uncertainty bounds are too wide for commercial use.',
-      concepts: ['DCI = \u03A3(SHAP_weight \u00D7 data_available) per country', 'DCI > 0.70 = production quality, 0.50\u20130.70 = indicative', 'OSM topology available globally = high-weight features covered', 'DCI creates data procurement priority roadmap'],
+      body: 'The Data Completeness Index (DCI) quantifies what fraction of the SSI-ENN\'s feature vector can be populated for a given country, weighted by each feature\'s contribution to prediction accuracy. Not all missing features matter equally — grid topology data (available globally via OpenStreetMap) matters more than hyper-local socio-economic variables. A country with DCI > 0.70 can produce production-quality valuations; DCI 0.50–0.70 produces indicative estimates; below 0.50, the uncertainty bounds are too wide for commercial use.',
+      concepts: ['DCI = Σ(SHAP_weight × data_available) per country', 'DCI > 0.70 = production quality, 0.50–0.70 = indicative', 'OSM topology available globally = high-weight features covered', 'DCI creates data procurement priority roadmap'],
       ssiLink: 'dci' },
-    { layer: 4, ref: '\u00A70.6.4', title: 'SSI Transfer & Calibration Protocol',
+    { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
       subtitle: 'Adapting the SSI model across different national grid characteristics',
-      body: 'The SSI v4.0 architecture was designed to be transferable across grid infrastructures globally. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources \u2014 e.g., AEMO/AER for Australia, CRE/ODRE for France, BNetzA for Germany), the calibration parameters (voltage thresholds, outage benchmarks, economic indicators), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process.',
-      concepts: ['5-step protocol: source mapping \u2192 gap \u2192 recalibration \u2192 validation \u2192 scorecard', 'AEMO/AER (AU), CRE (FR), BNetzA (DE), Ofgem (UK)', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires Coverage Quality Scorecard'],
+      body: 'The SSI v4.0 architecture was designed to be transferable across grid infrastructures globally. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., AEMO/AER for Australia, CRE/ODRE for France, BNetzA for Germany), the calibration parameters (voltage thresholds, outage benchmarks, economic indicators), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process.',
+      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'AEMO/AER (AU), CRE (FR), BNetzA (DE), Ofgem (UK)', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires Coverage Quality Scorecard'],
       ssiLink: 'transfer-protocol' },
-    { layer: 5, ref: '\u00A70.7.1', title: 'Platform \u2014 Product Delivery Pipeline',
+    { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
       subtitle: 'From raw analytical outputs to four commercial product formats',
-      body: 'The SSI-ENN\'s analytical engine (Layers 1\u20133) produces a high-dimensional output vector per substation per BESS configuration. The product delivery pipeline transforms this into four distinct product formats: (1) the Explorer Dashboard, (2) the API, (3) the Value-Add Card \u2014 a per-substation PDF report, and (4) the Advisory Report \u2014 a bespoke multi-substation analysis for institutional clients (DNSPs, TNSPs, investment funds, government agencies).',
+      body: 'The SSI-ENN\'s analytical engine (Layers 1–3) produces a high-dimensional output vector per substation per BESS configuration. The product delivery pipeline transforms this into four distinct product formats: (1) the Explorer Dashboard, (2) the API, (3) the Value-Add Card — a per-substation PDF report, and (4) the Advisory Report — a bespoke multi-substation analysis for institutional clients (DNSPs, TNSPs, investment funds, government agencies).',
       concepts: ['4 products: Dashboard, API, Value-Add Card, Advisory Report', 'Single analytical core, multiple delivery formats', 'Value-Add Card: per-substation investor-grade PDF', 'Advisory: bespoke multi-substation institutional analysis'],
       ssiLink: 'platform' },
-    { layer: 5, ref: '\u00A70.7.3', title: 'Revenue Model & Unit Economics',
+    { layer: 5, ref: '§0.7.3', title: 'Revenue Model & Unit Economics',
       subtitle: 'Three revenue channels with distinct scaling characteristics',
-      body: 'The SSI-ENN generates revenue through three channels. Subscriptions (recurring, scalable, high-margin): three tiers \u2014 Explorer (A$1,490/month), Developer (A$7,400/month), and Enterprise (custom pricing). Advisory services (project-based): per-project fees for bespoke analysis, typically A$35K\u2013A$220K. Data licensing (passive, institutional): anonymised dataset licensing to energy data platforms, credit agencies, and research institutions.',
-      concepts: ['3 tiers: Explorer A$1,490/mo, Developer A$7,400/mo, Enterprise custom', 'Advisory: A$35K\u2013A$220K per project', 'Data licensing: A$75K\u2013A$300K/year to institutions', 'Operating leverage: near-zero marginal cost per subscriber'],
+      body: 'The SSI-ENN generates revenue through three channels. Subscriptions (recurring, scalable, high-margin): three tiers — Explorer (A$1,490/month), Developer (A$7,400/month), and Enterprise (custom pricing). Advisory services (project-based): per-project fees for bespoke analysis, typically A$35K–A$220K. Data licensing (passive, institutional): anonymised dataset licensing to energy data platforms, credit agencies, and research institutions.',
+      concepts: ['3 tiers: Explorer A$1,490/mo, Developer A$7,400/mo, Enterprise custom', 'Advisory: A$35K–A$220K per project', 'Data licensing: A$75K–A$300K/year to institutions', 'Operating leverage: near-zero marginal cost per subscriber'],
       ssiLink: 'revenue-model' },
-    { layer: 1, ref: '\u00A70.3.6', title: 'Data Flow Matrix \u2014 Traceability Register',
+    { layer: 1, ref: '§0.3.6', title: 'Data Flow Matrix — Traceability Register',
       subtitle: 'For any output number, trace it back to the exact input variable and source',
-      body: 'The Data Flow Matrix maps every SSI component and sub-metric to the downstream valuation outputs it influences. This is the traceability register: for any number produced by the SSI-ENN \u2014 whether an R_median score, a DNSP NPV, or a community value estimate \u2014 you can trace it backwards through the matrix to the specific input variables and data sources that determined it. This traceability is a design requirement for investment-grade analytics.',
-      concepts: ['Every output traceable to specific inputs and sources', 'Investment-grade auditability for due diligence', 'Targeted recomputation when sources update', 'Bidirectional: input\u2192output and output\u2192input'],
+      body: 'The Data Flow Matrix maps every SSI component and sub-metric to the downstream valuation outputs it influences. This is the traceability register: for any number produced by the SSI-ENN — whether an R_median score, a DNSP NPV, or a community value estimate — you can trace it backwards through the matrix to the specific input variables and data sources that determined it. This traceability is a design requirement for investment-grade analytics.',
+      concepts: ['Every output traceable to specific inputs and sources', 'Investment-grade auditability for due diligence', 'Targeted recomputation when sources update', 'Bidirectional: input→output and output→input'],
       ssiLink: 'traceability' },
-    { layer: 2, ref: '\u00A70.4.3', title: 'Total Cost of Ownership Model',
-      subtitle: 'Stochastic cost modelling \u2014 because BESS economics are not deterministic',
+    { layer: 2, ref: '§0.4.3', title: 'Total Cost of Ownership Model',
+      subtitle: 'Stochastic cost modelling — because BESS economics are not deterministic',
       body: 'The TCO model provides the cost side of the NPV calculation, and all costs are stochastic. CAPEX follows a learning-curve distribution calibrated to Bloomberg NEF projections. OPEX is modelled as a mean-reverting process with seasonal components reflecting temperature-dependent degradation. Battery degradation follows a non-linear capacity fade model. The SSI data feeds this directly: substations with high I1 (temperature trajectory from CMIP6 SSP2-4.5) face faster degradation.',
       concepts: ['CAPEX learning curve calibrated to BNEF', 'Non-linear battery degradation: f(DoD, temperature, C-rate)', 'SSI I1 (climate trajectory) drives degradation forecast', 'Full NPV distribution, not point estimate'],
       ssiLink: 'tco' },
-    { layer: 1, ref: '\u00A70.3.2', title: 'Sub-Metric Definitions \u2014 Replicability Standard',
+    { layer: 1, ref: '§0.3.2', title: 'Sub-Metric Definitions — Replicability Standard',
       subtitle: 'Every sub-metric defined with sufficient precision for independent replication',
-      body: 'Each of the SSI\'s 20 sub-metrics is defined with sufficient precision for independent replication \u2014 a core requirement for academic credibility and regulatory acceptance. Each definition specifies: the mathematical formula, the data source and update frequency, the normalisation method, the relationship to upstream inputs, and the downstream components it feeds. This specification enables peer review, regulatory audit, and international transfer.',
+      body: 'Each of the SSI\'s 20 sub-metrics is defined with sufficient precision for independent replication — a core requirement for academic credibility and regulatory acceptance. Each definition specifies: the mathematical formula, the data source and update frequency, the normalisation method, the relationship to upstream inputs, and the downstream components it feeds. This specification enables peer review, regulatory audit, and international transfer.',
       concepts: ['20 sub-metrics, each formally defined for replication', 'C1: SAIDI proxy from AER reliability performance data', 'I5: 4-state Markov degradation chain', 'Enables peer review, regulatory audit, and international transfer'],
       ssiLink: 'sub-metrics' },
-    { layer: 5, ref: '\u00A70.7.2', title: 'API & Computation Architecture',
+    { layer: 5, ref: '§0.7.2', title: 'API & Computation Architecture',
       subtitle: 'Serving batch fleet recomputation and interactive queries from a single platform',
       body: 'The platform serves two fundamentally different workloads: batch computation (recompute all substations during quarterly refresh) and interactive query (serve a single substation lookup in <200ms). The architecture separates these: batch runs on GPU clusters, producing pre-computed results stored in a columnar database. Interactive queries hit this pre-computed store.',
       concepts: ['Batch (GPU, quarterly) + Interactive (<200ms, CPU)', 'Pre-computed columnar store for low-latency queries', 'Explorer: 100/day, Developer: 10K/day, Enterprise: unlimited', 'Real-time parameter adjustment on pre-computed base'],
       ssiLink: 'api' },
-    { layer: 4, ref: '\u00A70.6.3', title: 'Substation Registry Construction',
+    { layer: 4, ref: '§0.6.3', title: 'Substation Registry Construction',
       subtitle: 'How to identify 500,000+ substations across 28+ countries from open data',
       body: 'Before any valuation can be computed, the substation population must be identified. Australia has a clean registry of 8,500 substations from SSI v4.0, validated against AEMO and DNSP publications. The construction pipeline follows four steps: (1) OSM extraction, (2) deduplication, (3) attribute enrichment, (4) validation against published grid statistics.',
-      concepts: ['OSM extraction \u2192 deduplication \u2192 enrichment \u2192 validation', 'High recovery rate against official AEMO/DNSP registries', 'Voltage class, operator, capacity from OSM + AEMO data', 'Target: 500K+ substations across 28+ countries'],
+      concepts: ['OSM extraction → deduplication → enrichment → validation', 'High recovery rate against official AEMO/DNSP registries', 'Voltage class, operator, capacity from OSM + AEMO data', 'Target: 500K+ substations across 28+ countries'],
       ssiLink: 'registry' }
   ];
 
@@ -1644,11 +1644,11 @@ document.addEventListener("ssi-config-ready", function(e) {
   var monthYear = 'April 2026';
 
   var layerDefs = [
-    { n: 1, label: 'Layer 1 \u2014 Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
-    { n: 2, label: 'Layer 2 \u2014 Valuation', color: '#c0392b', desc: 'DNSP/TNSP + Community value stacks, TCO, real options' },
-    { n: 3, label: 'Layer 3 \u2014 Neural Net', color: '#6c3483', desc: 'GBT+DNN ensemble, transfer learning, SHAP' },
-    { n: 4, label: 'Layer 4 \u2014 Coverage', color: '#1a6b4a', desc: 'Country prioritisation, DCI, registry, calibration' },
-    { n: 5, label: 'Layer 5 \u2014 Platform', color: '#0e7490', desc: 'Products, API, revenue model, unit economics' }
+    { n: 1, label: 'Layer 1 — Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
+    { n: 2, label: 'Layer 2 — Valuation', color: '#c0392b', desc: 'DNSP/TNSP + Community value stacks, TCO, real options' },
+    { n: 3, label: 'Layer 3 — Neural Net', color: '#6c3483', desc: 'GBT+DNN ensemble, transfer learning, SHAP' },
+    { n: 4, label: 'Layer 4 — Coverage', color: '#1a6b4a', desc: 'Country prioritisation, DCI, registry, calibration' },
+    { n: 5, label: 'Layer 5 — Platform', color: '#0e7490', desc: 'Products, API, revenue model, unit economics' }
   ];
 
   var navHTML = '';
@@ -1668,14 +1668,14 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   var conceptsHTML = topic.concepts.map(function(c) {
     return '<div style="display:flex;align-items:baseline;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(44,36,32,0.04)">' +
-      '<span style="color:' + layerColor + ';font-weight:700;flex-shrink:0">\u2192</span>' +
+      '<span style="color:' + layerColor + ';font-weight:700;flex-shrink:0">→</span>' +
       '<span>' + c + '</span></div>';
   }).join('');
 
   document.getElementById('enn-topic').innerHTML =
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
       '<span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:' + layerColor + ';color:#fff;padding:4px 10px;border-radius:3px">Layer ' + topic.layer + '</span>' +
-      '<span style="font-size:10px;color:var(--warm-grey);letter-spacing:0.05em">' + topic.ref + ' \u00B7 Inaugural edition \u00B7 ' + monthYear + '</span></div>' +
+      '<span style="font-size:10px;color:var(--warm-grey);letter-spacing:0.05em">' + topic.ref + ' · Inaugural edition · ' + monthYear + '</span></div>' +
     '<h3 style="margin:0 0 4px;font-size:17px">' + topic.title + '</h3>' +
     '<p style="font-size:12px;color:var(--warm-grey);margin:0 0 16px;font-style:italic">' + topic.subtitle + '</p>' +
     '<p style="font-size:13px;line-height:1.7;margin-bottom:16px">' + topic.body + '</p>' +
@@ -1707,15 +1707,15 @@ document.addEventListener("ssi-config-ready", function(e) {
       var avgR3 = fleet.reduce(function(a,s){ return a + s.modifiers.R3_C_mult; }, 0) / n;
       statHTML = 'Across the ' + n.toLocaleString() + '-substation Australian fleet, the average consequence multiplier (R3) is ' +
         avgR3.toFixed(3) + ', indicating significant socio-economic exposure. ' +
-        highCrit + ' substations (' + (highCrit/n*100).toFixed(1) + '%) are classified High or Critical \u2014 ' +
+        highCrit + ' substations (' + (highCrit/n*100).toFixed(1) + '%) are classified High or Critical — ' +
         'these are the highest-priority candidates for BESS deployment where DNSP/TNSP and community value stacks are largest.';
     } else if (topic.layer === 3) {
       statHTML = 'The Australian training set comprises ' + n.toLocaleString() + ' substations with complete 95-feature vectors. ' +
-        'Average CI_width of ' + avgCI.toFixed(3) + ' provides the uncertainty ground truth for neural network calibration. The fleet\'s risk distribution \u2014 ' +
+        'Average CI_width of ' + avgCI.toFixed(3) + ' provides the uncertainty ground truth for neural network calibration. The fleet\'s risk distribution — ' +
         fleet.filter(function(s){ return s.classification === 'Low'; }).length + ' Low, ' +
         fleet.filter(function(s){ return s.classification === 'Medium'; }).length + ' Medium, ' +
         fleet.filter(function(s){ return s.classification === 'High'; }).length + ' High, ' +
-        fleet.filter(function(s){ return s.classification === 'Critical'; }).length + ' Critical \u2014 ensures balanced training across all risk bands.';
+        fleet.filter(function(s){ return s.classification === 'Critical'; }).length + ' Critical — ensures balanced training across all risk bands.';
     } else if (topic.layer === 4) {
       var provinces = {};
       fleet.forEach(function(s){ provinces[s.province || s.region] = true; });
@@ -1723,7 +1723,7 @@ document.addEventListener("ssi-config-ready", function(e) {
         Object.keys(provinces).length + ' SA4 regions. This serves as the reference benchmark for the Coverage Quality Scorecard.';
     } else {
       statHTML = 'The Australian fleet of ' + n.toLocaleString() + ' substations generates the full analytical depth that the platform delivers: ' +
-        'R_median, P5/P95 bounds, 6 component scores, 5 modifier impacts, band classification, and confidence tier \u2014 ' +
+        'R_median, P5/P95 bounds, 6 component scores, 5 modifier impacts, band classification, and confidence tier — ' +
         'all computed per substation per BESS configuration.';
     }
 
@@ -1739,7 +1739,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '<p style="font-size:13px;line-height:1.7;margin:0"><strong>Coming next month:</strong> ' +
     '<span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:' + nextLayer.color +
     ';color:#fff;padding:2px 8px;border-radius:3px;margin:0 4px">Layer ' + nextTopic.layer + '</span> ' +
-    nextTopic.title + ' \u2014 <em>' + nextTopic.subtitle + '</em></p>';
+    nextTopic.title + ' — <em>' + nextTopic.subtitle + '</em></p>';
 })();
 </script>
 </section>
@@ -1795,11 +1795,11 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   // ── Card 1: Next Edition deep-dive topics ──
   var deepDives = [
-    { region: 'New South Wales', theme: 'The NSW\u2013VIC Interconnector Corridor', context: 'SAIDI comparison', contextDetail: 'Interconnector constraint analysis and transmission bottlenecks' },
-    { region: 'South Australia', theme: 'South Australian DER Saturation', context: 'DER integration stress', contextDetail: 'Highest rooftop PV penetration globally \u2014 minimum demand challenges' },
+    { region: 'New South Wales', theme: 'The NSW–VIC Interconnector Corridor', context: 'SAIDI comparison', contextDetail: 'Interconnector constraint analysis and transmission bottlenecks' },
+    { region: 'South Australia', theme: 'South Australian DER Saturation', context: 'DER integration stress', contextDetail: 'Highest rooftop PV penetration globally — minimum demand challenges' },
     { region: 'Queensland', theme: 'Queensland Tropical Infrastructure', context: 'Climate vulnerability', contextDetail: 'Cyclone and extreme heat exposure on northern grid assets' },
     { region: 'Victoria', theme: 'Victorian Coal Transition', context: 'Coal closure impact', contextDetail: 'Latrobe Valley transition and replacement capacity adequacy' },
-    { region: 'Western Australia', theme: 'WA Isolated Grid Systems', context: 'Island grid analysis', contextDetail: 'SWIS and remote mining grids \u2014 standalone reliability challenges' },
+    { region: 'Western Australia', theme: 'WA Isolated Grid Systems', context: 'Island grid analysis', contextDetail: 'SWIS and remote mining grids — standalone reliability challenges' },
     { region: 'Tasmania', theme: 'Tasmanian Hydro Dependency', context: 'Single-resource risk', contextDetail: 'Battery of the Nation and Marinus Link implications' },
     { region: 'Northern Territory', theme: 'NT Remote Communities', context: 'Energy access', contextDetail: 'Aboriginal community power supply and diesel displacement' },
     { region: 'ACT', theme: 'ACT Urban Micro-Grid', context: '100% renewable target', contextDetail: 'Grid stability under complete renewable procurement' },
@@ -1814,10 +1814,10 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   var card1 = document.getElementById('g-next-edition');
   card1.innerHTML =
-    '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month \u2014 Edition ' + nextEdition + '</span>' +
+    '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
     '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
     '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-    'Deep-dive into ' + nextDive.region + '\'s grid risk profile \u2014 substation map, component analysis, SA4 breakdown. ' +
+    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, SA4 breakdown. ' +
     'Asia-Pacific Context Card: ' + nextDive.contextDetail + '.</p>';
 
   // ── Card 2: Next Data Refresh ──
@@ -1836,12 +1836,12 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     card2.innerHTML =
       '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
-      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' \u2014 ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
+      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
       '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
       'Next quarterly sources due: <strong>' + qtrSources + '</strong>. ' +
       'Estimated impact: R4 topology +0.8%, T component +3.2%, fleet median stable. ' +
       'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong> (' +
-      (annualHighImpact ? annualHighImpact.vars : '?') + ' variables \u2192 ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
+      (annualHighImpact ? annualHighImpact.vars : '?') + ' variables → ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
   }
 
   // ── Card 3: Fleet Spotlight ──
@@ -1871,7 +1871,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     spotlights.push({
       title: riskiest.name + ': Highest Risk Concentration',
       body: riskiest.name + ' has the highest concentration of High/Critical substations: <strong>' +
-        riskiest.highCrit + ' of ' + riskiest.n + ' (' + (riskiest.pctHC * 100).toFixed(0) + '%)</strong> are in the upper risk bands \u2014 ' +
+        riskiest.highCrit + ' of ' + riskiest.n + ' (' + (riskiest.pctHC * 100).toFixed(0) + '%)</strong> are in the upper risk bands — ' +
         'avg R = ' + riskiest.avg.toFixed(3) + '. This makes it the most acute risk corridor in the fleet.'
     });
 
@@ -1893,7 +1893,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var bridges = fleet.filter(function(s){ return s.graph_topology && s.graph_topology.is_bridge; });
     var bridgeHighCrit = bridges.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
     spotlights.push({
-      title: bridges.length + ' Bridge Substations \u2014 Single Points of Failure',
+      title: bridges.length + ' Bridge Substations — Single Points of Failure',
       body: 'Topological bridges whose failure disconnects part of the grid. <strong>' + bridgeHighCrit.length + '</strong> are classified High or Critical. ' +
         'These are fleet priorities for both reinforcement and BESS deployment investment.'
     });
@@ -1903,7 +1903,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var highEP_highRisk = highEP.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
     spotlights.push({
       title: 'Energy Poverty Double Jeopardy',
-      body: '<strong>' + highEP.length + ' substations</strong> serve regions with energy poverty rates above 14% \u2014 ' +
+      body: '<strong>' + highEP.length + ' substations</strong> serve regions with energy poverty rates above 14% — ' +
         'and <strong>' + highEP_highRisk.length + '</strong> of these are in the High/Critical risk bands. ' +
         'These communities face a double burden: poor grid reliability and limited capacity to absorb outage costs.'
     });
