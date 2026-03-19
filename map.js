@@ -63,7 +63,14 @@
     if (!sub) return '#8a7e76';
     const ssi = ssiMap[sub];
     if (!ssi) return '#8a7e76';
-    return BAND_COLORS[ssi.classification] || '#8a7e76';
+    // If fleet has spread, use classification directly
+    if (window._ssiHasSpread) return BAND_COLORS[ssi.classification] || '#8a7e76';
+    // Otherwise use fleet-percentile coloring for visual differentiation
+    var pct = ssi.fleet_percentile || 0;
+    if (pct >= 0.90) return BAND_COLORS['Critical'] || '#941914';
+    if (pct >= 0.70) return BAND_COLORS['High'] || '#aa4234';
+    if (pct >= 0.35) return BAND_COLORS['Medium'] || '#b8863a';
+    return BAND_COLORS['Low'] || '#5d8563';
   }
 
   function componentColor(sub, comp) {
@@ -1110,7 +1117,12 @@ if (!hasNested) {
   }
 
   // ── Filter wiring ──
-  function wireFilters() {
+  function 
+      // Detect if fleet has meaningful classification spread
+      var _classif = {};
+      (SSI.substations || []).forEach(function(s) { _classif[s.classification] = (_classif[s.classification]||0)+1; });
+      window._ssiHasSpread = Object.keys(_classif).length >= 3;
+      wireFilters() {
     const bandSel = document.getElementById('filter-band');
     const regionSel = document.getElementById('filter-region');
     const voltageSel = document.getElementById('filter-voltage');
