@@ -1130,7 +1130,7 @@ if (!hasNested) {
 
     // Populate regions dropdown — detect country from meta or URL
     if (regionSel && SSI) {
-      const regions = SSI.regions.map(r => r.region).sort();
+      const regions = (SSI.regions || []).map(r => r.region).sort();
       var allLabel = 'All Regions';
       var countryCode = (SSI.meta && SSI.meta.country) || '';
       if (countryCode === 'DE' || countryCode === 'AT') allLabel = 'All Bundesländer';
