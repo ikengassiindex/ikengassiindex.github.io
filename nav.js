@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan)\//);
   return match ? match[1] : null;
 })();
 
