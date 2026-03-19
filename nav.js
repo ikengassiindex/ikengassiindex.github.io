@@ -28,7 +28,9 @@ var SSI_COUNTRY_LABELS = {
   us: '🇺🇸 United States',
   canada: '🇨🇦 Canada',
     australia: '🇦🇺 Australia'
-};
+,
+    chile: '🇨🇱 Chile'
+  };
 
 // Ikenga logo
 var SSI_LOGO = '<img src="' + SSI_BASE + 'ikenga-logo.png" alt="Ikenga" style="height:187px;width:auto;display:block" />';
