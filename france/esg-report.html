@@ -371,7 +371,7 @@ const ESG_REPORTS = [
         ['ETTC (time to criticality)', ((d.markov?.ettc_years || d.markov?.ETTC_years) || '—') + ' years'],
         ['P(critical) at 20 years', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—')],
         ['Corrosion Class', d.markov?.corrosion_class || '—'],
-        ['Climate Trajectory (R2)', '||NOT ACTIVE||']
+        ['Climate Trajectory (R2)', d.markov?.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr Markov)' : '||NOT ACTIVE||']
       ];
     },
     getVariables: function(d) {
@@ -409,11 +409,11 @@ const ESG_REPORTS = [
         ['V_socio (energy poverty index)', se.V_socio?.toFixed(2) || '—'],
         ['EP Rate (energy poverty %)', (se.EP_rate_region || '—') + '%'],
         ['Unemployment Rate', (se.unemployment_rate || '—') + '%'],
-        ['GDP per Capita', 'EUR ' + (se.gdp_per_capita ? se.gdp_per_capita.toLocaleString() : '—')],
+        ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
         ['R&D % of GDP', (se.rd_pct_gdp || '—') + '%'],
         ['R3 Social Multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—'],
-        ['Elderly Vulnerability', '||NOT AVAILABLE||'],
-        ['Migration Score', '||NOT AVAILABLE||']
+        ['Elderly Vulnerability', d.socio_economic?.elderly_pct ? d.socio_economic.elderly_pct + '%' : '—'],
+        ['Migration Score', d.socio_economic?.migration_score !== undefined ? d.socio_economic.migration_score.toFixed(2) : '—']
       ];
     },
     getVariables: function(d) {
@@ -753,8 +753,8 @@ function computeESGScores(d) {
   if (d.seismic?.pga_g) r1 += 0.15;
   if (d.markov?.risk_score) r1 += 0.20;
   if ((d.markov?.ettc_years || d.markov?.ETTC_years)) r1 += 0.10;
-  // R2 trajectory always missing = max 0.85
-  r1 = Math.min(r1 + 0.15, 0.85); // cap without trajectory
+  // R2 trajectory: check if p_crit_20yr exists
+  if (d.markov?.p_crit_20yr !== undefined) { r1 += 0.15; } else { r1 = Math.min(r1 + 0.15, 0.85); }
 
   // R2: Social — need socio_economic suite + elderly + migration
   if (d.socio_economic?.V_socio) r2 += 0.20;
@@ -762,7 +762,9 @@ function computeESGScores(d) {
   if (d.socio_economic?.unemployment_rate) r2 += 0.10;
   if (d.socio_economic?.gdp_per_capita) r2 += 0.10;
   if (d.modifiers?.R3_C_mult) r2 += 0.15;
-  // elderly/migration always gap = max 0.70
+  // elderly/migration: check if data exists
+  if (d.socio_economic?.elderly_pct) r2 += 0.10;
+  if (d.socio_economic?.population) r2 += 0.05;
 
   // R3: Taxonomy — need R_median, 6 components, modifiers, Markov
   if (d.R_median) r3 += 0.25;
