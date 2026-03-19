@@ -167,12 +167,15 @@ document.addEventListener("ssi-config-ready", function(e) {
       { key: 'E', label: 'Economic', w: 0.10, color: '#3b9eff' },
       { key: 'T', label: 'Transition', w: 0.05, color: '#22d3ee' }
     ];
+    var _cSum = compDefs.reduce(function(sum, c){ return sum + (s.components[c.key] || 0); }, 0);
+    var _isRaw = _cSum > 1.0;
     var compHTML = compDefs.map(function(c){
-      var val = s.components[c.key];
-      var pct = (val / c.w * 100).toFixed(0);
+      var val = s.components[c.key] || 0;
+      var rawScore = _isRaw ? val : val / c.w;
+      var pct = (Math.min(rawScore, 1) * 100).toFixed(0);
       var isAlert = s.alert_components && s.alert_components.indexOf(c.key) >= 0;
       return '<div><strong style="color:' + c.color + '">' + c.key + '</strong> ' + c.label + ': ' +
-        val.toFixed(3) + ' / ' + c.w.toFixed(2) + ' (' + pct + '%)' +
+        (_isRaw ? rawScore.toFixed(2) : val.toFixed(3)) + ' / ' + c.w.toFixed(2) + ' (' + pct + '%)' +
         (isAlert ? ' <span style="color:var(--crimson);font-weight:600">⚠</span>' : '') + '</div>';
     }).join('');
     document.getElementById('focus-components').innerHTML = compHTML;
@@ -181,11 +184,11 @@ document.addEventListener("ssi-config-ready", function(e) {
       { key: 'R3_C_mult', label: 'R3 Consequence' },
       { key: 'R4_F_topo', label: 'R4 Graph Criticality' },
       { key: 'R6_restoration', label: 'R6a Restoration' },
-      { key: 'R6_hazard', label: 'R6b Climate Hazard' },
+      { key: 'R6_seismic', label: 'R6b Seismic/Hazard' },
       { key: 'R7_cyber', label: 'R7 Digital Readiness' }
     ];
     var modHTML = modDefs.map(function(m){
-      var val = s.modifiers[m.key];
+      var val = (s.modifiers||{})[m.key]; if(val===undefined||val===null) return "";
       var dir = val > 1.01 ? '↑ amplifies' : val < 0.99 ? '↓ dampens' : '→ neutral';
       var col = val > 1.05 ? 'var(--crimson)' : val < 0.95 ? 'var(--sage)' : 'var(--warm-grey)';
       return '<div><strong>' + m.label + ':</strong> <span style="color:' + col + '">' + val.toFixed(3) + '</span> ' + dir + '</div>';
@@ -499,16 +502,16 @@ document.addEventListener("ssi-config-ready", function(e) {
     // ── B.2 Economic Impact by Business Fabric ──
     var tiers = [
       { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, LNG processing, mining operations \u2014 highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '\u{1F3ED}',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
         voll: 'A$20\u201340/kWh' },
       { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics hubs, agri-processing \u2014 significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '\u{1F527}',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
         voll: 'A$10\u201320/kWh' },
       { label: 'Commercial / SME-Dense', desc: 'Service economy, retail corridors, tourism \u2014 moderate individual impact but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '\u{1F3EA}',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏪',
         voll: 'A$4\u201310/kWh' },
       { label: 'Light / Agricultural / Remote', desc: 'Pastoral stations, remote communities \u2014 lower VoLL but higher social vulnerability and longer restoration',
-        filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '\u{1F33E}',
+        filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
         voll: 'A$1\u20134/kWh' }
     ];
 
@@ -1304,35 +1307,35 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   <div style="display:flex;flex-direction:column;gap:6px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1F8}\u{1F1EC} Singapore</span>
+      <span style="min-width:130px">🇸🇬 Singapore</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:99%;height:100%;background:var(--sage);border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">0.18</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1EF}\u{1F1F5} Japan</span>
+      <span style="min-width:130px">🇯🇵 Japan</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:97%;height:100%;background:var(--sage);border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~16</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1F0}\u{1F1F7} South Korea</span>
+      <span style="min-width:130px">🇰🇷 South Korea</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:96%;height:100%;background:var(--sage);border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~18</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1F3}\u{1F1FF} New Zealand</span>
+      <span style="min-width:130px">🇳🇿 New Zealand</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:85%;height:100%;background:var(--bronze);border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~55</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding:4px 0;border-bottom:1px solid var(--card-border)">
-      <span style="min-width:130px">\u{1F1E6}\u{1F1FA} Australia (NEM)</span>
+      <span style="min-width:130px">🇦🇺 Australia (NEM)</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:80%;height:100%;background:var(--crimson);border-radius:4px"></div>
       </div>
@@ -1353,28 +1356,28 @@ document.addEventListener("ssi-config-ready", function(e) {
       <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">~180</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1F2}\u{1F1FE} Malaysia</span>
+      <span style="min-width:130px">🇲🇾 Malaysia</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:82%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~70</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1F9}\u{1F1ED} Thailand</span>
+      <span style="min-width:130px">🇹🇭 Thailand</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:72%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~115</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1F5}\u{1F1ED} Philippines</span>
+      <span style="min-width:130px">🇵🇭 Philippines</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:20%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
       <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~320</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <span style="min-width:130px">\u{1F1EE}\u{1F1E9} Indonesia</span>
+      <span style="min-width:130px">🇮🇩 Indonesia</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:5%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
       </div>
