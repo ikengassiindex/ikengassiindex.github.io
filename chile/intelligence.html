@@ -782,8 +782,8 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   // ── Intro ──
   document.getElementById('sec-c-intro').innerHTML =
-    'The SSI v4.0.2 draws on <strong>' + (meta.stats||\{\}).sources + ' verified public data sources</strong> feeding ' +
-    (meta.stats||\{\}).variables + ' variables across ' + (meta.stats||\{\}).components + ' components and ' + (meta.stats||\{\}).modifiers +
+    'The SSI v4.0.2 draws on <strong>' + (meta.stats||{}).sources + ' verified public data sources</strong> feeding ' +
+    (meta.stats||{}).variables + ' variables across ' + (meta.stats||{}).components + ' components and ' + (meta.stats||{}).modifiers +
     ' modifiers. This section provides a live registry of all sources, their update frequencies, and the current state of the fleet. ' +
     'Transparency in data vintage is central to the SSI\'s credibility.';
 
@@ -796,8 +796,8 @@ document.addEventListener("ssi-config-ready", function(e) {
   var staticC = (freq.Static ? freq.Static.count : 0);
   var derived = (freq.Derived ? freq.Derived.count : 0);
 
-  document.getElementById('c-total-src').textContent = (meta.stats||\{\}).sources;
-  document.getElementById('c-total-vars').textContent = (meta.stats||\{\}).variables + ' variables';
+  document.getElementById('c-total-src').textContent = (meta.stats||{}).sources;
+  document.getElementById('c-total-vars').textContent = (meta.stats||{}).variables + ' variables';
   document.getElementById('c-freq-fast').textContent = (weekly + monthly);
   document.getElementById('c-freq-slow').textContent = (quarterly + annual);
   document.getElementById('c-freq-static').textContent = (staticC + derived);
