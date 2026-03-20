@@ -1136,11 +1136,7 @@ if (!hasNested) {
   }
 
   // ------ Filter wiring ------
-        // Detect if fleet has meaningful classification spread
-      var _classif = {};
-      (SSI.substations || []).forEach(function(s) { _classif[s.classification] = (_classif[s.classification]||0)+1; });
-      window._ssiHasSpread = Object.keys(_classif).length >= 3;
-      function wireFilters() {
+              function wireFilters() {
     const bandSel = document.getElementById('filter-band');
     const regionSel = document.getElementById('filter-region');
     const voltageSel = document.getElementById('filter-voltage');
@@ -1362,6 +1358,10 @@ if (!hasNested) {
         });
         SSI.regions = Object.values(regionMap).map(function(r) { r.R_median = r.count ? r._sum / r.count : 0; delete r._sum; return r; });
       }
+      // Detect if fleet has meaningful classification spread
+      var _classif = {};
+      (SSI.substations || []).forEach(function(s) { _classif[s.classification] = (_classif[s.classification]||0)+1; });
+      window._ssiHasSpread = Object.keys(_classif).length >= 3;
       wireFilters();
       clearDetailPanel();
 
