@@ -235,12 +235,25 @@
     center: { lat: 39.0, lon: -98.0 },
     embedded: true,
     onLoaded: function(ssi) {
+        // Ensure fleet_summary has all expected fields
+        var fs = ssi.fleet_summary || {};
+        if (!fs.band_pct && fs.bands) {
+          var t = fs.total || 1;
+          fs.band_pct = {};
+          for (var b in fs.bands) { fs.band_pct[b] = (fs.bands[b] / t) * 100; }
+        }
+        if (!fs.confidence_pct) fs.confidence_pct = {};
+        if (!fs.confidence_tiers) fs.confidence_tiers = {};
+        if (!fs.median_R) fs.median_R = fs.R_median || 0;
+        if (!fs.mean_R) fs.mean_R = fs.R_median || fs.median_R || 0;
+        if (!fs.P5) fs.P5 = fs.R_min || 0;
+        if (!fs.P95) fs.P95 = fs.R_max || 0;
       // ── KPIs ──
       document.getElementById('kpi-total').textContent = (ssi.fleet_summary.total || 0).toLocaleString();
       document.getElementById('kpi-median').textContent = (ssi.fleet_summary.median_R || ssi.fleet_summary.R_median || 0).toFixed(3);
       document.getElementById('kpi-median-sub').textContent = 'P5 = ' + (ssi.fleet_summary.P5 || ssi.fleet_summary.R_min || 0).toFixed(3) + ' · P95 = ' + (ssi.fleet_summary.P95 || ssi.fleet_summary.R_max || 0).toFixed(3);
       document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
-      document.getElementById('kpi-critical-sub').textContent = ssi.fleet_summary.band_pct.Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
+      document.getElementById('kpi-critical-sub').textContent = (ssi.fleet_summary.band_pct||{}).Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
       document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
       var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 345; }).length;
       var hvCount = ssi.fleet_summary.total - ehvCount;
