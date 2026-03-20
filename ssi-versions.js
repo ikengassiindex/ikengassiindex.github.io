@@ -1,46 +1,59 @@
 /**
- * SSI Version Manifest Loader
+ * SSI Version Manifest & Dynamic Loader
+ * v2 — Dynamically injects scripts and stylesheets with versioned URLs
  *
- * Single source of truth for all asset cache-bust versions.
- * Every HTML page loads this ONE file (with a timestamp-based cache-bust).
- * This file then provides the correct version for every other asset.
+ * HTML pages only need:
+ *   <script src="../ssi-versions.js"></script>
+ *
+ * This loader:
+ *   1. Fetches versions.json (with timestamp bust — never cached)
+ *   2. Injects <link> for style.css with correct ?v=
+ *   3. Injects <script> for nav.js with correct ?v=
+ *   4. Injects <script> for ssi-metadata.js (country-specific, no version)
+ *   5. Exposes window.ssiAssetUrl() for JS code that fetches data files
+ *   6. Fires 'ssi-versions-ready' event when done
  *
  * To update any shared asset:
  *   1. Push the updated asset to GitHub
- *   2. Increment the version number in versions.json
- *   3. Done — all 84+ pages automatically use the new version
- *
- * Architecture:
- *   HTML page → ssi-versions.js?_=timestamp → versions.json → correct ?v= for all assets
+ *   2. Bump the number in versions.json
+ *   3. Done — all pages get the new version immediately
  */
 (function() {
   'use strict';
 
-  // Detect base path: country pages use ../, root pages use ./
+  // Detect context
   var path = window.location.pathname;
-  var isCountryPage = /^\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile)\//i.test(path);
+  var countryMatch = path.match(/^\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile)\//i);
+  var isCountryPage = !!countryMatch;
+  var country = countryMatch ? countryMatch[1].toLowerCase() : null;
   var base = isCountryPage ? '../' : './';
 
-  // Fetch versions.json with timestamp cache-bust (never cached)
+  // Store for global access
+  window.SSI_COUNTRY_CODE = country;
+  window.SSI_BASE = base;
+
+  // Fetch manifest
   var ts = Date.now();
   fetch(base + 'versions.json?_=' + ts, { cache: 'no-store' })
-    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
     .then(function(manifest) {
-      window.SSI_VERSIONS = manifest.assets;
-      window.SSI_VERSION_ID = manifest.v;
+      window.SSI_VERSIONS = manifest.assets || {};
+      window.SSI_VERSION_ID = manifest.v || 0;
 
-      // Helper: get versioned URL for any asset
+      // Version helper for data fetches
       window.ssiAssetUrl = function(assetKey, filename) {
         var v = (manifest.assets && manifest.assets[assetKey]) || ts;
         return filename + '?v=' + v;
       };
 
-      // Fire event so pages can react
+      // Fire ready event
       document.dispatchEvent(new CustomEvent('ssi-versions-ready', { detail: manifest }));
     })
     .catch(function(err) {
-      console.warn('[SSI-Versions] Failed to load versions.json, using timestamp fallback:', err.message);
-      // Fallback: use timestamp-based cache-busting (always fresh, no caching benefit)
+      console.warn('[SSI] versions.json unavailable, using timestamp fallback:', err.message);
       window.SSI_VERSIONS = {};
       window.SSI_VERSION_ID = 0;
       window.ssiAssetUrl = function(key, filename) { return filename + '?v=' + ts; };
