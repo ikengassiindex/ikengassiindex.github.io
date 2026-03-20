@@ -9,9 +9,9 @@
 })();
 
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   SSI Index Dashboard v4.0.2 â Interactive Map Engine
+   SSI Index Dashboard v4.0.2  Interactive Map Engine
    Canvas-based renderer for 4,293 substations (HV/MV/LV) + 14,221 lines
-   âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
+    */
  
 (function () {
   'use strict';
@@ -19,8 +19,8 @@
   // ------ State ------
   let GEO = null;           // grid-geo.json { l, s, a }
   let SSI = null;            // ssi-data.json { meta, fleet_summary, regions, substations }
-  let ssiMap = {};           // internal_id â substation record (fast lookup)
-  let lineById = {};         // line.i â line object (fast lookup)
+  let ssiMap = {};           // internal_id  substation record (fast lookup)
+  let lineById = {};         // line.i  line object (fast lookup)
   let canvas, ctx;
   let W, H;
   let view = { cx: 12.5, cy: 42.0, scale: 1 };
@@ -517,19 +517,19 @@
     C: [
       { id: 'C1', name: 'Outage Duration (SAIDI)',   intra: 0.40, norm: 'A (P5/P95)' },
       { id: 'C2', name: 'Outage Count (SAIFI)',      intra: 0.30, norm: 'A (P5/P95)' },
-      { id: 'C3', name: 'MT Exceed Rate',            intra: 0.15, norm: 'C (0â100%)' },
+      { id: 'C3', name: 'MT Exceed Rate',            intra: 0.15, norm: 'C (0100%)' },
       { id: 'C4', name: 'Planned Outages',           intra: 0.15, norm: 'B (P5/P95)' }
     ],
     V: [
-      { id: 'V1', name: 'Severity-Weighted Dips',    intra: 1.00, norm: 'B (Î³=0.50)' }
+      { id: 'V1', name: 'Severity-Weighted Dips',    intra: 1.00, norm: 'B (=0.50)' }
     ],
     I: [
-      { id: 'I1', name: 'Snow/Ice Risk (IRI)',       intra: 0.12, norm: 'C (0â0.30)', adaptive: true },
-      { id: 'I2', name: 'Tree-Fall Risk (IRI)',      intra: 0.09, norm: 'C (0â0.30)', adaptive: true },
-      { id: 'I3', name: 'Heat-Wave Risk (IRI)',      intra: 0.15, norm: 'C (0â0.30)', adaptive: true },
-      { id: 'I4', name: 'RTN Density',               intra: 0.12, norm: 'B âinverted' },
+      { id: 'I1', name: 'Snow/Ice Risk (IRI)',       intra: 0.12, norm: 'C (00.30)', adaptive: true },
+      { id: 'I2', name: 'Tree-Fall Risk (IRI)',      intra: 0.09, norm: 'C (00.30)', adaptive: true },
+      { id: 'I3', name: 'Heat-Wave Risk (IRI)',      intra: 0.15, norm: 'C (00.30)', adaptive: true },
+      { id: 'I4', name: 'RTN Density',               intra: 0.12, norm: 'B inverted' },
       { id: 'I5', name: 'Thermal Stress Proxy',      intra: 0.12, norm: 'B (P5/P95)' },
-      { id: 'I6', name: 'Substation Density',        intra: 0.12, norm: 'B âinverted' },
+      { id: 'I6', name: 'Substation Density',        intra: 0.12, norm: 'B inverted' },
       { id: 'I7', name: 'Load Stress',               intra: 0.10, norm: 'B (P5/P95)' },
       { id: 'I8', name: 'Air Quality Corrosion',     intra: 0.08, norm: 'B (P5/P95)' },
       { id: 'I9', name: 'Hydrogeological Risk',      intra: 0.10, norm: 'B (P5/P95)' }
@@ -559,13 +559,13 @@
     if (!ssi) return null;
     // Climate trajectory values
     if (ssi.climate_trajectory) {
-      if (metricId === 'I1' && ssi.climate_trajectory.I1_trajectory != null) return { label: 'Î climate', val: ssi.climate_trajectory.I1_trajectory };
-      if (metricId === 'I2' && ssi.climate_trajectory.I2_trajectory != null) return { label: 'Î climate', val: ssi.climate_trajectory.I2_trajectory };
-      if (metricId === 'I3' && ssi.climate_trajectory.I3_trajectory != null) return { label: 'Î climate', val: ssi.climate_trajectory.I3_trajectory };
+      if (metricId === 'I1' && ssi.climate_trajectory.I1_trajectory != null) return { label: ' climate', val: ssi.climate_trajectory.I1_trajectory };
+      if (metricId === 'I2' && ssi.climate_trajectory.I2_trajectory != null) return { label: ' climate', val: ssi.climate_trajectory.I2_trajectory };
+      if (metricId === 'I3' && ssi.climate_trajectory.I3_trajectory != null) return { label: ' climate', val: ssi.climate_trajectory.I3_trajectory };
     }
     // Socio-economic values
     if (ssi.socio_economic) {
-      if (metricId === 'E2' && ssi.socio_economic.E2_local != null) return { label: 'Î² local', val: ssi.socio_economic.E2_local };
+      if (metricId === 'E2' && ssi.socio_economic.E2_local != null) return { label: ' local', val: ssi.socio_economic.E2_local };
     }
     // Transition values
     if (ssi.transition) {
@@ -604,7 +604,7 @@
     var gt = ssi.graph_topology || {};
     var sm = ssi.seismic || {};
     var mk = ssi.markov || {};
-    var na = '<span style="opacity:0.35">â</span>';
+    var na = '<span style="opacity:0.35"></span>';
     var co = ssi.components || {};
     var mo = ssi.modifiers || {};
     var hasNested = !!(ssi.socio_economic || ssi.transition || ssi.graph_topology || ssi.seismic || ssi.markov);
@@ -735,8 +735,8 @@ if (!hasNested) {
             var sCtx = getContextValue(ssi, s.id);
             var sCtxHtml = sCtx ? '<span style="font-variant-numeric:tabular-nums;font-weight:500;width:46px;text-align:right;color:var(--ink)">' + (typeof sCtx.val === 'number' ? sCtx.val.toFixed(3) : sCtx.val) + '</span>' : '';
             return '<div style="display:flex;align-items:center;gap:4px;padding:2px 0 2px 52px;font-size:9.5px;color:var(--warm-grey)">' +
-              '<span style="width:10px;text-align:right;opacity:0.5">Â·</span>' +
-              '<span style="flex:1">' + s.name + ' (Î±=' + s.weight.toFixed(2) + ')</span>' +
+              '<span style="width:10px;text-align:right;opacity:0.5">.</span>' +
+              '<span style="flex:1">' + s.name + ' (=' + s.weight.toFixed(2) + ')</span>' +
               sCtxHtml +
             '</div>';
           }).join('');
@@ -765,9 +765,9 @@ if (!hasNested) {
       return 'var(--warm-grey)';
     }
     function modArrow(v) {
-      if (v > 1.01) return 'â²';
-      if (v < 0.99) return 'â¼';
-      return 'â';
+      if (v > 1.01) return '';
+      if (v < 0.99) return '';
+      return '';
     }
 
     const modRows = [
@@ -782,7 +782,7 @@ if (!hasNested) {
       return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0 3px 20px;font-size:11px">
         <span style="font-weight:600;width:20px;color:${modColor(val)}">${id}</span>
         <span style="flex:1;color:var(--warm-grey)">${name}</span>
-        <span style="font-weight:600;color:${modColor(val)};width:50px;text-align:right">Ã${val.toFixed(3)}</span>
+        <span style="font-weight:600;color:${modColor(val)};width:50px;text-align:right">${val.toFixed(3)}</span>
         <span style="font-size:9px;color:${modColor(val)};width:38px;text-align:right">${sign}${pctImpact}%</span>
       </div>`;
     }).join('');
@@ -795,7 +795,7 @@ if (!hasNested) {
             <span style="font-weight:700;color:${BAND_COLORS[ssi.classification]}">R_final</span>
             <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:${BAND_COLORS[ssi.classification]}">${R_final.toFixed(4)}</span>
           </div>
-          <div style="font-size:9px;color:var(--warm-grey);margin-top:2px">= soft_clip( R_base Ã R3 Ã R4 Ã R6a Ã R6b Ã R7 )</div>
+          <div style="font-size:9px;color:var(--warm-grey);margin-top:2px">= soft_clip( R_base  R3  R4  R6a  R6b  R7 )</div>
         </div>
 
         <!-- R_base -->
@@ -804,7 +804,7 @@ if (!hasNested) {
             <span>R_base</span>
             <span>${R_base.toFixed(4)}</span>
           </div>
-          <div style="font-size:9px;color:var(--warm-grey)">= 0.30Â·C + 0.10Â·V + 0.25Â·I + 0.10Â·E + 0.20Â·S + 0.05Â·T</div>
+          <div style="font-size:9px;color:var(--warm-grey)">= 0.30.C + 0.10.V + 0.25.I + 0.10.E + 0.20.S + 0.05.T</div>
         </div>
         ${compRows}
 
@@ -812,16 +812,16 @@ if (!hasNested) {
         <div style="padding:6px 10px;background:rgba(44,36,32,0.02);border-radius:6px;margin:8px 0 4px">
           <div style="display:flex;justify-content:space-between;font-weight:600">
             <span>Combined Modifiers</span>
-            <span>Ã${combined.toFixed(3)}</span>
+            <span>${combined.toFixed(3)}</span>
           </div>
-          <div style="font-size:9px;color:var(--warm-grey)">= R3 Ã R4 Ã R6a Ã R6b Ã R7</div>
+          <div style="font-size:9px;color:var(--warm-grey)">= R3  R4  R6a  R6b  R7</div>
         </div>
         ${modRows}
 
         <!-- Soft clip note -->
         <div style="margin-top:8px;padding:6px 10px;border-left:2px solid var(--warm-grey-light);font-size:9px;color:var(--warm-grey);line-height:1.5">
-          R_raw = ${R_base.toFixed(4)} Ã ${combined.toFixed(3)} = ${R_raw.toFixed(4)}<br>
-          ${R_raw > 1.0 ? 'soft_clip compresses overflow â ' + R_final.toFixed(4) : 'No clipping applied (R_raw â¤ 1.0)'}
+          R_raw = ${R_base.toFixed(4)}  ${combined.toFixed(3)} = ${R_raw.toFixed(4)}<br>
+          ${R_raw > 1.0 ? 'soft_clip compresses overflow  ' + R_final.toFixed(4) : 'No clipping applied (R_raw  1.0)'}
         </div>
       </div>`;
   }
@@ -838,7 +838,7 @@ if (!hasNested) {
       return;
     }
 
-    const compBars = `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:9px;color:var(--warm-grey);padding:0 0 0 98px"><span>â Higher risk</span><span>Lower risk â¶</span></div>` +
+    const compBars = `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:9px;color:var(--warm-grey);padding:0 0 0 98px"><span> Higher risk</span><span>Lower risk </span></div>` +
     ['C', 'V', 'I', 'E', 'S', 'T'].map(k => {
       const w = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 }[k];
       const val = ssi.components[k];
@@ -871,7 +871,7 @@ if (!hasNested) {
       const col = val > 1.05 ? 'var(--crimson)' : (val < 0.95 ? 'var(--sage)' : 'var(--warm-grey)');
       return `<div style="display:flex;justify-content:space-between">
         <span>${label}</span>
-        <span style="font-weight:600;color:${col}">Ã${val.toFixed(3)}</span>
+        <span style="font-weight:600;color:${col}">${val.toFixed(3)}</span>
       </div>`;
     }).join('');
 
@@ -879,7 +879,7 @@ if (!hasNested) {
       <div class="card" style="margin-bottom:12px">
         <div class="label-xs" style="margin-bottom:6px">Selected Substation</div>
         <h3 style="margin-bottom:2px;font-size:15px">${ssi.name}</h3>
-        <div style="font-size:11px;color:var(--warm-grey);margin-bottom:14px">${ssi.region} Â· ${ssi.province} Â· ${ssi.voltage_kv} kV ${ssi.voltage_kv >= 110 ? '(HV)' : '(MV)'} Â· ${ssi.substation_id}</div>
+        <div style="font-size:11px;color:var(--warm-grey);margin-bottom:14px">${ssi.region} . ${ssi.province} . ${ssi.voltage_kv} kV ${ssi.voltage_kv >= 110 ? '(HV)' : '(MV)'} . ${ssi.substation_id}</div>
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px">
           <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:${BAND_COLORS[ssi.classification]}">${ssi.R_median.toFixed(4)}</div>
           <span class="band-badge ${ssi.classification.toLowerCase()}"><span class="band-dot ${ssi.classification.toLowerCase()}"></span>${ssi.classification}</span>
@@ -921,7 +921,7 @@ if (!hasNested) {
         cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
         transition:all 0.15s;
       ">
-        <span id="breakdown-arrow" style="font-size:9px;transition:transform 0.2s">${breakdownOpen ? 'â¼' : 'â¶'}</span>
+        <span id="breakdown-arrow" style="font-size:9px;transition:transform 0.2s">${breakdownOpen ? '' : ''}</span>
         Score Breakdown
       </button>
       <div id="breakdown-panel" style="display:${breakdownOpen ? 'block' : 'none'};margin-top:12px">
@@ -954,7 +954,7 @@ if (!hasNested) {
     const arrow = document.getElementById('breakdown-arrow');
     if (bp) {
       bp.style.display = breakdownOpen ? 'block' : 'none';
-      if (arrow) arrow.textContent = breakdownOpen ? 'â¼' : 'â¶';
+      if (arrow) arrow.textContent = breakdownOpen ? '' : '';
       if (breakdownOpen) {
         const panel = document.getElementById('detail-panel');
         const sid = panel ? panel.dataset.sid : null;
@@ -975,7 +975,7 @@ if (!hasNested) {
     if (!panel) return;
     panel.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--warm-grey);text-align:center;padding:20px">
-        <div style="font-size:28px;opacity:0.3;margin-bottom:8px">ð</div>
+        <div style="font-size:28px;opacity:0.3;margin-bottom:8px"></div>
         <div style="font-size:13px;font-weight:500">Click a substation</div>
         <div style="font-size:11px;margin-top:4px">to inspect its SSI score, components, modifiers, and socio-economic context</div>
       </div>`;
@@ -995,7 +995,7 @@ if (!hasNested) {
         html = `<strong>${name}</strong><br>
           <span style="color:${BAND_COLORS[ssi.classification]};font-weight:600">${ssi.R_median.toFixed(3)}</span>
           <span class="band-badge ${ssi.classification.toLowerCase()}" style="font-size:9px;padding:1px 6px;margin-left:4px">${ssi.classification}</span><br>
-          <span style="font-size:10px;color:var(--warm-grey)">${ssi.region} Â· ${ssi.province}</span>`;
+          <span style="font-size:10px;color:var(--warm-grey)">${ssi.region} . ${ssi.province}</span>`;
       } else {
         html = `<strong>${name}</strong><br><span style="font-size:10px;color:var(--warm-grey)">No SSI data</span>`;
       }
@@ -1163,16 +1163,16 @@ if (!hasNested) {
       const regions = (SSI.regions || []).map(r => r.region).sort();
       var allLabel = 'All Regions';
       var countryCode = (SSI.meta && SSI.meta.country) || '';
-      if (countryCode === 'DE' || countryCode === 'AT') allLabel = 'All BundeslÃ¤nder';
+      if (countryCode === 'DE' || countryCode === 'AT') allLabel = 'All Bundeslnder';
       else if (countryCode === 'CH') allLabel = 'All Cantons';
       else if (countryCode === 'IT') allLabel = 'All Regioni';
-      else if (countryCode === 'FR') allLabel = 'All RÃ©gions';
+      else if (countryCode === 'FR') allLabel = 'All Rgions';
       else if (countryCode === 'ES') allLabel = 'All Comunidades';
       else if (window.SSI_COUNTRY === 'italy') allLabel = 'All Regioni';
-      else if (window.SSI_COUNTRY === 'france') allLabel = 'All RÃ©gions';
+      else if (window.SSI_COUNTRY === 'france') allLabel = 'All Rgions';
       else if (window.SSI_COUNTRY === 'spain') allLabel = 'All Comunidades';
       else if (window.SSI_COUNTRY === 'switzerland') allLabel = 'All Cantons';
-      else if (window.SSI_COUNTRY === 'austria' || window.SSI_COUNTRY === 'germany') allLabel = 'All BundeslÃ¤nder';
+      else if (window.SSI_COUNTRY === 'austria' || window.SSI_COUNTRY === 'germany') allLabel = 'All Bundeslnder';
       // Preserve existing label if the HTML already set one
       var existingAll = regionSel.querySelector('option[value="all"]');
       if (existingAll && existingAll.textContent !== 'All' && existingAll.textContent.length > 4) {
@@ -1372,7 +1372,7 @@ if (!hasNested) {
       console.error('Failed to load map data:', err);
       const container = canvas.parentElement;
       container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--warm-grey);padding:20px;text-align:center">
-        <div>â ï¸ Failed to load map data. Make sure grid-geo.json and ssi-data.json are in the same directory.</div>
+        <div> Failed to load map data. Make sure grid-geo.json and ssi-data.json are in the same directory.</div>
       </div>`;
     });
   }
