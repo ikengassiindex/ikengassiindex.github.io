@@ -92,7 +92,7 @@ if (window.SSI_METADATA) {
 
 <p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 30 verified public sources, making the methodology fully auditable and reproducible. Initially covering Canada's entire transmission and distribution grid, the Index is progressively being rolled out to all OECD countries — applying the same silo-breaking approach: fusing grid risk with societal exposure at asset-level resolution wherever open data permits.</p>
 
-<!-- Substation in Focus — auto-populated from ssi-data.json?v=43 -->
+<!-- Substation in Focus — auto-populated from ssi-data.json?v=44 -->
 <div class="card" style="border-left:3px solid var(--crimson);margin:20px 0" id="focus-card">
   <div style="display:flex;gap:24px;flex-wrap:wrap">
     <div style="flex:1;min-width:200px">
@@ -158,7 +158,7 @@ if (window.SSI_METADATA) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -377,7 +377,7 @@ if (window.SSI_METADATA) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -872,8 +872,8 @@ if (window.SSI_METADATA) {
   });
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
 
-  // ── C.2 Fleet Score Snapshot — from ssi-data.json?v=43 ──
-  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
+  // ── C.2 Fleet Score Snapshot — from ssi-data.json?v=44 ──
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -1053,7 +1053,7 @@ if (window.SSI_METADATA) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter Ontario–Quebec ──
     var puglia = data.substations.filter(function(s){ return s.region === 'Ontario' || s.region === 'Quebec'; });
     var fleet = data.substations;
@@ -1437,7 +1437,7 @@ if (window.SSI_METADATA) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var puglia = fleet.filter(function(s){ return s.region === 'Auvergne-Ontario–Quebec-Alpes'; });
 
@@ -1729,7 +1729,7 @@ if (window.SSI_METADATA) {
     '</div>';
 
   // ── SSI Data Connection — pull live stats to anchor the topic ──
-  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1816,7 +1816,7 @@ if (window.SSI_METADATA) {
     <h3 style="margin-top:0;font-size:15px">Loading…</h3>
     <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
   </div>
-  <!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json?v=43 -->
+  <!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json?v=44 -->
   <div class="card" style="border-top:3px solid var(--crimson)" id="g-spotlight">
     <span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Loading…</span>
     <h3 style="margin-top:0;font-size:15px">Loading…</h3>
@@ -1921,7 +1921,7 @@ if (window.SSI_METADATA) {
   }
 
   // ── Card 3: Fleet Spotlight — rotating stat ──
-  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);
