@@ -26,7 +26,7 @@ jobs:
       - name: Cache-bust ESG report assets
         run: |
           STAMP=$(date +%s)
-          for country in france italy uk us germany spain switzerland austria canada japan; do
+          for country in france italy uk us germany spain switzerland austria canada japan australia chile; do
             if [ -f "${country}/esg-report.html" ]; then
               # Cache-bust the intelligence-loader.js reference
               sed -i "s|intelligence-loader\.js?v=[0-9]*|intelligence-loader.js?v=${STAMP}|g" "${country}/esg-report.html"
@@ -42,7 +42,7 @@ jobs:
       - name: Update report generation date
         run: |
           REPORT_DATE=$(date +"%d %B %Y")
-          for country in france italy uk us germany spain switzerland austria canada japan; do
+          for country in france italy uk us germany spain switzerland austria canada japan australia chile; do
             if [ -f "${country}/esg-report.html" ]; then
               sed -i "s|Report generated [0-9]* [A-Za-z]* [0-9]*|Report generated ${REPORT_DATE}|g" "${country}/esg-report.html"
             fi
