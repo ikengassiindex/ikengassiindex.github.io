@@ -141,7 +141,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -347,7 +347,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -776,7 +776,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   document.getElementById('sec-c-source-list').innerHTML = srcHTML;
 
   // Fleet snapshot
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
@@ -880,7 +880,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   // Alpine cantons — those with significant hydropower/mountain infrastructure
   var alpineCantons = ['Valais', 'Graubünden', 'Uri', 'Ticino', 'Glarus', 'Obwalden', 'Nidwalden', 'Schwyz', 'Bern'];
 
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var alpine = fleet.filter(function(s){ return alpineCantons.indexOf(s.region) >= 0; });
@@ -1253,7 +1253,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '</div>';
 
   // ── SSI Data Connection — pull live stats to anchor the topic ──
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1445,7 +1445,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   }
 
   // ── Card 3: Fleet Spotlight — rotating stat ──
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);

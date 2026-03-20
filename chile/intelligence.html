@@ -139,7 +139,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -362,7 +362,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -860,7 +860,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
 
   // ── C.2 Fleet Score Snapshot ──
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -1038,7 +1038,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter Atacama–Central corridor ──
     var puglia = data.substations.filter(function(s){ return s.province === 'Antofagasta' || s.region === 'Antofagasta'; });
     if (puglia.length === 0) puglia = data.substations.filter(function(s){ return (s.province || '').indexOf('New South') >= 0 || (s.region || '').indexOf('New South') >= 0 || (s.province || '').indexOf('Atacama–Central') >= 0; });
@@ -1417,7 +1417,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var puglia = fleet.filter(function(s){ return s.province === 'Antofagasta' || s.region === 'Antofagasta' || (s.province || '').indexOf('Atacama–Central') >= 0; });
     if (puglia.length === 0) puglia = fleet.slice(0, Math.floor(fleet.length * 0.3));
@@ -1700,7 +1700,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '</div>';
 
   // SSI Data Connection
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1860,7 +1860,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   }
 
   // ── Card 3: Fleet Spotlight ──
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);

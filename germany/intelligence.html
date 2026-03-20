@@ -142,7 +142,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -352,7 +352,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -822,7 +822,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   });
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
 
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -997,7 +997,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var sh = data.substations.filter(function(s){ return s.region === 'Schleswig-Holstein'; });
     var fleet = data.substations;
     sh.sort(function(a,b){ return b.R_median - a.R_median; });
@@ -1239,7 +1239,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var sh = fleet.filter(function(s){ return s.region === 'Schleswig-Holstein'; });
 
@@ -1469,7 +1469,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       conceptsHTML +
     '</div>';
 
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1640,7 +1640,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'Key upcoming: BNetzA SAIDI/SAIFI refresh and MaStR updates.</p>';
   }
 
-  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=43').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);
