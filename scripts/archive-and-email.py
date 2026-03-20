@@ -2,23 +2,22 @@
 """
 SSI Monthly Archive — Intelligence + ESG Report Pages
 Captures each country's Intelligence and ESG report pages as PDF and HTML,
-emails them as attachments, and saves them to archive/ folder in the repo.
+emails them as attachments via Microsoft Graph API (OAuth2), and saves
+them to archive/ folder in the repo.
 
 Environment variables required:
-  SMTP_SERVER   — SMTP host (e.g. smtp.ikenga.eu)
-  SMTP_PORT     — SMTP port (default 587)
-  SMTP_USER     — SMTP username
-  SMTP_PASSWORD — SMTP password
-  ARCHIVE_EMAIL — Recipient (default: ssi_index@ikenga.eu)
+  AZURE_TENANT_ID     — Microsoft 365 tenant ID
+  AZURE_CLIENT_ID     — Azure AD app registration client ID
+  AZURE_CLIENT_SECRET — Azure AD app registration client secret
+  MAIL_SENDER         — Sending mailbox (e.g. ssi_index@ikenga.eu)
+  ARCHIVE_EMAIL       — Recipient (default: ssi_index@ikenga.eu)
 """
 import json
 import os
 import sys
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-from email import encoders
+import base64
+import urllib.request
+import urllib.parse
 from pathlib import Path
 from datetime import datetime
 
@@ -32,6 +31,137 @@ PAGES = [
     {"slug": "intelligence", "file": "intelligence.html", "label": "Intelligence"},
     {"slug": "esg-report",   "file": "esg-report.html",   "label": "ESG_Report"},
 ]
+
+# Graph API attachment size limit: 3 MB per attachment for direct attach,
+# larger files need upload session. We'll skip files > 3 MB.
+MAX_ATTACHMENT_BYTES = 3 * 1024 * 1024
+
+
+def get_graph_token():
+    """Acquire an OAuth2 access token using client credentials flow."""
+    tenant_id = os.environ.get("AZURE_TENANT_ID", "")
+    client_id = os.environ.get("AZURE_CLIENT_ID", "")
+    client_secret = os.environ.get("AZURE_CLIENT_SECRET", "")
+
+    if not tenant_id or not client_id or not client_secret:
+        print("WARNING: Azure OAuth not configured — skipping email.")
+        print("  Set AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET")
+        print("  in GitHub repository secrets.")
+        return None
+
+    token_url = f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
+    data = urllib.parse.urlencode({
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "scope": "https://graph.microsoft.com/.default",
+        "grant_type": "client_credentials",
+    }).encode("utf-8")
+
+    req = urllib.request.Request(token_url, data=data, method="POST")
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+            token = body.get("access_token")
+            if token:
+                print("  OAuth2 token acquired successfully")
+                return token
+            else:
+                print(f"  ERROR: No access_token in response: {body}")
+                return None
+    except Exception as e:
+        print(f"  ERROR acquiring token: {e}")
+        return None
+
+
+def send_email_graph(files, edition_label, edition_key):
+    """Send archive files as email attachments via Microsoft Graph API."""
+    token = get_graph_token()
+    if not token:
+        return False
+
+    sender = os.environ.get("MAIL_SENDER", "ssi_index@ikenga.eu")
+    recipient = os.environ.get("ARCHIVE_EMAIL", "ssi_index@ikenga.eu")
+
+    pdfs = [f for f in files if f.suffix == ".pdf"]
+    htmls = [f for f in files if f.suffix == ".html"]
+
+    # Build attachments array
+    attachments = []
+    skipped = 0
+    for file_path in files:
+        file_bytes = file_path.read_bytes()
+        if len(file_bytes) > MAX_ATTACHMENT_BYTES:
+            print(f"    SKIP attachment {file_path.name} ({len(file_bytes)/1024:.0f} KB > 3 MB limit)")
+            skipped += 1
+            continue
+
+        content_type = "application/pdf" if file_path.suffix == ".pdf" else "text/html"
+        attachments.append({
+            "@odata.type": "#microsoft.graph.fileAttachment",
+            "name": file_path.name,
+            "contentType": content_type,
+            "contentBytes": base64.b64encode(file_bytes).decode("ascii"),
+        })
+
+    body_text = (
+        f"SSI Monthly Archive — Edition {edition_label}\n"
+        f"Period: {edition_key}\n"
+        f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n\n"
+        f"Attached: {len(attachments)} files ({len(pdfs)} PDFs + {len(htmls)} HTMLs)"
+        f"{f' — {skipped} skipped (>3 MB)' if skipped else ''}\n"
+        f"Pages: Intelligence + ESG Report per country\n"
+        f"Countries: {', '.join(c.upper() for c in COUNTRIES)}\n\n"
+        f"Save these files to:\n"
+        f"  OneDrive > SSI Index Monthly intelligence and ESG Report pages\n\n"
+        f"This is an automated archive from the SSI Dashboard.\n"
+        f"https://ikengassiindex.github.io\n"
+    )
+
+    # Build the Graph API sendMail payload
+    mail_payload = {
+        "message": {
+            "subject": (
+                f"SSI Monthly Archive — Edition {edition_label} ({edition_key}) "
+                f"— {len(pdfs)} PDFs + {len(htmls)} HTMLs"
+            ),
+            "body": {
+                "contentType": "Text",
+                "content": body_text,
+            },
+            "toRecipients": [
+                {"emailAddress": {"address": recipient}}
+            ],
+            "attachments": attachments,
+        },
+        "saveToSentItems": "true",
+    }
+
+    # POST to Graph API
+    graph_url = f"https://graph.microsoft.com/v1.0/users/{sender}/sendMail"
+    payload_bytes = json.dumps(mail_payload).encode("utf-8")
+
+    req = urllib.request.Request(graph_url, data=payload_bytes, method="POST")
+    req.add_header("Authorization", f"Bearer {token}")
+    req.add_header("Content-Type", "application/json")
+
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            status = resp.status
+            if status == 202:
+                print(f"  Email sent to {recipient} with {len(attachments)} attachments (HTTP 202 Accepted)")
+                return True
+            else:
+                print(f"  Unexpected response: HTTP {status}")
+                return False
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode("utf-8", errors="replace")
+        print(f"  ERROR sending email: HTTP {e.code} — {error_body[:500]}")
+        return False
+    except Exception as e:
+        print(f"  ERROR sending email: {e}")
+        return False
 
 
 def capture_pages():
@@ -109,68 +239,6 @@ def capture_pages():
     return files, edition_label, edition_key, month_dir
 
 
-def send_email(files, edition_label, edition_key):
-    """Send archive files as email attachments via SMTP."""
-    smtp_server = os.environ.get("SMTP_SERVER", "")
-    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
-    smtp_user = os.environ.get("SMTP_USER", "")
-    smtp_pass = os.environ.get("SMTP_PASSWORD", "")
-    recipient = os.environ.get("ARCHIVE_EMAIL", "ssi_index@ikenga.eu")
-
-    if not smtp_server or not smtp_user or not smtp_pass:
-        print("WARNING: SMTP not configured — skipping email.")
-        print("  Set SMTP_SERVER, SMTP_USER, SMTP_PASSWORD secrets in GitHub.")
-        return False
-
-    # Separate PDFs and HTMLs
-    pdfs = [f for f in files if f.suffix == ".pdf"]
-    htmls = [f for f in files if f.suffix == ".html"]
-
-    msg = MIMEMultipart()
-    msg["From"] = smtp_user
-    msg["To"] = recipient
-    msg["Subject"] = (
-        f"SSI Monthly Archive — Edition {edition_label} ({edition_key}) "
-        f"— {len(pdfs)} PDFs + {len(htmls)} HTMLs"
-    )
-
-    body = (
-        f"SSI Monthly Archive — Edition {edition_label}\n"
-        f"Period: {edition_key}\n"
-        f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n\n"
-        f"Attached: {len(pdfs)} PDF files + {len(htmls)} HTML files\n"
-        f"Pages: Intelligence + ESG Report per country\n"
-        f"Countries: {', '.join(c.upper() for c in COUNTRIES)}\n\n"
-        f"Save these files to:\n"
-        f"  OneDrive > SSI Index Monthly intelligence and ESG Report pages\n\n"
-        f"This is an automated archive from the SSI Dashboard.\n"
-        f"https://ikengassiindex.github.io\n"
-    )
-    msg.attach(MIMEText(body, "plain"))
-
-    for file_path in files:
-        with open(file_path, "rb") as f:
-            if file_path.suffix == ".pdf":
-                part = MIMEBase("application", "pdf")
-            else:
-                part = MIMEBase("text", "html")
-            part.set_payload(f.read())
-        encoders.encode_base64(part)
-        part.add_header("Content-Disposition", f"attachment; filename={file_path.name}")
-        msg.attach(part)
-
-    try:
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
-            server.login(smtp_user, smtp_pass)
-            server.send_message(msg)
-        print(f"Email sent to {recipient} with {len(files)} attachments")
-        return True
-    except Exception as e:
-        print(f"ERROR sending email: {e}")
-        return False
-
-
 def main():
     print("=== SSI Monthly Archive — Intelligence + ESG Report ===")
     print(f"Date: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}")
@@ -189,8 +257,8 @@ def main():
     htmls = [f for f in files if f.suffix == ".html"]
     print(f"\nCaptured: {len(pdfs)} PDFs + {len(htmls)} HTMLs in {month_dir}/")
 
-    print(f"\nStep 2: Emailing {len(files)} files to ssi_index@ikenga.eu...")
-    send_email(files, edition_label, edition_key)
+    print(f"\nStep 2: Emailing {len(files)} files to ssi_index@ikenga.eu via Graph API...")
+    send_email_graph(files, edition_label, edition_key)
 
     # Files in archive/ will be committed by the workflow
     print(f"\nStep 3: Archive files ready in {month_dir}/ for git commit")
