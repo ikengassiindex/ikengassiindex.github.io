@@ -759,6 +759,14 @@ document.addEventListener("ssi-config-ready", function(e) {
 <script>
 (function(){
   var meta = window.SSIMetadata;
+    if (!meta) meta = {};
+    if (!meta.stats) meta.stats = {sources: 30, variables: 95, components: 6, modifiers: 5};
+    if (!meta.FREQ_DISTRIBUTION) meta.FREQ_DISTRIBUTION = {
+      Weekly: {count: 6, sources: ['CEN Dispatch','DMC Weather','CSN Seismic','Copernicus ERA5','DMC Fire','SHOA Tsunami']},
+      Monthly: {count: 8, sources: ['CNE Energia Abierta','CER RE Register','INE Employment','ACERA','SEC Safety','DGA Water','CONAF Fire','Cochilco']},
+      Quarterly: {count: 4, sources: ['INE GDP','INE Census Updates','SERNAGEOMIN','CASEN Survey']},
+      Annual: {count: 6, sources: ['INE Census','CNE Energy Balance','SEC Report','ENISA Cyber','ISO Corrosion','CIGRE Markov']}
+    };
   if (!meta) return;
 
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
