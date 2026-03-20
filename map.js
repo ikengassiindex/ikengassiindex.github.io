@@ -1136,12 +1136,11 @@ if (!hasNested) {
   }
 
   // ── Filter wiring ──
-  function 
-      // Detect if fleet has meaningful classification spread
+        // Detect if fleet has meaningful classification spread
       var _classif = {};
       (SSI.substations || []).forEach(function(s) { _classif[s.classification] = (_classif[s.classification]||0)+1; });
       window._ssiHasSpread = Object.keys(_classif).length >= 3;
-      wireFilters() {
+      function wireFilters() {
     const bandSel = document.getElementById('filter-band');
     const regionSel = document.getElementById('filter-region');
     const voltageSel = document.getElementById('filter-voltage');
