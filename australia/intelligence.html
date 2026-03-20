@@ -811,19 +811,19 @@ document.addEventListener("ssi-config-ready", function(e) {
   document.getElementById('c-table-header').innerHTML = '<h3 style="margin:0">Data Source Registry — ' + monthYear + '</h3>';
 
   var sources = meta.DATA_SOURCES;
-  var freqOrder = { Hourly: 0, Weekly: 1, Monthly: 2, Quarterly: 3, Annual: 4, Static: 5, Derived: 6, Continuous: 2 };
+  var freqOrder = { Hourly: 0, Daily: 0.5, Weekly: 1, Continuous: 1.5, Monthly: 2, Quarterly: 3, Seasonal: 3.5, Annual: 4, Biennial: 4.5, Static: 5, Derived: 6 };
   var sorted = sources.slice().sort(function(a,b){
     return (freqOrder[a.freq] || 9) - (freqOrder[b.freq] || 9);
   });
 
   var freqColors = {
-    Hourly: 'var(--sage)', Weekly: 'var(--sage)', Monthly: 'var(--sage)',
-    Quarterly: 'var(--bronze)', Annual: 'var(--bronze)', Continuous: 'var(--sage)',
+    Hourly: 'var(--sage)', Daily: 'var(--sage)', Weekly: 'var(--sage)', Monthly: 'var(--sage)', Continuous: 'var(--sage)',
+    Quarterly: 'var(--bronze)', Seasonal: 'var(--bronze)', Annual: 'var(--bronze)', Biennial: 'var(--bronze)',
     Static: 'var(--warm-grey)', Derived: 'var(--warm-grey)'
   };
   var freqBgs = {
-    Hourly: 'rgba(93,133,99,0.12)', Weekly: 'rgba(93,133,99,0.12)', Monthly: 'rgba(93,133,99,0.12)',
-    Quarterly: 'rgba(184,134,58,0.12)', Annual: 'rgba(184,134,58,0.12)', Continuous: 'rgba(93,133,99,0.12)',
+    Hourly: 'rgba(93,133,99,0.12)', Daily: 'rgba(93,133,99,0.12)', Weekly: 'rgba(93,133,99,0.12)', Monthly: 'rgba(93,133,99,0.12)', Continuous: 'rgba(93,133,99,0.12)',
+    Quarterly: 'rgba(184,134,58,0.12)', Seasonal: 'rgba(184,134,58,0.12)', Annual: 'rgba(184,134,58,0.12)', Biennial: 'rgba(184,134,58,0.12)',
     Static: 'rgba(44,36,32,0.06)', Derived: 'rgba(44,36,32,0.06)'
   };
 
