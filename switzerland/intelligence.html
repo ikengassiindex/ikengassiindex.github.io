@@ -479,20 +479,26 @@ document.addEventListener("ssi-config-ready", function(e) {
       'indicating strong digital infrastructure, concentrated in the Swiss Mittelland urban corridors.';
 
     // ── B.2 Economic Impact by Business Fabric ──
-    var tiers = [
-      { label: 'Financial & Pharma / High-Consequence', desc: 'Banking centres, pharmaceutical manufacturing, precision engineering — highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 0.94; }, color: '#941914', icon: '🏦',
-        voll: 'CHF 20–40/kWh' },
-      { label: 'Industrial / Medium-Large Enterprise', desc: 'Machinery, chemicals, food processing — significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 0.91 && s.modifiers.R3_C_mult < 0.94; }, color: '#aa4234', icon: '🔧',
-        voll: 'CHF 10–20/kWh' },
-      { label: 'Commercial / Tourism-Dense', desc: 'Service economy, retail, Alpine tourism — moderate individual impact but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 0.88 && s.modifiers.R3_C_mult < 0.91; }, color: '#b8863a', icon: '🏔️',
-        voll: 'CHF 4–10/kWh' },
-      { label: 'Rural / Agricultural', desc: 'Alpine farming, sparse population — lower VoLL but higher social vulnerability and longer restoration times',
-        filter: function(s){ return s.modifiers.R3_C_mult < 0.88; }, color: '#5d8563', icon: '🌾',
-        voll: 'CHF 1–4/kWh' }
-    ];
+    var tiers = (function() {
+      var r3vals = fleet.map(function(s){ return s.modifiers ? s.modifiers.R3_C_mult : 1.0; }).sort(function(a,b){return a-b;});
+      var p25 = r3vals[Math.floor(r3vals.length * 0.25)];
+      var p50 = r3vals[Math.floor(r3vals.length * 0.50)];
+      var p75 = r3vals[Math.floor(r3vals.length * 0.75)];
+      return [
+        { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, critical infrastructure -- highest economic loss per interruption',
+          filter: function(s){ return s.modifiers.R3_C_mult >= p75; }, color: '#941914', icon: '\ud83c\udfed',
+          voll: 'Est. high VoLL' },
+        { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, processing -- significant continuity requirements',
+          filter: function(s){ return s.modifiers.R3_C_mult >= p50 && s.modifiers.R3_C_mult < p75; }, color: '#b8863a', icon: '\ud83d\udd27',
+          voll: 'Est. medium-high VoLL' },
+        { label: 'Commercial / SME-Dense', desc: 'Service economy, commercial districts -- moderate individual but high aggregate exposure',
+          filter: function(s){ return s.modifiers.R3_C_mult >= p25 && s.modifiers.R3_C_mult < p50; }, color: '#5d8563', icon: '\ud83c\udfe2',
+          voll: 'Est. medium VoLL' },
+        { label: 'Light / Agricultural / Remote', desc: 'Rural communities, agriculture -- lower VoLL but higher social vulnerability',
+          filter: function(s){ return s.modifiers.R3_C_mult < p25; }, color: '#8a7e76', icon: '\ud83c\udf3e',
+          voll: 'Est. low VoLL' }
+      ];
+    })()
 
     var tiersHTML = '';
     tiers.forEach(function(tier){

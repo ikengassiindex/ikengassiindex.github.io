@@ -500,20 +500,26 @@ document.addEventListener("ssi-config-ready", function(e) {
       'concentrated in metropolitan networks (Ausgrid, CitiPower, Jemena).';
 
     // ── B.2 Economic Impact by Business Fabric ──
-    var tiers = [
-      { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, LNG processing, mining operations — highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
-        voll: 'A$20–40/kWh' },
-      { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics hubs, agri-processing — significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
-        voll: 'A$10–20/kWh' },
-      { label: 'Commercial / SME-Dense', desc: 'Service economy, retail corridors, tourism — moderate individual impact but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏪',
-        voll: 'A$4–10/kWh' },
-      { label: 'Light / Agricultural / Remote', desc: 'Pastoral stations, remote communities — lower VoLL but higher social vulnerability and longer restoration',
-        filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
-        voll: 'A$1–4/kWh' }
-    ];
+    var tiers = (function() {
+      var r3vals = fleet.map(function(s){ return s.modifiers ? s.modifiers.R3_C_mult : 1.0; }).sort(function(a,b){return a-b;});
+      var p25 = r3vals[Math.floor(r3vals.length * 0.25)];
+      var p50 = r3vals[Math.floor(r3vals.length * 0.50)];
+      var p75 = r3vals[Math.floor(r3vals.length * 0.75)];
+      return [
+        { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, critical infrastructure -- highest economic loss per interruption',
+          filter: function(s){ return s.modifiers.R3_C_mult >= p75; }, color: '#941914', icon: '\ud83c\udfed',
+          voll: 'Est. high VoLL' },
+        { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, processing -- significant continuity requirements',
+          filter: function(s){ return s.modifiers.R3_C_mult >= p50 && s.modifiers.R3_C_mult < p75; }, color: '#b8863a', icon: '\ud83d\udd27',
+          voll: 'Est. medium-high VoLL' },
+        { label: 'Commercial / SME-Dense', desc: 'Service economy, commercial districts -- moderate individual but high aggregate exposure',
+          filter: function(s){ return s.modifiers.R3_C_mult >= p25 && s.modifiers.R3_C_mult < p50; }, color: '#5d8563', icon: '\ud83c\udfe2',
+          voll: 'Est. medium VoLL' },
+        { label: 'Light / Agricultural / Remote', desc: 'Rural communities, agriculture -- lower VoLL but higher social vulnerability',
+          filter: function(s){ return s.modifiers.R3_C_mult < p25; }, color: '#8a7e76', icon: '\ud83c\udf3e',
+          voll: 'Est. low VoLL' }
+      ];
+    })()
 
     var tiersHTML = '';
     tiers.forEach(function(tier){
