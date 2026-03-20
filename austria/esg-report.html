@@ -201,10 +201,21 @@ p  { margin-bottom: 14px; }
 </style>
 </head>
 <body>
+<script>
+// Auto-detect country from URL path
+(function() {
+  var match = window.location.pathname.match(/\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile)\//i);
+  if (match) {
+    document.currentScript.parentElement.setAttribute('data-ssi-country', match[1].toLowerCase());
+    window.SSI_ESG_COUNTRY = match[1].toLowerCase();
+  }
+})();
+</script>
+
 
 <script src="../nav.js?v=1773921819"></script>
 <script src="ssi-metadata.js"></script>
-<script src="../intelligence/intelligence-loader.js" data-country="austria"></script>
+<script src="../intelligence/intelligence-loader.js" data-country="auto" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
@@ -1250,5 +1261,18 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+// Set data-country on the page element from URL path
+document.addEventListener('DOMContentLoaded', function() {
+  var country = window.SSI_ESG_COUNTRY;
+  if (country) {
+    var el = document.getElementById('ssi-esg-page');
+    if (el) el.setAttribute('data-country', country);
+    // Also set on intelligence-loader if present
+    var loaders = document.querySelectorAll('[data-country="auto"]');
+    loaders.forEach(function(l) { l.setAttribute('data-country', country); });
+  }
+});
+</script>
 </body>
 </html>

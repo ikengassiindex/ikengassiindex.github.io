@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — ESG Report</title>
-<link rel="stylesheet" href="../style.css?v=3">
+<link rel="stylesheet" href="../style.css?v=1773921819">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -201,10 +201,21 @@ p  { margin-bottom: 14px; }
 </style>
 </head>
 <body>
+<script>
+// Auto-detect country from URL path
+(function() {
+  var match = window.location.pathname.match(/\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile)\//i);
+  if (match) {
+    document.currentScript.parentElement.setAttribute('data-ssi-country', match[1].toLowerCase());
+    window.SSI_ESG_COUNTRY = match[1].toLowerCase();
+  }
+})();
+</script>
 
-<script src="../nav.js?v=116"></script>
+
+<script src="../nav.js?v=1773921819"></script>
 <script src="ssi-metadata.js"></script>
-<script src="../intelligence/intelligence-loader.js" data-country="chile"></script>
+<script src="../intelligence/intelligence-loader.js" data-country="auto" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
@@ -409,7 +420,7 @@ const ESG_REPORTS = [
         ['V_socio (energy poverty index)', se.V_socio?.toFixed(2) || '—'],
         ['EP Rate (energy poverty %)', (se.EP_rate_region || '—') + '%'],
         ['Unemployment Rate', (se.unemployment_rate || '—') + '%'],
-        ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':id.indexOf('CL_')===0?'CL$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
+        ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
         ['R&D % of GDP', (se.rd_pct_gdp || '—') + '%'],
         ['R3 Social Multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—'],
         ['Elderly Vulnerability', d.socio_economic?.elderly_pct ? d.socio_economic.elderly_pct + '%' : '—'],
@@ -714,22 +725,7 @@ const COUNTRY_SOURCES = {
     ['ISO 9223 Corrosion','ISO','2012','N/A','Published','R5'],
     ['CMIP6 SSP2-4.5 Projections','Data Integration and Analysis System (DIAS)','—','Not ingested','CC-BY-4.0','R1 (blocked)', true]
   ]
-,
-    chile: [
-      ['ERA5 Climate Reanalysis','Copernicus CDS','2024','Weekly','CC-BY-4.0','R1, R3'],
-      ['Chilean Seismic Hazard Map','Centro Sismol\u00f3gico Nacional (CSN)','2023','Multi-year','Open','R1, R3'],
-      ['Population & Economics','Instituto Nacional de Estad\u00edsticas (INE)','2023','Annual','OGD','R2, R3'],
-      ['Energy Market Data','Coordinador El\u00e9ctrico Nacional (CEN)','2024','Hourly','Open','R2, R4'],
-      ['Renewable Installations','Comisi\u00f3n Nacional de Energ\u00eda (CNE)','2024','Monthly','Open','R4'],
-      ['Weather Data','Direcci\u00f3n Meteorol\u00f3gica de Chile (DMC)','2024','Daily','CC-BY-4.0','R1'],
-      ['Environmental Data','SERNAGEOMIN','2023','Annual','Open','R5'],
-      ['Cybersecurity Index','CSIRT Chile','2024','Annual','Open','R6'],
-      ['IEEE C57.91 Thermal Model','IEEE','Standard','N/A','Published','R1'],
-      ['CIGRE TB 761 Markov','CIGRE','2019','N/A','Published','R1, R3'],
-      ['ISO 9223 Corrosion','ISO','2012','N/A','Published','R5'],
-      ['CMIP6 SSP2-4.5 Projections','Copernicus CDS','\u2014','Not ingested','CC-BY-4.0','R1 (blocked)', true]
-    ]
-  };
+};
 
 /* ── Component colors and weights ── */
 const COMP_CONFIG = {
@@ -1190,7 +1186,7 @@ function renderAuditTrail(d) {
 function renderESGFooter(d) {
   document.getElementById('footerContainer').innerHTML = `
     <div>SSI Index v4.0.2 · Ikenga Enhanced Infrastructure Intelligence · Annual ESG Disclosure</div>
-    <div>Report generated 17 March 2026 · All data sources are open-access institutional</div>
+    <div>Report generated 19 March 2026 · All data sources are open-access institutional</div>
   `;
 }
 
@@ -1236,7 +1232,7 @@ const DEMO_SUBSTATION = {
 
 async function loadSubstation(country) {
   try {
-    const url = `ssi-data.json?v=20260319`;
+    const url = `ssi-data.json?v=20260317`;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const json = await resp.json();
@@ -1265,5 +1261,18 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+// Set data-country on the page element from URL path
+document.addEventListener('DOMContentLoaded', function() {
+  var country = window.SSI_ESG_COUNTRY;
+  if (country) {
+    var el = document.getElementById('ssi-esg-page');
+    if (el) el.setAttribute('data-country', country);
+    // Also set on intelligence-loader if present
+    var loaders = document.querySelectorAll('[data-country="auto"]');
+    loaders.forEach(function(l) { l.setAttribute('data-country', country); });
+  }
+});
+</script>
 </body>
 </html>
