@@ -199,8 +199,28 @@ window.SSIMetadata = {
   ],
 
   /* ── fleet stats (placeholder — updated by ssi-data.json at runtime) ── */
-  FREQ_DISTRIBUTION: { Low:0.37, Medium:0.35, High:0.20, Critical:0.08 },
-  stats: { fleet_median:0.395, fleet_mean:0.412, fleet_std:0.156, n_substations:1095, n_comunas:346, n_regions:16 }
+  FREQ_DISTRIBUTION: {
+      Daily:      { count: 2, sources: ['CEN','DMC'] },
+      Continuous: { count: 2, sources: ['CSN','OSM'] },
+      Monthly:    { count: 5, sources: ['CNE','COPER','BancoCentral','ONEMI','DGA'] },
+      Quarterly:  { count: 4, sources: ['SEC','COCHILCO','ENAP','GEOAPI'] },
+      Seasonal:   { count: 1, sources: ['CONAF'] },
+      Annual:     { count: 11, sources: ['INE','ACERA','DINEM','CIREN','SUBGOV','SERNATUR','SISS','SEREMI','PNUD','SII','MINSAL'] },
+      Biennial:   { count: 1, sources: ['CASEN'] },
+      Static:     { count: 4, sources: ['SERNA','SHOA','IEEE-CIGRE','ISO9223'] }
+    },
+  stats: {
+      variables: 162,
+      metrics: 20,
+      components: 6,
+      modifiers: 5,
+      sources: 30,
+      substations: 1095,
+      powerLines: 4200,
+      mcIterations: 10000,
+      comunas: 346,
+      regions: 16
+    }
 };
 
 

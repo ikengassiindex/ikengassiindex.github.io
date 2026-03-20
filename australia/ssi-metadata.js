@@ -194,8 +194,26 @@ window.SSIMetadata = {
   ],
 
   /* ── fleet stats (placeholder — updated by ssi-data.json at runtime) ── */
-  FREQ_DISTRIBUTION: { Low:0.38, Medium:0.34, High:0.21, Critical:0.07 },
-  stats: { fleet_median:0.383, fleet_mean:0.401, fleet_std:0.148, n_substations:8500, n_departments:87, n_regions:8 }
+  FREQ_DISTRIBUTION: {
+      Continuous: { count: 1, sources: ['OSM'] },
+      Monthly:    { count: 4, sources: ['AEMO','BOM','COPER','OM-ERA5'] },
+      Quarterly:  { count: 1, sources: ['CER'] },
+      Annual:     { count: 15, sources: ['AER','ABS','CSIRO','AEMC','ARENA','ASD','DCCEEW','ENA','PHIDU','AUSGRID','ENERGEX','SAPN','POWERCOR','WEST','EUROSTAT'] },
+      Biennial:   { count: 2, sources: ['ACCC','AEMO-ISP'] },
+      Static:     { count: 2, sources: ['GA','IEC-IEEE'] }
+    },
+  stats: {
+      variables: 125,
+      metrics: 20,
+      components: 6,
+      modifiers: 5,
+      sources: 25,
+      substations: 8500,
+      powerLines: 12800,
+      mcIterations: 10000,
+      sa4s: 88,
+      states: 8
+    }
 };
 
 

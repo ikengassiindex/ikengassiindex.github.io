@@ -793,6 +793,16 @@ if (window.SSI_METADATA) {
 <script>
 (function(){
   var meta = window.SSIMetadata;
+  if (!meta) meta = {};
+  if (!meta.stats || !meta.stats.sources) meta.stats = Object.assign(meta.stats || {}, {sources: 20, variables: 68, components: 6, modifiers: 5});
+  if (!meta.FREQ_DISTRIBUTION || !meta.FREQ_DISTRIBUTION.Monthly) meta.FREQ_DISTRIBUTION = {
+      Daily:      { count: 1, sources: ['DS04'] },
+      Continuous: { count: 1, sources: ['DS15'] },
+      Monthly:    { count: 3, sources: ['DS05','DS07','DS08'] },
+      Quarterly:  { count: 1, sources: ['DS01'] },
+      Annual:     { count: 9, sources: ['DS02','DS03','DS09','DS10','DS11','DS12','DS13','DS14','DS18'] },
+      Static:     { count: 1, sources: ['DS19'] }
+    };
   if (!meta) return;
 
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -808,17 +818,21 @@ if (window.SSI_METADATA) {
 
   // ── Frequency KPIs ──
   var freq = meta.FREQ_DISTRIBUTION;
+  var daily = (freq.Daily ? freq.Daily.count : 0);
+  var continuous = (freq.Continuous ? freq.Continuous.count : 0);
   var weekly = (freq.Weekly ? freq.Weekly.count : 0);
   var monthly = (freq.Monthly ? freq.Monthly.count : 0);
   var quarterly = (freq.Quarterly ? freq.Quarterly.count : 0);
+  var seasonal = (freq.Seasonal ? freq.Seasonal.count : 0);
   var annual = (freq.Annual ? freq.Annual.count : 0);
+  var biennial = (freq.Biennial ? freq.Biennial.count : 0);
   var staticC = (freq.Static ? freq.Static.count : 0);
   var derived = (freq.Derived ? freq.Derived.count : 0);
 
   document.getElementById('c-total-src').textContent = meta.stats.sources;
   document.getElementById('c-total-vars').textContent = meta.stats.variables + ' variables';
-  document.getElementById('c-freq-fast').textContent = (weekly + monthly);
-  document.getElementById('c-freq-slow').textContent = (quarterly + annual);
+  document.getElementById('c-freq-fast').textContent = (daily + continuous + weekly + monthly);
+  document.getElementById('c-freq-slow').textContent = (quarterly + seasonal + annual + biennial);
   document.getElementById('c-freq-static').textContent = (staticC + derived);
 
   // ── Source Registry Table ──

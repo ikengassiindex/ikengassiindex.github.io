@@ -1074,5 +1074,29 @@ window.SSI_METADATA.CHANGELOG = [
   }
 ];
 
+/* ── Stats ── */
+window.SSI_METADATA.stats = {
+  variables: 68,
+  metrics: 20,
+  components: 6,
+  modifiers: 5,
+  sources: 20,
+  substations: 24986,
+  powerLines: 38500,
+  mcIterations: 10000,
+  provinces: 13,
+  regions: 13
+};
+
+
 /* ── SSIMetadata alias for methodology.html ── */
-window.SSIMetadata = window.SSI_METADATA;
+window.SSI_METADATA.FREQ_DISTRIBUTION = {
+    Daily: { count: 1, sources: ['DS04'] },
+    Continuous: { count: 1, sources: ['DS15'] },
+    Monthly: { count: 3, sources: ['DS05', 'DS07', 'DS08'] },
+    Quarterly: { count: 1, sources: ['DS01'] },
+    Annual: { count: 9, sources: ['DS02', 'DS03', 'DS09', 'DS10', 'DS11', 'DS12', 'DS13', 'DS14', 'DS18'] },
+    Static: { count: 1, sources: ['DS19'] }
+  };
+
+  window.SSIMetadata = window.SSI_METADATA;

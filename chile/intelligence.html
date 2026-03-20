@@ -767,12 +767,16 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   var meta = window.SSIMetadata;
     if (!meta) meta = {};
-    if (!meta.stats) meta.stats = {sources: 30, variables: 95, components: 6, modifiers: 5};
-    if (!meta.FREQ_DISTRIBUTION) meta.FREQ_DISTRIBUTION = {
-      Weekly: {count: 6, sources: ['CEN Dispatch','DMC Weather','CSN Seismic','Copernicus ERA5','DMC Fire','SHOA Tsunami']},
-      Monthly: {count: 8, sources: ['CNE Energia Abierta','CER RE Register','INE Employment','ACERA','SEC Safety','DGA Water','CONAF Fire','Cochilco']},
-      Quarterly: {count: 4, sources: ['INE GDP','INE Census Updates','SERNAGEOMIN','CASEN Survey']},
-      Annual: {count: 6, sources: ['INE Census','CNE Energy Balance','SEC Report','ENISA Cyber','ISO Corrosion','CIGRE Markov']}
+    if (!meta.stats || !meta.stats.sources) meta.stats = Object.assign(meta.stats || {}, {sources: 30, variables: 162, components: 6, modifiers: 5});
+    if (!meta.FREQ_DISTRIBUTION || !meta.FREQ_DISTRIBUTION.Daily) meta.FREQ_DISTRIBUTION = {
+      Daily:      { count: 2, sources: ['CEN','DMC'] },
+      Continuous: { count: 2, sources: ['CSN','OSM'] },
+      Monthly:    { count: 5, sources: ['CNE','COPER','BancoCentral','ONEMI','DGA'] },
+      Quarterly:  { count: 4, sources: ['SEC','COCHILCO','ENAP','GEOAPI'] },
+      Seasonal:   { count: 1, sources: ['CONAF'] },
+      Annual:     { count: 11, sources: ['INE','ACERA','DINEM','CIREN','SUBGOV','SERNATUR','SISS','SEREMI','PNUD','SII','MINSAL'] },
+      Biennial:   { count: 1, sources: ['CASEN'] },
+      Static:     { count: 4, sources: ['SERNA','SHOA','IEEE-CIGRE','ISO9223'] }
     };
   if (!meta) return;
 
@@ -789,17 +793,21 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   // ── Frequency KPIs ──
   var freq = meta.FREQ_DISTRIBUTION;
+  var daily = (freq.Daily ? freq.Daily.count : 0);
+  var continuous = (freq.Continuous ? freq.Continuous.count : 0);
   var weekly = (freq.Weekly ? freq.Weekly.count : 0);
   var monthly = (freq.Monthly ? freq.Monthly.count : 0);
   var quarterly = (freq.Quarterly ? freq.Quarterly.count : 0);
+  var seasonal = (freq.Seasonal ? freq.Seasonal.count : 0);
   var annual = (freq.Annual ? freq.Annual.count : 0);
+  var biennial = (freq.Biennial ? freq.Biennial.count : 0);
   var staticC = (freq.Static ? freq.Static.count : 0);
   var derived = (freq.Derived ? freq.Derived.count : 0);
 
-  document.getElementById('c-total-src').textContent = (meta.stats||{}).sources;
-  document.getElementById('c-total-vars').textContent = (meta.stats||{}).variables + ' variables';
-  document.getElementById('c-freq-fast').textContent = (weekly + monthly);
-  document.getElementById('c-freq-slow').textContent = (quarterly + annual);
+  document.getElementById('c-total-src').textContent = meta.stats.sources;
+  document.getElementById('c-total-vars').textContent = meta.stats.variables + ' variables';
+  document.getElementById('c-freq-fast').textContent = (daily + continuous + weekly + monthly);
+  document.getElementById('c-freq-slow').textContent = (quarterly + seasonal + annual + biennial);
   document.getElementById('c-freq-static').textContent = (staticC + derived);
 
   // ── Source Registry Table ──
