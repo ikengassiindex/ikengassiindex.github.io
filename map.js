@@ -1,3 +1,13 @@
+
+// Load countries.json config (currencies, flags, admin labels)
+(function() {
+  var base = window.SSI_BASE || (window.location.pathname.match(/^\/\w+\//) ? '../' : './');
+  fetch(base + 'countries.json?v=1', {cache: 'no-store'})
+    .then(function(r) { return r.json(); })
+    .then(function(cfg) { window.SSI_COUNTRIES_CONFIG = cfg; })
+    .catch(function() { window.SSI_COUNTRIES_CONFIG = {}; });
+})();
+
 /* ═══════════════════════════════════════════════════════════
    SSI Index Dashboard v4.0.2 — Interactive Map Engine
    Canvas-based renderer for 4,293 substations (HV/MV/LV) + 14,221 lines
@@ -608,7 +618,16 @@
                        se.population != null ? Math.round(se.population).toLocaleString() : na;
     var unemploymentLabel = se.unemployment_rate != null ? 'Unemployment' : se.population != null ? 'Population' : 'Unemployment';
     // 2. GDP per capita
-    var currSymbol = (ssi.substation_id && ssi.substation_id.indexOf('UK_') === 0) ? '\u00A3' : (ssi.substation_id && ssi.substation_id.indexOf('US_') === 0) ? '$' : (ssi.substation_id && ssi.substation_id.indexOf('CA_') === 0) ? 'C$' : (ssi.substation_id && ssi.substation_id.indexOf('JP_') === 0) ? '\u00A5' : (ssi.substation_id && ssi.substation_id.indexOf('AU_') === 0) ? 'A$' : '\u20AC';
+    var currSymbol = (function() {
+      if (!window.SSI_COUNTRIES_CONFIG) return '\u20AC'; // fallback to EUR
+      var id = ssi.substation_id || '';
+      var prefix = id.substring(0, 2);
+      // Map prefix to ISO code (UK_ -> GB, all others match)
+      var isoMap = {UK: 'GB'};
+      var iso = isoMap[prefix] || prefix;
+      var cc = window.SSI_COUNTRIES_CONFIG[iso];
+      return cc ? cc.currency : '\u20AC';
+    })();
     var gdp = se.gdp_per_capita != null ? currSymbol + Math.round(se.gdp_per_capita).toLocaleString() : na;
     // 3. Innovation (R&D) / Elderly pct
     var innovation = se.rd_pct_gdp != null ? se.rd_pct_gdp.toFixed(1) + '% of GDP' :
