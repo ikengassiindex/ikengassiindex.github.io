@@ -235,12 +235,12 @@
     embedded: true,
     onLoaded: function(ssi) {
       // ── KPIs ──
-      document.getElementById('kpi-total').textContent = ssi.fleet_summary.total.toLocaleString();
-      document.getElementById('kpi-median').textContent = ssi.fleet_summary.median_R.toFixed(3);
-      document.getElementById('kpi-median-sub').textContent = 'P5 = ' + ssi.fleet_summary.P5.toFixed(3) + ' · P95 = ' + ssi.fleet_summary.P95.toFixed(3);
+      document.getElementById('kpi-total').textContent = (ssi.fleet_summary.total || 0).toLocaleString();
+      document.getElementById('kpi-median').textContent = (ssi.fleet_summary.median_R || ssi.fleet_summary.R_median || 0).toFixed(3);
+      document.getElementById('kpi-median-sub').textContent = 'P5 = ' + (ssi.fleet_summary.P5 || ssi.fleet_summary.R_min || 0).toFixed(3) + ' · P95 = ' + (ssi.fleet_summary.P95 || ssi.fleet_summary.R_max || 0).toFixed(3);
       document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
       document.getElementById('kpi-critical-sub').textContent = ssi.fleet_summary.band_pct.Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
-      document.getElementById('dist-count').textContent = ssi.fleet_summary.total.toLocaleString() + ' substations';
+      document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
       var hvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 110; }).length;
       var mvCount = ssi.fleet_summary.total - hvCount;
       document.getElementById('kpi-total-sub').textContent = hvCount.toLocaleString() + ' HV · ' + mvCount.toLocaleString() + ' MV · ' + ssi.meta.total_kreise + ' Bezirke · ' + ssi.regions.length + ' Bundesländer';
