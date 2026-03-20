@@ -1461,10 +1461,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
     var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
     regions.forEach(function(reg, idx){
-      var isAtacama–Central = reg.name === 'Antofagasta' || reg.name.indexOf('Atacama–Central') >= 0;
+      var isAtacamaCentral = reg.name === 'Antofagasta' || reg.name.indexOf('Atacama–Central') >= 0;
       var barPct = ((1 - reg.avgR) * 100).toFixed(1);
       var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
-      var highlight = isAtacama–Central ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
+      var highlight = isAtacamaCentral ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
 
       var total = reg.n;
       var bandBar = '';
@@ -1477,7 +1477,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
       html += '<div style="margin-bottom:8px;' + highlight + '">' +
         '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline">' +
-          '<span style="font-weight:' + (isAtacama–Central ? '700' : '500') + ';min-width:180px">' +
+          '<span style="font-weight:' + (isAtacamaCentral ? '700' : '500') + ';min-width:180px">' +
             '<span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#' + (idx + 1) + '</span>' +
             reg.name + '</span>' +
           '<span style="color:var(--warm-grey);font-size:11px">' + reg.n + ' subs · avg R = ' + reg.avgR.toFixed(3) +
