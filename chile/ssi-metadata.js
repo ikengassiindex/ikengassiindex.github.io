@@ -10,7 +10,7 @@ window.SSIMetadata = {
   DATA_SOURCES: [
     { id:"CEN",    name:"CEN (Coordinador Eléctrico Nacional)", url:"cne.cl/coordinador", freq:"Daily", res:"Substation", vars:14, category:"Grid", feeds:"C1–C4, I2, S1–S2, transmission network topology, dispatch data" },
     { id:"CNE",    name:"CNE (Comisión Nacional de Energía)", url:"energia.gob.cl", freq:"Monthly", res:"Regional", vars:12, category:"Grid", feeds:"C1–C4, V1–V2, I1, policy data, Energía Abierta portal", registration:true },
-    { id:"SEC",    name:"SEC (Superintendencia de Electricidad y Combustibles)", url:"sec.cl", freq:"Quarterly", res:"DNSP", vars:10, category:"Grid", feeds:"C1–C4, safety compliance, technical standards, asset registration" },
+    { id:"SEC",    name:"SEC (Superintendencia de Electricidad y Combustibles)", url:"sec.cl", freq:"Quarterly", res:"Distribution Company", vars:10, category:"Grid", feeds:"C1–C4, safety compliance, technical standards, asset registration" },
     { id:"INE",    name:"INE (Instituto Nacional de Estadísticas)", url:"ine.cl", freq:"Annual", res:"Comuna", vars:9, category:"Socio-Econ", feeds:"E1–E3, Census 2017, population, income, unemployment, vulnerability indices" },
     { id:"CSN",    name:"CSN (Centro Sismológico Nacional)", url:"sismologia.cl", freq:"Continuous", res:"Grid 0.1°", vars:7, category:"Hazard", feeds:"I5 (seismic PGA), earthquake catalog, hazard maps (critical for Chile)" },
     { id:"SERNA",  name:"SERNAGEOMIN (Servicio Nacional de Geología y Minería)", url:"sernageomin.cl", freq:"Static", res:"Grid 0.1°", vars:6, category:"Hazard", feeds:"I5 variant (volcanic), geological mapping, tsunamis, landslide zones" },
