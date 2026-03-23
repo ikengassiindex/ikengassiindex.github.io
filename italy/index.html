@@ -269,7 +269,7 @@
 
       // ── Top critical table ──
       var tbody = document.getElementById('top-critical-tbody');
-      var top8 = ssi.substations.slice(0, 8);
+      var top8 = ssi.substations.slice().sort(function(a,b){ return b.R_median - a.R_median; }).slice(0, 8);
       tbody.innerHTML = top8.map(function(s) {
         return '<tr><td style="font-weight:500">' + s.name + '</td>' +
           '<td>' + s.region + '</td>' +
