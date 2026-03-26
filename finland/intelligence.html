@@ -153,7 +153,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('focus-r').textContent = s.R_median.toFixed(3);
     document.getElementById('focus-band').textContent = s.classification;
     document.getElementById('focus-ci').textContent = s.CI_width.toFixed(3);
-    document.getElementById('focus-pctile').textContent = (s.fleet_percentile * 100).toFixed(0) + 'th';
+    document.getElementById('focus-pctile').textContent = ((s.fleet_percentile > 1 ? s.fleet_percentile : s.fleet_percentile * 100)).toFixed(0) + 'th';
 
     var bandColors = { Low: 'var(--sage)', Medium: 'var(--bronze)', High: 'var(--terracotta)', Critical: 'var(--crimson)' };
     document.getElementById('focus-band').style.color = bandColors[s.classification] || 'var(--ink)';
@@ -264,7 +264,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
       ' — is <strong>' + s.name + '</strong> in ' + locStr +
       '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
-      (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
+      ((s.fleet_percentile > 1 ? s.fleet_percentile : s.fleet_percentile * 100)).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
       top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
       '% of its weight ceiling, followed by ' + top2.key + ' (' + top2.label + ') at ' +
       (s.components[top2.key] / top2.w * 100).toFixed(0) + '%. Modifiers collectively shift R_base by ' +
@@ -671,7 +671,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var highRiskLowDigital = fleet.filter(function(s){
       return s.classification === 'Critical' && s.modifiers.R7_cyber < medianR7;
     }).length;
-    var monthYear = 'April 2026';
+    var monthYear = (function(){ var _mn=['January','February','March','April','May','June','July','August','September','October','November','December']; var _d=new Date(); return _mn[_d.getMonth()]+' '+_d.getFullYear(); })();
 
     document.getElementById('b4-pulse').innerHTML =
       '<strong>Inaugural edition — Baseline Snapshot (' + monthYear + ').</strong> ' +
@@ -761,7 +761,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var now = new Date();
-  var monthYear = 'April 2026';
+  var monthYear = (function(){ var _mn=['January','February','March','April','May','June','July','August','September','October','November','December']; var _d=new Date(); return _mn[_d.getMonth()]+' '+_d.getFullYear(); })();
 
   document.getElementById('sec-c-intro').innerHTML =
     'The SSI v4.0.2 draws on <strong>' + (meta.stats||{}).sources + ' verified public data sources</strong> feeding ' +
@@ -1526,7 +1526,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   var topic = topics[topicIdx];
   var nextTopic = topics[nextIdx];
 
-  var monthYear = 'April 2026';
+  var monthYear = (function(){ var _mn=['January','February','March','April','May','June','July','August','September','October','November','December']; var _d=new Date(); return _mn[_d.getMonth()]+' '+_d.getFullYear(); })();
 
   var layerDefs = [
     { n: 1, label: 'Layer 1 — Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
