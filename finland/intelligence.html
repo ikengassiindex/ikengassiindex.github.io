@@ -139,7 +139,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=47').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -363,7 +363,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=47').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -828,7 +828,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">Quarterly <span style="font-weight:400;color:var(--warm-grey)">(4 sources)</span></span><span style="color:var(--warm-grey);font-size:11px">DER registry + Fingrid performance data</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden"><div style="width:60%;height:100%;background:#b8863a;border-radius:3px;opacity:0.7"></div></div></div>' +
     '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">Annual <span style="font-weight:400;color:var(--warm-grey)">(14 sources)</span></span><span style="color:var(--warm-grey);font-size:11px">Core grid quality + Tilastokeskus demographics</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden"><div style="width:100%;height:100%;background:#aa4234;border-radius:3px;opacity:0.7"></div></div></div>';
 
-  fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=47').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -894,12 +894,33 @@ document.addEventListener("ssi-config-ready", function(e) {
       '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
         '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">P1</span>' +
         '<span style="flex-shrink:0;font-size:10px;color:#b8863a;background:rgba(184,134,58,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">ENH</span>' +
-        '<span style="flex:1">R6b modifier: added snow/ice loading and permafrost instability + Vistula/Oder flood hazard</span>' +
-        '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Section D — Deep-Dive</span>
+        '<span style="flex:1">R6b modifier: added snow/ice loading and permafrost instability + coastal/river flood hazard</span>' +
+        '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Section D — Deep-Dive</span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
+        '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">P2</span>' +
+        '<span style="flex-shrink:0;font-size:10px;color:#5d8563;background:rgba(93,133,99,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">NEW</span>' +
+        '<span style="flex:1">R7 cyber modifier: Fingrid IT/OT convergence assessment integrated</span>' +
+        '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Section B</span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0">' +
+        '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">P2</span>' +
+        '<span style="flex-shrink:0;font-size:10px;color:#b8863a;background:rgba(184,134,58,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">ENH</span>' +
+        '<span style="flex:1">Monte Carlo upgraded to 2,000 iterations (vectorized NumPy)</span>' +
+        '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Methodology</span>' +
+      '</div>';
+
+  });
+  })();
+  </script>
+
+<!-- ═══════════ SECTION D — Deep-Dive ═══════════ -->
+<div class="section-label">SECTION D</div>
+
 <h2>The Uusimaa–Pirkanmaa Grid Corridor: Where Nuclear Concentration and Winter Storm Resilience Challenge Grid Stability</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Uusimaa–Pirkanmaa nuclear concentration and winter storm resilience corridor · <strong>002</strong> Eastern Finland DER & EU funding mismatch · <strong>003</strong> Mining subsidence infrastructure stress · <strong>004</strong> Metropolitan-Rural energy poverty disparity · <strong>005</strong> Grid stranding risk (nuclear-dependent assets) · <strong>006</strong> DSO smart meter rollout vs grid stress · <strong>007</strong> Vistula winter storms and coastal flooding resilience · <strong>008</strong> T-component forward projections · <strong>009</strong> Maakunta Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Uusimaa–Pirkanmaa nuclear concentration and winter storm resilience corridor · <strong>002</strong> Eastern Finland DER & EU funding mismatch · <strong>003</strong> Mining subsidence infrastructure stress · <strong>004</strong> Metropolitan-Rural energy poverty disparity · <strong>005</strong> Grid stranding risk (nuclear-dependent assets) · <strong>006</strong> DSO smart meter rollout vs grid stress · <strong>007</strong> Gulf of Finland coastal flooding resilience · <strong>008</strong> T-component forward projections · <strong>009</strong> Maakunta Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
 </div>
 
 <!-- D.1 KPI summary — auto-populated -->
@@ -986,7 +1007,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=47').then(function(r){ return r.json(); }).then(function(data){
     var puglia = data.substations.filter(function(s){ return s.province === 'Uusimaa' || s.region === 'Uusimaa' || s.province === 'Pirkanmaa' || s.region === 'Pirkanmaa'; });
     if (puglia.length === 0) puglia = data.substations.slice(0, Math.floor(data.substations.length * 0.3));
     var fleet = data.substations;
@@ -1186,7 +1207,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'Among modifiers, the R3 consequence multiplier averages ' + avgMod(puglia, 'R3_C_mult').toFixed(3) +
       ' (fleet: ' + avgMod(fleet, 'R3_C_mult').toFixed(3) + '), reflecting the economic significance of ' +
       'the corridor\'s nuclear-dependent industrial base — from nuclear plants to refineries to paper mills. The R6b winter storm/snow loading hazard modifier averages ' +
-      avgMod(puglia, 'R6_seismic').toFixed(3) + ', capturing the corridor\'s exposure to snow/ice loading and permafrost instability, Vistula/Oder winter storms and coastal flooding, and seismic hazard risk — ' +
+      avgMod(puglia, 'R6_seismic').toFixed(3) + ', capturing the corridor\'s exposure to snow/ice loading, Gulf of Finland coastal flooding, and winter storm hazard risk — ' +
       'a dimension invisible to every competing framework.';
 
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">Maakunta Risk Profile — Sorted by Mean R</div>' +
@@ -1341,7 +1362,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=47').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var puglia = fleet.filter(function(s){ return s.province === 'Uusimaa' || s.region === 'Uusimaa' || s.province === 'Pirkanmaa' || s.region === 'Pirkanmaa' || (s.province || '').indexOf('corridor') >= 0; });
     if (puglia.length === 0) puglia = fleet.slice(0, Math.floor(fleet.length * 0.3));
@@ -1548,7 +1569,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       conceptsHTML +
     '</div>';
 
-  fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=47').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
