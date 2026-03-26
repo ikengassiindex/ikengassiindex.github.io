@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland)\//);
   return match ? match[1] : null;
 })();
 
@@ -29,7 +29,8 @@ var SSI_COUNTRY_LABELS = {
   canada: '🇨🇦 Canada',
     australia: '🇦🇺 Australia'
 ,
-    chile: '🇨🇱 Chile'
+    chile: '🇨🇱 Chile',
+    poland: '🇵🇱 Poland'
   };
 
 // Ikenga logo
