@@ -16,7 +16,7 @@ window.SSIMetadata = {
     { id:"WUG",    name:"WUG — State Mining Authority", url:"wug.gov.pl", freq:"Static", res:"Grid 0.1°", vars:6, category:"Hazard", feeds:"I7 (mining subsidence zone), seismic monitoring, ground deformation" },
     { id:"GIOS",   name:"GIOŚ — Environmental Inspection", url:"gios.gov.pl", freq:"Real-time", res:"Station", vars:8, category:"Environment", feeds:"I6 (corrosion class, SO₂, PM exposure), air quality network" },
     { id:"UDT",    name:"UDT — Technical Inspection Office", url:"udt.gov.pl", freq:"Annual", res:"Distribution Company", vars:9, category:"Grid", feeds:"E1–E3, equipment compliance, transformer inspections, asset registration" },
-    { id:"OSM",    name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, 1,685 substations mapped, PSE/DSO networks" },
+    { id:"OSM",    name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, 2,248 substations mapped, PSE/DSO networks" },
     { id:"COPER",  name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, humidity, wind, CMIP6 forward projections for flood risk" },
     { id:"KZGW",   name:"KZGW — Wody Polskie (Water Authority)", url:"wody.gov.pl", freq:"Annual", res:"Coastal Grid", vars:5, category:"Hazard", feeds:"I5 (flood hazard ISOK maps), river basin plans, drought data, water stress" },
     { id:"KOBiZE", name:"KOBiZE — National Emissions Centre", url:"kobize.pl", freq:"Quarterly", res:"Mining Region", vars:4, category:"Industrial", feeds:"I9 (coal transition risk), CO₂ emissions by installation, EU ETS data" },
@@ -110,7 +110,7 @@ window.SSIMetadata = {
     { id:"R3", name:"Consequence + Energy Poverty + Coal Dependency", range:"[0.70, 1.35]", type:"Multiplicative", desc:"Amplifies risk for communities serving large populations, energy-poor households, or high coal-industry dependency. Includes vulnerability indices (GUS Census 2021), elderly exposure, and mining-region proximity.", formula:"C_mult = sigmoid(pop_weight × load_weight × V_socio × coal_factor)", sources:["GUS","EURO","Eurostat SILC","KOBiZE"], isEnhanced:true },
     { id:"R4", name:"Graph Criticality + Network Constraint", range:"[0.80, 1.40]", type:"Multiplicative", desc:"Penalises topological bottlenecks in PSE 400kV backbone and 5 DSO networks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph and PSE transmission constraints.", formula:"F_topo = f(degree, BC_percentile, is_bridge, pse_tier)", sources:["OSM","PSE"], isEnhanced:true },
     { id:"R6a", name:"Restoration Speed", range:"[0.90, 1.10]", type:"Multiplicative", desc:"URE-CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two substations with identical SAIDI can have different risk profiles based on restoration speed in remote województwa.", formula:"R6a = sigmoid_bounded(CAIDI_local / CAIDI_fleet_median)", sources:["URE","PSE"], isEnhanced:true },
-    { id:"R6b", name:"Flood + Mining Subsidence Overlay (CRITICAL FOR POLAND)", range:"[1.00, 1.50]", type:"Multiplicative", desc:"KZGW flood hazard + WUG mining subsidence overlay. Penalises substations in high-flood zones (Vistula/Oder basins) or mining subsidence risk areas (Upper Silesia). Integration of IMGW flood warnings.", formula:"R6b = f(KZGW_flood_percentile, WUG_subsidence_hazard, flood_zone_proximity)", sources:["KZGW","WUG","IMGW","PIG"], isEnhanced:true },
+    { id:"R6b", name:"Flood + Mining Subsidence Overlay (CRITICAL FOR POLAND)", range:"[1.00, 1.30]", type:"Multiplicative", desc:"KZGW flood hazard + WUG mining subsidence overlay. Penalises substations in high-flood zones (Vistula/Oder basins) or mining subsidence risk areas (Upper Silesia). Integration of IMGW flood warnings.", formula:"R6b = f(KZGW_flood_percentile, WUG_subsidence_hazard, flood_zone_proximity)", sources:["KZGW","WUG","IMGW","PIG"], isEnhanced:true },
     { id:"R7", name:"Digital Readiness + Cyber-Physical Resilience", range:"[0.99, 1.05]", type:"Multiplicative", desc:"Cyber-physical security baseline, SCADA maturity proxy, and microgrid/islanding capability. Indicates digital resilience capability at the grid edge for flood/mining-event recovery scenarios.", formula:"Cyber = f(SCADA_maturity, microgrid_pct, islanding_capability)", sources:["PSE","URE"], isEnhanced:false }
   ],
 
@@ -175,13 +175,13 @@ window.SSIMetadata = {
     { check:"Modifier range adherence",                             criterion:"All modifiers stay within declared [min, max] bounds across the fleet",                              status:"expected" },
     { check:"Band boundary contiguity",                             criterion:"No gap or overlap between Low/Medium/High/Critical thresholds",                                      status:"expected" },
     { check:"R3 consequence signal + coal dependency",              criterion:"High-population, energy-poor, coal-dependent powіats consistently score higher R3 multiplier",       status:"expected" },
-    { check:"R6b flood/subsidence sensitivity (CRITICAL)",          criterion:"Flood zone proximity drives R6b up to 1.50 ceiling; mining overlay independent of other modifiers", status:"critical" },
+    { check:"R6b flood/subsidence sensitivity (CRITICAL)",          criterion:"Flood zone proximity drives R6b up to 1.30 ceiling; mining overlay independent of other modifiers", status:"critical" },
     { check:"PSE vs DSO constraint signal",                         criterion:"PSE 400kV backbone substations score higher R4; DSO periphery lower due to topology",               status:"expected" }
   ],
 
   /* ── changelog v3.4 → v4.0.2 (Poland edition) ── */
   CHANGELOG: [
-    { id:"PL1",  change:"Poland country launch — 1,685 substations across 16 województwa, administrative powiat level",                                type:"new" },
+    { id:"PL1",  change:"Poland country launch — 2,248 substations across 16 województwa, administrative powiat level",                                type:"new" },
     { id:"PL2",  change:"Integrated PSE transmission dispatch data + URE reliability benchmarks",                                                     type:"data" },
     { id:"PL3",  change:"URE reliability register integrated — SAIDI/SAIFI standardisation for DSO networks",                                        type:"data" },
     { id:"PL4",  change:"KZGW flood hazard map integrated (ISOK programme) — critical for Vistula/Oder basin exposure",                            type:"data" },
@@ -191,7 +191,7 @@ window.SSIMetadata = {
     { id:"PL8",  change:"GUS Census 2021 + Eurostat socio-economic data integrated — vulnerability indices per powiat",                              type:"data" },
     { id:"PL9",  change:"PSEW wind + IEO solar capacity data integrated — RE penetration for northern/central regions",                             type:"data" },
     { id:"PL10", change:"ARE coal consumption coupling integrated — E1 volatility modulation for coal-dependent województwa",                       type:"new" },
-    { id:"PL11", change:"R6b modifier enhanced with dual KZGW flood + WUG subsidence hazard (range 1.00–1.50)",                                    type:"enhanced" },
+    { id:"PL11", change:"R6b modifier enhanced with dual KZGW flood + WUG subsidence hazard (range 1.00–1.30)",                                    type:"enhanced" },
     { id:"PL12", change:"R3 consequence enriched with Eurostat SILC energy poverty, KOBiZE coal criticality, health links",                       type:"enhanced" },
     { id:"PL13", change:"R4 graph criticality rebuilt with PSE 400kV topology + DSO network constraints — north-south flood corridor penalty",       type:"enhanced" },
     { id:"PL14", change:"I9 Coal Transition Risk — new metric from KOBiZE coal plant proximity and phase-out timelines",                           type:"new" },
@@ -215,7 +215,7 @@ window.SSIMetadata = {
       components: 6,
       modifiers: 7,
       sources: 30,
-      substations: 1685,
+      substations: 2248,
       powerLines: 4200,
       mcIterations: 2000,
       wojewodztwa: 16,
@@ -242,7 +242,7 @@ window.SSI_METADATA = {
   region_label_plural: "Województwa",
   admin_division_label: "Powiat",
   admin_division_label_short: "Powiat",
-  total_substations: 1685,
+  total_substations: 2248,
   total_powiats: 380,
   total_regions: 16,
   voltage_tiers: {
