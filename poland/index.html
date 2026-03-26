@@ -45,7 +45,7 @@
     <div class="kpi-card animate-in delay-1">
       <div class="kpi-label">Substations Scored</div>
       <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
-      <div class="kpi-sub" id="kpi-total-sub">EHV + HV · 16 województw · PSE + 5 DSOs</div>
+      <div class="kpi-sub" id="kpi-total-sub">HV + MV · 16 województw · PSE + 5 DSOs</div>
     </div>
     <div class="kpi-card animate-in delay-2">
       <div class="kpi-label">Fleet Median R</div>
@@ -241,7 +241,7 @@
       document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
       var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 220; }).length;
       var hvCount = ssi.fleet_summary.total - ehvCount;
-      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' województw · PSE + 5 DSOs';
+      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' HV · ' + hvCount.toLocaleString() + ' MV · ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' województw · PSE + 5 DSOs';
 
       var bp = ssi.fleet_summary.band_pct;
       var bc = ssi.fleet_summary.bands;
