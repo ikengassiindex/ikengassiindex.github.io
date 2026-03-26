@@ -15,7 +15,7 @@ window.SSIMetadata = {
     { id:"GTK", name:"GTK — Geological Survey of Finland", url:"gtk.fi", freq:"Annual", res:"Grid 0.1°", vars:7, category:"Hazard", feeds:"I5 (winter flooding hazard), geological data, peat soil mapping, permafrost zones" },
     { id:"SYKE", name:"SYKE — Finnish Environment Institute", url:"syke.fi", freq:"Annual", res:"Grid 0.1°", vars:6, category:"Hazard", feeds:"I7 (snow/ice loading zone mapping), environmental hazards, water availability" },
     { id:"STUK", name:"STUK — Radiation & Nuclear Safety Authority", url:"stuk.fi", freq:"Quarterly", res:"Nuclear Site", vars:5, category:"Energy", feeds:"I9 (nuclear concentration risk), safety metrics, Olkiluoto + Loviisa operational data" },
-    { id:"OSM", name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, ~532 substations mapped, transmission + distribution networks" },
+    { id:"OSM", name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, ~4,022 substations mapped, transmission + distribution networks" },
     { id:"COPERNICUS", name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, snow loading, winter storm risk, CMIP6 forward projections for Arctic" },
     { id:"ENTSOE", name:"ENTSO-E Transparency Platform", url:"transparency.entsoe.eu", freq:"Hourly", res:"Substation", vars:2, category:"Grid", feeds:"C1 (capacity), cross-border flows with Sweden/Norway, Nordic grid exchange" },
     { id:"EUROSTAT", name:"Eurostat — EU Statistics", url:"ec.europa.eu/eurostat", freq:"Annual", res:"Kunta", vars:3, category:"Socio-Econ", feeds:"E2 (population served), water-energy nexus, Arctic energy poverty indicators" },
@@ -215,8 +215,8 @@ window.SSIMetadata = {
       components: 6,
       modifiers: 7,
       sources: 30,
-      substations: 532,
-      powerLines: 4068,
+      substations: 4022,
+      powerLines: 6665,
       mcIterations: 2000,
       maakunta: 19,
       kunta: 310
@@ -242,7 +242,7 @@ window.SSI_METADATA = {
   region_label_plural: "Maakunnat",
   admin_division_label: "Kunta",
   admin_division_label_short: "Kunta",
-  total_substations: 532,
+  total_substations: 4022,
   total_kunta: 310,
   total_regions: 19,
   voltage_tiers: {
