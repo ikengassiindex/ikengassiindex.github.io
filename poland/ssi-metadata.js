@@ -236,7 +236,7 @@ window.SSI_METADATA = {
   currency: "zł",
   version: "4.0.2",
   edition: "001",
-  edition_month: "March 2026",
+  edition_month: (function(){var m=['January','February','March','April','May','June','July','August','September','October','November','December'];var d=new Date();return m[d.getMonth()]+' '+d.getFullYear()})(),
   substations_label: "substations",
   region_label: "Województwo",
   region_label_plural: "Województwa",

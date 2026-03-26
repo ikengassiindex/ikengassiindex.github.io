@@ -1198,7 +1198,7 @@ function renderAuditTrail(d) {
     ['Modifiers Applied', modStr || '—'],
     ['Degradation Model', 'Markov 5-state, CIGRE TB 761 calibration'],
     ['Thermal Model', 'IEEE C57.91 transformer loading curves'],
-    ['Report Date', '17 March 2026'],
+    ['Report Date', (function(){ var _d=new Date(),_m=['January','February','March','April','May','June','July','August','September','October','November','December']; return _d.getDate()+' '+_m[_d.getMonth()]+' '+_d.getFullYear(); })()],
     ['Reporting Period', 'Calendar year 2025'],
     ['Refresh Cadence', 'Annual (data ingestion → scoring engine → display)'],
     ['Substation', `${displayName(d)} (${d.substation_id || ''})`],
@@ -1210,7 +1210,7 @@ function renderAuditTrail(d) {
 function renderESGFooter(d) {
   document.getElementById('footerContainer').innerHTML = `
     <div>SSI Index v4.0.2 · Ikenga Enhanced Infrastructure Intelligence · Annual ESG Disclosure</div>
-    <div>Report generated 19 March 2026 · All data sources are open-access institutional</div>
+    <div>Report generated ${(function(){ var _d=new Date(),_m=['January','February','March','April','May','June','July','August','September','October','November','December']; return _d.getDate()+' '+_m[_d.getMonth()]+' '+_d.getFullYear(); })()} · All data sources are open-access institutional</div>
   `;
 }
 
