@@ -456,7 +456,7 @@ const ESG_REPORTS = [
     getProfile: function(d) {
       return [
         ['R_median (composite)', d.R_median?.toFixed(3) || '—'],
-        ['R_base (pre-modifier)', d.R_base?.toFixed(3) || '—'],
+        ['R_base (pre-modifier)', (d.R_base || d.R_base_median)?.toFixed(3) || '—'],
         ['Modifier Impact', (d.modifier_pct || '—') + '%'],
         ['C (Condition)', d.components?.C?.toFixed(3) || '—'],
         ['V (Voltage)', d.components?.V?.toFixed(3) || '—'],
@@ -1259,7 +1259,7 @@ const DEMO_SUBSTATION = {
 
 async function loadSubstation(country) {
   try {
-    const url = `ssi-data.json?v=45`;
+    const url = `ssi-data.json?v=46`;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const json = await resp.json();
