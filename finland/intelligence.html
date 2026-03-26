@@ -59,12 +59,12 @@ document.addEventListener("ssi-config-ready", function(e) {
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
-    <div class="kpi-value" style="color:var(--ink)">~2,847</div>
-    <div class="kpi-sub">~15,200 km transmission &amp; distribution</div>
+    <div class="kpi-value" style="color:var(--ink)">~6,665</div>
+    <div class="kpi-sub">~14,000 km transmission &amp; distribution</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">MC Simulations</div>
-    <div class="kpi-value" style="color:var(--ink)">168.5 M</div>
+    <div class="kpi-value" style="color:var(--ink)">~8.0 M</div>
     <div class="kpi-sub">2,000 per substation</div>
   </div>
   <div class="kpi-card">
@@ -496,16 +496,16 @@ document.addEventListener("ssi-config-ready", function(e) {
       return [
         { label: 'Heavy Industry / Mining', desc: 'Nuclear plants, paper mills, electronics manufacturing in Uusimaa and Pirkanmaa — highest economic loss per interruption',
           filter: function(s){ return s.modifiers.R3_C_mult >= p75; }, color: '#941914', icon: '⚙️',
-          voll: 'PLN 300–600/kWh' },
+          voll: 'EUR 15–30/kWh' },
         { label: 'Manufacturing / Food Processing', desc: 'Auto suppliers, food & beverage production, pharmaceuticals — significant continuity requirements for EU supply chains',
           filter: function(s){ return s.modifiers.R3_C_mult >= p50 && s.modifiers.R3_C_mult < p75; }, color: '#b8863a', icon: '🏭',
-          voll: 'PLN 100–300/kWh' },
-        { label: 'Commercial / Distribution Centers', desc: 'Warsaw, Krakow commercial districts, logistics hubs — moderate individual impact but high aggregate across cities',
+          voll: 'EUR 5–15/kWh' },
+        { label: 'Commercial / Distribution Centers', desc: 'Helsinki, Tampere commercial districts, logistics hubs — moderate individual impact but high aggregate across cities',
           filter: function(s){ return s.modifiers.R3_C_mult >= p25 && s.modifiers.R3_C_mult < p50; }, color: '#5d8563', icon: '🏢',
-          voll: 'PLN 40–100/kWh' },
+          voll: 'EUR 2–5/kWh' },
         { label: 'Agriculture / Rural / Remote', desc: 'Smallholder agriculture, rural settlements, Eastern Finland — lower VoLL but higher social vulnerability',
           filter: function(s){ return s.modifiers.R3_C_mult < p25; }, color: '#8a7e76', icon: '🌾',
-          voll: 'PLN 10–40/kWh' }
+          voll: 'EUR 0.5–2/kWh' }
       ];
     })()
 
@@ -551,8 +551,8 @@ document.addEventListener("ssi-config-ready", function(e) {
       return s.modifiers.R3_C_mult >= 1.05 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
-      '<strong>Value of Lost Load (VoLL) context:</strong> Energiavirasto\'s 2024 reliability cost-benefit studies place average VoLL at PLN 250–400/kWh for industrial/commercial ' +
-      'and PLN 100–150/kWh for residential customers across Finland\'s DSOs. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
+      '<strong>Value of Lost Load (VoLL) context:</strong> Energiavirasto\'s 2024 reliability cost-benefit studies place average VoLL at EUR 10–20/kWh for industrial/commercial ' +
+      'and EUR 5–8/kWh for residential customers across Finland\'s DSOs. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
       'exposed territories. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ 1.14) with ' +
       'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.';
 
@@ -567,7 +567,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('b2-narrative').innerHTML =
       'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
       'depend on uninterrupted power for continuous processes (nuclear baseload generation, paper mills, electronics manufacturing). A single hour of unplanned outage at these ' +
-      'substations carries an estimated VoLL of PLN 300–600/kWh, compared to PLN 10–40/kWh in rural pastoral areas. ' +
+      'substations carries an estimated VoLL of EUR 15–30/kWh, compared to EUR 0.5–2/kWh in rural pastoral areas. ' +
       'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
       'Eastern Finland and rural regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
       'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
@@ -752,7 +752,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       Daily:      { count: 2, sources: ['Energiavirasto','FMI'] },
       Continuous: { count: 1, sources: ['OSM'] },
       Monthly:    { count: 6, sources: ['Fingrid','Caruna','Fortum','Helen','Elenia','Tilastokeskus'] },
-      Quarterly:  { count: 4, sources: ['Gränges','Tekes',[Finnish source],'Bank of Finland'] },
+      Quarterly:  { count: 4, sources: ['Gränges','Tekes','Statistics Finland','Bank of Finland'] },
       Seasonal:   { count: 1, sources: ['IUNG'] },
       Annual:     { count: 14, sources: ['Energiavirasto','Fingrid','Caruna','Fortum','Tilastokeskus','Gränges','Tekes','FMI','CEIC','OSF','MTEK','UCV','VTT','MTK'] },
       Static:     { count: 2, sources: ['IEC-61000','ICOLD'] }

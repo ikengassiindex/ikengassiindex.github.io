@@ -378,8 +378,8 @@ const ESG_REPORTS = [
       return [
         ['Insulation Risk (I component)', d.components?.I?.toFixed(3) || '—'],
         ['Environment Component (E)', d.components?.E?.toFixed(3) || '—'],
-        ['Flooding Hazard (Finnish Rivers)', (d.winter storms and coastal flooding?.hazard_level || '—')],
-        ['Winter Storm/Ice Loading Risk', (d.snow loading?.risk_class || '—')],
+        ['Flooding Hazard (Finnish Rivers)', (d['winter_storms_coastal_flooding']?.hazard_level || '—')],
+        ['Winter Storm/Ice Loading Risk', (d['snow_loading']?.risk_class || '—')],
         ['Markov Risk Score', d.markov?.risk_score?.toFixed(3) || '—'],
         ['ETTC (time to criticality)', ((d.markov?.ettc_years || d.markov?.ETTC_years) || '—') + ' years'],
         ['P(critical) at 20 years', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—')],
@@ -393,8 +393,8 @@ const ESG_REPORTS = [
         ['I3', 'Heat-wave IRI', '—', 'EU Taxonomy Annex A: Heat stress', d.components?.I ? 'ready' : 'gap'],
         ['I5', 'Thermal stress', '—', 'ESRS E1-4: Climate mitigation targets', d.components?.I ? 'ready' : 'gap'],
         ['R2', 'Climate trajectory', (d.markov?.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr)' : 'N/A'), 'TCFD Strategy (c): Scenario analysis', d.markov?.p_crit_20yr !== undefined ? 'ready' : 'gap'],
-        ['Flood', 'Finnish river basin exposure', (d.winter storms and coastal flooding?.hazard_level || '—'), 'EU Taxonomy Annex A: Hydrological hazards', d.winter storms and coastal flooding?.hazard_level ? 'ready' : 'gap'],
-        ['Winter_Load', 'Winter storm and ice loading', (d.snow loading?.risk_class || '—'), 'TCFD Risk Management: Climate-related risk', d.snow loading?.risk_class ? 'ready' : 'gap'],
+        ['Flood', 'Finnish river basin exposure', (d['winter_storms_coastal_flooding']?.hazard_level || '—'), 'EU Taxonomy Annex A: Hydrological hazards', d['winter_storms_coastal_flooding']?.hazard_level ? 'ready' : 'gap'],
+        ['Winter_Load', 'Winter storm and ice loading', (d['snow_loading']?.risk_class || '—'), 'TCFD Risk Management: Climate-related risk', d['snow_loading']?.risk_class ? 'ready' : 'gap'],
         ['Markov', 'p_critical_20yr', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—'), 'ESRS E1-9: Time horizons', d.markov?.p_critical_20yr === 0 ? 'partial' : 'ready']
       ];
     },
@@ -785,7 +785,7 @@ function computeESGScores(d) {
   // R1: Climate — need I components, winter storms and coastal flooding, snow loading, Markov, climate trajectory
   if (d.components?.I) r1 += 0.25;
   if (d.components?.E) r1 += 0.15;
-  if (d.winter storms and coastal flooding?.hazard_level) r1 += 0.15;
+  if (d['winter_storms_coastal_flooding']?.hazard_level) r1 += 0.15;
   if (d.markov?.risk_score) r1 += 0.20;
   if ((d.markov?.ettc_years || d.markov?.ETTC_years)) r1 += 0.10;
   // R2 trajectory: check if p_crit_20yr exists
