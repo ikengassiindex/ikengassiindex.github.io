@@ -241,7 +241,7 @@
       document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
       var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 220; }).length;
       var hvCount = ssi.fleet_summary.total - ehvCount;
-      document.getElementById('kpi-total-sub').textContent = (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' województw covered';
+      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' województw · PSE + 5 DSOs';
 
       var bp = ssi.fleet_summary.band_pct;
       var bc = ssi.fleet_summary.bands;
