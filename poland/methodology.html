@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSI v4.0.2 — Poland Methodology</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #1a1a2e;
+            --paper: #faf9f6;
+            --accent: #c0392b;
+            --accent2: #2c3e7a;
+            --light-gray: #e8e7e3;
+            --medium-gray: #c4c3bf;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.8;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2c3e7a 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--light-gray);
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--light-gray);
+            color: var(--accent);
+        }
+
+        nav a.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--ink);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 0.8rem;
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            margin: 2rem 0 1rem 0;
+            color: var(--accent2);
+            font-weight: 600;
+        }
+
+        .section h4 {
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.8rem 0;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            border-left: 3px solid var(--accent2);
+            line-height: 1.8;
+        }
+
+        .formula-box {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            border-left: 3px solid var(--accent);
+            overflow-x: auto;
+        }
+
+        ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        ul li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        table thead {
+            background: var(--light-gray);
+        }
+
+        table th {
+            text-align: left;
+            padding: 0.8rem 1rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        table tbody tr:hover {
+            background: #f9f8f6;
+        }
+
+        .weight-table td:nth-child(2) {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .threshold-table td:nth-child(1) {
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--light-gray);
+            color: var(--ink);
+        }
+
+        strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        footer {
+            background: var(--ink);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent2);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .highlight {
+            background: rgba(192, 57, 43, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                gap: 0.5rem;
+            }
+
+            nav a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            table th,
+            table td {
+                padding: 0.6rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SSI v4.0.2 — Poland Methodology</h1>
+        <p>Technical Documentation & Calibration Framework</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Overview</a>
+        <a href="regional.html">Regional Analysis</a>
+        <a href="intelligence.html">Intelligence</a>
+        <a href="methodology.html" class="active">Methodology</a>
+        <a href="data.html">Data & Download</a>
+        <a href="map.html">Map Explorer</a>
+    </nav>
+
+    <div class="container">
+        <!-- Section 1: Data Collection -->
+        <div class="section">
+            <h2>1. Data Collection & Integration</h2>
+
+            <div class="info-box" id="dataCollectionContent">
+                <p>Loading methodology data...</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Scoring Model -->
+        <div class="section">
+            <h2>2. Scoring Model & Component Weights</h2>
+
+            <div class="info-box" id="scoringModelContent">
+                <p>Loading methodology data...</p>
+            </div>
+
+            <h3>SSI Formula</h3>
+            <div class="formula-box">
+R_base = Σ(weight_i × normalized_component_i)
+       = 0.20×C + 0.18×V + 0.15×I + 0.18×S + 0.16×E + 0.13×T
+
+R_modified = R_base × Π(modifier_j)
+           = R_base × R3_C_mult × R4_G_crit × R6a_restoration × R6b_mining × R7_digital
+
+R_median = median(R_modified_1000_MC_iterations)
+            </div>
+
+            <h3>Component Weights</h3>
+            <table class="weight-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Weight</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>R1: Continuity (C)</strong></td>
+                        <td>0.20</td>
+                        <td>Service availability & outage frequency from demand-side load data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R2: Voltage (V)</strong></td>
+                        <td>0.18</td>
+                        <td>Voltage regulation capability & harmonic distortion risk</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R3: Infrastructure (I)</strong></td>
+                        <td>0.15</td>
+                        <td>Physical asset consequence (population served, critical loads)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R4: Saturation (S)</strong></td>
+                        <td>0.18</td>
+                        <td>Transformer utilization & thermal stress limits</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R5: Equipment Aging (E)</strong></td>
+                        <td>0.16</td>
+                        <td>Vintage-based failure probability (higher for PRL-era assets)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R6: Transition & Hazard (T)</strong></td>
+                        <td>0.13</td>
+                        <td>Climate hazards (floods, mining subsidence), coal transition stranding</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 3: Risk Classification -->
+        <div class="section">
+            <h2>3. Risk Classification & Thresholds</h2>
+
+            <div class="info-box" id="riskClassificationContent">
+                <p>Loading methodology data...</p>
+            </div>
+
+            <h3>Risk Bands</h3>
+            <table class="threshold-table">
+                <thead>
+                    <tr>
+                        <th>Band</th>
+                        <th>R Range</th>
+                        <th>Poland Fleet Count</th>
+                        <th>Interpretation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Critical</td>
+                        <td>R ≥ 0.60</td>
+                        <td>0 (0%)</td>
+                        <td>Extreme systemic risk; immediate intervention required</td>
+                    </tr>
+                    <tr>
+                        <td>High</td>
+                        <td>0.40 ≤ R < 0.60</td>
+                        <td>289 (17%)</td>
+                        <td>Significant risk; enhanced monitoring and planned upgrades</td>
+                    </tr>
+                    <tr>
+                        <td>Medium</td>
+                        <td>0.25 ≤ R < 0.40</td>
+                        <td>929 (55%)</td>
+                        <td>Moderate risk; standard maintenance and routine reviews</td>
+                    </tr>
+                    <tr>
+                        <td>Low</td>
+                        <td>R < 0.25</td>
+                        <td>467 (28%)</td>
+                        <td>Minor risk; standard operations; low priority for capital investment</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 4: Monte Carlo Simulation -->
+        <div class="section">
+            <h2>4. Monte Carlo Simulation & Uncertainty Quantification</h2>
+
+            <div class="info-box" id="monteCarloContent">
+                <p>Loading methodology data...</p>
+            </div>
+
+            <h3>Simulation Parameters</h3>
+            <ul>
+                <li><strong>Iterations per substation:</strong> 2,000</li>
+                <li><strong>Correlation structure:</strong> 95-dimensional Gaussian copula with Cholesky decomposition</li>
+                <li><strong>Vintage uncertainty:</strong> σ wider for PRL-era (pre-1990) assets; narrower for post-EU-accession (2004+)</li>
+                <li><strong>Output metrics:</strong> R_median, CI_5 (5th percentile), CI_95 (95th percentile), P_critical (probability of reaching Critical band)</li>
+            </ul>
+
+            <h3>Copula Dependency Matrix (select entries)</h3>
+            <div class="formula-box">
+Corr(Flood_Risk, Mining_Subsidence | region) = 0.65 (Śląskie/Dolnośląskie)
+Corr(Equipment_Age, Failure_Rate) = 0.78 (captured via vintage proxy)
+Corr(Load_Growth, Saturation) = 0.72 (transmission zones)
+Corr(Wind_Generation, Voltage_Volatility) = 0.58 (coastal/highland regions)
+            </div>
+        </div>
+
+        <!-- Section 5: Environmental Hazards -->
+        <div class="section">
+            <h2>5. Environmental Hazard Profile</h2>
+
+            <div class="info-box" id="environmentalContent">
+                <p>Loading methodology data...</p>
+            </div>
+
+            <h3>Poland-Specific Hazards & Weights</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hazard</th>
+                        <th>κ Weight</th>
+                        <th>Spatial Coverage</th>
+                        <th>Data Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>River Flooding</strong></td>
+                        <td>0.35</td>
+                        <td>Vistula & Oder basins (25% of substations)</td>
+                        <td>KZGW ISOK maps, IMGW warnings</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mining Subsidence</strong></td>
+                        <td>0.25</td>
+                        <td>Upper Silesia Coal Basin — Śląskie (180 substations)</td>
+                        <td>WUG seismic monitoring, PIG geological maps</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Coal Transition</strong></td>
+                        <td>0.20</td>
+                        <td>Coal-fed power plants: Łódźkie, Śląskie, Dolnośląskie</td>
+                        <td>ARE energy balance data, regulatory forecasts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Extreme Weather</strong></td>
+                        <td>0.15</td>
+                        <td>National (heat waves, winter storms)</td>
+                        <td>Copernicus ERA5 reanalysis, IMGW extremes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Coastal Erosion</strong></td>
+                        <td>0.05</td>
+                        <td>Baltic coast: Pomorskakie, Zachodniopomorskie (~30 substations)</td>
+                        <td>EU coastal monitoring, IPCC projections</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 6: Data Quality -->
+        <div class="section">
+            <h2>6. Data Quality Assessment</h2>
+
+            <div class="info-box" id="dataQualityContent">
+                <p>Loading methodology data...</p>
+            </div>
+
+            <h3>Coverage Breakdown (95 Variables)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Coverage Level</th>
+                        <th>Variable Count</th>
+                        <th>% of Total</th>
+                        <th>Examples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Full Coverage</strong></td>
+                        <td>50</td>
+                        <td>53%</td>
+                        <td>Grid ops (PSE), meteorology (IMGW), demographics (GUS Census 2021)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Partial Coverage</strong></td>
+                        <td>20</td>
+                        <td>21%</td>
+                        <td>DSO equipment data (some operators incomplete), river flood maps (few zones)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Proxy/Model-Based</strong></td>
+                        <td>15</td>
+                        <td>16%</td>
+                        <td>Equipment condition (age-based), mining subsidence (zone-level)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gaps</strong></td>
+                        <td>5</td>
+                        <td>5%</td>
+                        <td>Detailed transformer inventory (restricted DSO data)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Derived/MC Output</strong></td>
+                        <td>5</td>
+                        <td>5%</td>
+                        <td>P_critical, confidence intervals, correlation structures</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Data Strengths</h3>
+            <ul>
+                <li><strong>GUS Census 2021:</strong> Most recent comprehensive demographic dataset in Europe; 100% substation-level granularity via voivodeship + powiat mapping</li>
+                <li><strong>IMGW Open Portal:</strong> Best-in-class meteorology coverage for Central Europe; 3-hour resolution; includes extreme event warnings</li>
+                <li><strong>EU Harmonization:</strong> Eurostat/ENTSO-E data enables cross-country benchmarking and standardized metrics</li>
+                <li><strong>PSE Real-Time:</strong> Transparent generation/load/cross-border flows; enables dynamic risk correlation analysis</li>
+            </ul>
+
+            <h3>Known Limitations</h3>
+            <ul>
+                <li><strong>Substation Vintage:</strong> PRL-era (1945–1989) asset commissioning dates incomplete; using installation-era proxies</li>
+                <li><strong>Equipment Condition:</strong> Per-unit transformer diagnostics restricted by DSO; relying on age-based failure curves and aggregate DSO annual reports</li>
+                <li><strong>Mining Subsidence Precision:</strong> WUG provides zone-level mapping; finer site-specific deformation data restricted to licensed extractors</li>
+                <li><strong>Distributed Generation:</strong> Prosumer PV data from IEO registry is aggregated by commune; household-level data unavailable</li>
+            </ul>
+        </div>
+
+        <!-- Section 7: Component Details -->
+        <div class="section">
+            <h2>Component Labels & Calibration</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Label</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody id="componentTable">
+                    <tr><td colspan="3" style="text-align: center; padding: 1rem; color: var(--medium-gray);">Loading components...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modifier Details -->
+        <div class="section">
+            <h2>Risk Modifiers & Scaling Factors</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Label</th>
+                        <th>Typical Range</th>
+                        <th>Interpretation</th>
+                    </tr>
+                </thead>
+                <tbody id="modifierTable">
+                    <tr><td colspan="4" style="text-align: center; padding: 1rem; color: var(--medium-gray);">Loading modifiers...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>SSI v4.0.2 — Poland Digital Twin Dashboard</p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">Data freshness: 100% | Last updated: 2026-03-26</p>
+    </footer>
+
+    <script src="ssi-metadata.js"></script>
+    <script>
+        function populateMethodology() {
+            const meta = window.SSI_METADATA;
+
+            // Section 1: Data Collection
+            const dataCollection = document.getElementById('dataCollectionContent');
+            if (meta.methodology?.data_collection) {
+                dataCollection.innerHTML = `<p>${meta.methodology.data_collection}</p>`;
+            }
+
+            // Section 2: Scoring Model
+            const scoringModel = document.getElementById('scoringModelContent');
+            if (meta.methodology?.scoring_model) {
+                scoringModel.innerHTML = `<p>${meta.methodology.scoring_model}</p>`;
+            }
+
+            // Section 3: Risk Classification
+            const riskClass = document.getElementById('riskClassificationContent');
+            if (meta.methodology?.risk_classification) {
+                riskClass.innerHTML = `<p>${meta.methodology.risk_classification}</p>`;
+            }
+
+            // Section 4: Monte Carlo
+            const monteCarlo = document.getElementById('monteCarloContent');
+            if (meta.methodology?.monte_carlo) {
+                monteCarlo.innerHTML = `<p>${meta.methodology.monte_carlo}</p>`;
+            }
+
+            // Section 5: Environmental
+            const environmental = document.getElementById('environmentalContent');
+            if (meta.methodology?.environmental) {
+                environmental.innerHTML = `<p>${meta.methodology.environmental}</p>`;
+            }
+
+            // Section 6: Data Quality
+            const dataQuality = document.getElementById('dataQualityContent');
+            if (meta.methodology?.data_quality) {
+                dataQuality.innerHTML = `<p>${meta.methodology.data_quality}</p>`;
+            }
+
+            // Components table
+            const componentLabels = meta.component_labels || {};
+            const compTable = document.getElementById('componentTable');
+            compTable.innerHTML = '';
+            Object.entries(componentLabels).forEach(([code, label]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${code}</strong></td>
+                    <td><strong>${label}</strong></td>
+                    <td>Normalized 0–1 scale. Higher values indicate greater risk in that dimension.</td>
+                `;
+                compTable.appendChild(tr);
+            });
+
+            // Modifiers table
+            const modLabels = meta.modifier_labels || {};
+            const modTable = document.getElementById('modifierTable');
+            modTable.innerHTML = '';
+            Object.entries(modLabels).forEach(([code, label]) => {
+                const tr = document.createElement('tr');
+                let range = '0.85–1.20';
+                let interp = 'Multiplicative modifier scaling R_base. Values >1.0 increase risk, <1.0 decrease risk.';
+
+                if (code === 'R3_C_mult') {
+                    range = '0.88–1.03';
+                    interp = 'Economic consequence multiplier. Reflects population-at-risk and critical infrastructure density.';
+                } else if (code === 'R4_G_crit') {
+                    range = '0.90–1.15';
+                    interp = 'Graph criticality. Higher for assets on trunk transmission or bottleneck paths.';
+                } else if (code === 'R6a_restoration') {
+                    range = '0.80–1.20';
+                    interp = 'Recovery time scaling. Higher values indicate longer restoration due to complexity or isolation.';
+                } else if (code === 'R6b_seismic') {
+                    range = '0.95–1.20';
+                    interp = 'Natural hazard exposure (mining subsidence, flooding, seismic). Poland-specific: mining subsidence in Śląskie.';
+                } else if (code === 'R7_digital') {
+                    range = '0.85–1.10';
+                    interp = 'Digital readiness. Lower values for substations with SCADA/automation; higher for legacy systems.';
+                }
+
+                tr.innerHTML = `
+                    <td><strong>${code}</strong></td>
+                    <td>${label}</td>
+                    <td><code>${range}</code></td>
+                    <td>${interp}</td>
+                `;
+                modTable.appendChild(tr);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', populateMethodology);
+    </script>
+</body>
+</html>

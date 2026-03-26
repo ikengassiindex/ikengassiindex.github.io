@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSI v4.0.2 — Poland Intelligence</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #1a1a2e;
+            --paper: #faf9f6;
+            --accent: #c0392b;
+            --accent2: #2c3e7a;
+            --light-gray: #e8e7e3;
+            --medium-gray: #c4c3bf;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2c3e7a 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--light-gray);
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--light-gray);
+            color: var(--accent);
+        }
+
+        nav a.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--ink);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 0.8rem;
+        }
+
+        .section h3 {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent2);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-box {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 3px solid var(--accent2);
+        }
+
+        .kpi-box .label {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-box .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .radar-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .modifiers-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .modifier-card {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .modifier-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            color: var(--ink);
+        }
+
+        .modifier-card .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+
+        .modifier-card .description {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+        }
+
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .tier-card {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 6px;
+            border-top: 4px solid var(--accent2);
+        }
+
+        .tier-card h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--ink);
+        }
+
+        .tier-card .count {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent2);
+            margin-bottom: 0.3rem;
+        }
+
+        .tier-card .percentage {
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+        }
+
+        .tier-card .range {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table thead {
+            background: var(--light-gray);
+        }
+
+        table th {
+            text-align: left;
+            padding: 0.8rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        table tbody tr:hover {
+            background: #f9f8f6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.weekly {
+            background: rgba(44, 62, 122, 0.2);
+            color: #2c3e7a;
+        }
+
+        .badge.monthly {
+            background: rgba(192, 57, 43, 0.2);
+            color: #c0392b;
+        }
+
+        .badge.quarterly {
+            background: rgba(243, 156, 18, 0.2);
+            color: #e67e22;
+        }
+
+        .badge.annual {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+        }
+
+        .badge.static {
+            background: rgba(149, 165, 166, 0.2);
+            color: #34495e;
+        }
+
+        .badge.realtime {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .badge.hourly {
+            background: rgba(155, 89, 182, 0.2);
+            color: #8e44ad;
+        }
+
+        .info-box {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid var(--accent2);
+            line-height: 1.7;
+        }
+
+        .info-box strong {
+            color: var(--ink);
+        }
+
+        footer {
+            background: var(--ink);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent2);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .component-bars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bar-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .bar-bg {
+            background: var(--light-gray);
+            height: 25px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent2), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tier-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                gap: 0.5rem;
+            }
+
+            nav a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SSI v4.0.2 — Poland Intelligence</h1>
+        <p>Strategic Infrastructure Risk Assessment & Deep-Dive Analysis</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Overview</a>
+        <a href="regional.html">Regional Analysis</a>
+        <a href="intelligence.html" class="active">Intelligence</a>
+        <a href="methodology.html">Methodology</a>
+        <a href="data.html">Data & Download</a>
+        <a href="map.html">Map Explorer</a>
+    </nav>
+
+    <div class="container">
+        <!-- Section A: Executive Summary -->
+        <div class="section">
+            <h2>Section A: Executive Summary</h2>
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="label">Substations</div>
+                    <div class="value">1,685</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Data Sources</div>
+                    <div class="value">30</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Variables</div>
+                    <div class="value">95</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Components</div>
+                    <div class="value">6</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Modifiers</div>
+                    <div class="value">5</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Data Freshness</div>
+                    <div class="value">100%</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Poland's Systemic Risk Profile:</strong> Poland's power grid comprises 1,685 substations evaluated across 95 variables from 30 institutional sources. The absence of Critical-band substations reflects Poland's low natural seismicity and EU-standard infrastructure protocols. The median fleet risk R = 0.345 (moderate) is driven primarily by PRL-era (1945–1989) equipment aging in Śląskie region and flood exposure in the Vistula and Oder basins. The transition away from coal-based generation creates both risk (stranded assets) and opportunity (renewable grid modernization).
+            </div>
+        </div>
+
+        <!-- Section B: Fleet Overview & Substation in Focus -->
+        <div class="section">
+            <h2>Section B: Fleet Overview & Substation in Focus</h2>
+
+            <h3>Top-Risk Substation Radar Profile</h3>
+            <div class="radar-container">
+                <canvas id="focusRadar"></canvas>
+            </div>
+
+            <h3>Risk Modifiers (Top Substation)</h3>
+            <div class="modifiers-table" id="modifiersTable"></div>
+
+            <h3>Component Detail Breakdown</h3>
+            <div class="component-bars" id="componentBars"></div>
+
+            <h3>B.2: Economic Tier Distribution</h3>
+            <div class="info-box">
+                Poland's 1,685 substations are classified into 4 economic tiers based on consequence (R3_C_mult). These tiers represent the socio-economic impact severity if a substation fails — ranging from capital-intensive industrial zones to rural light-load areas.
+            </div>
+            <div class="tier-grid" id="tierGrid"></div>
+        </div>
+
+        <!-- Section C: Data Source Registry -->
+        <div class="section">
+            <h2>Section C: Data Source Registry (30 Sources)</h2>
+            <div class="info-box">
+                All 30 institutional sources feeding the SSI v4.0.2 data pipeline for Poland, with update frequencies and variable counts.
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th style="flex: 0 0 350px;">Name</th>
+                        <th>Frequency</th>
+                        <th>Scope</th>
+                        <th style="width: 100px;">Variables</th>
+                    </tr>
+                </thead>
+                <tbody id="sourcesTable">
+                    <tr><td colspan="5" style="text-align: center; padding: 1rem; color: var(--medium-gray);">Loading sources...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section D: Deep-Dive Analysis -->
+        <div class="section">
+            <h2>Section D: Deep-Dive — Śląskie-Mazowieckie Industrial Corridor</h2>
+            <div class="info-box">
+                The Śląskie-Mazowieckie corridor encompasses Poland's largest industrial agglomeration. Śląskie (Upper Silesia) is the coal heartland, with 15.3% of national substations and the highest median risk (0.487) due to mining subsidence. Mazowieckie (Warsaw metropolitan area) is the economic center, with the largest population-at-risk and critical infrastructure density. The corridor comprises ~380 substations — 22.5% of the national fleet — and represents systemic interdependency risk due to shared transmission bottlenecks.
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="label">Corridor Substations</div>
+                    <div class="value" id="corridorCount">—</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Corridor % of Fleet</div>
+                    <div class="value" id="corridorPercent">—</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Corridor Median R</div>
+                    <div class="value" id="corridorMedianR">—</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">High-Risk Count</div>
+                    <div class="value" id="corridorHighCount">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section E: Coal Transition Spotlight -->
+        <div class="section">
+            <h2>Section E: Coal Transition Spotlight</h2>
+            <div class="info-box">
+                <strong>Poland's Coal Paradox:</strong> Despite EU climate commitments (carbon neutrality by 2050), Poland remains Europe's largest hard coal producer and maintains 30% coal-fired generation capacity. The κ_coal_transition modifier captures stranding risk: substations feeding aging coal plants that face early retirement. Śląskie and Dolnośląskie are most exposed. However, the transition also presents opportunity: Poland is rapidly deploying wind (>10 GW capacity) and solar (>3 GW), creating grid modernization requirements.
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="label">Coal-Heavy Voivodeships</div>
+                    <div class="value">3</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Wind Capacity Target 2030</div>
+                    <div class="value">12 GW</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Grid Modernization Spend</div>
+                    <div class="value">12 B zł</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Renewable %</div>
+                    <div class="value">21%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section F: Risk Outlook -->
+        <div class="section">
+            <h2>Section F: Risk Outlook & Climate Scenarios</h2>
+            <div class="info-box">
+                <strong>Baseline Scenario (10-year outlook):</strong> Systemic risk remains moderate (median R stable at 0.35–0.38) if current DSO capex levels continue. Key stressors: (1) flood risk in Oder/Vistula basins accelerating due to climate change (probability of 100-year flood increasing 2% annually); (2) mining subsidence in Śląskie concentrated in older, deeper reserves; (3) coal transition stranding risk for substations in Łódźkie and Dolnośląskie.
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="label">Flood Risk Increase (10yr)</div>
+                    <div class="value">+12%</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Subsidence Risk (Śląskie)</div>
+                    <div class="value">Stable</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Coal Transition Timeline</div>
+                    <div class="value">2040s</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="label">Recovery Investment</div>
+                    <div class="value">Rising</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section G: Looking Ahead -->
+        <div class="section">
+            <h2>Section G: Looking Ahead (Q2 2026 & Beyond)</h2>
+            <div class="info-box">
+                <strong>Next Steps:</strong> The April 2026 edition will feature region-specific deep-dives into Śląskie mining subsidence, updated climate scenarios from Copernicus CMIP6 data, and analysis of Ukraine crisis impacts on cross-border transmission flows. The intelligence page will incorporate monthly updates to corridor analysis and economic tier distributions.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>SSI v4.0.2 — Poland Digital Twin Dashboard</p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">Data freshness: 100% | Last updated: 2026-03-26</p>
+    </footer>
+
+    <script src="ssi-metadata.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+        let allData = {};
+        let focusRadar = null;
+
+        async function loadData() {
+            try {
+                const response = await fetch('ssi-data.json');
+                allData = await response.json();
+
+                populateDataSources();
+                findHighestRiskSubstation();
+                calculateTierDistribution();
+                calculateCorridor();
+            } catch (err) {
+                console.error('Error loading data:', err);
+            }
+        }
+
+        function populateDataSources() {
+            const sources = window.SSI_METADATA.DATA_SOURCES || [];
+            const tbody = document.getElementById('sourcesTable');
+            tbody.innerHTML = '';
+
+            sources.forEach(source => {
+                const freqMap = {
+                    'Real-time': 'realtime',
+                    'Hourly': 'hourly',
+                    'Daily': 'monthly',
+                    'Monthly': 'monthly',
+                    'Quarterly': 'quarterly',
+                    'Annual': 'annual',
+                    'Static': 'static',
+                    '5-Year': 'annual'
+                };
+
+                const badgeClass = freqMap[source.freq] || 'static';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code>${source.id}</code></td>
+                    <td><strong>${source.name}</strong></td>
+                    <td><span class="badge ${badgeClass}">${source.freq}</span></td>
+                    <td style="font-size: 0.9rem;">${source.scope}</td>
+                    <td style="text-align: center;">${source.vars ? source.vars.split(',').length : '—'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function findHighestRiskSubstation() {
+            const highest = allData.substations.reduce((max, sub) =>
+                sub.R_median > max.R_median ? sub : max
+            );
+
+            const comp = highest.components;
+            const sum = comp.C + comp.V + comp.I + comp.S + comp.E + comp.T;
+            const isRaw = sum > 1.0;
+
+            let norm = { C: comp.C, V: comp.V, I: comp.I, S: comp.S, E: comp.E, T: comp.T };
+
+            if (!isRaw) {
+                const weights = { C: 0.20, V: 0.18, I: 0.15, S: 0.18, E: 0.16, T: 0.13 };
+                Object.keys(norm).forEach(k => {
+                    norm[k] = Math.min(norm[k] / weights[k], 1);
+                });
+            } else {
+                Object.keys(norm).forEach(k => {
+                    norm[k] = Math.min(norm[k], 1);
+                });
+            }
+
+            const ctx = document.getElementById('focusRadar').getContext('2d');
+            focusRadar = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Continuity', 'Voltage', 'Infrastructure', 'Saturation', 'Equipment', 'Transition'],
+                    datasets: [{
+                        label: highest.substation_id,
+                        data: [norm.C, norm.V, norm.I, norm.S, norm.E, norm.T],
+                        borderColor: '#c0392b',
+                        backgroundColor: 'rgba(192, 57, 43, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#c0392b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 12, weight: 600 }, padding: 15 }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 1,
+                            ticks: { stepSize: 0.2 }
+                        }
+                    }
+                }
+            });
+
+            // Display modifiers
+            const modTable = document.getElementById('modifiersTable');
+            modTable.innerHTML = `
+                <div class="modifier-card">
+                    <h4>ID: ${highest.substation_id}</h4>
+                    <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">${highest.name}</div>
+                    <div style="font-size: 0.8rem; color: var(--medium-gray);">${highest.region} | R_median: ${highest.R_median.toFixed(3)}</div>
+                </div>
+                <div class="modifier-card">
+                    <h4>R3 Consequence</h4>
+                    <div class="value">${(highest.modifiers?.R3_C_mult || 0).toFixed(3)}</div>
+                    <div class="description">Economic impact severity</div>
+                </div>
+                <div class="modifier-card">
+                    <h4>R4 Graph Criticality</h4>
+                    <div class="value">${(highest.modifiers?.R4_G_crit || 0).toFixed(3)}</div>
+                    <div class="description">Network topology criticality</div>
+                </div>
+                <div class="modifier-card">
+                    <h4>R6a Restoration</h4>
+                    <div class="value">${(highest.modifiers?.R6a_restoration || 0).toFixed(3)}</div>
+                    <div class="description">Recovery time scaling</div>
+                </div>
+                <div class="modifier-card">
+                    <h4>R6b Mining/Hazard</h4>
+                    <div class="value">${(highest.modifiers?.R6b_seismic || 0).toFixed(3)}</div>
+                    <div class="description">Natural hazard exposure</div>
+                </div>
+                <div class="modifier-card">
+                    <h4>R7 Digital Readiness</h4>
+                    <div class="value">${(highest.modifiers?.R7_digital || 0).toFixed(3)}</div>
+                    <div class="description">Automation & monitoring</div>
+                </div>
+            `;
+
+            // Display components
+            const labels = window.SSI_METADATA.component_labels;
+            const compBars = document.getElementById('componentBars');
+            compBars.innerHTML = ['C', 'V', 'I', 'S', 'E', 'T'].map(k => `
+                <div class="bar-item">
+                    <div class="bar-label">${labels[k]}</div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${norm[k] * 100}%;">${(norm[k] * 100).toFixed(0)}%</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function calculateTierDistribution() {
+            const tiers = {
+                tier1: { min: 1.00, label: 'Capital-Intensive / High-Consequence', subs: [] },
+                tier2: { min: 0.97, max: 1.00, label: 'Industrial / Mid-Consequence', subs: [] },
+                tier3: { min: 0.92, max: 0.97, label: 'Commercial / Mixed-Use', subs: [] },
+                tier4: { max: 0.92, label: 'Light / Rural', subs: [] }
+            };
+
+            allData.substations.forEach(sub => {
+                const r3 = sub.modifiers?.R3_C_mult || 0;
+                if (r3 >= 1.00) tiers.tier1.subs.push(sub);
+                else if (r3 >= 0.97) tiers.tier2.subs.push(sub);
+                else if (r3 >= 0.92) tiers.tier3.subs.push(sub);
+                else tiers.tier4.subs.push(sub);
+            });
+
+            const total = allData.fleet_size;
+            const tierGrid = document.getElementById('tierGrid');
+            tierGrid.innerHTML = Object.entries(tiers).map(([key, tier], idx) => {
+                const count = tier.subs.length;
+                const pct = ((count / total) * 100).toFixed(1);
+                const range = key === 'tier1' ? '≥ 1.00' :
+                             key === 'tier2' ? '0.97–0.99' :
+                             key === 'tier3' ? '0.92–0.96' : '< 0.92';
+
+                return `
+                    <div class="tier-card">
+                        <h4>Tier ${idx + 1}: ${tier.label}</h4>
+                        <div class="count">${count}</div>
+                        <div class="percentage">${pct}% of fleet</div>
+                        <div class="range">R3 range: ${range}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateCorridor() {
+            const corridor = allData.substations.filter(s => s.region === 'Śląskie' || s.region === 'Mazowieckie');
+            const rValues = corridor.map(s => s.R_median).sort((a, b) => a - b);
+            const medianR = rValues[Math.floor(rValues.length / 2)];
+            const highCount = corridor.filter(s => s.classification === 'High' || s.classification === 'Critical').length;
+
+            document.getElementById('corridorCount').textContent = corridor.length;
+            document.getElementById('corridorPercent').textContent = ((corridor.length / allData.fleet_size) * 100).toFixed(1) + '%';
+            document.getElementById('corridorMedianR').textContent = medianR.toFixed(3);
+            document.getElementById('corridorHighCount').textContent = highCount;
+        }
+
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

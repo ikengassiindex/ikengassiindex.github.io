@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSI v4.0.2 — Poland Map Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #1a1a2e;
+            --paper: #faf9f6;
+            --accent: #c0392b;
+            --accent2: #2c3e7a;
+            --light-gray: #e8e7e3;
+            --medium-gray: #c4c3bf;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2c3e7a 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--light-gray);
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--light-gray);
+            color: var(--accent);
+        }
+
+        nav a.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .map-container {
+            display: flex;
+            height: calc(100vh - 200px);
+            gap: 0;
+        }
+
+        #map {
+            flex: 1;
+            background: #f0f0f0;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-size: 0.85rem;
+            z-index: 1000;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+
+        .popup-header {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+
+        .popup-detail {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.3rem 0.8rem;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .popup-detail-label {
+            font-weight: 600;
+            color: var(--medium-gray);
+        }
+
+        .popup-detail-value {
+            color: var(--ink);
+        }
+
+        .popup-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .popup-badge.critical {
+            background: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+        }
+
+        .popup-badge.high {
+            background: rgba(243, 156, 18, 0.2);
+            color: #e67e22;
+        }
+
+        .popup-badge.medium {
+            background: rgba(52, 152, 219, 0.2);
+            color: #2980b9;
+        }
+
+        .popup-badge.low {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+        }
+
+        .radar-container {
+            position: relative;
+            height: 200px;
+            margin: 1rem 0;
+        }
+
+        .components-bars {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .component-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .bar-label {
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .bar-bg {
+            background: var(--light-gray);
+            height: 18px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent2), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 3px;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            max-width: 250px;
+        }
+
+        .controls h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            color: var(--ink);
+        }
+
+        .controls label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: var(--ink);
+        }
+
+        .controls input,
+        .controls select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .controls input:focus,
+        .controls select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+            padding: 0.2rem 0;
+        }
+
+        .stat-label {
+            color: var(--medium-gray);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        footer {
+            background: var(--ink);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            nav {
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            nav a {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+
+            .controls {
+                max-width: 200px;
+                font-size: 0.9rem;
+            }
+
+            .legend {
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SSI v4.0.2 — Poland Map Explorer</h1>
+        <p>Interactive Substation Risk Map with Component Details</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Overview</a>
+        <a href="regional.html">Regional Analysis</a>
+        <a href="intelligence.html">Intelligence</a>
+        <a href="methodology.html">Methodology</a>
+        <a href="data.html">Data & Download</a>
+        <a href="map.html" class="active">Map Explorer</a>
+    </nav>
+
+    <div class="map-container">
+        <div id="map"></div>
+
+        <div class="controls">
+            <h3>Filter Substations</h3>
+            <label>Search by Name</label>
+            <input type="text" id="searchBox" placeholder="Katowice, Warszawa...">
+
+            <label>Risk Band</label>
+            <select id="bandFilter">
+                <option value="">All Bands</option>
+                <option value="Critical">Critical (≥0.60)</option>
+                <option value="High">High (0.40–0.60)</option>
+                <option value="Medium">Medium (0.25–0.40)</option>
+                <option value="Low">Low (<0.25)</option>
+            </select>
+
+            <label>Województwo</label>
+            <select id="regionFilter">
+                <option value="">All Voivodeships</option>
+            </select>
+
+            <div style="background: var(--light-gray); padding: 0.8rem; border-radius: 4px; margin-top: 0.8rem;">
+                <div class="stat-row">
+                    <span class="stat-label">Visible:</span>
+                    <span class="stat-value" id="visibleCount">—</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total:</span>
+                    <span class="stat-value" id="totalCount">1,685</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <strong style="display: block; margin-bottom: 0.5rem;">Risk Bands</strong>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e74c3c;"></div>
+                <span>Critical (R ≥ 0.60)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f39c12;"></div>
+                <span>High (0.40–0.60)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #3498db;"></div>
+                <span>Medium (0.25–0.40)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #27ae60;"></div>
+                <span>Low (&lt;0.25)</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>SSI v4.0.2 — Poland Digital Twin Dashboard | Click on markers for details | Data freshness: 100%</p>
+    </footer>
+
+    <script src="ssi-metadata.js"></script>
+    <script>
+        let map;
+        let markers = [];
+        let allSubstations = [];
+        let markerGroup = L.featureGroup();
+        let radarChart = null;
+
+        async function initMap() {
+            // Initialize map centered on Poland
+            map = L.map('map').setView([52.0, 19.5], 6);
+
+            // Add base layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map);
+
+            // Load data
+            await loadSubstations();
+            populateRegionFilter();
+            setupEventListeners();
+            renderMarkers(allSubstations);
+        }
+
+        async function loadSubstations() {
+            try {
+                const response = await fetch('ssi-data.json');
+                allSubstations = (await response.json()).substations || [];
+                document.getElementById('totalCount').textContent = allSubstations.length.toLocaleString();
+            } catch (err) {
+                console.error('Error loading substations:', err);
+            }
+        }
+
+        function populateRegionFilter() {
+            const regions = window.SSI_METADATA.regions || [];
+            const select = document.getElementById('regionFilter');
+            regions.forEach(region => {
+                const opt = document.createElement('option');
+                opt.value = region;
+                opt.textContent = region;
+                select.appendChild(opt);
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('searchBox').addEventListener('input', applyFilters);
+            document.getElementById('bandFilter').addEventListener('change', applyFilters);
+            document.getElementById('regionFilter').addEventListener('change', applyFilters);
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const band = document.getElementById('bandFilter').value;
+            const region = document.getElementById('regionFilter').value;
+
+            const filtered = allSubstations.filter(sub => {
+                const nameMatch = !search || sub.name.toLowerCase().includes(search) || sub.substation_id.toLowerCase().includes(search);
+                const bandMatch = !band || sub.classification === band;
+                const regionMatch = !region || sub.region === region;
+                return nameMatch && bandMatch && regionMatch;
+            });
+
+            renderMarkers(filtered);
+            document.getElementById('visibleCount').textContent = filtered.length.toLocaleString();
+        }
+
+        function renderMarkers(substations) {
+            markerGroup.clearLayers();
+
+            substations.forEach(sub => {
+                if (!sub.lat || !sub.lon) return;
+
+                const color = getBandColor(sub.classification);
+                const marker = L.circleMarker([sub.lat, sub.lon], {
+                    radius: 6,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                });
+
+                marker.bindPopup(() => createPopup(sub), { maxWidth: 400 });
+                markerGroup.addLayer(marker);
+            });
+
+            markerGroup.addTo(map);
+        }
+
+        function getBandColor(classification) {
+            switch (classification) {
+                case 'Critical': return '#e74c3c';
+                case 'High': return '#f39c12';
+                case 'Medium': return '#3498db';
+                case 'Low': return '#27ae60';
+                default: return '#95a5a6';
+            }
+        }
+
+        function createPopup(sub) {
+            const div = document.createElement('div');
+            div.style.fontSize = '0.9rem';
+
+            const header = document.createElement('div');
+            header.className = 'popup-header';
+            header.textContent = sub.substation_id;
+            div.appendChild(header);
+
+            // Details
+            const details = document.createElement('div');
+            details.className = 'popup-detail';
+            details.innerHTML = `
+                <span class="popup-detail-label">Name:</span>
+                <span class="popup-detail-value">${sub.name}</span>
+                <span class="popup-detail-label">Region:</span>
+                <span class="popup-detail-value">${sub.region}</span>
+                <span class="popup-detail-label">DSO:</span>
+                <span class="popup-detail-value">${sub.dso}</span>
+                <span class="popup-detail-label">Voltage:</span>
+                <span class="popup-detail-value">${sub.voltage_kv} kV</span>
+                <span class="popup-detail-label">Vintage:</span>
+                <span class="popup-detail-value">${sub.vintage}</span>
+                <span class="popup-detail-label">Risk:</span>
+                <span class="popup-detail-value"><span class="popup-badge ${sub.classification.toLowerCase()}">${sub.classification}</span></span>
+                <span class="popup-detail-label">R_median:</span>
+                <span class="popup-detail-value"><strong>${sub.R_median.toFixed(3)}</strong></span>
+                <span class="popup-detail-label">Confidence:</span>
+                <span class="popup-detail-value">[${sub.CI_5.toFixed(3)}, ${sub.CI_95.toFixed(3)}]</span>
+            `;
+            div.appendChild(details);
+
+            // Radar chart
+            const radarDiv = document.createElement('div');
+            radarDiv.className = 'radar-container';
+            div.appendChild(radarDiv);
+
+            // Component bars
+            const barsDiv = document.createElement('div');
+            barsDiv.className = 'components-bars';
+            div.appendChild(barsDiv);
+
+            // Create popup and render charts
+            const popup = L.popup().setContent(div);
+
+            // Delay chart rendering until popup is visible
+            setTimeout(() => {
+                renderSubstationRadar(sub, radarDiv);
+                renderComponentBars(sub, barsDiv);
+            }, 100);
+
+            return popup;
+        }
+
+        function renderSubstationRadar(sub, container) {
+            const comp = sub.components;
+            const sum = comp.C + comp.V + comp.I + comp.S + comp.E + comp.T;
+            const isRaw = sum > 1.0;
+
+            let norm = { C: comp.C, V: comp.V, I: comp.I, S: comp.S, E: comp.E, T: comp.T };
+
+            if (!isRaw) {
+                const weights = { C: 0.20, V: 0.18, I: 0.15, S: 0.18, E: 0.16, T: 0.13 };
+                Object.keys(norm).forEach(k => {
+                    norm[k] = Math.min(norm[k] / weights[k], 1);
+                });
+            } else {
+                Object.keys(norm).forEach(k => {
+                    norm[k] = Math.min(norm[k], 1);
+                });
+            }
+
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+
+            new Chart(canvas, {
+                type: 'radar',
+                data: {
+                    labels: ['C', 'V', 'I', 'S', 'E', 'T'],
+                    datasets: [{
+                        label: sub.substation_id,
+                        data: [norm.C, norm.V, norm.I, norm.S, norm.E, norm.T],
+                        borderColor: '#c0392b',
+                        backgroundColor: 'rgba(192, 57, 43, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#c0392b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 1,
+                            ticks: { stepSize: 0.25, font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderComponentBars(sub, container) {
+            const labels = window.SSI_METADATA.component_labels || {};
+            const comp = sub.components;
+            const sum = comp.C + comp.V + comp.I + comp.S + comp.E + comp.T;
+            const isRaw = sum > 1.0;
+
+            let norm = { C: comp.C, V: comp.V, I: comp.I, S: comp.S, E: comp.E, T: comp.T };
+
+            if (!isRaw) {
+                const weights = { C: 0.20, V: 0.18, I: 0.15, S: 0.18, E: 0.16, T: 0.13 };
+                Object.keys(norm).forEach(k => {
+                    norm[k] = Math.min(norm[k] / weights[k], 1);
+                });
+            } else {
+                Object.keys(norm).forEach(k => {
+                    norm[k] = Math.min(norm[k], 1);
+                });
+            }
+
+            ['C', 'V', 'I', 'S', 'E', 'T'].forEach(k => {
+                const item = document.createElement('div');
+                item.className = 'component-bar';
+                item.innerHTML = `
+                    <div class="bar-label">${k}: ${labels[k] || k}</div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${norm[k] * 100}%;">${(norm[k] * 100).toFixed(0)}%</div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>

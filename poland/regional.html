@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSI v4.0.2 — Poland Regional Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #1a1a2e;
+            --paper: #faf9f6;
+            --accent: #c0392b;
+            --accent2: #2c3e7a;
+            --light-gray: #e8e7e3;
+            --medium-gray: #c4c3bf;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2c3e7a 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--light-gray);
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--light-gray);
+            color: var(--accent);
+        }
+
+        nav a.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--light-gray);
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .tab {
+            padding: 1.2rem 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            color: var(--medium-gray);
+            font-size: 1rem;
+        }
+
+        .tab:hover {
+            color: var(--ink);
+            background: var(--light-gray);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            color: var(--ink);
+            border-bottom: 2px solid var(--accent2);
+            padding-bottom: 0.8rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table thead {
+            background: var(--light-gray);
+        }
+
+        table th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        table tbody tr:hover {
+            background: #f9f8f6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.critical {
+            background: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+        }
+
+        .badge.high {
+            background: rgba(243, 156, 18, 0.2);
+            color: #e67e22;
+        }
+
+        .badge.medium {
+            background: rgba(52, 152, 219, 0.2);
+            color: #2980b9;
+        }
+
+        .badge.low {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+        }
+
+        .info-box {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid var(--accent2);
+        }
+
+        .comparison-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--ink);
+            font-size: 0.95rem;
+        }
+
+        .control-group select {
+            padding: 0.8rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            font-size: 1rem;
+            background: white;
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .control-group select:hover,
+        .control-group select:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .radar-container {
+            position: relative;
+            height: 450px;
+            margin: 2rem 0;
+        }
+
+        .component-bars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bar-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .bar-bg {
+            background: var(--light-gray);
+            height: 25px;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent2), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        footer {
+            background: var(--ink);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent2);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+                border-bottom: none;
+            }
+
+            .tab {
+                border-bottom: 1px solid var(--light-gray);
+            }
+
+            .tab.active {
+                border-bottom-color: var(--accent);
+            }
+
+            .comparison-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .component-bars {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SSI v4.0.2 — Poland Regional Analysis</h1>
+        <p>Województwa Rankings & Comparative Risk Assessment</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Overview</a>
+        <a href="regional.html" class="active">Regional Analysis</a>
+        <a href="intelligence.html">Intelligence</a>
+        <a href="methodology.html">Methodology</a>
+        <a href="data.html">Data & Download</a>
+        <a href="map.html">Map Explorer</a>
+    </nav>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="ranking">Województwo Ranking</div>
+            <div class="tab" data-tab="comparison">Województwo Comparison</div>
+        </div>
+
+        <!-- Tab 1: Województwo Ranking -->
+        <div id="ranking" class="tab-content active">
+            <div class="section">
+                <h2>Województwo Ranking</h2>
+                <div class="info-box">
+                    All 16 voivodeships ranked by count, mean R, and maximum R. Śląskie leads in mean risk due to mining subsidence and industrial load concentration.
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Województwo</th>
+                            <th>Count</th>
+                            <th>Mean R</th>
+                            <th>Max R</th>
+                            <th>Dominant Band</th>
+                            <th>High Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingTable">
+                        <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--medium-gray);">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Województwo Comparison -->
+        <div id="comparison" class="tab-content">
+            <div class="section">
+                <h2>Województwo Comparison</h2>
+                <div class="info-box">
+                    Select two voivodeships to compare their risk component profiles across Continuity, Voltage, Infrastructure, Saturation, Equipment Aging, and Transition.
+                </div>
+
+                <div class="comparison-controls">
+                    <div class="control-group">
+                        <label for="region1">First Województwo</label>
+                        <select id="region1" onchange="updateRadar()">
+                            <option value="">Select a voivodeship...</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="region2">Second Województwo</label>
+                        <select id="region2" onchange="updateRadar()">
+                            <option value="">Select a voivodeship...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="radar-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <div class="component-bars" id="componentBars"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>SSI v4.0.2 — Poland Digital Twin Dashboard</p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">Data freshness: 100% | Last updated: 2026-03-26</p>
+    </footer>
+
+    <script src="ssi-metadata.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+        let allData = {};
+        let regionalStats = {};
+        let radarChart = null;
+
+        async function loadData() {
+            try {
+                const response = await fetch('ssi-data.json');
+                const data = await response.json();
+                allData = data;
+
+                // Calculate regional statistics
+                computeRegionalStats();
+                populateRanking();
+                populateSelects();
+            } catch (err) {
+                console.error('Error loading data:', err);
+            }
+        }
+
+        function computeRegionalStats() {
+            regionalStats = {};
+
+            window.SSI_METADATA.regions.forEach(region => {
+                const subs = allData.substations.filter(s => s.region === region);
+                const rValues = subs.map(s => s.R_median);
+
+                if (subs.length > 0) {
+                    const mean = rValues.reduce((a, b) => a + b, 0) / rValues.length;
+                    const max = Math.max(...rValues);
+                    const critCount = subs.filter(s => s.classification === 'Critical').length;
+                    const highCount = subs.filter(s => s.classification === 'High').length;
+                    const medCount = subs.filter(s => s.classification === 'Medium').length;
+                    const lowCount = subs.filter(s => s.classification === 'Low').length;
+
+                    const dominant = [
+                        { band: 'Critical', count: critCount },
+                        { band: 'High', count: highCount },
+                        { band: 'Medium', count: medCount },
+                        { band: 'Low', count: lowCount }
+                    ].sort((a, b) => b.count - a.count)[0].band;
+
+                    regionalStats[region] = {
+                        count: subs.length,
+                        meanR: mean,
+                        maxR: max,
+                        dominantBand: dominant,
+                        highCount: highCount,
+                        substations: subs
+                    };
+                }
+            });
+        }
+
+        function populateRanking() {
+            const sorted = Object.entries(regionalStats)
+                .sort((a, b) => b[1].meanR - a[1].meanR);
+
+            const tbody = document.getElementById('rankingTable');
+            tbody.innerHTML = '';
+
+            sorted.forEach((entry, idx) => {
+                const [region, stats] = entry;
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td><strong>${idx + 1}</strong></td>
+                    <td><strong>${region}</strong></td>
+                    <td>${stats.count}</td>
+                    <td>${stats.meanR.toFixed(3)}</td>
+                    <td>${stats.maxR.toFixed(3)}</td>
+                    <td><span class="badge ${stats.dominantBand.toLowerCase()}">${stats.dominantBand}</span></td>
+                    <td>${stats.highCount}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateSelects() {
+            const regions = window.SSI_METADATA.regions;
+            const select1 = document.getElementById('region1');
+            const select2 = document.getElementById('region2');
+
+            regions.forEach(region => {
+                const opt1 = document.createElement('option');
+                opt1.value = region;
+                opt1.textContent = region;
+                select1.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = region;
+                opt2.textContent = region;
+                select2.appendChild(opt2);
+            });
+
+            // Set defaults
+            select1.value = regions[0];
+            select2.value = regions[1];
+        }
+
+        function computeComponentAverages(substations) {
+            if (substations.length === 0) {
+                return { C: 0, V: 0, I: 0, S: 0, E: 0, T: 0 };
+            }
+
+            const avg = { C: 0, V: 0, I: 0, S: 0, E: 0, T: 0 };
+            substations.forEach(sub => {
+                Object.keys(avg).forEach(key => {
+                    avg[key] += (sub.components[key] || 0);
+                });
+            });
+
+            Object.keys(avg).forEach(key => {
+                avg[key] /= substations.length;
+            });
+
+            return avg;
+        }
+
+        function normalizeComponents(avgComponents) {
+            const sum = avgComponents.C + avgComponents.V + avgComponents.I + avgComponents.S + avgComponents.E + avgComponents.T;
+            const isRaw = sum > 1.0;
+
+            if (isRaw) {
+                return {
+                    C: Math.min(avgComponents.C, 1),
+                    V: Math.min(avgComponents.V, 1),
+                    I: Math.min(avgComponents.I, 1),
+                    S: Math.min(avgComponents.S, 1),
+                    E: Math.min(avgComponents.E, 1),
+                    T: Math.min(avgComponents.T, 1)
+                };
+            } else {
+                const weights = { C: 0.20, V: 0.18, I: 0.15, S: 0.18, E: 0.16, T: 0.13 };
+                return {
+                    C: Math.min(avgComponents.C / weights.C, 1),
+                    V: Math.min(avgComponents.V / weights.V, 1),
+                    I: Math.min(avgComponents.I / weights.I, 1),
+                    S: Math.min(avgComponents.S / weights.S, 1),
+                    E: Math.min(avgComponents.E / weights.E, 1),
+                    T: Math.min(avgComponents.T / weights.T, 1)
+                };
+            }
+        }
+
+        function updateRadar() {
+            const r1 = document.getElementById('region1').value;
+            const r2 = document.getElementById('region2').value;
+
+            if (!r1 || !r2) return;
+
+            const subs1 = regionalStats[r1]?.substations || [];
+            const subs2 = regionalStats[r2]?.substations || [];
+
+            const avg1 = computeComponentAverages(subs1);
+            const avg2 = computeComponentAverages(subs2);
+
+            const norm1 = normalizeComponents(avg1);
+            const norm2 = normalizeComponents(avg2);
+
+            const labels = ['Continuity (C)', 'Voltage (V)', 'Infrastructure (I)', 'Saturation (S)', 'Equipment (E)', 'Transition (T)'];
+            const data1 = [norm1.C, norm1.V, norm1.I, norm1.S, norm1.E, norm1.T];
+            const data2 = [norm2.C, norm2.V, norm2.I, norm2.S, norm2.E, norm2.T];
+
+            if (!radarChart) {
+                const ctx = document.getElementById('radarChart').getContext('2d');
+                radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: r1,
+                                data: data1,
+                                borderColor: '#c0392b',
+                                backgroundColor: 'rgba(192, 57, 43, 0.15)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#c0392b'
+                            },
+                            {
+                                label: r2,
+                                data: data2,
+                                borderColor: '#2c3e7a',
+                                backgroundColor: 'rgba(44, 62, 122, 0.15)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#2c3e7a'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { padding: 15, font: { size: 12, weight: 600 } }
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 1,
+                                ticks: { stepSize: 0.2 }
+                            }
+                        }
+                    }
+                });
+            } else {
+                radarChart.data.datasets[0].label = r1;
+                radarChart.data.datasets[0].data = data1;
+                radarChart.data.datasets[1].label = r2;
+                radarChart.data.datasets[1].data = data2;
+                radarChart.update();
+            }
+
+            displayComponentBars(r1, norm1, r2, norm2);
+        }
+
+        function displayComponentBars(r1, comp1, r2, comp2) {
+            const container = document.getElementById('componentBars');
+            const labels = window.SSI_METADATA.component_labels;
+
+            const html = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; width: 100%;">
+                    <div>
+                        <h3 style="margin-bottom: 1rem; color: #1a1a2e;">${r1}</h3>
+                        ${['C', 'V', 'I', 'S', 'E', 'T'].map(k => `
+                            <div class="bar-item">
+                                <div class="bar-label">${labels[k]}</div>
+                                <div class="bar-bg">
+                                    <div class="bar-fill" style="width: ${comp1[k] * 100}%;">${(comp1[k] * 100).toFixed(0)}%</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 1rem; color: #1a1a2e;">${r2}</h3>
+                        ${['C', 'V', 'I', 'S', 'E', 'T'].map(k => `
+                            <div class="bar-item">
+                                <div class="bar-label">${labels[k]}</div>
+                                <div class="bar-bg">
+                                    <div class="bar-fill" style="width: ${comp2[k] * 100}%;">${(comp2[k] * 100).toFixed(0)}%</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                if (tab.dataset.tab === 'comparison') {
+                    setTimeout(() => updateRadar(), 100);
+                }
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
