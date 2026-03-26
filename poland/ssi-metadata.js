@@ -121,7 +121,7 @@ window.SSIMetadata = {
     { step:3, name:"Weight", desc:"6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, Infrastructure at 0.25 (with higher flood/subsidence I5 weight), Saturation at 0.20. Weight budget validated by Sobol sensitivity analysis.", icon:"⚖️" },
     { step:4, name:"Compose R_base", desc:"Weighted sum of 6 normalised component scores produces the base resilience score.", icon:"🧮" },
     { step:5, name:"Modify", desc:"Seven multiplicative modifiers adjust R_base for Polish context: R2 (adaptive climate + flood trajectory), R3 (consequence + energy poverty + coal dependency), R4 (graph criticality + PSE/DSO constraints), R6a (restoration speed), R6b (flood/mining overlay — CRITICAL), R7 (digital readiness). Plus enrichments for vulnerable populations, flood zones, mining regions, and healthcare criticality.", icon:"🔧" },
-    { step:6, name:"Monte Carlo", desc:"2,000 iterations per substation using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, staleness, and model uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.", icon:"🎲" },
+    { step:6, name:"Monte Carlo", desc:"10,000 iterations per substation using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, staleness, and model uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.", icon:"🎲" },
     { step:7, name:"Classify", desc:"Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold. Flood/mining events escalate classification instantaneously.", icon:"🏷️" }
   ],
 
@@ -170,7 +170,7 @@ window.SSIMetadata = {
     { check:"SAIDI–CAIDI cross-consistency",                        criterion:"High SAIDI regions also show high CAIDI (slow restoration in remote województwa)",                   status:"expected" },
     { check:"KZGW flood spatial coherence",                         criterion:"KZGW ISOK hazard map aligns with I5 scores — elevated in Vistula/Oder basins",                      status:"expected" },
     { check:"RE stress vs EV load correlation",                     criterion:"S2 (RE stress) and S3 (EV penetration) positively correlated in urban województwos",               status:"nascent" },
-    { check:"Monte Carlo convergence (CV < 2%)",                    criterion:"Coefficient of variation < 2% at 2,000 iterations for all substations",                             status:"expected" },
+    { check:"Monte Carlo convergence (CV < 2%)",                    criterion:"Coefficient of variation < 2% at 10,000 iterations for all substations",                             status:"expected" },
     { check:"Weight budget unity",                                  criterion:"Component weights sum to 1.0000; all intra-weights sum to 1.0000 per component",                    status:"expected" },
     { check:"Modifier range adherence",                             criterion:"All modifiers stay within declared [min, max] bounds across the fleet",                              status:"expected" },
     { check:"Band boundary contiguity",                             criterion:"No gap or overlap between Low/Medium/High/Critical thresholds",                                      status:"expected" },
@@ -217,7 +217,7 @@ window.SSIMetadata = {
       sources: 30,
       substations: 2248,
       powerLines: 4200,
-      mcIterations: 2000,
+      mcIterations: 10000,
       wojewodztwa: 16,
       powiats: 380
     }
@@ -283,7 +283,7 @@ window.SSI_METADATA = {
   changelog: window.SSIMetadata.CHANGELOG.map(function(c) {
     return { version:"4.0.2", date:"2026-03", note:c.change };
   }),
-  monte_carlo: { iterations:2000, correlation_matrix:"20×20", seed:42, confidence_interval:0.95 },
+  monte_carlo: { iterations:10000, correlation_matrix:"20×20", seed:42, confidence_interval:0.95 },
   regions: [
     "Dolnośląskie",
     "Kujawsko-Pomorskie",
