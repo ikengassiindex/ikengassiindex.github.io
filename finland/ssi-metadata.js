@@ -204,7 +204,7 @@ window.SSIMetadata = {
       "Hourly":    { count: 2, sources: ['Fingrid Generation', 'ENTSO-E Flows'] },
       "Daily":     { count: 3, sources: ['FMI Weather', 'Copernicus ERA5', 'Fingrid Load'] },
       "Monthly":   { count: 5, sources: ['Energiavirasto Reports', 'Suomen Pankki Economics', 'Tilastokeskus Updates', 'Finnish Wind Power', 'STUK Safety'] },
-      "Quarterly": { count: 4, sources: ['Energiavirasto Reports', 'DSO Performance', 'FMI Forecasts', 'EUROSTAT Arctic' } },
+      "Quarterly": { count: 4, sources: ['Energiavirasto Reports', 'DSO Performance', 'FMI Forecasts', 'EUROSTAT Arctic'] },
       "Annual":    { count: 8, sources: ['Tilastokeskus Census Updates', 'Energiavirasto Inspections', 'FMI Climate', 'GTK Geology', 'SYKE Environment', 'DSO Annual Reports', 'LUKE Forest', 'World Bank'] },
       "Static":    { count: 3, sources: ['OSM Power', 'Metsähallitus Geodesy', 'SolarGIS'] },
       "5-Year":    { count: 2, sources: ['Tilastokeskus Census 2021', 'CMIP6 Cycle'] }
