@@ -54,18 +54,18 @@ document.addEventListener("ssi-config-ready", function(e) {
 <div class="kpi-grid" style="margin:20px 0">
   <div class="kpi-card">
     <div class="kpi-label">Substations Scored</div>
-    <div class="kpi-value" style="color:var(--ink)">2,248</div>
+    <div class="kpi-value" style="color:var(--ink)">532</div>
     <div class="kpi-sub">Major + distribution across Fingrid</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
     <div class="kpi-value" style="color:var(--ink)">~2,847</div>
-    <div class="kpi-sub">~52,380 km transmission &amp; distribution</div>
+    <div class="kpi-sub">~15,200 km transmission &amp; distribution</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">MC Simulations</div>
     <div class="kpi-value" style="color:var(--ink)">168.5 M</div>
-    <div class="kpi-sub">10,000 per substation</div>
+    <div class="kpi-sub">2,000 per substation</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Public Data Sources</div>
@@ -74,9 +74,9 @@ document.addEventListener("ssi-config-ready", function(e) {
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score — scoring 71/80 (89%) across 16 competitive dimensions. Its engine processes 254,700+ source data points per run, executes 168.5 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and performs 3.02 billion arithmetic operations — producing 717,595 output data points with full uncertainty quantification across 2,248 substations and ~2,847 grid lines spanning ~52,380 km.</p>
+<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score — scoring 71/80 (89%) across 16 competitive dimensions. Its engine processes ~50,540 source data points per run, executes ~1.1 million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and performs ~151 million arithmetic operations — producing ~51,000 output data points with full uncertainty quantification across 532 substations and ~4,068 grid lines spanning ~15,200 km.</p>
 
-<p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 30+ verified public sources (Energiavirasto, Fingrid, Gasum, FMI, Tilastokeskus, Gränges, Tekes), making the methodology fully auditable and reproducible. Initially covering Finland's Fingrid-managed transmission and five major distribution system operators, the Index is progressively being rolled out to all OECD countries — applying the same silo-breaking approach: fusing grid risk with societal exposure at asset-level resolution wherever open data permits.</p>
+<p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All 95 variables are drawn from 30+ verified public sources (Energiavirasto, Fingrid, Gasum, FMI, Tilastokeskus, Gränges, Tekes), making the methodology fully auditable and reproducible. Initially covering Finland's Fingrid-managed transmission and ~80 distribution network operators (DNOs), the Index is progressively being rolled out to all OECD countries — applying the same silo-breaking approach: fusing grid risk with societal exposure at asset-level resolution wherever open data permits.</p>
 
 <!-- Substation in Focus — auto-populated from ssi-data.json -->
 <div class="card" style="border-left:3px solid var(--crimson);margin:20px 0" id="focus-card">
@@ -289,7 +289,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h2>Cyber &amp; Economic Exposure Monitor</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that Poland's Energy Regulatory Office (Energiavirasto) and network operator strategic planning requires.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that Finland's Energy Regulatory Office (Energiavirasto) and network operator strategic planning requires.</p>
 </div>
 
 <!-- B.1 KPI boxes -->
@@ -343,9 +343,9 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <p style="font-size:13px;line-height:1.7" id="b2-narrative">Loading economic impact analysis…</p>
 
-<!-- B.3 Voivodeship Digital Readiness Heatmap -->
-<h3>B.3 &ensp; Voivodeship &amp; District Digital Readiness Ranking</h3>
-<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Voivodeships ranked by average R7 modifier — lower values indicate weaker digital infrastructure (broadband penetration, smart meter coverage). Cross-referenced with average R_median to identify regions combining digital exposure with high grid stress.</p>
+<!-- B.3 Maakunta Digital Readiness Heatmap -->
+<h3>B.3 &ensp; Maakunta &amp; District Digital Readiness Ranking</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Maakunnat ranked by average R7 modifier — lower values indicate weaker digital infrastructure (broadband penetration, smart meter coverage). Cross-referenced with average R_median to identify regions combining digital exposure with high grid stress.</p>
 
 <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
   <canvas id="b3-map" style="flex:1;min-width:260px;height:300px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff"></canvas>
@@ -486,7 +486,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'The blind spots concentrate in <strong>' + blindRegionStr + '</strong>. ' +
       'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry a HIGH cyber-exposure classification, ' +
       'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier — indicating robust digital infrastructure coverage ' +
-      'concentrated in urban networks (PGE, Tauron urban centers).';
+      'concentrated in urban networks (Caruna, Fortum, Helen urban centers).';
 
     var tiers = (function() {
       var r3vals = fleet.map(function(s){ return s.modifiers ? s.modifiers.R3_C_mult : 1.0; }).sort(function(a,b){return a-b;});
@@ -503,7 +503,7 @@ document.addEventListener("ssi-config-ready", function(e) {
         { label: 'Commercial / Distribution Centers', desc: 'Warsaw, Krakow commercial districts, logistics hubs — moderate individual impact but high aggregate across cities',
           filter: function(s){ return s.modifiers.R3_C_mult >= p25 && s.modifiers.R3_C_mult < p50; }, color: '#5d8563', icon: '🏢',
           voll: 'PLN 40–100/kWh' },
-        { label: 'Agriculture / Rural / Remote', desc: 'Smallholder agriculture, rural settlements, Eastern Poland — lower VoLL but higher social vulnerability',
+        { label: 'Agriculture / Rural / Remote', desc: 'Smallholder agriculture, rural settlements, Eastern Finland — lower VoLL but higher social vulnerability',
           filter: function(s){ return s.modifiers.R3_C_mult < p25; }, color: '#8a7e76', icon: '🌾',
           voll: 'PLN 10–40/kWh' }
       ];
@@ -552,7 +552,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
       '<strong>Value of Lost Load (VoLL) context:</strong> Energiavirasto\'s 2024 reliability cost-benefit studies place average VoLL at PLN 250–400/kWh for industrial/commercial ' +
-      'and PLN 100–150/kWh for residential customers across Poland\'s DSOs. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
+      'and PLN 100–150/kWh for residential customers across Finland\'s DSOs. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
       'exposed territories. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ 1.14) with ' +
       'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.';
 
@@ -569,7 +569,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'depend on uninterrupted power for continuous processes (nuclear baseload generation, paper mills, electronics manufacturing). A single hour of unplanned outage at these ' +
       'substations carries an estimated VoLL of PLN 300–600/kWh, compared to PLN 10–40/kWh in rural pastoral areas. ' +
       'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
-      'Eastern Poland and rural regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
+      'Eastern Finland and rural regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
       'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
       'to substation-level risk scores.';
 
@@ -641,7 +641,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     mctx.textAlign = 'right';
     mctx.fillText('High', 108, 36);
 
-    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Weakest Digital Readiness — Top 15 Voivodeships</div>' +
+    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Weakest Digital Readiness — Top 15 Maakuntas</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:6px">Longer bar = higher R7 = better digital infrastructure.</div>';
     provList.slice(0, 15).forEach(function(pv, idx){
       var barPct = ((pv.avgR7 - r7floor) / (r7ceil - r7floor) * 100).toFixed(1);
@@ -659,12 +659,12 @@ document.addEventListener("ssi-config-ready", function(e) {
     var bestProv = provList[provList.length - 1];
     var dualExposed = provList.filter(function(pv){ return pv.avgR7 < medianR7 && pv.avgR > medianR; });
     document.getElementById('b3-narrative').innerHTML =
-      'Voivodeship-level analysis reveals a clear digital divide mirroring Poland\'s metropolitan-regional connectivity gap. ' +
+      'Maakunta-level analysis reveals a clear digital divide mirroring Finland\'s metropolitan-regional connectivity gap. ' +
       '<strong>' + worstProv.name + '</strong> has the lowest average R7 (' + worstProv.avgR7.toFixed(4) + '), while ' +
       '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
       (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
       '<strong>' + dualExposed.length + ' regions</strong> combine below-median digital readiness with above-median grid risk, ' +
-      'making them priority targets for Energiavirasto/DSO digitalisation investment and Poland\'s National Energy and Climate Plan. ' +
+      'making them priority targets for Energiavirasto/DSO digitalisation investment and Finland\'s National Energy and Climate Plan. ' +
       'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open broadband/smart meter data — ' +
       'as Energiavirasto regulatory compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
 
@@ -751,10 +751,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     if (!meta.FREQ_DISTRIBUTION || !meta.FREQ_DISTRIBUTION.Daily) meta.FREQ_DISTRIBUTION = {
       Daily:      { count: 2, sources: ['Energiavirasto','FMI'] },
       Continuous: { count: 1, sources: ['OSM'] },
-      Monthly:    { count: 6, sources: ['Fingrid','PGE','Tauron','Enea','Energa','Tilastokeskus'] },
-      Quarterly:  { count: 4, sources: ['Gränges','Tekes','CEC','NBP'] },
+      Monthly:    { count: 6, sources: ['Fingrid','Caruna','Fortum','Helen','Elenia','Tilastokeskus'] },
+      Quarterly:  { count: 4, sources: ['Gränges','Tekes',[Finnish source],'Bank of Finland'] },
       Seasonal:   { count: 1, sources: ['IUNG'] },
-      Annual:     { count: 14, sources: ['Energiavirasto','Fingrid','PGE','Tauron','Tilastokeskus','Gränges','Tekes','FMI','CEIC','CSO','NCBR','MG','MRiRW','KPRM'] },
+      Annual:     { count: 14, sources: ['Energiavirasto','Fingrid','Caruna','Fortum','Tilastokeskus','Gränges','Tekes','FMI','CEIC','OSF','MTEK','UCV','VTT','MTK'] },
       Static:     { count: 2, sources: ['IEC-61000','ICOLD'] }
     };
   if (!meta) return;
@@ -884,11 +884,11 @@ document.addEventListener("ssi-config-ready", function(e) {
       'which have minimal impact on fleet-level score distribution.';
 
     document.getElementById('sec-c-changelog').innerHTML =
-      '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:10px">4 changes tracked for Poland v4.0.2 launch</div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:10px">4 changes tracked for Finland v4.0.2 launch</div>' +
       '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
         '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">P1</span>' +
         '<span style="flex-shrink:0;font-size:10px;color:#5d8563;background:rgba(93,133,99,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">NEW</span>' +
-        '<span style="flex:1">Poland grid registry expansion: 2,248 substations across Fingrid + 5 DSOs</span>' +
+        '<span style="flex:1">Finland grid registry expansion: 532 substations across Fingrid + ~80 DNOs</span>' +
         '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Section A</span>' +
       '</div>' +
       '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
@@ -899,11 +899,11 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h2>The Uusimaa–Pirkanmaa Grid Corridor: Where Nuclear Concentration and Winter Storm Resilience Challenge Grid Stability</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Śląskie–Mazowieckie nuclear concentration and winter storm resilience corridor · <strong>002</strong> Eastern Poland DER & EU funding mismatch · <strong>003</strong> Mining subsidence infrastructure stress · <strong>004</strong> Metropolitan-Rural energy poverty disparity · <strong>005</strong> Grid stranding risk (coal-dependent assets) · <strong>006</strong> DSO smart meter rollout vs grid stress · <strong>007</strong> Vistula winter storms and coastal flooding resilience · <strong>008</strong> T-component forward projections · <strong>009</strong> Voivodeship Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Uusimaa–Pirkanmaa nuclear concentration and winter storm resilience corridor · <strong>002</strong> Eastern Finland DER & EU funding mismatch · <strong>003</strong> Mining subsidence infrastructure stress · <strong>004</strong> Metropolitan-Rural energy poverty disparity · <strong>005</strong> Grid stranding risk (nuclear-dependent assets) · <strong>006</strong> DSO smart meter rollout vs grid stress · <strong>007</strong> Vistula winter storms and coastal flooding resilience · <strong>008</strong> T-component forward projections · <strong>009</strong> Maakunta Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
 </div>
 
 <!-- D.1 KPI summary — auto-populated -->
-<h3>D.1 &ensp; Why the Śląskie–Mazowieckie Corridor, Why Now</h3>
+<h3>D.1 &ensp; Why the Uusimaa–Pirkanmaa Corridor, Why Now</h3>
 
 <div class="kpi-grid" style="margin:16px 0" id="puglia-kpis">
   <div class="kpi-card">
@@ -922,7 +922,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     <div class="kpi-sub" id="pug-median-sub"></div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">Worst Voivodeship</div>
+    <div class="kpi-label">Worst Maakunta</div>
     <div class="kpi-value" style="color:var(--ink);font-size:20px" id="pug-worst-prov">—</div>
     <div class="kpi-sub" id="pug-worst-sub"></div>
   </div>
@@ -972,22 +972,22 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <p style="font-size:13px;line-height:1.7" id="pug-narrative-d3">Loading component analysis…</p>
 
-<!-- D.4 Voivodeship Breakdown -->
-<h3>D.4 &ensp; Voivodeship Risk Profile</h3>
+<!-- D.4 Maakunta Breakdown -->
+<h3>D.4 &ensp; Maakunta Risk Profile</h3>
 
 <div id="puglia-province-bars" style="margin:16px 0"></div>
 
 <p style="font-size:13px;line-height:1.7" id="pug-narrative-d4">Loading region breakdown…</p>
 
 <!-- D.5 Implications -->
-<h3>D.5 &ensp; Implications for Poland's Coal Transition</h3>
+<h3>D.5 &ensp; Implications for Finland's Energy Transition</h3>
 
 <p style="font-size:13px;line-height:1.7" id="pug-narrative-d5">Loading implications…</p>
 
 <script>
 (function(){
   fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
-    var puglia = data.substations.filter(function(s){ return s.province === 'Śląskie' || s.region === 'Śląskie' || s.province === 'Mazowieckie' || s.region === 'Mazowieckie'; });
+    var puglia = data.substations.filter(function(s){ return s.province === 'Uusimaa' || s.region === 'Uusimaa' || s.province === 'Pirkanmaa' || s.region === 'Pirkanmaa'; });
     if (puglia.length === 0) puglia = data.substations.slice(0, Math.floor(data.substations.length * 0.3));
     var fleet = data.substations;
     puglia.sort(function(a,b){ return b.R_median - a.R_median; });
@@ -1026,14 +1026,14 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     var pctAboveFleetMedian = (puglia.filter(function(s){ return s.R_median > fleetMedian; }).length / nTotal * 100).toFixed(0);
     document.getElementById('pug-narrative-d1').innerHTML =
-      'The Śląskie–Mazowieckie corridor hosts <strong>' + nTotal + ' substations</strong> across Poland\'s industrial heartland, forming the backbone of domestic transmission and coal-dependent distribution. ' +
+      'The Uusimaa–Pirkanmaa corridor hosts <strong>' + nTotal + ' substations</strong> across Finland\'s industrial heartland, forming the backbone of domestic transmission and nuclear-dependent distribution. ' +
       'Its risk profile is disproportionately concentrated in the upper bands: <strong>' + bands.High + ' substations (' +
       (bands.High/nTotal*100).toFixed(1) + '%)</strong> are classified High' +
       (bands.Critical ? ' and <strong>' + bands.Critical + '</strong> Critical' : '') +
       ', with only <strong>' + bands.Low + '</strong> in the Low band. ' +
       pctAboveFleetMedian + '% of corridor substations score above the national fleet median of ' + fleetMedian.toFixed(3) +
-      '. The corridor median R of ' + medianR.toFixed(3) + ' reflects the tension between nuclear baseload risk management mandates from Polish Energy Policy 2040, aging generation assets approaching retirement, snow/ice loading and permafrost instability threatening distribution lines, and EU Green Deal funding constraints. ' +
-      'The SSI flags continuity-of-supply deficits, infrastructure age mismatches, and the stranding risk of coal-dependent transmission assets.';
+      '. The corridor median R of ' + medianR.toFixed(3) + ' reflects the tension between nuclear baseload risk management mandates from Finnish Energy Policy 2040, aging generation assets approaching retirement, snow/ice loading and permafrost instability threatening distribution lines, and EU Green Deal funding constraints. ' +
+      'The SSI flags continuity-of-supply deficits, infrastructure age mismatches, and the stranding risk of nuclear-dependent transmission assets.';
 
     var canvas = document.getElementById('puglia-map');
     var dpr = window.devicePixelRatio || 1;
@@ -1059,7 +1059,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     fleet.forEach(function(s){
       var pv = s[provField] || s.region || '';
-      var isPuglia = (pv === 'Śląskie' || pv === 'Mazowieckie' || pv.indexOf('corridor') >= 0);
+      var isPuglia = (pv === 'Uusimaa' || pv === 'Pirkanmaa' || pv.indexOf('corridor') >= 0);
       if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && !isPuglia) {
         var p = proj(s.lon, s.lat);
         ctx.beginPath();
@@ -1185,11 +1185,11 @@ document.addEventListener("ssi-config-ready", function(e) {
       c2pug.toFixed(3) + ' vs fleet ' + c2flt.toFixed(3) + ' (' + (c2pug / c2.w * 100).toFixed(0) + '% of ceiling). ' +
       'Among modifiers, the R3 consequence multiplier averages ' + avgMod(puglia, 'R3_C_mult').toFixed(3) +
       ' (fleet: ' + avgMod(fleet, 'R3_C_mult').toFixed(3) + '), reflecting the economic significance of ' +
-      'the corridor\'s coal-dependent industrial base — from power plants to coal mines to steel mills. The R6b mining/flood hazard modifier averages ' +
+      'the corridor\'s nuclear-dependent industrial base — from nuclear plants to refineries to paper mills. The R6b winter storm/snow loading hazard modifier averages ' +
       avgMod(puglia, 'R6_seismic').toFixed(3) + ', capturing the corridor\'s exposure to snow/ice loading and permafrost instability, Vistula/Oder winter storms and coastal flooding, and seismic hazard risk — ' +
       'a dimension invisible to every competing framework.';
 
-    var provHTML = '<div class="label-xs" style="margin-bottom:10px">Voivodeship Risk Profile — Sorted by Mean R</div>' +
+    var provHTML = '<div class="label-xs" style="margin-bottom:10px">Maakunta Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){
       var provSubs = puglia.filter(function(s){ return (s[provField] || s.region) === pv.name; });
@@ -1220,10 +1220,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     var pugAbove065 = puglia.filter(function(s){ return s.R_median >= 0.65; }).length;
     document.getElementById('pug-narrative-d5').innerHTML =
       '<strong>' + pugAbove065 + ' corridor substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
-      'For Polish nuclear concentration and winter storm resilience planning, EU funding allocation, and grid modernisation investment, this analysis identifies the corridor as the highest-priority target — ' +
-      'where DER deployment must accelerate against ageing coal-dependent infrastructure with above-average continuity deficits and significant socio-economic exposure to mine closures. ' +
+      'For Finnish nuclear concentration and winter storm resilience planning, EU funding allocation, and grid modernisation investment, this analysis identifies the corridor as the highest-priority target — ' +
+      'where DER deployment must accelerate against ageing nuclear-dependent infrastructure with above-average continuity deficits and significant socio-economic exposure to energy transition risks. ' +
       'The SSI\'s silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only because of their engineering condition, ' +
-      'but because the communities they serve — characterised by coal dependency, mining heritage, and EU transition fund eligibility — are disproportionately ' +
+      'but because the communities they serve — characterised by nuclear concentration, Arctic infrastructure exposure, and EU transition fund eligibility — are disproportionately ' +
       'vulnerable to disruption during the nuclear baseload risk management. This is precisely the anticipatory grid planning capability that the SSI was built to provide.';
   });
 })();
@@ -1239,7 +1239,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h2>European Context Card</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one European Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because Poland's nuclear concentration and winter storm resilience and grid resilience depend on understanding European performance standards. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Central Europe peers (003), CMIP6 climate hazard vs Nordic models (004), etc. The underlying data updates annually with Energiavirasto and national regulator publications.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one European Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because Finland's nuclear concentration and winter storm resilience and grid resilience depend on understanding European performance standards. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Central Europe peers (003), CMIP6 climate hazard vs Nordic models (004), etc. The underlying data updates annually with Energiavirasto and national regulator publications.</p>
 </div>
 
 <!-- THE CARD ITSELF -->
@@ -1282,7 +1282,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~75</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding:4px 0;border-bottom:1px solid var(--card-border)">
-      <span style="min-width:130px">🇵🇱 Poland</span>
+      <span style="min-width:130px">🇫🇮 Finland</span>
       <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
         <div style="width:72%;height:100%;background:var(--terracotta);border-radius:4px"></div>
       </div>
@@ -1326,14 +1326,14 @@ document.addEventListener("ssi-config-ready", function(e) {
   </div>
 
   <div style="padding:12px 0;margin-top:12px;border-top:1px solid var(--card-border);font-size:11px;color:var(--warm-grey);line-height:1.6">
-    Source: CEER Benchmarking Report on Quality of Electricity Supply (2024); EEnergiavirastoLECTRIC SAIDI reports; national regulator publications. Poland sub-categories from Energiavirasto urban/rural classifications. · See §16 Peer Benchmarking for full methodology and caveats. · Updated annually.
+    Source: CEER Benchmarking Report on Quality of Electricity Supply (2024); EEnergiavirastoLECTRIC SAIDI reports; national regulator publications. Finland sub-categories from Energiavirasto urban/rural classifications. · See §16 Peer Benchmarking for full methodology and caveats. · Updated annually.
   </div>
 </div>
 
 <p style="font-size:13px;line-height:1.7" id="eu-insight">Loading European context insight…</p>
 
-<h3 style="margin-top:20px">Voivodeship Risk Ranking — All 16 Polish Voivodeships</h3>
-<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does the Śląskie–Mazowieckie corridor sit within the national landscape? Voivodeships sorted by mean R_median, with band distribution and fleet comparison.</p>
+<h3 style="margin-top:20px">Maakunta Risk Ranking — All 19 Finnish Maakunnat</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does the Uusimaa–Pirkanmaa corridor sit within the national landscape? Maakunnat sorted by mean R_median, with band distribution and fleet comparison.</p>
 
 <div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
 
@@ -1343,7 +1343,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   fetch('ssi-data.json?v=46').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
-    var puglia = fleet.filter(function(s){ return s.province === 'Śląskie' || s.region === 'Śląskie' || s.province === 'Mazowieckie' || s.region === 'Mazowieckie' || (s.province || '').indexOf('corridor') >= 0; });
+    var puglia = fleet.filter(function(s){ return s.province === 'Uusimaa' || s.region === 'Uusimaa' || s.province === 'Pirkanmaa' || s.region === 'Pirkanmaa' || (s.province || '').indexOf('corridor') >= 0; });
     if (puglia.length === 0) puglia = fleet.slice(0, Math.floor(fleet.length * 0.3));
 
     var highC = puglia.filter(function(s){ return s.components.C > 0.21; }).length;
@@ -1354,10 +1354,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('eu-insight').innerHTML =
       '<strong>This month\'s key insight:</strong> The corridor deep-dive shows <strong>' + highC +
       ' substations</strong> (of ' + puglia.length + ') with C-component above 70% of its weight ceiling — ' +
-      'indicating continuity-of-supply performance consistent with Poland\'s rural region classification. ' +
+      'indicating continuity-of-supply performance consistent with Finland\'s rural region classification. ' +
       'The corridor\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
-      avgC_fleet.toFixed(3) + '. In European terms, these substations individually perform closer to German or Central European SAIDI levels (~115–160 min/customer/year) than to Poland\'s own urban average (~65 min). ' +
-      'The SSI reveals what aggregate Energiavirasto statistics conceal: that Poland\'s mid-tier European position is not a national ' +
+      avgC_fleet.toFixed(3) + '. In European terms, these substations individually perform closer to German or Central European SAIDI levels (~115–160 min/customer/year) than to Finland\'s own urban average (~65 min). ' +
+      'The SSI reveals what aggregate Energiavirasto statistics conceal: that Finland\'s mid-tier European position is not a national ' +
       'condition but a statistical average of Western European-quality urban performance and emerging-market-level rural performance — ' +
       'and the nuclear concentration and winter storm resilience corridor concentrates significant pockets of the latter.';
 
@@ -1381,7 +1381,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
     var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
     regions.forEach(function(reg, idx){
-      var isCoalCorridor = reg.name === 'Śląskie' || reg.name === 'Mazowieckie' || reg.name.indexOf('corridor') >= 0;
+      var isCoalCorridor = reg.name === 'Uusimaa' || reg.name === 'Pirkanmaa' || reg.name.indexOf('corridor') >= 0;
       var barPct = ((1 - reg.avgR) * 100).toFixed(1);
       var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
       var highlight = isCoalCorridor ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
@@ -1411,18 +1411,18 @@ document.addEventListener("ssi-config-ready", function(e) {
     });
     document.getElementById('eu-regional-ranking').innerHTML = html;
 
-    var nswRank = regions.findIndex(function(r){ return r.name === 'Śląskie' || r.name === 'Mazowieckie' || r.name.indexOf('corridor') >= 0; }) + 1;
+    var nswRank = regions.findIndex(function(r){ return r.name === 'Uusimaa' || r.name === 'Pirkanmaa' || r.name.indexOf('corridor') >= 0; }) + 1;
     if (nswRank === 0) nswRank = 1;
     var top3 = regions.slice(0, 3).map(function(r){ return r.name; });
     var bot3 = regions.slice(-3).reverse().map(function(r){ return r.name; });
     var aboveAvg = regions.filter(function(r){ return r.avgR > fleetAvgR; }).length;
 
     document.getElementById('eu-ranking-narrative').innerHTML =
-      'Coal transition corridor ranks <strong>#' + nswRank + ' of ' + regions.length + ' regions</strong> by mean R_median. ' +
+      'Grid corridor ranks <strong>#' + nswRank + ' of ' + regions.length + ' regions</strong> by mean R_median. ' +
       'The three most stressed regions are ' + top3.join(', ') + ', while the three most resilient are ' + bot3.join(', ') + '. ' +
       aboveAvg + ' of ' + regions.length + ' regions score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
       'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate Fingrid/DSO or national statistics — ' +
-      'reveals the true spatial distribution of grid stress across Poland. ' +
+      'reveals the true spatial distribution of grid stress across Finland. ' +
       'It is precisely this substation-level granularity that positions the SSI as a tool for national nuclear concentration and winter storm resilience planning / EU green energy funding / Energiavirasto investment prioritisation: ' +
       'not treating entire regions as monoliths, but identifying the specific corridors within each that demand attention.';
   });
@@ -1460,9 +1460,9 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   var topics = [
     { layer: 1, ref: '§0.3', title: 'Data Architecture — Component Taxonomy',
-      subtitle: 'How the SSI\'s 6 components and 20 sub-metrics are sourced, validated, and scored for Poland\'s grid',
-      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index for Poland — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 30+ public data sources in the Polish SSI registry (Energiavirasto, Fingrid, PGE, Tauron, Enea, Energa, Stoen), validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither investment valuation nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs.',
-      concepts: ['6 components, 20 sub-metrics, 95 variables from 30+ Polish sources', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T', 'Each sub-metric traceable to Energiavirasto, Fingrid, or open data source'],
+      subtitle: 'How the SSI\'s 6 components and 20 sub-metrics are sourced, validated, and scored for Finland\'s grid',
+      body: 'The SSI-ENN\'s Layer 1 formally specifies the SSI v4.0 Index for Finland — its six components (Continuity, Voltage, Infrastructure, Economic, Saturation, Transition), twenty sub-metrics, normalisation methodology, and aggregation rules. Each sub-metric is independently sourced from one of the 30+ public data sources in the Finnish SSI registry (Energiavirasto, Fingrid, Caruna, Fortum, Helen, Elenia), validated against known reference distributions, and normalised to a common [0, 1] scale before aggregation. This rigorous data architecture is the foundation layer: without substation-level grid intelligence at this granularity, neither investment valuation nor the neural network can exist. The component taxonomy directly maps to downstream valuation outputs.',
+      concepts: ['6 components, 20 sub-metrics, 95 variables from 30+ Finnish sources', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T', 'Each sub-metric traceable to Energiavirasto, Fingrid, or open data source'],
       ssiLink: 'components' },
     { layer: 2, ref: '§0.4.1', title: 'DSO/Fingrid Value Stack',
       subtitle: 'What a battery or renewable retrofit is worth to the network operator in avoided or deferred costs',
@@ -1470,13 +1470,13 @@ document.addEventListener("ssi-config-ready", function(e) {
       concepts: ['D1: Avoided Outage = f(C, SAIDI, customer count)', 'D2: Deferred Reinforcement = f(S, I, load growth)', 'D3: Voltage Support = f(V, network impedance)', 'D4 + D5: Loss + Fault Level = f(R4, topology)'],
       ssiLink: 'valuation' },
     { layer: 3, ref: '§0.5.3', title: 'Transfer Learning & Feature Missingness',
-      subtitle: 'How Poland\'s grid data completeness enables investment-grade valuation across the full fleet',
-      body: 'Transfer learning is the mechanism that enables the SSI-ENN to value substations in countries where not all features are available. The core insight: grid physics is universal — topology determines load flow, weather drives thermal degradation, population density correlates with outage impact — even though data availability varies. Poland benefits from high data completeness (DCI 0.72+) from Energiavirasto, Fingrid, and Tilastokeskus sources, enabling production-grade valuations. For each substation, available features are validated. Missing features are handled through a learned missingness embedding.',
-      concepts: ['Poland\'s DCI 0.72+ (high completeness)', 'Learned missingness embedding quantifies data value', 'Grid physics universality enables high-confidence transfer', 'Accuracy validated against Energiavirasto audit standards'],
+      subtitle: 'How Finland\'s grid data completeness enables investment-grade valuation across the full fleet',
+      body: 'Transfer learning is the mechanism that enables the SSI-ENN to value substations in countries where not all features are available. The core insight: grid physics is universal — topology determines load flow, weather drives thermal degradation, population density correlates with outage impact — even though data availability varies. Finland benefits from high data completeness (DCI 0.72+) from Energiavirasto, Fingrid, and Tilastokeskus sources, enabling production-grade valuations. For each substation, available features are validated. Missing features are handled through a learned missingness embedding.',
+      concepts: ['Finland\'s DCI 0.72+ (high completeness)', 'Learned missingness embedding quantifies data value', 'Grid physics universality enables high-confidence transfer', 'Accuracy validated against Energiavirasto audit standards'],
       ssiLink: 'transfer' },
     { layer: 2, ref: '§0.4.2', title: 'Community Value Stack',
-      subtitle: 'Social and economic value to Polish communities — the case for EU funding investment',
-      body: 'The community value stack addresses regional governments, ARENA (Polish renewable energy agency), and EU cohesion allocators. W1 (Energy Cost Reduction) estimates savings for local consumers, weighted by energy poverty rate. W2 (Local Employment) models O&M jobs per MW. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂. W5 (Resilience Value) — most novel — uses the SSI\'s full R_median distribution to price avoided cost of extreme events. All discounted at social discount rate (3.0% real).',
+      subtitle: 'Social and economic value to Finnish communities — the case for EU funding investment',
+      body: 'The community value stack addresses regional governments, ARENA (Finnish renewable energy agency), and EU cohesion allocators. W1 (Energy Cost Reduction) estimates savings for local consumers, weighted by energy poverty rate. W2 (Local Employment) models O&M jobs per MW. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂. W5 (Resilience Value) — most novel — uses the SSI\'s full R_median distribution to price avoided cost of extreme events. All discounted at social discount rate (3.0% real).',
       concepts: ['W1: Energy cost savings weighted by energy poverty rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0%, not DSO WACC'],
       ssiLink: 'community' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery',
@@ -1484,10 +1484,10 @@ document.addEventListener("ssi-config-ready", function(e) {
       body: 'The SSI-ENN\'s analytical engine produces a high-dimensional output vector per substation per technology (battery, PV, wind). The product delivery pipeline transforms this into four distinct formats: (1) the Explorer Dashboard, (2) the API, (3) the Value-Add Card — a per-substation PDF report, and (4) the Advisory Report — bespoke analysis for institutional clients (DSOs, transmission operator Fingrid, regional governments, EU funding bodies).',
       concepts: ['4 products: Dashboard, API, Value-Add Card, Advisory Report', 'Single analytical core, multiple delivery formats', 'Value-Add Card: per-substation investor-grade PDF', 'Advisory: bespoke multi-substation institutional analysis'],
       ssiLink: 'platform' },
-    { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index for Poland',
-      subtitle: 'Quantifying what fraction of the SSI feature vector is available for Polish substations',
-      body: 'The Data Completeness Index (DCI) quantifies what fraction of the SSI-ENN\'s feature vector is populated for Poland, weighted by each feature\'s contribution to prediction accuracy. Poland scores DCI 0.72, significantly above the 0.70 threshold for production-quality valuations. This reflects high data quality from Energiavirasto, Fingrid, and Tilastokeskus, alongside global open data (OSM topology). Poland\'s DCI is exceeded only by France, Germany, and Australia among countries assessed.',
-      concepts: ['Poland DCI = 0.72 (production quality, >0.70 threshold)', 'Energiavirasto regulatory data + Fingrid operational data drive high DCI', 'OSM topology + Tilastokeskus demographics provide global foundation', 'DCI creates data procurement priority roadmap'],
+    { layer: 4, ref: '§0.6.2', title: 'Data Completeness Index for Finland',
+      subtitle: 'Quantifying what fraction of the SSI feature vector is available for Finnish substations',
+      body: 'The Data Completeness Index (DCI) quantifies what fraction of the SSI-ENN\'s feature vector is populated for Finland, weighted by each feature\'s contribution to prediction accuracy. Finland scores DCI 0.72, significantly above the 0.70 threshold for production-quality valuations. This reflects high data quality from Energiavirasto, Fingrid, and Tilastokeskus, alongside global open data (OSM topology). Finland\'s DCI is exceeded only by France, Germany, and Australia among countries assessed.',
+      concepts: ['Finland DCI = 0.72 (production quality, >0.70 threshold)', 'Energiavirasto regulatory data + Fingrid operational data drive high DCI', 'OSM topology + Tilastokeskus demographics provide global foundation', 'DCI creates data procurement priority roadmap'],
       ssiLink: 'dci' }
   ];
 
@@ -1562,18 +1562,18 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     var statHTML = '';
     if (topic.layer === 1) {
-      statHTML = 'The SSI Index currently scores <strong>' + n.toLocaleString() + ' substations</strong> across Poland\'s Fingrid + 5 DSOs. ' +
+      statHTML = 'The SSI Index currently scores <strong>' + n.toLocaleString() + ' substations</strong> across Finland\'s Fingrid + ~80 DNOs. ' +
         'Fleet mean R = ' + avgR.toFixed(3) + ', with an average confidence interval width of ' + avgCI.toFixed(3) +
         ' from 10,000 MC iterations per substation. The dominant component is C (Continuity) at avg ' + compAvgs.C.toFixed(3) +
         ' / 0.30 ceiling (' + (compAvgs.C / 0.30 * 100).toFixed(0) + '% utilisation).';
     } else if (topic.layer === 2) {
       var avgR3 = fleet.reduce(function(a,s){ return a + s.modifiers.R3_C_mult; }, 0) / n;
-      statHTML = 'Across the ' + n.toLocaleString() + '-substation Polish fleet, the average consequence multiplier (R3) is ' +
-        avgR3.toFixed(3) + ', indicating significant socio-economic exposure in coal and manufacturing regions. ' +
+      statHTML = 'Across the ' + n.toLocaleString() + '-substation Finnish fleet, the average consequence multiplier (R3) is ' +
+        avgR3.toFixed(3) + ', indicating significant socio-economic exposure in industrial and nuclear regions. ' +
         highCrit + ' substations (' + (highCrit/n*100).toFixed(1) + '%) are classified High or Critical — ' +
         'these are the highest-priority candidates for BESS/PV deployment where DSO/Fingrid and community value stacks are largest.';
     } else if (topic.layer === 3) {
-      statHTML = 'The Polish training set comprises ' + n.toLocaleString() + ' substations with complete 95-feature vectors. ' +
+      statHTML = 'The Finnish training set comprises ' + n.toLocaleString() + ' substations with complete 95-feature vectors. ' +
         'Average CI_width of ' + avgCI.toFixed(3) + ' provides the uncertainty ground truth for neural network calibration. The fleet\'s risk distribution — ' +
         fleet.filter(function(s){ return s.classification === 'Low'; }).length + ' Low, ' +
         fleet.filter(function(s){ return s.classification === 'Medium'; }).length + ' Medium, ' +
@@ -1582,10 +1582,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     } else if (topic.layer === 4) {
       var provinces = {};
       fleet.forEach(function(s){ provinces[s.province || s.region] = true; });
-      statHTML = 'Poland\'s coverage: ' + n.toLocaleString() + ' substations across 16 regions and ' +
+      statHTML = 'Finland\'s coverage: ' + n.toLocaleString() + ' substations across 19 maakunnat and ' +
         Object.keys(provinces).length + ' districts. DCI 0.72 qualifies as production-grade. This serves as the reference benchmark for European transfer learning.';
     } else {
-      statHTML = 'The Polish fleet of ' + n.toLocaleString() + ' substations generates the full analytical depth that the platform delivers: ' +
+      statHTML = 'The Finnish fleet of ' + n.toLocaleString() + ' substations generates the full analytical depth that the platform delivers: ' +
         'R_median, P5/P95 bounds, 6 component scores, 5 modifier impacts, band classification, and confidence tier — ' +
         'all computed per substation per technology configuration (battery, PV, wind, hybrid).';
     }
@@ -1617,7 +1617,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0">
   <div class="card" style="border-top:3px solid var(--bronze)" id="g-next-edition">
     <span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Edition 002 — May 2026</span>
-    <h3 style="margin-top:0;font-size:15px">Eastern Poland DER & EU Funding Mismatch</h3>
+    <h3 style="margin-top:0;font-size:15px">Eastern Finland DER & EU Funding Mismatch</h3>
     <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Where renewable energy deployment outpaces grid readiness in Warmian-Masurian and Lubusz regions. Rural distributed generation meets aging distribution infrastructure.</p>
   </div>
   <div class="card" style="border-top:3px solid var(--sage)" id="g-data-refresh">
@@ -1627,12 +1627,12 @@ document.addEventListener("ssi-config-ready", function(e) {
   </div>
   <div class="card" style="border-top:3px solid var(--crimson)" id="g-spotlight">
     <span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">In the Wild — SSI in Use</span>
-    <h3 style="margin-top:0;font-size:15px">Tauron DSO Case Study</h3>
-    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">How Poland's largest DSO is using SSI substation intelligence to prioritize battery storage deployment across 3,400 substations. Q3 2026 publication.</p>
+    <h3 style="margin-top:0;font-size:15px">Caruna DNO Case Study</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">How Finland's largest DNO is using SSI substation intelligence to prioritize battery storage deployment across regional substations. Q3 2026 publication.</p>
   </div>
 </div>
 
-<p style="font-size:13px;line-height:1.7" id="g-closing">The SSI inaugurates Poland's grid intelligence baseline — the foundation for all future investment decisions across transmission, distribution, and renewable energy integration. This inaugural edition establishes the data, methodology, and peer-reviewed rigor that regulatory bodies (Energiavirasto), network operators (Fingrid, five DSOs), and EU funding allocators require. Subsequent editions will deepen thematic analysis, expand to all 38 regions and isolated systems, integrate real-time operational data feeds, and track the grid's evolution as Poland executes its nuclear baseload risk management mandate and EU Green Deal transition. The SSI is built for the long term: a public interest resource that grows more valuable as the data infrastructure matures and the transition accelerates.</p>
+<p style="font-size:13px;line-height:1.7" id="g-closing">The SSI inaugurates Finland's grid intelligence baseline — the foundation for all future investment decisions across transmission, distribution, and renewable energy integration. This inaugural edition establishes the data, methodology, and peer-reviewed rigor that regulatory bodies (Energiavirasto), network operators (Fingrid and ~80 DNOs), and EU funding allocators require. Subsequent editions will deepen thematic analysis, expand across all 19 maakunnat and isolated systems, integrate real-time operational data feeds, and track the grid's evolution as Finland executes its nuclear baseload risk management mandate and EU Green Deal transition. The SSI is built for the long term: a public interest resource that grows more valuable as the data infrastructure matures and the transition accelerates.</p>
 
 </section>
 

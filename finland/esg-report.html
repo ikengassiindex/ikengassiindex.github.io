@@ -205,7 +205,7 @@ p  { margin-bottom: 14px; }
 <script>
 // Auto-detect country from URL path
 (function() {
-  var match = window.location.pathname.match(/\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile|poland)\//i);
+  var match = window.location.pathname.match(/\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile|finland|poland)\//i);
   if (match) {
     document.currentScript.parentElement.setAttribute('data-ssi-country', match[1].toLowerCase());
     window.SSI_ESG_COUNTRY = match[1].toLowerCase();
@@ -370,7 +370,7 @@ const ESG_REPORTS = [
       { num: 11, label: 'SDG 11', color: '#f99d26' }
     ],
     legendColor: '#aa4234',
-    why: 'ESRS E1 (Climate Change) is material for 98% of CSRD-reporting companies. TCFD physical risk disclosure is mandatory in 36+ jurisdictions. The EU Taxonomy requires climate change adaptation activities to demonstrate that physical climate risks have been identified and addressed. This report quantifies acute and chronic climate hazard exposure at substation level using ERA5 reanalysis and Markov degradation modelling. For Poland, winter storms, ice loading, and coastal flooding in the Gulf of Finland, alongside nuclear baseload snow/ice loading risks, are critical climate hazards affecting grid resilience.',
+    why: 'ESRS E1 (Climate Change) is material for 98% of CSRD-reporting companies. TCFD physical risk disclosure is mandatory in 36+ jurisdictions. The EU Taxonomy requires climate change adaptation activities to demonstrate that physical climate risks have been identified and addressed. This report quantifies acute and chronic climate hazard exposure at substation level using ERA5 reanalysis and Markov degradation modelling. For Finland, winter storms, ice loading, and coastal flooding in the Gulf of Finland, alongside nuclear baseload snow/ice loading risks, are critical climate hazards affecting grid resilience.',
     sdgRationale: function(d) {
       return `Target 13.1 calls for strengthening resilience and adaptive capacity to climate-related hazards. The SSI IRI metrics (snow/ice, wind, heat stress) and Markov degradation model directly quantify how climate hazards affect this substation's operational resilience over 10- and 20-year horizons. With a Markov risk score of ${d.markov?.risk_score?.toFixed(3) || '—'} and ETTC of ${(d.markov?.ettc_years || d.markov?.ETTC_years) || '—'} years, this substation's climate trajectory can be assessed against TCFD physical risk and EU Taxonomy adaptation screening requirements.`;
     },
@@ -378,8 +378,8 @@ const ESG_REPORTS = [
       return [
         ['Insulation Risk (I component)', d.components?.I?.toFixed(3) || '—'],
         ['Environment Component (E)', d.components?.E?.toFixed(3) || '—'],
-        ['Flooding Hazard (Vistula/Oder)', (d.winter storms and coastal flooding?.hazard_level || '—')],
-        ['Mining Subsidence Risk', (d.snow loading?.risk_class || '—')],
+        ['Flooding Hazard (Finnish Rivers)', (d.winter storms and coastal flooding?.hazard_level || '—')],
+        ['Winter Storm/Ice Loading Risk', (d.snow loading?.risk_class || '—')],
         ['Markov Risk Score', d.markov?.risk_score?.toFixed(3) || '—'],
         ['ETTC (time to criticality)', ((d.markov?.ettc_years || d.markov?.ETTC_years) || '—') + ' years'],
         ['P(critical) at 20 years', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—')],
@@ -393,12 +393,12 @@ const ESG_REPORTS = [
         ['I3', 'Heat-wave IRI', '—', 'EU Taxonomy Annex A: Heat stress', d.components?.I ? 'ready' : 'gap'],
         ['I5', 'Thermal stress', '—', 'ESRS E1-4: Climate mitigation targets', d.components?.I ? 'ready' : 'gap'],
         ['R2', 'Climate trajectory', (d.markov?.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr)' : 'N/A'), 'TCFD Strategy (c): Scenario analysis', d.markov?.p_crit_20yr !== undefined ? 'ready' : 'gap'],
-        ['Flood', 'Vistula/Oder basin exposure', (d.winter storms and coastal flooding?.hazard_level || '—'), 'EU Taxonomy Annex A: Hydrological hazards', d.winter storms and coastal flooding?.hazard_level ? 'ready' : 'gap'],
-        ['Subsidence', 'Mining-related snow loading', (d.snow loading?.risk_class || '—'), 'TCFD Risk Management: Geophysical risk', d.snow loading?.risk_class ? 'ready' : 'gap'],
+        ['Flood', 'Finnish river basin exposure', (d.winter storms and coastal flooding?.hazard_level || '—'), 'EU Taxonomy Annex A: Hydrological hazards', d.winter storms and coastal flooding?.hazard_level ? 'ready' : 'gap'],
+        ['Winter_Load', 'Winter storm and ice loading', (d.snow loading?.risk_class || '—'), 'TCFD Risk Management: Climate-related risk', d.snow loading?.risk_class ? 'ready' : 'gap'],
         ['Markov', 'p_critical_20yr', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—'), 'ESRS E1-9: Time horizons', d.markov?.p_critical_20yr === 0 ? 'partial' : 'ready']
       ];
     },
-    validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. Poland-specific winter storms and coastal flooding hazard derived from FMI hydrological monitoring. Mining snow loading risk integrated from Central Mining Archive data. All inputs are production-grade with institutional provenance.'
+    validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. Finland-specific winter storms and coastal flooding hazard derived from FMI hydrological monitoring. Nuclear facility snow loading risk integrated from SYKE environmental monitoring data. All inputs are production-grade with institutional provenance.'
   },
   {
     id: 'report-2', num: '2', title: 'Grid Equity & Social Vulnerability',
@@ -409,7 +409,7 @@ const ESG_REPORTS = [
       { num: 1, label: 'SDG 1', color: '#e5243b' }
     ],
     legendColor: '#5d8563',
-    why: 'ESRS S2 requires companies to disclose impacts on affected communities. SFDR mandates 5 social PAI indicators. The SSI Index is uniquely positioned here because no competing grid risk framework integrates socio-economic vulnerability at substation resolution. This report surfaces where infrastructure risk concentrates in economically disadvantaged populations. In Poland, this is critical for nuclear-dependent regions managing baseload transition, energy-poor rural areas, and communities affected by mining closure.',
+    why: 'ESRS S2 requires companies to disclose impacts on affected communities. SFDR mandates 5 social PAI indicators. The SSI Index is uniquely positioned here because no competing grid risk framework integrates socio-economic vulnerability at substation resolution. This report surfaces where infrastructure risk concentrates in economically disadvantaged populations. In Finland, this is critical for nuclear-dependent regions managing baseload transition, energy-poor rural areas, and communities affected by economic transition.',
     sdgRationale: function(d) {
       const vsocio = d.socio_economic?.V_socio;
       const ep = d.socio_economic?.EP_rate_region;
@@ -424,7 +424,7 @@ const ESG_REPORTS = [
         ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('PL_')===0?'zł':id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
         ['R&D % of GDP', (se.rd_pct_gdp || '—') + '%'],
         ['R3 Social Multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—'],
-        ['Coal-Mining Community Exposure', d.socio_economic?.coal_mining_pct ? d.socio_economic.coal_mining_pct + '%' : '—'],
+        ['Nuclear Facility Exposure', d.socio_economic?.coal_mining_pct ? d.socio_economic.coal_mining_pct + '%' : '—'],
         ['Migration Score', d.socio_economic?.migration_score !== undefined ? d.socio_economic.migration_score.toFixed(2) : '—']
       ];
     },
@@ -434,11 +434,11 @@ const ESG_REPORTS = [
         ['V_socio', 'Energy poverty index', se.V_socio?.toFixed(2) || '—', 'ESRS S2-4: Impacts on affected communities', se.V_socio ? 'ready' : 'gap'],
         ['EP_rate', 'Energy poverty rate', (se.EP_rate_region || '—') + '%', 'SFDR PAI #14: Fossil fuel exposure proxy', se.EP_rate_region ? 'ready' : 'gap'],
         ['R3', 'Social multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—', 'ESRS S1-6: Workforce characteristics', d.modifiers?.R3_C_mult ? 'ready' : 'gap'],
-        ['Coal_mining', 'Coal-mining exposure', (d.socio_economic?.coal_mining_pct ? d.socio_economic.coal_mining_pct + '%' : '—'), 'SFDR PAI: Just transition monitoring', d.socio_economic?.coal_mining_pct ? 'ready' : 'gap'],
+        ['Nuclear_facility', 'Nuclear facility exposure', (d.socio_economic?.coal_mining_pct ? d.socio_economic.coal_mining_pct + '%' : '—'), 'SFDR PAI: Just transition monitoring', d.socio_economic?.coal_mining_pct ? 'ready' : 'gap'],
         ['Community', 'Catchment population', (d.socio_economic?.population ? d.socio_economic.population.toLocaleString() : '—'), 'ESRS S2: Community impact', d.socio_economic?.population ? 'ready' : 'gap']
       ];
     },
-    validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using Tilastokeskus (Polish Central Statistical Office) household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, coal-mining exposure, elderly concentration, and net outward migration. Coal-mining percentage sourced from Central Mining Archive and regional employment registries. PARTIAL status reflects missing detailed elderly vulnerability enrichments — available from Tilastokeskus at gmina level.'
+    validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using Tilastokeskus (Finnish Central Statistical Office) household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, nuclear facility proximity, elderly concentration, and net outward migration. Nuclear facility exposure percentage sourced from SYKE environmental monitoring and regional employment registries. PARTIAL status reflects missing detailed elderly vulnerability enrichments — available from Tilastokeskus at kunta level.'
   },
   {
     id: 'report-3', num: '3', title: 'EU Taxonomy Alignment',
@@ -449,9 +449,9 @@ const ESG_REPORTS = [
       { num: 12, label: 'SDG 12', color: '#cf8d2a' }
     ],
     legendColor: '#b8863a',
-    why: 'The EU Taxonomy defines technical screening criteria for climate change adaptation in infrastructure. This is a critical ESG product for the SSI Index. The SSI composite score (R_median), 6 components, modifier architecture, and Markov risk outputs provide the quantitative evidence base for Article 11 screening at asset level. Poland, with its energy transition pathway from coal to renewables, requires robust taxonomy alignment to secure sustainable finance access.',
+    why: 'The EU Taxonomy defines technical screening criteria for climate change adaptation in infrastructure. This is a critical ESG product for the SSI Index. The SSI composite score (R_median), 6 components, modifier architecture, and Markov risk outputs provide the quantitative evidence base for Article 11 screening at asset level. Finland, with its energy transition pathway from nuclear baseload and renewable integration, requires robust taxonomy alignment to secure sustainable finance access.',
     sdgRationale: function(d) {
-      return `Target 9.4 calls for upgrading infrastructure to make it sustainable. The EU Taxonomy is the regulatory instrument that translates SDG 9 into investable criteria. By classifying this substation against Article 11 technical screening criteria — using R_median (${d.R_median?.toFixed(3) || '—'}), all 6 components, and 5 modifiers — this report provides asset-level Taxonomy alignment that enables sustainable finance reporting for Poland's grid modernisation.`;
+      return `Target 9.4 calls for upgrading infrastructure to make it sustainable. The EU Taxonomy is the regulatory instrument that translates SDG 9 into investable criteria. By classifying this substation against Article 11 technical screening criteria — using R_median (${d.R_median?.toFixed(3) || '—'}), all 6 components, and 5 modifiers — this report provides asset-level Taxonomy alignment that enables sustainable finance reporting for Finland's grid modernisation.`;
     },
     getProfile: function(d) {
       return [
@@ -475,7 +475,7 @@ const ESG_REPORTS = [
         ['R5', 'Asymmetric CI', d.CI_width?.toFixed(3) || '—', 'ESRS: Uncertainty quantification', d.CI_width ? 'ready' : 'gap']
       ];
     },
-    validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6 restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. Poland-specific hazard data (winter storms and coastal flooding, snow loading) integrated from FMI and Central Mining Archive. All inputs are from institutional open-source data with citable vintage — meeting CSRD Article 29a limited assurance requirements.'
+    validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (2,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6 restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. Finland-specific hazard data (winter storms and coastal flooding, snow loading) integrated from FMI and SYKE environmental monitoring. All inputs are from institutional open-source data with citable vintage — meeting CSRD Article 29a limited assurance requirements.'
   },
   {
     id: 'report-4', num: '4', title: 'Energy Transition & DER Stress',
@@ -486,10 +486,10 @@ const ESG_REPORTS = [
       { num: 9, label: 'SDG 9', color: '#f36d25' }
     ],
     legendColor: '#e8a838',
-    why: 'The energy transition creates infrastructure stress — bidirectional power flows, EV charging load, and intermittent renewable output strain substations designed for unidirectional delivery. This report measures whether grid infrastructure is keeping pace with decarbonisation. For Poland, transitioning from coal (52% of 2023 generation) to wind (28%) and solar (10%) represents dramatic volatility and requires grid modernisation at scale.',
+    why: 'The energy transition creates infrastructure stress — bidirectional power flows, EV charging load, and intermittent renewable output strain substations designed for unidirectional delivery. This report measures whether grid infrastructure is keeping pace with decarbonisation. For Finland, transitioning from nuclear (33% of 2023 generation) and renewable integration with wind and solar represents dynamic volatility and requires grid modernisation at scale.',
     sdgRationale: function(d) {
       const der = d.transition?.DER_ratio;
-      return `Target 7.2 requires substantially increasing the share of renewable energy. This substation has a DER ratio of ${der?.toFixed(3) || '—'}${der > 1 ? ' — local renewable generation exceeds consumption, a transition success that creates operational complexity' : ''}. The T1_score (${d.transition?.T1_score?.toFixed(3) || '—'}) measures the stress this places on the substation. Poland's coal-to-renewables shift is unparalleled in Europe, making this feedback loop essential for policy makers.`;
+      return `Target 7.2 requires substantially increasing the share of renewable energy. This substation has a DER ratio of ${der?.toFixed(3) || '—'}${der > 1 ? ' — local renewable generation exceeds consumption, a transition success that creates operational complexity' : ''}. The T1_score (${d.transition?.T1_score?.toFixed(3) || '—'}) measures the stress this places on the substation. Finland's nuclear baseload and renewable integration is unparalleled in Europe, making this feedback loop essential for policy makers.`;
     },
     getProfile: function(d) {
       const tr = d.transition || {};
@@ -512,7 +512,7 @@ const ESG_REPORTS = [
         ['Renewables', 'Wind + solar generation %', (d.transition?.renewable_pct || '—') + '%', 'EU Green Deal: 42.5% RES by 2030', d.transition?.renewable_pct !== undefined ? 'ready' : 'gap']
       ];
     },
-    validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from Energiavirasto (Polish Energy Regulatory Authority) and renewable installation registries. Renewable generation percentage from Fingrid (Polish Transmission System Operator) 2025 data. DER_ratio > 1.0 indicates net export during peak generation — a marker of successful energy transition with associated infrastructure stress.'
+    validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from Energiavirasto (Finnish Energy Regulatory Authority) and renewable installation registries. Renewable generation percentage from Fingrid (Finnish TSO) 2025 data. DER_ratio > 1.0 indicates net export during peak generation — a marker of successful energy transition with associated infrastructure stress.'
   },
   {
     id: 'report-5', num: '5', title: 'Pollution & Corrosion',
@@ -523,9 +523,9 @@ const ESG_REPORTS = [
       { num: 15, label: 'SDG 15', color: '#56c02b' }
     ],
     legendColor: '#6b8e6b',
-    why: 'Transformer oil degradation, SF6 leakage, and corrosion-driven failures release pollutants affecting local environments. ESRS E2 requires disclosure of pollution risks. This report assesses the substation\'s corrosion classification under ISO 9223 and the environmental sensitivity of its surroundings. In Poland, air quality impacts from historical coal combustion make PM2.5 and SO2 exposure critical environmental metrics.',
+    why: 'Transformer oil degradation, SF6 leakage, and corrosion-driven failures release pollutants affecting local environments. ESRS E2 requires disclosure of pollution risks. This report assesses the substation\'s corrosion classification under ISO 9223 and the environmental sensitivity of its surroundings. In Finland, air quality is generally excellent, but local PM2.5 and SO2 exposure remain important environmental metrics for monitoring.',
     sdgRationale: function(d) {
-      return `Target 11.6 aims to reduce the adverse environmental impact of cities. The corrosion class (${d.markov?.corrosion_class || '—'}) and E2_local enrichment factor (${d.socio_economic?.E2_local?.toFixed(2) || '—'}) track environmental degradation and pollution sensitivity at asset level. Where corrosion is advanced and maintenance deferred, equipment failure risks releasing mineral oil, PCBs (legacy units), and SF6. Poland's PM2.5 air quality challenges amplify these risks in urban and peri-urban regions.`;
+      return `Target 11.6 aims to reduce the adverse environmental impact of cities. The corrosion class (${d.markov?.corrosion_class || '—'}) and E2_local enrichment factor (${d.socio_economic?.E2_local?.toFixed(2) || '—'}) track environmental degradation and pollution sensitivity at asset level. Where corrosion is advanced and maintenance deferred, equipment failure risks releasing mineral oil, PCBs (legacy units), and SF6. Finland's air quality is generally strong, but local PM2.5 monitoring remains important in urban and industrial regions.`;
     },
     getProfile: function(d) {
       return [
@@ -540,11 +540,11 @@ const ESG_REPORTS = [
       return [
         ['Corrosion', 'ISO 9223 class', d.markov?.corrosion_class || '—', 'ESRS E2: Pollution risk classification', d.markov?.corrosion_class ? 'ready' : 'gap'],
         ['E2_local', 'Environmental sensitivity (PM2.5)', d.socio_economic?.E2_local?.toFixed(2) || '—', 'ESRS E2: Air quality impact', d.socio_economic?.E2_local ? 'ready' : 'gap'],
-        ['Air_Quality', 'Air quality zone (GIOŚ)', (d.environmental?.air_quality_class || '—'), 'ESRS E2: Air pollution monitoring', d.environmental?.air_quality_class ? 'ready' : 'gap'],
+        ['Air_Quality', 'Air quality zone (SYKE)', (d.environmental?.air_quality_class || '—'), 'ESRS E2: Air pollution monitoring', d.environmental?.air_quality_class ? 'ready' : 'gap'],
         ['E', 'Environment component', d.components?.E?.toFixed(3) || '—', 'ISO 9223: Atmospheric corrosion', d.components?.E ? 'ready' : 'gap']
       ];
     },
-    validity: 'Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Status depends on whether the corrosion class shows real variance across the fleet or uses default values. Full validation requires Polish environmental agency (GIOŚ) air quality monitoring overlay at substation coordinates (SO2, NOx, PM2.5 deposition). Poland-specific data sourced from GIOŚ Central Database of air quality observations.'
+    validity: 'Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Status depends on whether the corrosion class shows real variance across the fleet or uses default values. Full validation requires Finnish environmental agency (SYKE) air quality monitoring overlay at substation coordinates (SO2, NOx, PM2.5 deposition). Finland-specific data sourced from SYKE environmental monitoring database of air quality observations.'
   },
   {
     id: 'report-6', num: '6', title: 'Cybersecurity Exposure',
@@ -554,9 +554,9 @@ const ESG_REPORTS = [
       { num: 16, label: 'SDG 16', color: '#00689d' }
     ],
     legendColor: '#3a7ca5',
-    why: 'The NIS2 Directive mandates cybersecurity risk management for energy operators. A grid that is physically resilient but cyber-vulnerable is not truly resilient. The SSI R7 modifier combines SCADA assessment, communication architecture analysis, and national-level cyber maturity (ENISA/DESI indices) to produce a substation-level digital vulnerability score. Poland\'s role as a critical EU energy infrastructure hub makes cyber resilience a strategic imperative.',
+    why: 'The NIS2 Directive mandates cybersecurity risk management for energy operators. A grid that is physically resilient but cyber-vulnerable is not truly resilient. The SSI R7 modifier combines SCADA assessment, communication architecture analysis, and national-level cyber maturity (ENISA/DESI indices) to produce a substation-level digital vulnerability score. Finland\'s role as a critical EU energy infrastructure hub makes cyber resilience a strategic imperative.',
     sdgRationale: function(d) {
-      return `Target 9.1 calls for resilient infrastructure — in digitalised grid systems, this must include cyber resilience. The R7 modifier (${d.modifiers?.R7_cyber?.toFixed(3) || '—'}) assesses digital vulnerability combining SCADA exposure, communication protocol security, and Polish national cyber maturity. SDG 16 (Strong Institutions) also applies: NIS2 compliance is a governance imperative for energy operators, and the betweenness centrality (${d.graph_topology?.BC_percentile?.toFixed(3) || '—'}) identifies single-point-of-failure risk in the grid topology.`;
+      return `Target 9.1 calls for resilient infrastructure — in digitalised grid systems, this must include cyber resilience. The R7 modifier (${d.modifiers?.R7_cyber?.toFixed(3) || '—'}) assesses digital vulnerability combining SCADA exposure, communication protocol security, and Finnish national cyber maturity. SDG 16 (Strong Institutions) also applies: NIS2 compliance is a governance imperative for energy operators, and the betweenness centrality (${d.graph_topology?.BC_percentile?.toFixed(3) || '—'}) identifies single-point-of-failure risk in the grid topology.`;
     },
     getProfile: function(d) {
       const gt = d.graph_topology || {};
@@ -578,24 +578,24 @@ const ESG_REPORTS = [
         ['NIS2', 'Critical infrastructure status', (d.governance?.nis2_critical ? 'Critical' : 'Non-critical'), 'NIS2 Directive: Operator designation', d.governance?.nis2_critical !== undefined ? 'ready' : 'gap']
       ];
     },
-    validity: 'R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. NIS2 criticality designations sourced from Energiavirasto and Polish Cyber Security Center (CSIRT). Substation-level SCADA data is operator-proprietary — the national-level proxy provides a baseline but not asset-specific granularity.'
+    validity: 'R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. NIS2 criticality designations sourced from Energiavirasto and Finnish NCSC-FI (Traficom). Substation-level SCADA data is operator-proprietary — the national-level proxy provides a baseline but not asset-specific granularity.'
   }
 ];
 
 /* ── Country-specific data source registries ── */
 const COUNTRY_SOURCES = {
-  poland: [
+  finland: [
     ['ERA5 Climate Reanalysis','Copernicus CDS','2024','Weekly','CC-BY-4.0','R1, R3'],
-    ['Polish Flooding Hazard Maps','FMI (Institute of Meteorology and Water Management)','2023','Multi-year','CC0','R1, R3'],
-    ['Mining Subsidence Data','Central Mining Archive','2023','Annual','Regulated','R1, R3'],
-    ['Population & Economics','Tilastokeskus (Central Statistical Office of Poland)','2023','Annual','OGD','R2, R3'],
-    ['Energy Market Data','Energiavirasto (Energy Regulatory Authority of Poland)','2023','Annual','Regulated','R2, R4'],
-    ['Grid Operations Data','Fingrid (Polish Transmission System Operator)','2024','Monthly','Regulated','R2, R4'],
+    ['Finnish Flood Risk Maps','FMI (Finnish Meteorological Institute)','2023','Multi-year','CC0','R1, R3'],
+    ['Winter Storm & Ice Load Data','SYKE Environmental Monitoring','2023','Annual','Regulated','R1, R3'],
+    ['Population & Economics','Tilastokeskus (Central Statistical Office of Finland)','2023','Annual','OGD','R2, R3'],
+    ['Energy Market Data','Energiavirasto (Energy Regulatory Authority of Finland)','2023','Annual','Regulated','R2, R4'],
+    ['Grid Operations Data','Fingrid (Finnish TSO)','2024','Monthly','Regulated','R2, R4'],
     ['Renewable Installations','CIRE (Central Database of Renewable Energy Installations)','2024','Monthly','Open','R4'],
-    ['Air Quality Monitoring','GIOŚ (Chief Inspectorate of Environmental Protection)','2023','Annual','CC-BY-4.0','R5'],
+    ['Air Quality Monitoring','SYKE (Finnish Environment Institute)','2023','Annual','CC-BY-4.0','R5'],
     ['Cybersecurity Index','ENISA','2024','Biennial','Open','R6'],
     ['DESI Connectivity','European Commission','2024','Annual','Open','R6'],
-    ['NIS2 Criticality','Polish Cyber Security Center (CSIRT)','2024','Annual','Regulated','R6'],
+    ['NIS2 Criticality','Finnish NCSC-FI (Traficom)','2024','Annual','Regulated','R6'],
     ['IEEE C57.91 Thermal Model','IEEE','Standard','N/A','Published','R1'],
     ['CIGRE TB 761 Markov','CIGRE','2019','N/A','Published','R1, R3'],
     ['ISO 9223 Corrosion','ISO','2012','N/A','Published','R5'],
@@ -791,13 +791,13 @@ function computeESGScores(d) {
   // R2 trajectory: check if p_crit_20yr exists
   if (d.markov?.p_crit_20yr !== undefined) { r1 += 0.15; } else { r1 = Math.min(r1 + 0.15, 0.85); }
 
-  // R2: Social — need socio_economic suite + coal-mining + migration
+  // R2: Social — need socio_economic suite + nuclear facility exposure + migration
   if (d.socio_economic?.V_socio) r2 += 0.20;
   if (d.socio_economic?.EP_rate_region) r2 += 0.15;
   if (d.socio_economic?.unemployment_rate) r2 += 0.10;
   if (d.socio_economic?.gdp_per_capita) r2 += 0.10;
   if (d.modifiers?.R3_C_mult) r2 += 0.15;
-  // coal-mining/migration: check if data exists
+  // nuclear facility exposure/migration: check if data exists
   if (d.socio_economic?.coal_mining_pct) r2 += 0.10;
   if (d.socio_economic?.population) r2 += 0.05;
 
@@ -856,8 +856,8 @@ function readinessText(score) {
 
 /* ── Helper: get data sources filtered for a specific report ── */
 function getReportSources(reportNum) {
-  const country = SSI_COUNTRY || 'poland';
-  const sources = COUNTRY_SOURCES[country] || COUNTRY_SOURCES.poland;
+  const country = SSI_COUNTRY || 'finland';
+  const sources = COUNTRY_SOURCES[country] || COUNTRY_SOURCES.finland;
   const tag = 'R' + reportNum;
   const filtered = sources.filter(row => {
     const reports = row[5] || '';
@@ -1235,9 +1235,9 @@ function seededIndex(seed, len) {
 }
 
 const DEMO_SUBSTATION = {
-  substation_id: 'PL_001_000', internal_id: '001_0', version: '4.0.2',
-  name: 'Substation Example', lon: 19.5, lat: 52.1, voltage_kv: 200,
-  region: 'Mazowieckie', province: 'Warszawa', kreis: 'Warszawa',
+  substation_id: 'FI_001_000', internal_id: '001_0', version: '4.0.2',
+  name: 'Substation Example', lon: 24.9, lat: 60.2, voltage_kv: 200,
+  region: 'Uusimaa', province: 'Uusimaa', kreis: 'Helsinki',
   classification: 'Low',
   band_pct: { Low: 100, Medium: 0, High: 0, Critical: 0 },
   confidence_pct: 'medium', R_median: 0.3231, R_mean: 0.3213,
@@ -1284,7 +1284,7 @@ async function loadSubstation(country) {
 
 /* ── Initialise ── */
 document.addEventListener('DOMContentLoaded', function() {
-  loadSubstation(SSI_COUNTRY || 'poland');
+  loadSubstation(SSI_COUNTRY || 'finland');
 });
 </script>
 

@@ -18,7 +18,7 @@
 <main class="page-shell">
   <div class="page-header animate-in">
     <h1>Data &amp; Download</h1>
-    <p>All 30 data sources are public, free, and independently verifiable. Download the full SSI dataset or explore source documentation. v4.0.2 — 95 variables, ~1,200 substations.</p>
+    <p>All 30 data sources are public, free, and independently verifiable. Download the full SSI dataset or explore source documentation. v4.0.2 — 95 variables, 532 substations.</p>
   </div>
 
   <!-- Data Status -->
@@ -118,42 +118,42 @@
           <td>Grid Telemetry: Fuzzy</td>
           <td class="num">12</td>
           <td><span class="band-badge medium" style="font-size:10px">FUZZY</span></td>
-          <td style="font-size:12px">IEEE/CIGRÉ standards · PIG</td>
+          <td style="font-size:12px">IEEE/CIGRÉ standards · VTT</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#a67cff">C</td>
-          <td>Socio-Economic + Coal Dependency</td>
+          <td>Socio-Economic + Nuclear Concentration</td>
           <td class="num">10</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">Tilastokeskus · Eurostat · NBP</td>
+          <td style="font-size:12px">Tilastokeskus · Eurostat · Bank of Finland</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#ff8c42">D</td>
-          <td>Environmental Hazards (Flood+Subsidence)</td>
+          <td>Environmental Hazards (Winter Storm+Flooding)</td>
           <td class="num">8</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">KZGW · WUG · PIG · Copernicus</td>
+          <td style="font-size:12px">FMI · SYKE · GTK · Copernicus</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#3b9eff">E</td>
-          <td>Polish Open Data + Energy Policy</td>
+          <td>Finnish Open Data + Energy Policy</td>
           <td class="num">9</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">ARE · FingridW · IEO · Energiavirasto</td>
+          <td style="font-size:12px">Fingrid · TEM · Energiavirasto · Statistics Finland</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:var(--sage)">F</td>
-          <td>Network Transitions + Coal Phase-out</td>
+          <td>Network Transitions + Energy Transition</td>
           <td class="num">12</td>
           <td><span class="band-badge medium" style="font-size:10px">BAYESIAN</span></td>
           <td style="font-size:12px">DSO history OR IEEE/CIGRÉ + priors</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#22d3ee">G</td>
-          <td>Modifier Inputs (Flood-Weighted)</td>
+          <td>Modifier Inputs (Winter Storm-Weighted)</td>
           <td class="num">4</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">Energiavirasto reliability · KZGW · OSM</td>
+          <td style="font-size:12px">Energiavirasto reliability · FMI · OSM</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#e67e22">H</td>
@@ -469,9 +469,9 @@ fetch('ssi-data.json?v=46').then(function(r) { return r.json(); }).then(function
         { title: 'SSI v4.0.2 Composite Formula', text: 'R = softclip( w_C·C + w_V·V + w_I·I + w_E·E + w_S·S + w_T·T ) × R3 × R4 × R6a × R6b × R7\n\nwhere softclip(x) = 1 / (1 + exp(-12·(x - 0.5))) compresses overflow beyond [0,1].' },
         { title: 'Component Weights', text: 'w_C = 0.30  Condition (asset health & age)\nw_V = 0.10  Vulnerability (exposure to hazards)\nw_I = 0.25  Importance (criticality & load)\nw_E = 0.10  Environment (socio-economic context)\nw_S = 0.20  Stress (DER penetration & grid strain)\nw_T = 0.05  Transition (energy transition readiness)' },
         { title: 'Modifier Functions', text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence regions\nR4 — Graph criticality: betweenness centrality & bridge status from Fingrid network topology\nR6a — Restoration speed: Energiavirasto historical CAIDI or Bayesian estimate\nR6b — Network topology: Centrality and ring topology from physical network analysis\nR7 — Digital readiness: regulatory baseline & smart meter penetration proxy' },
-        { title: 'Monte Carlo Uncertainty', text: '10,000 iterations per substation\nEach metric perturbed ± based on confidence tier:\n  Tier A (measured): σ = 5%\n  Tier B (proxy): σ = 12%\n  Tier C (fuzzy): σ = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
+        { title: 'Monte Carlo Uncertainty', text: '2,000 iterations per substation\nEach metric perturbed ± based on confidence tier:\n  Tier A (measured): σ = 5%\n  Tier B (proxy): σ = 12%\n  Tier C (fuzzy): σ = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
         { title: 'Classification Bands', text: 'LOW risk: R_median < 0.25\nMEDIUM: 0.25 ≤ R < 0.50\nHIGH: 0.50 ≤ R < 0.75\nCRITICAL: R_median ≥ 0.75' },
-        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0.2 Resilience (20 vars): SAIDI/SAIFI, asset condition, topology\nB.1 — Grid Telemetry Open (3 vars): meteorology, Fingrid monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves\nC — Socio-Economic + Coal Dependency (10 vars): income, coal exposure, digital readiness\nD — Environmental Hazards (8 vars): floods, subsidence, mining risk, corrosion\nE — Polish Open Data (9 vars): ARE, FingridW, IEO, Energiavirasto indicators\nF — Network Transitions + Coal Phase-out (12 vars): state transition probabilities\nG — Modifier Inputs (4 vars): Energiavirasto quality, topology, flood weighting\nH — Network & Topology (7 vars): Fingrid data, ENTSO-E, ring analysis\nI — Output Scores + Alert Flags (7 vars): risk score, alert flags, stationary probabilities' },
+        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0.2 Resilience (20 vars): SAIDI/SAIFI, asset condition, topology\nB.1 — Grid Telemetry Open (3 vars): meteorology, Fingrid monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves\nC — Socio-Economic + Nuclear Concentration (10 vars): income, nuclear exposure, digital readiness\nD — Environmental Hazards (8 vars): winter storms, snow loading, flooding, corrosion\nE — Finnish Open Data (9 vars): Fingrid, TEM, Energiavirasto indicators\nF — Network Transitions + Energy Transition (12 vars): state transition probabilities\nG — Modifier Inputs (4 vars): Energiavirasto quality, topology, flood weighting\nH — Network & Topology (7 vars): Fingrid data, ENTSO-E, ring analysis\nI — Output Scores + Alert Flags (7 vars): risk score, alert flags, stationary probabilities' },
         { title: 'Normalisation', text: 'All metrics normalised to [0, 1] using fleet percentile scaling.\nHigher score = higher risk. Inverted metrics (where high raw value = low risk) are flipped: x_norm = 1 - (x - P5) / (P95 - P5).' }
       ];
 
@@ -529,14 +529,14 @@ fetch('ssi-data.json?v=46').then(function(r) { return r.json(); }).then(function
     '  <span class="hl-var">"transition"</span>: { ' +
       '<span class="hl-num">"T1_score"</span>: ' + (s.transition && s.transition.T1_score ? s.transition.T1_score.toFixed(3) : '—') + ', ' +
       '<span class="hl-num">"renewable_mw"</span>: ' + (s.transition && s.transition.renewable_mw ? s.transition.renewable_mw.toFixed(1) : '—') + ', ' +
-      '<span class="hl-num">"coal_retirement_score"</span>: ' + (s.transition && s.transition.coal_retirement_score ? s.transition.coal_retirement_score.toFixed(1) : '—') + ' },\n' +
+      '<span class="hl-num">"nuclear_concentration"</span>: ' + (s.transition && s.transition.nuclear_concentration ? s.transition.nuclear_concentration.toFixed(1) : '—') + ' },\n' +
     '  <span class="hl-var">"confidence_tier"</span>: <span class="hl-num">"' + s.confidence_tier + '"</span>\n' +
     '}';
   document.getElementById('schema-block').innerHTML = schemaHTML;
 }).catch(function() {
-  document.getElementById('data-subs').textContent = '2,248';
-  document.getElementById('data-subs-sub').textContent = '~1,200 substations · 16 regions';
-  document.getElementById('dl-full-info').textContent = '~1,200 substations · all fields';
+  document.getElementById('data-subs').textContent = '532';
+  document.getElementById('data-subs-sub').textContent = '532 substations · 19 maakunnat';
+  document.getElementById('dl-full-info').textContent = '532 substations · all fields';
   document.getElementById('schema-block').innerHTML = '<span style="color:var(--warm-grey)">ssi-data.json not yet loaded — schema sample will appear once the dataset is uploaded.</span>';
 });
 </script>
