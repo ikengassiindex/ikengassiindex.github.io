@@ -139,7 +139,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json?v=51').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=52').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -184,7 +184,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       { key: 'R3_C_mult', label: 'R3 Consequence' },
       { key: 'R4_F_topo', label: 'R4 Graph Criticality' },
       { key: 'R6_restoration', label: 'R6a Restoration' },
-      { key: 'R6_seismic', label: 'R6b Seismic/Hazard' },
+      { key: 'R6_seismic', label: 'R6b Winter Storm + Rime' },
       { key: 'R7_cyber', label: 'R7 Digital Readiness' }
     ];
     var modHTML = modDefs.map(function(m){
@@ -363,7 +363,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=51').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=52').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -494,7 +494,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       var p50 = r3vals[Math.floor(r3vals.length * 0.50)];
       var p75 = r3vals[Math.floor(r3vals.length * 0.75)];
       return [
-        { label: 'Heavy Industry / Mining', desc: 'Nuclear plants, paper mills, electronics manufacturing in Oslo and Bergen — highest economic loss per interruption',
+        { label: 'Heavy Industry / Aluminium', desc: 'Aluminium smelters, process industry, petroleum refining in Rogaland and Vestland — highest economic loss per interruption',
           filter: function(s){ return s.modifiers.R3_C_mult >= p75; }, color: '#941914', icon: '⚙️',
           voll: 'NOK 15–30/kWh' },
         { label: 'Manufacturing / Food Processing', desc: 'Auto suppliers, food & beverage production, pharmaceuticals — significant continuity requirements for EU supply chains',
@@ -828,7 +828,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">Quarterly <span style="font-weight:400;color:var(--warm-grey)">(4 sources)</span></span><span style="color:var(--warm-grey);font-size:11px">DER registry + Statnett SF performance data</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden"><div style="width:60%;height:100%;background:#b8863a;border-radius:3px;opacity:0.7"></div></div></div>' +
     '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">Annual <span style="font-weight:400;color:var(--warm-grey)">(14 sources)</span></span><span style="color:var(--warm-grey);font-size:11px">Core grid quality + SSB (Statistisk sentralbyrå) demographics</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden"><div style="width:100%;height:100%;background:#aa4234;border-radius:3px;opacity:0.7"></div></div></div>';
 
-  fetch('ssi-data.json?v=51').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=52').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -920,7 +920,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h2>The Oslo–Bergen Grid Corridor: Where Nuclear Concentration and Winter Storm Resilience Challenge Grid Stability</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Oslo–Bergen hydropower dominance and winter storm resilience corridor · <strong>002</strong> Eastern Norway DER & EU funding mismatch · <strong>003</strong> Mining subsidence infrastructure stress · <strong>004</strong> Metropolitan-Rural energy poverty disparity · <strong>005</strong> Grid stranding risk (hydropower-dependent assets) · <strong>006</strong> DSO smart meter rollout vs grid stress · <strong>007</strong> Gulf of Norway coastal flooding resilience · <strong>008</strong> T-component forward projections · <strong>009</strong> Fylke Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Oslo–Bergen hydropower dominance and winter storm resilience corridor · <strong>002</strong> Eastern Norway DER & EU funding mismatch · <strong>003</strong> Arctic rime ice and avalanche infrastructure stress · <strong>004</strong> Metropolitan-Rural energy poverty disparity · <strong>005</strong> Grid stranding risk (hydropower-dependent assets) · <strong>006</strong> DSO smart meter rollout vs grid stress · <strong>007</strong> Gulf of Norway coastal flooding resilience · <strong>008</strong> T-component forward projections · <strong>009</strong> Fylke Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
 </div>
 
 <!-- D.1 KPI summary — auto-populated -->
@@ -1007,7 +1007,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=51').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=52').then(function(r){ return r.json(); }).then(function(data){
     var puglia = data.substations.filter(function(s){ return s.province === 'Oslo' || s.region === 'Oslo' || s.province === 'Bergen' || s.region === 'Bergen'; });
     if (puglia.length === 0) puglia = data.substations.slice(0, Math.floor(data.substations.length * 0.3));
     var fleet = data.substations;
@@ -1175,7 +1175,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       { key: 'R3_C_mult', label: 'R3 Consequence', range: '[0.70, 1.30]' },
       { key: 'R4_F_topo', label: 'R4 Graph Crit.', range: '[0.80, 1.35]' },
       { key: 'R6_restoration', label: 'R6a Restoration', range: '[0.90, 1.10]' },
-      { key: 'R6_seismic', label: 'R6b Mining/Flood', range: '[1.00, 1.25]' },
+      { key: 'R6_seismic', label: 'R6b Winter Storm + Avalanche', range: '[1.00, 1.25]' },
       { key: 'R7_cyber', label: 'R7 Digital Read.', range: '[0.99, 1.05]' }
     ];
     var modBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Modifier Averages — Corridor vs Fleet</div>';
@@ -1362,7 +1362,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=51').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=52').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var puglia = fleet.filter(function(s){ return s.province === 'Oslo' || s.region === 'Oslo' || s.province === 'Bergen' || s.region === 'Bergen' || (s.province || '').indexOf('corridor') >= 0; });
     if (puglia.length === 0) puglia = fleet.slice(0, Math.floor(fleet.length * 0.3));
@@ -1569,7 +1569,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       conceptsHTML +
     '</div>';
 
-  fetch('ssi-data.json?v=51').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=52').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
