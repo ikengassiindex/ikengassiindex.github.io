@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Gap Audit (Sweden)</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Helvetica Neue',sans-serif; color:var(--ink); background:var(--paper); font-size:13px; line-height:1.6; }
+.page { max-width:1200px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.mono { font-family:'Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:monospace; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-full { background:#d5f5e3; color:#1a6b4a; }
+.tag-partial { background:#fff3cd; color:#856404; }
+.tag-gap { background:#fadbd8; color:#922b21; }
+.tag-proxy { background:#ebdef0; color:#6c3483; }
+.tag-na { background:#d6eaf8; color:#1a5276; }
+.sev-high { color:#922b21; font-weight:700; }
+.sev-med { color:#856404; font-weight:700; }
+.sev-low { color:#1a6b4a; font-weight:700; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+.summary-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin:1.5rem 0; }
+.summary-card { background:#fff; border:1px solid var(--border); border-radius:6px; padding:0.8rem; text-align:center; }
+.summary-card .number { font-size:1.6rem; font-weight:700; font-family:monospace; }
+.summary-card .label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Gap Audit (Sweden)</h1>
+<p class="subtitle">Data Availability Assessment · Coverage Gaps · Quality Concerns · Mitigation Strategies · Pre-Ingestion Planning</p>
+<div class="meta">
+  <span><strong>Country:</strong> Sweden (SE)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Variables Assessed:</strong> 95</span>
+  <span><strong>Phase:</strong> Pre-Ingestion Planning</span>
+</div>
+
+<!-- COVERAGE SUMMARY -->
+<h2>Coverage Summary</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="number" style="color:var(--accent3)">60</div><div class="label">Full Coverage (63%)</div></div>
+  <div class="summary-card"><div class="number" style="color:#856404">15</div><div class="label">Partial Coverage (16%)</div></div>
+  <div class="summary-card"><div class="number" style="color:#6c3483">11</div><div class="label">Proxy / Model (12%)</div></div>
+  <div class="summary-card"><div class="number" style="color:var(--accent)">4</div><div class="label">Gap (4%)</div></div>
+  <div class="summary-card"><div class="number" style="color:var(--accent2)">5</div><div class="label">Derived / N/A (5%)</div></div>
+</div>
+
+<p class="note"><strong>Overall Assessment:</strong> Sweden has excellent open data infrastructure comparable to Finland. SMHI (Swedish Meteorological and Hydrological Institute) operates ~700 weather stations, superior to FMI's ~200 (excellent Arctic/boreal coverage). SCB (Statistics Sweden) provides granular register-based statistics and demographic data annually. Svenska kraftnät publishes real-time generation and system adequacy data. Estimated coverage ~93% (slightly better than Finland due to SMHI's denser weather network). Main gaps: DSO fragmentation (~170 operators), substation vintage (pre-1980 records sparse), Arctic-specific equipment condition models, Kiruna mine subsidence infrastructure impacts.</p>
+
+<!-- GAP 1: DATA AVAILABILITY -->
+<h2>1. Data Availability Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Gap Description</th><th>Severity</th><th>Mitigation</th><th>Fallback Value</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GA-1</td>
+  <td class="mono">I4, B1.2, F.7</td>
+  <td><strong>Substation vintage (installation year):</strong> ~170 DSOs fragmented across Sweden with different archival practices. Pre-1980 records sparse, especially rural electrification era. OSM start_date coverage ~55% for Sweden. Swedish electrification timeline: 1920s–50s (hydro build-out), 1960s–80s (nuclear era), 2000s+ (wind/renewable expansion).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Extract vintage from DSO aggregate fleet reports. Apply Swedish electrification timeline: 1920s–50s (hydro infrastructure), 1960s–80s (nuclear expansion), 2000s+ (wind integration). OSM start_date where available. Cross-reference with Svenska kraftnät transmission asset maps. Ei-regulated data requests for standardization.</td>
+  <td>Cohort-based age (median vintage per Län × σ)</td>
+</tr>
+<tr>
+  <td class="mono">GA-2</td>
+  <td class="mono">C3, C4</td>
+  <td><strong>Voltage quality per-substation:</strong> Ei (Swedish Energy Markets Inspectorate) publishes aggregate compliance. Per-DSO voltage quality variable across fragmented operators. Regional variation not granular beyond Län level.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Ei compliance rates + DSO annual SAIDI/SAIFI reports. Apply regional variation (industrial zones worse than rural areas). Markov input: C3 = 0.94 (exceeds EU standards), C4 from system-level metrics. Swedish grid reliability excellent; Arctic climate IMPROVES reliability (fewer summer thunderstorms than Central Europe).</td>
+  <td>C3 = 0.94 (Sweden compliance), C4 from Ei system-level database</td>
+</tr>
+<tr>
+  <td class="mono">GA-3</td>
+  <td class="mono">B3.1–B3.9</td>
+  <td><strong>Equipment condition (transformer oil, insulation, grounding):</strong> Elsäkerhetsverket (Swedish Electrical Safety Agency) conducts inspections but results restricted. No per-substation condition data published. Svenska kraftnät owns transmission equipment with better metadata.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Apply IEEE C57.91 + CIGRÉ TB 761 models. Calibrate to SMHI temperature norms and Svenska kraftnät load history. Arctic cold PRESERVES insulation (lower thermal aging vs temperate regions). Widen σ in MC for pre-1980 equipment. Arctic advantage: mean annual temperature ~2°C in Norrbotten reduces thermal stress aging significantly.</td>
+  <td>Age-based curves (CIGRÉ TB 761) with κ_thermal [0.84–0.94] (Arctic benefit)</td>
+</tr>
+<tr>
+  <td class="mono">GA-4</td>
+  <td class="mono">V2</td>
+  <td><strong>Critical infrastructure dependency:</strong> SCB register-based system available with excellent coverage. Per-substation mapping feasible via spatial analysis. OSM completeness ~85% for Sweden (excellent Nordic coverage, even Norrbotten strong).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use SCB municipal facility counts (hospitals, schools, emergency services) by Kommune. Geofence within 10 km. Industrial zones: use Factory/Mine registries (LKAB iron ore operations). Population density weighting. Better OSM coverage than Finland reduces uncertainty.</td>
+  <td>Kommune-level critical facility count × pop density</td>
+</tr>
+<tr>
+  <td class="mono">GA-5</td>
+  <td class="mono">E2</td>
+  <td><strong>Employment by sector (β decomposition):</strong> SCB SNI 2007 (NACE equivalent) provides excellent employment by Län. Sector mapping to β weights requires standard mapping. Quarterly labor force survey available.</td>
+  <td class="sev-low">LOW</td>
+  <td>Map SNI to β_H/β_M/β_L. SNI B (mining—LKAB critical) + C (manufacturing) → β_H. SNI D-E (utilities) → β_H. SNI F-N (construction/services) → β_M. Use SCB quarterly labor force survey for interpolation.</td>
+  <td>National average β scaled by Län employment</td>
+</tr>
+<tr>
+  <td class="mono">GA-6</td>
+  <td class="mono">C.3</td>
+  <td><strong>Energy poverty temporal:</strong> SCB + Eurostat SILC provide data. Sweden has lower energy poverty than EU average (~4%, similar to Finland). Annual coverage available.</td>
+  <td class="sev-low">LOW</td>
+  <td>Use most recent SCB/Eurostat year. Sweden's advantage: high social support, low poverty baseline. Wider σ unnecessary. Widen σ 0.02/yr for interpolation years (lower than Poland due to stability).</td>
+  <td>Most recent SCB + linear interpolation</td>
+</tr>
+<tr>
+  <td class="mono">GA-7</td>
+  <td class="mono">F.5, F.6, F.12</td>
+  <td><strong>Markov recovery rates (maintenance CAPEX):</strong> Ei publishes aggregate CAPEX by DSO/year. Per-substation data unavailable but Swedish DSOs well-capitalized and technologically advanced.</td>
+  <td class="sev-low">LOW</td>
+  <td>Use Ei regulatory database (CAPEX as % of revenue). Swedish DSOs historically excellent maintenance investment. Apply 1.03–1.09× multiplier vs CIGRÉ baseline (positive deviation from standard).</td>
+  <td>CIGRÉ TB 761 × 1.06 (Sweden maintenance quality factor)</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 2: RESOLUTION GAPS -->
+<h2>2. Resolution Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Available Resolution</th><th>Desired Resolution</th><th>Gap</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GR-1</td>
+  <td class="mono">C1, C2, G.1 (CAIDI)</td>
+  <td>Län (21) or DSO level</td>
+  <td>Substation or district</td>
+  <td class="sev-med">Regional fragmentation</td>
+  <td>Within-Län from SCB demographics. Ei publishes annual SAIDI by DSO. Sub-regional from power density (load per km²). Sweden's administrative structure: 21 Län (~5,000–10,000 km² each) + 290 Kommune (smaller, detailed statistics available).</td>
+</tr>
+<tr>
+  <td class="mono">GR-2</td>
+  <td class="mono">S1 (grid capacity)</td>
+  <td>System-wide (Svenska kraftnät) or Län</td>
+  <td>Substation or transmission line</td>
+  <td class="sev-low">Regional-level</td>
+  <td>Svenska kraftnät publishes system adequacy reports and bidding zone maps (SE1–SE4 bidding zones reveal regional capacity bottlenecks). Sub-regional capacity hidden. Fallback: uniform within Län adjusted by demand density.</td>
+</tr>
+<tr>
+  <td class="mono">GR-3</td>
+  <td class="mono">V1 (VoLL)</td>
+  <td>Län from Ei tariff studies</td>
+  <td>Substation or DSO area</td>
+  <td class="sev-low">Län-level</td>
+  <td>Use SCB economic data (GDP by Län). Apply sector weighting (industrial areas higher VoLL than rural/forest regions). North-south transmission bottleneck (SE1→SE4 price differentials) reflects regional VoLL variation.</td>
+</tr>
+<tr>
+  <td class="mono">GR-4</td>
+  <td class="mono">I1, I3, I5 (weather)</td>
+  <td>SMHI ~700 stations, excellent coverage including Arctic Norrbotten</td>
+  <td>Substation exact location</td>
+  <td class="sev-low">Excellent</td>
+  <td>IDW from nearest 3 SMHI stations. Copernicus ERA5 0.25° grid as backup. SMHI coverage superior to FMI (Finland). Excellent Arctic/boreal station density. Mountain snow modeling excellent (Swedish mountains, Norrbotten highlands).</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 3: TEMPORAL GAPS -->
+<h2>3. Temporal / Frequency Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Available Freq.</th><th>Desired Freq.</th><th>Staleness Risk</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GT-1</td>
+  <td class="mono">D-SCB (Census, Demographics)</td>
+  <td>Census + annual register-based updates</td>
+  <td>Annual</td>
+  <td class="sev-low">LOW</td>
+  <td>Sweden's population register updated continuously (not decennial like others). Annual demographic data available. δ_staleness = 0.01/yr (excellent).</td>
+</tr>
+<tr>
+  <td class="mono">GT-2</td>
+  <td class="mono">C.3 (income/poverty)</td>
+  <td>SCB annual + Eurostat SILC biennial</td>
+  <td>Annual</td>
+  <td class="sev-low">LOW</td>
+  <td>SCB provides annual income data. Eurostat SILC adds EU-harmonized poverty measure. δ_staleness = 0.02/yr for SILC off-years (low due to stability).</td>
+</tr>
+<tr>
+  <td class="mono">GT-3</td>
+  <td class="mono">D6, G.1 (SAIDI/CAIDI)</td>
+  <td>Annual (Ei publishes Q2 following year)</td>
+  <td>Quarterly</td>
+  <td class="sev-low">LOW</td>
+  <td>Ei annual reliability report. Svenska kraftnät publishes monthly system metrics real-time. δ_staleness = 0.03/yr.</td>
+</tr>
+<tr>
+  <td class="mono">GT-4</td>
+  <td class="mono">D-DSO (utility reports)</td>
+  <td>Annual (published Q1–Q2)</td>
+  <td>Quarterly</td>
+  <td class="sev-low">LOW</td>
+  <td>Ei collects annual data from DSOs. δ_staleness = 0.05/yr (lower than Poland).</td>
+</tr>
+<tr>
+  <td class="mono">GT-5</td>
+  <td class="mono">Seismic monitoring (SGU)</td>
+  <td>Continuous + annual reports</td>
+  <td>Real-time</td>
+  <td class="sev-low">LOW</td>
+  <td>SGU (Swedish Geological Survey) monitors postglacial rebound and limited seismic activity. Sweden is seismically quiet (risk near zero). SGU provides near real-time monitoring. Excellent coverage.</td>
+</tr>
+<tr>
+  <td class="mono">GT-6</td>
+  <td class="mono">Flood risk (SMHI)</td>
+  <td>Continuous monitoring + annual flood season updates</td>
+  <td>Annual</td>
+  <td class="sev-low">LOW</td>
+  <td>SMHI flood risk maps comprehensive (spring flooding in Dalälven, Ångermanälven, major river systems). SMHI real-time river monitoring supplements. δ_staleness low due to slow geomorphological change in boreal climate.</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 4: QUALITY CONCERNS -->
+<h2>4. Data Quality Concerns</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Quality Concern</th><th>Severity</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GQ-1</td>
+  <td class="mono">D7, G.2 (OSM power graph)</td>
+  <td><strong>OSM completeness for Swedish power infrastructure:</strong> OSM coverage ~85% for HV in Sweden. Better in urban areas (Stockholm, Gothenburg, Malmö ~92%), good in northern regions (~80%).</td>
+  <td class="sev-high">HIGH</td>
+  <td>Cross-validate with Svenska kraftnät transmission map (published). Supplement with DSO data requests. Lantmäteriet (Land Survey Agency) has authoritative infrastructure layers. Flag sparse regions with lower confidence (minimal in Sweden due to excellent mapping).</td>
+</tr>
+<tr>
+  <td class="mono">GQ-2</td>
+  <td class="mono">H.2 (Seismic hazard)</td>
+  <td><strong>SGU monitoring — postglacial rebound:</strong> Sweden experiences postglacial rebound (mm/yr uplift) but not infrastructure-relevant. Natural seismicity essentially zero. SGU monitoring excellent but not critical for SSI.</td>
+  <td class="sev-low">LOW</td>
+  <td>Seismic risk treated as zero (confidence high). SGU data available for completeness. No need for σ_spatial amplification. Postglacial rebound affects GPS not substations.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-3</td>
+  <td class="mono">H.4, H.5 (ISO 9223 corrosion)</td>
+  <td><strong>Corrosion class varies with coastal/industrial proximity:</strong> Coastal (Gothenburg, Malmö, Baltic Sea) C3–C4. Industrial zones C3. Inland C1–C2. Arctic climate does NOT increase corrosion. Permafrost in Norrbotten irrelevant for corrosion.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use air quality data (SMHI/Swedish EPA) for industrial corrosion. Distance-from-coast for Baltic zones. Arctic cold actually PROTECTS (lower humidity, less salt spray reaction). Applied 0.9× corrosion rate for inland Arctic zones.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-4</td>
+  <td class="mono">T1 (DER + EV)</td>
+  <td><strong>Svenska kraftnät + IEA DER registries:</strong> Svenska kraftnät publishes generation mix real-time. Wind growing rapidly (excellent renewable resource). Small PV (<50 kW) underreported. EV charging data fragmented.</td>
+  <td class="sev-low">LOW</td>
+  <td>Svenska kraftnät for utility-scale. Apply 1.15–1.3× for unregistered small PV (growing segment). EV from Swedish Transport Administration (Trafikverket) and charging network operators. Wind integration excellent via Svenska kraftnät real-time dashboards.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-5</td>
+  <td class="mono">D4 (Flood risk)</td>
+  <td><strong>Spring flood potential:</strong> SMHI maps provide excellent baseline. Arctic thaw timing affects spring flood magnitude (Dalälven, Ångermanälven river systems). Climate change may extend flood season duration. Major river flood corridors well-documented.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Model two scenarios: (1) Historical flood frequency (SMHI baseline). (2) Climate-enhanced (CMIP6 RCP4.5, 1.2–1.4× flood frequency by 2050, shifted season). Use SMHI real-time river monitoring. Flag major river corridors (Dalälven, Ångermanälven, Torneälven) as moderate uncertainty vs coastal areas.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-6</td>
+  <td class="mono">C.6 (Migration)</td>
+  <td><strong>International + domestic migration:</strong> Sweden experiences migration from EU/Nordic countries (labor) and some refugee/asylum migration. SCB tracks accurately. Population growth ~0.7%/yr.</td>
+  <td class="sev-low">LOW</td>
+  <td>Use SCB migration data. Population growth ~0.7%/yr, primarily labor migration. Domestic migration toward urban centers (Stockholm, Gothenburg). Monitor quarterly updates. Slightly higher migration effect than Finland.</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 5: SWEDEN-SPECIFIC GAPS -->
+<h2>5. Sweden-Specific Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Issue</th><th>Impact</th><th>Severity</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">SA-1</td>
+  <td><strong>DSO fragmentation (~170 operators):</strong> Highly fragmented distribution system across 21 Län and 290 Kommune. Different IT systems, reporting standards, data formats. Consolidation minimal vs other Nordic countries.</td>
+  <td>Metadata inconsistency, asset ID conflicts, regional comparison difficult. Data aggregation complexity high. Larger fragmentation challenge than Finland.</td>
+  <td class="sev-high">HIGH</td>
+  <td>Build DSO-specific ingestion pipelines. Ei regulatory filings provide unified view (annual). Request standardized data via Ei coordination. Document all reconciliation decisions. Target largest 50 DSOs first (cover ~85% of grid).</td>
+</tr>
+<tr>
+  <td class="mono">SA-2</td>
+  <td><strong>Arctic equipment aging models (Norrbotten/Västerbotten):</strong> Standard CIGRÉ models assume temperate climate. Arctic conditions (cold, low humidity, permafrost risk in Norrbotten) create different aging profiles.</td>
+  <td>Equipment condition curves (B3) may overestimate degradation for Arctic-adapted equipment. Transformer insulation ages slower in cold. Norrbotten ~14% of Swedish land area.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Apply Arctic thermal adjustment: κ_thermal = 0.84–0.94 (vs standard 1.0). SMHI temperature norms validate. Cold climates preserve paper insulation. Widen literature search to Nordic utilities (Vattenfall SE/NO, Statnett) for Arctic calibration data.</td>
+</tr>
+<tr>
+  <td class="mono">SA-3</td>
+  <td><strong>North-south transmission bottleneck (SE1→SE4 bidding zones):</strong> Sweden's power system divided into 4 bidding zones (SE1 north, SE2 middle, SE3 south, SE4 southeast). Chronic transmission constraints between zones. Nord-south price differentials reflect bottleneck.</td>
+  <td>Grid capacity constraints affect VoLL (V1), system adequacy (S1), and congestion pricing. Historical load flow patterns may not reflect future bottlenecks as demand shifts (electrification, data centers). Bidding zone structure impacts regional resilience assessment.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Svenska kraftnät bidding zone maps and historical price differentials. Model three scenarios: (1) Current topology (SE1–SE4 constraints). (2) New transmission capacity (planned lines). (3) Demand shift (electrification). Flag SE1→SE2 and SE3→SE4 corridors as critical for resilience. Monitor Vindkraft (wind) capacity growth in SE1 (north).</td>
+</tr>
+<tr>
+  <td class="mono">SA-4</td>
+  <td><strong>Kiruna mine subsidence (LKAB iron ore):</strong> World's largest underground iron ore mine (LKAB, Norrbotten). Subsidence causing town relocation (Kiruna ~18,000 people). Affects ~2 km radius of substations/infrastructure. Unique localized hazard.</td>
+  <td>Foundation destabilization risk for substations/poles near Kiruna. Subsidence depth ~1.2 m expected (2020s–2040s). Grid infrastructure may require relocation or hardening. Geological hazard H layer impact localized but severe.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Identify substations within 2 km radius of Kiruna mine (est. ~5–10 substations). Request LKAB subsidence projections and timeline. Flag affected assets with higher structural risk multiplier (1.2–1.5× foundation failure probability). Monitor SGU/LKAB updates for subsidence progression. Plan infrastructure relocation contingency.</td>
+</tr>
+<tr>
+  <td class="mono">SA-5</td>
+  <td><strong>Nuclear decommissioning (Forsmark, Ringhals, Oskarshamn):</strong> Sweden has 6 operating nuclear reactors at 3 sites. Decommissioning planned 2020s–2040s with extended timelines. Grid reconfiguration uncertainty.</td>
+  <td>Nuclear plants supply ~40% of Swedish generation. Decommissioning will require substantial new capacity (renewable + grid storage). Grid topology may change (new interconnects, backup substations, transmission upgrades).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Model three scenarios: (1) Extended operation through 2045. (2) Decommissioning 2030s–2040s (policy baseline). (3) Accelerated to 2030s (less likely). Svenska kraftnät publishes long-term infrastructure plans. Monitor Strålsäkerhetsmyndigheten (SSM, radiation authority) timeline and grid adaptation plans.</td>
+</tr>
+<tr>
+  <td class="mono">SA-6</td>
+  <td><strong>Gotland island grid (separate, submarine cable):</strong> Gotland Islands (autonomous region with separate power system). Connected to mainland via two 70 km submarine cables (HVDC). Limited DSO coverage data. Island infrastructure fragile.</td>
+  <td>~60,000 population, small grid. Data sparse. Island infrastructure dependent on submarine cable reliability (rare failure but catastrophic). Island-specific vulnerability profile different from mainland.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Treat Gotland separately. Request Gotland's DSO data directly. Island grid simpler (lower asset count ~200–300 substations). Apply island-specific fragility (submarine cable vulnerability, limited backup capacity). Cable failure = island blackout. Request cable reliability from Svenska kraftnät.</td>
+</tr>
+<tr>
+  <td class="mono">SA-7</td>
+  <td><strong>Permafrost monitoring in Norrbotten/Lapland:</strong> Permafrost exists in northern Norrbotten (small area ~2% of land). Affects foundation stability for poles/towers. Thaw risk from climate change.</td>
+  <td>Foundation degradation in permafrost zones. Pole instability risk elevated in high-latitude locations. Geological hazard H layer impact limited but localized. Permafrost line migrating southward (climate change).</td>
+  <td class="sev-low">LOW</td>
+  <td>SGU monitors permafrost (MAAT tracking, Abisko research site). Flag substations/lines in permafrost zones (latitude >66°N with peaty soils, north Norrbotten). Apply 1.1–1.2× foundation risk multiplier for affected assets. Risk limited geographically (~2% of land). Monitor migration of permafrost boundary (~50 m/decade southward).</td>
+</tr>
+</tbody>
+</table>
+
+<!-- COVERAGE MATRIX -->
+<h2>6. Coverage Matrix by Layer</h2>
+
+<table>
+<thead><tr><th>Layer</th><th>Vars</th><th style="background:var(--accent3);color:#fff">Full</th><th style="background:#856404;color:#fff">Partial</th><th style="background:#6c3483;color:#fff">Proxy</th><th style="background:var(--accent);color:#fff">Gap</th><th style="background:var(--accent2);color:#fff">Derived</th><th>Overall</th></tr></thead>
+<tbody>
+<tr><td class="mono">A — Resilience</td><td class="num">20</td><td class="num">13</td><td class="num">3</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td><span class="tag tag-full">85%</span></td></tr>
+<tr><td class="mono">B.1 — Open</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">B.2 — Proxy</td><td class="num">4</td><td class="num">3</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">B.3 — Fuzzy</td><td class="num">12</td><td class="num">4</td><td class="num">2</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td><span class="tag tag-partial">78%</span></td></tr>
+<tr><td class="mono">C — Socio</td><td class="num">9</td><td class="num">8</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">D — Environ.</td><td class="num">7</td><td class="num">6</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">E — Open Data</td><td class="num">8</td><td class="num">7</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">F — Markov In</td><td class="num">12</td><td class="num">5</td><td class="num">2</td><td class="num">3</td><td class="num">2</td><td class="num">0</td><td><span class="tag tag-partial">75%</span></td></tr>
+<tr><td class="mono">G — Modifiers</td><td class="num">3</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">H — Hazard</td><td class="num">7</td><td class="num">5</td><td class="num">1</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td><span class="tag tag-full">86%</span></td></tr>
+<tr><td class="mono">I — Markov Out</td><td class="num">7</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">7</td><td><span class="tag tag-na">DERIVED</span></td></tr>
+<tr><td class="mono">ID — Join Keys</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr style="border-top:2px solid var(--ink);font-weight:700"><td>Total</td><td class="num">95</td><td class="num">60</td><td class="num">15</td><td class="num">11</td><td class="num">4</td><td class="num">5</td><td></td></tr>
+</tbody>
+</table>
+
+<div class="note">
+  <strong>Overall assessment:</strong> Pre-deployment coverage: 60 variables fully covered (63%), 15 partially covered (16%), 11 proxy/model-based (12%), 4 true gaps (4%), 5 derived (5%). True gaps: (1) DSO fragmentation (~170 operators) affects substation vintage. (2) Arctic equipment condition models need calibration. (3) North-south transmission bottleneck requires bidding zone mapping. (4) Kiruna mine subsidence impacts localized infrastructure. <strong>Advantages:</strong> (1) SMHI open data (~700 stations, world-class meteorology), (2) SCB register-based census (annual, excellent), (3) EU membership (Eurostat/ENTSO-E), (4) Svenska kraftnät transparency (real-time generation, system adequacy, bidding zones), (5) Excellent OSM coverage (~85% HV). (6) Arctic cold preserves equipment condition (thermal aging advantage). <strong>Remaining challenges:</strong> (1) DSO consolidation minimal (170 operators), (2) Nuclear decommissioning timeline, (3) Kiruna mine subsidence, (4) Gotland island grid vulnerability, (5) North-south transmission bottleneck, (6) Permafrost monitoring in Norrbotten.
+</div>
+
+<!-- PRE-INGESTION VALIDATION -->
+<h2>7. Pre-Ingestion Validation Priorities</h2>
+
+<table>
+<thead><tr><th>Priority</th><th>Task</th><th>Owner</th><th>Timeline</th><th>Dependency</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">P1</td>
+  <td><strong>DSO contact outreach:</strong> Request standardized asset data (vintage, location, voltage) from ~170 DSOs via Ei coordination. Target largest 50 first for rapid coverage.</td>
+  <td>Ei liaison</td>
+  <td>2026-04 to 2026-07</td>
+  <td>GA-1, SA-1</td>
+</tr>
+<tr>
+  <td class="mono">P2</td>
+  <td><strong>Svenska kraftnät integration:</strong> Real-time API access for generation, load, constraints. Bidding zone maps (SE1–SE4). Historical topology and transmission capacity bottlenecks.</td>
+  <td>Svenska kraftnät data team</td>
+  <td>2026-04 to 2026-05</td>
+  <td>GR-2, GR-3, SA-3</td>
+</tr>
+<tr>
+  <td class="mono">P3</td>
+  <td><strong>SMHI weather ingestion:</strong> Confirm ~700 station coverage, download historical temperature/snow/ice/flood data (1980–2026). Validate Arctic coverage (Norrbotten).</td>
+  <td>SMHI API liaison</td>
+  <td>2026-04</td>
+  <td>GR-4, GT-5, GT-6</td>
+</tr>
+<tr>
+  <td class="mono">P4</td>
+  <td><strong>Arctic equipment calibration:</strong> Literature review (Vattenfall SE, Vattenfall NO, Statnett, ABB Nordic). IEEE C57.91 cold-climate adaptations. CIGRÉ TB 761 vs Nordic practice.</td>
+  <td>Technical reviewer</td>
+  <td>2026-04 to 2026-05</td>
+  <td>GA-3, SA-2</td>
+</tr>
+<tr>
+  <td class="mono">P5</td>
+  <td><strong>Gotland DSO contact:</strong> Request Gotland grid data separately. Document island-specific infrastructure (submarine cables, limited backup). Request cable reliability from Svenska kraftnät.</td>
+  <td>Gotland liaison</td>
+  <td>2026-05</td>
+  <td>SA-6</td>
+</tr>
+</tbody>
+</table>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Gap Audit (Sweden) · Ikenga Project · 2026-03-27 · Pre-Ingestion Planning<br>
+~5,000 substations target · 95 variables assessed · 4 remaining gaps · ~93% coverage targeted
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Data Ingestion Audit (Sweden)</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Helvetica Neue',sans-serif; color:var(--ink); background:var(--paper); font-size:13px; line-height:1.6; }
+.page { max-width:1200px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.mono { font-family:'Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:monospace; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-ready { background:#d5f5e3; color:#1a6b4a; }
+.tag-active { background:#fff3cd; color:#856404; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Data Ingestion Audit (Sweden)</h1>
+<p class="subtitle">Source-by-Source Assessment · 30+ Swedish Data Institutions · Pre-Ingestion Status</p>
+<div class="meta">
+  <span><strong>Country:</strong> Sweden (SE)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Phase:</strong> Pre-Ingestion Planning</span>
+</div>
+
+<h2>1. Tier 1 Sources — Core Grid Operations & Regulation (10 sources)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Website</th><th>Data Type</th><th>Access</th><th>Frequency</th><th>Confidence</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="mono">S01</td><td><strong>Svenska kraftnät</strong> — Grid Operator</td><td>svk.se</td><td>Hourly dispatch, generation mix, transmission flows, cross-border exchanges (Finland, Norway, Denmark, Germany), system adequacy, real-time balancing</td><td>Public data portal + downloads</td><td>Real-time/Hourly</td><td><span class="tag tag-ready">TIER 1</span></td><td>Excellent</td></tr>
+<tr><td class="mono">S02</td><td><strong>Energimarknadsinspektionen</strong> — Energy Regulator (Ei)</td><td>ei.se</td><td>Tariff studies, market reports, SAIDI/SAIFI benchmarks, DNO performance metrics, electricity market data</td><td>Public reports (annual/quarterly)</td><td>Annual/Quarterly</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live</td></tr>
+<tr><td class="mono">S03</td><td><strong>Statens strålsäkerhetsmyndighet</strong> — Nuclear Safety (SSM)</td><td>ssm.se</td><td>Nuclear safety zones (Forsmark, Ringhals, Oskarshamn), radiation monitoring, emergency preparedness, incident reporting</td><td>Public reports + restricted operational data</td><td>Continuous monitoring + annual reports</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (critical infrastructure)</td></tr>
+<tr><td class="mono">S04</td><td><strong>Statistiska centralbyrån</strong> — Statistics Sweden (SCB)</td><td>scb.se</td><td>Census 2021, demographics, employment (NACE), income, migration, population by region (län), housing statistics</td><td>PxWeb API + CSV/XML exports</td><td>Census 2021 + annual estimates</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (excellent API)</td></tr>
+<tr><td class="mono">S05</td><td><strong>SMHI</strong> — Swedish Meteorological & Hydrological Institute</td><td>smhi.se</td><td>Temperature, wind, precipitation, snow cover, ice formation, frost data. Real-time observations and forecasts</td><td>Open data API (free, WFS/WMS)</td><td>Real-time/Daily</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (one of Europe's best)</td></tr>
+<tr><td class="mono">S06</td><td><strong>Geologiska undersökningen</strong> — Geological Survey (SGU)</td><td>sgu.se</td><td>Geological maps, soil types, postglacial rebound data, bedrock mapping, Quaternary deposits</td><td>Public GIS databases + maps</td><td>Annual updates + continuous monitoring</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live</td></tr>
+<tr><td class="mono">S07</td><td><strong>Naturvårdsverket</strong> — Environment Agency</td><td>naturvardsverket.se</td><td>Environmental monitoring, flood risk maps, water quality, wetlands mapping, air quality observations</td><td>Public databases + GIS portal</td><td>Daily/Real-time</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live</td></tr>
+<tr><td class="mono">S08</td><td><strong>Myndigheten för samhällsskydd och beredskap</strong> — Civil Contingencies (MSB)</td><td>msb.se</td><td>Critical infrastructure protection, emergency planning, societal resilience, disaster risk assessment</td><td>Public reports + restricted risk data</td><td>Continuous monitoring + annual reports</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (critical infrastructure)</td></tr>
+<tr><td class="mono">S09</td><td><strong>OSM</strong> — OpenStreetMap (Power)</td><td>overpass-api.de</td><td>Power substations (nodes), transmission lines (edges), HV/MV topology, transformer locations, coordinates</td><td>Public API (ODbL license)</td><td>Continuous (volunteer mapping)</td><td><span class="tag tag-active">TIER 2</span></td><td>~85% HV coverage (excellent Nordic mapping)</td></tr>
+<tr><td class="mono">S10</td><td><strong>Copernicus CDS</strong> — ESA Climate</td><td>cds.climate.copernicus.eu</td><td>ERA5 reanalysis, CMIP6 projections, satellite data, 0.25° grid, Arctic data</td><td>Open access (registration)</td><td>Daily/Monthly</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (international reference)</td></tr>
+</tbody>
+</table>
+
+<h2>2. Tier 2 Sources — Secondary & Sector-Specific (10 sources)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Data Type</th><th>Access</th><th>Frequency</th><th>Confidence</th></tr></thead>
+<tbody>
+<tr><td class="mono">S11</td><td>Energimyndigheten — Swedish Energy Agency</td><td>Energy statistics, policy data, energy efficiency improvements, renewable capacity planning, sectoral analysis</td><td>Public databases + reports</td><td>Annual/Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S12</td><td>Lantmäteriet — Land Survey Authority</td><td>DEM, orthophotos, land use mapping, geodetic data, cadastral information, topographic databases</td><td>Public GIS (lantmateriet.se)</td><td>Continuous updates</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S13</td><td>Trafikverket — Transport Agency</td><td>Transport infrastructure, communications network, critical telecom nodes, broadband coverage, regional connectivity</td><td>Public databases + GIS</td><td>Annual/Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S14</td><td>Svensk Energi / Energiföretagen Sverige — Energy Industry Association</td><td>Industry association statistics, electricity generation capacity by region, energy balance data, production forecasts</td><td>Public reports + member data summaries</td><td>Monthly/Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S15</td><td>Riksbanken — Central Bank of Sweden</td><td>GDP by region, economic indicators, inflation, monetary policy data, financial system stability</td><td>Public databases</td><td>Monthly/Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S16</td><td>Svensk Vindenergi — Swedish Wind Power Association</td><td>Wind capacity by region, curtailment events, project pipeline, operational performance, investment trends</td><td>Industry reports + public registry</td><td>Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S17</td><td>SLU — Swedish University of Agricultural Sciences</td><td>Forest inventory data, biomass resources, agricultural land use, land cover classification, harvesting statistics</td><td>Public databases + GIS</td><td>Annual</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S18</td><td>DSO Annual Reports (Vattenfall Eldistribution, E.ON Energidistribution, Ellevio, Jämtkraft, others)</td><td>CAPEX, maintenance spending, SAIDI/SAIFI metrics, operational KPIs, transformer inventories, investment plans</td><td>Public summaries (requires aggregation)</td><td>Annual (Q1/Q2 publication)</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S19</td><td>ENTSO-E Transparency Platform</td><td>Cross-border flows (Finland, Norway, Denmark, Germany), generation adequacy, planned outages, market data, balancing</td><td>Public API (RESTful)</td><td>Real-time/Hourly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">S20</td><td>HELCOM — Baltic Marine Environment</td><td>Baltic sea-level rise projections, coastal erosion models, marine ecosystem data, environmental status</td><td>International open access</td><td>Decadal/Annual</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+</tbody>
+</table>
+
+<h2>3. Tier 3 Sources — Complementary & Reference (10+ sources)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Data Type</th><th>Access</th><th>Frequency</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="mono">S21</td><td>Socialstyrelsen — National Board of Health and Welfare</td><td>Critical infrastructure locations (hospitals, clinics, emergency services), population health data</td><td>Public databases</td><td>Annual</td><td>Supports critical infrastructure consequence mapping (V2)</td></tr>
+<tr><td class="mono">S22</td><td>Swedish Transport Agency (Trafikverket)</td><td>Transport infrastructure, communications network, critical telecom nodes, broadband coverage</td><td>Public databases + GIS</td><td>Annual/Quarterly</td><td>Regional economic proxy + resilience indicator</td></tr>
+<tr><td class="mono">S23</td><td>Brottsförebyggande rådet (BRÅ) — Crime Prevention Council</td><td>Crime statistics by region (proxy for social vulnerability and risk perception)</td><td>Public reports</td><td>Annual</td><td>Supports C-layer (social/vulnerability metrics)</td></tr>
+<tr><td class="mono">S24</td><td>Skogsstyrelsen — National Board of Forestry</td><td>Forest management, harvesting data, biomass availability, forest conservation areas</td><td>Public GIS databases</td><td>Annual</td><td>Regional economic proxy + biomass resource proxy</td></tr>
+<tr><td class="mono">S25</td><td>Länsstyrelserna — Regional State Administrative Agencies</td><td>Regional authority data, municipal cooperation, development strategies, emergency management</td><td>Public reports</td><td>Annual</td><td>Regional coordination & governance indicator</td></tr>
+<tr><td class="mono">S26</td><td>Havs- och vattenmyndigheten (HaV) — Agency for Marine & Water Management</td><td>Water quality, marine ecosystem data, coastal zone management, hydrological monitoring</td><td>Public databases + GIS</td><td>Annual/Quarterly</td><td>Supports water infrastructure resilience assessment</td></tr>
+<tr><td class="mono">S27</td><td>Eurostat</td><td>EU-harmonized socio-economic data, energy poverty indicators (SILC), cross-validation benchmarks</td><td>Public API</td><td>Annual</td><td>Cross-validation reference + EU comparison</td></tr>
+<tr><td class="mono">S28</td><td>SolarGIS / Global Solar Atlas</td><td>Solar irradiance by location (GHI, DNI) for Sweden, insolation patterns</td><td>Public online tool</td><td>Static (periodically updated)</td><td>Supplements renewable energy potential assessment</td></tr>
+<tr><td class="mono">S29</td><td>Vinnova — Swedish Innovation Agency</td><td>Regional development investment data, R&D spending, innovation infrastructure</td><td>Public reports</td><td>Annual</td><td>Supports R5 (resilience investment trends)</td></tr>
+<tr><td class="mono">S30</td><td>World Bank / OECD / Climate-ADAPT</td><td>International benchmarks, climate adaptation data, socio-economic indicators, case studies</td><td>Public databases</td><td>Annual/Decadal</td><td>Cross-validation reference + climate scenario alignment</td></tr>
+</tbody>
+</table>
+
+<h2>4. Data Access & API Summary</h2>
+
+<h3>Tier 1 High-Confidence APIs</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Svenska kraftnät Data Portal (svk.se):</strong> Download hourly dispatch, generation, cross-border flows. Well-structured CSV/JSON downloads. No authentication required. Excellent historical archive.</li>
+  <li><strong>Statistiska centralbyrån PxWeb API (scb.se):</strong> RESTful API for Census and demographic data. Covers all 21 regions (län), multiple sub-regions, and 290+ municipalities (kommuner).</li>
+  <li><strong>SMHI Open Data API (smhi.se):</strong> Free meteorological/hydrological data with WFS/WMS services. Python package available. ~200 active weather stations nationwide.</li>
+  <li><strong>Naturvårdsverket Data Portals:</strong> Water quality, flood risk mapping, air quality observations. Multiple GIS services + downloadable datasets.</li>
+  <li><strong>Overpass API (OSM):</strong> Standard power infrastructure queries for Sweden with excellent Nordic mapping coverage.</li>
+  <li><strong>Copernicus CDS:</strong> CDAPI Python client. ERA5 + CMIP6 Arctic-enhanced resolution data.</li>
+  <li><strong>ENTSO-E Transparency:</strong> RESTful API, covers Sweden as multiple bidding zones with detailed cross-border reporting.</li>
+</ul>
+
+<h3>Tier 2 Manual/Semi-Automated Access</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Energimarknadsinspektionen Reports:</strong> Annual PDF reports, some Excel appendices. No formal API; requires parsing.</li>
+  <li><strong>Lantmäteriet Geospatial Data:</strong> DEM, orthophotos, land use classification downloadable. Multiple service endpoints (WMS/WFS/WMTS).</li>
+  <li><strong>SGU Geological Maps:</strong> Bedrock and soil mapping via web portal. GIS-compatible formats available.</li>
+  <li><strong>Trafikverket Regional Data:</strong> GIS services + infrastructure mapping. Regional databases accessible.</li>
+  <li><strong>DSO Reports:</strong> Annual reports published online (Vattenfall, E.ON, Ellevio, etc.). Disaggregated substation data requires utility contact directly.</li>
+  <li><strong>SSM Nuclear Safety:</strong> Public safety zones published (GIS-ready). Detailed operational data restricted to government agencies.</li>
+</ul>
+
+<h2>5. Implementation Roadmap — Phased Ingestion</h2>
+
+<table>
+<thead><tr><th>Phase</th><th>Duration</th><th>Sources</th><th>Variables</th><th>Expected Coverage</th><th>Priority</th></tr></thead>
+<tbody>
+<tr><td class="mono">Phase 1</td><td>Week 1–4</td><td>S01–S10 (Tier 1, Core)</td><td>A, C, D, E, G, H (60 variables)</td><td>72% coverage (DNO fragmentation moderate)</td><td><span class="tag tag-active">PENDING</span></td></tr>
+<tr><td class="mono">Phase 2</td><td>Week 5–8</td><td>S11–S20 (Tier 2, Secondary)</td><td>B, additional E, F partial (25 variables)</td><td>82% coverage</td><td><span class="tag tag-active">PENDING</span></td></tr>
+<tr><td class="mono">Phase 3</td><td>Week 9–12</td><td>S21–S30 (Tier 3, Complementary)</td><td>F remaining, I derived (10 variables)</td><td>88% coverage</td><td><span class="tag tag-active">PENDING</span></td></tr>
+<tr><td class="mono">Phase 4</td><td>Week 13–16</td><td>All sources (Monte Carlo + Validation)</td><td>All 95 (finalized)</td><td>90%+ (estimated substation coverage TBD)</td><td><span class="tag tag-active">PENDING</span></td></tr>
+</tbody>
+</table>
+
+<h2>6. Critical Data Dependencies & Bottlenecks</h2>
+
+<p class="note">
+<strong>Critical Path Assessment:</strong> Sweden's pre-ingestion phase focuses on core integration of Svenska kraftnät (S01) + Statistiska centralbyrån (S04) + SMHI (S05). DNO data fragmentation (major operators: Vattenfall, E.ON, Ellevio, plus ~40 regional operators) presents moderate aggregation complexity. Wind power dominance and hydro-thermal coordination, plus nuclear safety zone integration (Forsmark, Ringhals, Oskarshamn) are priority blockers.
+</p>
+
+<h3>High-Risk Dependencies</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Winter Storm Modelling & Resilience:</strong> Depends on SMHI (S05) + Naturvårdsverket (S07) integration. Snow load, ice formation, frost depth, and wind speed measurements are critical for infrastructure vulnerability assessment across Northern and mountain regions. Real-time SMHI forecasts essential for early warning systems.</li>
+  <li><strong>DNO Data Fragmentation:</strong> Sweden has major operators (Vattenfall Eldistribution, E.ON Energidistribution, Ellevio) plus ~40 regional distribution operators. Annual reports require manual aggregation. SAIDI/SAIFI metrics are dispersed across multiple sources. Energimarknadsinspektionen benchmarking partially compensates but requires cross-reference validation.</li>
+  <li><strong>Nuclear Safety Zone Mapping:</strong> SSM (S08) data for hazard zones around Forsmark, Ringhals, and Oskarshamn. Restricted operational data requires government agency coordination. Public GIS safety boundaries available; integration with critical infrastructure consequence mapping (V2) dependent on inter-agency data sharing agreements.</li>
+  <li><strong>Postglacial Rebound & Infrastructure Risk:</strong> SGU (S06) continuous GPS monitoring shows 9–10mm/year uplift in central and northern Sweden. Long-term foundation stability implications for substations and transmission towers. Model calibration requires 10+ year SGU historical trend datasets.</li>
+  <li><strong>Hydro-Thermal Coordination & Border Integration:</strong> Cross-border flows with Finland, Norway, and Denmark require integrated modelling of reservoir levels, thermal capacity, and wind generation. ENTSO-E data essential for real-time balancing. Seasonal hydro patterns drive Swedish grid dynamics more than thermal baseload.</li>
+  <li><strong>Flood Risk & Precipitation Variability:</strong> Naturvårdsverket (S07) flood risk maps updated cyclically. Precipitation variability (Northern watershed hydrology, mountain regions) impacts reservoir operations and transmission corridor flooding risk. SMHI climate projections (RCP 4.5/8.5) indicate increasing annual extremes and spring flood timing shifts.</li>
+</ul>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Data Ingestion Audit (Sweden) · Ikenga Project · 2026-03-27<br>
+30+ data sources · 4 implementation phases PENDING · ~90% coverage targeted · Critical path: Svenska kraftnät + SCB + SMHI
+</p>
+
+</div>
+</body>
+</html>

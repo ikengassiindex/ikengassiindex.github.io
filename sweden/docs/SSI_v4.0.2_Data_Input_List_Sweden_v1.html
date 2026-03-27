@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Data Input List (Sweden) v1</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: 'Segoe UI','Helvetica Neue',sans-serif; color: var(--ink); background: var(--paper); font-size:13px; line-height:1.5; }
+.page { max-width:1400px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; position:sticky; top:0; z-index:10; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; white-space:nowrap; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+tbody tr:hover { background:#e8f4fd; }
+.mono { font-family:'JetBrains Mono','Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-planned { background:#d6eaf8; color:#1a5276; }
+.tag-source { background:#fff3cd; color:#856404; }
+.tag-sweden { background:#fce8e8; color:#5a1f1f; }
+.summary-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin:1.5rem 0; }
+.summary-card { background:#fff; border:1px solid var(--border); border-radius:6px; padding:0.8rem; text-align:center; }
+.summary-card .number { font-size:1.8rem; font-weight:700; font-family:monospace; color:var(--accent2); }
+.summary-card .label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:0.3rem; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Final Data Input List (Sweden) v1</h1>
+<p class="subtitle">Variable-to-Source Mapping · Sverige Svenska kraftnät · 95 Variables · ~30 Data Sources</p>
+<div class="meta">
+  <span><strong>Country:</strong> Sweden (SE)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Phase:</strong> Pre-Deployment (Planning)</span>
+  <span><strong>Status:</strong> Data Mapping Phase · Infrastructure Baseline Defined</span>
+</div>
+
+<!-- SUMMARY -->
+<h2>Data Coverage Summary</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="number">95</div><div class="label">Total Variables</div></div>
+  <div class="summary-card"><div class="number">30</div><div class="label">Data Sources</div></div>
+  <div class="summary-card"><div class="number">21</div><div class="label">Län (Counties)</div></div>
+  <div class="summary-card"><div class="number">~5,000</div><div class="label">HV Substations (110 kV+)</div></div>
+  <div class="summary-card"><div class="number">2</div><div class="label">Hazard Zones</div></div>
+</div>
+
+<!-- PRIMARY SOURCES TABLE -->
+<h2>1. Primary Data Sources (Tier 1 — High Confidence)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution (Swedish/English)</th><th>Website</th><th>Access</th><th>Variables Supplied</th><th>Frequency</th><th>Coverage</th></tr></thead>
+<tbody>
+<tr><td class="mono">D01</td><td><strong>Svenska kraftnät</strong> — Swedish Transmission System Operator</td><td>svk.se</td><td>Public data portal + reports</td><td>S1 (dispatch/capacity), G.1 (system reliability), T1 (generation mix), cross-border flows, transmission line loads, hourly production, 4 bidding zones (SE1–SE4)</td><td>Hourly / Daily</td><td>National transmission 100% (Nordic market, 14+ interconnections)</td></tr>
+<tr><td class="mono">D02</td><td><strong>Energimarknadsinspektionen</strong> — Energy Market Inspectorate (Ei)</td><td>ei.se</td><td>Public reports + data portal</td><td>E1–E2 (energy market), V1 (VoLL from tariff studies), DSO regulation, utility CAPEX, SAIDI/SAIFI performance metrics, tariff analysis</td><td>Annual / Quarterly</td><td>All 21 Län and ~290 Kommuner (DSO areas)</td></tr>
+<tr><td class="mono">D03</td><td><strong>SCB</strong> — Statistics Sweden</td><td>scb.se</td><td>Folk- och bostadsräkningen (register-based census) + PxWeb API</td><td>C1–C6 (population, income, employment, migration), regional demographics, employment by sector, household data</td><td>Register-based (continuous) + annual surveys</td><td>All 21 Län + 290 Kommuner</td></tr>
+<tr><td class="mono">D04</td><td><strong>SMHI</strong> — Swedish Meteorological and Hydrological Institute</td><td>smhi.se</td><td>Open data API + portal</td><td>I1, I3, I5 (temperature, precipitation, wind), storm forecasts, snow loading data, extreme weather warnings, wind resource assessment</td><td>Daily / Real-time</td><td>~700+ weather stations + radar nationwide</td></tr>
+<tr><td class="mono">D05</td><td><strong>SGU</strong> — Geological Survey of Sweden</td><td>sgu.se</td><td>Public geological maps + databases</td><td>H1–H2 (seismic hazard: low, ~0.05–0.1g), postglacial rebound zones (Gulf of Bothnia), soil types, mineral resources, geological stability</td><td>Annual updates + continuous monitoring</td><td>All Sweden (low-moderate seismic activity)</td></tr>
+<tr><td class="mono">D06</td><td><strong>Naturvårdsverket</strong> — Swedish Environmental Protection Agency</td><td>naturvardsverket.se</td><td>Public monitoring network + GIS</td><td>D4 (flood risk), environmental monitoring, water quality, air quality, flooding events, water resource management</td><td>Real-time / Daily / Seasonal</td><td>National network + 100+ monitoring stations</td></tr>
+<tr><td class="mono">D07</td><td><strong>Elsäkerhetsverket</strong> — Swedish Electrical Safety Authority</td><td>elsakerhetsverket.se</td><td>Equipment registry + reports</td><td>B.2–B.3 (electrical equipment compliance), transformer standards, safety certification, technical regulations, inspection records</td><td>Annual / Continuous</td><td>All licensed electrical facilities, Län-level aggregation</td></tr>
+<tr><td class="mono">D08</td><td><strong>SSM</strong> — Swedish Radiation Safety Authority</td><td>ssm.se</td><td>Public registers + safety data</td><td>Nuclear safety zones, reactor operational status, emergency protocols, proximity hazard assessment, decommissioning timelines</td><td>Real-time + quarterly</td><td>3 operational nuclear sites (Forsmark, Ringhals, Oskarshamn) + decommissioned Barsebäck</td></tr>
+<tr><td class="mono">D09</td><td><strong>OSM</strong> — OpenStreetMap (Power)</td><td>overpass-api.de</td><td>Public API</td><td>A2–A4 (substation topology), G2 (network graph), transmission/distribution line geometry, asset mapping, ~85% HV coverage</td><td>Continuous</td><td>~85% HV coverage (high Nordic penetration)</td></tr>
+<tr><td class="mono">D10</td><td><strong>Copernicus CDS</strong> — ESA Climate Data Store</td><td>cds.climate.copernicus.eu</td><td>Open access (registration)</td><td>D3–D4 (temperature extremes, precipitation), CMIP6 projections, ERA5 reanalysis, wind fields, climate change scenarios</td><td>Daily / Monthly</td><td>Global 0.25° grid (~25 km)</td></tr>
+</tbody>
+</table>
+
+<!-- SECONDARY SOURCES -->
+<h2>2. Secondary Sources (Tier 2 — Medium Confidence, Modeled)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Website</th><th>Variables</th><th>Access</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="mono">D11</td><td>Lantmäteriet — National Land Survey of Sweden</td><td>lantmateriet.se</td><td>Geodetic data, land use mapping, spatial reference, DEM, orthophoto, cadastral data, property registers</td><td>Public GIS (SWEREF99)</td><td>Supports spatial analysis for substation mapping, hazard zone assignment, and infrastructure visualization</td></tr>
+<tr><td class="mono">D12</td><td>Energimyndigheten — Swedish Energy Agency</td><td>energimyndigheten.se</td><td>Energy efficiency profiles, building stock analysis, renewable statistics, energy targets, technology adoption tracking</td><td>Public reports + data portal</td><td>Supports demand-side variables, renewable energy penetration, and technology transition monitoring</td></tr>
+<tr><td class="mono">D13</td><td>Länsstyrelserna — County Administrative Boards</td><td>lansstyrelsen.se (regional)</td><td>Flood risk maps (Län-level), water resource management, environmental planning, Kiruna mine subsidence monitoring</td><td>Public GIS + reports</td><td>Critical for flood hazard in river basins and mining-affected regions (northern Norrbotten)</td></tr>
+<tr><td class="mono">D14</td><td>Energiföretagen Sverige — Swedish Energy Enterprises Federation</td><td>energiforetagen.se</td><td>Energy balance by region, electricity statistics, renewable energy penetration, sector profiles, generation capacity</td><td>Semi-public (industry reports)</td><td>Regional energy profiles; hydropower + nuclear dependency by Län; wind capacity tracking</td></tr>
+<tr><td class="mono">D15</td><td>Riksbanken — Riksbank (Central Bank)</td><td>riksbank.se</td><td>GDP by region, inflation, economic indicators, macroeconomic forecasts, regional development data</td><td>Public databases</td><td>Supports V1 (VoLL regional scaling) and regional economic resilience assessment</td></tr>
+<tr><td class="mono">D16</td><td>DSO Annual Reports</td><td>Vattenfall Eldistribution, E.ON, Ellevio, Jämtkraft, Skellefteå Kraft, etc.</td><td>CAPEX, maintenance, SAIDI/SAIFI, transformer age profiles, operational KPIs, network losses</td><td>Public summaries / restricted details</td><td>Annual (due within 4 months of fiscal year end); ~170 DSOs (highly fragmented market)</td></tr>
+<tr><td class="mono">D17</td><td>Svensk Vindenergi — Swedish Wind Power Association</td><td>svenskvindenergi.se</td><td>Wind capacity by region, project pipeline, wind farm locations, installed capacity trends, forecast data</td><td>Industry reports + public registry</td><td>Key for T1 (wind penetration tracking); Sweden among Europe's top 5 wind producers; ~3,800+ wind turbines</td></tr>
+<tr><td class="mono">D18</td><td>SLU — Swedish University of Agricultural Sciences</td><td>slu.se</td><td>Forest biomass mapping, forestry harvest data, agricultural land use, renewable resource availability, land classification</td><td>Research databases + GIS layers</td><td>Supports T1 (bioenergy potential), environmental baseline, and land management data</td></tr>
+<tr><td class="mono">D19</td><td>ENTSO-E Transparency Platform</td><td>transparency.entsoe.eu</td><td>Cross-border flows, generation schedules, load forecasting, market data (Nordic, EU-wide)</td><td>Open access (SFTP + API)</td><td>Integration point with Nordic grid coordination; Sweden's 14+ interconnections with Norway, Finland, Denmark, Germany, Poland</td></tr>
+<tr><td class="mono">D20</td><td>HELCOM — Helsinki Commission</td><td>helcom.fi</td><td>Baltic Sea environment, coastal hazard assessment, sea level rise projections, environmental monitoring</td><td>Public databases + reports</td><td>Critical for coastal regions (Stockholm, Gothenburg); ice phenology trends and storm surge risk</td></tr>
+</tbody>
+</table>
+
+<!-- VARIABLE MAPPING -->
+<h2>3. Variable-by-Variable Mapping (Selected Examples)</h2>
+
+<p class="note"><strong>Note:</strong> Full 95-variable list condensed to representative samples. All primary variables mapped to Swedish institutional data sources. Infrastructure baseline established for ~5,000 HV substations (110 kV+) and 290 Kommuner.</p>
+
+<table>
+<thead><tr><th>Variable</th><th>SSI Component</th><th>Data Source (Primary)</th><th>Secondary Source(s)</th><th>Resolution</th><th>Frequency</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="mono">A1 — Substation Age</td><td>Resilience</td><td>OSM (start_date tag) + Svenska kraftnät registry</td><td>DSO facility records (Vattenfall, E.ON, Ellevio, etc.)</td><td>Per substation</td><td>Static + annual updates</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">B1.2 — Transformer Hotspot Temp</td><td>Grid Telemetry</td><td>IEEE C57.91 model + SMHI ambient temperature</td><td>Elsäkerhetsverket equipment inspection records</td><td>Per substation</td><td>Monthly (seasonal norm)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C1 — Population</td><td>Socio-Economic</td><td>SCB Folk- och bostadsräkningen (register-based: 21 Län, 290 Kommuner)</td><td>SCB population estimates (annual/quarterly)</td><td>Kommun / Län</td><td>Continuous register, annual reports</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C2 — Median Income</td><td>Socio-Economic</td><td>SCB Income Survey (annual by kommun/Län)</td><td>SCB employment + tax register data</td><td>Kommun / Decile</td><td>Annual</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C3 — Energy Poverty %</td><td>Socio-Economic</td><td>Energimarknadsinspektionen energy affordability survey (regional)</td><td>SCB housing cost burden data</td><td>Län / Kommune</td><td>Annual / Biennial</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C6 — Net Migration</td><td>Socio-Economic</td><td>SCB migration statistics (internal + international)</td><td>Swedish Migration Agency visa/residence permit data</td><td>Kommun / Län</td><td>Annual</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D1 — Seismic PGA (g)</td><td>Environmental</td><td><strong>SGU</strong> seismic hazard map (low-moderate: 0.05–0.1g)</td><td>USGS model for reference (Nordic plate boundary effects minimal)</td><td>Per substation (spatial join)</td><td>Static (updated w/ new assessments ~5yr)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D2 — Postglacial Rebound Risk (mm/yr)</td><td>Environmental</td><td>SGU postglacial rebound zones (Gulf of Bothnia: ~9 mm/yr) + GPS monitoring</td><td>SMHI paleoclimatic records, sea level trend analysis</td><td>Per substation (regional zones: Gulf of Bothnia > Atlantic coast)</td><td>Annual (continuous monitoring)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D3 — Temperature Extremes (°C)</td><td>Environmental</td><td>SMHI historical records by station (record low: -52.6°C Kebnekaïse 1886)</td><td>Copernicus ERA5 reanalysis (gridded)</td><td>Län / Station</td><td>Daily → monthly/annual statistics</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D4 — Flood Risk Index</td><td>Environmental</td><td>Naturvårdsverket flood risk maps + Länsstyrelserna regional flood studies + SMHI snowmelt forecasting</td><td>SCB river basin stress indicators, Kiruna mine subsidence monitoring</td><td>Län / Sub-basin</td><td>Annual / Seasonal / Event-driven</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D5 — Ice Hazard Index</td><td>Environmental</td><td>SMHI ice phenology data (spring/autumn freeze-thaw, lake ice extent, Baltic ice cover) + monitoring</td><td>HELCOM Baltic ice extent forecasts</td><td>Regional (Swedish lakes, Gulf of Bothnia)</td><td>Seasonal / Monthly Nov–May</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D6 — Winter Storm Risk (probability)</td><td>Environmental</td><td>SMHI wind data + extreme weather frequency analysis</td><td>Historical gale force wind records (Atlantic/Baltic transitions)</td><td>Län</td><td>Annual / Seasonal</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">E1 — Renewable Capacity (MW)</td><td>Energy System</td><td><strong>Svenska kraftnät</strong> hourly dispatch (wind/hydro/nuclear by Län and bidding zone)</td><td>Svensk Vindenergi, Energimyndigheten renewable registries</td><td>Län / Bidding zone (SE1–SE4) / Substation feeder</td><td>Monthly (dispatch), quarterly (capacity)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">E2 — Employment by Sector</td><td>Energy System</td><td>SCB Census employment by ISIC (Län/Kommune)</td><td>SCB Labor Force Survey (quarterly)</td><td>Kommun / Sector</td><td>Register-based (annual), quarterly estimates</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">F1 — CAPEX per Asset (SEK)</td><td>Markov Input</td><td>Energimarknadsinspektionen regulatory filings (CAPEX by DSO/year)</td><td>Individual DSO annual reports (Vattenfall, E.ON, etc.)</td><td>DSO level</td><td>Annual (filed with Ei)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">G1 — SAIDI (hours/customer/year)</td><td>Modifiers</td><td><strong>Svenska kraftnät</strong> system reliability reports + DSO aggregate data</td><td>Individual DSO historical performance records</td><td>Län / DSO</td><td>Annual (filed with Ei)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">H1 — Postglacial Rebound Zone Classification</td><td>Hazard Zone</td><td>SGU zone classification (2 zones: Stable Regions / Postglacial Rebound Belt)</td><td>SMHI sea level trend synthesis</td><td>Per substation (spatial)</td><td>Static (updated with SGU reviews ~5yr)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">H2 — Winter Storm Hazard Zone</td><td>Hazard Zone</td><td>SMHI historical storm frequency by region + gale warning zones</td><td>HELCOM Baltic storm surge models, Atlantic storm tracking</td><td>Per substation or Län</td><td>Annual / As-updated</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">I2 — Risk Score (Markov output)</td><td>Markov Output</td><td><strong>DERIVED:</strong> From F + H via CIGRÉ TB 761 transition matrix</td><td>N/A</td><td>Per substation</td><td>Annual (post-data refresh)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">S1 — Grid Capacity Reserve (%)</td><td>Modifier</td><td>Svenska kraftnät capacity forecasts / Nordic adequacy reports</td><td>Energimyndigheten strategic plans, transmission upgrade pipeline (north-south bottleneck analysis)</td><td>Län / Bidding zone (SE1–SE4)</td><td>Quarterly (Svenska kraftnät forecasts)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">T1 — Grid Stability Index</td><td>Modifier</td><td>Svenska kraftnät dispatch variability (wind/hydro ramp rates, 4-zone balancing) + cross-border flow volatility</td><td>Svensk Vindenergi data, SLU bioenergy estimates, ENTSO-E Nordic flows</td><td>Län / Bidding zone / Technology</td><td>Hourly → monthly aggregate</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+</tbody>
+</table>
+
+<!-- SOURCE ASSESSMENT -->
+<h2>4. Data Source Assessment by Tier</h2>
+
+<h3>Tier 1: Primary Sources (10 sources, ~65% of variables)</h3>
+<p>Open access, high authority, Sweden-specific. <span class="tag tag-sweden">SWEDEN-NATIVE</span> sources (Svenska kraftnät, Energimarknadsinspektionen, SCB, SMHI, SGU, Naturvårdsverket, Elsäkerhetsverket, SSM, OSM, Copernicus).</p>
+
+<h3>Tier 2: Secondary Sources (10 sources, ~25% of variables)</h3>
+<p>Modeled, interpolated, or regional surveys. Lantmäteriet, Energimyndigheten, Länsstyrelserna, Energiföretagen Sverige, Riksbanken, DSO annual reports, Svensk Vindenergi, SLU, ENTSO-E, HELCOM.</p>
+
+<h3>Tier 3: Proxy / Fallback (2–3 sources, ~10% of variables)</h3>
+<p>Substation vintage (OSM start_date + cohort models), critical infrastructure (spatial analysis + population density), equipment condition (age curves + ambient temp + ice loading + nuclear proximity).</p>
+
+<h2>5. Key Advantages & Challenges</h2>
+
+<h3>Advantages</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Svenska kraftnät transparency:</strong> Public data portal with hourly dispatch, 4 bidding zones (SE1–SE4), cross-border flows with 14+ interconnections. Real-time Nordic market data integrated with ENTSO-E. Superior coverage vs. southern European TSOs.</li>
+  <li><strong>Register-based Census (SCB):</strong> Sweden's continuous register system provides granular demographic updates at kommun level (290 units) without census gaps. Real-time employment, income, and migration tracking via tax registers.</li>
+  <li><strong>SMHI world-class meteorology:</strong> ~700 weather stations with extensive historical records and high-quality forecasting. Superior ice phenology and snowmelt prediction vs. Central Europe. Open API access with no licensing barriers.</li>
+  <li><strong>Comprehensive interconnection network:</strong> Sweden's 14+ cross-border links to Norway, Finland, Denmark, Germany, and Poland enable detailed flow analysis. ENTSO-E transparency platform provides EU-wide market context.</li>
+  <li><strong>Wind energy leadership:</strong> Installed capacity ~18 GW (among EU top 5 producers); Svensk Vindenergi provides detailed regional breakdown by Län and technology type. Strong pipeline visibility for capacity planning.</li>
+  <li><strong>SGU postglacial rebound expertise:</strong> Gulf of Bothnia experiencing ~9 mm/yr uplift — detailed mapping crucial for coastal and riverine infrastructure. Low seismic hazard simplifies foundation risk assessment.</li>
+</ul>
+
+<h3>Challenges</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>DSO fragmentation:</strong> ~170 active DSOs with highly variable reporting standards and asset transparency. Energimarknadsinspektionen aggregates some metrics, but granular asset-level data inconsistent across operators (Vattenfall Eldistribution vs. regional players).</li>
+  <li><strong>North-south transmission bottleneck:</strong> Critical constraint (SE1 → SE4 congestion) during winter peak demand and summer export periods. Limited real-time line rating data; SCADA visibility restricted to Svenska kraftnät internal systems.</li>
+  <li><strong>Kiruna mine subsidence:</strong> Northern mining operations causing localized ground movement affecting infrastructure in Norrbotten. Requires collaboration with mining companies and county boards for spatial monitoring.</li>
+  <li><strong>Nuclear decommissioning timelines:</strong> Aging fleet with uncertain decommissioning schedules (Barsebäck, Ringhals). SSM data on operational timelines less predictive due to political/economic uncertainty. Proximity hazard data evolving.</li>
+  <li><strong>Substation vintage data gaps:</strong> OSM coverage strong (~85% HV) but OSM start_date completeness variable in rural areas. Individual DSO asset databases not universally public; age cohort models required.</li>
+  <li><strong>Hydropower volatility:</strong> Sweden's ~40% hydropower penetration creates generation variability tied to precipitation and snowmelt timing. Historical patterns less predictive as climate shifts seasonal dynamics.</li>
+  <li><strong>Regional disparities:</strong> Dense urban concentration (Stockholm, Gothenburg, Malmö) vs. sparse infrastructure in Norrland and Västsverige. Service reliability and asset density vary dramatically by Län.</li>
+</ul>
+
+<h2>6. Estimated Timeline & Ingestion Phases</h2>
+
+<div class="note">
+<strong>All 95 variables status: PLANNED (pre-ingestion phase).</strong> Once data ingestion commences, expect phased rollout over 4–6 months:
+<ul style="margin-top: 0.5rem; margin-bottom: 0;">
+  <li><strong>Phase 1 (Week 1–4):</strong> Core sources (D01–D10): Svenska kraftnät, Energimarknadsinspektionen, SCB, SMHI, SGU, Naturvårdsverket, Elsäkerhetsverket, SSM, OSM. ~60 variables mapped to 21 Län + 4 bidding zones.</li>
+  <li><strong>Phase 2 (Week 5–8):</strong> Secondary tier (D11–D17): Lantmäteriet, Energimyndigheten, Länsstyrelserna, Energiföretagen Sverige, Riksbanken, DSO reports, Svensk Vindenergi, SLU. ~25 variables for 290 Kommuner.</li>
+  <li><strong>Phase 3 (Week 9–16):</strong> Markov model (F/I), Monte Carlo engine, validation across ~5,000 HV substations. Nordic market integration (ENTSO-E, HELCOM, cross-border flow analysis). North-south bottleneck modeling.</li>
+  <li><strong>Phase 4 (Week 17–24):</strong> Dashboard deployment, ESG enrichment, intelligence page monthly updates. Cross-border coordination testing (Norway, Finland, Denmark). Mining subsidence and nuclear decommissioning scenario planning.</li>
+</ul>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Data Input List (Sweden) v1 · Ikenga Project · 2026-03-27<br>
+95 variables · 30 data sources · Planning phase · ~5,000 HV Substations
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Complete Formula Construct (Sweden)</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --paper: #faf9f6;
+  --accent: #c0392b;
+  --accent2: #2c3e7a;
+  --accent3: #1a6b4a;
+  --accent4: #d4740e;
+  --muted: #6b7280;
+  --border: #d1cfc9;
+  --code-bg: #f0ede6;
+  --highlight: #fff8e1;
+  --tag-bg: #e8e6df;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+  --sans: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --teal: #0e7490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--serif); color: var(--ink); background: var(--paper); line-height: 1.72; -webkit-font-smoothing: antialiased; }
+.page { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+.header { text-align: center; padding: 3.5rem 0 2.5rem; border-bottom: 3px double var(--border); margin-bottom: 3rem; }
+.header .tag { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); background: rgba(192,57,43,0.08); padding: 0.3em 1em; border-radius: 2px; margin-bottom: 1rem; }
+.header h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0.5rem 0; }
+.subtitle { font-size: 1.1rem; color: var(--muted); font-weight: 400; margin-bottom: 1rem; }
+.meta { display: flex; gap: 2.5rem; font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; justify-content: center; flex-wrap: wrap; }
+h2 { font-size: 1.5rem; font-weight: 700; margin: 3rem 0 1.2rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); color: var(--ink); }
+h3 { font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.8rem; color: var(--accent2); }
+h4 { font-size: 0.95rem; font-weight: 600; margin: 1.2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1rem; }
+table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
+thead { background: var(--ink); color: #fff; }
+thead th { padding: 0.8rem 1rem; text-align: left; font-weight: 600; font-family: var(--mono); letter-spacing: 0.03em; font-size: 0.75rem; text-transform: uppercase; }
+tbody td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+tbody tr:hover { background: #f5f3f0; }
+.mono { font-family: var(--mono); font-size: 0.85rem; }
+.num { text-align: right; font-family: var(--mono); font-weight: 500; }
+.tag-calibration { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #fadbd8; color: #922b21; }
+.tag-param { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #d5f5e3; color: #1a6b4a; }
+.tag-note { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #e0f7fa; color: #0e7490; }
+.formula-box { background: var(--highlight); border-left: 4px solid var(--accent4); padding: 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-family: var(--mono); font-size: 0.85rem; overflow-x: auto; }
+.highlight-box { background: #fff8f0; border-left: 4px solid var(--accent); padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+.calibration-note { background: #fff3e0; border-left: 4px solid var(--accent4); padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+.coefficient-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+.coefficient-table th { background: var(--code-bg); padding: 0.6rem 0.8rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); }
+.coefficient-table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+@media print { body { font-size: 11pt; } .page { padding: 1rem; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <span class="tag">SSI v4.0.2</span>
+  <h1>Complete Formula Construct</h1>
+  <p class="subtitle">Sweden (SE) — Stamnätet</p>
+  <div class="meta">
+    <span><strong>Country:</strong> Sweden (SE)</span>
+    <span><strong>Version:</strong> 4.0.2</span>
+    <span><strong>Date:</strong> 2026-03-27</span>
+    <span><strong>Author:</strong> Ikenga Project</span>
+  </div>
+</div>
+
+<h2>1. Executive Overview</h2>
+
+<p>Sweden's power system (Stamnätet — the transmission backbone operated by Svenska kraftnät) is fundamentally shaped by one of Earth's most seismically stable continental foundations (Fennoscandian Shield, Baltic craton), a diversified energy mix dominated by hydropower from major river systems (Luleälven, Umeälven, Ångermanälven, Dalälven), significant nuclear baseload capacity, and rapidly expanding wind energy across onshore and offshore domains. The system is geographically and climatically divided into four bidding zones (SE1–SE4) reflecting regional hydro dominance in the north and demand concentration in the central/southern regions. Unlike Poland's mining-induced seismicity or Chile's subduction zone dominance, Sweden's primary risk factors are winter storms (coastal and northern regions), snow/ice accumulation on overhead transmission lines, post-glacial rebound effects in northern coastal zones, and corrosion stress from Atlantic salt spray on the west coast and North Sea exposure. The SSI v4.0.2 formula for Sweden is adapted from the European baseline (Germany/France) with critical calibration adjustments for Sweden's unique Arctic-to-temperate climate gradient, exceptional seismic stability, and energy mix featuring ~40% hydro, ~30% nuclear, ~20% wind, and ~10% biomass/CHP:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Seismic intensity:</strong> α=0.10 (vs Poland 0.15, Australia 0.55, Chile 0.85) — Sweden sits atop the Fennoscandian Shield (Precambrian craton), one of Earth's most seismically stable regions. Natural PGA &lt;0.01g across 98% of territory. NO mining-induced seismicity. Only northern coastal postglacial rebound zones (2%) experience elevated activity (0.01–0.02g).</li>
+  <li><strong>Winter storm dominance:</strong> κ_winter = 0.30 (dominant in north and west coast) — Northern Sweden and west coast (Gothenburg region) experience extreme winter storms with hurricane-force winds and heavy snow loading on transmission lines. Atlantic exposure amplifies coastal risk.</li>
+  <li><strong>Snow/ice loading:</strong> κ_ice = 0.25 (Arctic-specific, Norrbotten/Västerbotten) — Overhead transmission lines in northern Sweden designed for extreme snow/ice accumulation. Equipment must operate at −40°C. Thermal stress κ_thermal = 0.90 in Arctic zones (cold preserves equipment life).</li>
+  <li><strong>Flood hazard:</strong> κ_flood = 0.20 (predictable spring snowmelt) — Spring snowmelt flooding in major river basins (Luleälven, Torne, Göta älv) is managed via hydroelectric dams. Coastal erosion risk elevated on west coast compared to Finland, driven by North Sea exposure.</li>
+  <li><strong>Grid operator:</strong> Svenska kraftnät (Swedish TSO) — state-owned, 100% control of 400/220/132 kV transmission grid (Stamnätet). ~170 DNOs operate lower-voltage networks, highly fragmented.</li>
+  <li><strong>Regulator:</strong> Energimarknadsinspektionen (Ei — Swedish Energy Markets Inspectorate); Statistics: SCB (Statistiska centralbyrån); Geology: SGU (Sveriges geologiska undersökning); Environment: Naturvårdsverket (Swedish EPA); Nuclear safety: SSM (Strålsäkerhetsmyndigheten); Weather: SMHI (Sveriges meteorologiska och hydrologiska institut).</li>
+  <li><strong>Energy transition:</strong> No fossil fuel phase-out (minimal coal &lt;5%, declining). Focus: hydropower optimization, nuclear baseload stability (Forsmark, Ringhals, Oskarshamn clusters), rapid wind expansion (onshore + offshore Baltic capacity), and green steel/hydrogen production (HYBRIT project in Norrbotten).</li>
+</ul>
+
+<h2>2. Structural Framework — 95 Variables Retained</h2>
+
+<p>All 95 SSI v4.0.2 variables are mapped to Swedish data sources. Administrative structure uses <strong>21 Län (counties)</strong> as primary units, with ~290 Kommuner (municipalities) as lower tiers. Bidding zones: SE1 (Luleå, hydro-dominant north), SE2 (Sundsvall, hydro+wind central-north), SE3 (Stockholm, nuclear+demand central), SE4 (Malmö, import-dependent south). Substations prefix: <strong>SE_</strong></p>
+
+<table>
+<thead><tr><th>Component</th><th>Variables</th><th>Primary Data Source</th><th>Swedish Institution</th></tr></thead>
+<tbody>
+<tr><td><strong>A — Resilience</strong></td><td>20</td><td>Transmission system topology, redundancy, Nordic interconnects (14+ to Norway/Denmark/Finland/Germany/Poland/Lithuania), EHV/HV network, HVDC links</td><td>Svenska kraftnät dispatch data; Ei annual reports; network maps</td></tr>
+<tr><td><strong>B — Grid Telemetry</strong></td><td>19</td><td>Equipment condition, transformer age, oil analysis, substation inventory, Arctic equipment certification, corrosion monitoring (west coast)</td><td>Svenska kraftnät operational logs; Ei compliance reports; utility asset registries</td></tr>
+<tr><td><strong>C — Socio-Economic</strong></td><td>9</td><td>Population, income, employment, regional development, energy poverty in northern regions, industrial demand (Gothenburg, Malmö, mining areas)</td><td>SCB Census 2020; regional offices; Län development surveys; municipality data</td></tr>
+<tr><td><strong>D — Environmental</strong></td><td>7</td><td>Seismic hazard (postglacial rebound zones), winter storm risk, snow/ice loading, flooding, coastal erosion, Kiruna mine subsidence (localized)</td><td>SGU (Geological Survey); SMHI (Meteorological Institute); Naturvårdsverket; flood monitoring network; LKAB mining operations data</td></tr>
+<tr><td><strong>E — Energy System</strong></td><td>8</td><td>DER, EV charging (Stockholm/southern metros), grid stability, nuclear generation (Forsmark 3.2 GW, Ringhals 1.7 GW, Oskarshamn 1.5 GW), renewable penetration, DSO data</td><td>Svenska kraftnät open data; Ei statistics; DNO operator records; nuclear plant data</td></tr>
+<tr><td><strong>F — Markov Input</strong></td><td>12</td><td>Maintenance records, failure rates, Arctic equipment stress, winter storm damage history, nuclear plant status, corrosion-related failures</td><td>Svenska kraftnät operational logs; Ei filings; DNO maintenance data; SSM nuclear oversight</td></tr>
+<tr><td><strong>G — Modifiers</strong></td><td>3</td><td>CAIDI, grid capacity margins, system losses, reserve margins, Nordic interconnect stability, cross-border flows</td><td>Svenska kraftnät monthly reports; Ei performance indicators; grid operation records</td></tr>
+<tr><td><strong>H — Seismic & Hazards</strong></td><td>7</td><td>PGA maps (postglacial rebound zones), winter storm intensity maps, snow/ice loading forecasts, flooding hazard, coastal erosion risk, Kiruna subsidence</td><td>SGU + SMHI seismic/storm data; Naturvårdsverket flood/weather monitoring; SSM nuclear safety; coastal agencies; LKAB</td></tr>
+<tr><td><strong>I — Markov Output</strong></td><td>7</td><td>Risk classifications, criticality projections, regional resilience ratings, transition rates</td><td>Derived from F, H via CIGRÉ TB 761</td></tr>
+<tr><td><strong>ID — Keys</strong></td><td>3</td><td>Substation ID, Län, voltage class</td><td>Svenska kraftnät registry; OSM; Swedish geodetic data</td></tr>
+</tbody>
+</table>
+
+<h2>3. Seismic Calibration — Stable Fennoscandian Shield with Postglacial Rebound</h2>
+
+<p>Sweden sits atop the Fennoscandian (Baltic/Precambrian) craton, one of Earth's most seismically stable regions. Natural tectonic seismicity is virtually absent. The only elevated seismic activity is postglacial rebound-induced seismicity in the northern coast (Bothnian Bay area, Västerbotten coast, and emerging subsidence from Kiruna mining operations in far north). This creates a bimodal seismic regime fundamentally different from mining-dominated Poland or subduction-dominated Chile:</p>
+
+<table class="coefficient-table">
+<tr><th>Parameter</th><th>Value</th><th>Zone</th><th>Rationale</th></tr>
+<tr><td><strong>R6b α (sensitivity)</strong></td><td class="num">0.10</td><td>Stable interior (98% of Sweden)</td><td>Sweden's natural PGA is &lt;0.01g across vast interior. α=0.10 is lower than Poland (0.15), reflecting exceptional Craton stability. No amplification needed in stable zones.</td></tr>
+<tr><td><strong>α_rebound</strong></td><td class="num">0.25</td><td>Northern coast postglacial rebound zones (Västerbotten, Norrbotten coast)</td><td>Ongoing land uplift (~5–9 mm/yr) creates minor tremors M2–M3, PGA 0.01–0.02g. Modest amplification. Much lower than mining-induced seismicity in Poland.</td></tr>
+<tr><td><strong>α_mining</strong></td><td class="num">0.15</td><td>Kiruna mine subsidence zone (far north, localized)</td><td>LKAB iron ore mining in Kiruna creates localized subsidence and minor induced seismicity (&lt;M2.5). Limited geographic extent. Affects only immediate substation vicinity.</td></tr>
+<tr><td><strong>PGA_ref (baseline)</strong></td><td class="num">0.01g</td><td>Stable zones</td><td>Sweden's baseline natural seismic PGA (~0.01g) is lower than Poland (0.02g), reflecting exceptional crustal stability.</td></tr>
+<tr><td><strong>Cap (max amplifier)</strong></td><td class="num">1.05</td><td>All zones</td><td>Sweden's worst-case postglacial rebound zones (0.02g) reach cap=1.05. Kiruna mining subsidence similarly capped at 1.03. Very low caps reflect minimal seismic hazard globally. Even rebound/mining zones are far safer than moderate seismic regions elsewhere.</td></tr>
+<tr><td><strong>Seismic zones</strong></td><td>2+1</td><td>—</td><td><strong>Zone 1:</strong> Stable interior (most of Sweden, PGA &lt;0.01g, 98%). <strong>Zone 2:</strong> Northern coast postglacial rebound (Västerbotten/Norrbotten coastal, 0.01–0.02g, ~2%). <strong>Zone 3 (local):</strong> Kiruna mine subsidence (far north, minor impact, &lt;0.5% of grid).</td></tr>
+</tbody>
+</table>
+
+<div class="calibration-note">
+<strong>Seismic Formula for Sweden:</strong><br>
+R6_seismic = clip(1.0 + α × max(0, PGA − PGA_ref), 1.0, 1.05)<br>
+where α = 0.10 (stable), α_rebound = 0.25 (postglacial zones), α_mining = 0.15 (Kiruna), PGA_ref = 0.01g, clip range [1.0, 1.05]<br>
+<strong>Impact:</strong> Zone 1 substations (&lt;0.01g) → 1.00× (no amplification). Zone 2 (0.015g) → 1.00125× (negligible). Zone 3 Kiruna (subsidence) → 1.00–1.03× (localized, minor). Rebound and mining components have minimal structural impact compared to winter storm damage or snow loading stress.
+</div>
+
+<h2>4. Corrosion Classification — North Sea Salt Spray + Interior Dry Continental</h2>
+
+<p>Sweden spans from exposed Atlantic/North Sea coasts (salt spray, high corrosion C4) to interior Arctic and continental zones (dry continental, very low corrosion C1). The west coast (Gothenburg, Halland region) is particularly exposed to Atlantic salt spray and North Sea weather, creating higher corrosion pressure than Finland's Baltic coast. Industrial activity concentrated in Gothenburg (Volvo, shipyards), Malmö, Norrköping, and northern mining areas. Interior Lapland has negligible corrosion stress.</p>
+
+<table class="coefficient-table">
+<tr><th>ISO 9223 Class</th><th>Environment Type</th><th>Regions</th><th>Corrosion Factor (κ)</th></tr>
+<tr><td><strong>C4</strong></td><td>High coastal salt spray (Atlantic/North Sea) + maritime humidity</td><td>West coast (Gothenburg, Halland, Västra Götaland), southern coast (Skåne, Blekinge — Øresund/Baltic exposure)</td><td>1.15</td></tr>
+<tr><td><strong>C3</strong></td><td>Industrial zones + moderate humidity + some SO₂</td><td>Gothenburg/Volvo industrial area, Malmö region, Norrköping, Västerås, mining areas (Kiruna, Gällivare)</td><td>1.07</td></tr>
+<tr><td><strong>C2</strong></td><td>Mixed inland, temperate humidity, low pollution</td><td>Central Sweden (Dalarna, Gävleborg, Västernorrland), southern inland (Jönköping, Värmland)</td><td>0.96</td></tr>
+<tr><td><strong>C1</strong></td><td>Interior continental/Arctic, very dry, minimal stress</td><td>Interior Arctic (Norrbotten, Västerbotten interior), Jämtland, interior Västernorrland, interior Kopparberg</td><td>0.80</td></tr>
+</tbody>
+</table>
+
+<h2>5. Hazard Adaptation — Winter Storms + Snow/Ice + Coastal Exposure</h2>
+
+<p>Unlike Australia's bushfire dominance or Poland's mining/flooding mix, Sweden's primary hazards are winter meteorological with Atlantic exposure: extreme winter storms (hurricane-force winds especially north and west coast), snow/ice accumulation on overhead transmission lines, coastal erosion accelerated by North Sea exposure, and spring snowmelt flooding in major river systems. Winter storms are more severe and frequent on the west coast and in far north compared to Finland. Minimal earthquake risk and no volcanic/geothermal activity.</p>
+
+<table class="coefficient-table">
+<tr><th>Hazard Type</th><th>Component</th><th>Data Source</th><th>Weight in Markov κ_climate</th></tr>
+<tr><td><strong>Winter storms</strong></td><td>D1: Storm intensity + gust speed + frequency</td><td>SMHI (Swedish Meteorological Institute) historical records + extreme weather database + coastal monitoring</td><td>0.30 (dominant in north and west coast)</td></tr>
+<tr><td><strong>Snow/ice loading</strong></td><td>D2: Accumulation depth + ice thickness on lines</td><td>SMHI snow/ice forecasts + regional monitoring + transmission line stress models</td><td>0.25 (Arctic-specific Norrbotten/Västerbotten)</td></tr>
+<tr><td><strong>Spring flooding</strong></td><td>D3: Snowmelt + river discharge + dam management</td><td>Naturvårdsverket flood forecasts + river monitoring network + dam operation records (Luleälven, Umeälven, Ångermanälven, Göta älv, Dalälven)</td><td>0.20 (major river systems, dam-managed)</td></tr>
+<tr><td><strong>Coastal erosion</strong></td><td>D4: North Sea/Atlantic exposure + shoreline retreat</td><td>SMHI maritime division + coastal monitoring; west coast (Gothenburg area) more exposed than Finland's coast</td><td>0.10 (west coast Gothenburg area elevated)</td></tr>
+<tr><td><strong>Summer heat stress</strong></td><td>D5: Rare heatwaves + transformer thermal stress</td><td>SMHI temperature records + heatwave indices; becoming more relevant with climate change</td><td>0.10 (growing, especially SE3/SE4)</td></tr>
+<tr><td><strong>Permafrost thaw</strong></td><td>D6: Arctic ground instability in far north</td><td>SGU permafrost monitoring; climate projections; affects Norrbotten/Västerbotten substation foundations</td><td>0.05 (emerging risk, far north)</td></tr>
+</tbody>
+</table>
+
+<div class="highlight-box">
+<strong>Markov Climate Shift Matrix for Sweden:</strong><br>
+κ_climate = 1.0 + max(0.30 × winter_storm_frequency, 0.25 × ice_loading_stress, 0.20 × snowmelt_flood_risk, 0.10 × coastal_erosion_stress, 0.10 × heat_stress, 0.05 × permafrost_thaw)<br>
+<strong>Interpretation:</strong> Winter storms dominate in far north (Norrbotten, Västerbotten) and Atlantic-exposed west coast (Gothenburg region). Snow/ice loading critical for all overhead transmission lines in northern Sweden. Spring flooding predictable via snowmelt forecasts and dam operations. Summer heat now measurable (heatwaves becoming more frequent). Permafrost thaw emerging in far Arctic. Coastal erosion elevated on Atlantic west coast compared to Finland's Baltic.
+</div>
+
+<h2>6. Post-Glacial Rebound — Fennoscandian Uplift & Long-Term Infrastructure Impact</h2>
+
+<p>Sweden experiences significant post-glacial land uplift, particularly in the north. The Bothnian Bay area and northern coast rise ~5–9 mm/year due to isostatic rebound from ice sheet deglaciation. This creates three long-term effects on power infrastructure: (1) minor seismicity from crustal stress (M2–M3 tremors, PGA 0.01–0.02g); (2) coastal foundation changes as land rises relative to sea level; (3) long-term permafrost stability changes as Arctic climate warms. Substations in northern coastal zones (Västerbotten, Norrbotten coast) are vulnerable to differential settlement over decades. Additionally, Kiruna iron ore mining in far north creates localized subsidence that complements regional uplift patterns in complex ways.</p>
+
+<div class="calibration-note">
+<strong>Post-Glacial Rebound Multiplier (κ_rebound):</strong><br>
+Applied to R6 (hazard) for substations in postglacial rebound zones:<br>
+κ_rebound = 1.00 (outside rebound zone)<br>
+κ_rebound = 1.02–1.05 (within postglacial rebound zone, depending on uplift rate and foundation stability concerns)<br>
+<strong>Critical regions:</strong> Northern coast (Västerbotten, Norrbotten coast), Bothnian Bay area. Seismic component minimal; primary risk is long-term foundation drift and permafrost dynamics. Impact on R6_seismic modest (1.01–1.02×). Kiruna mining subsidence requires separate localized monitoring.
+</div>
+
+<h2>7. Arctic Thermal Stress — Winter Preservation vs. Summer Extremes</h2>
+
+<p>Sweden's climate spans from extreme Arctic (−40°C in Norrbotten) to temperate maritime (southern coast). Extended winter in the north actually preserves transformer and cable insulation, extending equipment life. However, rare summer heatwaves (2023 reached 35°C in southern Sweden) now stress cooling systems, particularly in southern metropolitan areas (Stockholm SE3, Malmö SE4). Equipment designed for cold operation in north requires careful thermal modeling during summer peaks. This is opposite to southern European stress patterns and highlights Sweden's bipolar climate extremes.</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Arctic preservation effect:</strong> κ_thermal = 0.85–0.90 in far north (Norrbotten, Västerbotten) (cold slows aging, extends insulation life by ~5–10%).</li>
+  <li><strong>Subarctic baseline:</strong> κ_thermal = 0.95 in central regions (Jämtland, Gävleborg, central Västernorrland).</li>
+  <li><strong>Temperate baseline:</strong> κ_thermal = 1.00 in central-south (Dalarna, Värmland, southern inland).</li>
+  <li><strong>Metropolitan heat islands:</strong> κ_thermal = 1.05–1.08 in Stockholm (SE3, ~4 GWe demand center) and Malmö/Helsingborg (SE4) (urban heat + summer extremes accelerate aging slightly).</li>
+  <li><strong>Equipment certification:</strong> Transmission equipment must be rated for −40°C operation (far north) and 35°C summer spikes (becoming standard requirement by 2030). Arctic-rated components (special insulation, cold-resistant lubricants) are now specified for new substations in Norrbotten/Västerbotten. Southern substations require enhanced summer cooling capacity.</li>
+</ul>
+
+<div class="calibration-note">
+<strong>Arctic Thermal Modifier (κ_thermal):</strong><br>
+Applied to component aging rates (C variable) for thermal degradation modeling:<br>
+Norrbotten/Västerbotten far north: κ_thermal = 0.85–0.90 (cold preserves equipment)<br>
+Central northern/subarctic (Jämtland, Gävleborg): κ_thermal = 0.95 (cool continental)<br>
+South/inland: κ_thermal = 1.00 (temperate baseline)<br>
+Metropolitan (Stockholm, Malmö): κ_thermal = 1.05–1.08 (heat-stressed)<br>
+Used in life expectancy calculations for transformers and cables. Cold zones see extended asset life; metropolitan zones see modest acceleration.
+</div>
+
+<h2>8. Geographic Profile — Arctic North to Temperate South Zonation + West Coast Atlantic Exposure</h2>
+
+<p>Sweden spans ~449,000 km² from Arctic Norrbotten (68°N) to temperate south (55°N), with 14+ interconnections to neighboring countries (Norway, Denmark, Finland, Germany, Poland, Lithuania). The system is organized into four bidding zones reflecting hydro dominance in north and demand concentration in south, plus Atlantic exposure on west coast creating distinct corrosion and storm profiles:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>SE1 — North (Luleå region — Norrbotten Län, northern Västerbotten):</strong> Arctic/subarctic climate, extreme cold (−40°C), heavy wet snow loading, hurricane-force winter storms (dominant hazard in far north). Sparse grid, long transmission distances to southern load centers. Major hydro generation from northern rivers (Luleälven, Torne). Postglacial rebound zone (Bothnian Bay coast) + Kiruna mining area (localized subsidence). Equipment must survive Arctic extremes. κ_thermal = 0.85–0.90 (cold preserves). κ_winter = 0.35 (storm dominance). κ_ice = 0.30 (heavy loading). Corrosion C1 (interior) to C2 (coast).</li>
+  <li><strong>SE2 — Central-North (Sundsvall region — southern Västerbotten, Västernorrland, Gävleborg, Jämtland):</strong> Subarctic continental. Moderate winter severity, forestry economy. Significant biomass/CHP generation + expanding wind. Spring snowmelt flooding in river valleys (Umeälven, Ångermanälven). Moderate grid density. κ_thermal = 0.95 (cool). κ_winter = 0.30 (moderate storms). κ_flood = 0.25 (snowmelt). Corrosion C1–C2.</li>
+  <li><strong>SE3 — Central (Stockholm region — Stockholm Län, Uppsala, Västmanland, Sörmland, Örebro, southern Dalarna):</strong> Maritime temperate-subarctic. Stockholm metropolitan area (largest load center, ~5 GWe peak demand). Nuclear baseload (Forsmark 3.2 GW on east coast). Summer heatwaves emerging risk. Wind expansion (onshore in Dalarna, offshore Baltic planned). κ_thermal = 0.98–1.02 (baseline to slightly stressed). κ_winter = 0.25 (moderate storms, rare winter stress). Corrosion C2–C3 (industrial).</li>
+  <li><strong>SE4 — South (Malmö region — Skåne Län, Blekinge, Halland, Västra Götaland, southern Jönköping):</strong> Maritime temperate, import-dependent (Danish interconnects), Atlantic/North Sea exposure. Gothenburg (Volvo, shipyards) and Malmö major industrial/urban centers. Highest corrosion pressure (C4 west coast, C3–C4 southern coast). Winter storms less severe but Atlantic gales impactful. κ_thermal = 1.03–1.05 (heat-stressed, urban). κ_winter = 0.22 (Atlantic gales). κ_corrosion = 1.07–1.15 (highest in Sweden). Major interconnects to Denmark, Germany, Norway.</li>
+</ul>
+
+<div class="calibration-note">
+<strong>Regional Temperature & Thermal Stress (κ_thermal) + Winter Storm (κ_winter) + Ice Loading (κ_ice) + Corrosion (κ_corrosion):</strong><br>
+Equipment thermal life expectancy and failure rates modulated by regional climate and environmental stress. Transformer rated for −40°C in Norrbotten; summer cooling critical in SE4 (Malmö/Stockholm metro). West coast (SE4 Gothenburg) requires C4 corrosion-rated equipment; Arctic interior (SE1) requires C1 cold-rated equipment.<br>
+<strong>SE1 (Norrbotten/Västerbotten):</strong> κ_thermal = 0.87 (preserves life), κ_winter = 0.35, κ_ice = 0.30, κ_corrosion = 0.80<br>
+<strong>SE2 (Central-North):</strong> κ_thermal = 0.95, κ_winter = 0.30, κ_ice = 0.25, κ_corrosion = 0.90<br>
+<strong>SE3 (Stockholm):</strong> κ_thermal = 1.00, κ_winter = 0.25, κ_ice = 0.20, κ_corrosion = 1.05<br>
+<strong>SE4 (South/Malmö/Gothenburg):</strong> κ_thermal = 1.04, κ_winter = 0.22, κ_ice = 0.15, κ_corrosion = 1.12<br>
+Winter storm + ice loading + corrosion components weighted heavily in north and west; heat + corrosion dominance in south. Unique to Swedish system.
+</div>
+
+<h2>9. Energy System — Hydro-Dominant with Nuclear Baseload + Wind Expansion</h2>
+
+<p>Sweden's energy system is uniquely hydropower-dominant globally, with no fossil fuel phase-out (coal &lt;5% and declining, replaced by biomass). The system is dependent on three hydroelectric clusters in the north (Luleälven, Umeälven, Ångermanälven, Dalälven systems) for ~40% of generation. Nuclear provides stable baseload; wind is the fastest-growing sector:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Hydropower:</strong> ~40% of generation (dominant, major river systems: Luleälven, Umeälven, Ångermanälven, Dalälven, Göta älv cascades). Northern hydro baseload (SE1–SE2). Seasonal variation (spring spate from snowmelt, winter low). Cascade of dams managed by Svenska kraftnät + private operators. Climate change alters snowmelt timing and water availability (concern for long-term generation).</li>
+  <li><strong>Nuclear:</strong> ~30% of generation (Forsmark 3.2 GW east coast near Stockholm, Ringhals 1.7 GW west coast Gothenburg, Oskarshamn 1.5 GW southeast coast = 6.4 GW total capacity). Baseload stability. SSM (nuclear safety authority) oversight. Decommissioning planning post-2050s.</li>
+  <li><strong>Wind:</strong> ~20% existing; rapid growth to 30%+ by 2035. Onshore dominant (northern wind belt Norrbotten/Västerbotten, central Dalarna expanding). Offshore 6+ GW planned Baltic Sea capacity (southwest coast Skåne/Halland expansion, Malmö area). HVDC cables to southern load centers required for transmission of far-north wind generation.</li>
+  <li><strong>Biomass/CHP:</strong> ~10% (wood-based combined heat-power significant due to forestry economy). Distributed across central/northern regions. Reduces import dependence.</li>
+  <li><strong>Import capacity:</strong> Historically ~15–20% via 14+ interconnections to Norway (hydro surplus), Finland (nuclear), Denmark (wind), Germany/Poland (market optimization). Russian imports ceased 2022 (energy isolation + geopolitics). Baltic interconnects now provide diversification and resilience.</li>
+  <li><strong>Coal phase-out:</strong> Minimal coal &lt;5%, declining. No hard deadline like Poland/Germany; competitive economics and political pressure driving retirement. Coal-fired plants (Läckeby, Nordjylland coordination) likely retired 2028–2032.</li>
+  <li><strong>Grid stability:</strong> High renewable penetration (20% → 30%+) combined with hydro variability creates frequency support challenges. Synchronous generators (hydro, nuclear) declining relative to wind (inverter-based). Substations at wind connection points face heightened voltage/frequency stress. Svenska kraftnät has activated synthetic inertia requirements and renewable-backing services in northern bidding zones.</li>
+</ul>
+
+<h2>10. Renewable Integration & Grid Modernization</h2>
+
+<p>Sweden is accelerating renewable integration with careful attention to grid stability and cross-border resilience:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Offshore wind:</strong> 6+ GW planned Baltic capacity by 2035 (southwest coast, Malmö area, Stockholm approach). New HVDC interconnects will carry generation southward. Coastal substations (SE3–SE4 interface) will see major voltage/frequency stress during high generation periods. Arctic winter storm interaction with offshore wind forecasting requires new operational protocols.</li>
+  <li><strong>Onshore wind:</strong> ~20+ GW planned across northern regions (Norrbotten, Västerbotten, Jämtland wind belts). Reduces need for long transmission from hydro dams; creates local voltage support challenges at connection substations. Arctic winter storms can drastically change wind generation minute-to-minute (ramp rates critical for stability).</li>
+  <li><strong>Solar PV:</strong> ~5 GW potential in southern regions; rapid rooftop penetration in SE3 (Stockholm metro) and SE4 (Malmö/Gothenburg). Less weather-critical than wind but contributes to seasonal generation variation.</li>
+  <li><strong>Green steel/hydrogen:</strong> HYBRIT project in Norrbotten (Kiruna/Gällivare region) producing green hydrogen via electrolysis powered by local wind + hydro. Emerging demand vector (100–300 MW by 2035) with concentrated load at northern substation clusters. New resilience requirements for critical industrial process loads.</li>
+  <li><strong>Microgrid resilience:</strong> Arctic regions (Norrbotten, Västerbotten) planning islanding capability (local generation + storage) for resilience to transmission outages during winter storms. Test projects underway in Kiruna area.</li>
+  <li><strong>EV charging:</strong> Projected 150–250 MW additional load by 2035 (concentrated in Stockholm SE3 ~100 MW, Malmö/Gothenburg SE4 ~80–100 MW metros). Smart charging with time-of-use tariffs to flatten peaks. T1 (grid stability) amplified in metropolitan substations during peak charging (evening rush hours).</li>
+  <li><strong>Battery storage:</strong> Emerging (currently &lt;100 MW); planned expansion to 2–4 GW by 2035 to smooth wind/hydro variability and support frequency regulation. Storage interconnects at wind generation nodes (north) and demand centers (south).</li>
+</ul>
+
+<h2>11. Administrative & Institutional Framework</h2>
+
+<table>
+<thead><tr><th>Role</th><th>Nordic Equivalent</th><th>Swedish Institution</th><th>Data Contribution</th></tr></thead>
+<tbody>
+<tr><td><strong>Grid Operator</strong></td><td>Finnish: Fingrid, Norwegian: Statnett</td><td>Svenska kraftnät (TSO, state-owned)</td><td>Hourly dispatch, Nordic power exchange (Nord Pool) integration, transmission flows, system adequacy, SCADA telemetry, EHV substation registry, bidding zone operations (SE1–SE4)</td></tr>
+<tr><td><strong>Regulator</strong></td><td>Finnish: Energiavirasto</td><td>Energimarknadsinspektionen (Ei)</td><td>Tariff regulation, performance standards, market oversight, environmental compliance, annual regulatory reports, renewable integration requirements</td></tr>
+<tr><td><strong>Statistics</strong></td><td>Finnish: Tilastokeskus</td><td>SCB (Statistiska centralbyrån)</td><td>Census 2020, regional demographics, employment, income, Län-level data, energy poverty metrics, regional development</td></tr>
+<tr><td><strong>Weather & Flood</strong></td><td>Finnish: FMI</td><td>SMHI (Sveriges meteorologiska och hydrologiska institut)</td><td>Temperature, rainfall, wind, extreme weather alerts, flood forecasts, drought indices, Arctic observations, coastal monitoring, North Sea exposure</td></tr>
+<tr><td><strong>Geology/Seismic</strong></td><td>Finnish: GTK</td><td>SGU (Sveriges geologiska undersökning)</td><td>Geological mapping, hazard maps, landslide inventory, postglacial rebound data, permafrost monitoring, Kiruna mining subsidence tracking</td></tr>
+<tr><td><strong>Environment</strong></td><td>Finnish: SYKE</td><td>Naturvårdsverket (Swedish EPA)</td><td>Air quality, water quality, environmental impact assessments, flood hazard mapping, wetland inventory, climate monitoring, coastal erosion tracking</td></tr>
+<tr><td><strong>Nuclear Safety</strong></td><td>Finnish: STUK</td><td>SSM (Strålsäkerhetsmyndigheten)</td><td>Reactor safety oversight (Forsmark, Ringhals, Oskarshamn), security, decommissioning planning, waste management, radiation protection data</td></tr>
+<tr><td><strong>Land Use/Geodesy</strong></td><td>Finnish: Maanmittauslaitos</td><td>Lantmäteriet (Swedish Land Survey)</td><td>Geodetic data, land use mapping, spatial planning, cadastral records, transmission corridor zoning, coastal baseline mapping</td></tr>
+<tr><td><strong>Mining/Subsidence</strong></td><td>—</td><td>LKAB (Luossavaara-Kiirunavaara AB, state-owned mining)</td><td>Kiruna iron ore mining operations, subsidence monitoring data, local seismic activity tracking</td></tr>
+<tr><td><strong>DNO Operators (170+ total, highly fragmented)</strong></td><td>—</td><td>Vattenfall Eldistribution, Eon Sverige, Ellevio, and ~167 smaller municipal/regional operators</td><td>Local distribution data, customer metrics, outage statistics, DER penetration by municipality, corrosion damage reports</td></tr>
+<tr><td><strong>Open Mapping</strong></td><td>—</td><td>OpenStreetMap</td><td>Power infrastructure, transmission lines, substation locations, Arctic terrain features</td></tr>
+<tr><td><strong>Copernicus (ESA)</strong></td><td>—</td><td>ESA + Swedish research institutions (FOI, SMHI)</td><td>ERA5 weather data, CMIP6 climate projections, satellite imagery for flood/snow monitoring, Arctic observations, wind resource assessment</td></tr>
+</tbody>
+</table>
+
+<h2>12. Component Weights — 6-Component Architecture Preserved</h2>
+
+<p>The SSI v4.0.2 framework maintains the standard 6-component weighting, adapted for Sweden's risk profile with heightened emphasis on environmental/climate hazards (winter storms, snow/ice loading, coastal corrosion) and reduced seismic weight (exceptional stability). Condition and insulation/climate components reflect Arctic equipment requirements and Atlantic corrosion stress. Voltage component elevated due to complex bidding zone interactions and multiple interconnections:</p>
+
+<table class="coefficient-table">
+<tr><th>Component</th><th>Weight</th><th>Sweden-Specific Focus</th></tr>
+<tr><td><strong>C (Condition)</strong></td><td class="num">0.30</td><td>Transformer age, condition state, maintenance quality. Sweden's transmission grid relatively modern (post-1970s investment, ongoing renovation). Arctic equipment in northern zones requires specialized inspection protocols (cold-related failures, ice loading damage, permafrost settlement). Corrosion damage prominent in west coast (C4 zone). Condition monitoring critical due to winter storm damage risk and Atlantic salt spray corrosion. LKAB mining subsidence in Kiruna requires foundation settlement monitoring.</td></tr>
+<tr><td><strong>V (Voltage)</strong></td><td class="num">0.10</td><td>Voltage stress, loading ratio, VoLL. Central metropolitan demand concentration (Stockholm SE3 ~5 GWe) + southern industrial load (Malmö, Gothenburg SE4 ~3.5 GWe). Bidding zone interactions (north hydro/wind surplus, south demand/import dependence) create complex voltage coupling. Northern offshore wind (6+ GW) + central nuclear (Forsmark 3.2 GW) require sophisticated reactive power management. 14+ cross-border interconnections (Norway, Denmark, Finland, Germany, Poland, Lithuania) create cross-grid voltage sensitivity. Elevated stress during wind ramp events (Arctic winter storms).</td></tr>
+<tr><td><strong>I (Insulation/Climate)</strong></td><td class="num">0.25</td><td>Insulation climate stress, Arctic equipment ratings, winter storm/snow/ice damage, Atlantic corrosion aging. Elevated weight reflects dominant winter hazards + coastal corrosion. IRI snow/ice/cold/wind/salt spray components critical. Thermal stress κ_thermal [0.85–1.08] modulates equipment life. Transmission line icing forecasts inform outage risk assessment. Maritime corrosion (C3–C4) in coastal zones (west coast, southern Skåne/Blekinge) accelerates insulation aging. Unique: Atlantic salt spray (C4 west coast) more aggressive than Finnish Baltic. Arctic equipment specifications more stringent in SE1/SE2 than elsewhere in Nordic region.</td></tr>
+<tr><td><strong>E (Environment)</strong></td><td class="num">0.10</td><td>Environmental sensitivity, air quality, corrosion class (C1–C4). Sweden's clean air (low industrial SO₂ except Gothenburg/Malmö) offsets some maritime salt spray stress. Regional climate (Arctic vs. temperate) + Atlantic exposure drives corrosion factor κ_corrosion [0.80–1.15]. Postglacial rebound + permafrost dynamics emerging long-term concerns in north. Kiruna mining subsidence creates localized hazard. Coastal erosion elevated on Atlantic west coast (SE4 Gothenburg area) compared to Finnish Baltic — North Sea wave action 2–3× more energetic.</td></tr>
+<tr><td><strong>S (Hydrological/Seismic)</strong></td><td class="num">0.20</td><td>Seismic PGA (very low, minimal impact), postglacial rebound zones, Kiruna mining subsidence, winter storm risk, snow/ice loading, flooding hazard. Natural seismic hazard MINIMAL (α=0.10, PGA &lt;0.01g, 98% of territory). Weight elevated due to winter meteorological hazards + flooding + coastal erosion. κ_winter = 0.30 (storm dominance), κ_ice = 0.25 (ice loading), κ_flood = 0.20 (snowmelt), κ_coastal = 0.10 (Atlantic exposure). Seismic component negligible (~1.00×) except rebound zones (~1.02×) and Kiruna (~1.01×).</td></tr>
+<tr><td><strong>T (Transition)</strong></td><td class="num">0.05</td><td>DER ratio, EV load, renewable integration stress, grid modernization. Transition stress elevated compared to Finland (no coal phase-out) due to rapid wind expansion (20% → 30%+) and offshore integration (6+ GW HVDC). Focus: offshore wind transmission infrastructure (SE3–SE4 interconnect reinforcement), smart grid/microgrid resilience in Arctic regions (Norrbotten/Västerbotten islanding), Nordic market coupling stability, HYBRIT green steel hydrogen loads in Kiruna (100–300 MW emerging demand). EV charging (150–250 MW by 2035) concentrated in metros (Stockholm 100 MW, Malmö/Gothenburg 80–100 MW). T_transition_modifier [1.05–1.20] for wind integration hubs (SE1–SE2), hydrogen production facilities (Kiruna), and southern import-dependent zones (SE4).</td></tr>
+</tbody>
+</table>
+
+<h2>13. Formula Summary — Sweden SSI v4.0.2</h2>
+
+<div class="formula-box">
+R = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T<br><br>
+where:<br>
+C = f(transformer age, condition state, maintenance quality, Arctic equipment certification, corrosion damage assessment)<br>
+V = f(voltage stress, loading ratio, VoLL, bidding zone coupling, Nordic interconnect sensitivity, wind ramp rates)<br>
+I = f(insulation climate stress, Arctic cold/winter storm/snow/ice loading, Atlantic salt spray corrosion, thermal life expectancy)<br>
+E = f(environmental sensitivity, air quality, corrosion class [C1–C4], maritime salt spray pressure, permafrost risk, mining subsidence)<br>
+S = f(seismic PGA [minimal], postglacial rebound [northern coast ~2%], Kiruna mining subsidence [&lt;0.5%], winter storm intensity, snow/ice/coastal erosion/flooding hazards)<br>
+T = f(DER ratio, EV load, offshore wind integration, renewable penetration [20% → 30%+], Nordic market stability, HYBRIT hydrogen demand)<br><br>
+Modifiers applied: R3_C_mult (social), R4_F_topo (topology, 4-zone bidding structure), R6_restoration, R6_winter_storm, R6_ice_loading, R6_coastal_erosion, R6_seismic (rebound + mining), R7_cyber (Nordic coordinated attack resilience), R_interconnect (14+ cross-border coupling)<br>
+Band classification: Low [&lt;0.25], Medium [0.25–0.50], High [0.50–0.75], Critical [≥0.75]
+</div>
+
+<h2>14. Data Sources — 25+ Swedish Institutions Mapped</h2>
+
+<p>All 95 variables have Swedish equivalents. Primary sources organized by category:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1.5rem;">
+  <li><strong>Grid Operations (Svenska kraftnät):</strong> www.svk.se — hourly dispatch, Nordic power exchange (Nord Pool) integration, system state reports, real-time SCADA, EHV substation registry, bidding zone operations (SE1–SE4), frequency/voltage telemetry, wind/hydro forecast integration</li>
+  <li><strong>Regulation (Energimarknadsinspektionen):</strong> www.ei.se — tariff regulation, performance standards, market oversight, environmental compliance, annual reports, renewable integration requirements, Nordic coordination</li>
+  <li><strong>Statistics (SCB):</strong> www.scb.se — Census 2020, Län-level data, employment, income, regional development metrics, energy poverty surveys, population concentration analysis</li>
+  <li><strong>Meteorology (SMHI):</strong> www.smhi.se — weather forecasts, temperature/rainfall/wind records, extreme weather alerts, flood forecasts, drought indices, Arctic observations, North Sea coastal monitoring, wave/storm surge data</li>
+  <li><strong>Geology (SGU):</strong> www.sgu.se — geological mapping, hazard maps, landslide inventory, postglacial rebound monitoring data, permafrost observations, Kiruna subsidence tracking</li>
+  <li><strong>Environment (Naturvårdsverket):</strong> www.naturvardsverket.se — air quality, water quality, environmental impact assessments, flood hazard maps, wetland/biodiversity data, climate monitoring, coastal erosion tracking</li>
+  <li><strong>Nuclear Safety (SSM):</strong> www.ssm.se — reactor safety oversight (Forsmark, Ringhals, Oskarshamn), security protocols, decommissioning plans, waste management, radiation protection standards</li>
+  <li><strong>Land Survey (Lantmäteriet):</strong> www.lantmateriet.se — geodetic data, land use mapping, spatial planning, cadastral records, transmission corridor zoning, coastal baseline mapping, Arctic terrain features</li>
+  <li><strong>Mining Operations (LKAB):</strong> www.lkab.com — Kiruna iron ore mining data, subsidence monitoring, local seismic activity, operational impact on northern grid infrastructure</li>
+  <li><strong>DNO Operators (170+ total):</strong> Vattenfall Eldistribution, Eon Sverige, Ellevio, and ~167 municipal/regional operators — distribution data, customer count, outage logs, DER penetration, corrosion damage reports, storm resilience assessments</li>
+  <li><strong>Open Mapping (OSM):</strong> OpenStreetMap — power infrastructure, transmission lines, substation locations, transmission tower positions, Arctic terrain mapping</li>
+  <li><strong>Copernicus (ESA):</strong> ERA5 reanalysis weather, CMIP6 climate projections, satellite imagery (Sentinel) for flood/snow extent, Arctic thermal monitoring, wind resource assessment, coastal change detection</li>
+  <li><strong>Nordic Market (Nord Pool):</strong> www.nordpoolgroup.com — price signals, Nordic power exchange data, cross-border flow patterns, wind forecast integration, bidding zone price spreads</li>
+</ul>
+
+<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+<p style="text-align: center; font-size: 0.85rem; color: var(--muted); margin-top: 2rem;">
+<strong>SSI v4.0.2</strong> — Complete Formula Construct (Sweden) · Ikenga Project · 2026-03-27<br>
+95 variables · Stamnätet scored · 4 bidding zones (SE1–SE4) · 2 seismic zones + 1 mining subsidence zone · 4 corrosion classes (C1–C4) · 25+ data sources · 21 Län · 290 Kommuner<br>
+Fennoscandian Shield calibration with ultra-low natural seismicity (α=0.10), postglacial rebound + Kiruna mining subsidence monitoring, Arctic winter storm/ice loading/Atlantic corrosion dominance, hydropower-driven energy mix (40% hydro, 30% nuclear, 20% wind, 10% biomass), and 14+ Nordic interconnect resilience
+</p>
+
+</div>
+</body>
+</html>
