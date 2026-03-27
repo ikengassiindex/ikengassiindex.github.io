@@ -224,7 +224,7 @@ p  { margin-bottom: 14px; }
 
   <!-- ── Header ── -->
   <div class="page-header">
-    <div class="label-xs" style="margin-bottom:6px;">ANNUAL ESG DISCLOSEnergiavirasto — REPORTING PERIOD 2025</div>
+    <div class="label-xs" style="margin-bottom:6px;">ANNUAL ESG DISCLOSURE · Energimarknadsinspektionen — REPORTING PERIOD 2025</div>
     <h1>Substation ESG Report</h1>
     <p>Substation-level Environmental, Social, and Governance assessment aligned to CSRD/ESRS, EU Taxonomy, TCFD, SFDR, and UN PRI frameworks. Updated annually via the SSI Index scoring engine.</p>
   </div>
@@ -378,8 +378,8 @@ const ESG_REPORTS = [
       return [
         ['Insulation Risk (I component)', d.components?.I?.toFixed(3) || '—'],
         ['Environment Component (E)', d.components?.E?.toFixed(3) || '—'],
-        ['Flooding Hazard (Finnish Rivers)', (d['winter_storms_coastal_flooding']?.hazard_level || '—')],
-        ['Winter Storm/Ice Loading Risk', (d['snow_loading']?.risk_class || '—')],
+        ['Flooding Hazard (Coastal/River)', (d.climate_trajectory?.I2_trajectory?.toFixed(4) || '—')],
+        ['Winter Storm/Ice Loading Risk', (d.climate_trajectory?.I3_trajectory?.toFixed(4) || '—')],
         ['Markov Risk Score', d.markov?.risk_score?.toFixed(3) || '—'],
         ['ETTC (time to criticality)', ((d.markov?.ettc_years || d.markov?.ETTC_years) || '—') + ' years'],
         ['P(critical) at 20 years', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—')],
@@ -388,17 +388,17 @@ const ESG_REPORTS = [
     },
     getVariables: function(d) {
       return [
-        ['I1', 'Snow/Ice IRI', '—', 'ESRS E1-9: Financial effects from physical risks', d.components?.I ? 'ready' : 'gap'],
-        ['I2', 'Tree-fall IRI', '—', 'TCFD Strategy (b): Physical risk impact', d.components?.I ? 'ready' : 'gap'],
-        ['I3', 'Heat-wave IRI', '—', 'EU Taxonomy Annex A: Heat stress', d.components?.I ? 'ready' : 'gap'],
-        ['I5', 'Thermal stress', '—', 'ESRS E1-4: Climate mitigation targets', d.components?.I ? 'ready' : 'gap'],
-        ['R2', 'Climate trajectory', (d.markov?.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr)' : 'N/A'), 'TCFD Strategy (c): Scenario analysis', d.markov?.p_crit_20yr !== undefined ? 'ready' : 'gap'],
-        ['Flood', 'Finnish river basin exposure', (d['winter_storms_coastal_flooding']?.hazard_level || '—'), 'EU Taxonomy Annex A: Hydrological hazards', d['winter_storms_coastal_flooding']?.hazard_level ? 'ready' : 'gap'],
-        ['Winter_Load', 'Winter storm and ice loading', (d['snow_loading']?.risk_class || '—'), 'TCFD Risk Management: Climate-related risk', d['snow_loading']?.risk_class ? 'ready' : 'gap'],
+        ['I1', 'Snow/Ice IRI', d.climate_trajectory?.I1_trajectory?.toFixed(4) || '—', 'ESRS E1-9: Financial effects from physical risks', d.climate_trajectory?.I1_trajectory ? 'ready' : 'gap'],
+        ['I2', 'Tree-fall IRI', d.climate_trajectory?.I2_trajectory?.toFixed(4) || '—', 'TCFD Strategy (b): Physical risk impact', d.climate_trajectory?.I2_trajectory ? 'ready' : 'gap'],
+        ['I3', 'Heat-wave IRI', d.climate_trajectory?.I3_trajectory?.toFixed(4) || '—', 'EU Taxonomy Annex A: Heat stress', d.climate_trajectory?.I3_trajectory ? 'ready' : 'gap'],
+        ['I5', 'Thermal stress', d.components?.I?.toFixed(4) || '—', 'ESRS E1-4: Climate mitigation targets', d.components?.I ? 'ready' : 'gap'],
+        ['R2', 'Climate trajectory', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '% (20yr)' : 'N/A'), 'TCFD Strategy (c): Scenario analysis', d.markov?.p_critical_20yr !== undefined ? 'ready' : 'gap'],
+        ['Flood', 'Coastal/river basin exposure', d.climate_trajectory?.I2_trajectory?.toFixed(4) || '—', 'EU Taxonomy Annex A: Hydrological hazards', d.climate_trajectory?.I2_trajectory ? 'ready' : 'gap'],
+        ['Winter_Load', 'Winter storm and ice loading', d.climate_trajectory?.I3_trajectory?.toFixed(4) || '—', 'TCFD Risk Management: Climate-related risk', d.climate_trajectory?.I3_trajectory ? 'ready' : 'gap'],
         ['Markov', 'p_critical_20yr', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—'), 'ESRS E1-9: Time horizons', d.markov?.p_critical_20yr === 0 ? 'partial' : 'ready']
       ];
     },
-    validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. Sweden-specific winter storms and coastal flooding hazard derived from FMI hydrological monitoring. Nuclear facility snow loading risk integrated from SYKE environmental monitoring data. All inputs are production-grade with institutional provenance.'
+    validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. Sweden-specific winter storms and coastal flooding hazard derived from SMHI hydrological monitoring and MSB (Myndigheten för samhällsskydd och beredskap) risk assessments. Nuclear facility snow loading risk integrated from SGU geological survey data. All inputs are production-grade with institutional provenance.'
   },
   {
     id: 'report-2', num: '2', title: 'Grid Equity & Social Vulnerability',
@@ -421,11 +421,11 @@ const ESG_REPORTS = [
         ['V_socio (energy poverty index)', se.V_socio?.toFixed(2) || '—'],
         ['EP Rate (energy poverty %)', (se.EP_rate_region || '—') + '%'],
         ['Unemployment Rate', (se.unemployment_rate || '—') + '%'],
-        ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('PL_')===0?'zł':id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
-        ['R&D % of GDP', (se.rd_pct_gdp || '—') + '%'],
+        ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('SE_')===0?'kr':id.indexOf('PL_')===0?'zł':id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('FI_')===0?'€':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
+        ['R&D % of GDP', (se.rd_pct_gdp !== undefined ? se.rd_pct_gdp + '%' : '—')],
         ['R3 Social Multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—'],
-        ['Nuclear Facility Exposure', d.socio_economic?.coal_mining_pct ? d.socio_economic.coal_mining_pct + '%' : '—'],
-        ['Migration Score', d.socio_economic?.migration_score !== undefined ? d.socio_economic.migration_score.toFixed(2) : '—']
+        ['Nuclear Proximity', d.socio_economic?.nuclear_proximity !== undefined ? d.socio_economic.nuclear_proximity.toFixed(3) : '—'],
+        ['Migration Score', d.socio_economic?.migration_score !== undefined ? d.socio_economic.migration_score.toFixed(3) : '—']
       ];
     },
     getVariables: function(d) {
@@ -434,11 +434,11 @@ const ESG_REPORTS = [
         ['V_socio', 'Energy poverty index', se.V_socio?.toFixed(2) || '—', 'ESRS S2-4: Impacts on affected communities', se.V_socio ? 'ready' : 'gap'],
         ['EP_rate', 'Energy poverty rate', (se.EP_rate_region || '—') + '%', 'SFDR PAI #14: Fossil fuel exposure proxy', se.EP_rate_region ? 'ready' : 'gap'],
         ['R3', 'Social multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—', 'ESRS S1-6: Workforce characteristics', d.modifiers?.R3_C_mult ? 'ready' : 'gap'],
-        ['Nuclear_facility', 'Nuclear facility exposure', (d.socio_economic?.coal_mining_pct ? d.socio_economic.coal_mining_pct + '%' : '—'), 'SFDR PAI: Just transition monitoring', d.socio_economic?.coal_mining_pct ? 'ready' : 'gap'],
+        ['Nuclear_proximity', 'Nuclear facility proximity', (d.socio_economic?.nuclear_proximity !== undefined ? d.socio_economic.nuclear_proximity.toFixed(3) : '—'), 'SFDR PAI: Just transition monitoring', d.socio_economic?.nuclear_proximity !== undefined ? 'ready' : 'gap'],
         ['Community', 'Catchment population', (d.socio_economic?.population ? d.socio_economic.population.toLocaleString() : '—'), 'ESRS S2: Community impact', d.socio_economic?.population ? 'ready' : 'gap']
       ];
     },
-    validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using Tilastokeskus (Finnish Central Statistical Office) household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, nuclear facility proximity, elderly concentration, and net outward migration. Nuclear facility exposure percentage sourced from SYKE environmental monitoring and regional employment registries. PARTIAL status reflects missing detailed elderly vulnerability enrichments — available from Tilastokeskus at kunta level.'
+    validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using SCB (Statistiska centralbyrån) household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, nuclear facility proximity, elderly concentration, and net outward migration. Nuclear proximity scores based on distance to Forsmark, Ringhals, and Oskarshamn facilities. PARTIAL status reflects missing detailed elderly vulnerability enrichments — available from SCB at kommun level.'
   },
   {
     id: 'report-3', num: '3', title: 'EU Taxonomy Alignment',
@@ -475,7 +475,7 @@ const ESG_REPORTS = [
         ['R5', 'Asymmetric CI', d.CI_width?.toFixed(3) || '—', 'ESRS: Uncertainty quantification', d.CI_width ? 'ready' : 'gap']
       ];
     },
-    validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6 restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. Sweden-specific hazard data (winter storms and coastal flooding, snow loading) integrated from FMI and SYKE environmental monitoring. All inputs are from institutional open-source data with citable vintage — meeting CSRD Article 29a limited assurance requirements.'
+    validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6 restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. Sweden-specific hazard data (winter storms, ice loading, coastal flooding) integrated from SMHI and MSB risk assessments. All inputs are from institutional open-source data with citable vintage — meeting CSRD Article 29a limited assurance requirements.'
   },
   {
     id: 'report-4', num: '4', title: 'Energy Transition & DER Stress',
@@ -512,7 +512,7 @@ const ESG_REPORTS = [
         ['Renewables', 'Wind + solar generation %', (d.transition?.renewable_pct || '—') + '%', 'EU Green Deal: 42.5% RES by 2030', d.transition?.renewable_pct !== undefined ? 'ready' : 'gap']
       ];
     },
-    validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from Energiavirasto (Finnish Energy Regulatory Authority) and renewable installation registries. Renewable generation percentage from Fingrid (Finnish TSO) 2025 data. DER_ratio > 1.0 indicates net export during peak generation — a marker of successful energy transition with associated infrastructure stress.'
+    validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from Energimarknadsinspektionen (Ei) and Energimyndigheten renewable installation registries. Renewable generation percentage from Svenska kraftnät (Swedish TSO) 2025 data. DER_ratio > 1.0 indicates net export during peak generation — a marker of successful energy transition with associated infrastructure stress.'
   },
   {
     id: 'report-5', num: '5', title: 'Pollution & Corrosion',
@@ -540,11 +540,11 @@ const ESG_REPORTS = [
       return [
         ['Corrosion', 'ISO 9223 class', d.markov?.corrosion_class || '—', 'ESRS E2: Pollution risk classification', d.markov?.corrosion_class ? 'ready' : 'gap'],
         ['E2_local', 'Environmental sensitivity (PM2.5)', d.socio_economic?.E2_local?.toFixed(2) || '—', 'ESRS E2: Air quality impact', d.socio_economic?.E2_local ? 'ready' : 'gap'],
-        ['Air_Quality', 'Air quality zone (SYKE)', (d.environmental?.air_quality_class || '—'), 'ESRS E2: Air pollution monitoring', d.environmental?.air_quality_class ? 'ready' : 'gap'],
+        ['Air_Quality', 'Air quality zone (Naturvårdsverket)', (d.environmental?.air_quality_class || '—'), 'ESRS E2: Air pollution monitoring', d.environmental?.air_quality_class ? 'ready' : 'gap'],
         ['E', 'Environment component', d.components?.E?.toFixed(3) || '—', 'ISO 9223: Atmospheric corrosion', d.components?.E ? 'ready' : 'gap']
       ];
     },
-    validity: 'Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Status depends on whether the corrosion class shows real variance across the fleet or uses default values. Full validation requires Finnish environmental agency (SYKE) air quality monitoring overlay at substation coordinates (SO2, NOx, PM2.5 deposition). Sweden-specific data sourced from SYKE environmental monitoring database of air quality observations.'
+    validity: 'Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Status depends on whether the corrosion class shows real variance across the fleet or uses default values. Full validation requires Naturvårdsverket (Swedish EPA) air quality monitoring overlay at substation coordinates (SO2, NOx, PM2.5 deposition). Sweden-specific corrosion data informed by SGU geological survey and coastal proximity analysis.'
   },
   {
     id: 'report-6', num: '6', title: 'Cybersecurity Exposure',
@@ -556,7 +556,7 @@ const ESG_REPORTS = [
     legendColor: '#3a7ca5',
     why: 'The NIS2 Directive mandates cybersecurity risk management for energy operators. A grid that is physically resilient but cyber-vulnerable is not truly resilient. The SSI R7 modifier combines SCADA assessment, communication architecture analysis, and national-level cyber maturity (ENISA/DESI indices) to produce a substation-level digital vulnerability score. Sweden\'s role as a critical EU energy infrastructure hub makes cyber resilience a strategic imperative.',
     sdgRationale: function(d) {
-      return `Target 9.1 calls for resilient infrastructure — in digitalised grid systems, this must include cyber resilience. The R7 modifier (${d.modifiers?.R7_cyber?.toFixed(3) || '—'}) assesses digital vulnerability combining SCADA exposure, communication protocol security, and Finnish national cyber maturity. SDG 16 (Strong Institutions) also applies: NIS2 compliance is a governance imperative for energy operators, and the betweenness centrality (${d.graph_topology?.BC_percentile?.toFixed(3) || '—'}) identifies single-point-of-failure risk in the grid topology.`;
+      return `Target 9.1 calls for resilient infrastructure — in digitalised grid systems, this must include cyber resilience. The R7 modifier (${d.modifiers?.R7_cyber?.toFixed(3) || '—'}) assesses digital vulnerability combining SCADA exposure, communication protocol security, and Swedish national cyber maturity. SDG 16 (Strong Institutions) also applies: NIS2 compliance is a governance imperative for energy operators, and the betweenness centrality (${d.graph_topology?.BC_percentile?.toFixed(3) || '—'}) identifies single-point-of-failure risk in the grid topology.`;
     },
     getProfile: function(d) {
       const gt = d.graph_topology || {};
@@ -578,7 +578,7 @@ const ESG_REPORTS = [
         ['NIS2', 'Critical infrastructure status', (d.governance?.nis2_critical ? 'Critical' : 'Non-critical'), 'NIS2 Directive: Operator designation', d.governance?.nis2_critical !== undefined ? 'ready' : 'gap']
       ];
     },
-    validity: 'R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. NIS2 criticality designations sourced from Energiavirasto and Finnish NCSC-FI (Traficom). Substation-level SCADA data is operator-proprietary — the national-level proxy provides a baseline but not asset-specific granularity.'
+    validity: 'R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. NIS2 criticality designations sourced from Energimarknadsinspektionen (Ei) and Swedish CERT-SE (MSB). Substation-level SCADA data is operator-proprietary — the national-level proxy provides a baseline but not asset-specific granularity.'
   }
 ];
 
@@ -586,16 +586,16 @@ const ESG_REPORTS = [
 const COUNTRY_SOURCES = {
   sweden: [
     ['ERA5 Climate Reanalysis','Copernicus CDS','2024','Weekly','CC-BY-4.0','R1, R3'],
-    ['Finnish Flood Risk Maps','FMI (Finnish Meteorological Institute)','2023','Multi-year','CC0','R1, R3'],
-    ['Winter Storm & Ice Load Data','SYKE Environmental Monitoring','2023','Annual','Regulated','R1, R3'],
-    ['Population & Economics','Tilastokeskus (Central Statistical Office of Sweden)','2023','Annual','OGD','R2, R3'],
-    ['Energy Market Data','Energiavirasto (Energy Regulatory Authority of Sweden)','2023','Annual','Regulated','R2, R4'],
-    ['Grid Operations Data','Fingrid (Finnish TSO)','2024','Monthly','Regulated','R2, R4'],
-    ['Renewable Installations','CIRE (Central Database of Renewable Energy Installations)','2024','Monthly','Open','R4'],
-    ['Air Quality Monitoring','SYKE (Finnish Environment Institute)','2023','Annual','CC-BY-4.0','R5'],
+    ['Flood & Hydrological Risk Maps','SMHI (Swedish Meteorological and Hydrological Institute)','2024','Multi-year','CC0','R1, R3'],
+    ['Winter Storm & Ice Load Data','MSB (Myndigheten för samhällsskydd och beredskap)','2024','Annual','Regulated','R1, R3'],
+    ['Population & Economics','SCB (Statistiska centralbyrån)','2024','Annual','OGD','R2, R3'],
+    ['Energy Market Data','Energimarknadsinspektionen (Ei)','2024','Annual','Regulated','R2, R4'],
+    ['Grid Operations Data','Svenska kraftnät (Swedish TSO)','2024','Monthly','Regulated','R2, R4'],
+    ['Renewable Installations','Energimyndigheten (Swedish Energy Agency)','2024','Monthly','Open','R4'],
+    ['Air Quality Monitoring','Naturvårdsverket (Swedish EPA)','2024','Annual','CC-BY-4.0','R5'],
     ['Cybersecurity Index','ENISA','2024','Biennial','Open','R6'],
     ['DESI Connectivity','European Commission','2024','Annual','Open','R6'],
-    ['NIS2 Criticality','Finnish NCSC-FI (Traficom)','2024','Annual','Regulated','R6'],
+    ['NIS2 Criticality','Swedish CERT-SE (MSB)','2024','Annual','Regulated','R6'],
     ['IEEE C57.91 Thermal Model','IEEE','Standard','N/A','Published','R1'],
     ['CIGRE TB 761 Markov','CIGRE','2019','N/A','Published','R1, R3'],
     ['ISO 9223 Corrosion','ISO','2012','N/A','Published','R5'],
@@ -782,23 +782,22 @@ function bandClass(classification) {
 /* ── Helper: compute ESG readiness scores ── */
 function computeESGScores(d) {
   let r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0;
-  // R1: Climate — need I components, winter storms and coastal flooding, snow loading, Markov, climate trajectory
+  // R1: Climate — I components, climate trajectory, Markov
   if (d.components?.I) r1 += 0.25;
   if (d.components?.E) r1 += 0.15;
-  if (d['winter_storms_coastal_flooding']?.hazard_level) r1 += 0.15;
+  if (d.climate_trajectory?.I1_trajectory) r1 += 0.15;
   if (d.markov?.risk_score) r1 += 0.20;
   if ((d.markov?.ettc_years || d.markov?.ETTC_years)) r1 += 0.10;
-  // R2 trajectory: check if p_crit_20yr exists
-  if (d.markov?.p_crit_20yr !== undefined) { r1 += 0.15; } else { r1 = Math.min(r1 + 0.15, 0.85); }
+  if (d.markov?.p_critical_20yr !== undefined) r1 += 0.15;
 
-  // R2: Social — need socio_economic suite + nuclear facility exposure + migration
+  // R2: Social — socio_economic suite + nuclear proximity + migration
   if (d.socio_economic?.V_socio) r2 += 0.20;
   if (d.socio_economic?.EP_rate_region) r2 += 0.15;
   if (d.socio_economic?.unemployment_rate) r2 += 0.10;
   if (d.socio_economic?.gdp_per_capita) r2 += 0.10;
   if (d.modifiers?.R3_C_mult) r2 += 0.15;
-  // nuclear facility exposure/migration: check if data exists
-  if (d.socio_economic?.coal_mining_pct) r2 += 0.10;
+  if (d.socio_economic?.nuclear_proximity !== undefined) r2 += 0.10;
+  if (d.socio_economic?.migration_score !== undefined) r2 += 0.05;
   if (d.socio_economic?.population) r2 += 0.05;
 
   // R3: Taxonomy — need R_median, 6 components, modifiers, Markov
