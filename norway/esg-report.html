@@ -757,7 +757,7 @@ const COMP_CONFIG = {
   V: { label: 'Voltage', weight: 0.10, color: '#aa4234' },
   I: { label: 'Insulation', weight: 0.25, color: '#b8863a' },
   E: { label: 'Environment', weight: 0.10, color: '#5d8563' },
-  S: { label: 'Seismic', weight: 0.20, color: '#3a7ca5' },
+  S: { label: 'Saturation', weight: 0.20, color: '#3a7ca5' },
   T: { label: 'Transition', weight: 0.05, color: '#8a7e76' }
 };
 
@@ -1190,7 +1190,8 @@ function renderESGReports(d) {
 
 function renderAuditTrail(d) {
   const mods = d.modifiers || {};
-  const modStr = Object.entries(mods).map(([k, v]) => `${k.replace('_', ' ')}: ${v.toFixed(3)}`).join(', ');
+  const modLabels = { R6_seismic: 'R6b winter_storm' };
+  const modStr = Object.entries(mods).map(([k, v]) => `${(modLabels[k] || k).replace(/_/g, ' ')}: ${v.toFixed(3)}`).join(', ');
   const rows = [
     ['Scoring Engine', 'SSI Index v4.0.2 — Gaussian copula Monte Carlo (10,000 iterations)'],
     ['Weight Architecture', 'C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05'],
