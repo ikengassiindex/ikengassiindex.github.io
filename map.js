@@ -1225,7 +1225,7 @@ if (!hasNested) {
     const basePath = options.basePath || '';
     Promise.all([
       fetch(basePath + 'grid-geo.json?v=20').then(r => r.json()),
-      fetch(basePath + 'ssi-data.json?v=53').then(r => r.json())
+      fetch(basePath + 'ssi-data.json?v=54').then(r => r.json())
     ]).then(([geo, ssi]) => {
       GEO = geo;
       SSI = ssi;
