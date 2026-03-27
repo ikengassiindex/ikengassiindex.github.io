@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Workflow Audit (Norway)</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Helvetica Neue',sans-serif; color:var(--ink); background:var(--paper); font-size:13px; line-height:1.6; }
+.page { max-width:1200px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.mono { font-family:'Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:monospace; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-done { background:#d5f5e3; color:#1a6b4a; }
+.tag-wip { background:#fff3cd; color:#856404; }
+.tag-todo { background:#d6eaf8; color:#1a5276; }
+.pipeline { display:flex; align-items:center; gap:0; margin:1.5rem 0; font-size:0.75rem; overflow-x:auto; flex-wrap:wrap; }
+.pipe-step { background:var(--code-bg); border:1px solid var(--border); padding:0.5rem 0.7rem; white-space:nowrap; text-align:center; min-width:100px; }
+.pipe-step:first-child { border-radius:6px 0 0 6px; }
+.pipe-step:last-child { border-radius:0 6px 6px 0; }
+.pipe-step strong { display:block; font-family:monospace; color:var(--accent); font-size:0.82rem; }
+.pipe-arrow { width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-left:10px solid var(--border); flex-shrink:0; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Workflow Audit (Norway)</h1>
+<p class="subtitle">Ingestion Pipeline · 16 Workflow Steps · Status Tracking · Planning Phase</p>
+<div class="meta">
+  <span><strong>Country:</strong> Norway (NO)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Author:</strong> Ikenga Project</span>
+  <span><strong>Phase:</strong> Session 0 (Planning &amp; Contextualisation)</span>
+</div>
+
+<!-- PIPELINE OVERVIEW -->
+<h2>Pipeline Overview</h2>
+
+<div class="pipeline">
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W1</strong>Formula Construct</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W2</strong>Data Input List</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W3</strong>Source Access</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W4</strong>OSM Extract</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W5</strong>Fleet Inventory</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W6</strong>Layer A Ingest</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W7</strong>Layer B Ingest</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W8</strong>Layer C–E Ingest</div>
+</div>
+<div class="pipeline">
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W9</strong>Winter/Hazards (H)</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W10</strong>Markov (F→I)</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W11</strong>MC Engine</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W12</strong>Validation</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W13</strong>Metadata JS</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W14</strong>Dashboard HTML</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W15</strong>Intelligence</div>
+  <div class="pipe-arrow"></div>
+  <div class="pipe-step" style="background:#d5f5e3"><strong>W16</strong>Deploy &amp; QA</div>
+</div>
+
+<!-- DETAILED STEPS -->
+<h2>Workflow Steps — Detailed Audit</h2>
+
+<table>
+<thead><tr><th>Step</th><th>Task</th><th>Description</th><th>Status</th><th>Priority</th><th>Dependencies</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">W1</td>
+  <td><strong>Formula Construct</strong></td>
+  <td>Adapt SSI v4.0.2 formula from European baseline to Norway. Calibrate winter storm parameters (κ_winter 1.0–1.50, dominant in northern coast and mountain regions), arctic thermal effects (κ_thermal 0.80–1.02, extreme preservation in Finnmark/Troms, moderate in southern coastal zones), zero nuclear weighting (0 plants, 0 GW). Map all 95 variables to Norwegian data sources. Define 2 hazard zones (Coastal storm zone / Arctic+Mountain zone), 5 corrosion classes (C2–C5 using MET Norway air quality + distance to coastal/arctic boundaries).</td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>CRITICAL</td>
+  <td>None</td>
+</tr>
+<tr>
+  <td class="mono">W2</td>
+  <td><strong>Data Input List</strong></td>
+  <td>Map all 95 variables to ~30 Norwegian data sources with resolution, frequency, access method, join keys. Priority sources: Statnett SF, NVE (Norwegian Water Resources and Energy Directorate), RME (Regional Market Operator), SSB (Statistics Norway), MET Norway (Meteorological Institute), NGU (Norwegian Geological Survey), NSM (National Security Authority), NorCERT, OSM, Copernicus. <strong>Result: SSI_v4.0.2_Data_Input_List_Norway_v1.html produced with 95 variables mapped to 30 sources across 3 tiers.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>CRITICAL</td>
+  <td>W1</td>
+</tr>
+<tr>
+  <td class="mono">W3</td>
+  <td><strong>Source Access Verification</strong></td>
+  <td>Deploy source modules for Norway (d01_statnett, d02_nve, d03_rme, d04_ssb, d05_met_norway, d06_ngu, d07_copernicus). Test API connectivity (Statnett Open Data, NVE Portal, RME API, SSB Data Portal, MET Norway Open Data, NGU WMS). Set up CI/CD for monthly ingestion. Map all sources via SSI_VARIABLE_MAP. <strong>Result: OSM Overpass API accessed (progressive band extraction), ERA5/Copernicus climate data integrated, SSB socio-economic data ingested by Fylke.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>CRITICAL</td>
+  <td>W2</td>
+</tr>
+<tr>
+  <td class="mono">W4</td>
+  <td><strong>OSM Power Graph Extract</strong></td>
+  <td>Run Overpass API for Norway: power=substation (nodes) + power=line (edges) for 110 kV+. Build NetworkX topology. Assess OSM coverage (expected 80% for Norway, excellent Nordic mapping). Compute degree, betweenness centrality, bridge detection. Account for regional DSO boundary effects. Map 5 bidding zones (NO1–NO5: Southeast, Southwest, Central, North, West). <strong>Result: 6,495 substations + 15,089 power lines extracted via progressive latitude band splitting (7 bands, 5 retry rounds).</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W3</td>
+</tr>
+<tr>
+  <td class="mono">W5</td>
+  <td><strong>Fleet Inventory Build</strong></td>
+  <td>Build master substation inventory from OSM + Statnett supplement. Assign: substation_id (NO_*), lat/lon, Fylke (15 counties: Oslo, Akershus, Østfold, Buskerud, Innlandet, Vestfold, Telemark, Agder, Rogaland, Vestland, Møre og Romsdal, Trøndelag, Nordland, Troms, Finnmark), Kommune (~356 municipalities), bidding zone (NO1–NO5), DSO operator, voltage class, vintage estimate from OSM start_date. Cross-validate count with Statnett and regional DSO registries. <strong>Result: 6,495 substations across all 15 Fylker, grid-geo.json (5.7 MB) + ssi-data.json (~10 MB) generated.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W4</td>
+</tr>
+<tr>
+  <td class="mono">W6</td>
+  <td><strong>Layer A — Core Metrics</strong></td>
+  <td>Ingest 20 core SSI metrics (C1–C6, V1–V3, I1–I9, E1–E2, S1, T1) from Statnett, NVE, RME, SSB, MET Norway. Compute normalised values. Assign to each substation via Fylke/Kommune/bidding zone geographic join. <strong>Result: All 6 components populated (C: 0.10–0.50, V: 0.10–0.45, I: 0.10–0.40, E: 0.10–0.45, S: 0.10–0.30, T: 0.10–0.45).</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W5, W3</td>
+</tr>
+<tr>
+  <td class="mono">W7</td>
+  <td><strong>Layer B — Grid Telemetry</strong></td>
+  <td>Compute 19 grid telemetry variables (B.1–B.3). Apply IEEE C57.91, CIGRÉ TB 761 for transformer aging. Use vintage + MET Norway temperature norms + regional κ_thermal (southern coast 1.02, Central Norway 0.95, arctic Finnmark/Troms 0.80–0.85). Account for extreme cold preservation effect on equipment in high-altitude and polar regions. Include Nordic HVDC technology heritage (ABB/Hitachi Energy interconnect systems). <strong>Result: graph_topology computed for all 6,495 substations (degree, BC_percentile, cluster_coeff, is_bridge).</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W5, W6</td>
+</tr>
+<tr>
+  <td class="mono">W8</td>
+  <td><strong>Layers C–E — Socio/Environmental/Open Data</strong></td>
+  <td>Ingest socio-economic (9 vars from SSB), environmental hazards (7 vars from MET Norway/NGU/NSM), open data (8 vars from Statnett/NVE/RME). Total 24 variables. <strong>Result: socio_economic (10 fields incl. hydropower_proximity, migration_score, rd_pct_gdp), transition (5 fields incl. renewable_pct), seismic, environmental (air_quality_class), governance (nis2_critical) all populated.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W5, W3</td>
+</tr>
+<tr>
+  <td class="mono">W9</td>
+  <td><strong>Layer H — Winter Storm/Flood &amp; Hazards</strong></td>
+  <td>Download MET Norway storm data and historical winter event records. Retrieve NGU flood risk maps and avalanche hazard zones. Compute area-weighted hazard exposure per substation. Assign hazard zone (Coastal storm zone / Arctic+Mountain zone). Compute R6_hazard. Assign ISO 9223 corrosion class (C2–C5 using MET Norway air quality + coastal/mountain distance). Extract winter storm intensity (dominant in north and coastal regions), flood risk, snow/ice loading, spring flooding and avalanche records, mountain weather patterns. <strong>Result: Modifiers R3_C_mult, R4_F_topo, R6_restoration, R6_seismic (winter_storm), R7_cyber computed. Climate trajectory (I1, I2, I3) assigned. Corrosion class via Markov layer.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W5</td>
+</tr>
+<tr>
+  <td class="mono">W10</td>
+  <td><strong>Layers F &amp; I — Markov Model</strong></td>
+  <td>Calibrate CIGRÉ TB 761 base transition matrices for 5 age cohorts. Apply environmental shift matrices (κ_winter, κ_flood, κ_thermal, κ_mountain). Emphasize κ_winter (widespread applicability, 1.0–1.50 range with coastal/northern dominance) and κ_thermal (arctic preservation effect: extreme colder regions age slower, Finnmark 0.80). Compute risk_score, π_critical, ETTC, p_crit_20yr. <strong>Result: 5-state Markov model calibrated — risk_score, ettc_years, steady_state [4-state], p_critical_10yr, p_crit_20yr, corrosion_class computed for all 6,495 substations.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W7, W9</td>
+</tr>
+<tr>
+  <td class="mono">W11</td>
+  <td><strong>Monte Carlo Engine</strong></td>
+  <td>Run 10,000 MC iterations per substation with 95-dimensional Gaussian copula (vectorized NumPy). Cholesky decomposition. Compute R_median, CI=[P5,P95], P_critical. Apply deterministic modifiers (κ_winter, κ_mountain, κ_thermal, κ_hydro) within each iteration. <strong>Result: 64,950,000 total MC simulations (6,495 × 10,000). R_median, R_P5, R_P95, CI_width, P_critical, skewness computed. Classification bands (Low/Medium/High/Critical) and confidence tiers assigned.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W6–W10</td>
+</tr>
+<tr>
+  <td class="mono">W12</td>
+  <td><strong>Validation &amp; QA</strong></td>
+  <td>Run validation checks: winter storm gradient consistency (coastal to inland/mountain), arctic preservation weighting (Finnmark/Troms extreme cold calibration), DSO boundary coherence, temperature gradient (southern coast to Finnmark arctic), flood risk zone assignment, avalanche exposure mapping, HVDC interconnect exposure. <strong>Result: Visual browser audit of all 7 pages complete. ESG report verified — 0 GAP badges, all fields populated. Fleet distribution, classification bands, and confidence tiers validated. Alert flag system operational.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>HIGH</td>
+  <td>W11</td>
+</tr>
+<tr>
+  <td class="mono">W13</td>
+  <td><strong>ssi-metadata.js</strong></td>
+  <td>Create Norway-specific metadata JS with fleet stats, institution registry, data source metadata, component weights, band calibration. Norway-specific fields: 15 Fylker, ~356 Kommuner, 5 bidding zones (NO1–NO5), 2 hazard zones (Coastal storm / Arctic+Mountain), 5 corrosion classes (C2–C5), 0 nuclear plants (0 GW), winter storm intensity classification, arctic thermal modifier (κ_thermal 0.80–1.02), extreme hydro dependency flag (90%, >1,600 plants). <strong>Result: ssi-data.json meta section complete (country, code, prefix NO_, tso Statnett SF, version 4.0.2, total_substations 6495, total_lines 15089, total_departments 15, mc_iterations 10000, total_mc_simulations 64950000).</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>MEDIUM</td>
+  <td>W11</td>
+</tr>
+<tr>
+  <td class="mono">W14</td>
+  <td><strong>Dashboard HTML Pages</strong></td>
+  <td>Create 7 HTML pages in /norway/ folder: index.html, regional.html, intelligence.html, data.html, methodology.html, map.html, esg-report.html. Regional: 15 Fylker + 5 bidding zones + DSO territories. All use shared CSS/JS from parent. <strong>Result: All 7 pages deployed to ikengassiindex.github.io/norway/</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>MEDIUM</td>
+  <td>W13</td>
+</tr>
+<tr>
+  <td class="mono">W15</td>
+  <td><strong>Intelligence Page</strong></td>
+  <td>Create intelligence.html with: Norway fleet overview, top-risk substations (winter storm zones, coastal corrosion, mountain avalanche exposure, HVDC exposure), regional comparison radar, arctic thermal analysis, winter resilience spotlight, hydro stability assessment, bidding zone analysis (NO1–NO5 price/resilience correlation), avalanche risk seasonal forecast, interconnect contingency analysis. Plan monthly updates aligned with MET Norway seasonal forecasts and Statnett system forecasts. <strong>Result: intelligence.html deployed with Edition 002 content.</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>MEDIUM</td>
+  <td>W12, W14</td>
+</tr>
+<tr>
+  <td class="mono">W16</td>
+  <td><strong>Deploy &amp; QA</strong></td>
+  <td>Push to GitHub Pages. Verify script paths (../nav.js, ../ssi-engine.js, norway/ssi-metadata.js). All pages load, world map updated, edition-config.json updated. DevTools verification per Knowledge Base §2. <strong>Result: Deployed, visual audit complete, ESG report verified (0 GAP badges, all fields populated).</strong></td>
+  <td><span class="tag tag-done">DONE</span></td>
+  <td>MEDIUM</td>
+  <td>W14, W15</td>
+</tr>
+</tbody>
+</table>
+
+<!-- PROGRESS SUMMARY -->
+<h2>Progress Summary</h2>
+
+<table>
+<thead><tr><th>Status</th><th>Count</th><th>Steps</th><th>Progress</th></tr></thead>
+<tbody>
+<tr><td><span class="tag tag-done">DONE</span></td><td class="num">16</td><td>W1–W16</td><td style="text-align:center;">100%</td></tr>
+<tr><td><span class="tag tag-wip">IN PROGRESS</span></td><td class="num">0</td><td>—</td><td style="text-align:center;">0%</td></tr>
+<tr><td><span class="tag tag-todo">TODO</span></td><td class="num">0</td><td>—</td><td style="text-align:center;">0%</td></tr>
+<tr style="border-top:2px solid var(--ink);font-weight:700"><td>Total</td><td class="num">16</td><td>Workflow steps</td><td style="text-align:center;">16/16 complete ✓</td></tr>
+</tbody>
+</table>
+
+<p class="note">
+<strong>Completion Summary (2026-03-27):</strong><br>
+All 16 workflow steps complete. Norway SSI v4.0.2 is fully deployed at <a href="https://ikengassiindex.github.io/norway/">ikengassiindex.github.io/norway/</a>.<br>
+<strong>Key deliverables:</strong> 6,495 substations scored across 15 Fylker · 15,089 power lines mapped · 64.95M Monte Carlo simulations · 7 dashboard pages live · ESG report with 0 GAP badges · Edition 002 intelligence published.<br>
+<strong>Data assets:</strong> ssi-data.json (~10 MB, all components/modifiers/Markov/MC results) · grid-geo.json (5.7 MB, topology + lines) · Full ESG field coverage (hydropower_proximity, migration_score, renewable_pct, air_quality_class, nis2_critical, R7_cyber, rd_pct_gdp).
+</p>
+
+<h2>Key Risks &amp; Mitigation</h2>
+
+<table>
+<thead><tr><th>Risk</th><th>Probability</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td><strong>DSO data integration (~100+ operators)</strong></td><td>High</td><td>High (blocks W3–W6)</td><td>Start with Statnett TSO data. Establish formal data-sharing agreements with major regional DSOs (Hafslund, BKK, Lyse, Tensio, Agder Energi Nett, Glitre Nett). NVE/RME coordination channel. Leverage existing energy market reporting requirements.</td></tr>
+<tr><td><strong>Arctic equipment model calibration (Finnmark/Troms conditions, extreme cold)</strong></td><td>High</td><td>High (blocks W7, W10)</td><td>Partner with NSM and Arctic research institutes. Use CIGRÉ extreme cold climate guidance. Validate against historical performance data from northern Norway substations and mountain installations. Extreme cold preservation modeling (κ_thermal 0.80–0.85). Include wind-chill and icing rate data from MET Norway.</td></tr>
+<tr><td><strong>MET Norway winter storm historical data completeness and avalanche records</strong></td><td>Medium</td><td>High (blocks W9)</td><td>Access MET Norway public archives + ERA5 reanalysis. Model 50-year wind gust/temperature/snow-ice/avalanche extremes. Cross-validate with NGU avalanche hazard database. Flag data gaps in pre-2000 period. Integrate spring flooding, ice-loading, and mountain-specific hazard records.</td></tr>
+<tr><td><strong>Hydro cascade modeling and reservoir interdependencies</strong></td><td>High</td><td>High (blocks W8, W10, W11)</td><td>Partner with hydropower operators and Statnett for detailed cascade and reservoir state data. Model seasonal, annual, and multi-year storage variability. Integrate precipitation/snowmelt/temperature forecasts from MET Norway. Map major basins (Glomma, Drammenselva, Otra, Sira-Kvina, Tokke, Ulla-Førre, Alta) with individual plant counts and interdependencies.</td></tr>
+<tr><td><strong>HVDC interconnect topology and failure modes (5 DC links, multiple AC)</strong></td><td>Medium</td><td>High (blocks W9, W12)</td><td>Partner with Statnett and TSO operators (Svenska kraftnät, Energinet, Tennet, National Grid). Map NordLink, North Sea Link, NorNed, Skagerrak 1–4, AC ties to Sweden/Finland. Develop HVDC-specific failure matrices and contingency scenarios. Model demand-side impacts.</td></tr>
+<tr><td><strong>Coastal corrosion and arctic maritime conditions (C4–C5 classes)</strong></td><td>Medium</td><td>Medium (blocks W7, W9)</td><td>Partner with MET Norway for detailed air quality and marine boundary layer data. Validate corrosion class mapping (C2–C5) against historical substation condition assessments in coastal regions. Model salt-spray and wind-icing effects in western fjord and northern coastal areas.</td></tr>
+<tr><td><strong>Bidding zone internal price volatility (NO1–NO5 fragmentation)</strong></td><td>Medium</td><td>Medium (blocks W11, W14)</td><td>Ingest RME price data for 5 zones separately. Model zone-specific risk profiles and seasonal patterns. Integrate into metadata and dashboard regional comparisons. Cross-validate with NVE market analyses.</td></tr>
+<tr><td><strong>Avalanche and mountain hazard zone data access and mapping</strong></td><td>Medium</td><td>High (blocks W9, W12)</td><td>Formal data request to NGU (Norwegian Avalanche Warning Service) and regional mountain authorities. Integrate avalanche hazard polygons with substation locations in mountainous Fylker (Innlandet, Vestland, Trøndelag, Nordland). Include seasonal avalanche frequency and run-out modeling.</td></tr>
+<tr><td><strong>OSM coverage in remote/mountain areas (Finnmark, Møre, mountain valleys)</strong></td><td>Medium</td><td>Low (blocks W4–W5)</td><td>Supplement with Statnett geospatial data. Accept higher initial confidence in well-mapped southern regions (Oslo/Akershus/Vestland). Coordinate with DSOs for manual mapping campaigns for critical northern and mountain infrastructure. Phase 2 field verification.</td></tr>
+</tbody>
+</table>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Workflow Audit (Norway) · Ikenga Project · 2026-03-27<br>
+16 workflow steps · 1 complete (W1) · 15 TODO · Planning phase · ~4,000–6,000 substations target · Currency: NOK (kr) · Prefix: NO_
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Gap Audit (Norway)</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Helvetica Neue',sans-serif; color:var(--ink); background:var(--paper); font-size:13px; line-height:1.6; }
+.page { max-width:1200px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.mono { font-family:'Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:monospace; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-full { background:#d5f5e3; color:#1a6b4a; }
+.tag-partial { background:#fff3cd; color:#856404; }
+.tag-gap { background:#fadbd8; color:#922b21; }
+.tag-proxy { background:#ebdef0; color:#6c3483; }
+.tag-na { background:#d6eaf8; color:#1a5276; }
+.sev-high { color:#922b21; font-weight:700; }
+.sev-med { color:#856404; font-weight:700; }
+.sev-low { color:#1a6b4a; font-weight:700; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+.summary-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin:1.5rem 0; }
+.summary-card { background:#fff; border:1px solid var(--border); border-radius:6px; padding:0.8rem; text-align:center; }
+.summary-card .number { font-size:1.6rem; font-weight:700; font-family:monospace; }
+.summary-card .label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Gap Audit (Norway)</h1>
+<p class="subtitle">Data Availability Assessment · Coverage Gaps · Quality Concerns · Mitigation Strategies · Pre-Ingestion Planning</p>
+<div class="meta">
+  <span><strong>Country:</strong> Norway (NO)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Variables Assessed:</strong> 95</span>
+  <span><strong>Phase:</strong> Pre-Ingestion Planning</span>
+</div>
+
+<!-- COVERAGE SUMMARY -->
+<h2>Coverage Summary</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="number" style="color:var(--accent3)">63</div><div class="label">Full Coverage (66%)</div></div>
+  <div class="summary-card"><div class="number" style="color:#856404">12</div><div class="label">Partial Coverage (13%)</div></div>
+  <div class="summary-card"><div class="number" style="color:#6c3483">10</div><div class="label">Proxy / Model (11%)</div></div>
+  <div class="summary-card"><div class="number" style="color:var(--accent)">5</div><div class="label">Gap (5%)</div></div>
+  <div class="summary-card"><div class="number" style="color:var(--accent2)">5</div><div class="label">Derived / N/A (5%)</div></div>
+</div>
+
+<p class="note"><strong>Overall Assessment:</strong> Norway has world-class open data infrastructure for energy infrastructure. Statnett (TSO) publishes comprehensive grid data in real-time. NVE provides exceptional hazard mapping (flood zones, avalanche zones, quick clay—uniquely detailed in Europe). MET Norway operates ~300 weather stations with superior Arctic coverage and world-leading frost API (frost.met.no) for programmatic access. NGU (Geological Survey) offers detailed quick clay mapping unmatched elsewhere. SSB (Statistics Norway) provides excellent register-based socio-economic data. Hydropower dominance (~90% of generation) means hydro reservoir data from NVE is critical and comprehensive. Norway's lack of nuclear infrastructure eliminates nuclear-specific gaps but creates unique hydro-dependency risks. Estimated coverage ~91% (comparable to Finland/Sweden but with different hazard profiles). Main gaps: DSO-level data fragmented across 100+ operators, submarine cable condition data, detailed transformer age data (DSO-held), building-level energy poverty data. Strengths: NVE Atlas (world-class hazard mapping), hydro reservoir monitoring (real-time), quick clay hazard maps (NGU), MET Norway frost API.</p>
+
+<!-- GAP 1: DATA AVAILABILITY -->
+<h2>1. Data Availability Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Gap Description</th><th>Severity</th><th>Mitigation</th><th>Fallback Value</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GA-1</td>
+  <td class="mono">I4, B1.2, F.7</td>
+  <td><strong>Substation vintage (installation year):</strong> ~100+ independent DSOs across 15 Fylker and ~356 Kommune with fragmented archival practices. Pre-1980 records sparse outside Statnett infrastructure. OSM start_date coverage ~75-78% for Norway HV. Norwegian electrification timeline: 1900s–1950s (initial hydro), 1950s–1980s (major hydro expansion), 1990s+ (wind integration). Regional variation significant (southern vs northern installation patterns).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Extract vintage from DSO aggregate fleet reports via NVE/RME coordination. Apply Norwegian electrification cohorts: 1900s–1950s (early hydro), 1950s–1980s (major expansion era), 1990s+ (wind/modernization). OSM start_date where available. Cross-reference with Statnett transmission asset inventory. Request standardized data via NVE coordination. Better OSM coverage than some Nordic regions but fragmented DSO archival.</td>
+  <td>Cohort-based age (median vintage per Fylke × σ)</td>
+</tr>
+<tr>
+  <td class="mono">GA-2</td>
+  <td class="mono">C3, C4</td>
+  <td><strong>Voltage quality per-substation:</strong> RME (Norwegian energy regulator) publishes aggregate SAIDI/SAIFI compliance by DSO. Per-substation voltage quality varies across fragmented operators. Regional variation beyond Fylke level limited. Coastal vs inland distinction important (fjord-influenced climate).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use RME compliance rates + DSO annual SAIDI/SAIFI reports. Apply coastal/inland regional variation (coastal industrial zones marginally worse due to salt spray corrosion environment). Markov input: C3 = 0.92 (meets EU standards), C4 from system-level metrics. Norwegian grid reliability excellent; fjord geography creates localized wind channels affecting reliability (downside in some valleys, upside in predictability).</td>
+  <td>C3 = 0.92 (Norway compliance), C4 from RME system-level database</td>
+</tr>
+<tr>
+  <td class="mono">GA-3</td>
+  <td class="mono">B3.1–B3.9</td>
+  <td><strong>Equipment condition (transformer oil, insulation, grounding):</strong> DSOs hold most inspection data (restricted access). Statnett operates transmission equipment with better metadata. NVE has some operational data but granular per-substation condition data not published. Mountain and fjord geography creates unique environmental stresses (alpine loads, salt spray in fjords).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Apply IEEE C57.91 + CIGRÉ TB 761 models calibrated to Norwegian climate (cold, wet, steep terrain). MET Norway temperature norms and Statnett load history validate. Arctic/boreal cold PRESERVES insulation (lower thermal aging vs temperate regions). Mountain altitude and fjord humidity create dual environment: (1) High-altitude zones = lower humidity, better preservation. (2) Fjord zones = salt spray, higher corrosion (apply 1.1× degradation for coastal). Widen σ for pre-1950 hydro-era equipment.</td>
+  <td>Age-based curves (CIGRÉ TB 761) with κ_thermal [0.82–0.92] (Arctic benefit) and κ_corrosion [0.95–1.15] (fjord penalty)</td>
+</tr>
+<tr>
+  <td class="mono">GA-4</td>
+  <td class="mono">V2</td>
+  <td><strong>Critical infrastructure dependency:</strong> SSB register-based system available with excellent coverage. Per-substation mapping feasible via spatial analysis. OSM completeness ~80-85% for Norway HV (excellent for Nordic region, better in south/central, sparser in north). Mountain terrain and fjord isolation create critical infrastructure dependency clusters (hospitals/schools in valley concentrations).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use SSB municipal facility counts (hospitals, schools, emergency services) by Kommune. Geofence within 10 km and account for valley geography (critical facilities concentrated in valleys). Industrial zones: use mining registries (critical in Finnmark, Nord-Trøndelag). Population density weighting with terrain adjustment (valleys higher density/dependency). Better OSM coverage than some Nordic regions but mountain terrain complicates spatial analysis.</td>
+  <td>Kommune-level critical facility count × pop density with terrain factor</td>
+</tr>
+<tr>
+  <td class="mono">GA-5</td>
+  <td class="mono">E2</td>
+  <td><strong>Employment by sector (β decomposition):</strong> SSB SN (NACE equivalent) provides excellent employment by Fylke. Sector mapping to β weights requires standard mapping. Quarterly labor force survey available. Hydropower dependency means energy sector employment varies significantly by region.</td>
+  <td class="sev-low">LOW</td>
+  <td>Map SN to β_H/β_M/β_L. SN mining (Finnmark) → β_H. SN energy + manufacturing → β_H. SN construction/services → β_M. SSB quarterly labor force survey for interpolation. Weight regional variation: northern Fylker have higher energy sector dependency (Statnett, hydro) vs southern urban areas.</td>
+  <td>National average β scaled by Fylke employment</td>
+</tr>
+<tr>
+  <td class="mono">GA-6</td>
+  <td class="mono">C.3</td>
+  <td><strong>Energy poverty temporal:</strong> SSB + Eurostat SILC provide data. Norway's energy poverty lower than EU average (~3%, competitive with Nordic peers). Annual coverage available but Norwegian wealth means energy poverty typically driven by geographic isolation rather than poverty.</td>
+  <td class="sev-low">LOW</td>
+  <td>Use most recent SSB/Eurostat year. Norway's advantage: high incomes, strong social support, low baseline poverty. Geographic isolation (remote valleys, islands) drives higher energy costs and seasonal vulnerability. Widen σ 0.015/yr for remote regions (geographic isolation factor more relevant than income poverty).</td>
+  <td>Most recent SSB + linear interpolation with geographic isolation adjustment</td>
+</tr>
+<tr>
+  <td class="mono">GA-7</td>
+  <td class="mono">F.5, F.6, F.12</td>
+  <td><strong>Markov recovery rates (maintenance CAPEX):</strong> RME publishes aggregate CAPEX by DSO/year. Per-substation data unavailable but Norwegian DSOs generally well-capitalized. Statnett invests heavily in transmission maintenance. Harsh climate (avalanches, flooding, snow load) increases maintenance needs.</td>
+  <td class="sev-low">LOW</td>
+  <td>Use RME regulatory database (CAPEX as % of revenue). Norwegian DSOs and Statnett historically strong maintenance investment. Apply 1.08–1.15× multiplier vs CIGRÉ baseline (higher vs Sweden due to avalanche/flood hazard maintenance). Mountain avalanche hazard and flood risk drive elevated maintenance budgets. Monitor NVE hazard alert systems for maintenance intensity correlation.</td>
+  <td>CIGRÉ TB 761 × 1.10 (Norway hazard-driven maintenance factor)</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 2: RESOLUTION GAPS -->
+<h2>2. Resolution Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Available Resolution</th><th>Desired Resolution</th><th>Gap</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GR-1</td>
+  <td class="mono">C1, C2, G.1 (CAIDI)</td>
+  <td>Fylke (15) or DSO level</td>
+  <td>Substation or district</td>
+  <td class="sev-med">Regional fragmentation</td>
+  <td>Within-Fylke from SSB demographics. RME publishes annual SAIDI by DSO. Sub-regional from power density (load per km²) accounting for fjord/mountain topology. Norway's administrative structure: 15 Fylker (~23,000 km² average) + ~356 Kommune (smaller, excellent statistics available). Mountain terrain and fjord topology require terrain-weighted spatial interpolation.</td>
+</tr>
+<tr>
+  <td class="mono">GR-2</td>
+  <td class="mono">S1 (grid capacity)</td>
+  <td>System-wide (Statnett) or Fylke</td>
+  <td>Substation or transmission line</td>
+  <td class="sev-low">Regional-level</td>
+  <td>Statnett publishes bidding zone maps (NO1–NO5 reveal regional capacity). Sub-regional capacity sparse. Fallback: uniform within Fylke adjusted for demand density and hydro resource availability. Hveen region (NO5 - south) shows tighter capacity than northern zones (NO1-NO2). Monitor Statnett capacity reports.</td>
+</tr>
+<tr>
+  <td class="mono">GR-3</td>
+  <td class="mono">V1 (VoLL)</td>
+  <td>Fylke from RME tariff studies</td>
+  <td>Substation or DSO area</td>
+  <td class="sev-low">Fylke-level</td>
+  <td>Use SSB economic data (GDP by Fylke). Apply sector weighting (mining/energy-intensive regions higher VoLL, agricultural/rural lower). North-south transmission bottleneck (NO1→NO5 price differentials) reflects regional VoLL. Coastal zones have higher economic activity (fish/energy processing) → higher VoLL. Mountain valleys lower economic density → lower VoLL.</td>
+</tr>
+<tr>
+  <td class="mono">GR-4</td>
+  <td class="mono">I1, I3, I5 (weather)</td>
+  <td>MET Norway ~300 stations, world-class Arctic coverage + frost.met.no API</td>
+  <td>Substation exact location</td>
+  <td class="sev-low">Excellent</td>
+  <td>IDW from nearest 3 MET Norway stations. frost.met.no programmatic API excellent for seasonal modeling. Copernicus ERA5 0.25° grid as backup. MET Norway coverage superior to Nordic peers in fjord regions and mountain valleys. Frost modeling (freeze-thaw) critical for Norwegian infrastructure. Mountain stations sparse in some high-altitude zones (apply Copernicus ERA5 fill).</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 3: TEMPORAL GAPS -->
+<h2>3. Temporal / Frequency Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Available Freq.</th><th>Desired Freq.</th><th>Staleness Risk</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GT-1</td>
+  <td class="mono">D-SSB (Census, Demographics)</td>
+  <td>Census + annual register-based updates</td>
+  <td>Annual</td>
+  <td class="sev-low">LOW</td>
+  <td>Norway's population register updated continuously (not decennial like others). Annual demographic data available. δ_staleness = 0.01/yr (excellent).</td>
+</tr>
+<tr>
+  <td class="mono">GT-2</td>
+  <td class="mono">C.3 (income/poverty)</td>
+  <td>SSB annual + Eurostat SILC biennial</td>
+  <td>Annual</td>
+  <td class="sev-low">LOW</td>
+  <td>SSB provides annual income data. Eurostat SILC adds EU-harmonized poverty measure. Geographic isolation (valley/island communities) more relevant than income poverty. δ_staleness = 0.015/yr (low due to stability).</td>
+</tr>
+<tr>
+  <td class="mono">GT-3</td>
+  <td class="mono">D6, G.1 (SAIDI/CAIDI)</td>
+  <td>Annual (RME publishes Q2 following year)</td>
+  <td>Quarterly</td>
+  <td class="sev-low">LOW</td>
+  <td>RME annual reliability report. Statnett publishes monthly system metrics real-time. δ_staleness = 0.03/yr.</td>
+</tr>
+<tr>
+  <td class="mono">GT-4</td>
+  <td class="mono">D-DSO (utility reports)</td>
+  <td>Annual (published Q1–Q2)</td>
+  <td>Quarterly</td>
+  <td class="sev-low">LOW</td>
+  <td>RME collects annual data from DSOs. δ_staleness = 0.05/yr (manageable).</td>
+</tr>
+<tr>
+  <td class="mono">GT-5</td>
+  <td class="mono">Geological monitoring (NGU/NVE)</td>
+  <td>Continuous + annual reports</td>
+  <td>Real-time</td>
+  <td class="sev-low">LOW</td>
+  <td>NGU monitors quick clay hazard (unique to Norway), avalanche zones. NVE publishes varsom.no avalanche forecasts real-time (daily during season). Excellent monitoring. δ_staleness = 0/yr (continuous).</td>
+</tr>
+<tr>
+  <td class="mono">GT-6</td>
+  <td class="mono">Flood risk (NVE) + Hydro data</td>
+  <td>Continuous monitoring + daily flood forecasts</td>
+  <td>Daily/Real-time</td>
+  <td class="sev-low">LOW</td>
+  <td>NVE publishes daily flood forecasts and flood zone maps (NVE Atlas). Statnett provides real-time hydropower reservoir levels. Spring flooding (snowmelt) is seasonal and highly predictable. δ_staleness = 0/yr (real-time).</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 4: QUALITY CONCERNS -->
+<h2>4. Data Quality Concerns</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Quality Concern</th><th>Severity</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GQ-1</td>
+  <td class="mono">D7, G.2 (OSM power graph)</td>
+  <td><strong>OSM completeness for Norwegian power infrastructure:</strong> OSM coverage ~75-80% for HV in Norway. Better in urban/central areas (Oslo, Bergen, Stavanger ~88-92%), variable in northern/mountain regions (~70-75%). Fjord and mountain terrain complicates mapping. Less comprehensive than Sweden but improving rapidly.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Cross-validate with Statnett transmission map (published). Supplement with DSO data requests via NVE/RME. Kartverket (Norwegian Mapping Authority) has authoritative infrastructure layers. Flag mountain/fjord regions with lower confidence. Mountain valleys and remote fjord areas sparse in OSM (prioritize DSO outreach for these zones). Target OSM improvement campaign for Norwegian coverage gaps.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-2</td>
+  <td class="mono">H.1, H.3 (Geological hazard)</td>
+  <td><strong>Quick clay hazard mapping (unique to Norway):</strong> NGU provides world-leading quick clay mapping (kvikkleire). Quick clay present in ~10,000 km² across eastern and coastal regions. Causes catastrophic landslides (sensitivity ~100x normal clay). Infrastructure impacts localized but severe. NVE Atlas integrates NGU quick clay maps.</td>
+  <td class="sev-high">HIGH</td>
+  <td>Use NVE Atlas quick clay hazard layer (NgE-classification). Identify all substations/transmission lines in NGU-mapped quick clay zones (est. ~50-100 substations in high-risk areas). Apply infrastructure-specific vulnerability: foundation instability, slope failure, site abandonment risk. NGU NVE Atlas classification provides confidence levels. Request DSO infrastructure siting data for quick clay zone verification. Monitor active quick clay research (NGU KVIKKLEIRE database).</td>
+</tr>
+<tr>
+  <td class="mono">GQ-3</td>
+  <td class="mono">H.4, H.5, H.7 (Avalanche + Coastal corrosion)</td>
+  <td><strong>Avalanche hazard (NVE varsom) + Coastal corrosion:</strong> Avalanche hazard maps from NVE available for all Fylker. Affects mountain infrastructure (Norges hydro lines, mountain substations). Coastal corrosion high in western fjord regions (maritime salt spray). ISO 9223 class C3-C4 in fjords, C1-C2 inland. Arctic cold REDUCES corrosion rates (lower humidity, less salt spray reaction). Fjord zones most critical.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use NVE varsom.no avalanche forecasts (real-time) + NVE Atlas avalanche maps (historical). Identify substations/lines in avalanche terrain (est. ~200-300 mountain assets). Apply avalanche protection factor (1.2–1.5× structural degradation for mountain-exposed). Coastal corrosion: apply ISO 9223 C3-C4 (fjord zones) vs C1-C2 (inland, mountains). MET Norway salt spray data if available. Arctic climate benefit: mean annual temperature ~1-3°C reduces corrosion significantly (apply 0.85× vs temperate baseline).</td>
+</tr>
+<tr>
+  <td class="mono">GQ-4</td>
+  <td class="mono">T1 (DER + EV)</td>
+  <td><strong>NVE renewable registry + Statnett generation data:</strong> Statnett publishes real-time generation mix. Wind growing in coastal regions (Rogaland, Vestland, Finnmark). Hydropower dominance (~90%) means hydro flexibility is critical. Small PV (<50 kW) underreported. EV charging data fragmented across charging networks.</td>
+  <td class="sev-low">LOW</td>
+  <td>Statnett real-time for hydro/wind/utility-scale. NVE renewable registry for grid-connected assets. Apply 1.1–1.2× for unregistered small PV (growing segment). EV from charging network operators + Norwegian Road Federation. Hydro flexibility is advantage vs other regions. Seasonal variation (summer low hydro, winter high hydro) critical for modeling.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-5</td>
+  <td class="mono">D4 (Flood risk)</td>
+  <td><strong>Spring flood + Snowmelt dependency:</strong> NVE Atlas provides exceptional flood zone mapping. Spring flooding from snowmelt is dominant flood driver (highly seasonal, predictable). Mountain snowpack timing affects flood magnitude. Climate change shifts snowmelt earlier (impacts timing, less impact on magnitude). NVE real-time river monitoring excellent.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Model two scenarios: (1) Historical flood frequency (NVE baseline). (2) Climate-enhanced (CMIP6 RCP4.5, 1.15–1.35× flood frequency by 2050, shifted earlier in season). Use NVE real-time river monitoring + MET Norway snowpack forecasts. Spring flooding highly predictable (seasonal window known). Flag major river systems (Glomma, Drammen, Tronheim Fjord, western valleys) as primary flood corridors. Integrate Statnett reservoir levels for context.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-6</td>
+  <td class="mono">C.6 (Migration)</td>
+  <td><strong>International + domestic migration:</strong> Norway experiences EU/EEA labor migration (Sweden, Lithuania, Baltic workers). Refugee/asylum migration lower than Sweden. SSB tracks accurately. Population growth ~0.8%/yr (higher than Sweden due to immigration).</td>
+  <td class="sev-low">LOW</td>
+  <td>Use SSB migration data. Population growth ~0.8%/yr, majority labor migration. Domestic migration toward urban centers (Oslo, Bergen). Monitor quarterly SSB updates. Regional variation significant (Oslo metro +1.5%/yr, remote valleys -0.3%/yr).</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 5: NORWAY-SPECIFIC GAPS -->
+<h2>5. Norway-Specific Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Issue</th><th>Impact</th><th>Severity</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">NO-1</td>
+  <td><strong>DSO fragmentation (~100+ operators):</strong> Highly fragmented distribution system across 15 Fylker and ~356 Kommune. ~100+ independent DSOs with different IT systems, reporting standards, data formats. Consolidation minimal vs Nordic peers (Statnett is transmission-only, unlike Swedish integration). Data standardization challenge high.</td>
+  <td>Metadata inconsistency, asset ID conflicts, regional comparison difficult. Data aggregation complexity high. Larger fragmentation challenge than Sweden. Standardization via RME possible but slower than Sweden's Ei process.</td>
+  <td class="sev-high">HIGH</td>
+  <td>Build DSO-specific ingestion pipelines. RME regulatory filings provide unified view (annual). Request standardized data via NVE/RME coordination (slower than Sweden). Document all reconciliation decisions. Target largest ~30 DSOs first (cover ~80% of grid, including Statnett area). Establish RME liaison for standardization advocacy.</td>
+</tr>
+<tr>
+  <td class="mono">NO-2</td>
+  <td><strong>Hydropower dominance (~90% of generation):</strong> Extreme hydro dependency (vs Sweden's nuclear+hydro balance). Reservoir levels, snowmelt timing, drought risk are critical. Statnett reservoir data excellent but introduces strong seasonality and climate sensitivity. No nuclear baseload (structural difference vs Sweden).</td>
+  <td>Grid stability highly sensitive to hydro availability (winter high, summer low typically). Multi-year drought risk real (2018-2020 low reservoir episode). Climate change impacts snowmelt timing (earlier spring peaks). Extreme weather (heavy snow, low precipitation) poses systemic risk. No nuclear hedge vs other regions.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Integrate Statnett real-time reservoir monitoring into resilience model. Track NVE drought/flood forecasts. Apply seasonal hydro profiles (winter high, summer low). Model drought scenarios (multi-year low precipitation). Climate sensitivity: snowmelt timing shift -2 to -4 weeks by 2050 (CMIP6). Coordinate with Enova (energy efficiency) for demand-side flexibility. Cross-reference water year classification (wet/dry/normal). Hydropower advantage: flexible ramping, but systemic sensitivity requires explicit modeling.</td>
+</tr>
+<tr>
+  <td class="mono">NO-3</td>
+  <td><strong>Mountain avalanche hazard (NVE varsom):</strong> Infrastructure exposed in mountain valleys and high-altitude routes (~200-300 substations/transmission lines). NVE varsom.no provides real-time avalanche forecasts (daily during season). Avalanche zones concentrated in Fylke: Vestland, Møre og Romsdal, Nordland, Troms.</td>
+  <td>Structural damage from avalanche impact. Tower/line failure risk elevated in mountain corridors. Seasonal hazard (Nov-May primarily) but year-round infrastructure vulnerability. Forecast-driven maintenance possible (planned outages during high-risk forecasts).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use NVE varsom.no daily avalanche forecasts. Map infrastructure (substations, transmission lines) in avalanche terrain. Apply NVE terrain classification (exposed, partly exposed, protected). Structural design standards for avalanche zones (Norwegian standards). Identify ~200-300 mountain assets (priority review). Establish seasonal monitoring protocol (Nov-May). Coordinate with Statnett for mountain line maintenance planning. Insurance/resilience models: apply avalanche-specific fragility curves (higher damage potential than generic weathering).</td>
+</tr>
+<tr>
+  <td class="mono">NO-4</td>
+  <td><strong>Quick clay landslide risk (NGU kvikkleire):</strong> Unique geological hazard to Norway/Sweden/Finland. Quick clay (Leda clay, post-glacial) present in ~10,000 km² (est. ~5% of populated area). Catastrophic failures (Tuve 2017, Gos 2012) demonstrate severity. NGU mapping excellent, NVE Atlas integration complete.</td>
+  <td>Substation/transformer foundation failure (quick clay under-capacity). Slope instability near infrastructure. Site abandonment/relocation risk for affected installations (est. 50-100 substations in high-risk zones). Rare but catastrophic impact when occurs. Sensitivity ~100x normal clay (structural integrity critical).</td>
+  <td class="sev-high">HIGH</td>
+  <td>Comprehensive assessment: identify all substations/lines in NVE Atlas quick clay zones (NgE classification). Request NGU detailed hazard data (sensitivity mapping, historical failures, site-specific risk). DSO infrastructure siting verification (geotechnical reports if available). Apply quick clay-specific fragility: foundation failure probability 1.5–3.0× normal (depends on NGU sensitivity class). Require geotechnical investigation for all assets in QuickClayZone. Monitor NGU ongoing research, legal liability (municipalities, DSOs). Resilience strategy: foundation reinforcement, site relocation contingency planning.</td>
+</tr>
+<tr>
+  <td class="mono">NO-5</td>
+  <td><strong>Fjord and coastal infrastructure (salt spray, submarine cables):</strong> ~25% of Norwegian population/infrastructure in fjord regions (fjord-dependent). Submarine cables (NO-SE interconnects, Hordaland coastal zones) critical for transmission. Salt spray corrosion high in western fjord zones. Cable condition data limited.</td>
+  <td>Corrosion acceleration in fjord microenvironments (high humidity, salt spray). Submarine cable reliability data sparse (critical for cross-border resilience). Fjord geography creates operational isolation (narrow network topology, limited alternative routes). Infrastructure concentration in fjord valleys (high dependency).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Coastal corrosion: apply ISO 9223 C3-C4 classification to fjord-adjacent substations (est. ~10-15% of grid). Request Statnett submarine cable condition reports (NO-SE, NO-DK interconnects). Fjord-specific modeling: isolation factor (limited redundancy), weather exposure (wind channels, precipitation). MET Norway maritime data for salt spray modeling. Submarine cable: aging assessment via Statnett, apply cable-specific fragility (rare but high-impact failure). Redundancy analysis for fjord-dependent regions (identify single-point-of-failure cables).</td>
+</tr>
+<tr>
+  <td class="mono">NO-6</td>
+  <td><strong>North-south transmission capacity (NO1-NO5 bidding zones):</strong> Norway divided into 5 bidding zones (NO1 north, NO2 mid-north, NO3 mid-south, NO4 south, NO5 southeast). Transmission constraints between zones (especially NO3-NO4-NO5 south). Price differentials reflect bottlenecks. North-rich in hydro (abundant capacity), south concentrated demand.</td>
+  <td>Grid capacity constraints affect VoLL, system adequacy, congestion pricing. Historical load flow may not reflect future bottlenecks (electrification, data centers). Bidding zone structure impacts regional resilience assessment. Southern zone (NO5) shows tighter capacity than northern zones.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Statnett bidding zone maps and historical price differentials (NO1 low, NO5 high typically). Model three scenarios: (1) Current topology (NO1–NO5 constraints). (2) New transmission capacity (planned lines: Svartisen line 2, East-West connection). (3) Demand shift (electrification in south, data centers growth). Flag NO3-NO4, NO4-NO5 corridors as critical for resilience. Monitor Statnett capacity reports and line upgrade plans.</td>
+</tr>
+<tr>
+  <td class="mono">NO-7</td>
+  <td><strong>Submarine cable infrastructure (cross-border + internal fjord lines):</strong> Critical for inter-Nordic resilience (NO-SE, NO-DK, NO-GB cables). Internal fjord cables also important (western coast). Limited cable condition and reliability data. Rare failure but catastrophic impact (island/peninsula isolation).</td>
+  <td>Cable failure = potential regional isolation (fjord-bound communities, cross-border flow disruption). Repair timescale long (weeks-months), high cost. External damage (fishing, anchoring) and environmental degradation (cold seawater, deep pressure, salt). Aging assessment challenging (restricted access).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Request Statnett comprehensive submarine cable inventory and condition assessment reports. Cables: NO-SE (2x 140km, ~1000 MW capacity each), NO-DK (1x, 1000 MW), NO-GB (2x, 1400 MW+). Internal fjord cables: map all. Apply cable-specific aging model (salt water accelerated, cold slows some degradation). Establish RME/Statnett liaison for cable monitoring data. Resilience: redundancy analysis (identify single-point-of-failure cables), repair logistics planning. Cross-border implications (SE-NO, DK-NO, GB-NO coordination).</td>
+</tr>
+<tr>
+  <td class="mono">NO-8</td>
+  <td><strong>Permafrost and mountain infrastructure stability:</strong> Permafrost limited (sparse in high-altitude zones, mountain valleys >1500m in some areas, Arctic-adjacent Finnmark edge). Mountain terrain widespread (~25% of land area). Rock/slope stability affected by freeze-thaw cycles, avalanche, permafrost edge.</td>
+  <td>Foundation instability in mountain/permafrost zones. Pole failure in steep terrain. Tower loading variability (wind, snow, avalanche). Geological hazard impact regional (especially mountain infrastructure in Nordland, Troms, Vestland ranges). Permafrost migration northward due to climate change (reduces some far-north risks).</td>
+  <td class="sev-low">LOW</td>
+  <td>NGU monitors permafrost (limited extent). Flag mountain infrastructure (est. ~200-300 assets) for stability assessment. Apply 1.1–1.2× foundation risk multiplier for mountain/high-altitude substations. Request DSO terrain/foundation reports for mountain assets. Rock/slope stability: geotechnical assessment where available. Mountain wind loading: apply wind speed multiplier (funneling in valleys). Climate change: permafrost boundary migration (northward), reduces far-north risk slightly. Monitor NGU mountain hazard research.</td>
+</tr>
+<tr>
+  <td class="mono">NO-9</td>
+  <td><strong>Coastal erosion and storm surge (western fjord zones):</strong> Western Norwegian coast (Hordaland, Sogn og Fjordane) experiences high storminess, wave erosion, storm surge. Climate change increases extreme sea level frequency. Infrastructure in coastal low-lying areas at risk. Rare events but increasing frequency.</td>
+  <td>Coastal substation/line infrastructure vulnerable to erosion and storm surge (estimated 5-10 substations in direct coastal zones). Winter storms (December-February) most severe. Storm surge + high tide + heavy rain compound effects. Coastal retreat rate: 0.1-0.5 m/yr locally.</td>
+  <td class="sev-low">LOW</td>
+  <td>Use NVE coastal hazard maps (some integration in Atlas). MET Norway storm surge and extreme sea level forecasts. Identify coastal infrastructure (<100m from high tide line) in western zones. Apply coastal storm hazard multiplier (1.1–1.3× weather damage for Nov-Feb). Erosion risk assessment (rates vary by geology). Climate sensitivity: sea level rise +0.5-1.0 m by 2100 (regional), storm surge frequency increases 2-4× (CMIP6). Coastal resilience: raised infrastructure, drainage improvement, site relocation contingency.</td>
+</tr>
+</tbody>
+</table>
+
+<!-- COVERAGE MATRIX -->
+<h2>6. Coverage Matrix by Layer</h2>
+
+<table>
+<thead><tr><th>Layer</th><th>Vars</th><th style="background:var(--accent3);color:#fff">Full</th><th style="background:#856404;color:#fff">Partial</th><th style="background:#6c3483;color:#fff">Proxy</th><th style="background:var(--accent);color:#fff">Gap</th><th style="background:var(--accent2);color:#fff">Derived</th><th>Overall</th></tr></thead>
+<tbody>
+<tr><td class="mono">A — Resilience</td><td class="num">20</td><td class="num">14</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td><span class="tag tag-full">90%</span></td></tr>
+<tr><td class="mono">B.1 — Open</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">B.2 — Proxy</td><td class="num">4</td><td class="num">3</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">B.3 — Fuzzy</td><td class="num">12</td><td class="num">5</td><td class="num">1</td><td class="num">2</td><td class="num">4</td><td class="num">0</td><td><span class="tag tag-partial">75%</span></td></tr>
+<tr><td class="mono">C — Socio</td><td class="num">9</td><td class="num">8</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">D — Environ.</td><td class="num">7</td><td class="num">6</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">E — Open Data</td><td class="num">8</td><td class="num">8</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">F — Markov In</td><td class="num">12</td><td class="num">6</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td><span class="tag tag-partial">83%</span></td></tr>
+<tr><td class="mono">G — Modifiers</td><td class="num">3</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">H — Hazard</td><td class="num">7</td><td class="num">6</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td><span class="tag tag-full">86%</span></td></tr>
+<tr><td class="mono">I — Markov Out</td><td class="num">7</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">7</td><td><span class="tag tag-na">DERIVED</span></td></tr>
+<tr><td class="mono">ID — Join Keys</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr style="border-top:2px solid var(--ink);font-weight:700"><td>Total</td><td class="num">95</td><td class="num">63</td><td class="num">12</td><td class="num">10</td><td class="num">5</td><td class="num">5</td><td></td></tr>
+</tbody>
+</table>
+
+<div class="note">
+  <strong>Overall assessment:</strong> Pre-deployment coverage: 63 variables fully covered (66%), 12 partially covered (13%), 10 proxy/model-based (11%), 5 true gaps (5%), 5 derived (5%). True gaps: (1) DSO fragmentation (~100+ operators) affects substation vintage data standardization. (2) Quick clay hazard integration requires NGU-specific hazard modeling. (3) Avalanche hazard modeling needs NVE varsom.no integration. (4) Submarine cable condition data sparse. (5) Building-level energy poverty data unavailable. <strong>Advantages:</strong> (1) NVE Atlas world-class hazard mapping (unique quick clay, avalanche, flood integration), (2) Statnett real-time hydro reservoir data (critical for ~90% hydro grid), (3) MET Norway frost API (world-leading programmatic access), (4) NGU quick clay mapping (unique European advantage), (5) RME regulatory transparency (annual DSO reporting), (6) Excellent OSM coverage (~80% HV, improving), (7) No nuclear complexity (hydro-focused resilience). <strong>Remaining challenges:</strong> (1) DSO fragmentation (~100+ operators), more severe than Sweden, (2) Hydropower dominance creates systemic seasonal sensitivity (no nuclear hedge), (3) Quick clay hazard requires specialized geotechnical assessment, (4) Avalanche infrastructure requires seasonal monitoring, (5) Submarine cable condition (cross-border + fjord), (6) Fjord-dependent infrastructure isolation (limited redundancy), (7) North-south transmission bottleneck (NO3-NO5).
+</div>
+
+<!-- PRE-INGESTION VALIDATION -->
+<h2>7. Pre-Ingestion Validation Priorities</h2>
+
+<table>
+<thead><tr><th>Priority</th><th>Task</th><th>Owner</th><th>Timeline</th><th>Dependency</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">P1</td>
+  <td><strong>DSO contact outreach:</strong> Request standardized asset data (vintage, location, voltage) from ~100+ DSOs via RME coordination. Target largest ~30 DSOs first for rapid coverage (~80% of grid).</td>
+  <td>RME liaison</td>
+  <td>2026-04 to 2026-07</td>
+  <td>GA-1, NO-1</td>
+</tr>
+<tr>
+  <td class="mono">P2</td>
+  <td><strong>Statnett integration:</strong> Real-time API access for generation, load, constraints, reservoir levels. Bidding zone maps (NO1–NO5). Historical topology and transmission capacity bottlenecks. Submarine cable inventory and condition.</td>
+  <td>Statnett data team</td>
+  <td>2026-04 to 2026-05</td>
+  <td>GR-2, GR-3, NO-6, NO-7</td>
+</tr>
+<tr>
+  <td class="mono">P3</td>
+  <td><strong>NVE/NGU hazard data ingestion:</strong> NVE Atlas (avalanche, flood, quick clay, avalanche). NGU quick clay detailed mapping. NVE varsom.no avalanche forecasts (daily integration during season). Flood zone mapping validation.</td>
+  <td>NVE/NGU liaison</td>
+  <td>2026-04 to 2026-05</td>
+  <td>GQ-2, GQ-3, GQ-5, NO-3, NO-4</td>
+</tr>
+<tr>
+  <td class="mono">P4</td>
+  <td><strong>MET Norway weather ingestion:</strong> Confirm ~300 station coverage, frost.met.no API access. Download historical temperature/snow/precipitation/frost data (1980–2026). Arctic coverage validation. Maritime/coastal weather for fjord zones.</td>
+  <td>MET Norway liaison</td>
+  <td>2026-04</td>
+  <td>GR-4, GT-5, GT-6</td>
+</tr>
+<tr>
+  <td class="mono">P5</td>
+  <td><strong>Hydropower characterization:</strong> Statnett reservoir real-time data integration. Seasonal hydro profile modeling. Drought scenario analysis (multi-year low precipitation). Snowmelt forecasting (NVE + MET integration). Water year classification (wet/dry/normal).</td>
+  <td>Statnett + NVE liaison</td>
+  <td>2026-05 to 2026-07</td>
+  <td>NO-2, GA-7, GQ-5</td>
+</tr>
+<tr>
+  <td class="mono">P6</td>
+  <td><strong>Quick clay hazard geotechnical assessment:</strong> Comprehensive identification of substations/lines in NVE Atlas quick clay zones. Request DSO geotechnical reports (foundation data). NGU detailed hazard classification. Risk-specific fragility curves development.</td>
+  <td>Geotechnical consultant + DSO liaison</td>
+  <td>2026-05 to 2026-08</td>
+  <td>NO-4, GQ-2</td>
+</tr>
+<tr>
+  <td class="mono">P7</td>
+  <td><strong>Arctic/mountain equipment calibration:</strong> Literature review (Statnett, Statkraft, ABB Nordic). IEEE C57.91 cold-climate adaptations. Mountain-specific thermal/mechanical loads. Avalanche impact fragility curves.</td>
+  <td>Technical reviewer</td>
+  <td>2026-04 to 2026-05</td>
+  <td>GA-3, NO-3, NO-8</td>
+</tr>
+</tbody>
+</table>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Gap Audit (Norway) · Ikenga Project · 2026-03-27 · Pre-Ingestion Planning<br>
+~4,000-6,000 HV substations target · 95 variables assessed · 5 remaining gaps · ~91% coverage targeted
+</p>
+
+</div>
+</body>
+</html>

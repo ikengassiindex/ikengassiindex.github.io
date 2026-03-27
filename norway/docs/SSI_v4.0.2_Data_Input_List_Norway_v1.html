@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Data Input List (Norway) v1</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: 'Segoe UI','Helvetica Neue',sans-serif; color: var(--ink); background: var(--paper); font-size:13px; line-height:1.5; }
+.page { max-width:1400px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; position:sticky; top:0; z-index:10; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; white-space:nowrap; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+tbody tr:hover { background:#e8f4fd; }
+.mono { font-family:'JetBrains Mono','Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-planned { background:#d6eaf8; color:#1a5276; }
+.tag-source { background:#fff3cd; color:#856404; }
+.tag-norway { background:#fce8e8; color:#5a1f1f; }
+.summary-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin:1.5rem 0; }
+.summary-card { background:#fff; border:1px solid var(--border); border-radius:6px; padding:0.8rem; text-align:center; }
+.summary-card .number { font-size:1.8rem; font-weight:700; font-family:monospace; color:var(--accent2); }
+.summary-card .label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:0.3rem; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Final Data Input List (Norway) v1</h1>
+<p class="subtitle">Variable-to-Source Mapping · Statnett SF · 95 Variables · ~30 Data Sources</p>
+<div class="meta">
+  <span><strong>Country:</strong> Norway (NO)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Phase:</strong> Pre-Deployment (Planning)</span>
+  <span><strong>Status:</strong> Data Mapping Phase · Infrastructure Baseline Defined</span>
+</div>
+
+<!-- SUMMARY -->
+<h2>Data Coverage Summary</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="number">95</div><div class="label">Total Variables</div></div>
+  <div class="summary-card"><div class="number">30</div><div class="label">Data Sources</div></div>
+  <div class="summary-card"><div class="number">15</div><div class="label">Fylker (Counties)</div></div>
+  <div class="summary-card"><div class="number">~4,000–6,000</div><div class="label">HV Substations (110 kV+)</div></div>
+  <div class="summary-card"><div class="number">3</div><div class="label">Hazard Zones</div></div>
+</div>
+
+<!-- PRIMARY SOURCES TABLE -->
+<h2>1. Primary Data Sources (Tier 1 — High Confidence)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution (Norwegian/English)</th><th>Website</th><th>Access</th><th>Variables Supplied</th><th>Frequency</th><th>Coverage</th></tr></thead>
+<tbody>
+<tr><td class="mono">D01</td><td><strong>Statnett SF</strong> — Transmission System Operator</td><td>statnett.no</td><td>Public data portal + reports</td><td>S1 (dispatch/capacity), G.1 (system reliability), T1 (generation mix), cross-border flows, transmission line loads, hourly production, 5 bidding zones (NO1–NO5), HVDC corridors</td><td>Hourly / Daily</td><td>National transmission 100% (Nordic market, 5 international interconnections to Sweden, Finland, Denmark, Netherlands)</td></tr>
+<tr><td class="mono">D02</td><td><strong>NVE</strong> (Norges vassdrag- og energidirektorat) / <strong>RME</strong> (Regional Market Entity)</td><td>nve.no</td><td>Public reports + data portal</td><td>E1–E2 (energy market), V1 (VoLL from concession studies), DSO regulation, utility CAPEX, SAIDI/SAIFI performance metrics, hydro reservoir levels, concession terms, tariff analysis</td><td>Annual / Quarterly / Weekly (reservoir)</td><td>All 15 Fylker and ~356 Kommuner (DSO areas)</td></tr>
+<tr><td class="mono">D03</td><td><strong>SSB</strong> — Statistics Norway</td><td>ssb.no</td><td>Register-based census + PxWeb API + StatBank</td><td>C1–C6 (population, income, employment, migration), regional demographics, employment by sector, household data, regional economic accounts</td><td>Register-based (continuous) + annual surveys</td><td>All 15 Fylker + 356 Kommuner</td></tr>
+<tr><td class="mono">D04</td><td><strong>MET Norway</strong> — Norwegian Meteorological Institute</td><td>met.no</td><td>Open data API + portal</td><td>I1, I3, I5 (temperature, precipitation, wind), storm forecasts, snow loading data, extreme weather warnings, wind resource assessment, avalanche forecasts</td><td>Daily / Real-time</td><td>~500+ weather stations + radar nationwide, including high-altitude mountain stations</td></tr>
+<tr><td class="mono">D05</td><td><strong>NGU</strong> — Geological Survey of Norway</td><td>ngu.no</td><td>Public geological maps + databases</td><td>H1–H2 (seismic hazard: low-moderate, ~0.1–0.15g in Oslofjord region), quick clay risk zones, landslide susceptibility, soil types, postglacial rebound zones, mineral resources, geological stability</td><td>Annual updates + continuous monitoring</td><td>All Norway (low seismic activity, but higher than Sweden; quick clay zones critical in southeast)</td></tr>
+<tr><td class="mono">D06</td><td><strong>Miljødirektoratet</strong> — Norwegian Environment Directorate</td><td>miljodirektoratet.no</td><td>Public monitoring network + GIS</td><td>D4 (flood risk), environmental monitoring, water quality, air quality, flooding events, water resource management, coastal hazard assessment</td><td>Real-time / Daily / Seasonal</td><td>National network + 100+ monitoring stations, coastal surveillance</td></tr>
+<tr><td class="mono">D07</td><td><strong>DSB</strong> — Norwegian Directorate for Civil Protection and Emergency Management</td><td>dsb.no</td><td>Hazard maps + registers</td><td>B.2–B.3 (disaster management), avalanche hazard maps, flood zones, dam safety, emergency protocols, critical infrastructure registers, inspection records</td><td>Annual / Continuous / Event-driven</td><td>All licensed hazard zones and critical facilities (15 Fylker)</td></tr>
+<tr><td class="mono">D08</td><td><strong>NSM</strong> (Nasjonal sikkerhetsmyndighet) / <strong>NorCERT</strong></td><td>nsm.no</td><td>Restricted + public advisories</td><td>Cybersecurity incident reports, critical infrastructure protection standards, grid resilience alerts, coordination with regional emergency management, critical asset registers</td><td>Real-time / Weekly / Quarterly</td><td>All critical energy infrastructure (Statnett, major DSOs, generation facilities)</td></tr>
+<tr><td class="mono">D09</td><td><strong>OSM</strong> — OpenStreetMap (Power)</td><td>overpass-api.de</td><td>Public API</td><td>A2–A4 (substation topology), G2 (network graph), transmission/distribution line geometry, asset mapping, ~80–85% HV coverage</td><td>Continuous</td><td>~80–85% HV coverage (good Nordic penetration)</td></tr>
+<tr><td class="mono">D10</td><td><strong>Copernicus CDS</strong> — ESA Climate Data Store</td><td>cds.climate.copernicus.eu</td><td>Open access (registration)</td><td>D3–D4 (temperature extremes, precipitation), CMIP6 projections, ERA5 reanalysis, wind fields, climate change scenarios, glacial melt forecasting</td><td>Daily / Monthly</td><td>Global 0.25° grid (~25 km), high resolution for mountain regions</td></tr>
+</tbody>
+</table>
+
+<!-- SECONDARY SOURCES -->
+<h2>2. Secondary Sources (Tier 2 — Medium Confidence, Modeled)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Website</th><th>Variables</th><th>Access</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="mono">D11</td><td>Kartverket — Norwegian Mapping Authority</td><td>kartverket.no</td><td>Geodetic data, land use mapping, spatial reference, DEM, orthophoto, cadastral data, property registers</td><td>Public GIS (EUREF89 UTM)</td><td>Supports spatial analysis for substation mapping, hazard zone assignment, mountain terrain analysis for avalanche/landslide risk</td></tr>
+<tr><td class="mono">D12</td><td>Oljedirektoratet — Norwegian Petroleum Directorate (Energy Planning)</td><td>npd.no</td><td>Energy efficiency profiles, renewable statistics, energy targets, technology adoption tracking, renewable energy capacity expansion data</td><td>Public reports + data portal</td><td>Supports demand-side variables, renewable energy penetration, and technology transition monitoring</td></tr>
+<tr><td class="mono">D13</td><td>Fylkesmannen — County Governors (15 Fylker)</td><td>fylkesmannen.no (regional)</td><td>Flood risk maps (Fylke-level), water resource management, environmental planning, avalanche monitoring, emergency response coordination</td><td>Public GIS + reports</td><td>Critical for flood hazard in river basins, avalanche risk assessment (Østlandet, Vestlandet, Nordlandet) and local emergency management</td></tr>
+<tr><td class="mono">D14</td><td>Energi Norge — Norwegian Energy Industry Federation</td><td>energinorge.no</td><td>Energy balance by region, electricity statistics, renewable energy penetration, sector profiles, generation capacity, hydropower reservoir status</td><td>Semi-public (industry reports + public data)</td><td>Regional energy profiles; hydropower capacity by fylke/catchment; wind capacity tracking; HVDC corridor utilization</td></tr>
+<tr><td class="mono">D15</td><td>Norges Bank — Central Bank of Norway</td><td>norgesbank.no</td><td>GDP by region, inflation, economic indicators, macroeconomic forecasts, regional development data</td><td>Public databases</td><td>Supports V1 (VoLL regional scaling) and regional economic resilience assessment</td></tr>
+<tr><td class="mono">D16</td><td>DSO Annual Reports & Regulators</td><td>Hafslund, BKK, Lyse, Agder Energi Nett, Tensio, Glitre Nett, others (100+ DSOs)</td><td>CAPEX, maintenance, SAIDI/SAIFI, transformer age profiles, operational KPIs, network losses, tariff structures</td><td>Public summaries / restricted details</td><td>Annual (due to NVE within specified timeframes); ~100+ DSOs (highly fragmented market, regional consolidation trend)</td></tr>
+<tr><td class="mono">D17</td><td>NVE — Renewable Energy Unit (Wind Registry)</td><td>nve.no/energiressurser</td><td>Wind capacity by region, project pipeline, wind farm locations, installed capacity trends, forecast data, onshore & offshore project tracking</td><td>Public registry + reports</td><td>Key for T1 (wind penetration tracking); Norway rapidly expanding wind capacity; ~3,000+ wind turbines installed, significant pipeline for onshore/offshore</td></tr>
+<tr><td class="mono">D18</td><td>NIBIO — Norwegian Institute of Bioeconomy Research</td><td>nibio.no</td><td>Forest biomass mapping, forestry harvest data, agricultural land use, renewable resource availability, land classification, biomass potential</td><td>Research databases + GIS layers</td><td>Supports T1 (bioenergy potential), environmental baseline, and land management data for forest-based regions (Østlandet, Trøndelag)</td></tr>
+<tr><td class="mono">D19</td><td>ENTSO-E Transparency Platform</td><td>transparency.entsoe.eu</td><td>Cross-border flows, generation schedules, load forecasting, market data (Nordic, EU-wide)</td><td>Open access (SFTP + API)</td><td>Integration point with Nordic grid coordination; Norway's 5 bidding zones (NO1–NO5) and 5 international interconnections with Sweden, Finland, Denmark, Netherlands, Sweden HVDC</td></tr>
+<tr><td class="mono">D20</td><td>NordPool — Nordic Power Exchange</td><td>nordpool.com</td><td>Spot market prices, forward curve data, cross-border price spreads, electricity market liquidity, grid congestion metrics by bidding zone</td><td>Public + subscription data</td><td>Critical for V1 (value of lost load regional calibration) and real-time grid stress monitoring across NO1–NO5 bidding zones</td></tr>
+</tbody>
+</table>
+
+<!-- VARIABLE MAPPING -->
+<h2>3. Variable-by-Variable Mapping (Selected Examples)</h2>
+
+<p class="note"><strong>Note:</strong> Full 95-variable list condensed to representative samples. All primary variables mapped to Norwegian institutional data sources. Infrastructure baseline established for ~4,000–6,000 HV substations (110 kV+) and 356 Kommuner.</p>
+
+<table>
+<thead><tr><th>Variable</th><th>SSI Component</th><th>Data Source (Primary)</th><th>Secondary Source(s)</th><th>Resolution</th><th>Frequency</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="mono">A1 — Substation Age</td><td>Resilience</td><td>OSM (start_date tag) + Statnett registry</td><td>DSO facility records (Hafslund, BKK, Lyse, Agder Energi Nett, etc.)</td><td>Per substation</td><td>Static + annual updates</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">B1.2 — Transformer Hotspot Temp</td><td>Grid Telemetry</td><td>IEEE C57.91 model + MET Norway ambient temperature</td><td>DSO equipment inspection records, historical maintenance logs</td><td>Per substation</td><td>Monthly (seasonal norm)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C1 — Population</td><td>Socio-Economic</td><td>SSB register-based census (15 Fylker, 356 Kommuner)</td><td>SSB population estimates (annual/quarterly)</td><td>Kommune / Fylke</td><td>Continuous register, annual reports</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C2 — Median Income</td><td>Socio-Economic</td><td>SSB Income Survey (annual by kommune/Fylke)</td><td>SSB employment + tax register data</td><td>Kommune / Decile</td><td>Annual</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C3 — Energy Poverty %</td><td>Socio-Economic</td><td>NVE energy affordability survey (regional)</td><td>SSB housing cost burden data</td><td>Fylke / Kommune</td><td>Annual / Biennial</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">C6 — Net Migration</td><td>Socio-Economic</td><td>SSB migration statistics (internal + international)</td><td>Norwegian Directorate of Immigration visa/residence permit data</td><td>Kommune / Fylke</td><td>Annual</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D1 — Seismic PGA (g)</td><td>Environmental</td><td><strong>NGU</strong> seismic hazard map (low-moderate: 0.1–0.15g in Oslofjord) + national assessment</td><td>USGS model for reference (Fennoscandian Plate stability); NSM infrastructure resilience analysis</td><td>Per substation (spatial join)</td><td>Static (updated w/ new assessments ~5yr)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D2 — Quick Clay Risk Index</td><td>Environmental</td><td>NGU quick clay hazard zone maps (southeast: Østlandet, Oslo-Akershus region critical) + active monitoring</td><td>Fylkesmannen emergency response registers, historical landslide events, vulnerability mapping</td><td>Per substation (regional zones: Southeast > Central > West)</td><td>Annual (continuous monitoring)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D3 — Temperature Extremes (°C)</td><td>Environmental</td><td>MET Norway historical records by station (record low: -60.5°C Karasjok 1886)</td><td>Copernicus ERA5 reanalysis (gridded); high-altitude mountain station data</td><td>Fylke / Station / Elevation zone</td><td>Daily → monthly/annual statistics</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D4 — Flood Risk Index</td><td>Environmental</td><td>Miljødirektoratet + Fylkesmannen flood risk maps + MET Norway snowmelt forecasting + NVE reservoir forecasting</td><td>SSB river basin stress indicators, historical flood events (Glomma, Drammenselva, Otra, others), Copernicus flood modeling</td><td>Fylke / Sub-basin / River catchment</td><td>Annual / Seasonal / Event-driven / Weekly (NVE reservoir)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D5 — Avalanche Hazard Index</td><td>Environmental</td><td>DSB avalanche hazard maps + MET Norway snow forecast + NGU terrain analysis (Westland, Nordland, high mountain areas critical)</td><td>Fylkesmannen emergency response, historical avalanche events, mountain highway/infrastructure exposure</td><td>Regional (vulnerable valleys/slopes in mountain zones)</td><td>Seasonal / Daily (winter months) / Event-driven</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">D6 — Coastal Storm Risk (probability)</td><td>Environmental</td><td>MET Norway wind data + extreme weather frequency analysis + Miljødirektoratet coastal hazard assessment</td><td>Historical gale force wind records (Atlantic/North Sea transitions), HELCOM storm surge models (Barents/North Sea)</td><td>Fylke / Coastal zone</td><td>Annual / Seasonal</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">E1 — Renewable Capacity (MW)</td><td>Energy System</td><td><strong>Statnett</strong> hourly dispatch (hydro/wind by Fylke and bidding zone NO1–NO5) + NVE capacity registry</td><td>Energi Norge, NVE renewable registries, DSO portfolio data</td><td>Fylke / Bidding zone (NO1–NO5) / Substation feeder / Power station</td><td>Monthly (dispatch), weekly (hydro reservoir), quarterly (capacity)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">E2 — Employment by Sector</td><td>Energy System</td><td>SSB Census employment by ISIC (Fylke/Kommune)</td><td>SSB Labor Force Survey (quarterly)</td><td>Kommune / Sector</td><td>Register-based (annual), quarterly estimates</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">F1 — CAPEX per Asset (NOK)</td><td>Markov Input</td><td>NVE regulatory filings (CAPEX by DSO/year)</td><td>Individual DSO annual reports (Hafslund, BKK, Lyse, Agder Energi Nett, etc.)</td><td>DSO level</td><td>Annual (filed with NVE/RME)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">G1 — SAIDI (hours/customer/year)</td><td>Modifiers</td><td><strong>Statnett</strong> system reliability reports + NVE DSO aggregate data</td><td>Individual DSO historical performance records</td><td>Fylke / DSO</td><td>Annual (filed with NVE/RME)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">H1 — Seismic Hazard Zone Classification</td><td>Hazard Zone</td><td>NGU zone classification (3 zones: Stable Regions / Oslofjord Moderate Risk / Fennoscandian Low-Moderate)</td><td>NSM infrastructure resilience analysis, historical earthquake records</td><td>Per substation (spatial)</td><td>Static (updated with NGU reviews ~5yr)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">H2 — Avalanche & Coastal Storm Hazard Zone</td><td>Hazard Zone</td><td>DSB avalanche maps + MET Norway storm frequency + Miljødirektoratet coastal assessment</td><td>Fylkesmannen emergency management, historical events, mountain infrastructure exposure</td><td>Per substation or Fylke (mountain/coastal regions)</td><td>Annual / As-updated / Seasonal</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">I2 — Risk Score (Markov output)</td><td>Markov Output</td><td><strong>DERIVED:</strong> From F + H via CIGRÉ TB 761 transition matrix</td><td>N/A</td><td>Per substation</td><td>Annual (post-data refresh)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">S1 — Grid Capacity Reserve (%)</td><td>Modifier</td><td>Statnett capacity forecasts / Nordic adequacy reports / HVDC corridor utilization</td><td>Energi Norge strategic plans, transmission upgrade pipeline (north-south and export capacity analysis)</td><td>Fylke / Bidding zone (NO1–NO5)</td><td>Quarterly (Statnett forecasts)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+<tr><td class="mono">T1 — Grid Stability Index</td><td>Modifier</td><td>Statnett dispatch variability (hydro/wind ramp rates, 5-zone balancing, HVDC control) + cross-border flow volatility</td><td>Energi Norge data, NVE hydro forecasting, wind capacity forecasts, ENTSO-E Nordic flows, NordPool market data</td><td>Fylke / Bidding zone / Technology</td><td>Hourly → monthly aggregate</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+</tbody>
+</table>
+
+<!-- SOURCE ASSESSMENT -->
+<h2>4. Data Source Assessment by Tier</h2>
+
+<h3>Tier 1: Primary Sources (10 sources, ~65% of variables)</h3>
+<p>Open access, high authority, Norway-specific. <span class="tag tag-norway">NORWAY-NATIVE</span> sources (Statnett, NVE/RME, SSB, MET Norway, NGU, Miljødirektoratet, DSB, NSM/NorCERT, OSM, Copernicus).</p>
+
+<h3>Tier 2: Secondary Sources (10 sources, ~25% of variables)</h3>
+<p>Modeled, interpolated, or regional surveys. Kartverket, Oljedirektoratet, Fylkesmannen, Energi Norge, Norges Bank, DSO annual reports, NVE Wind Registry, NIBIO, ENTSO-E, NordPool.</p>
+
+<h3>Tier 3: Proxy / Fallback (2–3 sources, ~10% of variables)</h3>
+<p>Substation vintage (OSM start_date + cohort models), critical infrastructure (spatial analysis + population density), equipment condition (age curves + ambient temp + avalanche/flood hazard exposure).</p>
+
+<h2>5. Key Advantages & Challenges</h2>
+
+<h3>Advantages</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Statnett transparency:</strong> Public data portal with hourly dispatch, 5 bidding zones (NO1–NO5), cross-border flows with 5 international interconnections. Real-time Nordic market data integrated with ENTSO-E and NordPool. Superior transparency vs. many European TSOs.</li>
+  <li><strong>Register-based Census (SSB):</strong> Norway's continuous register system provides granular demographic updates at kommune level (356 units) without census gaps. Real-time employment, income, and migration tracking via tax registers.</li>
+  <li><strong>MET Norway world-class meteorology:</strong> ~500 weather stations with extensive historical records and high-quality forecasting. Superior avalanche, snow, and snowmelt prediction. Open API access with no licensing barriers. Critical for hydropower forecasting.</li>
+  <li><strong>Hydropower dominance:</strong> ~90% hydropower generation with NVE reservoir data providing weekly forecasting and seasonal planning. Detailed water resource management essential for grid stability. HVDC export corridors enable market integration.</li>
+  <li><strong>Wind energy expansion:</strong> Growing wind capacity (onshore + planned offshore); NVE wind registry provides project visibility and capacity tracking. Key for T1 (generation variability) and renewable integration modeling.</li>
+  <li><strong>Comprehensive hazard mapping:</strong> NGU quick clay expertise (southeast), DSB avalanche mapping (mountain zones), Miljødirektoratet flood forecasting, and coastal storm assessment. Critical for northern/western regional resilience.</li>
+  <li><strong>HVDC expertise:</strong> Norway operates major HVDC corridors to Sweden, Finland, Denmark, Netherlands. Statnett provides real-time flow data; unique capacity for cross-border grid analysis vs. continental-only systems.</li>
+</ul>
+
+<h3>Challenges</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>DSO fragmentation:</strong> ~100+ active DSOs with highly variable reporting standards and asset transparency. NVE aggregates some metrics, but granular asset-level data inconsistent across operators (Hafslund vs. regional players). Consolidation trend ongoing.</li>
+  <li><strong>North-south transmission constraints:</strong> Structural bottleneck (NO1/NO2 → NO3/NO4/NO5) during peak demand and export periods. HVDC corridors mitigate but not eliminate. Limited real-time line rating data; Statnett SCADA visibility restricted.</li>
+  <li><strong>Hydropower volatility:</strong> Norway's ~90% hydropower penetration creates generation variability tied to precipitation and snowmelt timing. Historical precipitation patterns less predictive as climate shifts seasonal dynamics. Reservoir depletion risk in drought years.</li>
+  <li><strong>Quick clay hazard management:</strong> Southeast (Østlandet) regions subject to sudden landslide risk. Infrastructure in affected zones requires continuous monitoring; NGU quick clay mapping not universally complete in all municipalities.</li>
+  <li><strong>Avalanche & mountain hazard zones:</strong> Western coast (Vestlandet, Nordland) and interior mountains (Jotunheimen, Scandinavian divide) subject to seasonal avalanche risk. Some high-altitude substations difficult to access and maintain; hazard mapping improving but sparse historical data in remote valleys.</li>
+  <li><strong>Substation vintage data gaps:</strong> OSM coverage ~80–85% HV but OSM start_date completeness variable in rural areas. Individual DSO asset databases not universally public; age cohort models required. Northern remote infrastructure less documented.</li>
+  <li><strong>Regional disparities:</strong> Dense urban concentration (Oslo, Bergen, Stavanger) vs. sparse infrastructure in Nordland and interior mountain zones. Service reliability and asset density vary dramatically by Fylke. Rural electrification ongoing in Arctic regions.</li>
+  <li><strong>Arctic zone challenges:</strong> Northern Fylker (Finnmark, Troms) subject to permafrost degradation, extreme cold, and Arctic storm exposure. Limited weather station density in far north; seasonal access constraints for infrastructure maintenance.</li>
+</ul>
+
+<h2>6. Estimated Timeline & Ingestion Phases</h2>
+
+<div class="note">
+<strong>All 95 variables status: PLANNED (pre-ingestion phase).</strong> Once data ingestion commences, expect phased rollout over 4–6 months:
+<ul style="margin-top: 0.5rem; margin-bottom: 0;">
+  <li><strong>Phase 1 (Week 1–4):</strong> Core sources (D01–D10): Statnett, NVE/RME, SSB, MET Norway, NGU, Miljødirektoratet, DSB, NSM/NorCERT, OSM. ~60 variables mapped to 15 Fylker + 5 bidding zones.</li>
+  <li><strong>Phase 2 (Week 5–8):</strong> Secondary tier (D11–D17): Kartverket, Oljedirektoratet, Fylkesmannen, Energi Norge, Norges Bank, DSO reports, NVE Wind Registry, NIBIO. ~25 variables for 356 Kommuner.</li>
+  <li><strong>Phase 3 (Week 9–16):</strong> Markov model (F/I), Monte Carlo engine, validation across ~4,000–6,000 HV substations. Nordic market integration (ENTSO-E, NordPool, cross-border flow analysis). North-south bottleneck and HVDC corridor modeling.</li>
+  <li><strong>Phase 4 (Week 17–24):</strong> Dashboard deployment, ESG enrichment, intelligence page monthly updates. Cross-border coordination testing (Sweden, Finland, Denmark). Hazard zone scenario planning (avalanche, flood, quick clay, Arctic). Hydropower forecast integration.</li>
+</ul>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Data Input List (Norway) v1 · Ikenga Project · 2026-03-27<br>
+95 variables · 30 data sources · Planning phase · ~4,000–6,000 HV Substations
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Complete Formula Construct (Norway)</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --paper: #faf9f6;
+  --accent: #c0392b;
+  --accent2: #2c3e7a;
+  --accent3: #1a6b4a;
+  --accent4: #d4740e;
+  --muted: #6b7280;
+  --border: #d1cfc9;
+  --code-bg: #f0ede6;
+  --highlight: #fff8e1;
+  --tag-bg: #e8e6df;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+  --sans: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --teal: #0e7490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--serif); color: var(--ink); background: var(--paper); line-height: 1.72; -webkit-font-smoothing: antialiased; }
+.page { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+.header { text-align: center; padding: 3.5rem 0 2.5rem; border-bottom: 3px double var(--border); margin-bottom: 3rem; }
+.header .tag { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); background: rgba(192,57,43,0.08); padding: 0.3em 1em; border-radius: 2px; margin-bottom: 1rem; }
+.header h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0.5rem 0; }
+.subtitle { font-size: 1.1rem; color: var(--muted); font-weight: 400; margin-bottom: 1rem; }
+.meta { display: flex; gap: 2.5rem; font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; justify-content: center; flex-wrap: wrap; }
+h2 { font-size: 1.5rem; font-weight: 700; margin: 3rem 0 1.2rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); color: var(--ink); }
+h3 { font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.8rem; color: var(--accent2); }
+h4 { font-size: 0.95rem; font-weight: 600; margin: 1.2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1rem; }
+table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
+thead { background: var(--ink); color: #fff; }
+thead th { padding: 0.8rem 1rem; text-align: left; font-weight: 600; font-family: var(--mono); letter-spacing: 0.03em; font-size: 0.75rem; text-transform: uppercase; }
+tbody td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+tbody tr:hover { background: #f5f3f0; }
+.mono { font-family: var(--mono); font-size: 0.85rem; }
+.num { text-align: right; font-family: var(--mono); font-weight: 500; }
+.tag-calibration { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #fadbd8; color: #922b21; }
+.tag-param { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #d5f5e3; color: #1a6b4a; }
+.tag-note { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #e0f7fa; color: #0e7490; }
+.formula-box { background: var(--highlight); border-left: 4px solid var(--accent4); padding: 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-family: var(--mono); font-size: 0.85rem; overflow-x: auto; }
+.highlight-box { background: #fff8f0; border-left: 4px solid var(--accent); padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+.calibration-note { background: #fff3e0; border-left: 4px solid var(--accent4); padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+.coefficient-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+.coefficient-table th { background: var(--code-bg); padding: 0.6rem 0.8rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); }
+.coefficient-table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+@media print { body { font-size: 11pt; } .page { padding: 1rem; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <span class="tag">SSI v4.0.2</span>
+  <h1>Complete Formula Construct</h1>
+  <p class="subtitle">Norway (NO) — Statnett Transmission Grid</p>
+  <div class="meta">
+    <span><strong>Country:</strong> Norway (NO)</span>
+    <span><strong>Version:</strong> 4.0.2</span>
+    <span><strong>Date:</strong> 2026-03-27</span>
+    <span><strong>Author:</strong> Ikenga Project</span>
+  </div>
+</div>
+
+<h2>1. Executive Overview</h2>
+
+<p>Norway's power system (operated by Statnett SF, the state-owned transmission system operator) is globally unique as the world's hydropower-dominant electricity producer, with ~90% of generation derived from ~1,600 hydroelectric plants cascading down major river systems (Glomma, Drammenselva, Numedalslågen, Otra, Sira-Kvina, Tokke, Ulla-Førre, Aurland, Bykle, Alta). Unlike Sweden's balancing of hydro, nuclear, and wind, Norway has ZERO nuclear capacity and has never built a commercial nuclear plant, making the system fundamentally dependent on water availability and sophisticated dam management. The system is geographically and climatically divided into five bidding zones (NO1–NO5) reflecting regional hydro generation patterns and demand concentration in the southeast. Norway serves as the "battery of Europe" during wet years (exporting surplus hydro via HVDC interconnects to Sweden, Denmark, Germany, UK, and Netherlands), and imports power during dry years. The system is exceptionally exposed to coastal hazards (North Sea and Norwegian Sea storms, coastal erosion), Arctic conditions in Troms and Finnmark, and avalanche risk in mountain regions. The SSI v4.0.2 formula for Norway is fundamentally adapted from European baseline with critical calibration adjustments reflecting NO nuclear capacity (κ_nuclear = 0), extreme hydro dependence (~0.90), and heightened emphasis on maritime hazards, avalanche risk, and water resource variability:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Seismic intensity:</strong> α=0.10 (minimal natural seismicity, as with Sweden on Fennoscandian craton), but NO significant mining-induced seismicity (unlike Sweden's Kiruna). Only minor postglacial rebound effects in northern coast.</li>
+  <li><strong>Hydropower dominance:</strong> κ_hydro = 0.90 (critical to grid stability) — Norway has ~33 GW installed hydro capacity across major cascading systems. NO nuclear plants at all. Dam water levels directly control generation; dry years force imports. Extreme weather (winter storms, floods, droughts) directly impacts energy availability.</li>
+  <li><strong>Winter storm dominance:</strong> κ_winter = 0.35 (especially Rogaland, Vestland, Møre og Romsdal coast) — North Sea and Norwegian Sea exposure creates severe gale-force winds, higher wind speeds than Sweden's west coast.</li>
+  <li><strong>Avalanche hazard:</strong> κ_avalanche = 0.20 (mountain regions Nordland, Troms, Vestland) — Norwegian mountain geography creates significant avalanche risk unlike Sweden. Avalanche can directly damage transmission lines and substations in mountain valleys.</li>
+  <li><strong>Coastal corrosion:</strong> κ_corrosion = C3–C4 (coastal zones) — North Sea spray more aggressive than Baltic. Fjord-protected interior zones have lower corrosion stress.</li>
+  <li><strong>Grid operator:</strong> Statnett SF (Norwegian TSO) — state-owned, 100% control of EHV/HV transmission grid (~11,000 km of 300/420 kV lines, ~19,000 km of 132 kV regional grid, ~30,000 km total HV transmission). ~100+ DSOs operate local distribution networks.</li>
+  <li><strong>Regulator:</strong> RME (Reguleringsmyndigheten for energi, part of NVE — Norges vassdrags- og energidirektorat); Statistics: SSB (Statistisk sentralbyrå); Geology: NGU (Norges geologiske undersøkelse); Environment: Miljødirektoratet; Weather: MET Norway (Meteorologisk institutt); Civil protection: DSB (Direktoratet for samfunnssikkerhet og beredskap); Cyber: NSM (Nasjonal sikkerhetsmyndighet) / NorCERT.</li>
+  <li><strong>Energy transition:</strong> No nuclear decommissioning (none to phase out). Focus: maximize hydropower optimization and storage, expand wind (onshore expanding, offshore 30 GW planned by 2040 — Sørlige Nordsjø, Utsira Nord projects), maintain zero-carbon electricity system, support European green transition via HVDC interconnects (NordLink to Germany, North Sea Link to UK, etc.).</li>
+</ul>
+
+<h2>2. Structural Framework — 95 Variables Retained</h2>
+
+<p>All 95 SSI v4.0.2 variables are mapped to Norwegian data sources. Administrative structure uses <strong>15 Fylker (counties, post-2024 reform)</strong> as primary units, with ~356 Kommuner (municipalities) as lower tiers. Bidding zones: NO1 (Southeast, Oslo/Akershus hydro), NO2 (Southwest, Rogaland/Stavanger region), NO3 (Central, Trøndelag), NO4 (North, Nordland/Troms), NO5 (West, Vestland/Møre og Romsdal). Substations prefix: <strong>NO_</strong></p>
+
+<table>
+<thead><tr><th>Component</th><th>Variables</th><th>Primary Data Source</th><th>Norwegian Institution</th></tr></thead>
+<tbody>
+<tr><td><strong>A — Resilience</strong></td><td>20</td><td>Transmission system topology, redundancy, major interconnects (5: Sweden via AC, Denmark via HVDC Skagerrak 1-4, Germany via NordLink HVDC, UK via North Sea Link HVDC, Netherlands via NorNed HVDC, Finland via northern AC ties), EHV/HV network, HVDC links</td><td>Statnett dispatch data; NVE/RME annual reports; network maps</td></tr>
+<tr><td><strong>B — Grid Telemetry</strong></td><td>19</td><td>Equipment condition, transformer age, oil analysis, substation inventory, Arctic equipment certification (Troms/Finnmark), avalanche protection measures, coastal corrosion monitoring</td><td>Statnett operational logs; NVE/RME compliance reports; utility asset registries</td></tr>
+<tr><td><strong>C — Socio-Economic</strong></td><td>9</td><td>Population, income, employment, regional development, energy intensity (industrial electrochemistry, aluminum smelting in western regions), remote population centers</td><td>SSB Census 2024; regional offices; Fylke development surveys; municipality data</td></tr>
+<tr><td><strong>D — Environmental</strong></td><td>7</td><td>Seismic hazard (minimal), winter storm risk, avalanche hazard (mountain zones), flooding, coastal erosion, permafrost thaw (Arctic regions)</td><td>NGU (Geological Survey); MET Norway (Meteorological Institute); Miljødirektoratet; flood monitoring network; DSB avalanche/hazard data</td></tr>
+<tr><td><strong>E — Energy System</strong></td><td>8</td><td>DER (limited), EV charging (emerging in urban centers), grid stability, hydro generation (major river cascades), renewable penetration, DSO data</td><td>Statnett open data; NVE/RME statistics; DSO operator records; hydro plant data</td></tr>
+<tr><td><strong>F — Markov Input</strong></td><td>12</td><td>Maintenance records, failure rates, avalanche damage history, coastal storm damage, hydroplant outage data, permafrost-related foundation issues</td><td>Statnett operational logs; NVE/RME filings; DSO maintenance data; DSB incident reports</td></tr>
+<tr><td><strong>G — Modifiers</strong></td><td>3</td><td>CAIDI, grid capacity margins, system losses, reserve margins, interconnect stability, cross-border flow patterns</td><td>Statnett monthly reports; NVE/RME performance indicators; grid operation records</td></tr>
+<tr><td><strong>H — Seismic & Hazards</strong></td><td>7</td><td>PGA maps (minimal), postglacial rebound zones, winter storm intensity maps, avalanche hazard mapping, snow/ice forecasts, coastal erosion risk, flooding hazard</td><td>NGU + MET Norway seismic/storm data; Miljødirektoratet flood/weather monitoring; DSB avalanche risk mapping; coastal agencies</td></tr>
+<tr><td><strong>I — Markov Output</strong></td><td>7</td><td>Risk classifications, criticality projections, regional resilience ratings, transition rates</td><td>Derived from F, H via CIGRÉ TB 761</td></tr>
+<tr><td><strong>ID — Keys</strong></td><td>3</td><td>Substation ID, Fylke, voltage class</td><td>Statnett registry; OSM; Norwegian geodetic data</td></tr>
+</tbody>
+</table>
+
+<h2>3. Seismic Calibration — Stable Fennoscandian Shield with Minimal Natural Activity</h2>
+
+<p>Norway, like Sweden, sits atop the Fennoscandian (Baltic/Precambrian) craton and experiences minimal natural seismic activity. Unlike Sweden's concern with mining-induced seismicity (Kiruna), Norway has no comparable mining operations affecting grid infrastructure. Postglacial rebound in northern coastal zones (Troms/Finnmark coast) creates minor tremors but with less intensity than Sweden's postglacial zones. This creates an exceptionally seismically stable regime requiring minimal seismic design factors:</p>
+
+<table class="coefficient-table">
+<tr><th>Parameter</th><th>Value</th><th>Zone</th><th>Rationale</th></tr>
+<tr><td><strong>R6b α (sensitivity)</strong></td><td class="num">0.10</td><td>Stable interior (98% of Norway)</td><td>Norway's natural PGA is &lt;0.01g across vast interior and coastal regions. Exceptional craton stability, comparable to Sweden. α=0.10 reflects minimal seismic hazard. No amplification needed in stable zones.</td></tr>
+<tr><td><strong>α_rebound</strong></td><td class="num">0.20</td><td>Northern coast postglacial rebound zones (Troms, Finnmark coast)</td><td>Ongoing land uplift (~5–8 mm/yr, slightly less than Sweden) creates minor tremors M2–M2.5, PGA 0.005–0.015g. Very modest amplification. Much lower than any mining-related activity.</td></tr>
+<tr><td><strong>α_mining</strong></td><td class="num">0.00</td><td>N/A (no mining-induced seismicity in Norway)</td><td>Norway has no significant hard rock or coal mining affecting grid infrastructure. Some mineral exploration but no seismic impact on transmission system. This is a major differentiator from Sweden (Kiruna).</td></tr>
+<tr><td><strong>PGA_ref (baseline)</strong></td><td class="num">0.01g</td><td>Stable zones</td><td>Norway's baseline natural seismic PGA (~0.01g) equivalent to Sweden, reflecting exceptional crustal stability.</td></tr>
+<tr><td><strong>Cap (max amplifier)</strong></td><td class="num">1.03</td><td>All zones (postglacial rebound zones)</td><td>Norway's postglacial rebound zones (0.01–0.015g) reach cap=1.03, slightly lower than Sweden due to less intense rebound dynamics. Effectively negligible seismic hazard. Globally one of safest regions for power infrastructure seismic design.</td></tr>
+<tr><td><strong>Seismic zones</strong></td><td>2</td><td>—</td><td><strong>Zone 1:</strong> Stable interior + coast (vast majority, PGA &lt;0.01g, 98%+). <strong>Zone 2:</strong> Northern coast postglacial rebound (Troms/Finnmark coast, 0.01–0.015g, &lt;2% of grid). NO Zone 3 (no mining hazard).</td></tr>
+</tbody>
+</table>
+
+<div class="calibration-note">
+<strong>Seismic Formula for Norway:</strong><br>
+R6_seismic = clip(1.0 + α × max(0, PGA − PGA_ref), 1.0, 1.03)<br>
+where α = 0.10 (stable), α_rebound = 0.20 (postglacial zones, reduced vs. Sweden), PGA_ref = 0.01g, clip range [1.0, 1.03]<br>
+<strong>Impact:</strong> Zone 1 substations (&lt;0.01g) → 1.00× (no amplification). Zone 2 (0.012g) → 1.0002× (negligible). Norway's seismic component negligible globally. Dominates risk assessment are coastal hazards (North Sea storms, avalanches, coastal erosion) rather than earthquakes.
+</div>
+
+<h2>4. Corrosion Classification — North Sea Exposure + Fjord Interior Protection</h2>
+
+<p>Norway's unique fjord geography creates distinct corrosion zones. Coastal regions directly exposed to North Sea and Norwegian Sea (Rogaland, Vestland, Møre og Romsdal, Troms/Finnmark coasts) experience severe C4 salt spray corrosion, more aggressive than Sweden's west coast due to more open ocean exposure and stronger Atlantic fetch. Interior fjord zones and mountain regions experience lower corrosion stress. Eastern regions (Østfold, Akershus, Innlandet) have continental/inland environments with minimal salt stress. Northern Arctic coast (Finnmark) experiences harsh maritime conditions but less salt spray than southern coasts due to colder water and shorter growing season.</p>
+
+<table class="coefficient-table">
+<tr><th>ISO 9223 Class</th><th>Environment Type</th><th>Regions</th><th>Corrosion Factor (κ)</th></tr>
+<tr><td><strong>C4</strong></td><td>Very high coastal salt spray (North Sea/Norwegian Sea exposure) + maritime humidity + strong fetch winds</td><td>Rogaland coast (Stavanger area), Vestland coast (Bergen area, south coast), Møre og Romsdal coast, Troms/Finnmark North Sea exposure</td><td>1.18</td></tr>
+<tr><td><strong>C3</strong></td><td>Moderate coastal + fjord maritime, some salt spray, industrial (aluminum smelting)</td><td>Inner fjord zones (Sogn, Hardanger fjords, Sognefjord), western Agder coast, industrial zones (Rogaland aluminum plants, Vestland smelters)</td><td>1.08</td></tr>
+<tr><td><strong>C2</strong></td><td>Inland maritime, low salt spray, temperate/boreal humidity</td><td>Interior fjord valleys (Vestfold og Telemark, Innlandet), eastern coastal (Østfold coast, low exposure), central valleys (Trøndelag, Innlandet interior)</td><td>0.96</td></tr>
+<tr><td><strong>C1</strong></td><td>Interior continental/mountain/Arctic, very dry, minimal corrosion stress</td><td>Mountain interior (Innlandet highlands, eastern Norway), interior Nordland, interior Troms/Finnmark, Finnmark plateau regions</td><td>0.78</td></tr>
+</tbody>
+</table>
+
+<h2>5. Hazard Adaptation — North Sea Storms + Avalanches + Coastal Erosion + Flooding</h2>
+
+<p>Norway's hazard profile fundamentally differs from Sweden in three ways: (1) more intense coastal storms due to open North Sea/Norwegian Sea exposure (gale force more frequent); (2) significant avalanche hazard in mountain regions (unique to Norway compared to Sweden); (3) more pronounced coastal erosion driven by Atlantic/North Sea wave energy. Water-related hazards (flooding from snowmelt and extreme precipitation) are comparable to Sweden but with added avalanche component. Minimal seismic risk, no volcanic activity.</p>
+
+<table class="coefficient-table">
+<tr><th>Hazard Type</th><th>Component</th><th>Data Source</th><th>Weight in Markov κ_climate</th></tr>
+<tr><td><strong>Winter storms (North Sea)</strong></td><td>D1: Storm intensity + gust speed + frequency + Atlantic fetch</td><td>MET Norway (Meteorological Institute) historical records + extreme weather database + North Sea monitoring; more intense than Sweden</td><td>0.35 (dominant in coastal regions)</td></tr>
+<tr><td><strong>Avalanche hazard</strong></td><td>D2: Avalanche probability + path extent + frequency</td><td>DSB (Norwegian Directorate for Civil Protection) avalanche hazard mapping + NGU geological surveys + regional monitoring in Nordland, Troms, Vestland</td><td>0.20 (mountain/steep valley regions)</td></tr>
+<tr><td><strong>Snow/ice loading</strong></td><td>D3: Accumulation depth + ice thickness on lines + frozen precipitation</td><td>MET Norway snow/ice forecasts + regional monitoring + transmission line stress models</td><td>0.18 (Arctic-specific Troms/Finnmark, mountain passes)</td></tr>
+<tr><td><strong>Spring flooding</strong></td><td>D4: Snowmelt + glacier runoff + river discharge + dam management</td><td>NVE flood forecasts + river monitoring network + dam operation records (Glomma, Drammenselva, Otra, Sira-Kvina, Tokke, Ulla-Førre, Aurland, Bykle, Alta systems)</td><td>0.15 (major river systems, glacier-fed)</td></tr>
+<tr><td><strong>Coastal erosion</strong></td><td>D5: North Sea/Norwegian Sea exposure + wave action + shoreline retreat</td><td>MET Norway maritime division + coastal monitoring; more aggressive than Sweden due to open ocean exposure</td><td>0.12 (North Sea coast Rogaland/Vestland/Møre og Romsdal)</td></tr>
+<tr><td><strong>Permafrost thaw</strong></td><td>D6: Arctic ground instability in far north (Finnmark/northern Troms)</td><td>NGU permafrost monitoring + MET climate projections; affects substation foundations in northernmost regions</td><td>0.05 (emerging risk in Finnmark/Troms)</td></tr>
+</tbody>
+</table>
+
+<div class="highlight-box">
+<strong>Markov Climate Shift Matrix for Norway:</strong><br>
+κ_climate = 1.0 + max(0.35 × winter_storm_frequency, 0.20 × avalanche_hazard, 0.18 × ice_loading_stress, 0.15 × snowmelt_flood_risk, 0.12 × coastal_erosion_stress, 0.05 × permafrost_thaw)<br>
+<strong>Interpretation:</strong> Winter storms dominate coastal regions (Rogaland, Vestland, Møre og Romsdal, Finnmark coast) with more intensity than Sweden. Avalanche hazard UNIQUE to Norway, critical in mountain regions (Nordland, Troms, Vestland valleys). Snow/ice loading severe in Arctic and mountain passes. Spring flooding predictable via snowmelt and dam management. Coastal erosion significant on North Sea coasts. Permafrost thaw emerging in Finnmark. MAJOR DIFFERENCE FROM SWEDEN: avalanche component critical for Norwegian system; no equivalent hazard in Sweden.
+</div>
+
+<h2>6. Post-Glacial Rebound — Fennoscandian Uplift & Permafrost Dynamics</h2>
+
+<p>Norway experiences postglacial land uplift, particularly in the north (Troms, Finnmark coast rising ~5–8 mm/year). This creates minor seismic activity (M2–M2.5) but less intense than Sweden's rebound zones. More critical for Norway are permafrost dynamics in Arctic regions, where warming threatens substation foundations and tower stability. Northern coastal zones (Troms/Finnmark coast) are vulnerable to differential settlement over decades due to ongoing isostatic rebound and climate-driven permafrost thaw. Unlike Sweden, Norway has no mining subsidence issues.</p>
+
+<div class="calibration-note">
+<strong>Post-Glacial Rebound & Permafrost Multiplier (κ_rebound, κ_permafrost):</strong><br>
+Applied to R6 (hazard) for substations in postglacial rebound and permafrost zones:<br>
+κ_rebound = 1.00 (outside rebound zone)<br>
+κ_rebound = 1.01–1.03 (within postglacial rebound zone, Troms/Finnmark coast)<br>
+κ_permafrost = 1.00 (outside permafrost zone)<br>
+κ_permafrost = 1.03–1.08 (within active permafrost zone, Finnmark interior, Troms mountains) (emerging risk due to climate change)<br>
+<strong>Critical regions:</strong> Northern coast (Troms, Finnmark), Arctic interior. Seismic component minimal (&lt;1.01×); primary risk is foundation settlement and permafrost thaw-induced instability. Permafrost risk growing with warming climate.
+</div>
+
+<h2>7. Arctic Thermal Stress & Avalanche Preservation Risk — Extreme Cold + Mountain Hazard</h2>
+
+<p>Norway's climate spans from extreme Arctic (−40°C in Finnmark interior, −30°C in Troms) to temperate maritime (western coasts). Extended winter in far north preserves transformer and cable insulation. However, this extreme cold environment also accelerates brittle fracture risk in metal structures and requires specialized Arctic equipment ratings. Additionally, the extreme snow accumulation and avalanche activity in mountain regions (unique to Norway) creates direct transmission line damage risk not present in Sweden. Equipment must survive both extreme cold AND avalanche impact loads in some locations.</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Arctic preservation effect:</strong> κ_thermal = 0.82–0.88 in far north (Finnmark interior, Troms mountains) (cold slows aging, extends equipment life by ~8–12%).</li>
+  <li><strong>Northern Arctic coast:</strong> κ_thermal = 0.88–0.92 in Finnmark/Troms coast (preservation effect offset partially by harsh maritime corrosion).</li>
+  <li><strong>Subarctic baseline:</strong> κ_thermal = 0.95 in central regions (Trøndelag interior, Nordland, Buskerud valleys).</li>
+  <li><strong>Temperate maritime baseline:</strong> κ_thermal = 0.98–1.00 in western coastal and eastern regions (Rogaland, Vestland, Østfold, Akershus).</li>
+  <li><strong>Avalanche mechanical stress:</strong> κ_avalanche = 1.05–1.15 in mountain valleys and steep terrain (Nordland, Troms, Vestland avalanche zones) (impact loads on towers and lines accelerate fatigue failure). This is UNIQUE to Norwegian system design — no equivalent in Swedish framework.</li>
+  <li><strong>Equipment certification:</strong> Transmission equipment in Finnmark/Troms must be rated for −40°C operation with avalanche impact protection (reinforced foundations, debris deflectors). Arctic certification now standard for new substations in northernmost regions. Coastal substations require marine corrosion protection despite cold preservation benefits.</li>
+</ul>
+
+<div class="calibration-note">
+<strong>Arctic Thermal Modifier (κ_thermal) + Avalanche Mechanical Stress (κ_avalanche):</strong><br>
+Applied to component aging rates (C variable) for thermal degradation and mechanical stress modeling:<br>
+Finnmark interior: κ_thermal = 0.85 (extreme cold preserves), κ_avalanche = 1.08 (avalanche hazard high)<br>
+Troms coast: κ_thermal = 0.90, κ_avalanche = 1.10 (both Arctic cold and avalanche)<br>
+Central interior: κ_thermal = 0.95, κ_avalanche = 1.02–1.05 (moderate mountain risk)<br>
+Coastal temperate: κ_thermal = 0.99–1.00, κ_avalanche = 1.00 (baseline)<br>
+Cold zones see extended asset life; avalanche zones see accelerated mechanical fatigue. UNIQUE NORWAY FACTOR: avalanche mechanical stress not present in Sweden or most other systems.
+</div>
+
+<h2>8. Geographic Profile — Fjord-Dominated Landscape with North Sea Exposure + Arctic North + Avalanche Zones</h2>
+
+<p>Norway spans ~385,000 km² with an extremely long and complex fjord coastline (~25,000 km including islands and indentations), extending from temperate south (Skagerrak, 58°N) to Arctic Finnmark (71°N). The transmission grid follows fjord valleys and mountain passes, creating unique vulnerability patterns. System organized into five bidding zones reflecting hydro generation patterns and regional load concentration, with additional emphasis on avalanche and coastal hazard zonation:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>NO1 — Southeast (Oslo region — Oslo, Akershus, Østfold, Buskerud, Innlandet, Vestfold, Telemark):</strong> Maritime temperate to inland continental. Oslo metropolitan area (largest load center, ~3 GWe peak demand). Eastern hydropower systems (Glomma, Drammenselva cascades). Moderate winter storms (less coastal exposure). κ_thermal = 0.98 (baseline), κ_winter = 0.25 (moderate storms), κ_avalanche = 1.01 (low mountain risk). Corrosion C1–C2.</li>
+  <li><strong>NO2 — Southwest (Rogaland/Stavanger region — Rogaland, Agder, western Vestfold):</strong> North Sea coastal exposure, severe winter gale storms, industrial aluminum smelting. Highest corrosion pressure in Norway (C4). κ_thermal = 0.99, κ_winter = 0.38 (North Sea dominance), κ_avalanche = 1.02 (low), κ_corrosion = 1.18 (highest). Major interconnects to UK (North Sea Link HVDC) and Denmark (Skagerrak HVDC).</li>
+  <li><strong>NO3 — Central (Trøndelag/Møre og Romsdal — Trøndelag, Møre og Romsdal, southern Vestland):</strong> Fjord-coastal with mountain interior. North Sea storms (Atlantic fetch), avalanche hazard in mountain valleys (Verksgaarden, Rommedalsura passes). Significant hydropower (Tokke, Ulla-Førre systems). κ_thermal = 0.97, κ_winter = 0.36 (coastal storms), κ_avalanche = 1.08 (avalanche hazard ELEVATED). Corrosion C3–C4 coastal, C2 interior.</li>
+  <li><strong>NO4 — North (Nordland/Troms — Nordland, Troms, northern Vestland):</strong> Subarctic/Arctic climate, extreme winter conditions, avalanche-prone mountain terrain (Lyngen Alps, Tromso region), Arctic coast (Barents Sea, North Cape). Sparse grid, long transmission distances. Extreme cold preserves equipment but avalanche risk and coastal storms dominate. κ_thermal = 0.87 (Arctic), κ_winter = 0.37 (extreme storms), κ_avalanche = 1.12 (avalanche dominant hazard), κ_permafrost = 1.04 (emerging). Corrosion C2–C3 (coast higher).</li>
+  <li><strong>NO5 — West (Vestland/southern Møre og Romsdal — Vestland, southern Møre og Romsdal, western Buskerud):</strong> Fjord-intensive, major hydropower (Aurland, Bykle, Sira-Kvina, Ulla-Førre systems), exposed to North Atlantic storms, avalanche zones in steep valleys. κ_thermal = 0.96, κ_winter = 0.35 (Atlantic storms), κ_avalanche = 1.10 (avalanche risk high). Corrosion C3–C4. HVDC connection to NordLink (Germany) emerging.</li>
+</ul>
+
+<div class="calibration-note">
+<strong>Regional Temperature, Storm, Avalanche & Corrosion (κ_thermal, κ_winter, κ_avalanche, κ_corrosion):</strong><br>
+Equipment thermal life and mechanical resilience modulated by regional climate and environmental stress. Transformer rated for −40°C in Finnmark; avalanche impact protection critical in mountain passes. North Sea coast (NO2, southern NO3) requires C4 corrosion-rated equipment; inland mountains (NO4) require avalanche-rated structures.<br>
+<strong>NO1 (Southeast):</strong> κ_thermal = 0.98, κ_winter = 0.25, κ_avalanche = 1.01, κ_corrosion = 0.96<br>
+<strong>NO2 (Southwest/North Sea):</strong> κ_thermal = 0.99, κ_winter = 0.38, κ_avalanche = 1.02, κ_corrosion = 1.18<br>
+<strong>NO3 (Central/Fjord):</strong> κ_thermal = 0.97, κ_winter = 0.36, κ_avalanche = 1.08, κ_corrosion = 1.06<br>
+<strong>NO4 (North/Arctic):</strong> κ_thermal = 0.87, κ_winter = 0.37, κ_avalanche = 1.12, κ_corrosion = 0.95<br>
+<strong>NO5 (West/Fjord):</strong> κ_thermal = 0.96, κ_winter = 0.35, κ_avalanche = 1.10, κ_corrosion = 1.10<br>
+Winter storms + avalanche hazard + coastal corrosion dominance in north and west; heat negligible (no summer stress like Sweden's metropolitan zones). AVALANCHE COMPONENT UNIQUE TO NORWAY.
+</div>
+
+<h2>9. Energy System — Hydropower Absolute Dominance (90%) + NO NUCLEAR + Emerging Wind</h2>
+
+<p>Norway's energy system is globally unique: ~90% hydropower, ~10% wind (expanding), ZERO nuclear capacity, NO coal, NO natural gas for electricity (used only for export/industry). This extreme hydro dependence creates fundamental system characteristics: (1) annual generation varies ±20% based on precipitation/snowmelt (wet vs. dry years); (2) system acts as "battery of Europe" (exports surplus in wet years, imports in dry years); (3) dam levels directly determine system stability; (4) grid frequency and voltage are highly sensitive to water availability. Climate change impacts (altered snowmelt timing, more extreme precipitation events, glacier retreat) pose existential challenges to energy security:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Hydropower:</strong> ~90% of generation (global leader, major river systems: Glomma 22% of national capacity, Drammenselva, Numedalslågen, Otra, Sira-Kvina, Tokke, Ulla-Førre, Aurland, Bykle, Alta cascades). ~33 GW installed capacity across ~1,600 plants. Seasonal variation (spring spate from snowmelt/glacier runoff, winter/dry summer low). Sophisticated cascade management by Statnett and private operators. Water reservoir levels are public policy concern (strategic national asset). Climate change reshaping seasonal patterns (earlier spring melt, lower summer water, increased autumn flooding).</li>
+  <li><strong>Nuclear:</strong> 0% — Norway has NEVER built a commercial nuclear plant and has strong political/cultural opposition. NO nuclear decommissioning concerns. This is FUNDAMENTAL DIFFERENTIATOR from Sweden.</li>
+  <li><strong>Wind:</strong> ~10% existing (growing); rapid expansion planned. Onshore expansion in mountain regions (Finnmark, northern valleys) and coastal areas. Offshore 30 GW planned by 2040 (Sørlige Nordsjø and Utsira Nord projects, North Sea offshore farms). Major HVDC transmission infrastructure required to move generation from north/west to southern load centers and European interconnects.</li>
+  <li><strong>Biomass/biofuel:</strong> Minimal (&lt;1%); limited forest biomass for electricity (forests reserved for timber/pulp industry). Some district heating biomass but not grid-connected electricity.</li>
+  <li><strong>Import/Export capacity:</strong> Essential infrastructure: 5 HVDC interconnects + multiple AC ties to Sweden, plus AC ties to Finland. NordLink (to Germany, 1.4 GW, operational), North Sea Link (to UK, 1.4 GW, operational), Skagerrak 1-4 (to Denmark, 1.7 GW total), NorNed (to Netherlands, 700 MW), plus AC ties to Sweden/Finland. System designed to export ~10–15 GW during wet years, import during droughts.</li>
+  <li><strong>Grid stability:</strong> Hydro systems provide natural inertia and frequency regulation. Wind integration (now ~10%, expanding to 20%+) requires careful frequency support. Synthetic inertia and renewable-backing services becoming critical. Statnett implementing minimum synchronous generation requirements in each bidding zone.</li>
+</ul>
+
+<h2>10. Renewable Integration & Hydropower Modernization</h2>
+
+<p>Norway is balancing rapid renewable growth with maintaining grid stability and managing extreme hydro dependence:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Offshore wind (Sørlige Nordsjø & Utsira Nord):</strong> 30 GW planned by 2040 (major North Sea development). New HVDC interconnects will carry generation southward and to UK/Germany. Coastal substations (especially NO2/NO5) will face major voltage/frequency stress. North Sea winter storms interact with offshore wind forecasting (ramp rate challenges). Arctic wave interaction with wind platforms in Finnmark projects requires new design standards.</li>
+  <li><strong>Onshore wind:</strong> ~20+ GW potential in mountain regions (Finnmark, Nordland, Troms wind belts, Rogaland hills). Avalanche-wind interaction in mountain passes creates unique failure modes (avalanche destroys wind installation). Local voltage support challenges at wind connection points.</li>
+  <li><strong>Hydropower modernization:</strong> Aging dam infrastructure (many built 1950s–1980s) undergoing refurbishment. Climate change adaptation (altered snowmelt, increased flood events) driving investment in reservoir management and spillway capacity. Transnational water management critical (Sweden/Finland/Russia river systems shared).</li>
+  <li><strong>Pumped storage:</strong> ~1.3 GW existing; limited expansion potential (geography/environmental concerns). Focus on battery storage as wind integration tool.</li>
+  <li><strong>Battery storage:</strong> Emerging (currently &lt;50 MW); planned expansion to 2–5 GW by 2035 to smooth wind/hydro variability and support frequency regulation. Storage interconnects at wind hubs (north/west) and demand centers (Oslo, Bergen).</li>
+  <li><strong>Green hydrogen:</strong> Electrolysis projects planned (cliff-side locations like Utsirafjellet in Rogaland). Emerging demand (~100–200 MW by 2035) at specific coastal locations. Grid stability implications for concentrated load nodes.</li>
+  <li><strong>EV charging:</strong> Projected 80–150 MW additional load by 2035 (concentrated in Oslo metro ~60 MW, Bergen ~25 MW, Stavanger ~20 MW). Smart charging with time-of-use tariffs. T1 (grid stability) amplified in metropolitan substations during peak charging.</li>
+  <li><strong>Microgrid resilience:</strong> Arctic regions (Finnmark, Troms) planning islanding capability (local wind + hydro + storage) for resilience during winter storms. Test projects underway in Tromsø and Kirkenes. Island communities (Svalbard) already operate as isolated microgrids.</li>
+</ul>
+
+<h2>11. Administrative & Institutional Framework</h2>
+
+<table>
+<thead><tr><th>Role</th><th>Nordic Equivalent</th><th>Norwegian Institution</th><th>Data Contribution</th></tr></thead>
+<tbody>
+<tr><td><strong>Grid Operator</strong></td><td>Swedish: Svenska kraftnät, Finnish: Fingrid</td><td>Statnett SF (TSO, state-owned)</td><td>Hourly dispatch, Nordic power exchange (Nord Pool) integration, transmission flows, system adequacy, SCADA telemetry, EHV substation registry, bidding zone operations (NO1–NO5), HVDC interconnect management (NordLink, North Sea Link, Skagerrak, NorNed)</td></tr>
+<tr><td><strong>Regulator</strong></td><td>Swedish: Ei</td><td>NVE (Norges vassdrags- og energidirektorat) + RME (Reguleringsmyndigheten for energi)</td><td>Tariff regulation, performance standards, market oversight, environmental compliance, water resource management, annual reports, renewable integration requirements, hydropower licensing</td></tr>
+<tr><td><strong>Statistics</strong></td><td>Swedish: SCB</td><td>SSB (Statistisk sentralbyrå)</td><td>Census 2024, regional demographics (Fylke-level), employment, income, municipal data, energy poverty metrics, regional development indicators</td></tr>
+<tr><td><strong>Weather & Flood</strong></td><td>Swedish: SMHI</td><td>MET Norway (Meteorologisk institutt)</td><td>Temperature, rainfall, wind, extreme weather alerts (North Sea storms, Arctic conditions), flood forecasts, drought indices, snowmelt timing, glacier monitoring, coastal wave data, North Sea exposure</td></tr>
+<tr><td><strong>Geology/Seismic</strong></td><td>Swedish: SGU</td><td>NGU (Norges geologiske undersøkelse)</td><td>Geological mapping, hazard maps, landslide inventory, postglacial rebound data, permafrost monitoring (emerging in Finnmark), avalanche hazard mapping</td></tr>
+<tr><td><strong>Avalanche/Civil Protection</strong></td><td>—</td><td>DSB (Direktoratet for samfunnssikkerhet og beredskap)</td><td>Avalanche hazard mapping and forecasting, extreme weather monitoring, civil protection alerts, hazard communication to critical infrastructure operators</td></tr>
+<tr><td><strong>Environment</strong></td><td>Swedish: Naturvårdsverket</td><td>Miljødirektoratet (Norwegian Environment Agency)</td><td>Air quality, water quality, environmental impact assessments, flood hazard mapping, wetland inventory, climate monitoring, coastal erosion tracking, glacier monitoring</td></tr>
+<tr><td><strong>Cyber Security</strong></td><td>Swedish: MSB</td><td>NSM (Nasjonal sikkerhetsmyndighet) / NorCERT</td><td>Cyber threat monitoring, critical infrastructure protection, SCADA security oversight, Nordic cybersecurity cooperation</td></tr>
+<tr><td><strong>Land Use/Geodesy</strong></td><td>Swedish: Lantmäteriet</td><td>Kartverket (Norwegian Mapping Authority)</td><td>Geodetic data, land use mapping, spatial planning, cadastral records, transmission corridor zoning, coastal baseline mapping, mountain terrain data</td></tr>
+<tr><td><strong>DSO Operators (100+ total)</strong></td><td>—</td><td>Hafslund (southeast), BKK (Oslo region), Lyse (Rogaland), Agder Energi Nett (Agder), Tensio (Nordland), and ~95 municipal/regional operators</td><td>Local distribution data, customer metrics, outage statistics, DER penetration, corrosion/avalanche damage reports</td></tr>
+<tr><td><strong>Open Mapping</strong></td><td>—</td><td>OpenStreetMap</td><td>Power infrastructure, transmission lines, substation locations, fjord/mountain terrain features, avalanche zones</td></tr>
+<tr><td><strong>Copernicus (ESA)</strong></td><td>—</td><td>ESA + Norwegian research institutions (NILU, MET, NGU)</td><td>ERA5 weather data, CMIP6 climate projections, satellite imagery (flood/snow/glacier monitoring), Arctic observations, wind resource assessment, coastal change detection, avalanche risk modeling via SAR</td></tr>
+</tbody>
+</table>
+
+<h2>12. Component Weights — 6-Component Architecture Preserved with Avalanche & Hydro Emphasis</h2>
+
+<p>The SSI v4.0.2 framework maintains the standard 6-component weighting, adapted for Norway's risk profile with emphasis on environmental/climate hazards (North Sea storms, avalanches, coastal corrosion) and ZERO seismic weight (exceptional stability). Hydro criticality and avalanche mechanical stress dominate risk assessment. Condition component reflects Arctic equipment requirements and avalanche impact monitoring. Insulation/climate component heavily weighted for coastal corrosion and Arctic cold. Energy component elevated due to absolute hydro dependence and water resource volatility:</p>
+
+<table class="coefficient-table">
+<tr><th>Component</th><th>Weight</th><th>Norway-Specific Focus</th></tr>
+<tr><td><strong>C (Condition)</strong></td><td class="num">0.30</td><td>Transformer age, condition state, maintenance quality. Norway's transmission grid relatively mature (post-1970s investment, ongoing modernization). Arctic equipment in Troms/Finnmark requires specialized inspection protocols (cold-related failures, avalanche impact damage, permafrost settlement). Avalanche protection measures (debris deflectors, reinforced foundations) require condition monitoring. Coastal equipment (NO2 west) requires intensive corrosion damage assessment. Aging hydroplant turbines and dams require separate condition tracking (water intake blockages, spill gate corrosion). Avalanche deflector integrity critical annual inspection item in mountain zones.</td></tr>
+<tr><td><strong>V (Voltage)</strong></td><td class="num">0.10</td><td>Voltage stress, loading ratio, VoLL. Oslo metropolitan demand concentration (~3 GWe) + regional industrial loads (aluminum smelting in Rogaland, other heavy industry). Bidding zone interactions (north/west hydro/wind generation, south/east demand concentration) create complex voltage coupling. Hydropower generation variability (±20% annually) creates sustained voltage stress during dry years. Interconnect flows to Sweden/Denmark/Germany/UK/Netherlands couple Norwegian voltage to European grid. Emerging offshore wind (30 GW) + mountain onshore wind require sophisticated reactive power management. Arctic wind ramp events (North Sea storms) create rapid frequency swings.</td></tr>
+<tr><td><strong>I (Insulation/Climate)</strong></td><td class="num">0.25</td><td>Insulation climate stress, Arctic equipment ratings, winter storm/avalanche damage, North Sea corrosion aging. Elevated weight reflects dominant coastal/mountain hazards + extreme cold + avalanche impact loads. IRI snow/ice/cold/wind/salt spray + avalanche mechanical stress components critical. Thermal stress κ_thermal [0.82–1.00] modulates equipment life. Transmission line icing forecasts inform outage risk. Maritime corrosion (C3–C4) in North Sea zones (NO2, southern NO3, NO5) accelerates insulation aging. Avalanche impact mechanical stress (κ_avalanche 1.08–1.12) critical in mountain valleys. Arctic equipment specifications stringent in Finnmark/Troms.</td></tr>
+<tr><td><strong>E (Environment)</strong></td><td class="num">0.10</td><td>Environmental sensitivity, water quality/hydropower, avalanche risk, corrosion class (C1–C4). Norway's clean air (minimal industrial pollution) offsets maritime salt spray stress minimally. Regional climate (Arctic vs. temperate fjord) + North Sea exposure drives corrosion factor κ_corrosion [0.78–1.18] (higher range than Sweden). Avalanche hazard unique environmental factor (not in Sweden framework). Postglacial rebound + permafrost thaw emerging concerns in Finnmark. Water resource management (precipitation, snowmelt timing, glacier retreat) is critical environmental factor for generation adequacy.</td></tr>
+<tr><td><strong>S (Hydrological/Avalanche)</strong></td><td class="num">0.20</td><td>Seismic PGA (negligible), postglacial rebound zones (northern coast, minimal), winter storm risk, avalanche hazard (DOMINANT in mountain zones), snow/ice loading, flooding, coastal erosion, hydro resource variability. Natural seismic hazard MINIMAL (α=0.10, PGA &lt;0.01g across nearly all territory). Weight elevated due to avalanche dominance + winter meteorological hazards + flooding + coastal erosion + hydro resource criticality. κ_winter = 0.35–0.38 (North Sea storm dominance), κ_avalanche = 1.08–1.12 (avalanche MAJOR hazard), κ_ice = 0.18 (ice loading), κ_flood = 0.15 (snowmelt/extreme precip), κ_coastal = 0.12 (Atlantic exposure). Seismic component negligible (~1.00×) except minor postglacial zones (~1.02×). Hydro resource variability (wet vs. dry years) modulates S component annually.</td></tr>
+<tr><td><strong>T (Transition)</strong></td><td class="num">0.05</td><td>DER ratio (limited), EV load (emerging), renewable integration stress (wind expansion critical), grid modernization, hydro system modernization. Transition stress elevated compared to Sweden due to wind expansion (10% → 20%+) and offshore integration (30 GW HVDC). Focus: offshore wind transmission infrastructure (coastal HVDC hubs), mountain wind-avalanche interaction mitigation, Arctic microgrid resilience (Finnmark/Troms islanding), Nordic market coupling stability, green hydrogen emerging demand at coastal locations, hydropower modernization (dam refurbishment, climate adaptation). EV charging (80–150 MW by 2035) concentrated in metros (Oslo 60 MW, Bergen 25 MW, Stavanger 20 MW). T_transition_modifier [1.05–1.20] for wind integration hubs (NO4–NO5), hydrogen production sites (coastal), and dry-year import zones (NO1–NO2).</td></tr>
+</tbody>
+</table>
+
+<h2>13. Formula Summary — Norway SSI v4.0.2</h2>
+
+<div class="formula-box">
+R = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T<br><br>
+where:<br>
+C = f(transformer age, condition state, maintenance quality, Arctic equipment certification, avalanche damage assessment, corrosion damage assessment)<br>
+V = f(voltage stress, loading ratio, VoLL, bidding zone coupling, Nordic interconnect sensitivity, hydro variability stress, wind ramp rates)<br>
+I = f(insulation climate stress, Arctic cold/winter storm/avalanche/snow/ice loading, North Sea salt spray corrosion, thermal life expectancy, avalanche mechanical fatigue)<br>
+E = f(environmental sensitivity, water quality, avalanche risk, corrosion class [C1–C4], maritime salt spray pressure, permafrost risk, hydropower resource variability)<br>
+S = f(seismic PGA [negligible], postglacial rebound [northern coast &lt;2%], winter storm intensity, avalanche hazard [mountain zones, UNIQUE], snow/ice/coastal erosion/flooding hazards, hydro resource variability [annual ±20%])<br>
+T = f(DER ratio [limited], EV load, onshore/offshore wind integration, renewable penetration [10% → 20%+], Nordic market stability, hydropower modernization, green hydrogen demand)<br><br>
+Modifiers applied: R3_C_mult (social), R4_F_topo (topology, 5-zone bidding structure), R6_restoration, R6_winter_storm, R6_avalanche (NORWAY-SPECIFIC), R6_ice_loading, R6_coastal_erosion, R6_seismic (minimal), R6_hydro_variability, R7_cyber (Nordic coordinated attack resilience), R_interconnect (5 HVDC + AC ties to Sweden/Finland/Denmark)<br>
+Band classification: Low [&lt;0.25], Medium [0.25–0.50], High [0.50–0.75], Critical [≥0.75]
+</div>
+
+<h2>14. Data Sources — 25+ Norwegian Institutions Mapped</h2>
+
+<p>All 95 variables have Norwegian equivalents. Primary sources organized by category:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1.5rem;">
+  <li><strong>Grid Operations (Statnett SF):</strong> www.statnett.no — hourly dispatch, Nordic power exchange (Nord Pool) integration, system state reports, real-time SCADA, EHV substation registry, bidding zone operations (NO1–NO5), frequency/voltage telemetry, wind/hydro forecast integration, HVDC interconnect management</li>
+  <li><strong>Regulation (NVE + RME):</strong> www.nve.no — tariff regulation, performance standards, market oversight, environmental compliance (water/land use), annual reports, renewable integration requirements, hydropower licensing, Nordic coordination</li>
+  <li><strong>Statistics (SSB):</strong> www.ssb.no — Census 2024, Fylke-level demographics, employment, income, municipal data, energy poverty surveys, regional development metrics</li>
+  <li><strong>Meteorology (MET Norway):</strong> www.met.no — weather forecasts, temperature/rainfall/wind records, extreme weather alerts (North Sea storms, Arctic observations), flood forecasts, snowmelt timing, glacier monitoring, coastal wave/storm surge data, wind resource assessment</li>
+  <li><strong>Geology (NGU):</strong> www.ngu.no — geological mapping, hazard maps, landslide inventory, postglacial rebound monitoring, permafrost observations (Finnmark focus), avalanche geological assessment</li>
+  <li><strong>Civil Protection & Avalanche (DSB):</strong> www.dsb.no — avalanche hazard mapping, extreme weather monitoring, civil protection alerts, hazard communication to critical infrastructure</li>
+  <li><strong>Environment (Miljødirektoratet):</strong> www.miljodirektoratet.no — air quality, water quality, environmental impact assessments, flood hazard maps, wetland/biodiversity data, climate monitoring, coastal erosion tracking, glacier retreat monitoring</li>
+  <li><strong>Cyber Security (NSM/NorCERT):</strong> www.nsm.no — cyber threat monitoring, critical infrastructure protection, SCADA security oversight, Nordic cybersecurity cooperation</li>
+  <li><strong>Land Survey (Kartverket):</strong> www.kartverket.no — geodetic data, land use mapping, spatial planning, cadastral records, transmission corridor zoning, coastal baseline mapping, mountain/fjord terrain data</li>
+  <li><strong>DSO Operators (100+ total):</strong> Hafslund, BKK, Lyse, Agder Energi Nett, Tensio, and ~95 municipal/regional operators — distribution data, customer count, outage logs, DER penetration, avalanche/corrosion damage reports</li>
+  <li><strong>Hydropower Data:</strong> Individual dam operator records (Statkraft, Hydro, and private operators) — water level monitoring, spill records, generation data, maintenance schedules</li>
+  <li><strong>Open Mapping (OSM):</strong> OpenStreetMap — power infrastructure, transmission lines, substation locations, fjord/mountain terrain, avalanche zones</li>
+  <li><strong>Copernicus (ESA):</strong> ERA5 reanalysis weather, CMIP6 climate projections, satellite imagery (flood/snow/glacier/avalanche monitoring via SAR), Arctic observations, wind resource assessment, coastal change detection</li>
+  <li><strong>Nordic Market (Nord Pool):</strong> www.nordpoolgroup.com — price signals, Nordic power exchange data, cross-border flow patterns, hydro reservoir forecasts, wind forecast integration, bidding zone price spreads</li>
+</ul>
+
+<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+<p style="text-align: center; font-size: 0.85rem; color: var(--muted); margin-top: 2rem;">
+<strong>SSI v4.0.2</strong> — Complete Formula Construct (Norway) · Ikenga Project · 2026-03-27<br>
+95 variables · Statnett transmission grid scored · 5 bidding zones (NO1–NO5) · 2 seismic zones (minimal activity) · 5 corrosion classes (C1–C4, higher ranges than Sweden) · 25+ data sources · 15 Fylker · 356 Kommuner<br>
+Fennoscandian Shield calibration with ultra-low natural seismicity (α=0.10), zero nuclear capacity (fundamental differentiator from Sweden), AVALANCHE HAZARD dominance in mountain regions (unique to Norway), North Sea winter storm exposure (more intense than Sweden), hydropower absolute dominance (90% generation, ~33 GW capacity, 1,600 plants), ±20% annual resource variability, 5 HVDC interconnects (NordLink, North Sea Link, Skagerrak, NorNed, plus AC ties), and "battery of Europe" role in Nordic energy system
+</p>
+
+</div>
+</body>
+</html>
