@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Data Input List (Denmark) v1</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: 'Segoe UI','Helvetica Neue',sans-serif; color: var(--ink); background: var(--paper); font-size:13px; line-height:1.5; }
+.page { max-width:1400px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; position:sticky; top:0; z-index:10; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; white-space:nowrap; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+tbody tr:hover { background:#e8f4fd; }
+.mono { font-family:'JetBrains Mono','Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-planned { background:#d6eaf8; color:#1a5276; }
+.tag-source { background:#fff3cd; color:#856404; }
+.tag-denmark { background:#fce8e8; color:#5a1f1f; }
+.summary-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin:1.5rem 0; }
+.summary-card { background:#fff; border:1px solid var(--border); border-radius:6px; padding:0.8rem; text-align:center; }
+.summary-card .number { font-size:1.8rem; font-weight:700; font-family:monospace; color:var(--accent2); }
+.summary-card .label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:0.3rem; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+ul { list-style-position:inside; }
+ul li { margin-bottom:0.4rem; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Final Data Input List (Denmark) v1</h1>
+<p class="subtitle">Variable-to-Source Mapping · Energinet · 95 Variables · ~25 Data Sources</p>
+<div class="meta">
+  <span><strong>Country:</strong> Denmark (DK)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Phase:</strong> Pre-Deployment (Planning)</span>
+  <span><strong>Status:</strong> Data Mapping Phase · Infrastructure Baseline Defined</span>
+</div>
+
+<!-- SUMMARY -->
+<h2>Data Coverage Summary</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="number">95</div><div class="label">Total Variables</div></div>
+  <div class="summary-card"><div class="number">25</div><div class="label">Data Sources</div></div>
+  <div class="summary-card"><div class="number">5</div><div class="label">Regioner</div></div>
+  <div class="summary-card"><div class="number">~2,000–3,500</div><div class="label">HV Substations (110 kV+)</div></div>
+  <div class="summary-card"><div class="number">2</div><div class="label">Hazard Zones</div></div>
+</div>
+
+<!-- PRIMARY SOURCES TABLE -->
+<h2>1. Primary Data Sources (Tier 1 — High Confidence)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution (Danish/English)</th><th>Website</th><th>Access</th><th>Variables Supplied</th><th>Frequency</th><th>Coverage</th></tr></thead>
+<tbody>
+<tr><td class="mono">D01</td><td><strong>Energinet</strong> — Transmission System Operator (Electricity + Gas)</td><td>energinet.dk</td><td>Public data portal + reports</td><td>S1 (real-time dispatch, capacity), G.1 (system reliability), T1 (generation mix), wind forecasts, 2 bidding zones (DK1, DK2), cross-border flows (Sweden, Germany, Netherlands), system adequacy monitoring</td><td>Hourly / Daily</td><td>National transmission 100% (2 interconnections to Sweden, 3 to Germany, 1 to Netherlands; 2 bidding zones DK1 West, DK2 East)</td></tr>
+
+<tr><td class="mono">D02</td><td><strong>Forsyningstilsynet</strong> — Regulator</td><td>forsyningstilsynet.dk</td><td>Public reports + data portal</td><td>SAIDI/SAIFI DSO performance, tariff oversight, market supervision, DSO regulation, utility metrics</td><td>Annual / Quarterly</td><td>All 5 Regioner and ~98 Kommuner (DSO service areas)</td></tr>
+
+<tr><td class="mono">D03</td><td><strong>Danmarks Statistik</strong> — Statistics Denmark</td><td>dst.dk</td><td>Register-based census + API + StatBank</td><td>C1–C6 (population, income, employment, migration), demographics, CPR register, employment by sector, household data, regional economic accounts</td><td>Register-based (continuous) + annual surveys</td><td>All 5 Regioner + 98 Kommuner</td></tr>
+
+<tr><td class="mono">D04</td><td><strong>DMI</strong> — Danish Meteorological Institute</td><td>dmi.dk</td><td>Open data API + portal</td><td>I1, I3, I5 (temperature, precipitation, wind), storm forecasts, wave data (North Sea), extreme weather warnings, wind resource assessment</td><td>Daily / Real-time</td><td>~100 weather stations nationwide + North Sea wave buoys and radar</td></tr>
+
+<tr><td class="mono">D05</td><td><strong>GEUS</strong> — Geological Survey of Denmark</td><td>geus.dk</td><td>Public geological maps + databases</td><td>H1–H2 (seismic hazard: minimal, ~0.005g, stable Fennoscandian platform), soil types, groundwater, geological stability mapping</td><td>Annual updates + continuous monitoring</td><td>All Denmark (very low seismic activity; stable geological platform)</td></tr>
+
+<tr><td class="mono">D06</td><td><strong>Miljøstyrelsen</strong> — Environmental Agency</td><td>mst.dk</td><td>Public monitoring network + GIS</td><td>D4 (flood risk, coastal water quality), environmental monitoring, air quality, water quality data</td><td>Real-time / Daily / Seasonal</td><td>National network + ~50 monitoring stations, coastal surveillance</td></tr>
+
+<tr><td class="mono">D07</td><td><strong>Kystdirektoratet</strong> — Coastal Authority</td><td>kyst.dk</td><td>Coastal hazard maps + GIS</td><td>D4 (coastal flooding, storm surge, sea level rise), erosion maps, coastal defense infrastructure</td><td>Annual / Continuous / Event-driven</td><td>All coastal zones (Jylland + Danish Islands)</td></tr>
+
+<tr><td class="mono">D08</td><td><strong>CFCS</strong> — Center for Cybersikkerhed (Center for Cybersecurity)</td><td>cfcs.dk</td><td>Restricted + public advisories</td><td>Cybersecurity incident reports, critical infrastructure protection standards, grid resilience alerts, critical asset registers</td><td>Real-time / Weekly / Quarterly</td><td>All critical energy infrastructure (Energinet, major DSOs)</td></tr>
+
+<tr><td class="mono">D09</td><td><strong>OSM</strong> — OpenStreetMap (Power)</td><td>overpass-api.de</td><td>Public API</td><td>A2–A4 (substation topology), G2 (network graph), transmission/distribution line geometry, asset mapping, ~80–85% HV coverage</td><td>Continuous</td><td>~80–85% HV coverage (strong Nordic penetration)</td></tr>
+
+<tr><td class="mono">D10</td><td><strong>Copernicus CDS</strong> — ESA Climate Data Store</td><td>cds.climate.copernicus.eu</td><td>Open access (registration)</td><td>D3–D4 (temperature extremes, precipitation), CMIP6 projections, ERA5 reanalysis, wind fields, climate change scenarios</td><td>Daily / Monthly</td><td>Global 0.25° grid (~25 km), full coverage Denmark</td></tr>
+</tbody>
+</table>
+
+<!-- SECONDARY SOURCES -->
+<h2>2. Secondary Sources (Tier 2 — Medium Confidence, Modeled)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Website</th><th>Variables</th><th>Access</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="mono">D11</td><td>DSOs — RADIUS Copenhagen, N1 Elnet (North Jutland), Cerius, NOE, KONSTANT, Energi Fyn, and others</td><td>DSO operator sites</td><td>CAPEX, maintenance, SAIDI/SAIFI, transformer age profiles, operational KPIs, network losses, tariff structures</td><td>Public summaries / restricted details</td><td>Annual filings; ~40+ DSOs (highly fragmented); regional consolidation ongoing</td></tr>
+
+<tr><td class="mono">D12</td><td>ENTSO-E Transparency Platform</td><td>transparency.entsoe.eu</td><td>Cross-border flows, generation schedules, load forecasting, market data (Nordic + EU)</td><td>Open access (SFTP + API)</td><td>Integration point with Nordic/EU grid coordination; Denmark's 2 bidding zones (DK1, DK2) and cross-border interconnections with Sweden, Germany (2 AC, 1 DC), Netherlands (1 DC)</td></tr>
+
+<tr><td class="mono">D13</td><td>Geodatastyrelsen — Danish Geodata Agency</td><td>geodatastyrelsen.dk</td><td>DEM, land use mapping, cadastral data, spatial reference, property registers</td><td>Public GIS (EUREF89 UTM)</td><td>Supports spatial analysis for substation mapping, land use classification, flood risk zone assignment</td></tr>
+
+<tr><td class="mono">D14</td><td>Dansk Energi — Danish Energy (industry association)</td><td>danskenergi.dk</td><td>Energy statistics, sector profiles, renewable energy capacity, energy balance by region</td><td>Semi-public (reports + public data)</td><td>Regional energy profiles, renewable penetration tracking, sector analysis</td></tr>
+
+<tr><td class="mono">D15</td><td>Nationalbanken — National Bank of Denmark (Central Bank)</td><td>nationalbanken.dk</td><td>GDP by region, inflation, economic indicators, macroeconomic forecasts</td><td>Public databases</td><td>Supports V1 (value of lost load regional scaling) and regional economic resilience assessment</td></tr>
+
+<tr><td class="mono">D16</td><td>Energistyrelsen — Danish Energy Agency</td><td>ens.dk</td><td>Energy policy, renewable statistics, offshore wind licenses, capacity planning, energy targets</td><td>Public reports + data portal</td><td>Wind/solar capacity tracking, offshore wind project pipeline, renewable integration data</td></tr>
+
+<tr><td class="mono">D17</td><td>Dansk Fjernvarme — District Heating Association</td><td>danskfjernvarme.dk</td><td>CHP coupling data, heat demand by region, district heating network mapping</td><td>Semi-public (member reports)</td><td>Supports energy system integration analysis; Denmark has Europe's highest district heating penetration (~60% residential)</td></tr>
+
+<tr><td class="mono">D18</td><td>Nord Pool — Nordic Power Exchange</td><td>nordpool.com</td><td>Spot market prices, forward curve, cross-border price spreads, market liquidity, congestion metrics (DK1/DK2)</td><td>Public + subscription</td><td>Critical for V1 calibration and real-time grid stress monitoring across DK1/DK2 bidding zones</td></tr>
+
+<tr><td class="mono">D19</td><td>Eurostat — EU Statistics</td><td>ec.europa.eu/eurostat</td><td>Harmonized socio-economic data, employment, income, regional development indicators</td><td>Open access</td><td>EU-wide consistency for cross-border analysis and policy alignment</td></tr>
+
+<tr><td class="mono">D20</td><td>Global Solar Atlas / SolarGIS</td><td>globalsolaratlas.info / solargis.com</td><td>Solar irradiance, photovoltaic potential, direct/diffuse radiation</td><td>Open access / subscription</td><td>Supports renewable energy modeling for increasing solar capacity (Denmark targeting 50% renewables by 2030)</td></tr>
+</tbody>
+</table>
+
+<!-- VARIABLE MAPPING -->
+<h2>3. Variable-by-Variable Mapping (Selected Examples)</h2>
+
+<p class="note"><strong>Note:</strong> Full 95-variable list condensed to representative samples. All primary variables mapped to Danish institutional data sources. Infrastructure baseline established for ~2,000–3,500 HV substations (110 kV+) and 98 Kommuner across 5 Regioner.</p>
+
+<table>
+<thead><tr><th>Variable</th><th>SSI Component</th><th>Data Source (Primary)</th><th>Secondary Source(s)</th><th>Resolution</th><th>Frequency</th><th>Status</th></tr></thead>
+<tbody>
+
+<tr><td class="mono">A1 — Substation Age</td><td>Resilience</td><td>OSM (start_date tag) + Energinet registry</td><td>DSO facility records (RADIUS, N1, Cerius, NOE, etc.)</td><td>Per substation</td><td>Static + annual updates</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">B1.2 — Transformer Hotspot Temp</td><td>Grid Telemetry</td><td>IEEE C57.91 model + DMI ambient temperature</td><td>DSO equipment inspection records, maintenance logs, SCADA telemetry</td><td>Per substation</td><td>Monthly (seasonal norm)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">C1 — Population</td><td>Socio-Economic</td><td>Danmarks Statistik CPR register (5 Regioner, 98 Kommuner)</td><td>DST population estimates (quarterly/annual)</td><td>Kommune / Region</td><td>Continuous register, annual reports</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">C2 — Median Income</td><td>Socio-Economic</td><td>DST Income Survey (annual by kommune/region)</td><td>DST employment + tax register data</td><td>Kommune / Decile</td><td>Annual</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">C3 — Energy Poverty %</td><td>Socio-Economic</td><td>Energistyrelsen energy affordability survey (regional)</td><td>DST housing cost burden data</td><td>Region / Kommune</td><td>Annual / Biennial</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">C6 — Net Migration</td><td>Socio-Economic</td><td>DST migration statistics (internal + international)</td><td>Immigration Agency visa/residence permit data</td><td>Kommune / Region</td><td>Annual</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">D1 — Seismic PGA (g)</td><td>Environmental</td><td><strong>GEUS</strong> seismic hazard map (minimal: ~0.005g, stable Fennoscandian platform)</td><td>USGS model for reference; NSM infrastructure resilience analysis</td><td>Per substation (spatial join)</td><td>Static (updated with GEUS reviews ~10yr)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">D3 — Temperature Extremes (°C)</td><td>Environmental</td><td>DMI historical records by station (record low: −25°C, record high: +40.7°C)</td><td>Copernicus ERA5 reanalysis (gridded)</td><td>Region / Weather station</td><td>Daily → monthly/annual statistics</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">D4 — Coastal Flooding Index</td><td>Environmental</td><td>Kystdirektoratet + DMI storm surge forecasting + Miljøstyrelsen water quality</td><td>Copernicus flood modeling, historical storm events, sea level rise projections</td><td>Coastal zone / Region</td><td>Annual / Seasonal / Event-driven / Real-time (DMI)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">E1 — Renewable Capacity (MW)</td><td>Energy System</td><td><strong>Energinet</strong> hourly dispatch (wind/solar/CHP by DK1/DK2 bidding zones) + Energistyrelsen registry</td><td>Dansk Energi, DSO portfolio data, North Sea offshore wind pipeline</td><td>Region / Bidding zone (DK1/DK2) / Substation feeder</td><td>Monthly (dispatch), weekly (wind), quarterly (capacity)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">E2 — Employment by Sector</td><td>Energy System</td><td>DST Census employment by ISIC (Region/Kommune)</td><td>DST Labor Force Survey (quarterly)</td><td>Kommune / Sector</td><td>Register-based (annual), quarterly estimates</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">F1 — CAPEX per Asset (DKK)</td><td>Markov Input</td><td>Forsyningstilsynet regulatory filings (CAPEX by DSO/year)</td><td>Individual DSO annual reports (RADIUS, N1, Cerius, etc.)</td><td>DSO level</td><td>Annual (filed with regulator)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">G1 — SAIDI (hours/customer/year)</td><td>Modifiers</td><td><strong>Energinet</strong> system reliability reports + Forsyningstilsynet DSO aggregate data</td><td>Individual DSO historical performance records</td><td>Region / DSO</td><td>Annual (filed with regulator)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">H1 — Seismic Hazard Zone Classification</td><td>Hazard Zone</td><td>GEUS zone classification (1 zone: Stable Low-Risk; minimal seismic hazard)</td><td>NSM infrastructure resilience analysis</td><td>Per substation (spatial)</td><td>Static (updated with GEUS reviews ~10yr)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">H2 — Coastal Storm Hazard Zone</td><td>Hazard Zone</td><td>Kystdirektoratet coastal maps + DMI storm frequency + Miljøstyrelsen assessment</td><td>Historical storm events, sea level rise projections, storm surge models</td><td>Per substation (coastal zones: Jylland coast, Island perimeters critical)</td><td>Annual / As-updated / Seasonal</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">I2 — Risk Score (Markov output)</td><td>Markov Output</td><td><strong>DERIVED:</strong> From F + H via CIGRÉ TB 761 transition matrix</td><td>N/A</td><td>Per substation</td><td>Annual (post-data refresh)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">S1 — Grid Capacity Reserve (%)</td><td>Modifier</td><td>Energinet capacity forecasts / Nordic adequacy reports / cross-border flow analysis</td><td>Dansk Energi strategic plans, transmission upgrade pipeline (DK1/DK2 balancing)</td><td>Region / Bidding zone (DK1/DK2)</td><td>Quarterly (Energinet forecasts)</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+
+<tr><td class="mono">T1 — Grid Stability Index</td><td>Modifier</td><td>Energinet dispatch variability (wind ramp rates, DK1/DK2 balancing, cross-border flows) + Nord Pool market data</td><td>Dansk Energi, Energistyrelsen forecasts, ENTSO-E Nordic flows</td><td>Region / Bidding zone / Technology</td><td>Hourly → monthly aggregate</td><td><span class="tag tag-planned" style="background:#d5f5e3;color:#1a6b4a">PLANNED</span></td></tr>
+</tbody>
+</table>
+
+<!-- SOURCE ASSESSMENT -->
+<h2>4. Data Source Assessment by Tier</h2>
+
+<h3>Tier 1: Primary Sources (10 sources, ~65% of variables)</h3>
+<p>Open access, high authority, Denmark-specific. <span class="tag tag-denmark">DENMARK-NATIVE</span> sources (Energinet, Forsyningstilsynet, Danmarks Statistik, DMI, GEUS, Miljøstyrelsen, Kystdirektoratet, CFCS, OSM, Copernicus).</p>
+
+<h3>Tier 2: Secondary Sources (10 sources, ~25% of variables)</h3>
+<p>Modeled, interpolated, or regional surveys. DSOs (RADIUS, N1, Cerius, NOE, KONSTANT, Energi Fyn, others), ENTSO-E, Geodatastyrelsen, Dansk Energi, Nationalbanken, Energistyrelsen, Dansk Fjernvarme, Nord Pool, Eurostat, SolarGIS.</p>
+
+<h3>Tier 3: Proxy / Fallback (2–3 sources, ~10% of variables)</h3>
+<p>Substation vintage (OSM start_date + cohort models), critical infrastructure (spatial analysis + population density), equipment condition (age curves + ambient temp + coastal storm hazard exposure).</p>
+
+<h2>5. Key Advantages & Challenges</h2>
+
+<h3>Advantages</h3>
+<ul>
+  <li><strong>Energinet transparency:</strong> Public data portal with real-time dispatch, 2 bidding zones (DK1 West, DK2 East), wind forecasts, and cross-border flows. Strong integration with Nordic market and EU transparency platforms.</li>
+  <li><strong>Register-based Census (DST):</strong> Denmark's continuous CPR register system provides granular demographic updates at kommune level (98 units) without census gaps. Real-time employment, income, and migration tracking via tax registers. Gold standard in Northern Europe.</li>
+  <li><strong>DMI meteorology:</strong> ~100 weather stations with excellent historical records and superior wind forecasting (critical for 80%+ wind+solar penetration). North Sea wave data integration. Open API with no licensing barriers.</li>
+  <li><strong>Wind energy leadership:</strong> Denmark world leader in wind penetration (~80% on recent windy days). Energistyrelsen wind registry provides project visibility. Offshore wind expansion major growth vector. Key for T1 (generation variability) and renewable integration modeling.</li>
+  <li><strong>District heating coupling:</strong> Highest district heating penetration in Europe (~60% residential). Dansk Fjernvarme and CHP data enable unique energy system integration analysis; thermal demand side representation.</li>
+  <li><strong>Coastal hazard expertise:</strong> Kystdirektoratet and Miljøstyrelsen provide comprehensive coastal flooding, storm surge, and sea level rise mapping. Critical for low-lying island and peninsula infrastructure.</li>
+  <li><strong>Small geography, high density:</strong> Compact country (~43,000 km²) enables dense data coverage. ~2,000–3,500 HV substations manageable for granular asset-level analysis. Urban infrastructure density supports detailed SCADA integration.</li>
+  <li><strong>Solar growth potential:</strong> Increasing solar capacity (6+ GW target by 2030). Global Solar Atlas + SolarGIS provide high-resolution irradiance data. Complementary to wind for renewable smoothing.</li>
+</ul>
+
+<h3>Challenges</h3>
+<ul>
+  <li><strong>DSO fragmentation:</strong> ~40 active DSOs with variable reporting standards and asset transparency. No centralized asset database equivalent to larger countries. Consolidation trend ongoing but slow; regional cooperation improving.</li>
+  <li><strong>Wind variability & ramp rates:</strong> Denmark's 80%+ wind penetration creates extreme generation variability. Hourly ramps can exceed 50% of instantaneous load. High wind forecasting precision required; current models struggle with coastal/island effects.</li>
+  <li><strong>Interconnection bottlenecks:</strong> DK1–DK2 internal transmission constraint during peak wind and demand periods. Limited east-west transmission capacity. Cross-border congestion with Germany (2 AC, 1 DC) and Sweden common during export periods.</li>
+  <li><strong>Soft soil foundation risks:</strong> Significant portions of Denmark underlain by soft clay and glacial deposits. Substation foundation settlement and ground water rise risks in low-lying areas and islands. Limited geotechnical baseline data for all infrastructure.</li>
+  <li><strong>Coastal flood exposure:</strong> ~60% of critical infrastructure and population within 10 km of coast. Sea level rise (Denmark among most vulnerable in Europe) and storm surge risks increasing. Kystdirektoratet data improving but gaps in subsidence/relative sea level projections.</li>
+  <li><strong>Substation vintage data gaps:</strong> OSM coverage ~80–85% HV but completeness variable in rural/island areas. Individual DSO asset databases not universally public; age cohort models required. Island infrastructure (Bornholm, Faroe Islands) less documented.</li>
+  <li><strong>District heating data fragmentation:</strong> ~100+ independent district heating companies with inconsistent data sharing. CHP coupling data scattered; no centralized efficiency metrics or thermal demand aggregation.</li>
+  <li><strong>Island electrification challenges:</strong> Bornholm and remote islands subject to extreme weather exposure, supply chain constraints, and variable generation (local wind). Limited redundancy; single-point-of-failure transmission connections to mainland.</li>
+</ul>
+
+<h2>6. Estimated Timeline & Ingestion Phases</h2>
+
+<div class="note">
+<strong>All 95 variables status: PLANNED (pre-ingestion phase).</strong> Once data ingestion commences, expect phased rollout over 4–6 months:
+<ul style="margin-top: 0.5rem; margin-bottom: 0;">
+  <li><strong>Phase 1 (Week 1–4):</strong> Core sources (D01–D10): Energinet, Forsyningstilsynet, DST, DMI, GEUS, Miljøstyrelsen, Kystdirektoratet, CFCS, OSM. ~60 variables mapped to 5 Regioner + 2 bidding zones.</li>
+  <li><strong>Phase 2 (Week 5–8):</strong> Secondary tier (D11–D20): DSOs, ENTSO-E, Geodatastyrelsen, Dansk Energi, Nationalbanken, Energistyrelsen, Dansk Fjernvarme, Nord Pool, Eurostat, SolarGIS. ~25 variables for 98 Kommuner.</li>
+  <li><strong>Phase 3 (Week 9–16):</strong> Markov model (F/I), Monte Carlo engine, validation across ~2,000–3,500 HV substations. Nordic/EU market integration (ENTSO-E, Nord Pool, cross-border flow analysis). DK1–DK2 balancing and internal constraints.</li>
+  <li><strong>Phase 4 (Week 17–24):</strong> Dashboard deployment, ESG enrichment, intelligence page monthly updates. Cross-border coordination testing (Sweden, Germany, Nordic grid). Hazard zone scenario planning (coastal flood, wind ramp, soft soil, island resilience). Wind variability and CHP coupling integration.</li>
+</ul>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Data Input List (Denmark) v1 · Ikenga Project · 2026-03-27<br>
+95 variables · 25 data sources · Planning phase · ~2,000–3,500 HV Substations
+</p>
+
+</div>
+</body>
+</html>

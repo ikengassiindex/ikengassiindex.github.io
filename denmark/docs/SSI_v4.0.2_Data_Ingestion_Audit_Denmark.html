@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Data Ingestion Audit (Denmark)</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Helvetica Neue',sans-serif; color:var(--ink); background:var(--paper); font-size:13px; line-height:1.6; }
+.page { max-width:1200px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.mono { font-family:'Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:monospace; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-ready { background:#d5f5e3; color:#1a6b4a; }
+.tag-active { background:#fff3cd; color:#856404; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Data Ingestion Audit (Denmark)</h1>
+<p class="subtitle">Source-by-Source Assessment · 25+ Danish Data Institutions · Pre-Ingestion Status</p>
+<div class="meta">
+  <span><strong>Country:</strong> Denmark (DK)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Phase:</strong> Pre-Ingestion Planning</span>
+</div>
+
+<h2>1. Tier 1 Sources — Core Grid Operations & Regulation (10 sources)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Website</th><th>Data Type</th><th>Access</th><th>Frequency</th><th>Confidence</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="mono">DK01</td><td><strong>Energinet</strong> — Transmission System Operator (TSO)</td><td>energinet.dk</td><td>Real-time flows, hourly dispatch, wind generation, cross-border exchanges (Norway, Sweden, Germany, Netherlands, UK), system adequacy, balancing market, reserve activation, 2 bidding zones (DK1, DK2)</td><td>Public data portal + downloads</td><td>Real-time/Hourly</td><td><span class="tag tag-ready">TIER 1</span></td><td>Excellent</td></tr>
+<tr><td class="mono">DK02</td><td><strong>Forsyningstilsynet</strong> — Energy Regulator</td><td>forsyningstilsynet.dk</td><td>SAIDI/SAIFI benchmarks, DSO performance metrics, electricity market oversight, tariff regulation, market monitoring, retail price data, supply security assessments</td><td>Public reports + databases</td><td>Real-time/Annual</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (comprehensive)</td></tr>
+<tr><td class="mono">DK03</td><td><strong>Danmarks Statistik</strong> — Statistics Denmark</td><td>dst.dk</td><td>Census data, demographics, employment (NACE), income, migration, population by region (5 Regioner, 98 Kommuner), housing statistics, CPR register integration, municipal data</td><td>StatBank API + CSV/JSON exports</td><td>Census + annual estimates</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (excellent API)</td></tr>
+<tr><td class="mono">DK04</td><td><strong>DMI</strong> — Danish Meteorological Institute</td><td>dmi.dk</td><td>Temperature, wind, precipitation, storm forecasts, extreme weather monitoring. Real-time observations and forecasts. ~100 weather stations nationwide. North Sea monitoring. Baltic monitoring. Advanced storm surge models</td><td>Open data APIs + direct downloads</td><td>Real-time/Daily</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (exceptional data quality)</td></tr>
+<tr><td class="mono">DK05</td><td><strong>GEUS</strong> — Geological Survey of Denmark and Greenland</td><td>geus.dk</td><td>Geological mapping, soil types, groundwater resources, groundwater quality, coastal geology, soil chemistry, no significant seismic hazard</td><td>Public GIS databases + Jupiter database access</td><td>Annual updates + continuous monitoring</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (critical for groundwater)</td></tr>
+<tr><td class="mono">DK06</td><td><strong>Kystdirektoratet</strong> — Coastal Authority</td><td>kyst.dk</td><td>Storm surge modelling, coastal flooding, sea level rise projections, coastal erosion maps, beach nourishment programs, coastal infrastructure vulnerability, saltwater intrusion monitoring</td><td>Public maps + GIS services</td><td>Continuous monitoring + annual updates</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (critical coastal risk)</td></tr>
+<tr><td class="mono">DK07</td><td><strong>CFCS</strong> — Center for Cybersecurity</td><td>cfcs.dk</td><td>Cybersecurity assessments, digital readiness, critical infrastructure cyber threats, incident reporting, SCADA security frameworks, grid security monitoring</td><td>Public guidelines + restricted incident data</td><td>Continuous monitoring + quarterly reports</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (emerging importance)</td></tr>
+<tr><td class="mono">DK08</td><td><strong>Miljøstyrelsen</strong> — Environmental Protection Agency</td><td>mst.dk</td><td>Environmental monitoring, emissions data, air quality observations, water quality monitoring, protected nature areas, renewable energy siting, climate commitments tracking</td><td>Public databases + GIS portal</td><td>Daily/Real-time</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live</td></tr>
+<tr><td class="mono">DK09</td><td><strong>Energistyrelsen</strong> — Danish Energy Agency</td><td>ens.dk</td><td>Energy policy data, offshore wind licenses, renewable energy statistics, Power-to-X strategy, energy efficiency programs, sector coupling initiatives, biomass potential, heat planning</td><td>Public databases + reports</td><td>Annual/Quarterly</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (policy-critical)</td></tr>
+<tr><td class="mono">DK10</td><td><strong>Nord Pool</strong> — Electricity Market</td><td>nordpoolgroup.com</td><td>DK1–DK2 bidding zone prices, cross-border flows, generation adequacy, market settlements, wind curtailment events, reserve pricing, congestion management</td><td>Public API + historical data downloads</td><td>Real-time/Hourly</td><td><span class="tag tag-ready">TIER 1</span></td><td>Live (2-zone market)</td></tr>
+</tbody>
+</table>
+
+<h2>2. Tier 2 Sources — Secondary & Sector-Specific (10 sources)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Data Type</th><th>Access</th><th>Frequency</th><th>Confidence</th></tr></thead>
+<tbody>
+<tr><td class="mono">DK11</td><td>Major DSOs — RADIUS, N1, Cerius, NOE, KONSTANT, Energi Fyn</td><td>CAPEX, maintenance spending, SAIDI/SAIFI metrics, operational KPIs, transformer inventories, investment plans, grid digitalization status, substation data</td><td>Public summaries (requires aggregation)</td><td>Annual (Q1/Q2 publication)</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK12</td><td>ENTSO-E Transparency Platform</td><td>Cross-border flows (Sweden, Germany, Norway, Netherlands, UK), generation adequacy, planned outages, market data, balancing forecasts, wind capacity</td><td>Public API (RESTful)</td><td>Real-time/Hourly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK13</td><td>Geodatastyrelsen — Danish Geodata Agency</td><td>DEM, orthophotos, land use mapping, geodetic data, cadastral information, topographic databases, administrative boundaries, address registry</td><td>Public GIS (geodata.dk)</td><td>Continuous updates</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK14</td><td>Dansk Energi — Energy Industry Association</td><td>Energy statistics, sector surveys, capacity planning, renewable energy data, industry benchmarking, energy transition tracking</td><td>Public reports + databases</td><td>Annual/Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK15</td><td>Nationalbanken — Central Bank of Denmark</td><td>GDP by region, economic indicators, inflation, monetary policy, regional development funds, financial system stability, business cycle data</td><td>Public databases</td><td>Monthly/Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK16</td><td>Dansk Fjernvarme — District Heating Association</td><td>CHP coupling data, district heating demand, heat load profiles, energy efficiency investments, sector coupling with electricity grid, combined heat & power statistics</td><td>Industry reports + registry</td><td>Annual/Quarterly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK17</td><td>OpenStreetMap (Power) — Overpass API</td><td>Power substations (nodes), transmission/distribution lines (edges), HV/MV topology, transformer locations, coordinates, power infrastructure mapping</td><td>Public API (ODbL license)</td><td>Continuous (volunteer mapping)</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK18</td><td>Copernicus CDS — ESA Climate Data</td><td>ERA5 reanalysis, CMIP6 projections, satellite data, 0.25° grid, coastal data, wind dynamics, precipitation patterns, temperature trends</td><td>Open access (registration)</td><td>Daily/Monthly</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK19</td><td>Eurostat</td><td>EU-harmonized socio-economic data, energy poverty indicators (SILC), cross-validation benchmarks, regional comparisons, EU renewable targets</td><td>Public API</td><td>Annual</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+<tr><td class="mono">DK20</td><td>Global Solar Atlas / SolarGIS</td><td>Solar irradiance by location (GHI, DNI) for Denmark, insolation patterns, site-specific assessments, rooftop potential</td><td>Public online tool</td><td>Static (periodically updated)</td><td><span class="tag tag-active">TIER 2</span></td></tr>
+</tbody>
+</table>
+
+<h2>3. Tier 3 Sources — Complementary & Reference (10+ sources)</h2>
+
+<table>
+<thead><tr><th>Source ID</th><th>Institution</th><th>Data Type</th><th>Access</th><th>Frequency</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="mono">DK21</td><td>Vejdirektoratet — Road Directorate</td><td>Road/transport infrastructure, critical transport corridors, regional connectivity, bridge and tunnel locations, maintenance data, traffic monitoring</td><td>Public databases + GIS</td><td>Annual/Quarterly</td><td>Transport system resilience proxy + access corridor mapping</td></tr>
+<tr><td class="mono">DK22</td><td>Sundhedsstyrelsen — Health Authority</td><td>Critical infrastructure locations (hospitals, clinics, emergency services), population health data, healthcare system resilience, emergency capacity</td><td>Public databases</td><td>Annual</td><td>Supports critical infrastructure consequence mapping</td></tr>
+<tr><td class="mono">DK23</td><td>Danish Maritime Authority — Søfartsstyrelsen</td><td>Offshore cable corridors, shipping routes, maritime traffic monitoring, port locations, offshore energy infrastructure routing, submarine cable registries</td><td>Public registers + GIS</td><td>Continuous</td><td>Offshore/coastal energy system context</td></tr>
+<tr><td class="mono">DK24</td><td>Slots- og Kulturstyrelsen — Cultural Heritage Agency</td><td>Cultural heritage sites, protected areas, historic buildings near critical infrastructure, cultural consequence assessment, UNESCO sites</td><td>Public databases + GIS</td><td>Annual</td><td>Consequence mapping + social resilience indicator</td></tr>
+<tr><td class="mono">DK25</td><td>Landbrugsstyrelsen — Agricultural Authority</td><td>Agricultural land use, crop statistics, biomass resources, land cover classification, agricultural infrastructure, renewable energy siting on farms</td><td>Public databases + GIS</td><td>Annual</td><td>Land-use proxy + bioeconomy resilience indicator</td></tr>
+<tr><td class="mono">DK26</td><td>Politiet — Danish Police</td><td>Crime statistics by region (proxy for social vulnerability and risk perception), public safety assessments, emergency response capability</td><td>Public reports + databases</td><td>Annual</td><td>Supports C-layer (social/vulnerability metrics)</td></tr>
+<tr><td class="mono">DK27</td><td>KL (Kommunernes Landsforening) — Local Government Denmark</td><td>Municipal authority data, regional cooperation, development strategies, emergency management coordination, regional planning, municipal resilience frameworks</td><td>Public reports</td><td>Annual</td><td>Regional governance & coordination indicator</td></tr>
+<tr><td class="mono">DK28</td><td>Beredskabsstyrelsen — Emergency Management Agency</td><td>Emergency preparedness frameworks, critical infrastructure protection guidelines, inter-agency coordination protocols, disaster response plans, community resilience</td><td>Public guidance documents</td><td>Annual/Continuous</td><td>Resilience planning framework reference</td></tr>
+<tr><td class="mono">DK29</td><td>World Bank / OECD / Climate-ADAPT</td><td>International benchmarks, climate adaptation data, socio-economic indicators, Nordic case studies, EU green transition metrics</td><td>Public databases</td><td>Annual/Decadal</td><td>Cross-validation reference + climate scenario alignment</td></tr>
+<tr><td class="mono">DK30</td><td>Innovationsfonden — Innovation Fund Denmark</td><td>Regional development investment data, R&D spending, innovation infrastructure, green transition funding, sector coupling R&D projects</td><td>Public reports</td><td>Annual</td><td>Supports R5 (resilience investment trends)</td></tr>
+</tbody>
+</table>
+
+<h2>4. Data Access & API Summary</h2>
+
+<h3>Tier 1 High-Confidence APIs</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Energinet Data Portal (energinet.dk/energisystem):</strong> Download hourly dispatch, wind generation, cross-border flows, reserve activation, system status data. Well-structured CSV/JSON downloads. No authentication required. Excellent historical archive extending back 10+ years. Real-time APIs for operational monitoring.</li>
+  <li><strong>Danmarks Statistik StatBank API (dst.dk):</strong> RESTful API for Census and demographic data. Covers all 5 Regioner, 98 Kommuner (municipalities), and detailed sub-regional statistics. CPR register integration for population-level granularity. World-class data quality and accessibility.</li>
+  <li><strong>DMI Open Data (dmi.dk/open-data):</strong> Exceptional open meteorological data access. ~100 weather stations nationwide with temperature, precipitation, wind, storm data, and forecasts. Direct API access with flexible spatial/temporal coverage. North Sea and Baltic monitoring integration.</li>
+  <li><strong>Forsyningstilsynet Performance Data:</strong> SAIDI/SAIFI benchmarks, DSO performance metrics, tariff regulation oversight, supply security assessments. Annual regulatory reports with historical trend analysis. Direct database access for authorized parties.</li>
+  <li><strong>GEUS Jupiter Database (geus.dk):</strong> Groundwater chemistry, hydrogeological data, soil mapping, geological characterization. Direct query access for authorized users. Critical for groundwater-dependent resilience assessments and saltwater intrusion monitoring (coastal Denmark).</li>
+  <li><strong>Nord Pool API:</strong> Real-time + historical electricity price data across DK1–DK2 bidding zones. Covers generation adequacy, cross-border capacity constraints, wind curtailment events, and market settlement details.</li>
+  <li><strong>Kystdirektoratet Coastal Risk Data:</strong> Storm surge models, sea level rise projections, coastal erosion monitoring, coastal infrastructure vulnerability maps. GIS-accessible via kyst.dk portal.</li>
+  <li><strong>Copernicus CDS:</strong> CDAPI Python client. ERA5 + CMIP6 regional-enhanced resolution data with excellent wind, precipitation, and coastal flooding dynamics coverage.</li>
+</ul>
+
+<h3>Tier 2 Manual/Semi-Automated Access</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Geodatastyrelsen Geospatial Data (geodata.dk):</strong> DEM, orthophotos, land use classification, administrative boundaries, address registry. Multiple service endpoints (WMS/WFS/WMTS). Seamless integration with other Danish spatial data sources.</li>
+  <li><strong>ENTSO-E Transparency:</strong> RESTful API covers Denmark as bidding zones (DK1, DK2) with detailed cross-border reporting to 5+ neighboring countries (Germany, Sweden, Norway, Netherlands, UK).</li>
+  <li><strong>DSO Reports:</strong> Annual reports published online (RADIUS, N1, Cerius, NOE, KONSTANT, Energi Fyn, and 10+ regional operators). Disaggregated substation data requires direct utility contact.</li>
+  <li><strong>Dansk Energi Industry Databases:</strong> Energy statistics, renewable capacity planning, sector coupling initiatives, energy efficiency investment tracking. Direct query access available.</li>
+  <li><strong>Energistyrelsen Policy Data:</strong> Offshore wind licensing registers, renewable energy targets, Power-to-X strategy implementation data, heat planning frameworks. Public documents and policy tracking.</li>
+</ul>
+
+<h2>5. Implementation Roadmap — Phased Ingestion</h2>
+
+<table>
+<thead><tr><th>Phase</th><th>Duration</th><th>Sources</th><th>Variables</th><th>Expected Coverage</th><th>Priority</th></tr></thead>
+<tbody>
+<tr><td class="mono">Phase 1</td><td>Week 1–4</td><td>DK01–DK10 (Tier 1, Core)</td><td>A, C, D, E, G, H (55 variables)</td><td>72% coverage (wind-dominant baseline)</td><td><span class="tag tag-active">PENDING</span></td></tr>
+<tr><td class="mono">Phase 2</td><td>Week 5–8</td><td>DK11–DK20 (Tier 2, Secondary)</td><td>B, additional E, F partial (22 variables)</td><td>81% coverage</td><td><span class="tag tag-active">PENDING</span></td></tr>
+<tr><td class="mono">Phase 3</td><td>Week 9–12</td><td>DK21–DK30 (Tier 3, Complementary)</td><td>F remaining, I derived (10 variables)</td><td>88% coverage</td><td><span class="tag tag-active">PENDING</span></td></tr>
+<tr><td class="mono">Phase 4</td><td>Week 13–16</td><td>All sources (Monte Carlo + Validation)</td><td>All 87 (finalized)</td><td>92%+ (estimated substation + coastal coverage TBD)</td><td><span class="tag tag-active">PENDING</span></td></tr>
+</tbody>
+</table>
+
+<h2>6. Critical Data Dependencies & Bottlenecks</h2>
+
+<p class="note">
+<strong>Critical Path Assessment:</strong> Denmark's pre-ingestion phase focuses on core integration of Energinet (DK01) + Forsyningstilsynet (DK02) + Danmarks Statistik (DK03) + DMI (DK04). Wind energy dominance (c. 80% of renewable generation, 50%+ of total capacity) and offshore wind expansion drive grid operations fundamentally differently from hydro-dependent systems. Kystdirektoratet (coastal risk) + DMI (storm surge/extreme weather) provide uniquely rich geospatial risk assessment capability for maritime Denmark. Great Belt and Øresund interconnections connect DK to Sweden and Germany—critical for system stability. Two bidding zones (DK1 = Jutland, DK2 = Zealand/Funen) with pronounced regional generation-demand asymmetry require explicit zoning in all models. District heating (40%+ of heating demand via CHP) creates tight energy-electricity coupling.
+</p>
+
+<h3>High-Risk Dependencies</h3>
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Wind Generation Forecasting & Ramp Rate Management:</strong> Depends on Energinet (DK01) + DMI (DK04) integration. Offshore wind capacity now exceeds 5 GW and expanding. Wind ramp rates (>1 GW per hour during weather fronts) create acute balancing challenges. Real-time wind forecasts from DMI essential for intra-hour dispatch optimization and reserve pre-positioning. Integration with Nord Pool (DK10) balancing market required. Seasonal wind variability (higher winter, lower summer) contrasts with summer solar production and tourism-driven demand peaks.</li>
+  <li><strong>Coastal Flooding & Storm Surge Modelling:</strong> Kystdirektoratet (DK06) + DMI (DK04) + GEUS (DK05) integration for flood zones, sea level rise projections, saltwater intrusion monitoring, and coastal infrastructure vulnerability. Extensive coastline (7,000 km) with critical infrastructure (power plants, substations, export cable landing sites, ports). Danish straits (Great Belt, Øresund, Little Belt) contain interconnection cables and major shipping channels. Winter storm surge events (>1.5 m above normal) pose highest-consequence risks to coastal generation and distribution assets. Real-time storm surge forecasts mandatory for operational resilience assessment.</li>
+  <li><strong>Cross-Border Integration & Market Coupling:</strong> Nord Pool (DK10) + Energinet (DK01) + ENTSO-E (DK12) integration for electricity price formation and cross-border flow management. Denmark's 2 bidding zones interact with Germany (4 zones), Sweden (4 zones), Norway (5 zones), and Netherlands in real-time. Congestion management across Great Belt (DK1↔DK2) and interconnections to Germany + Sweden requires detailed modelling of both physical flows and market mechanisms. Intra-day and day-ahead price coupling with continental Europe creates complex arbitrage dynamics.</li>
+  <li><strong>DSO Data Fragmentation & Regional Variation:</strong> Denmark has ~40 DSO operators aggregated into 6–8 major groups (RADIUS serving Copenhagen metro area with ~1M customers, N1, Cerius, NOE, KONSTANT, Energi Fyn, and smaller regional operators). Annual reports require manual aggregation. SAIDI/SAIFI metrics and investment patterns vary significantly by region and operator. Forsyningstilsynet (DK02) regulation creates standardized benchmarking but substation-level data remains fragmented. Grid digitalization (smart grids, IoT sensors) deployment uneven across the country. Integration of regional resilience assessments with national grid models requires standardized metrics.</li>
+  <li><strong>District Heating & Sector Coupling:</strong> Dansk Fjernvarme (DK16) + Energinet (DK01) integration for CHP operational constraints. ~40% of Danish heating demand supplied via district heating (primarily CHP plants). CHP marginal cost curves and must-run capacity create electricity-heat coupling constraints. Summer/winter demand seasonality (peak heating Nov–Mar) creates asymmetric grid stress. Power-to-Heat and Power-to-X initiatives (Energistyrelsen strategy) require integrated modeling of emerging flexibility assets. Integration of distributed heat pumps with grid operators essential for future scenarios.</li>
+  <li><strong>Saltwater Intrusion & Groundwater Security:</strong> GEUS (DK05) + Kystdirektoratet (DK06) + DMI (DK04) integration for groundwater vulnerability monitoring. ~70% of freshwater supply depends on groundwater. Coastal regions (especially southern Jutland and western Zealand) threatened by saltwater intrusion due to sea level rise and overexploitation. GEUS Jupiter database provides hydrochemical data critical for assessing long-term freshwater security and agricultural sustainability. Climate projections (Copernicus CDS, DK18) indicate accelerating intrusion risk by 2050.</li>
+  <li><strong>Offshore Wind Cable Infrastructure & Maritime Coordination:</strong> Danish Maritime Authority (DK23) + Energinet (DK01) integration for submarine cable routing and marine spatial planning. Denmark operates ~8 GW offshore wind capacity with 15+ export cables crossing North Sea and Baltic to Germany, UK, Netherlands, Sweden, Norway. Submarine cables (±400 kV HVDC, 220 kV AC) carry 20–30% of generation. Storm damage, ship anchor snagging, sand migration, and subsea geology monitoring required. Coordination with fishing activities, shipping routes, and environmental conservation (marine habitats) adds complexity to infrastructure expansion planning.</li>
+</ul>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Data Ingestion Audit (Denmark) · Ikenga Project · 2026-03-27<br>
+25+ data sources · 4 implementation phases PENDING · ~92% coverage targeted · Critical path: Energinet + Forsyningstilsynet + Danmarks Statistik + DMI + Kystdirektoratet
+</p>
+
+</div>
+</body>
+</html>
