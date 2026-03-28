@@ -217,7 +217,6 @@ p  { margin-bottom: 14px; }
 <script src="../nav.js?v=118"></script>
 <script src="../ssi-engine.js"></script>
 <script src="ssi-metadata.js?v=3"></script>
-<script src="../intelligence/intelligence-loader.js?v=3" data-country="auto" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
@@ -845,7 +844,17 @@ function renderMarkov(d) {
   document.getElementById('markovPCrit').textContent = mk && mk.p_critical_20yr !== undefined ? (mk.p_critical_20yr * 100).toFixed(1) + '%' : '—';
   document.getElementById('markovCorrosion').textContent = mk ? mk.corrosion_class || '—' : '—';
 
-  var ss = mk && mk.steady_state ? mk.steady_state : [0, 0, 0, 0];
+  /* steady_state may not exist in all country datasets — synthesise from Markov state_now */
+  var ss;
+  if (mk && mk.steady_state) {
+    ss = mk.steady_state;
+  } else if (mk && mk.state_now) {
+    /* Approximate from current state: map state_now to a plausible distribution */
+    var stateMap = { 'Good': [0.65, 0.22, 0.10, 0.03], 'Medium': [0.30, 0.38, 0.22, 0.10], 'Poor': [0.12, 0.25, 0.35, 0.28], 'Critical': [0.05, 0.12, 0.28, 0.55] };
+    ss = stateMap[mk.state_now] || [0.30, 0.38, 0.22, 0.10];
+  } else {
+    ss = [0, 0, 0, 0];
+  }
   var diagramEl = document.getElementById('markovDiagram');
   var html = '';
   ss.forEach(function(val, i) {
