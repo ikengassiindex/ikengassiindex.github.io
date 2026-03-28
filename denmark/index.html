@@ -149,7 +149,7 @@
         fetch('ssi-data.json?v=52').then(function(r){return r.json()}).then(function(data){
           var subs=data.substations,n=subs.length;
           var isArr=Array.isArray(subs[0]);
-          var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=132}).length,mv=n-hv;
+          var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=220}).length,mv=n-hv;
           var mcIter=(data.meta&&data.meta.mc_iterations)||10000;
           var vars=(data.meta&&data.meta.variables)||95;
           var mc=n*mcIter;
