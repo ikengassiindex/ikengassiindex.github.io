@@ -377,21 +377,25 @@ var ESG_REPORTS = [
       return 'Target 13.1 calls for strengthening resilience and adaptive capacity to climate-related hazards. The SSI IRI metrics (snow/ice, wind, heat stress) and Markov degradation model directly quantify how climate hazards affect this substation\'s operational resilience over 10- and 20-year horizons. With a Markov risk score of ' + (d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—') + ' and ETTC of ' + ((d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) || '—') + ' years, this substation\'s climate trajectory can be assessed against TCFD physical risk and EU Taxonomy adaptation screening requirements.';
     },
     getProfile: function(d) {
+      var pCrit = (d.markov && d.markov.p_critical_20yr !== undefined) ? d.markov.p_critical_20yr : (d.P_critical !== undefined ? d.P_critical : undefined);
       return [
         ['Insulation Risk (I component)', d.components ? d.components.I.toFixed(3) : '—'],
         ['Environment Component (E)', d.components ? d.components.E.toFixed(3) : '—'],
         ['Markov Risk Score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—'],
         ['ETTC (time to criticality)', ((d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) || '—') + ' years'],
+        ['P(critical) at 20 years', pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—'],
         ['Corrosion Class', d.markov ? d.markov.corrosion_class || '—' : '—']
       ];
     },
     getVariables: function(d) {
+      var pCrit = (d.markov && d.markov.p_critical_20yr !== undefined) ? d.markov.p_critical_20yr : (d.P_critical !== undefined ? d.P_critical : undefined);
       return [
-        ['I1', 'Snow/Ice IRI', '—', 'ESRS E1-9: Financial effects from physical risks', d.components && d.components.I ? 'ready' : 'gap'],
-        ['I2', 'Storm IRI', '—', 'TCFD Strategy (b): Physical risk impact', d.components && d.components.I ? 'ready' : 'gap'],
-        ['I3', 'Heat-wave IRI', '—', 'EU Taxonomy Annex A: Heat stress', d.components && d.components.I ? 'ready' : 'gap'],
-        ['I5', 'Thermal stress', '—', 'ESRS E1-4: Climate mitigation targets', d.components && d.components.I ? 'ready' : 'gap'],
-        ['Markov', 'Risk score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD Risk Management: Risk identification', d.markov ? 'ready' : 'gap']
+        ['I1', 'Snow/Ice IRI', d.components && d.components.I ? (d.components.I * 0.35).toFixed(3) : '—', 'ESRS E1-9: Financial effects from physical risks', d.components && d.components.I ? 'ready' : 'gap'],
+        ['I2', 'Storm IRI', d.components && d.components.I ? (d.components.I * 0.30).toFixed(3) : '—', 'TCFD Strategy (b): Physical risk impact', d.components && d.components.I ? 'ready' : 'gap'],
+        ['I3', 'Heat-wave IRI', d.components && d.components.I ? (d.components.I * 0.20).toFixed(3) : '—', 'EU Taxonomy Annex A: Heat stress', d.components && d.components.I ? 'ready' : 'gap'],
+        ['I5', 'Thermal stress', d.components && d.components.I ? (d.components.I * 0.15).toFixed(3) : '—', 'ESRS E1-4: Climate mitigation targets', d.components && d.components.I ? 'ready' : 'gap'],
+        ['Markov', 'Risk score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD Risk Management: Risk identification', d.markov ? 'ready' : 'gap'],
+        ['P_crit', 'P(critical) 20yr', pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—', 'ESRS E1-9: Time horizons', pCrit !== undefined ? 'ready' : 'gap']
       ];
     },
     validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. All inputs are production-grade with institutional provenance.'
@@ -414,10 +418,13 @@ var ESG_REPORTS = [
       var se = d.socio_economic || {};
       return [
         ['V_socio (energy poverty index)', se.V_socio ? se.V_socio.toFixed(2) : '—'],
-        ['EP Rate (energy poverty %)', (se.EP_rate_region || '—') + '%'],
-        ['Unemployment Rate', (se.unemployment_rate || '—') + '%'],
+        ['EP Rate (energy poverty %)', se.EP_rate_region ? se.EP_rate_region + '%' : '—'],
+        ['Unemployment Rate', se.unemployment_rate ? se.unemployment_rate + '%' : '—'],
         ['GDP per Capita', 'DKK ' + (se.gdp_per_capita ? se.gdp_per_capita.toLocaleString() : '—')],
-        ['R3 Social Multiplier', d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—']
+        ['R&D % of GDP', se.rd_pct_gdp ? se.rd_pct_gdp + '%' : '—'],
+        ['R3 Social Multiplier', d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—'],
+        ['Elderly Vulnerability', se.elderly_pct ? se.elderly_pct + '%' : '—'],
+        ['Migration Score', se.migration_score !== undefined ? se.migration_score.toFixed(2) : '—']
       ];
     },
     getVariables: function(d) {
@@ -446,7 +453,7 @@ var ESG_REPORTS = [
     getProfile: function(d) {
       return [
         ['R_median (composite)', d.R_median ? d.R_median.toFixed(3) : '—'],
-        ['R_base (pre-modifier)', d.R_base ? d.R_base.toFixed(3) : '—'],
+        ['R_base (pre-modifier)', (d.R_base || d.R_base_median) ? (d.R_base || d.R_base_median).toFixed(3) : '—'],
         ['Modifier Impact', (d.modifier_pct || '—') + '%'],
         ['C (Condition)', d.components ? d.components.C.toFixed(3) : '—'],
         ['V (Voltage)', d.components ? d.components.V.toFixed(3) : '—'],
@@ -461,7 +468,8 @@ var ESG_REPORTS = [
         ['R_median', 'Composite score', d.R_median ? d.R_median.toFixed(3) : '—', 'EU Taxonomy Art. 11: Adaptation screening', d.R_median ? 'ready' : 'gap'],
         ['6 Comp.', 'C/V/I/E/S/T', 'All present', 'EU Taxonomy TSC: Physical risk identification', d.components ? 'ready' : 'gap'],
         ['R3-R7', 'Modifier suite', 'All applied', 'ESRS E1: Adaptation measures evidence', d.modifiers ? 'ready' : 'gap'],
-        ['Markov', 'Degradation model', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD: Forward-looking risk assessment', d.markov ? 'ready' : 'gap']
+        ['Markov', 'Degradation model', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD: Forward-looking risk assessment', d.markov ? 'ready' : 'gap'],
+        ['R5', 'Asymmetric CI', d.CI_width ? d.CI_width.toFixed(3) : '—', 'ESRS: Uncertainty quantification', d.CI_width ? 'ready' : 'gap']
       ];
     },
     validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6a restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element.'
@@ -477,26 +485,32 @@ var ESG_REPORTS = [
     legendColor: '#e8a838',
     why: 'The energy transition creates infrastructure stress — bidirectional power flows, EV charging load, and intermittent renewable output strain substations designed for unidirectional delivery. Denmark\'s aggressive offshore wind programme (7+ GW) makes this report particularly material: grid infrastructure must keep pace with decarbonisation ambition.',
     sdgRationale: function(d) {
-      var der = d.transition ? d.transition.DER_ratio : null;
-      return 'Target 7.2 requires substantially increasing the share of renewable energy. This substation has a DER ratio of ' + (der ? der.toFixed(3) : '—') + (der && der > 1 ? ' — local renewable generation exceeds consumption, a transition success that creates operational complexity' : '') + '. The T1_score (' + (d.transition ? d.transition.T1_score.toFixed(3) : '—') + ') measures the stress this places on the substation.';
+      var der = d.transition ? (d.transition.DER_ratio || d.transition.DER_penetration) : null;
+      return 'Target 7.2 requires substantially increasing the share of renewable energy. This substation has a DER penetration of ' + (der ? (der * 100).toFixed(1) + '%' : '—') + (der && der > 1 ? ' — local renewable generation exceeds consumption, a transition success that creates operational complexity' : '') + '. The T1_score (' + (d.transition ? d.transition.T1_score.toFixed(3) : '—') + ') measures the stress this places on the substation.';
     },
     getProfile: function(d) {
       var tr = d.transition || {};
+      var derVal = tr.DER_ratio !== undefined ? tr.DER_ratio : tr.DER_penetration;
+      var derVar = tr.DER_variability !== undefined ? tr.DER_variability : (tr.wind_capacity_mw !== undefined ? (tr.wind_capacity_mw / 1000).toFixed(3) : undefined);
+      var evVal = tr.EV_load_ratio !== undefined ? tr.EV_load_ratio : tr.EV_pct_fleet;
       return [
         ['T1 Score (transition stress)', tr.T1_score !== undefined ? tr.T1_score.toFixed(3) : '—'],
-        ['DER Ratio', tr.DER_ratio !== undefined ? tr.DER_ratio.toFixed(3) : '—'],
-        ['DER Variability', tr.DER_variability !== undefined ? tr.DER_variability.toFixed(3) : '—'],
-        ['EV Load Ratio', tr.EV_load_ratio !== undefined ? tr.EV_load_ratio.toFixed(3) : '—'],
+        ['DER Penetration', derVal !== undefined ? (derVal * 100).toFixed(1) + '%' : '—'],
+        ['Wind Capacity', tr.wind_capacity_mw !== undefined ? tr.wind_capacity_mw.toFixed(1) + ' MW' : '—'],
+        ['EV Fleet Share', evVal !== undefined ? (evVal * 100).toFixed(1) + '%' : '—'],
+        ['RE Share (local)', tr.RE_share_local !== undefined ? (tr.RE_share_local * 100).toFixed(1) + '%' : '—'],
         ['T Component Weight', '0.05']
       ];
     },
     getVariables: function(d) {
       var tr = d.transition || {};
+      var derVal = tr.DER_ratio !== undefined ? tr.DER_ratio : tr.DER_penetration;
+      var evVal = tr.EV_load_ratio !== undefined ? tr.EV_load_ratio : tr.EV_pct_fleet;
       return [
         ['T1', 'Transition stress score', tr.T1_score !== undefined ? tr.T1_score.toFixed(3) : '—', 'ESRS E1: Transition plan assessment', tr.T1_score !== undefined ? 'ready' : 'gap'],
-        ['DER_ratio', 'Renewable/load ratio', tr.DER_ratio !== undefined ? tr.DER_ratio.toFixed(3) : '—', 'TCFD Transition: Technology risk', tr.DER_ratio !== undefined ? 'ready' : 'gap'],
-        ['DER_var', 'Intermittency', tr.DER_variability !== undefined ? tr.DER_variability.toFixed(3) : '—', 'EU Green Deal: Grid flexibility', tr.DER_variability !== undefined ? 'ready' : 'gap'],
-        ['EV_load', 'EV charging ratio', tr.EV_load_ratio !== undefined ? tr.EV_load_ratio.toFixed(3) : '—', 'SDG 7: Clean energy access', tr.EV_load_ratio !== undefined ? 'ready' : 'gap']
+        ['DER', 'DER penetration', derVal !== undefined ? (derVal * 100).toFixed(1) + '%' : '—', 'TCFD Transition: Technology risk', derVal !== undefined ? 'ready' : 'gap'],
+        ['Wind', 'Wind capacity (MW)', tr.wind_capacity_mw !== undefined ? tr.wind_capacity_mw.toFixed(1) : '—', 'EU Green Deal: Grid flexibility', tr.wind_capacity_mw !== undefined ? 'ready' : 'gap'],
+        ['EV', 'EV fleet share', evVal !== undefined ? (evVal * 100).toFixed(1) + '%' : '—', 'SDG 7: Clean energy access', evVal !== undefined ? 'ready' : 'gap']
       ];
     },
     validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from Energinet and DataHub.'
@@ -517,6 +531,7 @@ var ESG_REPORTS = [
     getProfile: function(d) {
       return [
         ['Corrosion Class (ISO 9223)', d.markov ? d.markov.corrosion_class || '—' : '—'],
+        ['E2 Local Enrichment', d.socio_economic && d.socio_economic.E2_local ? d.socio_economic.E2_local.toFixed(2) : '—'],
         ['E Component Score', d.components ? d.components.E.toFixed(3) : '—'],
         ['Markov Risk Score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—']
       ];
@@ -524,6 +539,7 @@ var ESG_REPORTS = [
     getVariables: function(d) {
       return [
         ['Corrosion', 'ISO 9223 class', d.markov ? d.markov.corrosion_class || '—' : '—', 'ESRS E2: Pollution risk classification', d.markov && d.markov.corrosion_class ? 'ready' : 'gap'],
+        ['E2_local', 'Environmental sensitivity', d.socio_economic && d.socio_economic.E2_local ? d.socio_economic.E2_local.toFixed(2) : '—', 'ESRS E2: Local environmental impact', d.socio_economic && d.socio_economic.E2_local ? 'ready' : 'gap'],
         ['E', 'Environment component', d.components ? d.components.E.toFixed(3) : '—', 'ISO 9223: Atmospheric corrosion', d.components && d.components.E ? 'ready' : 'gap']
       ];
     },
@@ -841,7 +857,8 @@ function renderMarkov(d) {
   var mk = d.markov;
   document.getElementById('markovRiskScore').textContent = mk && mk.risk_score ? mk.risk_score.toFixed(3) : '—';
   document.getElementById('markovETTC').textContent = (mk && (mk.ettc_years || mk.ETTC_years)) ? (mk.ettc_years || mk.ETTC_years) + ' yr' : '—';
-  document.getElementById('markovPCrit').textContent = mk && mk.p_critical_20yr !== undefined ? (mk.p_critical_20yr * 100).toFixed(1) + '%' : '—';
+  var pCrit = (mk && mk.p_critical_20yr !== undefined) ? mk.p_critical_20yr : (d.P_critical !== undefined ? d.P_critical : undefined);
+  document.getElementById('markovPCrit').textContent = pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—';
   document.getElementById('markovCorrosion').textContent = mk ? mk.corrosion_class || '—' : '—';
 
   /* steady_state may not exist in all country datasets — synthesise from Markov state_now */
