@@ -424,22 +424,32 @@ document.addEventListener("ssi-config-ready", function(e) {
       'concentrated in Copenhagen metropolitan and major urban centers.';
 
     var tiers = (function() {
-      var r3vals = fleet.map(function(s){ return s.modifiers ? s.modifiers.R3_C_mult : 1.0; }).sort(function(a,b){return a-b;});
-      var p25 = r3vals[Math.floor(r3vals.length * 0.25)];
-      var p50 = r3vals[Math.floor(r3vals.length * 0.50)];
-      var p75 = r3vals[Math.floor(r3vals.length * 0.75)];
+      /* R3 consequence multiplier has discrete levels (1.00, 1.08, 1.15, 1.20).
+         Percentile-based splitting fails when the majority sits at baseline (1.00).
+         Use the actual distinct values as tier boundaries instead. */
+      var r3unique = [];
+      var r3seen = {};
+      fleet.forEach(function(s) {
+        var v = s.modifiers ? s.modifiers.R3_C_mult : 1.0;
+        if (!r3seen[v]) { r3seen[v] = true; r3unique.push(v); }
+      });
+      r3unique.sort(function(a,b){ return a - b; });
+      /* Build thresholds from distinct values — highest R3 = highest consequence tier */
+      var t3 = r3unique.length >= 4 ? r3unique[r3unique.length - 1] : 1.20;  /* top tier */
+      var t2 = r3unique.length >= 3 ? r3unique[r3unique.length - 2] : 1.15;
+      var t1 = r3unique.length >= 2 ? r3unique[r3unique.length - 3] || r3unique[1] : 1.08;
       return [
         { label: 'Wind Energy / Offshore', desc: 'Offshore wind farms, onshore wind parks, renewable energy plants — highest economic value per interruption',
-          filter: function(s){ return s.modifiers.R3_C_mult >= p75; }, color: '#941914', icon: '💨',
+          filter: function(s){ return s.modifiers.R3_C_mult >= t3; }, color: '#941914', icon: '💨',
           voll: 'DKK 150–300/kWh' },
         { label: 'Manufacturing / Food Processing', desc: 'Dairy processing, pharmaceutical production, machinery — significant continuity requirements for EU supply chains',
-          filter: function(s){ return s.modifiers.R3_C_mult >= p50 && s.modifiers.R3_C_mult < p75; }, color: '#b8863a', icon: '🏭',
+          filter: function(s){ return s.modifiers.R3_C_mult >= t2 && s.modifiers.R3_C_mult < t3; }, color: '#b8863a', icon: '🏭',
           voll: 'DKK 50–150/kWh' },
         { label: 'Commercial / Copenhagen', desc: 'Copenhagen and Aarhus commercial districts, logistics hubs — moderate individual impact but high aggregate across cities',
-          filter: function(s){ return s.modifiers.R3_C_mult >= p25 && s.modifiers.R3_C_mult < p50; }, color: '#5d8563', icon: '🏢',
+          filter: function(s){ return s.modifiers.R3_C_mult >= t1 && s.modifiers.R3_C_mult < t2; }, color: '#5d8563', icon: '🏢',
           voll: 'DKK 20–50/kWh' },
         { label: 'Agriculture / Rural', desc: 'Smallholder agriculture, rural settlements, provincial areas — lower VoLL but higher social vulnerability',
-          filter: function(s){ return s.modifiers.R3_C_mult < p25; }, color: '#8a7e76', icon: '🌾',
+          filter: function(s){ return s.modifiers.R3_C_mult < t1; }, color: '#8a7e76', icon: '🌾',
           voll: 'DKK 5–20/kWh' }
       ];
     })()
