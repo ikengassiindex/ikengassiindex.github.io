@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico)\//);
   return match ? match[1] : null;
 })();
 
@@ -34,7 +34,8 @@ var SSI_COUNTRY_LABELS = {
     finland: '🇫🇮 Finland',
     sweden: '🇸🇪 Sweden',
     norway: '🇳🇴 Norway',
-    denmark: '🇩🇰 Denmark'
+    denmark: '🇩🇰 Denmark',
+    mexico: '🇲🇽 Mexico'
   };
 
 // Ikenga logo
@@ -213,7 +214,8 @@ function renderFooter() {
       australia: '95 variables · 20+ sources · 8,500 substations (1,705 HV · 6,795 MV) across 8 states/territories',
     france: '95 variables · 35 sources · 7,898 substations (996 HV · 6,902 MV) across 13 Régions',
     spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas',
-    us: '95 variables · 40 sources · 45,003 substations (1,726 HV · 36,654 MV) across 52 states'
+    us: '95 variables · 40 sources · 45,003 substations (1,726 HV · 36,654 MV) across 52 states',
+    mexico: '95 variables · 25+ sources · 3,140 substations · 30,396 power lines across 32 Estados'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
