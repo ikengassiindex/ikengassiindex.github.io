@@ -384,7 +384,9 @@ var ESG_REPORTS = [
         ['Markov Risk Score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—'],
         ['ETTC (time to criticality)', ((d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) || '—') + ' years'],
         ['P(critical) at 20 years', pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—'],
-        ['Corrosion Class', d.markov ? d.markov.corrosion_class || '—' : '—']
+        ['Corrosion Class', d.markov ? d.markov.corrosion_class || '—' : '—'],
+        ['Seismic PGA (g)', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) : '—'],
+        ['Climate Δ R 2050', d.climate_trajectory && d.climate_trajectory.delta_R_2050 ? d.climate_trajectory.delta_R_2050.toFixed(4) : '—']
       ];
     },
     getVariables: function(d) {
@@ -395,7 +397,9 @@ var ESG_REPORTS = [
         ['I3', 'Heat-wave IRI', d.components && d.components.I ? (d.components.I * 0.20).toFixed(3) : '—', 'EU Taxonomy Annex A: Heat stress', d.components && d.components.I ? 'ready' : 'gap'],
         ['I5', 'Thermal stress', d.components && d.components.I ? (d.components.I * 0.10).toFixed(3) : '—', 'ESRS E1-4: Climate mitigation targets', d.components && d.components.I ? 'ready' : 'gap'],
         ['Markov', 'Risk score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD Risk Management: Risk identification', d.markov ? 'ready' : 'gap'],
-        ['P_crit', 'P(critical) 20yr', pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—', 'ESRS E1-9: Time horizons', pCrit !== undefined ? 'ready' : 'gap']
+        ['P_crit', 'P(critical) 20yr', pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—', 'ESRS E1-9: Time horizons', pCrit !== undefined ? 'ready' : 'gap'],
+        ['R6b', 'Seismic PGA', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) : '—', 'TCFD Strategy (b): Seismic physical risk', d.seismic && d.seismic.PGA_g ? 'ready' : 'gap'],
+        ['ΔR2050', 'Climate trajectory', d.climate_trajectory && d.climate_trajectory.delta_R_2050 ? d.climate_trajectory.delta_R_2050.toFixed(4) : '—', 'ESRS E1-9: Forward-looking climate impact', d.climate_trajectory ? 'ready' : 'gap']
       ];
     },
     validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. SMN weather data informs hurricane and seismic vulnerability assessment. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. All inputs are production-grade with institutional provenance from CENACE, CRE, INEGI, and SGM.'
@@ -420,11 +424,13 @@ var ESG_REPORTS = [
         ['V_socio (energy poverty index)', se.V_socio ? se.V_socio.toFixed(2) : '—'],
         ['EP Rate (energy poverty %)', se.EP_rate_region ? se.EP_rate_region + '%' : '—'],
         ['Unemployment Rate', se.unemployment_rate ? se.unemployment_rate + '%' : '—'],
-        ['GDP per Capita', 'MXN ' + (se.gdp_per_capita ? se.gdp_per_capita.toLocaleString() : '—')],
+        ['GDP per Capita', (se.gdp_per_capita ? 'MXN ' + se.gdp_per_capita.toLocaleString() : '—')],
         ['R&D % of GDP', se.rd_pct_gdp ? se.rd_pct_gdp + '%' : '—'],
         ['R3 Social Multiplier', d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—'],
         ['Poverty Rate', se.poverty_rate ? se.poverty_rate + '%' : '—'],
-        ['Indigenous Population', se.indigenous_pct ? se.indigenous_pct + '%' : '—']
+        ['Indigenous Population', se.indigenous_pct ? se.indigenous_pct + '%' : '—'],
+        ['Elderly Population %', se.elderly_pct ? se.elderly_pct + '%' : '—'],
+        ['Catchment Population', se.population ? se.population.toLocaleString() : '—']
       ];
     },
     getVariables: function(d) {
@@ -432,7 +438,9 @@ var ESG_REPORTS = [
       return [
         ['V_socio', 'Energy poverty index', se.V_socio ? se.V_socio.toFixed(2) : '—', 'ESRS S2-4: Impacts on affected communities', se.V_socio ? 'ready' : 'gap'],
         ['EP_rate', 'Energy poverty rate', (se.EP_rate_region || '—') + '%', 'SFDR PAI #14: Fossil fuel exposure proxy', se.EP_rate_region ? 'ready' : 'gap'],
-        ['R3', 'Social multiplier', d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—', 'ESRS S1-6: Workforce characteristics', d.modifiers && d.modifiers.R3_C_mult ? 'ready' : 'gap']
+        ['R3', 'Social multiplier', d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—', 'ESRS S1-6: Workforce characteristics', d.modifiers && d.modifiers.R3_C_mult ? 'ready' : 'gap'],
+        ['Elderly', 'Elderly population %', se.elderly_pct ? se.elderly_pct + '%' : '—', 'ESRS S2: Vulnerable populations', se.elderly_pct ? 'ready' : 'gap'],
+        ['Pop', 'Catchment population', se.population ? se.population.toLocaleString() : '—', 'ESRS S1: Affected communities', se.population ? 'ready' : 'gap']
       ];
     },
     validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using INEGI household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, poverty concentration, and energy poverty. Regional data sourced from INEGI, CONEVAL, and CFE distribution company reports.'
@@ -459,8 +467,10 @@ var ESG_REPORTS = [
         ['V (Voltage)', d.components ? d.components.V.toFixed(3) : '—'],
         ['I (Insulation/Climate)', d.components ? d.components.I.toFixed(3) : '—'],
         ['E (Environment)', d.components ? d.components.E.toFixed(3) : '—'],
-        ['S (Saturation)', d.components ? d.components.S.toFixed(3) : '—'],
-        ['T (Transition)', d.components ? d.components.T.toFixed(3) : '—']
+        ['S (Seismic)', d.components ? d.components.S.toFixed(3) : '—'],
+        ['T (Transition)', d.components ? d.components.T.toFixed(3) : '—'],
+        ['Seismic PGA (g)', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) + ' (' + d.seismic.zone + ')' : '—'],
+        ['Climate Δ R 2050', d.climate_trajectory ? '+' + d.climate_trajectory.delta_R_2050.toFixed(4) + ' (' + d.climate_trajectory.scenario + ')' : '—']
       ];
     },
     getVariables: function(d) {
@@ -469,7 +479,8 @@ var ESG_REPORTS = [
         ['6 Comp.', 'C/V/I/E/S/T', 'All present', 'EU Taxonomy TSC: Physical risk identification', d.components ? 'ready' : 'gap'],
         ['R3-R7', 'Modifier suite', 'All applied', 'ESRS E1: Adaptation measures evidence', d.modifiers ? 'ready' : 'gap'],
         ['Markov', 'Degradation model', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD: Forward-looking risk assessment', d.markov ? 'ready' : 'gap'],
-        ['R5', 'Asymmetric CI', d.CI_width ? d.CI_width.toFixed(3) : '—', 'ESRS: Uncertainty quantification', d.CI_width ? 'ready' : 'gap']
+        ['R5', 'Asymmetric CI', d.CI_width ? d.CI_width.toFixed(3) : '—', 'ESRS: Uncertainty quantification', d.CI_width ? 'ready' : 'gap'],
+        ['PGA', 'Seismic hazard', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) : '—', 'EU Taxonomy: Seismic risk screening', d.seismic ? 'ready' : 'gap']
       ];
     },
     validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6a restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. Hazard inputs sourced from SMN (hurricane/weather), SGM (seismic), and CENAPRED (multi-hazard risk assessment).'
@@ -546,7 +557,7 @@ var ESG_REPORTS = [
     validity: 'Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Mexico\'s coastal climate and volcanic gas exposure in central states produce elevated corrosion in coastal and high-altitude zones. Full validation requires SEMARNAT air quality monitoring overlay at substation coordinates, plus SMN weather station data.'
   },
   {
-    id: 'report-6', num: '6', title: 'Community Vulnerability Index',
+    id: 'report-6', num: '6', title: 'Cybersecurity & Digital Resilience',
     framework: 'NIS2 Directive · ENISA Cybersecurity Index · ESRS G1 Governance',
     sdgPrimary: { num: 9, label: 'SDG 9', name: 'Industry, Innovation, Infrastructure', color: '#f36d25' },
     sdgSecondary: [
@@ -608,7 +619,7 @@ var COMP_CONFIG = {
   V: { label: 'Voltage', weight: 0.10, color: '#aa4234' },
   I: { label: 'Insulation', weight: 0.25, color: '#b8863a' },
   E: { label: 'Environment', weight: 0.10, color: '#5d8563' },
-  S: { label: 'Saturation', weight: 0.20, color: '#3a7ca5' },
+  S: { label: 'Seismic', weight: 0.20, color: '#3a7ca5' },
   T: { label: 'Transition', weight: 0.05, color: '#8a7e76' }
 };
 
@@ -633,19 +644,21 @@ function bandClass(classification) {
 /* ── Helper: compute ESG readiness scores ── */
 function computeESGScores(d) {
   var r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0;
-  // R1: Climate
+  // R1: Climate — need I components, seismic, Markov, climate trajectory
   if (d.components && d.components.I) r1 += 0.25;
   if (d.components && d.components.E) r1 += 0.15;
+  if (d.seismic && d.seismic.PGA_g) r1 += 0.15;
   if (d.markov && d.markov.risk_score) r1 += 0.20;
   if (d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) r1 += 0.10;
-  r1 = Math.min(r1 + 0.15, 0.85);
+  if (d.markov && d.markov.p_critical_20yr !== undefined) { r1 += 0.15; } else { r1 = Math.min(r1 + 0.15, 0.85); }
 
-  // R2: Social
+  // R2: Social — need socio_economic suite + elderly + migration
   if (d.socio_economic && d.socio_economic.V_socio) r2 += 0.20;
   if (d.socio_economic && d.socio_economic.EP_rate_region) r2 += 0.15;
   if (d.socio_economic && d.socio_economic.unemployment_rate) r2 += 0.10;
   if (d.socio_economic && d.socio_economic.gdp_per_capita) r2 += 0.10;
   if (d.modifiers && d.modifiers.R3_C_mult) r2 += 0.15;
+  if (d.socio_economic && d.socio_economic.elderly_pct) r2 += 0.10;
   if (d.socio_economic && d.socio_economic.population) r2 += 0.05;
 
   // R3: Taxonomy
@@ -657,12 +670,13 @@ function computeESGScores(d) {
 
   // R4: Transition
   if (d.transition && d.transition.T1_score !== undefined) r4 += 0.25;
-  if (d.transition && d.transition.DER_ratio !== undefined) r4 += 0.25;
-  if (d.transition && d.transition.DER_variability !== undefined) r4 += 0.25;
-  if (d.transition && d.transition.EV_load_ratio !== undefined) r4 += 0.25;
+  if (d.transition && (d.transition.DER_ratio !== undefined || d.transition.DER_penetration !== undefined)) r4 += 0.25;
+  if (d.transition && d.transition.wind_capacity_mw !== undefined) r4 += 0.25;
+  if (d.transition && (d.transition.EV_pct_fleet !== undefined || d.transition.EV_load_ratio !== undefined)) r4 += 0.25;
 
-  // R5: Pollution
+  // R5: Pollution — need corrosion class with real variance + E2
   if (d.markov && d.markov.corrosion_class) r5 += 0.35;
+  if (d.socio_economic && d.socio_economic.E2_local) r5 += 0.25;
   if (d.components && d.components.E) r5 += 0.20;
   r5 = Math.min(r5, 0.80);
 
@@ -731,13 +745,13 @@ function displayName(d) {
   var n = d.name || "";
   if (n && n.indexOf("UNKNOWN") !== 0 && n.indexOf("Sub_") !== 0 && n !== "—") return n;
   var parts = [];
-  if (d.estado) parts.push(d.estado);
+  if (d.province) parts.push(d.province);
   if (d.substation_id) {
     var sid = d.substation_id.replace(/^[A-Z]{2}_/, "");
     if (sid.indexOf("UNKNOWN") === 0) sid = sid.replace("UNKNOWN", "#");
     parts.push("Station " + sid);
-  } else if (d.municipio) {
-    parts.push(d.municipio + " Station");
+  } else if (d.region) {
+    parts.push(d.region + " Station");
   }
   return parts.length ? parts.join(" · ") : (n || "Substation");
 }
@@ -760,7 +774,7 @@ function renderKPIs(d) {
     '<div class="kpi-card">' +
       '<div class="kpi-label">Substation</div>' +
       '<div class="kpi-value" style="font-size:22px;">' + displayName(d) + '</div>' +
-      '<div class="kpi-sub">' + (d.substation_id || '') + ' · ' + (d.estado || '') + ', ' + (d.municipio || '') + '</div>' +
+      '<div class="kpi-sub">' + (d.substation_id || '') + ' · ' + (d.region || '') + ', ' + (d.province || '') + '</div>' +
     '</div>' +
     '<div class="kpi-card">' +
       '<div class="kpi-label">SSI Score (R<sub>median</sub>)</div>' +
@@ -888,9 +902,9 @@ function renderMarkov(d) {
 function renderRadar(d) {
   var scores = computeESGScores(d);
   var labels = [
-    ['R1 SSI Annual','Risk Report'], ['R2 Regional','Deep-Dive'],
-    ['R3 Hurricane &','Seismic'], ['R4 Energy','Transition'],
-    ['R5 Infrastructure','Modernization'], ['R6 Community','Vulnerability']
+    ['R1 Climate','Physical Risk'], ['R2 Grid Equity','& Social'],
+    ['R3 Taxonomy','& Resilience'], ['R4 Energy','Transition'],
+    ['R5 Pollution','& Corrosion'], ['R6 Cybersecurity','& Digital']
   ];
   var colors = ESG_REPORTS.map(function(r) { return r.legendColor; });
 
@@ -1065,6 +1079,27 @@ function seededIndex(seed, len) {
   return Math.abs(h) % len;
 }
 
+var DEMO_SUBSTATION = {
+  substation_id: 'MX_001_000', internal_id: '001_0', version: '4.0.2',
+  name: 'Substation Example', lon: -99.13, lat: 19.43, voltage_kv: 230,
+  region: 'Ciudad de México', province: 'Ciudad de México',
+  departement: 'Ciudad de México', dept_code: 'CDMX', region_code: 'MX-CMX',
+  tso_zone: 'SIN', classification: 'Low',
+  confidence_tier: 'medium', R_median: 0.3231, R_P5: 0.2067, R_P95: 0.4292, CI_width: 0.2225,
+  R_base_median: 0.3286, modifier_pct: -1.69, P_critical: 0.0, skewness: -0.16,
+  fleet_percentile: 0.50, alert_flag: 0,
+  components: { C: 0.248, V: 0.148, I: 0.287, E: 0.431, S: 0.431, T: 0.091 },
+  modifiers: { R3_C_mult: 1.049, R4_F_topo: 1.123, R6_restoration: 1.030, R6_seismic: 1.051, R7_cyber: 1.017 },
+  graph_topology: { degree: 6, BC_percentile: 0.40, is_bridge: false, cluster_coeff: 0.013 },
+  markov: { state_now: 'Medium', risk_score: 0.386, ettc_years: 18.5, corrosion_class: 'C1', p_critical_20yr: 0.10, steady_state: { Good: 0.30, Acceptable: 0.38, Degraded: 0.22, Critical: 0.10 } },
+  socio_economic: { V_socio: 0.15, EP_rate_region: 0.12, elderly_pct: 0.12, population: 45840, gdp_per_capita: 132000, unemployment_rate: 3.5, E2_local: 0.43, poverty_rate: 16.8, indigenous_pct: 2.0, rd_pct_gdp: 0.015 },
+  transition: { RE_share_local: 0.158, wind_capacity_mw: 196.3, DER_penetration: 0.121, DER_ratio: 0.122, EV_pct_fleet: 0.012, T1_score: 0.091 },
+  seismic: { PGA_g: 0.175, zone: 'Moderate', alpha: 0.15 },
+  climate_trajectory: { delta_R_2030: 0.018, delta_R_2050: 0.113, scenario: 'SSP2-4.5', primary_driver: 'renewable integration' },
+  environmental: { corrosion_class: 'C1', flood_zone: false, coastal_proximity_km: 212, storm_surge_risk: 'low', soft_soil_risk: 'low' },
+  governance: { dso_operator: 'Comisión Federal de Electricidad', last_inspection_year: 2024, grid_code_compliant: true, smart_meter_pct: 0.79 }
+};
+
 function loadSubstation() {
   fetch('ssi-data.json?v=52').then(function(r) { return r.json(); }).then(function(json) {
     var sub = null;
@@ -1075,10 +1110,12 @@ function loadSubstation() {
     if (sub) {
       renderAll(sub);
     } else {
-      console.warn('No substation found in data');
+      console.warn('No substation found, using demo data');
+      renderAll(DEMO_SUBSTATION);
     }
   }).catch(function(err) {
-    console.warn('Failed to load data:', err.message);
+    console.warn('Failed to load data:', err.message, '— using demo substation');
+    renderAll(DEMO_SUBSTATION);
   });
 }
 
