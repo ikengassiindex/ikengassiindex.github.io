@@ -878,9 +878,15 @@ function renderMarkov(d) {
 
   var ss;
   if (mk && mk.steady_state) {
-    ss = mk.steady_state;
+    var raw = mk.steady_state;
+    if (Array.isArray(raw)) {
+      ss = raw;
+    } else {
+      // Object format {Good:x, Acceptable:y, Degraded:z, Critical:w} → array
+      ss = [raw.Good || 0, raw.Acceptable || raw.Aged || 0, raw.Degraded || 0, raw.Critical || 0];
+    }
   } else if (mk && mk.state_now) {
-    var stateMap = { 'Good': [0.65, 0.22, 0.10, 0.03], 'Medium': [0.30, 0.38, 0.22, 0.10], 'Poor': [0.12, 0.25, 0.35, 0.28], 'Critical': [0.05, 0.12, 0.28, 0.55] };
+    var stateMap = { 'Good': [0.65, 0.22, 0.10, 0.03], 'Low': [0.65, 0.22, 0.10, 0.03], 'Medium': [0.30, 0.38, 0.22, 0.10], 'High': [0.12, 0.25, 0.35, 0.28], 'Poor': [0.12, 0.25, 0.35, 0.28], 'Critical': [0.05, 0.12, 0.28, 0.55] };
     ss = stateMap[mk.state_now] || [0.30, 0.38, 0.22, 0.10];
   } else {
     ss = [0, 0, 0, 0];
