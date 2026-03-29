@@ -6,16 +6,17 @@ and overlays onto substation coordinates.
 Priority 3 in the Data Procurement Matrix (INGV for Italy is URGENT).
 
 Supported sources:
-  - Italy:   INGV MPS04 (Mappa di Pericolosità Sismica 2004, updated)
-  - Japan:   NIED J-SHIS (National Seismic Hazard Maps)
-  - Spain:   IGN (Instituto Geográfico Nacional)
-  - US:      USGS NSHM 2023
-  - Canada:  NRCan NBCC seismic hazard
-  - Germany: BGR seismic hazard map
-  - Austria: GeoSphere Austria / ZAMG
-  - France:  BRGM Plan Séisme
-  - UK:      BGS seismic hazard
+  - Italy:       INGV MPS04 (Mappa di Pericolosità Sismica 2004, updated)
+  - Japan:       NIED J-SHIS (National Seismic Hazard Maps)
+  - Spain:       IGN (Instituto Geográfico Nacional)
+  - US:          USGS NSHM 2023
+  - Canada:      NRCan NBCC seismic hazard
+  - Germany:     BGR seismic hazard map
+  - Austria:     GeoSphere Austria / ZAMG
+  - France:      BRGM Plan Séisme
+  - UK:          BGS seismic hazard
   - Switzerland: SED seismic hazard
+  - Mexico:      CENAPRED Atlas Nacional de Riesgos / SSN
 """
 
 import csv
@@ -198,13 +199,20 @@ _SEISMIC_LOCAL_PATHS = {
     "switzerland": DATA_DIR / "switzerland" / "sed_pga475.csv",
     "austria":     DATA_DIR / "austria" / "geosphere_pga475.csv",
     "canada":      DATA_DIR / "canada" / "nrcan_pga475.csv",
+    "denmark":     DATA_DIR / "denmark" / "geus_pga475.csv",
+    "norway":      DATA_DIR / "norway" / "norsar_pga475.csv",
+    "finland":     DATA_DIR / "finland" / "isuh_pga475.csv",
+    "poland":      DATA_DIR / "poland" / "igf_pan_pga475.csv",
+    "sweden":      DATA_DIR / "sweden" / "snsn_pga475.csv",
+    "mexico":      DATA_DIR / "mexico" / "cenapred_pga475.csv",
 }
 
 # Live API URLs per country (upgrade path)
 _SEISMIC_API_URLS = {
-    "us":    ["https://earthquake.usgs.gov/nshmp/api/hazard"],
-    "japan": ["https://www.j-shis.bosai.go.jp/map/api/psha"],
-    "spain": ["https://www.ign.es/web/resources/sismologia/peligrosidad/"],
+    "us":     ["https://earthquake.usgs.gov/nshmp/api/hazard"],
+    "japan":  ["https://www.j-shis.bosai.go.jp/map/api/psha"],
+    "spain":  ["https://www.ign.es/web/resources/sismologia/peligrosidad/"],
+    "mexico": ["https://www2.ssn.unam.mx:8080/catalogo/"],
 }
 
 
@@ -262,6 +270,12 @@ def fetch_seismic_grid(country, cache=True):
         "switzerland": ("SED",              "http://www.seismo.ethz.ch/"),
         "austria":     ("GeoSphere Austria","https://www.zamg.ac.at/"),
         "canada":      ("NRCan",            "https://earthquakescanada.nrcan.gc.ca/"),
+        "denmark":     ("GEUS",             "https://eng.geus.dk/"),
+        "norway":      ("NORSAR",           "https://www.norsar.no/"),
+        "finland":     ("ISUH",             "https://www.seismo.helsinki.fi/"),
+        "poland":      ("IGF-PAN",          "https://www.igf.edu.pl/"),
+        "sweden":      ("SNSN",             "https://www.snsn.se/"),
+        "mexico":      ("CENAPRED/SSN",     "https://www.cenapred.unam.mx/"),
     }
     name, url = source_info.get(country, ("national agency", ""))
     expected_path = local_path or DATA_DIR / country / f"seismic_pga475.csv"
@@ -404,7 +418,8 @@ def main():
 
     parser = argparse.ArgumentParser(description="SSI Pipeline — Seismic PGA Ingestion")
     parser.add_argument("country", choices=["italy", "japan", "us", "spain", "germany",
-                                            "france", "uk", "switzerland", "austria", "canada"],
+                                            "france", "uk", "switzerland", "austria", "canada",
+                                            "denmark", "norway", "finland", "poland", "sweden", "mexico"],
                         help="Country to process")
     parser.add_argument("--method", choices=["bilinear", "nearest"], default="bilinear",
                         help="Interpolation method")

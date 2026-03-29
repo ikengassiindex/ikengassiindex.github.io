@@ -16,7 +16,8 @@ CACHE_DIR.mkdir(exist_ok=True)
 # ── Countries ─────────────────────────────────────────────
 COUNTRIES = [
     "italy", "germany", "france", "spain", "uk",
-    "us", "switzerland", "austria", "canada", "japan"
+    "us", "switzerland", "austria", "canada", "japan",
+    "denmark", "norway", "finland", "poland", "sweden", "mexico",
 ]
 
 # Country metadata for ingestion routing
@@ -31,6 +32,12 @@ COUNTRY_META = {
     "austria":     {"iso2": "AT", "iso3": "AUT", "nuts0": "AT",  "stats_agency": "StatAT", "seismic_source": "GeoSphere",  "fields": 79},
     "canada":      {"iso2": "CA", "iso3": "CAN", "nuts0": None,   "stats_agency": "StatCan","seismic_source": "NRCan",      "fields": 39},
     "japan":       {"iso2": "JP", "iso3": "JPN", "nuts0": None,   "stats_agency": "eStat",  "seismic_source": "NIED",       "fields": 62},
+    "denmark":     {"iso2": "DK", "iso3": "DNK", "nuts0": "DK",  "stats_agency": "DST",    "seismic_source": "GEUS",       "fields": 61},
+    "norway":      {"iso2": "NO", "iso3": "NOR", "nuts0": "NO",  "stats_agency": "SSB",    "seismic_source": "NORSAR",     "fields": 61},
+    "finland":     {"iso2": "FI", "iso3": "FIN", "nuts0": "FI",  "stats_agency": "StatFin","seismic_source": "ISUH",       "fields": 61},
+    "poland":      {"iso2": "PL", "iso3": "POL", "nuts0": "PL",  "stats_agency": "GUS",    "seismic_source": "IGF-PAN",    "fields": 61},
+    "sweden":      {"iso2": "SE", "iso3": "SWE", "nuts0": "SE",  "stats_agency": "SCB",    "seismic_source": "SNSN",       "fields": 61},
+    "mexico":      {"iso2": "MX", "iso3": "MEX", "nuts0": None,   "stats_agency": "INEGI",  "seismic_source": "CENAPRED",   "fields": 95},
 }
 
 # ── SSI v4.0.2 Scoring Parameters ─────────────────────────
@@ -107,6 +114,13 @@ CDS_API_URL = "https://cds.climate.copernicus.eu/api"
 # INGV MPS04 — Italy seismic hazard (direct download, no API key needed)
 INGV_MPS04_URL = "https://esse1-gis.mi.ingv.it/s1_en.php"
 INGV_HAZARD_GRID_URL = "https://esse1-gis.mi.ingv.it/data/pga_475_grid.csv"
+
+# CENAPRED — Mexico seismic & volcanic hazard (open access)
+CENAPRED_SEISMIC_URL = "https://www.cenapred.unam.mx/es/Publicaciones/archivos/atlas-nacional-de-riesgos"
+# SSN — Servicio Sismológico Nacional seismicity data
+SSN_SEISMIC_URL = "https://www2.ssn.unam.mx:8080/catalogo/"
+# INEGI — Mexican statistics open data
+INEGI_API_BASE = "https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml"
 
 # Copernicus ERA5 reanalysis
 ERA5_VARIABLES = ["2m_temperature", "10m_u_component_of_wind", "10m_v_component_of_wind"]

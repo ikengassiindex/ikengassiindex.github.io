@@ -16,6 +16,7 @@ Supported sources:
     * Switzerland: CH2018
     * France: DRIAS/Météo-France
     * Germany: DWD REMO/WETTREG
+    * Mexico: SMN/CONAGUA regional projections
 """
 
 import json
@@ -497,6 +498,12 @@ def _country_bbox(country):
         "austria":     {"lat_min": 46.4, "lat_max": 49.0, "lon_min": 9.5, "lon_max": 17.2},
         "canada":      {"lat_min": 41.7, "lat_max": 83.1, "lon_min": -141.0, "lon_max": -52.6},
         "japan":       {"lat_min": 24.0, "lat_max": 45.6, "lon_min": 122.9, "lon_max": 153.0},
+        "denmark":     {"lat_min": 54.5, "lat_max": 57.8, "lon_min": 8.0,  "lon_max": 15.2},
+        "norway":      {"lat_min": 57.9, "lat_max": 71.2, "lon_min": 4.5,  "lon_max": 31.1},
+        "finland":     {"lat_min": 59.8, "lat_max": 70.1, "lon_min": 20.6, "lon_max": 31.6},
+        "poland":      {"lat_min": 49.0, "lat_max": 54.9, "lon_min": 14.1, "lon_max": 24.2},
+        "sweden":      {"lat_min": 55.3, "lat_max": 69.1, "lon_min": 11.0, "lon_max": 24.2},
+        "mexico":      {"lat_min": 14.5, "lat_max": 32.8, "lon_min": -118.5, "lon_max": -86.5},
     }
     return boxes.get(country)
 
