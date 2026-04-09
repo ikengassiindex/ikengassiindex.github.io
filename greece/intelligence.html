@@ -1420,9 +1420,55 @@ document.addEventListener("ssi-config-ready", function(e) {
 </script>
 </section>
 
-<div style="margin:64px 0"></div>
+<div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey);font-weight:400">
+  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent a Greek utility, RAE, ADMIE/IPTO, DEDDIE/HEDNO, or academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
+</div>
+</section>
+
+
+<!-- ═══════════════════ COLOPHON ═══════════════════ -->
+<div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
+  <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Monthly Intelligence Report — Edition 001 (Inaugural)</p>
+  <p style="margin-bottom:4px">Published 9 April 2026 · SSI Index v4.0.2 · 581 substations · 1,420 grid lines · 6 components · 20 metrics · 8 modifiers</p>
+  <p>10,000-iteration Gaussian Copula Monte Carlo · Sobol global sensitivity analysis (196,608 evals/substation) · CMIP6 SSP2-4.5</p>
+</div>
 
 </main>
 
+<footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
+  © 2026 Altinium Invest · Corso Vittorio Emanuele 110/5, 80121 Napoli · P.IVA 10656441218<br>
+  USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 633/1941, Berne Convention, Copyright Act 1976<br>
+  <a href="#" style="color:var(--warm-grey-light);text-decoration:none">View in browser</a>
+</footer>
+
+
+<!-- ======= EDITION AUTO-PATCHER ======= -->
+<script>
+(function(){
+  var now=new Date(), m=now.getMonth(), y=now.getFullYear();
+  var MN=['January','February','March','April','May','June',
+         'July','August','September','October','November','December'];
+  var edN=Math.max(1,(y-2026)*12+(m+1)-2);
+  var curEd=Math.max(1,edN-1);
+  var eS=('00'+curEd).slice(-3), MY=MN[m]+' '+y;
+  var pm=m-1<0?11:m-1, py=m-1<0?y-1:y, pMY=MN[pm]+' '+py;
+  var d1=new Date(y,m,1).getDay(), thu2=((4-d1+7)%7)+8;
+  var pub=thu2+' '+MN[m]+' '+y;
+  function R(o,n){
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false),t;
+    while(t=w.nextNode()) if(t.nodeValue.indexOf(o)!==-1) t.nodeValue=t.nodeValue.split(o).join(n);
+  }
+  R('[Month Year]',MY);
+  if(curEd>1){
+    document.title=document.title.replace(/Edition \d{3}/,'Edition '+eS);
+    R('Published 9 April 2026','Published '+pub);
+    R('Edition 001','Edition '+eS);
+    R('April 2026',MY);
+    R('March 2026',pMY);
+    R(' (Inaugural)','');R('(Inaugural)','');
+    R('inaugural edition','edition');R('inaugural ','');R('Inaugural ','');
+  }
+})();
+</script>
 </body>
 </html>
