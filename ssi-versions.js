@@ -23,7 +23,7 @@
 
   // Detect context
   var path = window.location.pathname;
-  var countryMatch = path.match(/^\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile|poland|finland|sweden|norway|denmark)\//i);
+  var countryMatch = path.match(/^\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile|poland|finland|sweden|norway|denmark|mexico|greece)\//i);
   var isCountryPage = !!countryMatch;
   var country = countryMatch ? countryMatch[1].toLowerCase() : null;
   var base = isCountryPage ? '../' : './';
