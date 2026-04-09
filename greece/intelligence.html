@@ -724,97 +724,232 @@ document.addEventListener("ssi-config-ready", function(e) {
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section C</span>
 <h2>Data Refresh &amp; Changelog</h2>
 
-<div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-bottom:16px">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Data philosophy:</strong> The SSI Index operates on a multi-cadence refresh schedule — weekly grid topology updates, monthly economic indicators, quarterly DER registry and energy poverty snapshots, annual seismic and climate hazard revisions. All 95 input variables are sourced from 30 public authorities and scientific agencies, ensuring full auditability and compliance with EU Open Data Directive 2019/1024.</p>
+<p style="font-size:13px;line-height:1.7" id="sec-c-intro">Loading data source registry…</p>
+
+<!-- Frequency Distribution KPIs -->
+<div class="kpi-grid" style="margin:16px 0" id="sec-c-freq-kpis">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Sources</div>
+    <div class="kpi-value" style="color:var(--ink)" id="c-total-src">—</div>
+    <div class="kpi-sub" id="c-total-vars"></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Weekly / Monthly</div>
+    <div class="kpi-value" style="color:var(--sage)" id="c-freq-fast">—</div>
+    <div class="kpi-sub">High-frequency feeds</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Quarterly / Annual</div>
+    <div class="kpi-value" style="color:var(--bronze)" id="c-freq-slow">—</div>
+    <div class="kpi-sub">Regular refresh cycle</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Static / Derived</div>
+    <div class="kpi-value" style="color:var(--warm-grey)" id="c-freq-static">—</div>
+    <div class="kpi-sub">Standards + scenarios</div>
+  </div>
 </div>
 
-<h3>C.1 &ensp; Scheduled Upcoming Refreshes</h3>
-<div id="c1-refreshes" style="margin:16px 0">Loading refresh schedule…</div>
+<!-- Data Source Registry Table -->
+<div class="card" style="margin:16px 0">
+  <div class="card-header" id="c-table-header"><h3 style="margin:0">Data Source Registry — Loading…</h3></div>
+  <div id="sec-c-source-list" style="display:flex;flex-direction:column;gap:0">
+    <div style="text-align:center;color:var(--warm-grey);padding:24px">Loading source registry…</div>
+  </div>
+</div>
 
-<h3>C.2 &ensp; Source Data Lineage</h3>
-<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">The 30 public data sources tracked by SSIMetadata. Frequencies: W=weekly, M=monthly, Q=quarterly, A=annual.</p>
-<div id="c2-sources" style="margin:16px 0;font-size:12px">Loading data sources…</div>
+<!-- Frequency Timeline -->
+<h3>C.1 &ensp; Update Frequency Timeline</h3>
+<div id="sec-c-timeline" style="margin:16px 0">Loading…</div>
 
+<!-- Fleet Score Summary -->
+<h3>C.2 &ensp; Fleet Score Snapshot</h3>
+<div id="sec-c-fleet" style="margin:16px 0">Loading…</div>
+<p style="font-size:13px;line-height:1.7" id="sec-c-fleet-narrative">Loading…</p>
+
+<!-- Notable Changes -->
 <h3>C.3 &ensp; Notable April 2026 Changes</h3>
 <div class="card" style="border-left:3px solid var(--terracotta)">
   <ul style="margin:0;padding-left:20px;line-height:2;font-size:13px">
-    <li><strong>Crete HVDC Interconnection Model:</strong> As of April 2026, the Crete–Attica HVDC link (scheduled commissioning Q2 2024) is now live in network topology. This eliminates non-interconnection status for Crete's 85 substations and significantly reduces R8 island isolation modifier across the region. Previous editions modeled Crete as fully non-interconnected; this edition reflects actual grid configuration.</li>
-    <li><strong>NECP 2030 DER Registry (Q1 2026):</strong> Greek capacity for DER (solar + wind) reached 8.2 GW as of March 2026 — tracking toward the NECP 2030 renewable target of 15+ GW. The T (Transition) component now captures actual RES curtailment and voltage stress at substations serving high-penetration renewable clusters (Thessaly, Peloponnese, Crete post-interconnection).</li>
-    <li><strong>EAK 2003 Seismic Zone Revision:</strong> Annual update to GGDC/USGS seismic catalogue and EAK 2003 hazard zones. Two substations reclassified from Zone II to Zone I (0.30g → 0.35g PGA); R6b modifier uplift of ~3% fleet-wide for high-hazard substations.</li>
-    <li><strong>Wildfire Risk Layer (EMSR/Copernicus):</strong> 2025–2026 fire season mapping from Copernicus Emergency Management Service (EMSR-615) shows elevated wildfire risk in Peloponnese and Attica (average fuel load depletion index down 12% year-over-year). The I (Infrastructure) component now includes transmission tower/line exposure to wildfire in these zones.</li>
-    <li><strong>Energy Poverty Regional Snapshot (ELSTAT Q4 2025):</strong> Regional energy poverty rates published by Hellenic Statistical Authority. Highest exposure in Western Greece (14.2%), Epirus (13.8%), North Aegean islands (17.1% — non-interconnection premium). The E component's socio-economic proxy now reflects 2025 household energy cost burden.</li>
+    <li><strong>Crete HVDC Interconnection Model:</strong> The Crete–Attica HVDC link is now live in network topology, eliminating non-interconnection status for Crete's 85 substations and significantly reducing R8 island isolation modifier.</li>
+    <li><strong>NECP 2030 DER Registry (Q1 2026):</strong> Greek DER capacity reached 8.2 GW — tracking toward the 15+ GW NECP 2030 target. T component captures RES curtailment at high-penetration clusters (Thessaly, Peloponnese, Crete).</li>
+    <li><strong>EAK 2003 Seismic Zone Revision:</strong> Two substations reclassified Zone II → Zone I (0.30g → 0.35g PGA); R6b modifier uplift of ~3% for high-hazard substations.</li>
+    <li><strong>Wildfire Risk Layer (EMSR/Copernicus):</strong> 2025–2026 fire season mapping shows elevated risk in Peloponnese and Attica. I component now includes transmission line exposure to wildfire.</li>
+    <li><strong>Energy Poverty (ELSTAT Q4 2025):</strong> Highest exposure in Western Greece (14.2%), Epirus (13.8%), North Aegean islands (17.1% — non-interconnection premium).</li>
   </ul>
 </div>
 
-<h3>C.4 &ensp; Metadata Card</h3>
-<div class="card" style="border-left:3px solid var(--sage)">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:12px">
-    <div>
-      <div style="font-weight:600;margin-bottom:6px">Total Data Points Ingested</div>
-      <div style="font-size:14px;font-weight:600;color:var(--terracotta)">18,945</div>
-      <div style="color:var(--warm-grey)">95 variables × 581 substations + regional aggregates</div>
-    </div>
-    <div>
-      <div style="font-weight:600;margin-bottom:6px">Monte Carlo Iterations</div>
-      <div style="font-size:14px;font-weight:600;color:var(--bronze)">5.81 M</div>
-      <div style="color:var(--warm-grey)">10,000 per substation</div>
-    </div>
-    <div>
-      <div style="font-weight:600;margin-bottom:6px">Correlation Matrix Rank</div>
-      <div style="font-size:14px;font-weight:600;color:var(--sage)">20×20 Gaussian Copula</div>
-      <div style="color:var(--warm-grey)">Full Cholesky decomposition</div>
-    </div>
-    <div>
-      <div style="font-weight:600;margin-bottom:6px">Output Data Points Generated</div>
-      <div style="font-size:14px;font-weight:600;color:var(--crimson)">18,945</div>
-      <div style="color:var(--warm-grey)">R_median, P5/P95, 6 components, 5 modifiers per substation</div>
-    </div>
-  </div>
-</div>
+<!-- Changelog -->
+<h3>C.4 &ensp; Changelog — v3.4 → v4.0.2</h3>
+<div id="sec-c-changelog" style="margin:16px 0">Loading…</div>
 
 <script>
 (function(){
   var meta = window.SSIMetadata;
-  if (!meta) {
-    console.log('SSIMetadata not yet loaded');
-    return;
-  }
+  if (!meta) { console.log('SSIMetadata not yet loaded'); return; }
 
-  // ── C.1 Refresh schedule ──
-  var refreshOrder = ['Weekly', 'Monthly', 'Quarterly', 'Annual'];
-  var refreshHTML = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">';
-  refreshOrder.forEach(function(freq){
-    var dist = meta.FREQ_DISTRIBUTION[freq];
-    if (dist) {
-      refreshHTML += '<div class="card" style="border-top:3px solid ' +
-        (freq === 'Weekly' ? 'var(--sage)' : freq === 'Monthly' ? 'var(--bronze)' : freq === 'Quarterly' ? 'var(--terracotta)' : 'var(--crimson)') + '">' +
-        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">' + freq + '</div>' +
-        '<div style="font-size:16px;font-weight:600;margin-bottom:4px">' + dist.count + '</div>' +
-        '<div style="font-size:11px;color:var(--warm-grey)">' + dist.sources.join(', ') + '</div></div>';
-    }
+  var monthYear = 'April 2026';
+
+  // ── Intro ──
+  document.getElementById('sec-c-intro').innerHTML =
+    'The SSI v4.0.2 draws on <strong>' + meta.stats.sources + ' verified public data sources</strong> feeding ' +
+    meta.stats.variables + ' variables across ' + meta.stats.components + ' components and ' + meta.stats.modifiers +
+    ' modifiers. This section provides a live registry of all sources, their update frequencies, and the current state of the fleet. ' +
+    'Transparency in data vintage is central to the SSI\'s credibility.';
+
+  // ── Frequency KPIs ──
+  var freq = meta.FREQ_DISTRIBUTION;
+  var weekly = (freq.Weekly ? freq.Weekly.count : 0);
+  var monthly = (freq.Monthly ? freq.Monthly.count : 0);
+  var quarterly = (freq.Quarterly ? freq.Quarterly.count : 0);
+  var annual = (freq.Annual ? freq.Annual.count : 0);
+  var staticC = (freq.Static ? freq.Static.count : 0);
+  var derived = (freq.Derived ? freq.Derived.count : 0);
+
+  document.getElementById('c-total-src').textContent = meta.stats.sources;
+  document.getElementById('c-total-vars').textContent = meta.stats.variables + ' variables';
+  document.getElementById('c-freq-fast').textContent = (weekly + monthly);
+  document.getElementById('c-freq-slow').textContent = (quarterly + annual);
+  document.getElementById('c-freq-static').textContent = (staticC + derived);
+
+  // ── Source Registry Table ──
+  document.getElementById('c-table-header').innerHTML = '<h3 style="margin:0">Data Source Registry \u2014 ' + monthYear + '</h3>';
+
+  var sources = meta.DATA_SOURCES;
+  var freqOrder = { Hourly: 0, Weekly: 1, Monthly: 2, Quarterly: 3, Annual: 4, Static: 5, Derived: 6, Continuous: 2 };
+  var sorted = sources.slice().sort(function(a,b){
+    return (freqOrder[a.freq] || 9) - (freqOrder[b.freq] || 9);
   });
-  refreshHTML += '</div>';
-  document.getElementById('c1-refreshes').innerHTML = refreshHTML;
 
-  // ── C.2 Data sources ──
-  var srcHTML = '<table style="width:100%;border-collapse:collapse;font-size:11px">' +
-    '<tr style="border-bottom:1px solid var(--card-border)">' +
-    '<td style="padding:8px;font-weight:600">Name</td>' +
-    '<td style="padding:8px;font-weight:600">Variables</td>' +
-    '<td style="padding:8px;font-weight:600">Frequency</td>' +
-    '</tr>';
+  var freqColors = {
+    Hourly: 'var(--sage)', Weekly: 'var(--sage)', Monthly: 'var(--sage)',
+    Quarterly: 'var(--bronze)', Annual: 'var(--bronze)', Continuous: 'var(--sage)',
+    Static: 'var(--warm-grey)', Derived: 'var(--warm-grey)'
+  };
+  var freqBgs = {
+    Hourly: 'rgba(93,133,99,0.12)', Weekly: 'rgba(93,133,99,0.12)', Monthly: 'rgba(93,133,99,0.12)',
+    Quarterly: 'rgba(184,134,58,0.12)', Annual: 'rgba(184,134,58,0.12)', Continuous: 'rgba(93,133,99,0.12)',
+    Static: 'rgba(44,36,32,0.06)', Derived: 'rgba(44,36,32,0.06)'
+  };
 
-  if (meta.DATA_SOURCES && meta.DATA_SOURCES.length) {
-    meta.DATA_SOURCES.slice(0, 15).forEach(function(src){
-      srcHTML += '<tr style="border-bottom:1px solid var(--card-border)">' +
-        '<td style="padding:8px">' + src.name + '</td>' +
-        '<td style="padding:8px;text-align:center">' + (src.vars || '?') + '</td>' +
-        '<td style="padding:8px;text-align:center">' + (src.freq || '?').charAt(0).toUpperCase() + '</td>' +
-        '</tr>';
+  var listHTML = sorted.map(function(s, i){
+    var fCol = freqColors[s.freq] || 'var(--warm-grey)';
+    var fBg = freqBgs[s.freq] || 'rgba(44,36,32,0.06)';
+    var border = i < sorted.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
+    return '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:8px 0;' + border + '">' +
+      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:42px;font-family:Consolas,monospace">' + s.id + '</span>' +
+      '<span style="flex:1;font-weight:500">' + s.name + '</span>' +
+      '<span style="flex-shrink:0;font-size:10px;color:' + fCol + ';background:' + fBg + ';padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase">' + s.freq + '</span>' +
+      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:11px;min-width:90px;text-align:right">' + s.res + '</span>' +
+      '<span style="flex-shrink:0;font-weight:600;min-width:30px;text-align:right">' + s.vars + ' var' + (s.vars > 1 ? 's' : '') + '</span>' +
+    '</div>';
+  }).join('');
+  document.getElementById('sec-c-source-list').innerHTML = listHTML;
+
+  // ── C.1 Frequency Timeline ──
+  var timelineHTML = '<div class="label-xs" style="margin-bottom:10px">Expected Update Windows</div>';
+  var timelineDefs = [
+    { label: 'Weekly', sources: freq.Weekly ? freq.Weekly.sources : [], color: '#5d8563', note: 'OSM diffs + weather reanalysis' },
+    { label: 'Monthly', sources: freq.Monthly ? freq.Monthly.sources : [], color: '#5d8563', note: 'Grid load + procurement data' },
+    { label: 'Quarterly', sources: freq.Quarterly ? freq.Quarterly.sources : [], color: '#b8863a', note: 'DER registry + energy poverty + macro indicators' },
+    { label: 'Annual', sources: freq.Annual ? freq.Annual.sources : [], color: '#aa4234', note: 'Core grid quality + demographics + environment' },
+    { label: 'Static', sources: freq.Static ? freq.Static.sources : [], color: '#6b7280', note: 'Standards + scenarios + seismic hazard' }
+  ];
+  timelineDefs.forEach(function(t){
+    if (t.sources.length === 0) return;
+    var barW = Math.min(t.sources.length / 20 * 100, 100).toFixed(0);
+    timelineHTML += '<div style="margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
+        '<span style="font-weight:600">' + t.label + ' <span style="font-weight:400;color:var(--warm-grey)">(' + t.sources.length + ' sources)</span></span>' +
+        '<span style="color:var(--warm-grey);font-size:11px">' + t.note + '</span></div>' +
+      '<div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden">' +
+        '<div style="width:' + barW + '%;height:100%;background:' + t.color + ';border-radius:3px;opacity:0.7"></div></div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-top:2px">' + t.sources.join(' \u00B7 ') + '</div>' +
+    '</div>';
+  });
+  document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
+
+  // ── C.2 Fleet Score Snapshot — from ssi-data.json ──
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var n = fleet.length;
+    var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
+    var median = rVals[Math.floor(n / 2)];
+    var p5 = rVals[Math.floor(n * 0.05)];
+    var p95 = rVals[Math.floor(n * 0.95)];
+    var mean = rVals.reduce(function(a,b){ return a + b; }, 0) / n;
+
+    var bands = { Low:0, Medium:0, High:0, Critical:0 };
+    fleet.forEach(function(s){ bands[s.classification]++; });
+
+    var confTiers = { high:0, medium:0, low:0 };
+    fleet.forEach(function(s){
+      var ciRatio = s.R_median > 0.01 ? s.CI_width / s.R_median : 1.0;
+      if (ciRatio < 0.50) confTiers.high++;
+      else if (ciRatio < 0.70) confTiers.medium++;
+      else confTiers.low++;
     });
-  }
-  srcHTML += '</table>';
-  document.getElementById('c2-sources').innerHTML = srcHTML;
+
+    // Band distribution bar
+    var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
+    var bandBar = '';
+    ['Low','Medium','High','Critical'].forEach(function(b){
+      var pct = (bands[b] / n * 100).toFixed(1);
+      bandBar += '<div style="width:' + pct + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + bands[b] + ' (' + pct + '%)"></div>';
+    });
+
+    var fleetHTML = '<div class="kpi-grid" style="margin-bottom:16px">' +
+      '<div class="kpi-card"><div class="kpi-label">Fleet Size</div><div class="kpi-value" style="color:var(--ink)">' + n.toLocaleString() + '</div><div class="kpi-sub">substations scored</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">' + median.toFixed(3) + '</div><div class="kpi-sub">P5=' + p5.toFixed(3) + ' \u00B7 P95=' + p95.toFixed(3) + '</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">High + Critical</div><div class="kpi-value" style="color:var(--crimson)">' + (bands.High + bands.Critical) + '</div><div class="kpi-sub">' + ((bands.High + bands.Critical) / n * 100).toFixed(1) + '% of fleet</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">' + (confTiers.high / n * 100).toFixed(0) + '%</div><div class="kpi-sub">' + confTiers.high + ' subs \u00B7 CI/R &lt; 0.50</div></div>' +
+    '</div>';
+
+    // Band distribution
+    fleetHTML += '<div style="margin-bottom:8px"><div class="label-xs" style="margin-bottom:6px">Band Distribution</div>' +
+      '<div style="height:10px;border-radius:5px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--warm-grey);margin-top:4px">' +
+        '<span>Low ' + bands.Low + ' (' + (bands.Low/n*100).toFixed(1) + '%)</span>' +
+        '<span>Medium ' + bands.Medium + ' (' + (bands.Medium/n*100).toFixed(1) + '%)</span>' +
+        '<span>High ' + bands.High + ' (' + (bands.High/n*100).toFixed(1) + '%)</span>' +
+        '<span>Critical ' + bands.Critical + ' (' + (bands.Critical/n*100).toFixed(1) + '%)</span>' +
+      '</div></div>';
+
+    document.getElementById('sec-c-fleet').innerHTML = fleetHTML;
+
+    // Fleet narrative
+    document.getElementById('sec-c-fleet-narrative').innerHTML =
+      'No primary data sources have been updated since the v4.0.2 launch baseline. All <strong>' + n.toLocaleString() +
+      ' substation scores remain unchanged</strong> this edition. The fleet median R of ' + median.toFixed(3) +
+      ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
+      (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
+      'The first material score changes are expected when RAE publishes annual grid quality tables (affecting C1\u2013C4 and R6a) ' +
+      'and when DEDDIE/HEDNO refreshes the DER registry (affecting T1). ' +
+      'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
+      'which have minimal impact on fleet-level score distribution.';
+  });
+
+  // ── C.4 Changelog ──
+  var cl = meta.CHANGELOG;
+  var typeLabels = { 'new': 'New', 'enhanced': 'Enhanced', 'data': 'Data' };
+  var typeColors = { 'new': 'var(--sage)', 'enhanced': 'var(--bronze)', 'data': 'var(--terracotta)' };
+  var typeBgs = { 'new': 'rgba(93,133,99,0.12)', 'enhanced': 'rgba(184,134,58,0.12)', 'data': 'rgba(170,66,52,0.12)' };
+
+  var clHTML = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:10px">' + cl.length + ' changes tracked across P0, P1, and P2 releases</div>';
+  cl.forEach(function(c, i){
+    var col = typeColors[c.type] || 'var(--warm-grey)';
+    var bg = typeBgs[c.type] || 'rgba(44,36,32,0.06)';
+    var lbl = typeLabels[c.type] || c.type;
+    var border = i < cl.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
+    var p2 = c.isP2 ? ' <span style="font-size:9px;color:var(--terracotta);font-weight:600">P2</span>' : '';
+    clHTML += '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;' + border + '">' +
+      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">' + c.id + '</span>' +
+      '<span style="flex-shrink:0;font-size:10px;color:' + col + ';background:' + bg + ';padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">' + lbl + '</span>' +
+      '<span style="flex:1">' + c.change + p2 + '</span>' +
+      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">' + c.section + '</span>' +
+    '</div>';
+  });
+  document.getElementById('sec-c-changelog').innerHTML = clHTML;
 })();
 </script>
 </section>
@@ -1062,28 +1197,48 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <h3>E.1 &ensp; Greece vs European Peers: Grid Risk Benchmarks</h3>
 
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0" id="eu-benchmark">
-  <div class="card">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px;letter-spacing:0.05em">Median Risk (R_median)</div>
-    <div style="font-size:14px;font-weight:600;color:var(--ink)">0.645</div>
-    <div style="font-size:11px;color:var(--warm-grey)">Greece fleet median · 581 subs</div>
+<div class="kpi-grid" style="margin:16px 0" id="eu-benchmark">
+  <div class="kpi-card">
+    <div class="kpi-label">Median Risk (R_median)</div>
+    <div class="kpi-value" style="color:var(--ink)" id="eu-median-r">—</div>
+    <div class="kpi-sub" id="eu-median-sub">Loading…</div>
   </div>
-  <div class="card">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px;letter-spacing:0.05em">High/Critical %</div>
-    <div style="font-size:14px;font-weight:600;color:var(--crimson)">97.5%</div>
-    <div style="font-size:11px;color:var(--warm-grey)">vs Italy 89%, Germany 34%</div>
+  <div class="kpi-card">
+    <div class="kpi-label">High / Critical %</div>
+    <div class="kpi-value" style="color:var(--crimson)" id="eu-hc-pct">—</div>
+    <div class="kpi-sub">vs Italy 89%, Germany 34%</div>
   </div>
-  <div class="card">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px;letter-spacing:0.05em">Seismic Exposure</div>
-    <div style="font-size:14px;font-weight:600;color:var(--orange)">68%</div>
-    <div style="font-size:11px;color:var(--warm-grey)">Zone I/II (EAK 2003) · vs IT 45%, PT 12%</div>
+  <div class="kpi-card">
+    <div class="kpi-label">Seismic Exposure</div>
+    <div class="kpi-value" style="color:var(--terracotta)" id="eu-seismic">—</div>
+    <div class="kpi-sub">Zone I/II (EAK 2003) · vs IT 45%, PT 12%</div>
   </div>
-  <div class="card">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px;letter-spacing:0.05em">Island Isolation Subs</div>
-    <div style="font-size:14px;font-weight:600;color:var(--sage)">180</div>
-    <div style="font-size:11px;color:var(--warm-grey)">30% of fleet · unique to Med</div>
+  <div class="kpi-card">
+    <div class="kpi-label">Island Substations</div>
+    <div class="kpi-value" style="color:var(--sage)" id="eu-island">—</div>
+    <div class="kpi-sub" id="eu-island-sub">Loading…</div>
   </div>
 </div>
+
+<!-- SAIDI Benchmarking Chart -->
+<div class="card" style="border-top:3px solid var(--terracotta);margin:20px 0">
+  <div style="padding:0;margin:-20px -24px 16px;padding:12px 24px;background:var(--cream-deep);border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px">
+    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">European Context Card — SAIDI Benchmarking</span>
+    <span style="font-size:10px;color:var(--warm-grey)">Ed. 001 · April 2026</span>
+  </div>
+  <h3 style="margin-top:0;font-size:14px">Unplanned SAIDI (min/customer/year) — Selected EU Countries</h3>
+  <p style="font-size:11px;color:var(--warm-grey);margin:0 0 10px">Longer bar = lower SAIDI = better reliability. Values in min/customer/year.</p>
+  <div id="eu-saidi-chart">Loading SAIDI chart…</div>
+  <div style="padding:12px 0;margin-top:12px;border-top:1px solid var(--card-border);font-size:11px;color:var(--warm-grey);line-height:1.6">
+    Source: CEER 7th Benchmarking Report (2022); Bundesnetzagentur (2024); DEDDIE/HEDNO Quality Report (2023). Greece sub-categories from DEDDIE territory classification. · Updated annually with CEER BR release.
+  </div>
+</div>
+
+<!-- Regional Risk Ranking -->
+<h3 style="margin-top:20px">Regional Risk Ranking — All 13 Periphereies</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does Crete sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison.</p>
+<div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
+<p style="font-size:13px;line-height:1.7" id="eu-ranking-narrative">Loading…</p>
 
 <h3>E.2 &ensp; Energy Transition Drivers</h3>
 
@@ -1121,10 +1276,119 @@ document.addEventListener("ssi-config-ready", function(e) {
   </div>
   <div class="card" style="border-left:3px solid var(--sage)">
     <div style="font-weight:600;margin-bottom:6px;color:var(--sage)">Island Interconnection Economics</div>
-    <p style="font-size:12px;line-height:1.6;margin:0">The Crete HVDC project demonstrates positive ROI through reduced diesel fuel imports (EUR 800M capex × 30-year life → EUR 27M/year operational savings). However, the remaining 180 non-interconnected substations (Cyclades, Dodecanese, Ionian Islands) require sequenced infrastructure investment. The SSI enables prioritization: substations with highest R (risk) and lowest R8 (island isolation modifier) should receive HVDC/DC cable projects first.</p>
+    <p style="font-size:12px;line-height:1.6;margin:0">The Crete HVDC project demonstrates positive ROI through reduced diesel fuel imports (EUR 800M capex × 30-year life → EUR 27M/year operational savings). The SSI enables prioritization for remaining non-interconnected islands: substations with highest R (risk) and lowest R8 (island isolation modifier) should receive HVDC/DC cable projects first.</p>
   </div>
 </div>
 
+<script>
+(function(){
+  fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = data.substations;
+    var n = fleet.length;
+
+    // ── E.1 KPIs ──
+    var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
+    var medR = rVals[Math.floor(n/2)];
+    var hcCount = fleet.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
+    var seismicCount = fleet.filter(function(s){ return s.seismic && (s.seismic.zone <= 2 || s.seismic.zone === 'I' || s.seismic.zone === 'II'); }).length;
+    var islandRegions = ['Crete','Ionian Islands','North Aegean','South Aegean'];
+    var islandCount = fleet.filter(function(s){ return islandRegions.indexOf(s.region) >= 0; }).length;
+
+    document.getElementById('eu-median-r').textContent = medR.toFixed(3);
+    document.getElementById('eu-median-sub').textContent = 'Greece fleet median \u00B7 ' + n + ' subs';
+    document.getElementById('eu-hc-pct').textContent = (hcCount / n * 100).toFixed(1) + '%';
+    document.getElementById('eu-seismic').textContent = (seismicCount / n * 100).toFixed(0) + '%';
+    document.getElementById('eu-island').textContent = islandCount;
+    document.getElementById('eu-island-sub').textContent = (islandCount / n * 100).toFixed(1) + '% of fleet \u00B7 4 island regions';
+
+    // ── SAIDI Chart ──
+    var saidiData = [
+      { country: '\uD83C\uDDE9\uD83C\uDDEA Germany', val: 11.7, color: 'var(--sage)' },
+      { country: '\uD83C\uDDE8\uD83C\uDDED Switzerland', val: 15, color: 'var(--sage)' },
+      { country: '\uD83C\uDDF3\uD83C\uDDF1 Netherlands', val: 23.9, color: 'var(--sage)' },
+      { country: '\uD83C\uDDEB\uD83C\uDDF7 France', val: 36, color: 'var(--bronze)' },
+      { country: '\uD83C\uDDEC\uD83C\uDDE7 UK', val: 40, color: 'var(--bronze)' },
+      { country: '\uD83C\uDDEE\uD83C\uDDF9 Italy', val: 43, color: 'var(--warm-grey)' },
+      { country: '\uD83C\uDDEA\uD83C\uDDF8 Spain', val: 48, color: 'var(--warm-grey)' },
+      { country: '\uD83C\uDDEC\uD83C\uDDF7 Greece (national)', val: 72, color: 'var(--crimson)', bold: true },
+      { country: '  \u21B3 Urban/mainland', val: 45, color: '#e67e22', indent: true },
+      { country: '  \u21B3 Island/remote', val: 130, color: 'var(--crimson)', indent: true },
+      { country: '\uD83C\uDDED\uD83C\uDDFA Hungary', val: 57, color: 'var(--warm-grey)' },
+      { country: '\uD83C\uDDF5\uD83C\uDDF1 Poland', val: 95, color: 'var(--warm-grey)' },
+      { country: '\uD83C\uDDF7\uD83C\uDDF4 Romania', val: 290, color: 'var(--warm-grey)' }
+    ];
+    var maxSaidi = 300;
+    var saidiHTML = '<div style="display:flex;flex-direction:column;gap:6px">';
+    saidiData.forEach(function(d){
+      var barPct = Math.max(2, (1 - d.val / maxSaidi) * 100).toFixed(0);
+      var fw = d.bold ? 'font-weight:600;' : '';
+      var pl = d.indent ? 'padding-left:20px;' : '';
+      var border = d.bold ? 'padding:4px 0;border-bottom:1px solid var(--card-border);' : '';
+      saidiHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;font-size:12px;' + fw + pl + border + '">' +
+        '<span style="min-width:150px">' + d.country + '</span>' +
+        '<div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">' +
+          '<div style="width:' + barPct + '%;height:100%;background:' + d.color + ';border-radius:4px"></div></div>' +
+        '<span class="num" style="min-width:40px;text-align:right;color:' + d.color + ';font-weight:600">' + (d.val < 20 ? d.val : '~' + d.val) + '</span></div>';
+    });
+    saidiHTML += '</div>';
+    document.getElementById('eu-saidi-chart').innerHTML = saidiHTML;
+
+    // ── Regional Risk Ranking — All 13 Periphereies ──
+    var regData = {};
+    fleet.forEach(function(s){
+      if (!regData[s.region]) regData[s.region] = { subs: [], sumR: 0 };
+      regData[s.region].subs.push(s);
+      regData[s.region].sumR += s.R_median;
+    });
+    var regList = Object.keys(regData).map(function(r){
+      var d = regData[r];
+      var nn = d.subs.length;
+      var bands = { Low:0, Medium:0, High:0, Critical:0 };
+      d.subs.forEach(function(s){ bands[s.classification]++; });
+      return { name: r, n: nn, avgR: d.sumR / nn, bands: bands };
+    });
+    regList.sort(function(a,b){ return b.avgR - a.avgR; }); // highest risk first
+
+    var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
+    var regHTML = '';
+    regList.forEach(function(rg, idx){
+      var bandBar = '';
+      ['Low','Medium','High','Critical'].forEach(function(b){
+        if (rg.bands[b] > 0) {
+          var w = (rg.bands[b] / rg.n * 100).toFixed(1);
+          bandBar += '<div style="width:' + w + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + rg.bands[b] + '"></div>';
+        }
+      });
+      var isIsland = islandRegions.indexOf(rg.name) >= 0;
+      var tag = isIsland ? ' <span style="font-size:10px;color:var(--sage)">\uD83C\uDFDD\uFE0F island</span>' : '';
+      regHTML += '<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;' +
+        (isIsland ? 'background:rgba(93,133,99,0.05);padding:4px 6px;border-radius:4px' : '') + '">' +
+        '<span style="min-width:18px;color:var(--warm-grey);font-size:10px">' + (idx+1) + '</span>' +
+        '<span style="min-width:180px;font-weight:500">' + rg.name + tag + '</span>' +
+        '<div style="flex:1;height:8px;border-radius:4px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+        '<span style="min-width:50px;text-align:right;font-family:Consolas,monospace;font-size:10px">' + rg.avgR.toFixed(3) + '</span>' +
+        '<span style="min-width:40px;text-align:right;font-size:10px;color:var(--warm-grey)">' + rg.n + ' subs</span></div>';
+    });
+    document.getElementById('eu-regional-ranking').innerHTML = regHTML;
+
+    // Ranking narrative
+    var worst = regList[0];
+    var best = regList[regList.length - 1];
+    var islandRegs = regList.filter(function(rg){ return islandRegions.indexOf(rg.name) >= 0; });
+    var islandAvg = islandRegs.length ? islandRegs.reduce(function(a,rg){ return a + rg.avgR; }, 0) / islandRegs.length : 0;
+    var mainlandAvg = regList.filter(function(rg){ return islandRegions.indexOf(rg.name) < 0; }).reduce(function(a,rg){ return a + rg.avgR * rg.n; }, 0) /
+      regList.filter(function(rg){ return islandRegions.indexOf(rg.name) < 0; }).reduce(function(a,rg){ return a + rg.n; }, 0);
+    document.getElementById('eu-ranking-narrative').innerHTML =
+      '<strong>' + worst.name + '</strong> leads the risk ranking with avg R = ' + worst.avgR.toFixed(3) +
+      ', while <strong>' + best.name + '</strong> has the lowest at ' + best.avgR.toFixed(3) + '. ' +
+      'Island periphereies average R = ' + islandAvg.toFixed(3) + ' vs mainland ' + mainlandAvg.toFixed(3) +
+      ' \u2014 a ' + ((islandAvg - mainlandAvg) / mainlandAvg * 100).toFixed(1) + '% premium reflecting ' +
+      'non-interconnection, fuel import dependence, and limited repair logistics. ' +
+      'The SAIDI chart shows Greece\'s national average (~72 min/customer/year) significantly above Northern European benchmarks, ' +
+      'with island/remote areas experiencing ~130 min \u2014 nearly double the mainland urban average of ~45 min.';
+  });
+})();
+</script>
 </section>
 
 <div style="margin:32px 0"></div>
