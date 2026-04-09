@@ -23,7 +23,7 @@
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
     <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
-    <p>A composite resilience score for 581 Greek substations — 71 EHV (≥300 kV), 410 HV (100–300 kV), 100 MV — 95 variables, 30 public data sources, zero proprietary dependencies.</p>
+    <p>A composite resilience score for 581 Greek substations — 71 HV (≥300 kV) · 410 MV (100–299 kV) · 100 LV (<100 kV) — 95 variables, 30 public data sources, zero proprietary dependencies.</p>
     <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
   </div>
 
@@ -48,7 +48,7 @@
     <div class="kpi-card animate-in delay-1">
       <div class="kpi-label">Substations Scored</div>
       <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
-      <div class="kpi-sub">71 EHV · 410 HV · 100 MV</div>
+      <div class="kpi-sub">71 HV · 410 MV · 100 LV</div>
     </div>
     <div class="kpi-card animate-in delay-2">
       <div class="kpi-label">Fleet Median R</div>
@@ -140,7 +140,7 @@
             <div><strong>8</strong> modifiers (R2–R8)</div>
             <div><strong>10,000</strong> Monte Carlo iterations</div>
             <div><strong>20×20</strong> correlation matrix</div>
-            <div><strong>74</strong> Regional Units covered</div>
+            <div><strong>13</strong> Periphereies covered</div>
             <div><strong>30</strong> verified data sources</div>
           </div>
           <div style="border-top:1px solid rgba(0,0,0,0.06);margin-top:10px;padding-top:10px">
@@ -159,7 +159,9 @@
         fetch('ssi-data.json?v=44').then(function(r){return r.json()}).then(function(data){
           var subs=data.substations,n=subs.length;
           var isArr=Array.isArray(subs[0]);
-          var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=100}).length,mv=n-hv;
+          var hvCount=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=300}).length;
+          var mvCount=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=100&&v<300}).length;
+          var lvCount=n-hvCount-mvCount;
           var mcIter=(data.meta&&data.meta.mc_iterations)||10000;
           var vars=(data.meta&&data.meta.variables)||95;
           var mc=n*mcIter;
@@ -168,7 +170,7 @@
           document.getElementById('scale-comp').textContent=fmt(comp);
           document.getElementById('scale-mc').textContent=fmt(mc);
           document.getElementById('scale-dp').textContent=fmt(dp);
-          document.getElementById('scale-subs').textContent=n.toLocaleString('en-US')+' substation risk scores \u00b7 '+hv.toLocaleString('en-US')+' EHV+HV \u00b7 '+mv.toLocaleString('en-US')+' MV';
+          document.getElementById('scale-subs').textContent=n.toLocaleString('en-US')+' substation risk scores \u00b7 '+hvCount+' HV \u00b7 '+mvCount+' MV \u00b7 '+lvCount+' LV';
           document.getElementById('scale-leaves').textContent=String(vars);
         });
       })();
@@ -311,9 +313,9 @@
       // ── Confidence bars ──
       var cp = ssi.fleet_summary.confidence_pct;
       var confDefs = [
-        { label: 'High', pct: cp.high, color: 'var(--sage)' },
-        { label: 'Medium', pct: cp.medium, color: 'var(--bronze)' },
-        { label: 'Low', pct: cp.low, color: 'var(--terracotta)' }
+        { label: 'High', pct: cp.high || 0, color: 'var(--sage)' },
+        { label: 'Medium', pct: cp.medium || 0, color: 'var(--bronze)' },
+        { label: 'Low', pct: cp.low || 0, color: 'var(--terracotta)' }
       ];
       var confHTML = confDefs.map(function(c) {
         return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">' +

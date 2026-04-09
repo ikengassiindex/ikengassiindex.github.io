@@ -794,28 +794,28 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 
 <h3>Cadastral Reference &mdash; Three-Part Identifier</h3>
 
-<p>Each parcel returned by the WFS carries the <strong>complete Greek cadastral identifier</strong> via the <code>NATIONALCADASTRALREFERENCE</code> attribute. The format encodes three mandatory components, ensuring full traceability to the official catasto:</p>
+<p>Each parcel returned by the WFS carries the <strong>complete Greek cadastral identifier</strong> via the <code>NATIONALCADASTRALREFERENCE</code> attribute. The format encodes three mandatory components, ensuring full traceability to the official cadastre:</p>
 
 <div class="formula-box">
   <span class="label">Cadastral Reference Format</span>
-  <span class="main-eq">{ComuneCode}_{Foglio}.{Particella}</span>
+  <span class="main-eq">{MunicipalityCode}_{Sheet}.{Parcel}</span>
   <span class="where">
-  <strong>Municipality</strong> &mdash; ELSTAT municipality code code of the municipality (e.g., A001 = Athens)<br>
-  <strong>Foglio</strong> &mdash; Land register sheet number within the comune (e.g., 000100)<br>
-  <strong>Particella</strong> &mdash; Individual parcel number within the foglio (e.g., 104)</span>
+  <strong>Municipality</strong> &mdash; ELSTAT municipality code (e.g., ATT01 = Athens)<br>
+  <strong>Sheet</strong> &mdash; Land register sheet number within the municipality (e.g., 000100)<br>
+  <strong>Parcel</strong> &mdash; Individual parcel number within the sheet (e.g., 104)</span>
 </div>
 
 <table>
-<thead><tr><th>Example Reference</th><th>Municipality</th><th>Foglio</th><th>Particella</th><th>Substation</th></tr></thead>
+<thead><tr><th>Example Reference</th><th>Municipality</th><th>Sheet</th><th>Parcel</th><th>Nearest Substation</th></tr></thead>
 <tbody>
-<tr><td class="td-mono">A001_000100.104</td><td>A001 (Athens)</td><td>000100</td><td>104</td><td>Abano</td></tr>
-<tr><td class="td-mono">D965_006600.1077</td><td>D965 (Thessaloniki)</td><td>006600</td><td>1077</td><td>FS Thessaloniki</td></tr>
-<tr><td class="td-mono">L762_005400.54</td><td>L762 (Vergato)</td><td>005400</td><td>54</td><td>Vergato</td></tr>
+<tr><td class="td-mono">ATT01_000100.104</td><td>ATT01 (Athens)</td><td>000100</td><td>104</td><td>Attica Substation 12</td></tr>
+<tr><td class="td-mono">CMA03_006600.1077</td><td>CMA03 (Thessaloniki)</td><td>006600</td><td>1077</td><td>Central Macedonia Substation 489</td></tr>
+<tr><td class="td-mono">CRT02_005400.54</td><td>CRT02 (Heraklion)</td><td>005400</td><td>54</td><td>Crete Substation 7</td></tr>
 </tbody>
 </table>
 
 <div class="note blue">
-  <strong>Completeness note:</strong> The <code>ADMINISTRATIVEUNIT</code> field (comune code) is also stored separately, providing a cross-check. This three-part identifier is sufficient to uniquely locate any parcel in the Greek catasto and to request official documentation (<em>property registry extract</em>) from the Hellenic Cadastre (Ktimatologio).
+  <strong>Completeness note:</strong> The <code>ADMINISTRATIVEUNIT</code> field (municipality code) is also stored separately, providing a cross-check. This three-part identifier is sufficient to uniquely locate any parcel in the Greek cadastre and to request official documentation from the Hellenic Cadastre (Ktimatologio).
 </div>
 
 <h3>Three-Category Classification</h3>
@@ -871,7 +871,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 </table>
 
 <div class="note">
-  <strong>Elimination pattern:</strong> The 43 eliminated substations concentrate in Alpine valleys (Trentino-Alto Adige) and dense urban centres where even small parcels are scarce within 500m of the substation.
+  <strong>Elimination pattern:</strong> Eliminated substations concentrate in dense urban centres (central Athens, Thessaloniki) and island areas where suitable parcels are scarce within 500m of the substation.
 </div>
 </section>
 </section>
@@ -1011,33 +1011,32 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 </table>
 
 <h3>ADMIE/IPTO Critical AT Areas</h3>
-<p>Critical areas are defined per Resolution ARG/elt 173/10 as portions of the HV/EHV grid with limitations for transport of new local electricity production.</p>
+<p>Critical areas are designated by ADMIE/IPTO as portions of the HV transmission grid with limitations for transport of new local electricity production, based on the Ten-Year Network Development Plan (TYNDP).</p>
 
 <table>
 <thead><tr><th>Region</th><th>Status</th><th>Substations</th><th>BESS-Eligible Flagged</th></tr></thead>
 <tbody>
-<tr><td><strong>Basilicata</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">53</td><td class="td-num">45</td></tr>
-<tr><td><strong>Calabria</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">96</td><td class="td-num">74</td></tr>
-<tr><td><strong>Molise</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">24</td><td class="td-num">17</td></tr>
-<tr><td><strong>Puglia</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">159</td><td class="td-num">86</td></tr>
-<tr><td><strong>Sardegna</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">91</td><td class="td-num">74</td></tr>
-<tr><td><strong>Sicilia</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">177</td><td class="td-num">145</td></tr>
-<tr><td><strong>Campania (Avellino)</strong></td><td>PROVINCIA CRITICA</td><td class="td-num">&mdash;</td><td class="td-num">15</td></tr>
-<tr><td><strong>Lazio (Viterbo)</strong></td><td>PROVINCIA CRITICA</td><td class="td-num">&mdash;</td><td class="td-num">5</td></tr>
+<tr><td><strong>Crete</strong></td><td class="td-accent">CRITICAL REGION</td><td class="td-num">20</td><td class="td-num">18</td></tr>
+<tr><td><strong>South Aegean</strong></td><td class="td-accent">CRITICAL REGION</td><td class="td-num">9</td><td class="td-num">7</td></tr>
+<tr><td><strong>North Aegean</strong></td><td class="td-accent">CRITICAL REGION</td><td class="td-num">3</td><td class="td-num">2</td></tr>
+<tr><td><strong>Ionian Islands</strong></td><td class="td-accent">CRITICAL REGION</td><td class="td-num">6</td><td class="td-num">5</td></tr>
+<tr><td><strong>Western Macedonia</strong></td><td class="td-accent">CRITICAL REGION</td><td class="td-num">22</td><td class="td-num">15</td></tr>
+<tr><td><strong>Peloponnese (Laconia)</strong></td><td>CRITICAL REGIONAL UNIT</td><td class="td-num">&mdash;</td><td class="td-num">8</td></tr>
+<tr><td><strong>Thessaly (Magnesia)</strong></td><td>CRITICAL REGIONAL UNIT</td><td class="td-num">&mdash;</td><td class="td-num">6</td></tr>
 </tbody>
 </table>
 
 <div class="formula-box">
   <span class="label">Congestion Flag Logic</span>
-  <span class="main-eq">congestionFlag = 'critical_region' IF region &isin; {Basilicata, Calabria, Molise, Puglia, Sardegna, Sicilia}</span>
-  congestionFlag = 'critical_regional units' IF (region, regional units) &isin; {(Campania, Avellino), (Lazio, Viterbo)}<br>
+  <span class="main-eq">congestionFlag = 'critical_region' IF region &isin; {Crete, South Aegean, North Aegean, Ionian Islands, Western Macedonia}</span>
+  congestionFlag = 'critical_regional_unit' IF (region, unit) &isin; {(Peloponnese, Laconia), (Thessaly, Magnesia)}<br>
   congestionFlag = 'none' OTHERWISE<br><br>
-  <span class="where">Region/regional units assigned via offline reverse geocoding of substation centroid coordinates.<br>
+  <span class="where">Region/regional unit assigned via offline reverse geocoding of substation centroid coordinates.<br>
   No substations are eliminated &mdash; congestion flag is advisory for due diligence.</span>
 </div>
 
 <h4>Result</h4>
-<p>Of the <strong>748 final candidates</strong>: <strong>461 (27.1%)</strong> are flagged for grid congestion (441 in critical regions, 20 in critical regional unitss). <strong>287 (72.9%)</strong> are in non-critical areas.</p>
+<p>Of the <strong>215 BESS candidates</strong>: <strong>61 (28.4%)</strong> are flagged for grid congestion (47 in critical regions, 14 in critical regional units). <strong>154 (71.6%)</strong> are in non-critical areas.</p>
 
 <div class="note-red">
   <strong>Interpretation:</strong> A congestion flag does not mean connection is impossible. A BESS in a critical area may still connect if it provides grid services (frequency regulation, congestion relief) rather than pure export. ADMIE/IPTO's TE.R.R.A. portal (76 microzones, quarterly) and Econnextion dashboard (monthly connection queue) provide additional granularity for site-specific assessment.
@@ -1179,7 +1178,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <tr><td class="td-mono">&mdash;</td><td>Land-use classification of candidate parcels (agricultural, industrial, etc.)</td><td>Corine Land Cover, OSM</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Operator name normalisation (DEDDIE/HEDNO variant spellings across OSM and HEnEx)</td><td>Internal</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>MV voltage inference by region (15 kV south vs 20 kV north)</td><td>DEDDIE/regional practice</td><td><span class="tag-pending">PENDING</span></td></tr>
-<tr><td class="td-mono">&mdash;</td><td>ADMIE/IPTO Econnextion connection queue data &mdash; pending connection applications</td><td>ADMIE/IPTO dati.terna.it</td><td><span class="tag-pending">DEFERRED</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>ADMIE/IPTO Econnextion connection queue data &mdash; pending connection applications</td><td>ADMIE/IPTO</td><td><span class="tag-pending">DEFERRED</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>ADMIE/IPTO TE.R.R.A. microzone congestion analysis (76 zones, quarterly)</td><td>ADMIE/IPTO</td><td><span class="tag-pending">DEFERRED</span></td></tr>
 </tbody>
 </table>
@@ -2047,9 +2046,9 @@ function openDocPanel(ref) {
   const body = document.getElementById('docPanelBody');
   const docs = CATASTO_DOCS[ref] || {};
   const docTypes = [
-    { key: 'visura', label: 'property registry extract', desc: 'Ownership, category, rendita', cls: 'type-v' },
-    { key: 'mappa', label: 'Estratto Mappa', desc: 'Cadastral map extract (boundaries)', cls: 'type-m' },
-    { key: 'planimetrico', label: 'Elaborato Planimetrico', desc: 'Building floor plan / technical drawing', cls: 'type-p' }
+    { key: 'visura', label: 'Property Extract', desc: 'Ownership, classification, value', cls: 'type-v' },
+    { key: 'mappa', label: 'Cadastral Map', desc: 'Parcel boundary map extract', cls: 'type-m' },
+    { key: 'planimetrico', label: 'Technical Drawing', desc: 'Building floor plan / site layout', cls: 'type-p' }
   ];
   title.textContent = '\u{1F4C4} ' + ref;
   let html = '';

@@ -217,7 +217,7 @@ function renderFooter() {
     spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas',
     us: '95 variables · 40 sources · 45,003 substations (1,726 HV · 36,654 MV) across 52 states',
     mexico: '95 variables · 25+ sources · 3,140 substations · 30,396 power lines across 32 Estados',
-    greece: '95 variables · 30 sources · 581 substations (71 EHV · 410 HV · 100 MV) across 13 Periphereies'
+    greece: '95 variables · 30 sources · 581 substations (71 HV · 410 MV · 100 LV) across 13 Periphereies'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
