@@ -152,7 +152,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // Basic info
     document.getElementById('focus-name').textContent = s.name;
-    document.getElementById('focus-location').textContent = s.region + ' · ' + s.voltage_kv + ' kV';
+    document.getElementById('focus-location').textContent = s.province + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
     document.getElementById('focus-r').textContent = s.R_median.toFixed(3);
     document.getElementById('focus-band').textContent = s.classification;
     document.getElementById('focus-ci').textContent = s.CI_width.toFixed(3);
@@ -267,7 +267,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var d = new Date();
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
-      ' — is <strong>' + s.name + '</strong> in ' + s.region +
+      ' — is <strong>' + s.name + '</strong> in ' + s.province + ', ' + s.region +
       '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
       (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
       top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
@@ -1396,18 +1396,26 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <!-- ═══════════════════ F. SSI ENHANCED NEURAL NETWORK ═══════════════════ -->
 <section id="enn" style="margin-bottom:32px">
-<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F — Topic Rotation</span>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F — Recurring Module</span>
 <h2>SSI Enhanced Neural Network — Monthly Topic</h2>
 
-<div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-bottom:16px">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>ENN Framework:</strong> The SSI Enhanced Neural Network is a monthly feature that rotates through 5 deep technical topics — each anchored in live SSI data and designed to deepen practitioner understanding of the Index's methodology. Editions are sequenced by publishing calendar; topics repeat on a 5-month cycle.</p>
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to actionable risk analytics.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What are the compound risk drivers at this substation — and where should intervention be prioritised?"</em> Each edition explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
 </div>
 
-<div id="enn-topic" style="margin:16px 0">Loading this month's ENN topic…</div>
+<!-- Architecture overview — always visible -->
+<div style="display:flex;gap:6px;margin:16px 0;flex-wrap:wrap" id="enn-layer-nav"></div>
 
-<div id="enn-data-link" style="margin:16px 0">Loading live data connection…</div>
+<!-- Topic content — auto-populated -->
+<div id="enn-topic" style="margin:16px 0">Loading this month's topic…</div>
 
-<div id="enn-next" style="margin:16px 0;padding:12px;background:rgba(184,134,58,0.06);border-left:3px solid var(--bronze);font-size:12px">Loading next topic preview…</div>
+<!-- SSI data connection — auto-populated -->
+<div id="enn-data-link" style="margin:16px 0"></div>
+
+<!-- Coming next -->
+<div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-top:16px" id="enn-next">
+  <p style="font-size:13px;line-height:1.7;margin:0">Loading next month's preview…</p>
+</div>
 
 <script>
 (function(){
@@ -1459,6 +1467,18 @@ document.addEventListener("ssi-config-ready", function(e) {
   var currentTopic = layerDefs[baseTopicIdx];
   var nextTopic = layerDefs[(baseTopicIdx + 1) % 5];
   var layerColor = currentTopic.color;
+
+  // Layer navigation tabs
+  var navHTML = '';
+  layerDefs.forEach(function(ld, idx){
+    var isCurrent = idx === baseTopicIdx;
+    navHTML += '<div style="padding:6px 14px;border-radius:4px;font-size:11px;font-weight:600;cursor:default;' +
+      'background:' + (isCurrent ? ld.color : 'var(--cream-deep)') + ';' +
+      'color:' + (isCurrent ? '#fff' : 'var(--warm-grey)') + ';' +
+      'border:1px solid ' + (isCurrent ? 'transparent' : 'var(--card-border)') + '">' +
+      'L' + ld.n + '</div>';
+  });
+  document.getElementById('enn-layer-nav').innerHTML = navHTML;
 
   var conceptsHTML = '';
   if (currentTopic.n === 1) {
