@@ -1,514 +1,708 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="DNO Dashboard — Compare ADMIE and DEDDIE grid operator risk profiles across 581 Greek substations.">
-  <title>SSI Index — Grid Operator Dashboard</title>
-  <link rel="stylesheet" href="../style.css?v=3">
-  <style>
-    :root {
-      --cream: #faf6f5;
-      --cream-deep: #f0ebe8;
-      --crimson: #941914;
-      --terracotta: #aa4234;
-      --sage: #5d8563;
-      --bronze: #b8863a;
-      --ink: #2c2420;
-      --warm-grey: #8a7e76;
-      --warm-grey-light: #b5aca5;
-      --bg: #f5f0ed;
-      --card-bg: #ffffff;
-      --card-border: rgba(44,36,32,0.08);
-      --card-shadow: 0 1px 4px rgba(44,36,32,0.06);
-      --card-shadow-hover: 0 4px 16px rgba(44,36,32,0.10);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNO Greece — BESS Site Assessment Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a26; }
+.header { background:#1a1714; color:#f8f7f4; padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+.header h1 { font-size:1.1rem; font-weight:600; letter-spacing:-0.01em; }
+.header .brand { font-size:0.75rem; color:#a0937d; text-transform:uppercase; letter-spacing:0.08em; }
+.header .version { font-size:0.7rem; color:#6b6358; margin-left:0.5rem; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+.funnel-bar { display:flex; gap:0; background:#fff; border-bottom:1px solid #e5e0d8; overflow-x:auto; }
+.funnel-step { flex:1; min-width:140px; padding:0.6rem 0.8rem; text-align:center; border-right:1px solid #e5e0d8; cursor:pointer; transition:all 0.2s; position:relative; }
+.funnel-step:hover { background:#faf8f5; }
+.funnel-step.active { background:#f5f0e8; border-bottom:3px solid #a0522d; }
+.funnel-step.pending { opacity:0.55; border-right:1px dashed #ccc; cursor:default; background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,0.02) 4px,rgba(0,0,0,0.02) 8px); }
+.funnel-step.pending .step-count { color:#b0a898; }
+.funnel-step.pending .step-name { color:#b0a898; font-style:italic; }
+.funnel-step.pending .step-label { color:#b0a898; }
+.funnel-step .step-label { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.06em; color:#8b8075; }
+.funnel-step .step-count { font-size:1.3rem; font-weight:700; color:#2d2a26; margin:0.15rem 0; }
+.funnel-step .step-pct { font-size:0.65rem; color:#a0937d; }
+.funnel-step .step-name { font-size:0.7rem; color:#5a5349; margin-top:0.1rem; }
 
-    body {
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg); color: var(--ink);
-      font-size: 14px; line-height: 1.6;
-    }
+.main-layout { display:flex; width:100%; height:calc(100vh - 140px); }
+.sidebar { width:320px; background:#fff; border-right:1px solid #e5e0d8; overflow-y:auto; flex-shrink:0; }
+.sidebar-section { padding:1rem; border-bottom:1px solid #e5e0d8; }
+.sidebar-section h3 { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:#8b8075; margin-bottom:0.6rem; }
 
-    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; }
-    h1 { font-size: 28px; line-height: 1.2; }
-    h2 { font-size: 22px; line-height: 1.3; margin-bottom: 16px; }
-    h3 { font-size: 17px; line-height: 1.4; margin-bottom: 12px; }
+.filter-group { margin-bottom:0.6rem; }
+.filter-group label { font-size:0.72rem; color:#5a5349; display:block; margin-bottom:0.2rem; }
+.filter-group select, .filter-group input { width:100%; padding:0.35rem 0.5rem; border:1px solid #d4cfc7; border-radius:4px; font-size:0.78rem; font-family:inherit; background:#fff; }
 
-    .label-xs { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--warm-grey); font-weight: 500; }
-    .label-sm { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; }
+.stat-row { display:flex; justify-content:space-between; padding:0.3rem 0; font-size:0.78rem; }
+.stat-row .label { color:#6b6358; }
+.stat-row .value { font-weight:600; }
+.stat-row .value.good { color:#27ae60; }
+.stat-row .value.warn { color:#e67e22; }
+.stat-row .value.bad { color:#c0392b; }
 
-    .page-shell { max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
-    .page-header { margin-bottom: 32px; }
-    .page-header h1 { margin-bottom: 6px; }
-    .page-header p { color: var(--warm-grey); font-size: 14px; max-width: 700px; }
+.legend-item { display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; padding:0.2rem 0; }
+.legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; border:2px solid rgba(0,0,0,0.15); }
 
-    .card {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 10px; padding: 20px 24px;
-      box-shadow: var(--card-shadow); transition: box-shadow 0.2s;
-    }
-    .card:hover { box-shadow: var(--card-shadow-hover); }
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
-    .card-header h3 { font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; margin: 0; }
+.map-area { flex:1; position:relative; }
+#map { width:100%; height:100%; }
 
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .kpi-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 20px; box-shadow: var(--card-shadow); }
-    .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; margin-bottom: 6px; }
-    .kpi-card .kpi-value { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
-    .kpi-card .kpi-sub { font-size: 12px; color: var(--warm-grey); }
+.info-popup { max-width:280px; }
+.info-popup h4 { font-size:0.85rem; margin-bottom:0.4rem; color:#2d2a26; }
+.info-popup .row { display:flex; justify-content:space-between; font-size:0.72rem; padding:0.15rem 0; border-bottom:1px solid #f0ece5; }
+.info-popup .row:last-child { border:none; }
+.info-popup .row .k { color:#8b8075; }
+.info-popup .row .v { font-weight:500; color:#2d2a26; text-align:right; max-width:160px; }
+.info-popup .badge { display:inline-block; padding:0.1rem 0.4rem; border-radius:3px; font-size:0.65rem; font-weight:600; }
+.badge-pass { background:#d4edda; color:#155724; }
+.badge-fail { background:#f8d7da; color:#721c24; }
+.badge-warn { background:#fff3cd; color:#856404; }
+.badge-flag { background:#e8d4f0; color:#5b2d7a; }
 
-    .band-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-    .band-badge.low { background: rgba(93,133,99,0.10); color: var(--sage); }
-    .band-badge.medium { background: rgba(184,134,58,0.10); color: var(--bronze); }
-    .band-badge.high { background: rgba(170,66,52,0.10); color: var(--terracotta); }
-    .band-badge.critical { background: rgba(148,25,20,0.10); color: var(--crimson); }
-    .band-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-    .band-dot.low { background: var(--sage); }
-    .band-dot.medium { background: var(--bronze); }
-    .band-dot.high { background: var(--terracotta); }
-    .band-dot.critical { background: var(--crimson); }
+.region-bar { display:flex; align-items:center; gap:0.4rem; font-size:0.72rem; margin-bottom:0.3rem; }
+.region-bar .bar-bg { flex:1; height:8px; background:#eae5dc; border-radius:4px; overflow:hidden; }
+.region-bar .bar-fill { height:100%; border-radius:4px; }
+.region-bar .name { width:70px; text-align:right; color:#5a5349; font-size:0.65rem; }
+.region-bar .count { width:30px; font-weight:600; font-size:0.65rem; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.cluster-icon { background:rgba(160,82,45,0.15); border:2px solid rgba(160,82,45,0.5); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Inter',sans-serif; font-weight:600; font-size:0.75rem; color:#a0522d; }
 
-    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .data-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-grey); font-weight: 500; padding: 10px 12px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); }
-    .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(44,36,32,0.04); vertical-align: top; }
-    .data-table tr:hover td { background: rgba(44,36,32,0.02); }
-    .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+@media (max-width: 900px) { .sidebar { width:260px; } }
+@media (max-width: 700px) { .main-layout { flex-direction:column; } .sidebar { width:100%; max-height:40vh; } }
 
-    .section-block { margin-bottom: 40px; }
-    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--cream-deep); }
-    .section-number { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--cream-deep); line-height: 1; }
-    .section-title-group { flex: 1; }
-    .section-title-group h2 { margin-bottom: 2px; }
-    .section-title-group .section-sub { font-size: 13px; color: var(--warm-grey); }
+/* ── View switching ── */
+.view { display:none; }
+.view.active { display:block; }
+.view-dashboard.active { display:flex; height:calc(100vh - 140px); }
 
-    .operator-card { background: var(--card-bg); border-left: 4px solid; padding: 20px 24px; border-radius: 6px; margin-bottom: 16px; }
-    .operator-card.admie { border-left-color: var(--terracotta); }
-    .operator-card.deddie { border-left-color: var(--sage); }
-    .operator-card h3 { margin-bottom: 12px; }
-    .operator-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-    .stat-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--cream-deep); }
-    .stat-item:last-child { border-bottom: none; }
-    .stat-label { color: var(--warm-grey); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
-    .stat-value { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-top: 2px; }
+/* ── Nav buttons ── */
+.nav-btns { display:flex; gap:0.5rem; margin-left:1.5rem; }
+.nav-btn { background:rgba(255,255,255,0.1); color:#f8f7f4; border:1px solid rgba(255,255,255,0.2); padding:0.3rem 0.9rem; border-radius:4px; font-size:0.75rem; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+.nav-btn:hover { background:rgba(255,255,255,0.2); }
+.nav-btn.active { background:#a0522d; border-color:#a0522d; }
+.nav-back { background:none; border:none; color:#f8f7f4; cursor:pointer; font-size:0.8rem; font-family:inherit; padding:0.3rem 0; }
+.nav-back:hover { color:#d4a574; }
+.header-detail-info { display:none; align-items:center; gap:1rem; }
+.header-detail-info.visible { display:flex; }
+.header-nav-main { display:flex; align-items:center; gap:0; }
+.header-nav-main.hidden { display:none; }
 
-    .region-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 8px; }
-    .region-bar-bg { flex: 1; height: 12px; background: var(--cream-deep); border-radius: 6px; overflow: hidden; position: relative; }
-    .region-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
-    .region-name { width: 140px; font-weight: 500; color: var(--ink); }
-    .region-count { width: 45px; text-align: right; font-variant-numeric: tabular-nums; }
-    .region-pct { width: 50px; text-align: right; color: var(--warm-grey); font-size: 12px; }
+/* ── Methodology page ── */
+.meth-container { display:flex; height:calc(100vh - 60px); overflow:hidden; }
+.meth-toc { width:280px; background:#fff; border-right:1px solid #e5e0d8; overflow-y:auto; padding:1rem; flex-shrink:0; }
+.meth-toc h3 { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:#8b8075; margin-bottom:0.6rem; }
+.meth-toc-list { list-style:none; padding:0; }
+.meth-toc-list li { margin-bottom:0.3rem; }
+.meth-toc-list a { color:#5a5349; font-size:0.73rem; text-decoration:none; display:block; padding:0.2rem 0.4rem; border-radius:3px; }
+.meth-toc-list a:hover { background:#f5f0e8; color:#a0522d; }
+.meth-content { flex:1; overflow-y:auto; padding:2rem 3rem; background:#faf8f5; }
+.meth-content h1 { font-size:1.5rem; color:#2d2a26; margin:1.5rem 0 0.8rem; border-bottom:2px solid #e5e0d8; padding-bottom:0.4rem; }
+.meth-content h2 { font-size:1.15rem; color:#2d2a26; margin:1.2rem 0 0.6rem; }
+.meth-content h3 { font-size:1rem; color:#a0522d; margin:1.5rem 0 0.6rem; border-bottom:1px solid #e5e0d8; padding-bottom:0.3rem; }
+.meth-content h4 { font-size:0.88rem; color:#5a5349; margin:1rem 0 0.4rem; font-weight:600; }
+.meth-content p { font-size:0.82rem; line-height:1.6; margin-bottom:0.6rem; color:#3d3a36; }
+.meth-content ul, .meth-content ol { font-size:0.82rem; margin:0.4rem 0 0.8rem 1.5rem; line-height:1.6; }
+.meth-content table { border-collapse:collapse; width:100%; margin:0.8rem 0; font-size:0.78rem; }
+.meth-content th { background:#2d2a26; color:#fff; padding:0.5rem 0.8rem; text-align:left; font-weight:600; }
+.meth-content td { padding:0.4rem 0.8rem; border-bottom:1px solid #e5e0d8; }
+.meth-content tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.meth-content code { background:#eae5dc; padding:0.1rem 0.3rem; border-radius:3px; font-size:0.78rem; }
+.meth-content pre { background:#2d2a26; color:#e8e0d4; padding:1rem; border-radius:6px; overflow-x:auto; margin:0.8rem 0; font-size:0.75rem; }
+.meth-content pre code { background:none; padding:0; color:inherit; }
+.meth-content hr { border:none; border-top:1px solid #e5e0d8; margin:1.5rem 0; }
+.meth-content strong { color:#2d2a26; }
+.meth-content img { max-width:100%; }
 
-    .top-risks-list { list-style: none; }
-    .top-risks-list li { padding: 10px 0; border-bottom: 1px solid var(--cream-deep); display: flex; align-items: center; gap: 12px; }
-    .top-risks-list li:last-child { border-bottom: none; }
-    .risk-rank { width: 28px; height: 28px; background: var(--cream-deep); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--ink); font-size: 12px; flex-shrink: 0; }
-    .risk-info { flex: 1; }
-    .risk-name { font-weight: 500; color: var(--ink); }
-    .risk-details { font-size: 12px; color: var(--warm-grey); margin-top: 2px; }
+/* ── Details page ── */
+.detail-container { height:calc(100vh - 60px); display:flex; flex-direction:column; overflow:hidden; }
+.detail-top { display:flex; flex:1; min-height:0; }
+#detailMap { flex:1; min-width:0; }
+.detail-checklist { width:300px; background:#fff; border-left:1px solid #e5e0d8; overflow-y:auto; padding:1rem; flex-shrink:0; }
+.detail-checklist h3 { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:#8b8075; margin-bottom:0.6rem; }
+.check-item { display:flex; align-items:flex-start; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid #f0ece5; font-size:0.78rem; }
+.check-item .icon { font-size:0.9rem; flex-shrink:0; margin-top:0.05rem; }
+.check-item .label { color:#5a5349; flex:1; }
+.check-item .val { font-weight:600; color:#2d2a26; text-align:right; font-size:0.72rem; }
+.check-item.pass .icon { color:#27ae60; }
+.check-item.fail .icon { color:#c0392b; }
+.check-item.pass { background:rgba(39,174,96,0.04); }
+.check-item.fail { background:rgba(192,57,43,0.04); }
 
-    .page-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--card-border); color: var(--warm-grey); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.detail-info { padding:0.6rem 1rem; background:#fff; border-top:1px solid #e5e0d8; display:flex; gap:2rem; font-size:0.78rem; flex-shrink:0; }
+.detail-info .di-item { display:flex; gap:0.3rem; }
+.detail-info .di-label { color:#8b8075; }
+.detail-info .di-value { font-weight:600; color:#2d2a26; }
 
-    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-    @media (max-width: 768px) { .page-shell { padding: 20px 16px 48px; } }
-    @media (max-width: 480px) { .kpi-card .kpi-value { font-size: 26px; } .kpi-card { padding: 14px 16px; } .card { padding: 16px; } }
-  </style>
+.detail-bottom { max-height:35vh; overflow-y:auto; border-top:2px solid #e5e0d8; background:#fff; flex-shrink:0; }
+.parcel-table { width:100%; border-collapse:collapse; font-size:0.75rem; }
+.parcel-table th { background:#2d2a26; color:#fff; padding:0.4rem 0.6rem; text-align:left; font-weight:600; position:sticky; top:0; z-index:1; cursor:pointer; }
+.parcel-table th:hover { background:#3d3a36; }
+.parcel-table td { padding:0.35rem 0.6rem; border-bottom:1px solid #f0ece5; }
+.parcel-table tr:hover { background:#faf5ee; }
+.parcel-table tr.pass-row { }
+.parcel-table tr.fail-row { color:#999; }
+.parcel-table tr.best-row { background:#e8f5e9; font-weight:500; }
+.parcel-table .badge-sm { display:inline-block; padding:0.05rem 0.3rem; border-radius:2px; font-size:0.65rem; font-weight:600; }
+.route-loading { text-align:center; padding:0.5rem; color:#8b8075; font-size:0.75rem; }
+
+/* ── Methodology v2 Scoped Styles ── */
+#view-methodology {
+  --ink: #1a1a2e;
+  --paper: #faf9f6;
+  --accent: #a0522d;
+  --accent2: #2c3e7a;
+  --accent3: #1a6b4a;
+  --accent4: #d4740e;
+  --muted: #6b7280;
+  --border: #d1cfc9;
+  --code-bg: #f0ede6;
+  --highlight: #fff8e1;
+  --tag-bg: #e8e6df;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+  --sans: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --teal: #0e7490;
+  --red: #c0392b;
+  --purple: #8e44ad;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+#view-methodology { font-size: 16px; scroll-behavior: smooth; }
+#view-methodology { font-family: var(--serif); color: var(--ink); background: var(--paper); line-height: 1.72; -webkit-font-smoothing: antialiased; }
+#view-methodology .page { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+/* HEADER */
+#view-methodology .header { text-align: center; padding: 3.5rem 0 2.5rem; border-bottom: 3px double var(--border); margin-bottom: 3rem; }
+#view-methodology .header .tag { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); background: rgba(160,82,45,0.08); padding: 0.3em 1em; border-radius: 2px; margin-bottom: 1rem; }
+#view-methodology .header h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0.5rem 0; }
+#view-methodology .header .subtitle { font-size: 1.1rem; color: var(--muted); font-weight: 300; font-style: italic; margin-top: 0.5rem; }
+#view-methodology .meta-row { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; font-family: var(--sans); font-size: 0.78rem; color: var(--muted); flex-wrap: wrap; }
+
+/* TOC */
+#view-methodology .toc { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 1.8rem 2.2rem; margin-bottom: 3rem; }
+#view-methodology .toc h3 { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.8rem; }
+#view-methodology .toc ol { columns: 2; column-gap: 2rem; padding-left: 1.2rem; font-size: 0.92rem; }
+#view-methodology .toc li { margin-bottom: 0.35rem; break-inside: avoid; }
+#view-methodology .toc a { color: var(--accent2); text-decoration: none; }
+#view-methodology .toc a:hover { text-decoration: underline; }
+
+/* SECTIONS */
+#view-methodology .section { margin-bottom: 3.5rem; }
+#view-methodology .section-num { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--accent); display: block; margin-bottom: 0.3rem; }
+#view-methodology h2 { font-size: 1.65rem; font-weight: 700; line-height: 1.25; margin-bottom: 1.2rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+#view-methodology h3 { font-size: 1.15rem; font-weight: 600; margin: 1.8rem 0 0.8rem; color: var(--accent2); }
+#view-methodology h4 { font-family: var(--sans); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 1.5rem 0 0.6rem; }
+#view-methodology p { margin-bottom: 1rem; }
+
+/* FORMULA BOXES */
+#view-methodology .formula-box { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 0 4px 4px 0; padding: 1.5rem 2rem; margin: 1.5rem 0; font-family: var(--mono); font-size: 0.85rem; line-height: 1.9; overflow-x: auto; }
+#view-methodology .formula-box .main-eq { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-bottom: 0.8rem; display: block; }
+#view-methodology .formula-box .where { color: var(--muted); font-size: 0.78rem; }
+#view-methodology .formula-box .label { font-family: var(--sans); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); display: block; margin-bottom: 0.5rem; }
+
+/* TABLES */
+#view-methodology table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 1.2rem 0 1.5rem; }
+#view-methodology thead { background: var(--ink); color: #fff; }
+#view-methodology thead th { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.7rem 0.8rem; text-align: left; font-weight: 600; }
+#view-methodology tbody td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+#view-methodology tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+#view-methodology .td-mono { font-family: var(--mono); font-size: 0.82rem; }
+#view-methodology .td-num { text-align: right; font-family: var(--mono); font-weight: 500; }
+#view-methodology .td-accent { color: var(--accent); font-weight: 600; }
+#view-methodology .td-green { color: var(--accent3); font-weight: 600; }
+
+/* NOTE BOXES */
+#view-methodology .note { background: rgba(200,200,200,0.1); border-left: 4px solid #999; border-radius: 0 4px 4px 0; padding: 1rem 1.5rem; margin: 1.5rem 0; font-size: 0.92rem; }
+#view-methodology .note-blue { background: rgba(46,62,122,0.08); border-left-color: var(--accent2); }
+#view-methodology .note-green { background: rgba(26,107,74,0.08); border-left-color: var(--accent3); }
+#view-methodology .note-red { background: rgba(192,57,43,0.08); border-left-color: var(--red); }
+#view-methodology .note strong { color: var(--ink); }
+
+/* FILTER CARDS */
+#view-methodology .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+#view-methodology .filter-card { border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; background: #fff; }
+#view-methodology .filter-card.pass { border-left: 4px solid var(--accent3); }
+#view-methodology .filter-card.fail { border-left: 4px solid var(--red); }
+#view-methodology .step-num { font-family: var(--sans); font-size: 0.75rem; font-weight: 600; color: var(--accent2); text-transform: uppercase; margin-bottom: 0.3rem; }
+#view-methodology .step-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+#view-methodology .step-desc { font-size: 0.88rem; color: #666; line-height: 1.6; margin-bottom: 0.8rem; }
+#view-methodology .step-result { font-size: 0.85rem; font-weight: 600; }
+
+/* BAR CHARTS */
+#view-methodology .bar-chart { margin: 1.5rem 0; }
+#view-methodology .bar-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; }
+#view-methodology .bar-label { width: 60px; font-family: var(--mono); font-size: 0.78rem; font-weight: 600; }
+#view-methodology .bar-track { flex: 1; height: 28px; background: #eee; border-radius: 4px; overflow: hidden; position: relative; }
+#view-methodology .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5rem; font-size: 0.75rem; font-weight: 600; color: #fff; }
+
+/* LOADING & STATUS */
+.loading-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #f3f3f3; border-top: 2px solid #a0522d; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=118"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
-<script>renderNav('dno');</script>
 
-<div class="page-shell">
-
-  <!-- ── Header ── -->
-  <div class="page-header">
-    <div class="label-xs" style="margin-bottom:6px;">GREECE GRID OPERATORS — 2026 SUSTAINABILITY INDEX</div>
-    <h1>DNO Dashboard: ADMIE vs DEDDIE</h1>
-    <p>Operator-level risk assessment across Greece's transmission (ADMIE/IPTO) and distribution (DEDDIE/HEDNO) networks. Compare fleet composition, regional exposure, and investment priorities across 581 substations.</p>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-nav-main" id="headerNavMain">
+    <h1>DNO Greece — BESS Site Assessment Dashboard</h1>
+    <span class="brand">ADMIE/IPTO & DEDDIE/HEDNO</span>
   </div>
+  <div class="nav-btns">
+    <button class="nav-btn" id="btn-dashboard">Map</button>
+    <button class="nav-btn" id="btn-methodology">Methodology</button>
+  </div>
+</div>
 
-  <!-- ── Fleet Overview KPIs ── -->
-  <div class="section-block">
-    <div class="section-header">
-      <div class="section-title-group">
-        <h2>Fleet Overview</h2>
-        <div class="section-sub">Aggregate statistics for Greece's grid operators</div>
+<!-- FUNNEL PIPELINE -->
+<div class="funnel-bar" id="funnelBar"></div>
+
+<!-- MAIN VIEWS -->
+
+<!-- View 1: Dashboard -->
+<div class="view view-dashboard active" id="view-dashboard">
+  <div class="main-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <h3>Filter by Operator</h3>
+        <div class="filter-group">
+          <label>Grid Operator</label>
+          <select id="operatorFilter">
+            <option value="">All Operators</option>
+            <option value="ADMIE">ADMIE/IPTO (TSO, ≥150kV)</option>
+            <option value="DEDDIE">DEDDIE/HEDNO (DSO, <150kV)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Filter by Region</h3>
+        <div class="filter-group">
+          <select id="regionFilter">
+            <option value="">All Regions (13 Peripheries)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Risk Band</h3>
+        <div id="legendRisk"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Regional Summary</h3>
+        <div id="regionBars"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Statistics</h3>
+        <div id="stats"></div>
       </div>
     </div>
-    <div class="kpi-grid" id="fleetKpis"></div>
-  </div>
 
-  <!-- ── Operator Comparison ── -->
-  <div class="section-block">
-    <div class="section-header">
-      <div class="section-title-group">
-        <h2>Operator Fleet Statistics</h2>
-        <div class="section-sub">Risk profile and asset composition by transmission and distribution operators</div>
-      </div>
-    </div>
-    <div id="operatorCards"></div>
-  </div>
-
-  <!-- ── Regional Breakdown ── -->
-  <div class="section-block">
-    <div class="section-header">
-      <span class="section-number">1</span>
-      <div class="section-title-group">
-        <h2>Regional Breakdown: 13 Peripheries</h2>
-        <div class="section-sub">Substation count and risk distribution across Greek administrative regions</div>
-      </div>
-    </div>
-    <div class="card">
-      <div id="regionBreakdown"></div>
+    <!-- MAP AREA -->
+    <div class="map-area">
+      <div id="map"></div>
     </div>
   </div>
+</div>
 
-  <!-- ── Top Risk Substations ── -->
-  <div class="section-block">
-    <div class="section-header">
-      <span class="section-number">2</span>
-      <div class="section-title-group">
-        <h2>Top Risk Substations by Operator</h2>
-        <div class="section-sub">Highest-risk facilities requiring prioritized investment and monitoring</div>
-      </div>
+<!-- View 2: Methodology -->
+<div class="view" id="view-methodology">
+  <div class="meth-container">
+    <div class="meth-toc">
+      <h3>Contents</h3>
+      <ul class="meth-toc-list">
+        <li><a href="#s1">Overview</a></li>
+        <li><a href="#s2">Funnel Summary</a></li>
+        <li><a href="#s3">Greek Operators</a></li>
+        <li><a href="#s4">Assessment Steps</a></li>
+        <li><a href="#s5">Risk Classification</a></li>
+        <li><a href="#s6">Regional Analysis</a></li>
+      </ul>
     </div>
-    <div class="grid-2" id="topRisksContainer"></div>
-  </div>
+    <div class="meth-content" id="methContent">
+      <section class="section" id="s1">
+        <span class="section-num">Section 1</span>
+        <h2>Overview</h2>
+        <p>This dashboard presents a comprehensive site assessment of Greece's 581 electrical substations across 13 Peripheries (administrative regions), operated by two primary entities: ADMIE/IPTO (transmission, ≥150 kV) and DEDDIE/HEDNO (distribution, <150 kV).</p>
+        <p>The assessment framework evaluates substations using multiple criteria including risk profiles, regional distribution, and operational characteristics to support investment planning and grid resilience strategies.</p>
+      </section>
 
-  <!-- ── Investment Priorities ── -->
-  <div class="section-block">
-    <div class="section-header">
-      <span class="section-number">3</span>
-      <div class="section-title-group">
-        <h2>Investment Priority Ranking</h2>
-        <div class="section-sub">Regional and operator-level allocation guidance based on risk concentration</div>
-      </div>
+      <section class="section" id="s2">
+        <span class="section-num">Section 2</span>
+        <h2>Funnel Summary</h2>
+        <p>The dashboard visualises the complete portfolio of Greek substations across the filter funnel:</p>
+        <div class="bar-chart" id="funnelVisualization"></div>
+      </section>
+
+      <section class="section" id="s3">
+        <span class="section-num">Section 3</span>
+        <h2>Greek Grid Operators</h2>
+
+        <h3>ADMIE/IPTO (Transmission System Operator)</h3>
+        <p>Operates the high-voltage transmission network at 150 kV and above, managing the backbone of Greece's electrical infrastructure. Responsible for system stability, long-distance power transfer, and interconnection with neighbouring countries.</p>
+
+        <h3>DEDDIE/HEDNO (Distribution System Operator)</h3>
+        <p>Manages the medium and low-voltage distribution networks (<150 kV), serving as the interface between transmission and end consumers. Operates the local distribution infrastructure across all Greek regions.</p>
+
+        <h3>13 Greek Peripheries</h3>
+        <p>Greece's administrative structure comprises 13 Peripheries (regions):</p>
+        <div id="regionsList"></div>
+      </section>
+
+      <section class="section" id="s4">
+        <span class="section-num">Section 4</span>
+        <h2>Assessment Framework</h2>
+        <p>Each substation is assessed across multiple dimensions:</p>
+        <ul>
+          <li><strong>Location & Region:</strong> Geographic placement and regional context</li>
+          <li><strong>Voltage Level:</strong> Classification as transmission or distribution asset</li>
+          <li><strong>Operator Assignment:</strong> ADMIE/IPTO or DEDDIE/HEDNO responsibility</li>
+          <li><strong>Risk Profile:</strong> Multi-component risk assessment including reliability, voltage stability, infrastructure, and transition readiness</li>
+        </ul>
+      </section>
+
+      <section class="section" id="s5">
+        <span class="section-num">Section 5</span>
+        <h2>Risk Classification</h2>
+        <p>Substations are classified into four risk bands based on comprehensive assessment:</p>
+        <div class="filter-grid">
+          <div class="filter-card pass">
+            <div class="step-num">Low Risk</div>
+            <div class="step-title">Minimal Intervention Required</div>
+            <div class="step-desc">Well-maintained assets with strong operational resilience and modern infrastructure.</div>
+          </div>
+          <div class="filter-card pass">
+            <div class="step-num">Medium Risk</div>
+            <div class="step-title">Routine Monitoring</div>
+            <div class="step-desc">Assets requiring standard maintenance and periodic upgrades.</div>
+          </div>
+          <div class="filter-card pass">
+            <div class="step-num">High Risk</div>
+            <div class="step-title">Prioritized Investment</div>
+            <div class="step-desc">Assets requiring near-term capital investment and enhanced monitoring.</div>
+          </div>
+          <div class="filter-card fail">
+            <div class="step-num">Critical Risk</div>
+            <div class="step-title">Urgent Action Required</div>
+            <div class="step-desc">Assets requiring immediate intervention to ensure grid stability and safety.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="s6">
+        <span class="section-num">Section 6</span>
+        <h2>Regional Distribution</h2>
+        <p>Substations are distributed across Greece's 13 Peripheries, with concentration varying by regional demand patterns, transmission backbone density, and historical infrastructure development.</p>
+        <div id="regionTable"></div>
+      </section>
     </div>
-    <div class="card">
-      <table class="data-table" id="investmentTable">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Region</th>
-            <th>Operator</th>
-            <th>Substations (High/Critical)</th>
-            <th>Median Risk</th>
-            <th>Priority</th>
-          </tr>
-        </thead>
-        <tbody id="investmentBody"></tbody>
-      </table>
-    </div>
   </div>
+</div>
 
-  <!-- ── Footer ── -->
-  <div class="page-footer">
-    <div>SSI Index v4.0.2 — Greece Grid Operators Report</div>
-    <div>581 substations across 13 Peripheries | ADMIE & DEDDIE networks</div>
-  </div>
-
-</div><!-- /page-shell -->
+<!-- Leaflet Maps -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-'use strict';
+// Global data
+let SUBSTATIONS = [];
+let map = null;
+let markers = null;
+let filteredMarkers = [];
+let currentOperatorFilter = '';
+let currentRegionFilter = '';
 
-let ssiData = null;
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load data from ssi-data.json
+  try {
+    const response = await fetch('ssi-data.json');
+    const data = await response.json();
+    SUBSTATIONS = data.substations || [];
 
-// Load and process ssi-data.json
-fetch('ssi-data.json')
-  .then(r => r.json())
-  .then(data => {
-    ssiData = data;
-    renderDashboard();
-  })
-  .catch(err => {
-    console.error('Failed to load ssi-data.json:', err);
-    document.body.innerHTML += '<p style="padding:20px; color:red;">Error loading data. Check ssi-data.json availability.</p>';
-  });
+    // Initialize UI
+    initFunnel();
+    initRegionFilter();
+    initLegend();
+    initMap();
+    renderRegionalBars();
+    renderStats();
+    renderMethodology();
 
-function getBand(score) {
-  if (score < 0.25) return 'low';
-  if (score < 0.50) return 'medium';
-  if (score < 0.75) return 'high';
-  return 'critical';
-}
-
-function getOperatorType(voltage) {
-  // TSO (ADMIE/IPTO): ≥ 300kV
-  // DSO (DEDDIE/HEDNO): < 300kV
-  return voltage >= 300 ? 'TSO' : 'DSO';
-}
-
-function renderDashboard() {
-  if (!ssiData || !ssiData.substations) {
-    console.error('ssiData structure invalid');
-    return;
+    // Set up event listeners
+    document.getElementById('btn-dashboard').addEventListener('click', () => switchView('dashboard'));
+    document.getElementById('btn-methodology').addEventListener('click', () => switchView('methodology'));
+    document.getElementById('operatorFilter').addEventListener('change', (e) => {
+      currentOperatorFilter = e.target.value;
+      updateMapMarkers();
+    });
+    document.getElementById('regionFilter').addEventListener('change', (e) => {
+      currentRegionFilter = e.target.value;
+      updateMapMarkers();
+    });
+  } catch (e) {
+    console.error('Failed to load data:', e);
+    alert('Error loading substation data. Please check ssi-data.json');
   }
+});
 
-  const substations = ssiData.substations;
+function initFunnel() {
+  const counts = {
+    'Total': SUBSTATIONS.length,
+    'High': SUBSTATIONS.filter(s => s.classification === 'High').length,
+    'Critical': SUBSTATIONS.filter(s => s.classification === 'Critical').length,
+    'ADMIE': SUBSTATIONS.filter(s => s.substation_id && s.substation_id.includes('ADMIE')).length,
+    'DEDDIE': SUBSTATIONS.filter(s => s.substation_id && s.substation_id.includes('DEDDIE')).length
+  };
 
-  // Partition by operator
-  const admie = substations.filter(s => getOperatorType(s.voltage_kv) === 'TSO');
-  const deddie = substations.filter(s => getOperatorType(s.voltage_kv) === 'DSO');
-
-  renderFleetKpis(substations, admie, deddie);
-  renderOperatorCards(admie, deddie);
-  renderRegionalBreakdown(substations);
-  renderTopRisks(admie, deddie);
-  renderInvestmentPriorities(substations);
-}
-
-function renderFleetKpis(all, admie, deddie) {
-  const fleetKpis = document.getElementById('fleetKpis');
-  const medianAll = getMedianRisk(all);
-  const p95All = getPercentileRisk(all, 0.95);
-  const criticalCount = all.filter(s => getBand(s.R_median) === 'critical').length;
-
-  const kpis = [
-    { label: 'Total Substations', value: all.length.toString() },
-    { label: 'Median Risk (Fleet)', value: medianAll.toFixed(3) },
-    { label: 'P95 Risk', value: p95All.toFixed(3) },
-    { label: 'Critical Band', value: criticalCount + ' (' + (100 * criticalCount / all.length).toFixed(1) + '%)' }
-  ];
-
-  fleetKpis.innerHTML = kpis.map(kpi => `
-    <div class="kpi-card">
-      <div class="kpi-label">${kpi.label}</div>
-      <div class="kpi-value">${kpi.value}</div>
+  const funnelBar = document.getElementById('funnelBar');
+  funnelBar.innerHTML = `
+    <div class="funnel-step active">
+      <div class="step-label">STEP 1</div>
+      <div class="step-count">${counts.Total}</div>
+      <div class="step-name">Total Subs</div>
+      <div class="step-pct">100%</div>
     </div>
-  `).join('');
-}
-
-function renderOperatorCards(admie, deddie) {
-  const container = document.getElementById('operatorCards');
-
-  const admieCard = renderOperatorCard('ADMIE / IPTO', 'TSO (Transmission)', admie, 'admie');
-  const deddieCard = renderOperatorCard('DEDDIE / HEDNO', 'DSO (Distribution)', deddie, 'deddie');
-
-  container.innerHTML = admieCard + deddieCard;
-}
-
-function renderOperatorCard(name, type, substations, cssClass) {
-  const median = getMedianRisk(substations);
-  const p95 = getPercentileRisk(substations, 0.95);
-  const avgAge = substations.length > 0
-    ? substations.reduce((sum, s) => sum + (s.age_years || 0), 0) / substations.length
-    : 0;
-  const critCount = substations.filter(s => getBand(s.R_median) === 'critical').length;
-  const highCount = substations.filter(s => getBand(s.R_median) === 'high').length;
-
-  return `
-    <div class="operator-card ${cssClass}">
-      <h3>${name}</h3>
-      <div class="label-sm" style="margin-bottom:12px;">${type}</div>
-      <div class="operator-stats">
-        <div class="stat-item">
-          <div class="stat-label">Substations</div>
-          <div class="stat-value">${substations.length}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Median Risk</div>
-          <div class="stat-value">${median.toFixed(3)}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">P95 Risk</div>
-          <div class="stat-value">${p95.toFixed(3)}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Avg Age</div>
-          <div class="stat-value">${avgAge.toFixed(1)}y</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Critical</div>
-          <div class="stat-value">${critCount} (${(100*critCount/substations.length).toFixed(1)}%)</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">High Risk</div>
-          <div class="stat-value">${highCount} (${(100*highCount/substations.length).toFixed(1)}%)</div>
-        </div>
-      </div>
+    <div class="funnel-step">
+      <div class="step-label">STEP 2</div>
+      <div class="step-count">${counts.High}</div>
+      <div class="step-name">High Risk</div>
+      <div class="step-pct">${((counts.High / counts.Total) * 100).toFixed(1)}%</div>
+    </div>
+    <div class="funnel-step">
+      <div class="step-label">STEP 3</div>
+      <div class="step-count">${counts.Critical}</div>
+      <div class="step-name">Critical</div>
+      <div class="step-pct">${((counts.Critical / counts.Total) * 100).toFixed(1)}%</div>
+    </div>
+    <div class="funnel-step">
+      <div class="step-label">ADMIE/IPTO</div>
+      <div class="step-count">${counts.ADMIE}</div>
+      <div class="step-name">TSO (≥150kV)</div>
+      <div class="step-pct">${((counts.ADMIE / counts.Total) * 100).toFixed(1)}%</div>
+    </div>
+    <div class="funnel-step">
+      <div class="step-label">DEDDIE/HEDNO</div>
+      <div class="step-count">${counts.DEDDIE}</div>
+      <div class="step-name">DSO (<150kV)</div>
+      <div class="step-pct">${((counts.DEDDIE / counts.Total) * 100).toFixed(1)}%</div>
     </div>
   `;
 }
 
-function renderRegionalBreakdown(substations) {
-  const container = document.getElementById('regionBreakdown');
-  const regionMap = {};
+function initRegionFilter() {
+  const regions = [...new Set(SUBSTATIONS.map(s => s.region))].sort();
+  const select = document.getElementById('regionFilter');
+  regions.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r;
+    opt.textContent = r;
+    select.appendChild(opt);
+  });
+}
 
-  substations.forEach(s => {
-    const region = s.region || 'Unknown';
-    if (!regionMap[region]) {
-      regionMap[region] = { count: 0, risks: [] };
-    }
-    regionMap[region].count++;
-    regionMap[region].risks.push(s.R_median || 0);
+function initLegend() {
+  const bandColors = {
+    'Low': '#27ae60',
+    'Medium': '#e67e22',
+    'High': '#c0392b',
+    'Critical': '#8b0000'
+  };
+
+  let html = '';
+  Object.entries(bandColors).forEach(([band, color]) => {
+    html += `<div class="legend-item"><div class="legend-dot" style="background:${color};"></div><span>${band}</span></div>`;
+  });
+  document.getElementById('legendRisk').innerHTML = html;
+}
+
+function initMap() {
+  map = L.map('map').setView([38.5, 23.5], 6); // Greece center
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 18
+  }).addTo(map);
+
+  markers = L.markerClusterGroup();
+
+  const bandColors = {
+    'Low': '#27ae60',
+    'Medium': '#e67e22',
+    'High': '#c0392b',
+    'Critical': '#8b0000'
+  };
+
+  SUBSTATIONS.forEach(sub => {
+    const color = bandColors[sub.classification] || '#999';
+    const marker = L.circleMarker([sub.lat, sub.lon], {
+      radius: 6,
+      fillColor: color,
+      color: color,
+      weight: 2,
+      opacity: 0.8,
+      fillOpacity: 0.7
+    });
+
+    marker.bindPopup(`
+      <div class="info-popup">
+        <h4>${sub.name}</h4>
+        <div class="row"><div class="k">Region:</div><div class="v">${sub.region}</div></div>
+        <div class="row"><div class="k">Operator:</div><div class="v">${sub.substation_id.includes('ADMIE') ? 'ADMIE/IPTO' : 'DEDDIE/HEDNO'}</div></div>
+        <div class="row"><div class="k">Voltage:</div><div class="v">${sub.voltage_kv} kV</div></div>
+        <div class="row"><div class="k">Risk:</div><div class="v"><span class="badge" style="background:${color};">${sub.classification}</span></div></div>
+        <div class="row"><div class="k">Risk Score:</div><div class="v">${(sub.R_median * 100).toFixed(1)}%</div></div>
+      </div>
+    `);
+
+    marker.substation = sub;
+    markers.addLayer(marker);
   });
 
-  const regions = Object.entries(regionMap)
-    .map(([name, data]) => ({
-      name,
-      count: data.count,
-      median: data.risks.length > 0 ? data.risks.sort((a,b) => a - b)[Math.floor(data.risks.length / 2)] : 0
-    }))
-    .sort((a, b) => b.count - a.count);
+  map.addLayer(markers);
+}
 
-  const maxCount = Math.max(...regions.map(r => r.count));
+function updateMapMarkers() {
+  map.removeLayer(markers);
+  markers = L.markerClusterGroup();
 
-  const html = regions.map(r => {
-    const fillWidth = (100 * r.count / maxCount);
-    const band = getBand(r.median);
-    return `
-      <div class="region-bar">
-        <div class="region-name">${r.name}</div>
-        <div class="region-bar-bg">
-          <div class="region-bar-fill" style="width:${fillWidth}%; background:${getColorForBand(band)};"></div>
+  const bandColors = {
+    'Low': '#27ae60',
+    'Medium': '#e67e22',
+    'High': '#c0392b',
+    'Critical': '#8b0000'
+  };
+
+  SUBSTATIONS.forEach(sub => {
+    let include = true;
+    if (currentOperatorFilter) {
+      const isADMIE = sub.substation_id.includes('ADMIE');
+      include = (currentOperatorFilter === 'ADMIE' && isADMIE) || (currentOperatorFilter === 'DEDDIE' && !isADMIE);
+    }
+    if (currentRegionFilter) {
+      include = include && sub.region === currentRegionFilter;
+    }
+
+    if (include) {
+      const color = bandColors[sub.classification] || '#999';
+      const marker = L.circleMarker([sub.lat, sub.lon], {
+        radius: 6,
+        fillColor: color,
+        color: color,
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.7
+      });
+
+      marker.bindPopup(`
+        <div class="info-popup">
+          <h4>${sub.name}</h4>
+          <div class="row"><div class="k">Region:</div><div class="v">${sub.region}</div></div>
+          <div class="row"><div class="k">Operator:</div><div class="v">${sub.substation_id.includes('ADMIE') ? 'ADMIE/IPTO' : 'DEDDIE/HEDNO'}</div></div>
+          <div class="row"><div class="k">Voltage:</div><div class="v">${sub.voltage_kv} kV</div></div>
+          <div class="row"><div class="k">Risk:</div><div class="v"><span class="badge" style="background:${color};">${sub.classification}</span></div></div>
+          <div class="row"><div class="k">Risk Score:</div><div class="v">${(sub.R_median * 100).toFixed(1)}%</div></div>
         </div>
-        <div class="region-count">${r.count}</div>
-        <div class="region-pct">${r.median.toFixed(3)}</div>
+      `);
+
+      marker.substation = sub;
+      markers.addLayer(marker);
+    }
+  });
+
+  map.addLayer(markers);
+}
+
+function renderRegionalBars() {
+  const regions = [...new Set(SUBSTATIONS.map(s => s.region))].sort();
+  const maxCount = Math.max(...regions.map(r => SUBSTATIONS.filter(s => s.region === r).length));
+
+  let html = '';
+  regions.forEach(region => {
+    const count = SUBSTATIONS.filter(s => s.region === region).length;
+    const pct = ((count / maxCount) * 100).toFixed(0);
+    html += `
+      <div class="region-bar">
+        <div class="name">${region}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:#a0522d;"></div></div>
+        <div class="count">${count}</div>
       </div>
     `;
-  }).join('');
-
-  container.innerHTML = html;
-}
-
-function renderTopRisks(admie, deddie) {
-  const container = document.getElementById('topRisksContainer');
-
-  const admieTop10 = admie
-    .sort((a, b) => (b.R_median || 0) - (a.R_median || 0))
-    .slice(0, 10);
-
-  const deddieTop10 = deddie
-    .sort((a, b) => (b.R_median || 0) - (a.R_median || 0))
-    .slice(0, 10);
-
-  container.innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <h3>ADMIE/IPTO (TSO)</h3>
-      </div>
-      <ul class="top-risks-list">
-        ${admieTop10.map((s, i) => renderRiskItem(i + 1, s)).join('')}
-      </ul>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <h3>DEDDIE/HEDNO (DSO)</h3>
-      </div>
-      <ul class="top-risks-list">
-        ${deddieTop10.map((s, i) => renderRiskItem(i + 1, s)).join('')}
-      </ul>
-    </div>
-  `;
-}
-
-function renderRiskItem(rank, substation) {
-  const band = getBand(substation.R_median);
-  return `
-    <li>
-      <div class="risk-rank">#${rank}</div>
-      <div class="risk-info">
-        <div class="risk-name">${substation.substation_id || 'Unknown'}</div>
-        <div class="risk-details">
-          <span class="band-badge ${band}">
-            <span class="band-dot ${band}"></span>
-            ${getBandLabel(band)}
-          </span>
-          R = ${(substation.R_median || 0).toFixed(3)} | ${substation.region || '—'} | ${substation.voltage_kv}kV
-        </div>
-      </div>
-    </li>
-  `;
-}
-
-function renderInvestmentPriorities(substations) {
-  const tbody = document.getElementById('investmentBody');
-  const regionMap = {};
-
-  substations.forEach(s => {
-    const region = s.region || 'Unknown';
-    const operator = getOperatorType(s.voltage_kv) === 'TSO' ? 'ADMIE' : 'DEDDIE';
-    const key = region + '|' + operator;
-
-    if (!regionMap[key]) {
-      regionMap[key] = { region, operator, substations: [] };
-    }
-    regionMap[key].substations.push(s);
   });
-
-  const priorities = Object.values(regionMap)
-    .map(entry => {
-      const risks = entry.substations.map(s => s.R_median || 0);
-      const critical = entry.substations.filter(s => getBand(s.R_median) === 'critical').length;
-      const high = entry.substations.filter(s => getBand(s.R_median) === 'high').length;
-      const median = risks.sort((a, b) => a - b)[Math.floor(risks.length / 2)];
-      const highCritical = critical + high;
-
-      return {
-        ...entry,
-        median,
-        highCritical,
-        score: highCritical * 100 + median
-      };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 15);
-
-  tbody.innerHTML = priorities.map((p, idx) => `
-    <tr>
-      <td>${idx + 1}</td>
-      <td>${p.region}</td>
-      <td>${p.operator}</td>
-      <td>${p.highCritical} substations</td>
-      <td class="num">${p.median.toFixed(3)}</td>
-      <td>
-        <span class="band-badge ${p.highCritical > 5 ? 'critical' : p.highCritical > 2 ? 'high' : 'medium'}">
-          <span class="band-dot ${p.highCritical > 5 ? 'critical' : p.highCritical > 2 ? 'high' : 'medium'}"></span>
-          ${p.highCritical > 5 ? 'Critical' : p.highCritical > 2 ? 'High' : 'Medium'}
-        </span>
-      </td>
-    </tr>
-  `).join('');
+  document.getElementById('regionBars').innerHTML = html;
 }
 
-function getMedianRisk(substations) {
-  if (substations.length === 0) return 0;
-  const sorted = substations.map(s => s.R_median || 0).sort((a, b) => a - b);
-  return sorted[Math.floor(sorted.length / 2)];
+function renderStats() {
+  const criticalCount = SUBSTATIONS.filter(s => s.classification === 'Critical').length;
+  const highCount = SUBSTATIONS.filter(s => s.classification === 'High').length;
+  const admieCount = SUBSTATIONS.filter(s => s.substation_id.includes('ADMIE')).length;
+  const medianRisk = (SUBSTATIONS.reduce((sum, s) => sum + s.R_median, 0) / SUBSTATIONS.length * 100).toFixed(1);
+
+  let html = `
+    <div class="stat-row"><div class="label">Total</div><div class="value">${SUBSTATIONS.length}</div></div>
+    <div class="stat-row"><div class="label">Critical</div><div class="value bad">${criticalCount}</div></div>
+    <div class="stat-row"><div class="label">High Risk</div><div class="value warn">${highCount}</div></div>
+    <div class="stat-row"><div class="label">ADMIE/IPTO</div><div class="value">${admieCount}</div></div>
+    <div class="stat-row"><div class="label">Fleet Median Risk</div><div class="value">${medianRisk}%</div></div>
+  `;
+  document.getElementById('stats').innerHTML = html;
 }
 
-function getPercentileRisk(substations, percentile) {
-  if (substations.length === 0) return 0;
-  const sorted = substations.map(s => s.R_median || 0).sort((a, b) => a - b);
-  const idx = Math.floor(sorted.length * percentile);
-  return sorted[Math.min(idx, sorted.length - 1)];
+function renderMethodology() {
+  const regions = [...new Set(SUBSTATIONS.map(s => s.region))].sort();
+
+  // Regions list
+  let regionsList = '<ul style="columns:2;margin:1rem 0;">';
+  regions.forEach(r => {
+    const count = SUBSTATIONS.filter(s => s.region === r).length;
+    regionsList += `<li>${r}: ${count} substations</li>`;
+  });
+  regionsList += '</ul>';
+  document.getElementById('regionsList').innerHTML = regionsList;
+
+  // Regional table
+  let tableHtml = '<table><thead><tr><th>Region</th><th>Substations</th><th>Median Risk</th><th>High Risk</th><th>Critical</th></tr></thead><tbody>';
+  regions.forEach(r => {
+    const subs = SUBSTATIONS.filter(s => s.region === r);
+    const medianRisk = (subs.reduce((sum, s) => sum + s.R_median, 0) / subs.length * 100).toFixed(1);
+    const highCount = subs.filter(s => s.classification === 'High').length;
+    const criticalCount = subs.filter(s => s.classification === 'Critical').length;
+    tableHtml += `<tr><td>${r}</td><td class="td-num">${subs.length}</td><td class="td-num">${medianRisk}%</td><td class="td-num">${highCount}</td><td class="td-num">${criticalCount}</td></tr>`;
+  });
+  tableHtml += '</tbody></table>';
+  document.getElementById('regionTable').innerHTML = tableHtml;
+
+  // Funnel visualization
+  const total = SUBSTATIONS.length;
+  const high = SUBSTATIONS.filter(s => s.classification === 'High').length;
+  const critical = SUBSTATIONS.filter(s => s.classification === 'Critical').length;
+
+  let funnelHtml = `
+    <div class="bar-row"><span class="bar-label">All</span><div class="bar-track"><div class="bar-fill" style="width:100%;"><span>${total}</span></div></div></div>
+    <div class="bar-row"><span class="bar-label">High</span><div class="bar-track"><div class="bar-fill" style="width:${(high/total*100).toFixed(0)}%;"><span>${high}</span></div></div></div>
+    <div class="bar-row"><span class="bar-label">Critical</span><div class="bar-track"><div class="bar-fill" style="width:${(critical/total*100).toFixed(0)}%;background:#8b0000;"><span>${critical}</span></div></div></div>
+  `;
+  document.getElementById('funnelVisualization').innerHTML = funnelHtml;
 }
 
-function getBandLabel(band) {
-  const labels = { low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical' };
-  return labels[band] || 'Unknown';
-}
+function switchView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
 
-function getColorForBand(band) {
-  const colors = {
-    low: '#5d8563',
-    medium: '#b8863a',
-    high: '#aa4234',
-    critical: '#941914'
-  };
-  return colors[band] || '#ccc';
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + view).classList.add('active');
+
+  if (view === 'dashboard' && map) {
+    setTimeout(() => map.invalidateSize(), 100);
+  }
 }
 </script>
 
-<script>renderFooter();</script>
 </body>
 </html>
