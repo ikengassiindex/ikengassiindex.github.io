@@ -1065,21 +1065,21 @@ document.addEventListener("ssi-config-ready", function(e) {
       color: 'rgba(170,66,52,0.8)',
       subtitle: 'From SCADA dumps to structured risk vectors',
       ref: 'L1',
-      body: 'Every substation begins as raw operational data: voltage measurements, loading ratios, transformer specs, commissioned dates. Layer 1 transforms this heterogeneous SCADA/GIS dump into the 95-dimension feature vector that feeds the SSI engine. We trace the journey from bits-to-insights: how ADMIE''s transmission data, DEDDIE/HEDNO distribution records, and Hellenic Statistical Authority socio-economic snapshots are harmonized into a single substation profile.'
+      body: 'Every substation begins as raw operational data: voltage measurements, loading ratios, transformer specs, commissioned dates. Layer 1 transforms this heterogeneous SCADA/GIS dump into the 95-dimension feature vector that feeds the SSI engine. We trace the journey from bits-to-insights: how ADMIE\'s transmission data, DEDDIE/HEDNO distribution records, and Hellenic Statistical Authority socio-economic snapshots are harmonized into a single substation profile.'
     },
     {
       n: 2, title: 'Layer 2: Consequence Cascades',
       color: 'rgba(93,133,99,0.8)',
       subtitle: 'Why outage costs are nonlinear and cumulative',
       ref: 'L2',
-      body: 'A substation failure is not a 1-to-1 outage. The SSI''s R3 consequence multiplier reveals the network cascade: failure at a hub node can disconnect 100+ remote substations, disrupting critical services (hospitals, water treatment, telecommunications). Layer 2 examines how the SSI uses graph-theoretic centrality, economic VoLL data (EUR 450–850/MWh in Greece), and societal criticality (energy poverty proxies) to score consequence — turning invisible cascades into visible risk.'
+      body: 'A substation failure is not a 1-to-1 outage. The SSI\'s R3 consequence multiplier reveals the network cascade: failure at a hub node can disconnect 100+ remote substations, disrupting critical services (hospitals, water treatment, telecommunications). Layer 2 examines how the SSI uses graph-theoretic centrality, economic VoLL data (EUR 450–850/MWh in Greece), and societal criticality (energy poverty proxies) to score consequence — turning invisible cascades into visible risk.'
     },
     {
       n: 3, title: 'Layer 3: The Neural Confidence Bound',
       color: 'rgba(184,134,58,0.8)',
       subtitle: 'How quantile regression captures uncertainty',
       ref: 'L3',
-      body: 'The SSI output is not a point estimate — it''s a distribution. For each substation, the neural network (a 3-layer residual MLP with quantile heads) produces R_median, P5, and P95 bounds, quantifying the 90% confidence interval around risk. Layer 3 unpacks the training process: how 581 Greek substations'' historical failure rates, maintenance records, and climate/seismic proxy data teach the network to output well-calibrated uncertainty bounds.'
+      body: 'The SSI output is not a point estimate — it\'s a distribution. For each substation, the neural network (a 3-layer residual MLP with quantile heads) produces R_median, P5, and P95 bounds, quantifying the 90% confidence interval around risk. Layer 3 unpacks the training process: how 581 Greek substations\' historical failure rates, maintenance records, and climate/seismic proxy data teach the network to output well-calibrated uncertainty bounds.'
     },
     {
       n: 4, title: 'Layer 4: The Modifiers Algebra',
@@ -1175,7 +1175,7 @@ document.addEventListener("ssi-config-ready", function(e) {
         'these are the highest-priority candidates for BESS deployment where DNO and community value stacks are largest.';
     } else if (currentTopic.n === 3) {
       statHTML = 'The Greek training set comprises ' + n.toLocaleString() + ' substations with complete 95-feature vectors. ' +
-        'Average CI_width of ' + avgCI.toFixed(3) + ' across the fleet provides the uncertainty ground truth that the neural network''s ' +
+        'Average CI_width of ' + avgCI.toFixed(3) + ' across the fleet provides the uncertainty ground truth that the neural network\'s ' +
         'quantile regression heads must calibrate against. The fleet''s risk distribution — ' +
         fleet.filter(function(s){ return s.classification === 'Low'; }).length + ' Low, ' +
         fleet.filter(function(s){ return s.classification === 'Medium'; }).length + ' Medium, ' +
@@ -1184,7 +1184,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     } else if (currentTopic.n === 4) {
       var regions = {};
       fleet.forEach(function(s){ regions[s.region] = true; });
-      statHTML = 'Greece''s coverage: ' + n.toLocaleString() + ' substations across ' +
+      statHTML = 'Greece\'s coverage: ' + n.toLocaleString() + ' substations across ' +
         Object.keys(regions).length + ' regions (Periphereies). ' +
         'The seismic modifier R6b varies by EAK 2003 zone: Zone I substations see R6b ≈1.08–1.12; ' +
         'Zone III substations ≈1.01–1.02. Island substations (Cyclades, Dodecanese, Ionian Islands pre-interconnection) ' +
@@ -1269,7 +1269,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   // ── Card 1: Next Edition deep-dive topics ──
   var deepDives = [
     { region: 'Attica', theme: 'The Attica Metropolitan Grid', context: 'Urban saturation & energy poverty', contextDetail: 'Where 40% of Greek load concentrates in one region — and 17.8% face energy poverty' },
-    { region: 'Thessaly', theme: 'The Thessaly Solar Belt', context: 'RES curtailment stress', contextDetail: 'Greece''s highest solar capacity density (2.1 GW in 4,300 km2) — grid absorption limits and BESS needs' },
+    { region: 'Thessaly', theme: 'The Thessaly Solar Belt', context: 'RES curtailment stress', contextDetail: 'Greece\'s highest solar capacity density (2.1 GW in 4,300 km2) — grid absorption limits and BESS needs' },
     { region: 'Peloponnese', theme: 'The Peloponnese Seismic & Transition Belt', context: 'Compound seismic + renewable stress', contextDetail: 'High EAK Zone I exposure + major wind projects = dual-risk convergence' },
     { region: 'Thessaloniki', theme: 'The Thessaloniki Industrial Hub', context: 'Secondary load center & strategic port', contextDetail: 'Critical infrastructure for Balkans energy corridor; ferry, automotive, food processing exposure' },
     { region: 'Cyclades', theme: 'The Cyclades Island Archipelago', context: 'Non-interconnection & tourism VoLL', contextDetail: 'Interconnection target 2027; current R8 island premium 20% — case study for follow-on projects' },
@@ -1290,7 +1290,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
     '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
     '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-    'Deep-dive into ' + nextDive.region + ''s grid risk profile — substation map, component analysis, regional breakdown. ' +
+    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, regional breakdown. ' +
     'European Context Card: ' + nextDive.contextDetail + '.</p>';
 
   // ── Card 2: Next Data Refresh ──
@@ -1362,7 +1362,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var seismicHighRisk = seismicHigh.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
     spotlights.push({
       title: 'Seismic Zone I: ' + seismicHigh.length + ' Substations in Highest Hazard',
-      body: '<strong>' + seismicHigh.length + ' substations</strong> sit in Greece''s highest seismic hazard zone (Zone I, PGA > 0.25g, EAK 2003). ' +
+      body: '<strong>' + seismicHigh.length + ' substations</strong> sit in Greece\'s highest seismic hazard zone (Zone I, PGA > 0.25g, EAK 2003). ' +
         'Of these, <strong>' + seismicHighRisk.length + '</strong> already score High/Critical — meaning their grid condition is poor <em>before</em> ' +
         'considering earthquake risk. The R6b seismic modifier captures this compound vulnerability.'
     });
@@ -1394,7 +1394,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var highT = fleet.filter(function(s){ return s.components.T > 0.035; });
     spotlights.push({
       title: highT.length + ' Substations Under Renewable Integration Stress',
-      body: 'The SSI''s T (Transition) component identifies <strong>' + highT.length +
+      body: 'The SSI\'s T (Transition) component identifies <strong>' + highT.length +
         ' substations</strong> bearing high renewable integration load (solar/wind penetration, curtailment risk, voltage volatility). ' +
         'These are priority sites for BESS, smart inverters, and demand-response infrastructure. The NECP 2030 renewable target (60% RES) ' +
         'cannot be met without strategic BESS deployment at these locations.'
@@ -1412,7 +1412,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     // Closing paragraph
     document.getElementById('g-closing').innerHTML =
       'The April 2026 inaugural SSI Index for Greece establishes the baseline for tracking grid resilience under NECP 2030 energy transition targets. ' +
-      'Monthly editions will rotate through Greece''s 13 regions, deepening intelligence on seismic exposure, renewable integration stress, and island interconnection progress. ' +
+      'Monthly editions will rotate through Greece\'s 13 regions, deepening intelligence on seismic exposure, renewable integration stress, and island interconnection progress. ' +
       'Quarterly data refreshes from ADMIE, DEDDIE/HEDNO, RAE, ELSTAT, and Hellenic Scientific agencies will keep the SSI synchronized with real grid conditions. ' +
       'The next edition focuses on <strong>' + nextDive.region + '</strong> — a critical region for understanding how Greece balances energy transition ambition with geophysical reality.';
   });
