@@ -2040,25 +2040,6 @@ function renderParcelTable(s) {
   tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#a0937d;padding:1rem;">No parcels loaded (PARCELS array is empty)</td></tr>';
 }
 
-  // Click row to highlight on map; click docs cell to open panel
-  tbody.querySelectorAll('tr').forEach(tr => {
-    tr.style.cursor = 'pointer';
-    tr.addEventListener('click', (e) => {
-      const lat = parseFloat(tr.dataset.lat);
-      const lon = parseFloat(tr.dataset.lon);
-      const ref = tr.dataset.ref;
-      // If clicked on docs cell or doc icon, open doc panel
-      if (e.target.closest('.docs-cell') || e.target.classList.contains('doc-icon')) {
-        if (ref) openDocPanel(ref);
-        return;
-      }
-      if (lat && lon && detailMap) {
-        detailMap.setView([lat, lon], 17);
-      }
-    });
-  });
-}
-
 // ── Cadastral Document Panel ──────────────────────────────────────
 function openDocPanel(ref) {
   const panel = document.getElementById('docPanel');
