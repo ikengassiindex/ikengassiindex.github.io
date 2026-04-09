@@ -504,19 +504,20 @@ document.addEventListener("ssi-config-ready", function(e) {
       'DSO SCADA upgrades and ADMIE monitoring investment.';
 
     // ── B.2 Economic Impact & Island Isolation Risk ──
-    // Tier by R3 (consequence multiplier) — adapted for Greek grid structure
+    // Tier by R3 (consequence multiplier) — thresholds calibrated to Greek R3 distribution
+    // Greek R3_C_mult range: 0.96–1.18; natural clusters at 1.18, 1.06, 0.98–1.00, 0.96–0.97
     var tiers = [
-      { label: 'Metropolitan / Strategic', desc: 'Major load centres (Attica, Thessaloniki) — highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.40; }, color: '#941914', icon: '\uD83C\uDFD9\uFE0F',
+      { label: 'Metropolitan / Strategic', desc: 'Major load centres (Attica, Thessaloniki, Central Macedonia) — highest economic loss per interruption',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10; }, color: '#941914', icon: '\uD83C\uDFD9\uFE0F',
         voll: '\u20AC450\u2013850/MWh' },
-      { label: 'Industrial / Urban', desc: 'Industrial zones, port cities, tourism hubs — significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.25 && s.modifiers.R3_C_mult < 1.40; }, color: '#aa4234', icon: '\uD83C\uDFED',
+      { label: 'Urban / Regional Centre', desc: 'Prefecture capitals, port cities, tourism hubs — significant continuity requirements',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.03 && s.modifiers.R3_C_mult < 1.10; }, color: '#aa4234', icon: '\uD83C\uDFED',
         voll: '\u20AC250\u2013450/MWh' },
       { label: 'Commercial / Town-Scale', desc: 'Regional towns, SME clusters, coastal tourism — moderate individual but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.25; }, color: '#b8863a', icon: '\uD83C\uDFEA',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.975 && s.modifiers.R3_C_mult < 1.03; }, color: '#b8863a', icon: '\uD83C\uDFEA',
         voll: '\u20AC100\u2013250/MWh' },
       { label: 'Rural / Agricultural / Island', desc: 'Sparse economic activity, agricultural land, small islands — lower VoLL but higher social vulnerability',
-        filter: function(s){ return s.modifiers.R3_C_mult < 1.10; }, color: '#5d8563', icon: '\uD83C\uDF3E',
+        filter: function(s){ return s.modifiers.R3_C_mult < 0.975; }, color: '#5d8563', icon: '\uD83C\uDF3E',
         voll: '\u20AC50\u2013100/MWh' }
     ];
 
@@ -561,12 +562,12 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // VoLL context note
     var totalHighConseqHighRisk = fleet.filter(function(s){
-      return s.modifiers.R3_C_mult >= 1.40 && (s.classification === 'High' || s.classification === 'Critical');
+      return s.modifiers.R3_C_mult >= 1.10 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
     document.getElementById('b2-voll-note').innerHTML =
-      '<strong>Value of Lost Load (VoLL) context:</strong> Greece\'s mainland VoLL averages EUR 450\u2013550/MWh (RAE/HEnEx 2024); ' +
+      '<strong>Value of Lost Load (VoLL) context:</strong> Greece\'s mainland VoLL averages \u20AC450\u2013550/MWh (RAE/HEnEx 2024); ' +
       'island communities face a 30\u201350% VoLL premium due to fuel import dependence and non-interconnection risk. ' +
-      '<strong>' + totalHighConseqHighRisk + ' substations</strong> combine metropolitan economic fabric (R3 \u2265 1.40) with ' +
+      '<strong>' + totalHighConseqHighRisk + ' substations</strong> combine metropolitan economic fabric (R3 \u2265 1.10) with ' +
       'High or Critical risk classification \u2014 representing the highest VoLL-weighted exposure in the fleet. ' +
       'The 2024 Crete HVDC interconnection will gradually reduce island premiums, but Cyclades and Dodecanese ' +
       'substations should still carry a multiplicative VoLL uplift in BESS investment analysis until full interconnection (est. 2027).';
@@ -585,21 +586,21 @@ document.addEventListener("ssi-config-ready", function(e) {
     var avgEP = fleet.reduce(function(a,s){ return a + (s.socio_economic.EP_rate_region || 0); }, 0) / n;
     document.getElementById('b2-narrative').innerHTML =
       'Greece\'s economic consequence landscape is highly heterogeneous. ' +
-      '<strong>' + topTierSubs.length + ' substations</strong> (R3 \u2265 1.40) serve metropolitan/strategic cores, ' +
+      '<strong>' + topTierSubs.length + ' substations</strong> (R3 \u2265 1.10) serve metropolitan/strategic cores, ' +
       'concentrated in ' + econRegionStr + '. Island substations (' + islandSubs.length + ' across Crete, Ionian Islands, ' +
       'South Aegean, North Aegean) face an amplified consequence premium via the R8 island isolation modifier. ' +
       'Average fleet energy poverty rate: <strong>' + avgEP.toFixed(1) + '%</strong> \u2014 ranging from ~6% in Attica to >14% ' +
       'in Western Greece and Epirus, underscoring the socio-economic dimension of grid resilience.';
 
-    // ── B.3 Regional ranking ──
+    // ── B.3 Regional Resilience Ranking ──
     var regionData = {};
     fleet.forEach(function(s){
-      if (!regionData[s.region]) {
-        regionData[s.region] = { subs: [], r7Vals: [], rVals: [], seismicCnt: 0 };
-      }
+      if (!regionData[s.region]) regionData[s.region] = { subs: [], sumR7: 0, sumR: 0, sumLon: 0, sumLat: 0, seismicCnt: 0 };
       regionData[s.region].subs.push(s);
-      regionData[s.region].r7Vals.push(s.modifiers.R7_cyber);
-      regionData[s.region].rVals.push(s.R_median);
+      regionData[s.region].sumR7 += s.modifiers.R7_cyber;
+      regionData[s.region].sumR += s.R_median;
+      regionData[s.region].sumLon += s.lon;
+      regionData[s.region].sumLat += s.lat;
       if (s.seismic && (s.seismic.zone === 'I' || s.seismic.zone === 'II' || s.seismic.zone <= 2)) {
         regionData[s.region].seismicCnt++;
       }
@@ -607,38 +608,95 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     var regionList = Object.keys(regionData).map(function(r){
       var d = regionData[r];
-      var avgR7 = d.r7Vals.reduce(function(a,b){return a+b;},0) / d.r7Vals.length;
-      var avgR = d.rVals.reduce(function(a,b){return a+b;},0) / d.rVals.length;
-      var seismicPct = d.seismicCnt / d.subs.length;
-      return {
-        name: r,
-        n: d.subs.length,
-        avgR7: avgR7,
-        avgR: avgR,
-        seismicPct: seismicPct,
-        resilience: (1 - avgR7 + 0.02) * (1 - seismicPct) // synthetic metric
-      };
+      var nn = d.subs.length;
+      return { name: r, n: nn, avgR7: d.sumR7 / nn, avgR: d.sumR / nn,
+               lon: d.sumLon / nn, lat: d.sumLat / nn,
+               seismicPct: d.seismicCnt / nn };
     });
-    regionList.sort(function(a,b){ return a.resilience - b.resilience; }); // lower = higher risk
+    regionList.sort(function(a,b){ return a.avgR7 - b.avgR7; }); // worst digital readiness first
 
-    var rankHTML = '<div style="font-size:12px;line-height:1.8">';
-    regionList.slice(0, 10).forEach(function(r, idx){
-      rankHTML += '<div style="padding:8px;margin-bottom:4px;background:rgba(44,36,32,0.03);border-left:3px solid ' +
-        (idx < 3 ? 'var(--crimson)' : idx < 6 ? 'var(--terracotta)' : 'var(--bronze)') + '">' +
-        '<strong>' + r.name + '</strong> · ' + r.n + ' subs · R_avg=' + r.avgR.toFixed(3) +
-        ' · R7_avg=' + r.avgR7.toFixed(4) + ' · Seismic=' + (r.seismicPct*100).toFixed(0) + '%' +
-        '</div>';
+    // Mini-map coloured by R7
+    var mapCanvas = document.getElementById('b3-map');
+    var dpr2 = window.devicePixelRatio || 1;
+    mapCanvas.width = mapCanvas.offsetWidth * dpr2;
+    mapCanvas.height = mapCanvas.offsetHeight * dpr2;
+    var mctx = mapCanvas.getContext('2d');
+    mctx.scale(dpr2, dpr2);
+    var mW = mapCanvas.offsetWidth, mH = mapCanvas.offsetHeight;
+
+    var allLons = fleet.map(function(s){ return s.lon; });
+    var allLats = fleet.map(function(s){ return s.lat; });
+    var lonMin = Math.min.apply(null, allLons) - 0.3, lonMax = Math.max.apply(null, allLons) + 0.3;
+    var latMin = Math.min.apply(null, allLats) - 0.2, latMax = Math.max.apply(null, allLats) + 0.2;
+
+    function mProj(lon, lat) {
+      return [30 + (lon - lonMin) / (lonMax - lonMin) * (mW - 60),
+              mH - 30 - (lat - latMin) / (latMax - latMin) * (mH - 60)];
+    }
+
+    // Colour by R7: low R7 = red, high R7 = green
+    var r7floor = 0.990, r7ceil = 1.040;
+    function r7Color(r7) {
+      var t = Math.max(0, Math.min(1, (r7 - r7floor) / (r7ceil - r7floor)));
+      var r = Math.round(180 - t * 100);
+      var g = Math.round(60 + t * 90);
+      var b = Math.round(40 + t * 20);
+      return 'rgba(' + r + ',' + g + ',' + b + ',0.6)';
+    }
+
+    fleet.forEach(function(s){
+      var p = mProj(s.lon, s.lat);
+      mctx.beginPath();
+      mctx.arc(p[0], p[1], 2.5, 0, Math.PI * 2);
+      mctx.fillStyle = r7Color(s.modifiers.R7_cyber);
+      mctx.fill();
     });
-    rankHTML += '</div>';
+
+    // Legend
+    mctx.font = '500 10px DM Sans, sans-serif';
+    mctx.textAlign = 'left';
+    mctx.fillStyle = '#2c2420';
+    mctx.fillText('R7 Digital Readiness', 8, 14);
+    var grd = mctx.createLinearGradient(8, 22, 108, 22);
+    grd.addColorStop(0, r7Color(r7floor));
+    grd.addColorStop(1, r7Color(r7ceil));
+    mctx.fillStyle = grd;
+    mctx.fillRect(8, 18, 100, 8);
+    mctx.fillStyle = '#8a7e76';
+    mctx.font = '400 9px DM Sans, sans-serif';
+    mctx.fillText('Low', 8, 36);
+    mctx.textAlign = 'right';
+    mctx.fillText('High', 108, 36);
+
+    // Region ranking — bar chart (all regions, sorted worst first)
+    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Worst Digital Readiness &amp; Seismic Exposure — Regions</div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:6px">Shorter bar = lower R7 = weaker digital infrastructure. \u26A0 = seismic zone I/II &gt; 50%.</div>';
+    regionList.forEach(function(rg, idx){
+      var barPct = ((rg.avgR7 - r7floor) / (r7ceil - r7floor) * 100).toFixed(1);
+      var riskTag = rg.avgR > medianR ? '<span style="color:var(--crimson);font-weight:600;font-size:10px"> \u26A0 high R</span>' : '';
+      var seismicTag = rg.seismicPct > 0.5 ? '<span style="color:var(--terracotta);font-weight:600;font-size:10px"> \uD83C\uDF0B seis</span>' : '';
+      rankHTML += '<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px">' +
+        '<span style="min-width:14px;color:var(--warm-grey);font-size:10px">' + (idx+1) + '</span>' +
+        '<span style="min-width:130px;font-weight:500">' + rg.name + riskTag + seismicTag + '</span>' +
+        '<div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">' +
+          '<div style="width:' + barPct + '%;height:100%;background:' + r7Color(rg.avgR7) + ';border-radius:3px"></div></div>' +
+        '<span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">' + rg.avgR7.toFixed(4) + '</span></div>';
+    });
     document.getElementById('b3-ranking').innerHTML = rankHTML;
 
     // B.3 Narrative
-    var topRisk = regionList[0];
+    var worstReg = regionList[0];
+    var bestReg = regionList[regionList.length - 1];
+    var dualExposed = regionList.filter(function(rg){ return rg.avgR7 < medianR7 && rg.avgR > medianR; });
     document.getElementById('b3-narrative').innerHTML =
-      '<strong>' + topRisk.name + '</strong> shows the weakest combined resilience score (lowest digital readiness + highest seismic exposure): ' +
-      'avg R7 = ' + topRisk.avgR7.toFixed(4) + ', avg R = ' + topRisk.avgR.toFixed(3) + ', seismic zone I/II: ' + (topRisk.seismicPct*100).toFixed(0) + '%. ' +
-      'This region should be prioritized for joint ADMIE/DEDDIE/HEDNO/RAE initiatives combining SCADA upgrades with ' +
-      'seismic hardening and renewable integration planning.';
+      'Regional analysis reveals significant digital infrastructure disparity. ' +
+      '<strong>' + worstReg.name + '</strong> has the lowest average R7 (' + worstReg.avgR7.toFixed(4) + '), while ' +
+      '<strong>' + bestReg.name + '</strong> leads at ' + bestReg.avgR7.toFixed(4) + ' \u2014 a spread of ' +
+      (bestReg.avgR7 - worstReg.avgR7).toFixed(4) + ' across the R7 range. ' +
+      '<strong>' + dualExposed.length + ' regions</strong> combine below-median digital readiness with above-median grid risk, ' +
+      'making them priority targets for ADMIE/DEDDIE/HEDNO/RAE joint digitalisation and seismic hardening initiatives. ' +
+      'The R7 modifier is intentionally narrow ([0.99, 1.04]) to reflect the current limitations of open DESI data \u2014 ' +
+      'as NIS2 compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
 
     // ── B.4 Monthly Pulse ──
     var highCrit = fleet.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
