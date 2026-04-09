@@ -754,12 +754,12 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <table>
 <thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Projection</th><th>Size</th></tr></thead>
 <tbody>
-<tr><td>NOA (National Observatory of Athens)</td><td>Mosaicatura Nazionale Pericolosit&agrave; Idraulica v5.0</td><td>2020</td><td>ETRS89 LAEA (EPSG:3035)</td><td>P3: 28,791 polygons (328 MB); P2: 29,493 polygons (369 MB)</td></tr>
+<tr><td>NOA (National Observatory of Athens)</td><td>Flood Hazard Mapping &mdash; EU Floods Directive 2007/60/EC (PFRA Greece)</td><td>2021</td><td>ETRS89 LAEA (EPSG:3035)</td><td>Preliminary Flood Risk Assessment polygons (national coverage)</td></tr>
 </tbody>
 </table>
 
 <div class="note-green">
-  <strong>Why NOA mosaic as single source:</strong> The national mosaic harmonises flood hazard maps from all 7 District Basin Authorities into a consistent classification, reconciling Flood Risk Management Plans (older EU Floods Directive 2007/60/EC maps) and PGRA (EU Floods Directive 2007/60/EC maps). Using a single authoritative source avoids conflicts and vintage discrepancies that arise from cross-referencing multiple regional datasets at the screening stage.
+  <strong>Why NOA flood mapping as single source:</strong> The national dataset harmonises flood hazard maps from all 14 Water Districts into a consistent classification, reconciling Preliminary Flood Risk Assessment (PFRA) outputs under the EU Floods Directive 2007/60/EC. Using a single authoritative source avoids conflicts and vintage discrepancies that arise from cross-referencing multiple regional datasets at the screening stage.
 </div>
 
 <h4>Method</h4>
@@ -1228,7 +1228,7 @@ const DATA=[{"id":0,"name":"Attica Substation 0","lat":39.676069,"lon":19.815271
 const PARCELS = [];
 const ROUTES = {};
 const BUFFERS = {};
-const CATASTO_DOCS = {};
+const CADASTRE_DOCS = {};
 const ENV_DATA = {};
 const PARCEL_ENV = {};
 
@@ -1300,7 +1300,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // ── Cadastral WMS Layers (Hellenic Cadastre (Ktimatologio)) ──
 const wmsBase = 'https://gis.ktimanet.gr/wms/wmsopen/wmsserver.aspx';
-const catastoParcelLayer = L.tileLayer.wms(wmsBase, {
+const cadastreParcelLayer = L.tileLayer.wms(wmsBase, {
   layers: 'CP.CadastralParcel',
   format: 'image/png',
   transparent: true,
@@ -1310,7 +1310,7 @@ const catastoParcelLayer = L.tileLayer.wms(wmsBase, {
   minZoom: 15,
   maxZoom: 21
 });
-const catastoZoningLayer = L.tileLayer.wms(wmsBase, {
+const cadastreZoningLayer = L.tileLayer.wms(wmsBase, {
   layers: 'CP.CadastralZoning',
   format: 'image/png',
   transparent: true,
@@ -1320,8 +1320,8 @@ const catastoZoningLayer = L.tileLayer.wms(wmsBase, {
   minZoom: 13,
   maxZoom: 21
 });
-const fabbricatiLayer = L.tileLayer.wms(wmsBase, {
-  layers: 'fabbricati',
+const buildingsLayer = L.tileLayer.wms(wmsBase, {
+  layers: 'KTBASEMAP',
   format: 'image/png',
   transparent: true,
   version: '1.3.0',
@@ -1527,8 +1527,8 @@ document.getElementById('fSearch').addEventListener('input', () => {
 
 // toggleRadius removed (moved to details view)
 
-// toggleCatasto removed (moved to details view)
-// toggleCatastoZoning removed (moved to details view)
+// toggleCadastre removed (moved to details view)
+// toggleCadastreZoning removed (moved to details view)
 // toggleFabbricati removed (moved to details view)
 
 map.on('zoomend moveend', () => {
@@ -1650,7 +1650,7 @@ function renderDetailMap(s) {
       errorTileUrl: ''
     }).addTo(detailMap);
     detailLayers.wms.buildings = L.tileLayer.wms(wmsBase, {
-      layers: 'fabbricati', format: 'image/png', transparent: true,
+      layers: 'KTBASEMAP', format: 'image/png', transparent: true,
       version: '1.3.0', opacity: 0.8, minZoom: 15, maxZoom: 21,
       errorTileUrl: ''
     }).addTo(detailMap);
@@ -1667,7 +1667,7 @@ function renderDetailMap(s) {
       wmsStatus.innerHTML = '<span style="color:#27ae60">&#9679;</span> Cadastral: active';
     });
     detailLayers.wms.parcels.on('tileerror', function() {
-      wmsStatus.innerHTML = '<span style="color:#c0392b">&#9679;</span> Cadastral: unavailable (Agenzia server 503)';
+      wmsStatus.innerHTML = '<span style="color:#c0392b">&#9679;</span> Cadastral: unavailable (Ktimanet server 503)';
     });
 
     // Layer control: base layers (OSM/Satellite) + overlay toggles
@@ -1719,11 +1719,11 @@ function renderDetailMap(s) {
       radius: 6, fillColor: color, fillOpacity: 0.8, color: '#fff', weight: 1.5
     });
     pm.bindTooltip(ref + ' (' + catLabel + ')', { direction: 'top', offset: [0, -8] });
-    const pDocs = CATASTO_DOCS[ref] || {};
+    const pDocs = CADASTRE_DOCS[ref] || {};
     const pDocLinks = Object.keys(pDocs).length > 0 ? '<br><b>Docs:</b> ' +
-      (pDocs.visura ? '<a href="'+pDocs.visura.url+'" target="_blank" style="color:#27ae60;font-weight:600">Visura</a> ' : '') +
-      (pDocs.mappa ? '<a href="'+pDocs.mappa.url+'" target="_blank" style="color:#2980b9;font-weight:600">Mappa</a> ' : '') +
-      (pDocs.planimetrico ? '<a href="'+pDocs.planimetrico.url+'" target="_blank" style="color:#8e44ad;font-weight:600">Plan</a> ' : '') : '';
+      (pDocs.visura ? '<a href="'+pDocs.visura.url+'" target="_blank" style="color:#27ae60;font-weight:600">Property Extract</a> ' : '') +
+      (pDocs.mappa ? '<a href="'+pDocs.mappa.url+'" target="_blank" style="color:#2980b9;font-weight:600">Cadastral Map</a> ' : '') +
+      (pDocs.planimetrico ? '<a href="'+pDocs.planimetrico.url+'" target="_blank" style="color:#8e44ad;font-weight:600">Drawing</a> ' : '') : '';
     pm.bindPopup(
       '<div style="font-size:12px">' +
       '<b>' + ref + '</b><br>' +
@@ -2044,7 +2044,7 @@ function openDocPanel(ref) {
   const panel = document.getElementById('docPanel');
   const title = document.getElementById('docPanelTitle');
   const body = document.getElementById('docPanelBody');
-  const docs = CATASTO_DOCS[ref] || {};
+  const docs = CADASTRE_DOCS[ref] || {};
   const docTypes = [
     { key: 'visura', label: 'Property Extract', desc: 'Ownership, classification, value', cls: 'type-v' },
     { key: 'mappa', label: 'Cadastral Map', desc: 'Parcel boundary map extract', cls: 'type-m' },
