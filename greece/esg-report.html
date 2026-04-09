@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSI Index — Greece ESG Report</title>
+  <link rel="stylesheet" href="../style.css?v=1775735860">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       SSI Index ESG Report — Design System
+       Ikenga Palette · DM Sans + Playfair Display
+       v4.0.2 — Annual Substation ESG Disclosure (Greece)
+       ═══════════════════════════════════════════════════════════ */
+
+    :root {
+      --cream: #faf6f5;
+      --cream-deep: #f0ebe8;
+      --crimson: #941914;
+      --terracotta: #aa4234;
+      --sage: #5d8563;
+      --bronze: #b8863a;
+      --ink: #2c2420;
+      --warm-grey: #8a7e76;
+      --warm-grey-light: #b5aca5;
+      --bg: #f5f0ed;
+      --card-bg: #ffffff;
+      --card-border: rgba(44,36,32,0.08);
+      --card-shadow: 0 1px 4px rgba(44,36,32,0.06);
+      --card-shadow-hover: 0 4px 16px rgba(44,36,32,0.10);
+      --radius: 10px;
+      --radius-sm: 6px;
+      --radius-lg: 14px;
+      --band-low: #5d8563;
+      --band-low-bg: rgba(93,133,99,0.10);
+      --band-medium: #b8863a;
+      --band-medium-bg: rgba(184,134,58,0.10);
+      --band-high: #aa4234;
+      --band-high-bg: rgba(170,66,52,0.10);
+      --band-critical: #941914;
+      --band-critical-bg: rgba(148,25,20,0.10);
+      --sdg-7: #fcc30b;
+      --sdg-9: #f36d25;
+      --sdg-11: #f99d26;
+      --sdg-13: #48773c;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg); color: var(--ink);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px; line-height: 1.6;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; }
+    h1 { font-size: 28px; line-height: 1.2; }
+    h2 { font-size: 22px; line-height: 1.3; margin-top: 0; margin-bottom: 16px; }
+    h3 { font-size: 17px; line-height: 1.4; margin-top: 0; margin-bottom: 12px; }
+    p { margin-bottom: 14px; }
+
+    .label-xs { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--warm-grey); font-weight: 500; }
+    .label-sm { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; }
+
+    .page-shell { max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { margin-bottom: 6px; }
+    .page-header p { color: var(--warm-grey); font-size: 14px; max-width: 700px; }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 20px 24px;
+      box-shadow: var(--card-shadow); transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: var(--card-shadow-hover); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+    .card-header h3 { font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; margin: 0; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--card-shadow); }
+    .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; margin-bottom: 6px; }
+    .kpi-card .kpi-value { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .kpi-card .kpi-sub { font-size: 12px; color: var(--warm-grey); }
+
+    .band-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .band-badge.low { background: var(--band-low-bg); color: var(--band-low); }
+    .band-badge.medium { background: var(--band-medium-bg); color: var(--band-medium); }
+    .band-badge.high { background: var(--band-high-bg); color: var(--band-high); }
+    .band-badge.critical { background: var(--band-critical-bg); color: var(--band-critical); }
+    .band-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .band-dot.low { background: var(--band-low); }
+    .band-dot.medium { background: var(--band-medium); }
+    .band-dot.high { background: var(--band-high); }
+    .band-dot.critical { background: var(--band-critical); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-grey); font-weight: 500; padding: 10px 12px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); }
+    .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(44,36,32,0.04); vertical-align: top; }
+    .data-table tr:hover td { background: rgba(44,36,32,0.02); }
+    .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+    .section-block { margin-bottom: 40px; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--cream-deep); }
+    .section-number { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--cream-deep); line-height: 1; }
+    .section-title-group { flex: 1; }
+    .section-title-group h2 { margin-bottom: 2px; }
+    .section-title-group .section-sub { font-size: 13px; color: var(--warm-grey); }
+
+    .why-box { background: var(--cream); border-left: 3px solid var(--terracotta); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 14px 18px; margin-bottom: 20px; }
+    .why-box .why-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--terracotta); font-weight: 600; margin-bottom: 4px; }
+    .why-box p { font-size: 13px; color: var(--ink); margin-bottom: 0; line-height: 1.55; }
+
+    .esg-report-card { border-top: 3px solid var(--terracotta); margin-bottom: 32px; }
+    .esg-report-card .report-index { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--terracotta); margin-bottom: 8px; }
+
+    .readiness-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .readiness-pill.ready { background: rgba(93,133,99,0.12); color: var(--sage); }
+    .readiness-pill.partial { background: rgba(184,134,58,0.12); color: var(--bronze); }
+    .readiness-pill.gap { background: rgba(170,66,52,0.12); color: var(--terracotta); }
+
+    .method-box { background: rgba(93,133,99,0.06); border: 1px solid rgba(93,133,99,0.15); border-radius: var(--radius-sm); padding: 14px 18px; }
+    .method-box .method-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--sage); font-weight: 600; margin-bottom: 6px; }
+    .method-box p { font-size: 13px; margin-bottom: 0; line-height: 1.55; }
+
+    .page-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--card-border); color: var(--warm-grey); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .page-shell { padding: 20px 16px 48px; } }
+    @media (max-width: 480px) { .kpi-card .kpi-value { font-size: 26px; } .kpi-card { padding: 14px 16px; } .card { padding: 16px; } }
+  </style>
+</head>
+<body>
+<script>
+// Auto-detect country from URL path
+(function() {
+  window.SSI_ESG_COUNTRY = 'greece';
+  document.currentScript.parentElement.setAttribute('data-ssi-country', 'greece');
+})();
+</script>
+
+<script src="../nav.js?v=1775735860"></script>
+<script src="ssi-metadata.js"></script>
+<script>renderNav('esg-report');</script>
+
+<!-- ═══ Page Shell ═══ -->
+<div class="page-shell">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="label-xs" style="margin-bottom:6px;">ANNUAL ESG DISCLOSURE — GREECE 2026</div>
+    <h1>Substation ESG Report</h1>
+    <p>Substation-level Environmental, Social, and Governance assessment aligned to CSRD/ESRS, EU Taxonomy, TCFD, SFDR, and UN PRI frameworks. Greece-specific focus on seismic resilience, energy poverty, and Mediterranean climate adaptation.</p>
+  </div>
+
+  <!-- ── Substation Identity KPIs ── -->
+  <div class="kpi-grid" id="kpiGrid" style="margin-bottom:32px;"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION A: ENVIRONMENTAL PILLAR
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">A</span>
+      <div class="section-title-group">
+        <h2>Environmental Pillar</h2>
+        <div class="section-sub">Climate physical risk, seismic exposure, wildfire vulnerability, and flood risk in the Greek context</div>
+      </div>
+    </div>
+
+    <!-- A1: Climate Risk Assessment -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report A1: Climate Physical Risk Assessment</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>Greece experiences acute climate hazards: heat waves (40–48°C summer peaks), Mediterranean flash flooding, and extended drought. ESRS E1 and TCFD mandate disclosure of physical climate risk to infrastructure. Substations in exposed regions face thermal stress on transformers, wildfire corridor exposure, and flood inundation risk.</p>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="label-sm" style="margin-bottom:8px;">Climate Risk Profile</div>
+          <div id="climateProfile"></div>
+        </div>
+        <div id="climateMetrics"></div>
+      </div>
+    </div>
+
+    <!-- A2: Seismic & Geological Hazard -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report A2: Seismic & Geological Hazard Assessment</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>Greece lies on the Hellenic Arc subduction zone with significant seismic activity. EAK 2003 seismic code assigns zones I–IV across regions. High-risk zones (IV: East Macedonia, North Aegean) require earthquake-resilient transformer foundations and cable anchorage. Critical substations in seismic zones face asset damage, grid isolation, and emergency restoration complexity.</p>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="label-sm" style="margin-bottom:8px;">Seismic Classification</div>
+          <div id="seismicProfile"></div>
+        </div>
+        <div id="seismicMetrics"></div>
+      </div>
+    </div>
+
+    <!-- A3: Wildfire & Vegetation Risk -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report A3: Wildfire Exposure & Vegetation Risk</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>Mediterranean climate and extended fire seasons (May–September) create wildfire corridors in Peloponnese, Attica, Central Greece, and Crete. Overhead transmission lines and dry vegetation increase tree-fall risk. High-risk substations require vegetation management investment and fire-resistant equipment upgrades.</p>
+      </div>
+      <div id="wildfireProfile"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION B: SOCIAL PILLAR
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">B</span>
+      <div class="section-title-group">
+        <h2>Social Pillar</h2>
+        <div class="section-sub">Energy poverty, vulnerable populations, and island isolation in Greece</div>
+      </div>
+    </div>
+
+    <!-- B1: Energy Poverty & Vulnerability -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report B1: Energy Poverty & Household Vulnerability</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>Greece's energy poverty rate averages ~27% (HEPI data), concentrated in rural regions, island communities, and aging populations. Substations serving high-poverty catchments face social consequence amplification: outages affect vulnerable households with limited adaptive capacity. ESRS S2 requires companies to assess impacts on affected communities.</p>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="label-sm" style="margin-bottom:8px;">Energy Poverty Exposure</div>
+          <div id="povertyProfile"></div>
+        </div>
+        <div id="povertyMetrics"></div>
+      </div>
+    </div>
+
+    <!-- B2: Island Community Vulnerability -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report B2: Island Isolation & Community Resilience</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>Greek islands (Crete, Aegean islands, Ionian islands) face grid isolation risk. Many are not interconnected to mainland grids; power generation and restoration depend on submarine cables with limited redundancy. Island substations have longer recovery times and greater consequence from extended outages. Tourism-dependent economies multiply economic impact.</p>
+      </div>
+      <div id="islandProfile"></div>
+    </div>
+
+    <!-- B3: Elderly & Demographic Vulnerability -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report B3: Elderly Population Exposure</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>Greece has a high elderly population (>20% age 65+) with concentration in rural depopulating regions. Heat waves pose acute health risk to elderly populations without air conditioning. Substations in aging communities amplify social consequence of grid disruptions. Mitigation requires outage prioritization and critical load (hospitals, care facilities) protection.</p>
+      </div>
+      <div id="elderlyProfile"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION C: GOVERNANCE PILLAR
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">C</span>
+      <div class="section-title-group">
+        <h2>Governance Pillar</h2>
+        <div class="section-sub">Regulatory compliance, EU energy policy, and digital readiness</div>
+      </div>
+    </div>
+
+    <!-- C1: RAE Regulatory Framework & Compliance -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report C1: RAE Regulatory Framework & Compliance</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>The Regulatory Authority for Energy (RAE) enforces SAIDI/SAIFI standards, investment transparency, and grid codes. Substations with poor SAIDI/SAIFI metrics face regulatory penalties and reputational risk. RAE's 2024 investment prioritization aligns with SSI rankings; substations in High/Critical bands attract investment and compliance scrutiny.</p>
+      </div>
+      <div id="raeProfile"></div>
+    </div>
+
+    <!-- C2: EU Energy & Climate Policy Alignment -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report C2: EU NECP, Green Deal, & Taxonomy Alignment</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>Greece's National Energy and Climate Plan (NECP) targets 61% renewable energy by 2030. EU Taxonomy climate adaptation screening (Article 11) requires infrastructure to demonstrate climate resilience. Substations in DER-rich regions must support bidirectional power flows. Taxonomy alignment unlocks sustainable finance.</p>
+      </div>
+      <div id="euProfile"></div>
+    </div>
+
+    <!-- C3: Cybersecurity & NIS2 Readiness -->
+    <div class="card esg-report-card" style="margin-bottom:20px;">
+      <div class="report-index">Report C3: Cybersecurity & NIS2 Directive Readiness</div>
+      <div class="why-box">
+        <div class="why-label">Why This Matters</div>
+        <p>The NIS2 Directive mandates cybersecurity risk management for energy operators. ADMIE and DEDDIE must ensure SCADA and communication systems are resilient to cyberattacks. Substations with high betweenness centrality (critical network nodes) face elevated cyber consequence. Compliance requires digital capability maturity assessment and incident response planning.</p>
+      </div>
+      <div id="cyberProfile"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       REGIONAL ESG BREAKDOWN TABLE
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">D</span>
+      <div class="section-title-group">
+        <h2>Regional ESG Summary: 13 Peripheries</h2>
+        <div class="section-sub">Aggregate ESG and risk metrics by Greek administrative region</div>
+      </div>
+    </div>
+    <div class="card">
+      <table class="data-table" id="regionalESGTable">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Substations</th>
+            <th>Median Risk</th>
+            <th>Environmental Exposure</th>
+            <th>Social Vulnerability</th>
+            <th>Governance Readiness</th>
+          </tr>
+        </thead>
+        <tbody id="regionalESGBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="page-footer">
+    <div>SSI Index v4.0.2 — Greece ESG Report | 581 substations across 13 Peripheries</div>
+    <div>ADMIE/IPTO & DEDDIE/HEDNO networks | RAE regulatory alignment</div>
+  </div>
+
+</div><!-- /page-shell -->
+
+<script>
+'use strict';
+
+let ssiData = null;
+
+// Load ssi-data.json
+fetch('ssi-data.json')
+  .then(r => r.json())
+  .then(data => {
+    ssiData = data;
+    renderESGReport();
+  })
+  .catch(err => {
+    console.error('Failed to load ssi-data.json:', err);
+    document.body.innerHTML += '<p style="padding:20px; color:red;">Error loading data. Check ssi-data.json availability.</p>';
+  });
+
+function renderESGReport() {
+  if (!ssiData || !ssiData.substations) {
+    console.error('ssiData invalid');
+    return;
+  }
+
+  renderKPIs(ssiData.substations);
+  renderClimateSection(ssiData.substations);
+  renderSeismicSection(ssiData.substations);
+  renderWildfireSection(ssiData.substations);
+  renderPovertySection(ssiData.substations);
+  renderIslandSection(ssiData.substations);
+  renderElderlySection(ssiData.substations);
+  renderRAESection(ssiData.substations);
+  renderEUSection(ssiData.substations);
+  renderCyberSection(ssiData.substations);
+  renderRegionalESG(ssiData.substations);
+}
+
+function renderKPIs(substations) {
+  const kpiGrid = document.getElementById('kpiGrid');
+  const medianRisk = getMedianRisk(substations);
+  const critical = substations.filter(s => getBand(s.R_median) === 'critical').length;
+
+  const kpis = [
+    { label: 'Total Substations', value: substations.length.toString() },
+    { label: 'Median Risk', value: medianRisk.toFixed(3) },
+    { label: 'Critical Band', value: critical + ' (' + (100 * critical / substations.length).toFixed(1) + '%)' },
+    { label: 'Regions Assessed', value: '13 Peripheries' }
+  ];
+
+  kpiGrid.innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+    </div>
+  `).join('');
+}
+
+function renderClimateSection(substations) {
+  const container = document.getElementById('climateProfile');
+  const metricsContainer = document.getElementById('climateMetrics');
+
+  const avgI3 = substations.reduce((s, sub) => s + (sub.components?.I || 0), 0) / substations.length;
+  const heatStressCount = substations.filter(s => (s.components?.I || 0) > 0.6).length;
+
+  container.innerHTML = `
+    <div style="font-size:13px; line-height:1.8;">
+      <strong>Heat Wave & Thermal Stress Index (I3):</strong> ${avgI3.toFixed(3)}<br/>
+      <strong>High Thermal Stress Substations:</strong> ${heatStressCount} (${(100*heatStressCount/substations.length).toFixed(1)}%)<br/>
+      <strong>Mediterranean Climate Profile:</strong> Hot, dry summers; extended drought periods<br/>
+      <strong>Mitigation Priority:</strong> Thermal load management, cooling infrastructure, vegetation clearing
+    </div>
+  `;
+
+  metricsContainer.innerHTML = `
+    <div class="kpi-grid" style="grid-template-columns: 1fr;">
+      <div class="kpi-card">
+        <div class="kpi-label">Heat Wave IRI (Component I3)</div>
+        <div class="kpi-value" style="font-size:24px;">${avgI3.toFixed(3)}</div>
+        <div class="kpi-sub">Average thermal stress exposure</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSeismicSection(substations) {
+  const container = document.getElementById('seismicProfile');
+
+  const zoneStats = {};
+  substations.forEach(s => {
+    const zone = s.seismic?.zone || 'III';
+    if (!zoneStats[zone]) zoneStats[zone] = 0;
+    zoneStats[zone]++;
+  });
+
+  const html = `
+    <div style="font-size:13px; line-height:1.8;">
+      <strong>EAK 2003 Seismic Zone Distribution:</strong><br/>
+      ${Object.entries(zoneStats).map(([zone, count]) => `Zone ${zone}: ${count} substations (${(100*count/substations.length).toFixed(1)}%)`).join('<br/>')}
+      <br/><br/>
+      <strong>High-Risk Zones (III & IV):</strong> Require earthquake-resilient foundation design and cable anchorage<br/>
+      <strong>Hellenic Arc Coupling:</strong> Subduction zone activity creates multi-year episodic hazard cycles<br/>
+      <strong>Restoration Complexity:</strong> Island substations in zones III–IV require aerial/marine logistics
+    </div>
+  `;
+
+  container.innerHTML = html;
+
+  const metricsContainer = document.getElementById('seismicMetrics');
+  const avgPGA = substations.reduce((s, sub) => s + (parseFloat(sub.seismic?.pga_g) || 0.36), 0) / substations.length;
+  metricsContainer.innerHTML = `
+    <div class="kpi-grid" style="grid-template-columns: 1fr;">
+      <div class="kpi-card">
+        <div class="kpi-label">Average PGA (Peak Ground Accel.)</div>
+        <div class="kpi-value" style="font-size:24px;">${avgPGA.toFixed(3)}g</div>
+        <div class="kpi-sub">EAK 2003 baseline: 0.36g (Zone III)</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderWildfireSection(substations) {
+  const container = document.getElementById('wildfireProfile');
+
+  const wildfire = substations.filter(s => {
+    const region = s.region || '';
+    return ['Peloponnese', 'Attica', 'Central Greece', 'Thessaly'].some(r => region.includes(r));
+  });
+
+  container.innerHTML = `
+    <div class="grid-2">
+      <div style="font-size:13px; line-height:1.8;">
+        <strong>High-Risk Wildfire Regions:</strong> Peloponnese, Attica, Central Greece, Thessaly<br/>
+        <strong>Season:</strong> May–September (peak: July–August)<br/>
+        <strong>Vegetation Risk (I2 component):</strong> Tree-fall and brush fire exposure<br/>
+        <strong>Exposed Substations:</strong> ${wildfire.length} (${(100*wildfire.length/substations.length).toFixed(1)}%)<br/>
+        <strong>Mitigation Actions:</strong> Vegetation management, fireproofing, rapid restoration logistics
+      </div>
+      <div class="method-box">
+        <div class="method-label">Wildfire Modifier (R5)</div>
+        <p>R5 multiplier applies 1.10–1.35 kappa scaling in high-risk regions during fire season. Mediterranean climate trajectory under RCP 8.5 scenarios extends fire season by ~2 months (2050s), increasing expected wildfire frequency by 30–50%.</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderPovertySection(substations) {
+  const container = document.getElementById('povertyProfile');
+  const metricsContainer = document.getElementById('povertyMetrics');
+
+  const highPoverty = substations.filter(s => (s.socio_economic?.V_socio || 0) > 0.3).length;
+
+  container.innerHTML = `
+    <div style="font-size:13px; line-height:1.8;">
+      <strong>Energy Poverty (HEPI) Average:</strong> ~27% nationally<br/>
+      <strong>High-Poverty Substations (V_socio > 0.3):</strong> ${highPoverty} (${(100*highPoverty/substations.length).toFixed(1)}%)<br/>
+      <strong>Concentrations:</strong> Rural regions, islands, aging urban areas<br/>
+      <strong>Social Consequence (R3 modifier):</strong> Amplifies infrastructure risk in vulnerable communities<br/>
+      <strong>Policy Alignment:</strong> EU Social Energy Directive (energy poverty targets)
+    </div>
+  `;
+
+  const avgSocio = substations.reduce((s, sub) => s + (sub.socio_economic?.V_socio || 0), 0) / substations.length;
+  metricsContainer.innerHTML = `
+    <div class="kpi-grid" style="grid-template-columns: 1fr;">
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Energy Poverty Index</div>
+        <div class="kpi-value" style="font-size:24px;">${avgSocio.toFixed(3)}</div>
+        <div class="kpi-sub">Socio-economic vulnerability measure</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderIslandSection(substations) {
+  const container = document.getElementById('islandProfile');
+
+  const islandRegions = ['Crete', 'Ionian Islands', 'North Aegean', 'South Aegean'];
+  const islands = substations.filter(s => islandRegions.some(r => (s.region || '').includes(r)));
+
+  container.innerHTML = `
+    <div class="grid-2">
+      <div style="font-size:13px; line-height:1.8;">
+        <strong>Island Peripheries (Non-Interconnected):</strong> North Aegean, Ionian Islands (partial), South Aegean<br/>
+        <strong>Substations in Island Systems:</strong> ${islands.length} (${(100*islands.length/substations.length).toFixed(1)}%)<br/>
+        <strong>Mean Recovery Time (CAIDI):</strong> 2–4x mainland systems due to marine logistics<br/>
+        <strong>Submarine Cable Redundancy:</strong> Limited; single-cable systems dominant<br/>
+        <strong>Economic Multiplier:</strong> Tourism-dependent economies amplify outage consequence
+      </div>
+      <div class="method-box">
+        <div class="method-label">Island Isolation Modifier (R8)</div>
+        <p>R8 multiplier applies 0.80–1.05 kappa scaling. Non-interconnected islands (North Aegean, Ionian non-Corfu) receive 1.05 upscale (highest isolation risk); Crete receives 0.95 (subsea interconnection to Peloponnese reduces risk).</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderElderlySection(substations) {
+  const container = document.getElementById('elderlyProfile');
+
+  const elderlyRegions = ['Epirus', 'Western Macedonia', 'East Macedonia'];
+  const elderly = substations.filter(s => elderlyRegions.some(r => (s.region || '').includes(r)));
+
+  container.innerHTML = `
+    <div style="font-size:13px; line-height:1.8;">
+      <strong>Aging Population Regions:</strong> Epirus, Western Macedonia, East Macedonia, Thessaly<br/>
+      <strong>Substations in High-Elderly Catchments:</strong> ${elderly.length} (${(100*elderly.length/substations.length).toFixed(1)}%)<br/>
+      <strong>Heat Wave Vulnerability:</strong> Lack of air conditioning; limited mobility during emergencies<br/>
+      <strong>Critical Infrastructure Dependency:</strong> Hospitals, care facilities, dialysis centers<br/>
+      <strong>Outage Duration Consequence:</strong> Multiplied by demographic vulnerability; elevated health & mortality risk<br/>
+      <strong>Mitigation:</strong> Prioritized critical load protection; fast restoration protocols
+    </div>
+  `;
+}
+
+function renderRAESection(substations) {
+  const container = document.getElementById('raeProfile');
+
+  const avgC = substations.reduce((s, sub) => s + (sub.components?.C || 0), 0) / substations.length;
+  const highSAIDI = substations.filter(s => (s.components?.C || 0) > 0.6).length;
+
+  container.innerHTML = `
+    <div style="font-size:13px; line-height:1.8;">
+      <strong>SAIDI/SAIFI Performance (Component C):</strong> ${avgC.toFixed(3)} (average)<br/>
+      <strong>High SAIDI Substations:</strong> ${highSAIDI} (${(100*highSAIDI/substations.length).toFixed(1)}%)<br/>
+      <strong>RAE Investment Prioritization:</strong> Substations in High/Critical bands align with RAE 2024–2026 focus list<br/>
+      <strong>Compliance Framework:</strong> EU Network Codes, EN 50160 voltage quality standards<br/>
+      <strong>Regulatory Penalties:</strong> Non-compliance triggers fines; SAIDI/SAIFI targets mandatory reporting<br/>
+      <strong>Transparency Requirement:</strong> Public disclosure of investment plans and risk assessments
+    </div>
+  `;
+}
+
+function renderEUSection(substations) {
+  const container = document.getElementById('euProfile');
+
+  const derHigh = substations.filter(s => (s.transition?.DER_ratio || 0) > 0.8).length;
+
+  container.innerHTML = `
+    <div style="font-size:13px; line-height:1.8;">
+      <strong>Greece NECP 2030 Target:</strong> 61% renewable energy share<br/>
+      <strong>Substations with High DER Penetration (>0.8):</strong> ${derHigh} (${(100*derHigh/substations.length).toFixed(1)}%)<br/>
+      <strong>EU Taxonomy Article 11 Screening:</strong> Substations must demonstrate climate resilience (R_median, modifiers R2–R7)<br/>
+      <strong>Clean Energy Package Compliance:</strong> Grid modernization, demand flexibility, storage integration<br/>
+      <strong>Sustainable Finance Access:</strong> Taxonomy-aligned assets unlock green bonds, EU funding mechanisms<br/>
+      <strong>Decarbonization Imperative:</strong> Phase-out of coal-fired generation creates DER integration stress; grid upgrades essential
+    </div>
+  `;
+}
+
+function renderCyberSection(substations) {
+  const container = document.getElementById('cyberProfile');
+
+  const highCentrality = substations.filter(s => (s.graph_topology?.BC_percentile || 0) > 0.7).length;
+
+  container.innerHTML = `
+    <div style="font-size:13px; line-height:1.8;">
+      <strong>NIS2 Directive Scope:</strong> ADMIE (TSO) and DEDDIE (DSO) are essential service providers<br/>
+      <strong>High-Criticality Substations (Betweenness Centrality > 0.7):</strong> ${highCentrality} (${(100*highCentrality/substations.length).toFixed(1)}%)<br/>
+      <strong>SCADA & Communication Risk:</strong> Legacy systems (proprietary protocols); modern SCADA (IEC 60870-5-104, DNP3)<br/>
+      <strong>Cyber Consequence:</strong> Single-point-of-failure nodes trigger cascading blackouts; economic/health impact multiplied<br/>
+      <strong>NIS2 Requirements:</strong> Risk assessments, incident response plans, supply chain vetting, cyber insurance<br/>
+      <strong>Compliance Deadline:</strong> October 2024 (now in effect); audits ongoing
+    </div>
+  `;
+}
+
+function renderRegionalESG(substations) {
+  const tbody = document.getElementById('regionalESGBody');
+
+  const regionMap = {};
+  substations.forEach(s => {
+    const region = s.region || 'Unknown';
+    if (!regionMap[region]) {
+      regionMap[region] = { risks: [], env: 0, socio: 0, count: 0 };
+    }
+    regionMap[region].count++;
+    regionMap[region].risks.push(s.R_median || 0);
+    regionMap[region].env += (s.components?.I || 0);
+    regionMap[region].socio += (s.socio_economic?.V_socio || 0);
+  });
+
+  const regions = Object.entries(regionMap)
+    .map(([name, data]) => {
+      const sorted = data.risks.sort((a,b) => a - b);
+      const median = sorted[Math.floor(sorted.length / 2)];
+      return {
+        name,
+        count: data.count,
+        median,
+        env: data.env / data.count,
+        socio: data.socio / data.count
+      };
+    })
+    .sort((a, b) => b.count - a.count);
+
+  tbody.innerHTML = regions.map(r => {
+    const envBand = getBandLabel(getBand(r.env));
+    const socioBand = getBandLabel(getBand(r.socio));
+    const riskBand = getBandLabel(getBand(r.median));
+    return `
+      <tr>
+        <td><strong>${r.name}</strong></td>
+        <td class="num">${r.count}</td>
+        <td class="num">${r.median.toFixed(3)}</td>
+        <td>
+          <span class="band-badge ${getBand(r.env).toLowerCase()}">
+            <span class="band-dot ${getBand(r.env).toLowerCase()}"></span>
+            ${envBand}
+          </span>
+        </td>
+        <td>
+          <span class="band-badge ${getBand(r.socio).toLowerCase()}">
+            <span class="band-dot ${getBand(r.socio).toLowerCase()}"></span>
+            ${socioBand}
+          </span>
+        </td>
+        <td>
+          <span class="band-badge ${getBand(r.median).toLowerCase()}">
+            <span class="band-dot ${getBand(r.median).toLowerCase()}"></span>
+            ${riskBand}
+          </span>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function getMedianRisk(substations) {
+  const sorted = substations.map(s => s.R_median || 0).sort((a,b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)];
+}
+
+function getBand(score) {
+  if (score < 0.25) return 'low';
+  if (score < 0.50) return 'medium';
+  if (score < 0.75) return 'high';
+  return 'critical';
+}
+
+function getBandLabel(band) {
+  const labels = { low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical' };
+  return labels[band] || 'Unknown';
+}
+</script>
+
+<script>renderFooter();</script>
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DNO Dashboard — Compare ADMIE and DEDDIE grid operator risk profiles across 581 Greek substations.">
+  <title>SSI Index — Grid Operator Dashboard</title>
+  <link rel="stylesheet" href="../style.css?v=3">
+  <style>
+    :root {
+      --cream: #faf6f5;
+      --cream-deep: #f0ebe8;
+      --crimson: #941914;
+      --terracotta: #aa4234;
+      --sage: #5d8563;
+      --bronze: #b8863a;
+      --ink: #2c2420;
+      --warm-grey: #8a7e76;
+      --warm-grey-light: #b5aca5;
+      --bg: #f5f0ed;
+      --card-bg: #ffffff;
+      --card-border: rgba(44,36,32,0.08);
+      --card-shadow: 0 1px 4px rgba(44,36,32,0.06);
+      --card-shadow-hover: 0 4px 16px rgba(44,36,32,0.10);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg); color: var(--ink);
+      font-size: 14px; line-height: 1.6;
+    }
+
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; }
+    h1 { font-size: 28px; line-height: 1.2; }
+    h2 { font-size: 22px; line-height: 1.3; margin-bottom: 16px; }
+    h3 { font-size: 17px; line-height: 1.4; margin-bottom: 12px; }
+
+    .label-xs { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--warm-grey); font-weight: 500; }
+    .label-sm { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; }
+
+    .page-shell { max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { margin-bottom: 6px; }
+    .page-header p { color: var(--warm-grey); font-size: 14px; max-width: 700px; }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 20px 24px;
+      box-shadow: var(--card-shadow); transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: var(--card-shadow-hover); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+    .card-header h3 { font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; margin: 0; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 20px; box-shadow: var(--card-shadow); }
+    .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; margin-bottom: 6px; }
+    .kpi-card .kpi-value { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .kpi-card .kpi-sub { font-size: 12px; color: var(--warm-grey); }
+
+    .band-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .band-badge.low { background: rgba(93,133,99,0.10); color: var(--sage); }
+    .band-badge.medium { background: rgba(184,134,58,0.10); color: var(--bronze); }
+    .band-badge.high { background: rgba(170,66,52,0.10); color: var(--terracotta); }
+    .band-badge.critical { background: rgba(148,25,20,0.10); color: var(--crimson); }
+    .band-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .band-dot.low { background: var(--sage); }
+    .band-dot.medium { background: var(--bronze); }
+    .band-dot.high { background: var(--terracotta); }
+    .band-dot.critical { background: var(--crimson); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-grey); font-weight: 500; padding: 10px 12px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); }
+    .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(44,36,32,0.04); vertical-align: top; }
+    .data-table tr:hover td { background: rgba(44,36,32,0.02); }
+    .data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+    .section-block { margin-bottom: 40px; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--cream-deep); }
+    .section-number { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--cream-deep); line-height: 1; }
+    .section-title-group { flex: 1; }
+    .section-title-group h2 { margin-bottom: 2px; }
+    .section-title-group .section-sub { font-size: 13px; color: var(--warm-grey); }
+
+    .operator-card { background: var(--card-bg); border-left: 4px solid; padding: 20px 24px; border-radius: 6px; margin-bottom: 16px; }
+    .operator-card.admie { border-left-color: var(--terracotta); }
+    .operator-card.deddie { border-left-color: var(--sage); }
+    .operator-card h3 { margin-bottom: 12px; }
+    .operator-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .stat-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--cream-deep); }
+    .stat-item:last-child { border-bottom: none; }
+    .stat-label { color: var(--warm-grey); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-value { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-top: 2px; }
+
+    .region-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 8px; }
+    .region-bar-bg { flex: 1; height: 12px; background: var(--cream-deep); border-radius: 6px; overflow: hidden; position: relative; }
+    .region-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
+    .region-name { width: 140px; font-weight: 500; color: var(--ink); }
+    .region-count { width: 45px; text-align: right; font-variant-numeric: tabular-nums; }
+    .region-pct { width: 50px; text-align: right; color: var(--warm-grey); font-size: 12px; }
+
+    .top-risks-list { list-style: none; }
+    .top-risks-list li { padding: 10px 0; border-bottom: 1px solid var(--cream-deep); display: flex; align-items: center; gap: 12px; }
+    .top-risks-list li:last-child { border-bottom: none; }
+    .risk-rank { width: 28px; height: 28px; background: var(--cream-deep); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--ink); font-size: 12px; flex-shrink: 0; }
+    .risk-info { flex: 1; }
+    .risk-name { font-weight: 500; color: var(--ink); }
+    .risk-details { font-size: 12px; color: var(--warm-grey); margin-top: 2px; }
+
+    .page-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--card-border); color: var(--warm-grey); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .page-shell { padding: 20px 16px 48px; } }
+    @media (max-width: 480px) { .kpi-card .kpi-value { font-size: 26px; } .kpi-card { padding: 14px 16px; } .card { padding: 16px; } }
+  </style>
+</head>
+<body>
+<script src="../ssi-versions.js?_=1"></script>
+<script src="../nav.js?v=118"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js"></script>
+<script>renderNav('dno');</script>
+
+<div class="page-shell">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="label-xs" style="margin-bottom:6px;">GREECE GRID OPERATORS — 2026 SUSTAINABILITY INDEX</div>
+    <h1>DNO Dashboard: ADMIE vs DEDDIE</h1>
+    <p>Operator-level risk assessment across Greece's transmission (ADMIE/IPTO) and distribution (DEDDIE/HEDNO) networks. Compare fleet composition, regional exposure, and investment priorities across 581 substations.</p>
+  </div>
+
+  <!-- ── Fleet Overview KPIs ── -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Fleet Overview</h2>
+        <div class="section-sub">Aggregate statistics for Greece's grid operators</div>
+      </div>
+    </div>
+    <div class="kpi-grid" id="fleetKpis"></div>
+  </div>
+
+  <!-- ── Operator Comparison ── -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Operator Fleet Statistics</h2>
+        <div class="section-sub">Risk profile and asset composition by transmission and distribution operators</div>
+      </div>
+    </div>
+    <div id="operatorCards"></div>
+  </div>
+
+  <!-- ── Regional Breakdown ── -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">1</span>
+      <div class="section-title-group">
+        <h2>Regional Breakdown: 13 Peripheries</h2>
+        <div class="section-sub">Substation count and risk distribution across Greek administrative regions</div>
+      </div>
+    </div>
+    <div class="card">
+      <div id="regionBreakdown"></div>
+    </div>
+  </div>
+
+  <!-- ── Top Risk Substations ── -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">2</span>
+      <div class="section-title-group">
+        <h2>Top Risk Substations by Operator</h2>
+        <div class="section-sub">Highest-risk facilities requiring prioritized investment and monitoring</div>
+      </div>
+    </div>
+    <div class="grid-2" id="topRisksContainer"></div>
+  </div>
+
+  <!-- ── Investment Priorities ── -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">3</span>
+      <div class="section-title-group">
+        <h2>Investment Priority Ranking</h2>
+        <div class="section-sub">Regional and operator-level allocation guidance based on risk concentration</div>
+      </div>
+    </div>
+    <div class="card">
+      <table class="data-table" id="investmentTable">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Region</th>
+            <th>Operator</th>
+            <th>Substations (High/Critical)</th>
+            <th>Median Risk</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody id="investmentBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="page-footer">
+    <div>SSI Index v4.0.2 — Greece Grid Operators Report</div>
+    <div>581 substations across 13 Peripheries | ADMIE & DEDDIE networks</div>
+  </div>
+
+</div><!-- /page-shell -->
+
+<script>
+'use strict';
+
+let ssiData = null;
+
+// Load and process ssi-data.json
+fetch('ssi-data.json')
+  .then(r => r.json())
+  .then(data => {
+    ssiData = data;
+    renderDashboard();
+  })
+  .catch(err => {
+    console.error('Failed to load ssi-data.json:', err);
+    document.body.innerHTML += '<p style="padding:20px; color:red;">Error loading data. Check ssi-data.json availability.</p>';
+  });
+
+function getBand(score) {
+  if (score < 0.25) return 'low';
+  if (score < 0.50) return 'medium';
+  if (score < 0.75) return 'high';
+  return 'critical';
+}
+
+function getOperatorType(voltage) {
+  // TSO (ADMIE/IPTO): ≥ 300kV
+  // DSO (DEDDIE/HEDNO): < 300kV
+  return voltage >= 300 ? 'TSO' : 'DSO';
+}
+
+function renderDashboard() {
+  if (!ssiData || !ssiData.substations) {
+    console.error('ssiData structure invalid');
+    return;
+  }
+
+  const substations = ssiData.substations;
+
+  // Partition by operator
+  const admie = substations.filter(s => getOperatorType(s.voltage_kv) === 'TSO');
+  const deddie = substations.filter(s => getOperatorType(s.voltage_kv) === 'DSO');
+
+  renderFleetKpis(substations, admie, deddie);
+  renderOperatorCards(admie, deddie);
+  renderRegionalBreakdown(substations);
+  renderTopRisks(admie, deddie);
+  renderInvestmentPriorities(substations);
+}
+
+function renderFleetKpis(all, admie, deddie) {
+  const fleetKpis = document.getElementById('fleetKpis');
+  const medianAll = getMedianRisk(all);
+  const p95All = getPercentileRisk(all, 0.95);
+  const criticalCount = all.filter(s => getBand(s.R_median) === 'critical').length;
+
+  const kpis = [
+    { label: 'Total Substations', value: all.length.toString() },
+    { label: 'Median Risk (Fleet)', value: medianAll.toFixed(3) },
+    { label: 'P95 Risk', value: p95All.toFixed(3) },
+    { label: 'Critical Band', value: criticalCount + ' (' + (100 * criticalCount / all.length).toFixed(1) + '%)' }
+  ];
+
+  fleetKpis.innerHTML = kpis.map(kpi => `
+    <div class="kpi-card">
+      <div class="kpi-label">${kpi.label}</div>
+      <div class="kpi-value">${kpi.value}</div>
+    </div>
+  `).join('');
+}
+
+function renderOperatorCards(admie, deddie) {
+  const container = document.getElementById('operatorCards');
+
+  const admieCard = renderOperatorCard('ADMIE / IPTO', 'TSO (Transmission)', admie, 'admie');
+  const deddieCard = renderOperatorCard('DEDDIE / HEDNO', 'DSO (Distribution)', deddie, 'deddie');
+
+  container.innerHTML = admieCard + deddieCard;
+}
+
+function renderOperatorCard(name, type, substations, cssClass) {
+  const median = getMedianRisk(substations);
+  const p95 = getPercentileRisk(substations, 0.95);
+  const avgAge = substations.length > 0
+    ? substations.reduce((sum, s) => sum + (s.age_years || 0), 0) / substations.length
+    : 0;
+  const critCount = substations.filter(s => getBand(s.R_median) === 'critical').length;
+  const highCount = substations.filter(s => getBand(s.R_median) === 'high').length;
+
+  return `
+    <div class="operator-card ${cssClass}">
+      <h3>${name}</h3>
+      <div class="label-sm" style="margin-bottom:12px;">${type}</div>
+      <div class="operator-stats">
+        <div class="stat-item">
+          <div class="stat-label">Substations</div>
+          <div class="stat-value">${substations.length}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Median Risk</div>
+          <div class="stat-value">${median.toFixed(3)}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">P95 Risk</div>
+          <div class="stat-value">${p95.toFixed(3)}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Avg Age</div>
+          <div class="stat-value">${avgAge.toFixed(1)}y</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Critical</div>
+          <div class="stat-value">${critCount} (${(100*critCount/substations.length).toFixed(1)}%)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">High Risk</div>
+          <div class="stat-value">${highCount} (${(100*highCount/substations.length).toFixed(1)}%)</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderRegionalBreakdown(substations) {
+  const container = document.getElementById('regionBreakdown');
+  const regionMap = {};
+
+  substations.forEach(s => {
+    const region = s.region || 'Unknown';
+    if (!regionMap[region]) {
+      regionMap[region] = { count: 0, risks: [] };
+    }
+    regionMap[region].count++;
+    regionMap[region].risks.push(s.R_median || 0);
+  });
+
+  const regions = Object.entries(regionMap)
+    .map(([name, data]) => ({
+      name,
+      count: data.count,
+      median: data.risks.length > 0 ? data.risks.sort((a,b) => a - b)[Math.floor(data.risks.length / 2)] : 0
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const maxCount = Math.max(...regions.map(r => r.count));
+
+  const html = regions.map(r => {
+    const fillWidth = (100 * r.count / maxCount);
+    const band = getBand(r.median);
+    return `
+      <div class="region-bar">
+        <div class="region-name">${r.name}</div>
+        <div class="region-bar-bg">
+          <div class="region-bar-fill" style="width:${fillWidth}%; background:${getColorForBand(band)};"></div>
+        </div>
+        <div class="region-count">${r.count}</div>
+        <div class="region-pct">${r.median.toFixed(3)}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = html;
+}
+
+function renderTopRisks(admie, deddie) {
+  const container = document.getElementById('topRisksContainer');
+
+  const admieTop10 = admie
+    .sort((a, b) => (b.R_median || 0) - (a.R_median || 0))
+    .slice(0, 10);
+
+  const deddieTop10 = deddie
+    .sort((a, b) => (b.R_median || 0) - (a.R_median || 0))
+    .slice(0, 10);
+
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h3>ADMIE/IPTO (TSO)</h3>
+      </div>
+      <ul class="top-risks-list">
+        ${admieTop10.map((s, i) => renderRiskItem(i + 1, s)).join('')}
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3>DEDDIE/HEDNO (DSO)</h3>
+      </div>
+      <ul class="top-risks-list">
+        ${deddieTop10.map((s, i) => renderRiskItem(i + 1, s)).join('')}
+      </ul>
+    </div>
+  `;
+}
+
+function renderRiskItem(rank, substation) {
+  const band = getBand(substation.R_median);
+  return `
+    <li>
+      <div class="risk-rank">#${rank}</div>
+      <div class="risk-info">
+        <div class="risk-name">${substation.substation_id || 'Unknown'}</div>
+        <div class="risk-details">
+          <span class="band-badge ${band}">
+            <span class="band-dot ${band}"></span>
+            ${getBandLabel(band)}
+          </span>
+          R = ${(substation.R_median || 0).toFixed(3)} | ${substation.region || '—'} | ${substation.voltage_kv}kV
+        </div>
+      </div>
+    </li>
+  `;
+}
+
+function renderInvestmentPriorities(substations) {
+  const tbody = document.getElementById('investmentBody');
+  const regionMap = {};
+
+  substations.forEach(s => {
+    const region = s.region || 'Unknown';
+    const operator = getOperatorType(s.voltage_kv) === 'TSO' ? 'ADMIE' : 'DEDDIE';
+    const key = region + '|' + operator;
+
+    if (!regionMap[key]) {
+      regionMap[key] = { region, operator, substations: [] };
+    }
+    regionMap[key].substations.push(s);
+  });
+
+  const priorities = Object.values(regionMap)
+    .map(entry => {
+      const risks = entry.substations.map(s => s.R_median || 0);
+      const critical = entry.substations.filter(s => getBand(s.R_median) === 'critical').length;
+      const high = entry.substations.filter(s => getBand(s.R_median) === 'high').length;
+      const median = risks.sort((a, b) => a - b)[Math.floor(risks.length / 2)];
+      const highCritical = critical + high;
+
+      return {
+        ...entry,
+        median,
+        highCritical,
+        score: highCritical * 100 + median
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 15);
+
+  tbody.innerHTML = priorities.map((p, idx) => `
+    <tr>
+      <td>${idx + 1}</td>
+      <td>${p.region}</td>
+      <td>${p.operator}</td>
+      <td>${p.highCritical} substations</td>
+      <td class="num">${p.median.toFixed(3)}</td>
+      <td>
+        <span class="band-badge ${p.highCritical > 5 ? 'critical' : p.highCritical > 2 ? 'high' : 'medium'}">
+          <span class="band-dot ${p.highCritical > 5 ? 'critical' : p.highCritical > 2 ? 'high' : 'medium'}"></span>
+          ${p.highCritical > 5 ? 'Critical' : p.highCritical > 2 ? 'High' : 'Medium'}
+        </span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function getMedianRisk(substations) {
+  if (substations.length === 0) return 0;
+  const sorted = substations.map(s => s.R_median || 0).sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)];
+}
+
+function getPercentileRisk(substations, percentile) {
+  if (substations.length === 0) return 0;
+  const sorted = substations.map(s => s.R_median || 0).sort((a, b) => a - b);
+  const idx = Math.floor(sorted.length * percentile);
+  return sorted[Math.min(idx, sorted.length - 1)];
+}
+
+function getBandLabel(band) {
+  const labels = { low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical' };
+  return labels[band] || 'Unknown';
+}
+
+function getColorForBand(band) {
+  const colors = {
+    low: '#5d8563',
+    medium: '#b8863a',
+    high: '#aa4234',
+    critical: '#941914'
+  };
+  return colors[band] || '#ccc';
+}
+</script>
+
+<script>renderFooter();</script>
+</body>
+</html>
