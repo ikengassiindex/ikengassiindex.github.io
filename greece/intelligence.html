@@ -503,56 +503,93 @@ document.addEventListener("ssi-config-ready", function(e) {
       'telemetry, and remote response capacity are weak. Concentrated in: ' + blindRegionStr + '. These are priority targets for ' +
       'DSO SCADA upgrades and ADMIE monitoring investment.';
 
-    // ── B.2 Economic tiers ──
-    var econTiers = [
-      { threshold: 1.10, label: 'Low Economic Consequence', color: 'var(--sage)', desc: 'R3 < 1.10 — rural/sparse load' },
-      { threshold: 1.25, label: 'Medium Economic Consequence', color: 'var(--bronze)', desc: 'R3 [1.10–1.25] — town-scale exposure' },
-      { threshold: 1.40, label: 'High Economic Consequence', color: 'var(--terracotta)', desc: 'R3 [1.25–1.40] — industrial/urban' },
-      { threshold: 999, label: 'Critical Economic Consequence', color: 'var(--crimson)', desc: 'R3 ≥ 1.40 — metropolitan/strategic' }
+    // ── B.2 Economic Impact & Island Isolation Risk ──
+    // Tier by R3 (consequence multiplier) — adapted for Greek grid structure
+    var tiers = [
+      { label: 'Metropolitan / Strategic', desc: 'Major load centres (Attica, Thessaloniki) — highest economic loss per interruption',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.40; }, color: '#941914', icon: '\uD83C\uDFD9\uFE0F',
+        voll: '\u20AC450\u2013850/MWh' },
+      { label: 'Industrial / Urban', desc: 'Industrial zones, port cities, tourism hubs — significant continuity requirements',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.25 && s.modifiers.R3_C_mult < 1.40; }, color: '#aa4234', icon: '\uD83C\uDFED',
+        voll: '\u20AC250\u2013450/MWh' },
+      { label: 'Commercial / Town-Scale', desc: 'Regional towns, SME clusters, coastal tourism — moderate individual but high aggregate exposure',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.25; }, color: '#b8863a', icon: '\uD83C\uDFEA',
+        voll: '\u20AC100\u2013250/MWh' },
+      { label: 'Rural / Agricultural / Island', desc: 'Sparse economic activity, agricultural land, small islands — lower VoLL but higher social vulnerability',
+        filter: function(s){ return s.modifiers.R3_C_mult < 1.10; }, color: '#5d8563', icon: '\uD83C\uDF3E',
+        voll: '\u20AC50\u2013100/MWh' }
     ];
 
-    var tierCounts = { Low: 0, Medium: 0, High: 0, Critical: 0 };
-    fleet.forEach(function(s){
-      var r3 = s.modifiers.R3_C_mult || 1.0;
-      if (r3 < 1.10) tierCounts.Low++;
-      else if (r3 < 1.25) tierCounts.Medium++;
-      else if (r3 < 1.40) tierCounts.High++;
-      else tierCounts.Critical++;
-    });
+    var tiersHTML = '';
+    tiers.forEach(function(tier){
+      var subs = fleet.filter(tier.filter);
+      var nTier = subs.length;
+      var highCrit = subs.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
+      var avgR = subs.length ? subs.reduce(function(a,s){ return a + s.R_median; }, 0) / subs.length : 0;
+      var avgE = subs.length ? subs.reduce(function(a,s){ return a + s.components.E; }, 0) / subs.length : 0;
+      var pctFleet = (nTier / n * 100).toFixed(1);
 
-    var tierHTML = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">';
-    econTiers.forEach(function(t){
-      var key = t.label.split(' ')[0].toLowerCase();
-      var keyMap = { low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical' };
-      var cnt = tierCounts[keyMap[key]] || 0;
-      tierHTML += '<div class="card" style="border-top:3px solid ' + t.color + '">' +
-        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:' + t.color + ';margin-bottom:6px;letter-spacing:0.05em">' +
-        t.label + '</div>' +
-        '<div style="font-size:14px;font-weight:600;margin-bottom:4px">' + cnt + '</div>' +
-        '<div style="font-size:12px;color:var(--warm-grey)">' + (cnt/n*100).toFixed(1) + '% · ' + t.desc + '</div></div>';
-    });
-    tierHTML += '</div>';
-    document.getElementById('b2-tiers').innerHTML = tierHTML;
+      // Band breakdown within tier
+      var tierBands = { Low:0, Medium:0, High:0, Critical:0 };
+      subs.forEach(function(s){ tierBands[s.classification]++; });
+      var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
+      var bandBar = '';
+      ['Low','Medium','High','Critical'].forEach(function(b){
+        if (tierBands[b] > 0) {
+          var w = (tierBands[b] / nTier * 100).toFixed(1);
+          bandBar += '<div style="width:' + w + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + tierBands[b] + '"></div>';
+        }
+      });
 
-    // B.2 VoLL note
+      tiersHTML += '<div class="card" style="margin-bottom:12px;border-left:3px solid ' + tier.color + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">' +
+          '<span style="font-size:14px;font-weight:600">' + tier.icon + ' ' + tier.label + '</span>' +
+          '<span style="font-size:12px;color:var(--warm-grey)">Est. VoLL: ' + tier.voll + '</span></div>' +
+        '<p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">' + tier.desc + '</p>' +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">' +
+          '<span><strong>' + nTier.toLocaleString() + '</strong> substations (' + pctFleet + '%)</span>' +
+          '<span>High/Critical: <strong style="color:var(--crimson)">' + highCrit + '</strong> (' + (nTier ? (highCrit/nTier*100).toFixed(1) : 0) + '%)</span>' +
+          '<span>Avg R: <strong>' + avgR.toFixed(3) + '</strong></span>' +
+          '<span>Avg E: <strong>' + avgE.toFixed(3) + '</strong> / 0.10</span></div>' +
+        '<div style="height:8px;border-radius:4px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+        '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px">' +
+          '<span>Low ' + tierBands.Low + '</span><span>Med ' + tierBands.Medium + '</span>' +
+          '<span>High ' + tierBands.High + '</span><span>Crit ' + tierBands.Critical + '</span></div>' +
+      '</div>';
+    });
+    document.getElementById('b2-tiers').innerHTML = tiersHTML;
+
+    // VoLL context note
+    var totalHighConseqHighRisk = fleet.filter(function(s){
+      return s.modifiers.R3_C_mult >= 1.40 && (s.classification === 'High' || s.classification === 'Critical');
+    }).length;
     document.getElementById('b2-voll-note').innerHTML =
-      '<strong>Value of Lost Load (VoLL) and Island Premium:</strong> Greece\'s mainland VoLL averages EUR 450–550/MWh; ' +
-      'island communities face a 30–50% VoLL premium due to fuel import dependence and non-interconnection risk. ' +
-      'The 2024 Crete HVDC interconnection and ongoing non-interconnected island projects (Cyclades, Dodecanese by 2027) ' +
-      'will gradually reduce this island premium — but until then, substations serving Cyclades and Dodecanese should be ' +
-      'weighted with a multiplicative VoLL uplift in BESS investment analysis.';
+      '<strong>Value of Lost Load (VoLL) context:</strong> Greece\'s mainland VoLL averages EUR 450\u2013550/MWh (RAE/HEnEx 2024); ' +
+      'island communities face a 30\u201350% VoLL premium due to fuel import dependence and non-interconnection risk. ' +
+      '<strong>' + totalHighConseqHighRisk + ' substations</strong> combine metropolitan economic fabric (R3 \u2265 1.40) with ' +
+      'High or Critical risk classification \u2014 representing the highest VoLL-weighted exposure in the fleet. ' +
+      'The 2024 Crete HVDC interconnection will gradually reduce island premiums, but Cyclades and Dodecanese ' +
+      'substations should still carry a multiplicative VoLL uplift in BESS investment analysis until full interconnection (est. 2027).';
 
     // B.2 Narrative
+    var topTierSubs = fleet.filter(tiers[0].filter);
+    var topTierRegions = {};
+    topTierSubs.forEach(function(s){ topTierRegions[s.region] = (topTierRegions[s.region] || 0) + 1; });
+    var topEconRegions = Object.keys(topTierRegions).map(function(r){ return { name: r, n: topTierRegions[r] }; })
+      .sort(function(a,b){ return b.n - a.n; }).slice(0, 3);
+    var econRegionStr = topEconRegions.map(function(r){ return r.name + ' (' + r.n + ')'; }).join(', ');
+
     var islandSubs = fleet.filter(function(s){
       return s.region && (s.region.indexOf('Island') >= 0 || ['Cyclades','Crete','Dodecanese','Ionian Islands'].indexOf(s.region) >= 0);
     });
+    var avgEP = fleet.reduce(function(a,s){ return a + (s.socio_economic.EP_rate_region || 0); }, 0) / n;
     document.getElementById('b2-narrative').innerHTML =
-      'Greece\'s economic consequence landscape is highly heterogeneous. <strong>' + tierCounts.Critical + ' substations</strong> ' +
-      '(R3 ≥ 1.40) serve metropolitan/industrial cores (Attica, Thessaloniki, Larissa), where the socio-economic fallout of ' +
-      'grid failure is largest. An additional <strong>' + tierCounts.High + ' substations</strong> sit in the High tier (R3 [1.25–1.40]), ' +
-      'serving secondary industrial nodes and tourism-dependent coastal zones. ' +
-      'Island substations (' + islandSubs.length + ' total) face a unique premium: their economic consequence is amplified by ' +
-      'non-interconnection and fuel logistics. The R8 island isolation modifier captures this.';
+      'Greece\'s economic consequence landscape is highly heterogeneous. ' +
+      '<strong>' + topTierSubs.length + ' substations</strong> (R3 \u2265 1.40) serve metropolitan/strategic cores, ' +
+      'concentrated in ' + econRegionStr + '. Island substations (' + islandSubs.length + ' across Crete, Ionian Islands, ' +
+      'South Aegean, North Aegean) face an amplified consequence premium via the R8 island isolation modifier. ' +
+      'Average fleet energy poverty rate: <strong>' + avgEP.toFixed(1) + '%</strong> \u2014 ranging from ~6% in Attica to >14% ' +
+      'in Western Greece and Epirus, underscoring the socio-economic dimension of grid resilience.';
 
     // ── B.3 Regional ranking ──
     var regionData = {};
@@ -647,7 +684,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     <li><strong>NECP 2030 DER Registry (Q1 2026):</strong> Greek capacity for DER (solar + wind) reached 8.2 GW as of March 2026 — tracking toward the NECP 2030 renewable target of 15+ GW. The T (Transition) component now captures actual RES curtailment and voltage stress at substations serving high-penetration renewable clusters (Thessaly, Peloponnese, Crete post-interconnection).</li>
     <li><strong>EAK 2003 Seismic Zone Revision:</strong> Annual update to GGDC/USGS seismic catalogue and EAK 2003 hazard zones. Two substations reclassified from Zone II to Zone I (0.30g → 0.35g PGA); R6b modifier uplift of ~3% fleet-wide for high-hazard substations.</li>
     <li><strong>Wildfire Risk Layer (EMSR/Copernicus):</strong> 2025–2026 fire season mapping from Copernicus Emergency Management Service (EMSR-615) shows elevated wildfire risk in Peloponnese and Attica (average fuel load depletion index down 12% year-over-year). The I (Infrastructure) component now includes transmission tower/line exposure to wildfire in these zones.</li>
-    <li><strong>Energy Poverty Regional Snapshot (ELSTAT Q4 2025):</strong> Regional energy poverty rates published by Hellenic Statistical Authority. Highest exposure in Western Greece (14.2%), Epirus (13.8%), Basilicata Island (17.1% — non-interconnection premium). The E component's socio-economic proxy now reflects 2025 household energy cost burden.</li>
+    <li><strong>Energy Poverty Regional Snapshot (ELSTAT Q4 2025):</strong> Regional energy poverty rates published by Hellenic Statistical Authority. Highest exposure in Western Greece (14.2%), Epirus (13.8%), North Aegean islands (17.1% — non-interconnection premium). The E component's socio-economic proxy now reflects 2025 household energy cost burden.</li>
   </ul>
 </div>
 
@@ -1436,8 +1473,8 @@ document.addEventListener("ssi-config-ready", function(e) {
 </main>
 
 <footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
-  © 2026 Altinium Invest · Corso Vittorio Emanuele 110/5, 80121 Napoli · P.IVA 10656441218<br>
-  USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 633/1941, Berne Convention, Copyright Act 1976<br>
+  © 2026 Ikenga · SSI Digital Twin Dashboard v4.0.2<br>
+  Protected under Berne Convention, EU Directive 2019/790, Copyright Act 1976<br>
   <a href="#" style="color:var(--warm-grey-light);text-decoration:none">View in browser</a>
 </footer>
 
