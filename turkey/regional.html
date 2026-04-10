@@ -33,7 +33,7 @@
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
         <h3>Regions Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">Regions · sorted worst → best</span>
+        <span class="label-xs" id="ranking-count">7 bölges · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
@@ -100,7 +100,7 @@
     <div class="card animate-in">
       <div class="card-header">
         <h3>Average Component Contribution by Region</h3>
-        <span class="label-xs">Stacked horizontal bars · Regions</span>
+        <span class="label-xs">Stacked horizontal bars · 7 bölges</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
         <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
@@ -231,7 +231,8 @@ function populateProvinceSelects() {
   selA.value = sorted[0] || provNames[0]; // worst province
   // Find best province
   var bestIdx = sorted.length - 1;
-  selB.value = sorted[bestIdx];
+  var istIdx = sorted.indexOf('İstanbul') >= 0 ? sorted.indexOf('İstanbul') : sorted.indexOf('Istanbul');
+  selB.value = istIdx >= 0 ? sorted[istIdx] : sorted[bestIdx];
 
   selA.addEventListener('change', updateComparison);
   selB.addEventListener('change', updateComparison);

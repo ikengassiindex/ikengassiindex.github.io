@@ -298,7 +298,7 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
 
   // Update KPI
   document.getElementById('data-subs').textContent = n.toLocaleString();
-  document.getElementById('data-subs-sub').textContent = ssi.bölges.length + ' bölges · 107 ils';
+  document.getElementById('data-subs-sub').textContent = ssi.regions.length + ' bölges · 81 iller';
   document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' substations · all fields';
 
   // ── Full Dataset PDF (registration-gated) ──
@@ -315,7 +315,7 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
         head: [['ID', 'Name', 'Bölge', 'İl', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6a', 'R6b', 'R7', 'SZone', 'Markov', 'Tier']],
         body: ssi.substations.map(function(s) {
           return [
-            s.internal_id, s.name, s.bölge, s.il, s.voltage_kv,
+            s.internal_id, s.name, s.region, s.province, s.voltage_kv,
             s.R_median.toFixed(3), s.R_P5.toFixed(3), s.R_P95.toFixed(3), s.CI_width.toFixed(3),
             s.classification, (s.fleet_percentile * 100).toFixed(0) + '%',
             s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
@@ -364,17 +364,17 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
       });
       y = doc.lastAutoTable.finalY + 10;
 
-      // Bölgeal summary
+      // Regional summary
       doc.setFontSize(11); doc.setFont('helvetica', 'bold');
-      doc.text('Bölgeal Summary', 14, y); y += 6;
+      doc.text('Regional Summary', 14, y); y += 6;
 
       var regData = {};
       ssi.substations.forEach(function(s) {
-        if (!regData[s.bölge]) regData[s.bölge] = { sum: 0, count: 0, min: 1, max: 0 };
-        regData[s.bölge].sum += s.R_median;
-        regData[s.bölge].count++;
-        if (s.R_median < regData[s.bölge].min) regData[s.bölge].min = s.R_median;
-        if (s.R_median > regData[s.bölge].max) regData[s.bölge].max = s.R_median;
+        if (!regData[s.region]) regData[s.region] = { sum: 0, count: 0, min: 1, max: 0 };
+        regData[s.region].sum += s.R_median;
+        regData[s.region].count++;
+        if (s.R_median < regData[s.region].min) regData[s.region].min = s.R_median;
+        if (s.R_median > regData[s.region].max) regData[s.region].max = s.R_median;
       });
 
       doc.autoTable({
@@ -403,7 +403,7 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
         alternateRowStyles: { fillColor: [252, 249, 244] },
         head: [['#', 'Name', 'Bölge', 'kV', 'R_median', 'Band']],
         body: sorted.slice(0, 20).map(function(s, i) {
-          return [i + 1, s.name, s.bölge, s.voltage_kv, s.R_median.toFixed(4), s.classification];
+          return [i + 1, s.name, s.region, s.voltage_kv, s.R_median.toFixed(4), s.classification];
         }),
         margin: { left: 14, right: 14 }
       });
@@ -419,7 +419,7 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
         alternateRowStyles: { fillColor: [252, 249, 244] },
         head: [['#', 'Name', 'Bölge', 'kV', 'R_median', 'Band']],
         body: sorted.slice(-20).reverse().map(function(s, i) {
-          return [i + 1, s.name, s.bölge, s.voltage_kv, s.R_median.toFixed(4), s.classification];
+          return [i + 1, s.name, s.region, s.voltage_kv, s.R_median.toFixed(4), s.classification];
         }),
         margin: { left: 14, right: 14 }
       });
@@ -445,7 +445,7 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
         head: [['ID', 'Name', 'Bölge', 'İl', 'Longitude', 'Latitude', 'kV', 'R_median', 'Band', 'C', 'V', 'I', 'E', 'S', 'T']],
         body: ssi.substations.map(function(s) {
           return [
-            s.internal_id, s.name, s.bölge, s.il,
+            s.internal_id, s.name, s.region, s.province,
             s.lon.toFixed(5), s.lat.toFixed(5), s.voltage_kv,
             s.R_median.toFixed(3), s.classification,
             s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
@@ -506,7 +506,7 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
     '  <span class="hl-var">"substation_id"</span>: <span class="hl-num">"' + s.substation_id + '"</span>,\n' +
     '  <span class="hl-var">"version"</span>: <span class="hl-num">"' + s.version + '"</span>,\n' +
     '  <span class="hl-var">"name"</span>: <span class="hl-num">"' + s.name + '"</span>,\n' +
-    '  <span class="hl-var">"bölge"</span>: <span class="hl-num">"' + s.bölge + '"</span>,  <span class="hl-var">"il"</span>: <span class="hl-num">"' + s.il + '"</span>,\n' +
+    '  <span class="hl-var">"region"</span>: <span class="hl-num">"' + s.region + '"</span>,  <span class="hl-var">"province"</span>: <span class="hl-num">"' + s.province + '"</span>,\n' +
     '  <span class="hl-var">"R_median"</span>: <span class="hl-num">' + s.R_median.toFixed(4) + '</span>,\n' +
     '  <span class="hl-var">"R_P5"</span>: <span class="hl-num">' + s.R_P5.toFixed(4) + '</span>,  <span class="hl-var">"R_P95"</span>: <span class="hl-num">' + s.R_P95.toFixed(4) + '</span>,\n' +
     '  <span class="hl-var">"classification"</span>: <span class="hl-num">"' + s.classification + '"</span>,\n' +
@@ -524,7 +524,7 @@ fetch('ssi-data.json?v=44').then(function(r) { return r.json(); }).then(function
       '<span class="hl-num">"R6a"</span>: ' + s.modifiers.R6_restoration.toFixed(3) + ', ' +
       '<span class="hl-num">"R6b"</span>: ' + (s.modifiers.R6_seismic || 1.0).toFixed(3) + ', ' +
       '<span class="hl-num">"R7"</span>: ' + s.modifiers.R7_cyber.toFixed(3) + ' },\n' +
-    '  <span class="hl-var">"socio_economic"</span>: { <span class="hl-num">"V_socio"</span>: ' + s.socio_economic.V_socio.toFixed(3) + ', <span class="hl-num">"EP_rate"</span>: ' + s.socio_economic.EP_rate_bölge.toFixed(1) + ' },\n' +
+    '  <span class="hl-var">"socio_economic"</span>: { <span class="hl-num">"V_socio"</span>: ' + s.socio_economic.V_socio.toFixed(3) + ', <span class="hl-num">"EP_rate"</span>: ' + s.socio_economic.EP_rate_region.toFixed(1) + ' },\n' +
     '  <span class="hl-var">"graph_topology"</span>: { <span class="hl-num">"degree"</span>: ' + s.graph_topology.degree + ', <span class="hl-num">"BC_pct"</span>: ' + s.graph_topology.BC_percentile.toFixed(2) + ', <span class="hl-num">"bridge"</span>: ' + s.graph_topology.is_bridge + ' },\n' +
     '  <span class="hl-var">"seismic"</span>: { ' +
       '<span class="hl-num">"zone"</span>: ' + (s.seismic ? s.seismic.zone : 4) + ', ' +
