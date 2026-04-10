@@ -957,227 +957,352 @@ document.addEventListener("ssi-config-ready", function(e) {
 <div style="margin:32px 0"></div>
 
 
-<!-- ═══════════════════ D. DEEP-DIVE: CRETE–PELOPONNESE CORRIDOR ═══════════════════ -->
+<!-- ═══════════════════ D. THEMATIC DEEP-DIVE ═══════════════════ -->
 <section id="deep" style="margin-bottom:32px">
-<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section D</span>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section D — Monthly Deep-Dive</span>
 <h2>The Crete–Peloponnese Corridor: Where Island Interconnection Meets Seismic Exposure</h2>
 
-<div class="card" style="border-left:3px solid var(--crimson);background:var(--cream);margin-bottom:16px">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Edition 001 Deep-Dive Theme:</strong> Greece's energy transition pivots on two interconnected challenges: (1) integrating 8+ GW of renewable capacity (solar in Thessaly/Crete, wind in Peloponnese/Thrace) into a grid designed for legacy fossil fuels; (2) reducing grid fragmentation by interconnecting non-connected islands. The Crete–Peloponnese corridor exemplifies both. Crete's 85 substations just gained HVDC connectivity (Q2 2024); Peloponnese's 127 substations combine high renewable integration stress with the Hellenic Arc's seismic intensity. Together, they serve a region of 3+ million people and host critical tourism infrastructure — making this corridor a pilot for the entire Greek energy transition.</p>
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Crete–Peloponnese corridor · <strong>002</strong> DER saturation hotspots · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> Island–mainland economic disparity · <strong>005</strong> Voltage quality and tourism load · <strong>006</strong> Infrastructure age vs investment · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> Regional Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
 </div>
 
-<h3>D.1 &ensp; Regional Risk Profile</h3>
+<!-- D.1 KPI summary — auto-populated -->
+<h3>D.1 &ensp; Why Crete–Peloponnese, Why Now</h3>
 
-<div id="d1-regional-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0">Loading regional statistics…</div>
-
-<h3>D.2 &ensp; Seismic Stress &amp; Grid Vulnerability</h3>
-
-<p style="font-size:13px;line-height:1.7;margin:16px 0">Crete sits at the junction of the Hellenic Arc (subduction zone) and the North African Plate, making it one of Europe's highest-seismic-hazard regions. The 1995 Aigion earthquake (M6.2) and 2008 Achaia-Ileia sequence (M6.4) demonstrated that moderate-to-strong seismic events can cascade through critical grid assets. Peloponnese faces similar hazard, with several substations in EAK 2003 Zone I (PGA > 0.25g).</p>
-
-<div class="card" style="border-left:3px solid var(--terracotta);margin:16px 0">
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:12px">
-    <div>
-      <div style="font-weight:600;margin-bottom:6px;color:var(--terracotta)">Crete EAK 2003 Zone I/II</div>
-      <div style="font-size:14px;font-weight:600" id="d2-crete-seismic">—</div>
-      <div style="color:var(--warm-grey)">% of 85 substations</div>
-    </div>
-    <div>
-      <div style="font-weight:600;margin-bottom:6px;color:var(--terracotta)">Peloponnese EAK 2003 Zone I/II</div>
-      <div style="font-size:14px;font-weight:600" id="d2-pelo-seismic">—</div>
-      <div style="color:var(--warm-grey)">% of 127 substations</div>
-    </div>
-    <div>
-      <div style="font-weight:600;margin-bottom:6px;color:var(--terracotta)">Average R6b Seismic Modifier</div>
-      <div style="font-size:14px;font-weight:600" id="d2-avg-r6b">—</div>
-      <div style="color:var(--warm-grey)">Corridor median</div>
-    </div>
+<div class="kpi-grid" style="margin:16px 0" id="cp-kpis">
+  <div class="kpi-card">
+    <div class="kpi-label">Corridor Substations</div>
+    <div class="kpi-value" style="color:var(--ink)" id="cp-total">—</div>
+    <div class="kpi-sub" id="cp-total-sub"></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">High Band</div>
+    <div class="kpi-value" style="color:var(--terracotta)" id="cp-high">—</div>
+    <div class="kpi-sub" id="cp-high-sub"></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Corridor Median R</div>
+    <div class="kpi-value" style="color:var(--crimson)" id="cp-median">—</div>
+    <div class="kpi-sub" id="cp-median-sub"></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Worst Region</div>
+    <div class="kpi-value" style="color:var(--ink);font-size:20px" id="cp-worst-prov">—</div>
+    <div class="kpi-sub" id="cp-worst-sub"></div>
   </div>
 </div>
 
-<h3>D.3 &ensp; Renewable Integration &amp; Saturation</h3>
+<p style="font-size:13px;line-height:1.7" id="cp-narrative-d1">Loading Crete–Peloponnese corridor data…</p>
 
-<p style="font-size:13px;line-height:1.7;margin:16px 0">Crete hosts some of Greece's highest solar penetration rates (peak solar generation now exceeds 60% of instantaneous load during midday in summer). Peloponnese is transitioning to major wind deployment (Taygetus/Parnon clusters). Both regions face voltage stability and curtailment challenges that traditional grid assets cannot manage without BESS or advanced grid codes. The SSI's T (Transition) and S (Saturation) components capture this stress.</p>
+<!-- D.2 Corridor Map + Table — auto-populated -->
+<h3>D.2 &ensp; Corridor Map and Scoring</h3>
 
-<div id="d3-transition-chart" style="margin:16px 0;padding:16px;background:rgba(44,36,32,0.02);border-radius:var(--radius)">
-  <canvas id="d3-chart" style="width:100%;height:240px"></canvas>
-</div>
-
-<h3>D.4 &ensp; Island Interconnection Impact</h3>
-
-<p style="font-size:13px;line-height:1.7;margin:16px 0">Until March 2024, Crete operated as a non-interconnected island, relying on expensive diesel generation and limited renewable curtailment. The Crete HVDC link (±250 MW, 240 km submarine cable from Attica to Chania) now allows Crete to export surplus renewable generation and import low-cost continental power during deficit hours. This fundamentally transforms the economics and resilience of Crete's 85 substations: the R8 island isolation modifier dropped from 1.15–1.25 to near 1.0 for most Crete assets, reflecting the reduced islanding risk and improved energy economics.</p>
-
-<div class="card" style="border-left:3px solid var(--sage);margin:16px 0">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:12px">
-    <div>
-      <div style="font-weight:600;margin-bottom:6px">Crete Substations Upgraded via HVDC</div>
-      <div style="font-size:13px;color:var(--sage);font-weight:600">85 / 85 (100%)</div>
-      <div style="color:var(--warm-grey);font-size:11px">Island isolation modifier: 1.15–1.25 → ~1.00</div>
-    </div>
-    <div>
-      <div style="font-weight:600;margin-bottom:6px">Still Non-Interconnected Islands</div>
-      <div style="font-size:13px;color:var(--crimson);font-weight:600">~180 substations</div>
-      <div style="color:var(--warm-grey);font-size:11px">Cyclades, Dodecanese, Ionian Islands — interconnection target 2027</div>
-    </div>
+<div style="position:relative;height:380px;background:var(--cream-deep);border-radius:var(--radius);overflow:hidden;margin:16px 0">
+  <canvas id="cp-map" style="width:100%;height:100%"></canvas>
+  <div style="position:absolute;bottom:8px;right:12px;display:flex;gap:10px;font-size:10px;color:var(--warm-grey)">
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-low);margin-right:3px"></span>Low</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-medium);margin-right:3px"></span>Medium</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-high);margin-right:3px"></span>High</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-critical);margin-right:3px"></span>Critical</span>
   </div>
 </div>
 
-<h3>D.5 &ensp; Spotlight: Top 10 Risk Substations in Corridor</h3>
+<table class="data-table" style="width:100%;border-collapse:collapse;font-size:13px;margin:16px 0">
+<thead style="background:var(--ink);color:#fff"><tr>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Substation</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Region</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">R_final</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Band</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">C</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">V</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">I</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">E</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">S</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">T</th>
+  <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Alert</th>
+</tr></thead>
+<tbody id="cp-tbody">
+  <tr><td colspan="11" style="text-align:center;color:var(--warm-grey);padding:24px">Loading…</td></tr>
+</tbody>
+</table>
 
-<div id="d5-spotlight" style="margin:16px 0;font-size:12px">Loading spotlight substations…</div>
+<!-- D.3 Component Analysis — auto-populated -->
+<h3>D.3 &ensp; Component Analysis</h3>
 
-<h3>D.6 &ensp; Policy & Infrastructure Implications</h3>
-
-<p style="font-size:13px;line-height:1.7;margin:16px 0">The SSI analysis reveals three priority areas for the Crete–Peloponnese corridor:</p>
-
-<div style="display:grid;gap:12px;margin:16px 0">
-  <div class="card" style="border-left:3px solid var(--terracotta)">
-    <div style="font-weight:600;margin-bottom:6px;color:var(--terracotta)">1. BESS Deployment for Renewable Integration</div>
-    <p style="font-size:12px;line-height:1.6;margin:0">Peloponnese substations with high T (Transition) and S (Saturation) scores should be prioritized for battery storage investment. The 85 Crete substations post-interconnection no longer need islanding BESS; instead, they shift to frequency-regulation services. ADMIE/DEDDIE funding should target 200+ MWh of BESS co-located at HV/MV transition nodes across both regions by 2027.</p>
-  </div>
-  <div class="card" style="border-left:3px solid var(--bronze)">
-    <div style="font-weight:600;margin-bottom:6px;color:var(--bronze)">2. Seismic Resilience & Grid Hardening</div>
-    <p style="font-size:12px;line-height:1.6;margin:0">Substations in EAK 2003 Zone I with High/Critical risk classification (8–12 assets identified in this corridor) require accelerated seismic retrofit under RAE/HEDNO/ADMIE joint programs. Foundation upgrades, damping systems, and equipment anchoring should target these sites by 2026–2027 to align with EU Green Deal and NECP 2030 compliance.</p>
-  </div>
-  <div class="card" style="border-left:3px solid var(--sage)">
-    <div style="font-weight:600;margin-bottom:6px;color:var(--sage)">3. Non-Interconnected Islands Follow-On (2026–2027)</div>
-    <p style="font-size:12px;line-height:1.6;margin:0">Cyclades (38 subs) and Dodecanese (52 subs) interconnection projects are due to commence 2026–2027. The SSI intelligence from this Crete–Peloponnese pilot should inform submarine cable routing, onshore substation upgrades, and BESS sizing for those future projects — avoiding the capital and operational missteps that Crete required.</p>
-  </div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
+  <div style="flex:1;min-width:280px" id="cp-comp-bars"></div>
+  <div style="flex:1;min-width:280px" id="cp-mod-bars"></div>
 </div>
+
+<p style="font-size:13px;line-height:1.7" id="cp-narrative-d3">Loading component analysis…</p>
+
+<!-- D.4 Region Breakdown — auto-populated -->
+<h3>D.4 &ensp; Region Breakdown</h3>
+
+<div id="cp-region-bars" style="margin:16px 0"></div>
+
+<p style="font-size:13px;line-height:1.7" id="cp-narrative-d4">Loading region breakdown…</p>
+
+<!-- D.5 Implications -->
+<h3>D.5 &ensp; Implications</h3>
+
+<p style="font-size:13px;line-height:1.7" id="cp-narrative-d5">Loading implications…</p>
 
 <script>
 (function(){
   fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
-    var fleet = data.substations || [];
+    // ── Filter Crete–Peloponnese ──
+    var corridor = data.substations.filter(function(s){ return s.region === 'Crete' || s.region === 'Peloponnese'; });
+    var fleet = data.substations;
+    corridor.sort(function(a,b){ return b.R_median - a.R_median; });
 
-    // Filter to Crete and Peloponnese
-    var cretenSubset = fleet.filter(function(s){ return s.region === 'Crete'; });
-    var peloSubset = fleet.filter(function(s){ return s.region === 'Peloponnese'; });
-    var corridorSubset = cretenSubset.concat(peloSubset);
+    // ── D.1 KPIs ──
+    var nTotal = corridor.length;
+    var nHV = corridor.filter(function(s){ return s.voltage_kv >= 132; }).length;
+    var nMV = nTotal - nHV;
+    document.getElementById('cp-total').textContent = nTotal;
+    document.getElementById('cp-total-sub').textContent = nHV + ' HV · ' + nMV + ' MV';
 
-    if (!cretenSubset.length && !peloSubset.length) {
-      // Fallback for regional naming variations
-      cretenSubset = fleet.filter(function(s){ return s.region && (s.region.indexOf('Crete') >= 0 || s.region.indexOf('Kriti') >= 0); });
-      peloSubset = fleet.filter(function(s){ return s.region && (s.region.indexOf('Peloponnese') >= 0 || s.region.indexOf('Pelopon') >= 0); });
-      corridorSubset = cretenSubset.concat(peloSubset);
+    var bands = { Low:0, Medium:0, High:0, Critical:0 };
+    corridor.forEach(function(s){ bands[s.classification]++; });
+    document.getElementById('cp-high').textContent = bands.High + (bands.Critical ? ' + ' + bands.Critical : '');
+    document.getElementById('cp-high-sub').textContent = ((bands.High + bands.Critical) / nTotal * 100).toFixed(1) + '% of corridor';
+
+    var rVals = corridor.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
+    var medianR = rVals[Math.floor(rVals.length / 2)];
+    var fleetRVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
+    var fleetMedian = fleetRVals[Math.floor(fleetRVals.length / 2)];
+    document.getElementById('cp-median').textContent = medianR.toFixed(3);
+    document.getElementById('cp-median-sub').textContent = 'Fleet median: ' + fleetMedian.toFixed(3);
+
+    // Worst region by mean R
+    var regSums = {}, regCounts = {};
+    corridor.forEach(function(s){
+      var reg = s.province || s.region;
+      if (!regSums[reg]) { regSums[reg] = 0; regCounts[reg] = 0; }
+      regSums[reg] += s.R_median;
+      regCounts[reg]++;
+    });
+    var regAvgs = Object.keys(regSums).map(function(p){ return { name: p, avg: regSums[p]/regCounts[p], n: regCounts[p] }; });
+    regAvgs.sort(function(a,b){ return b.avg - a.avg; });
+    var worst = regAvgs[0];
+    document.getElementById('cp-worst-prov').textContent = worst.name;
+    document.getElementById('cp-worst-sub').textContent = 'Avg R: ' + worst.avg.toFixed(3) + ' · ' + worst.n + ' substations';
+
+    // D.1 Narrative
+    var pctAboveFleetMedian = (corridor.filter(function(s){ return s.R_median > fleetMedian; }).length / nTotal * 100).toFixed(0);
+    document.getElementById('cp-narrative-d1').innerHTML =
+      'The Crete–Peloponnese corridor hosts <strong>' + nTotal + ' substations</strong> spanning two regions with distinct risk profiles. ' +
+      'However, the risk is heavily concentrated in the upper bands: <strong>' + bands.High + ' substations (' +
+      (bands.High/nTotal*100).toFixed(1) + '%)</strong> are classified High' +
+      (bands.Critical ? ' and <strong>' + bands.Critical + '</strong> Critical' : '') +
+      ', with only <strong>' + bands.Low + '</strong> in the Low band. ' +
+      pctAboveFleetMedian + '% of corridor substations score above the national fleet median of ' + fleetMedian.toFixed(3) +
+      '. The corridor median R of ' + medianR.toFixed(3) + ' reflects the complex interplay of seismic hazard (Hellenic Arc, EAK 2003 zones), high renewable penetration stress, and island grid fragmentation — the defining challenges of Greece\'s energy transition.';
+
+    // ── D.2 Map ──
+    var canvas = document.getElementById('cp-map');
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = canvas.offsetWidth * dpr;
+    canvas.height = canvas.offsetHeight * dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    var W = canvas.offsetWidth, H = canvas.offsetHeight;
+
+    // Compute bounds
+    var lons = corridor.map(function(s){ return s.lon; });
+    var lats = corridor.map(function(s){ return s.lat; });
+    var minLon = Math.min.apply(null, lons) - 0.15, maxLon = Math.max.apply(null, lons) + 0.15;
+    var minLat = Math.min.apply(null, lats) - 0.1, maxLat = Math.max.apply(null, lats) + 0.1;
+    var lonSpan = maxLon - minLon, latSpan = maxLat - minLat;
+
+    function proj(lon, lat) {
+      var x = 40 + (lon - minLon) / lonSpan * (W - 80);
+      var y = H - 40 - (lat - minLat) / latSpan * (H - 80);
+      return [x, y];
     }
 
-    // ── D.1 Regional stats ──
-    var creNetR = cretenSubset.length ? cretenSubset.reduce(function(a,s){ return a + s.R_median; }, 0) / cretenSubset.length : 0;
-    var peloAvgR = peloSubset.length ? peloSubset.reduce(function(a,s){ return a + s.R_median; }, 0) / peloSubset.length : 0;
-    var corridorAvgR = corridorSubset.length ? corridorSubset.reduce(function(a,s){ return a + s.R_median; }, 0) / corridorSubset.length : 0;
+    var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
 
-    var creHighCrit = cretenSubset.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
-    var peloHighCrit = peloSubset.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
-
-    document.getElementById('d1-regional-stats').innerHTML =
-      '<div class="card" style="border-top:3px solid var(--terracotta)">' +
-      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px">Crete (85 subs)</div>' +
-      '<div style="font-size:14px;font-weight:600">' + creNetR.toFixed(3) + '</div>' +
-      '<div style="font-size:12px;color:var(--warm-grey)">Avg R · ' + creHighCrit + ' High/Critical</div></div>' +
-      '<div class="card" style="border-top:3px solid var(--bronze)">' +
-      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--bronze);margin-bottom:6px">Peloponnese (127 subs)</div>' +
-      '<div style="font-size:14px;font-weight:600">' + peloAvgR.toFixed(3) + '</div>' +
-      '<div style="font-size:12px;color:var(--warm-grey)">Avg R · ' + peloHighCrit + ' High/Critical</div></div>' +
-      '<div class="card" style="border-top:3px solid var(--sage)">' +
-      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--sage);margin-bottom:6px">Corridor Total (212 subs)</div>' +
-      '<div style="font-size:14px;font-weight:600">' + corridorAvgR.toFixed(3) + '</div>' +
-      '<div style="font-size:12px;color:var(--warm-grey)">Avg R · ' + (creHighCrit + peloHighCrit) + ' High/Critical</div></div>';
-
-    // ── D.2 Seismic stats ──
-    var creSeismic = cretenSubset.filter(function(s){ return s.seismic && (s.seismic.zone === 'I' || s.seismic.zone === 'II' || s.seismic.zone <= 2); }).length;
-    var peloSeismic = peloSubset.filter(function(s){ return s.seismic && (s.seismic.zone === 'I' || s.seismic.zone === 'II' || s.seismic.zone <= 2); }).length;
-
-    document.getElementById('d2-crete-seismic').textContent = cretenSubset.length ? (creSeismic / cretenSubset.length * 100).toFixed(0) + '%' : '—';
-    document.getElementById('d2-pelo-seismic').textContent = peloSubset.length ? (peloSeismic / peloSubset.length * 100).toFixed(0) + '%' : '—';
-
-    var corridorR6b = corridorSubset.length ? corridorSubset.reduce(function(a,s){
-      return a + (s.modifiers && s.modifiers.R6_restoration ? s.modifiers.R6_restoration : 1.0);
-    }, 0) / corridorSubset.length : 1.0;
-    document.getElementById('d2-avg-r6b').textContent = corridorR6b.toFixed(4);
-
-    // ── D.3 Transition chart ──
-    var regions = { 'Crete': cretenSubset, 'Peloponnese': peloSubset };
-    var chartData = Object.keys(regions).map(function(regName){
-      var subs = regions[regName];
-      var avgT = subs.length ? subs.reduce(function(a,s){ return a + (s.components.T || 0); }, 0) / subs.length : 0;
-      var avgS = subs.length ? subs.reduce(function(a,s){ return a + (s.components.S || 0); }, 0) / subs.length : 0;
-      return { name: regName, T: avgT, S: avgS };
+    // Draw all non-corridor substations as faint grey for context
+    fleet.forEach(function(s){
+      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && s.region !== 'Crete' && s.region !== 'Peloponnese') {
+        var p = proj(s.lon, s.lat);
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(44,36,32,0.08)';
+        ctx.fill();
+      }
     });
 
-    var canvas = document.getElementById('d3-chart');
-    if (canvas) {
-      var dpr = window.devicePixelRatio || 1;
-      canvas.width = canvas.offsetWidth * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
-      var ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-      var W = canvas.offsetWidth, H = canvas.offsetHeight;
-      var pad = { top: 20, right: 20, bottom: 40, left: 50 };
-      var barW = (W - pad.left - pad.right) / (chartData.length * 2 + 1);
+    // Draw corridor substations
+    corridor.forEach(function(s){
+      var p = proj(s.lon, s.lat);
+      var r = s.classification === 'Critical' ? 6 : s.classification === 'High' ? 4.5 : 3.5;
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], r, 0, Math.PI * 2);
+      ctx.fillStyle = bandColors[s.classification] || '#999';
+      ctx.globalAlpha = 0.7;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = bandColors[s.classification] || '#999';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    });
 
-      // Draw bars
-      var colors = ['var(--terracotta)', 'var(--sage)'];
-      chartData.forEach(function(d, i){
-        var x = pad.left + barW * (i * 2 + 0.5);
-        var yT = pad.top + (1 - d.T / 0.05) * (H - pad.top - pad.bottom);
-        var hT = Math.max(2, (H - pad.top - pad.bottom) * (d.T / 0.05));
+    // Region labels
+    ctx.font = '600 11px DM Sans, sans-serif';
+    ctx.fillStyle = 'rgba(44,36,32,0.5)';
+    ctx.textAlign = 'center';
+    regAvgs.forEach(function(rv){
+      var regSubs = corridor.filter(function(s){ return (s.province || s.region) === rv.name; });
+      var avgLon = regSubs.reduce(function(a,s){ return a + s.lon; }, 0) / regSubs.length;
+      var avgLat = regSubs.reduce(function(a,s){ return a + s.lat; }, 0) / regSubs.length;
+      var p = proj(avgLon, avgLat);
+      ctx.fillText(rv.name, p[0], p[1] - 12);
+    });
 
-        ctx.fillStyle = 'rgba(170,66,52,0.7)';
-        ctx.fillRect(x - barW/3, yT, barW/3, hT);
+    // ── D.2 Table — Top 10 ──
+    var top10 = corridor.slice(0, 10);
+    var tbody = document.getElementById('cp-tbody');
+    var thStyle = 'padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;';
+    var numStyle = thStyle + 'text-align:right;font-family:"Playfair Display",serif;font-weight:500;';
+    tbody.innerHTML = top10.map(function(s){
+      var bCol = bandColors[s.classification] || 'var(--ink)';
+      var alertStr = s.alert_components ? s.alert_components.join(', ') : '—';
+      return '<tr>' +
+        '<td style="' + thStyle + 'font-weight:500">' + s.name + '</td>' +
+        '<td style="' + thStyle + '">' + s.region + '</td>' +
+        '<td style="' + numStyle + 'color:' + bCol + ';font-weight:600">' + s.R_median.toFixed(3) + '</td>' +
+        '<td style="' + thStyle + 'color:' + bCol + ';font-weight:600">' + s.classification + '</td>' +
+        '<td style="' + numStyle + '">' + s.components.C.toFixed(3) + '</td>' +
+        '<td style="' + numStyle + '">' + s.components.V.toFixed(3) + '</td>' +
+        '<td style="' + numStyle + '">' + s.components.I.toFixed(3) + '</td>' +
+        '<td style="' + numStyle + '">' + s.components.E.toFixed(3) + '</td>' +
+        '<td style="' + numStyle + '">' + s.components.S.toFixed(3) + '</td>' +
+        '<td style="' + numStyle + '">' + s.components.T.toFixed(3) + '</td>' +
+        '<td style="' + thStyle + 'color:var(--crimson);font-weight:600">' + alertStr + '</td></tr>';
+    }).join('') +
+      '<tr><td colspan="11" style="text-align:center;color:var(--warm-grey);font-style:italic;font-size:12px;padding:8px 10px">… ' +
+      (nTotal - 10) + ' additional substations — <a href="map.html" style="color:var(--terracotta)">explore full corridor in Digital Twin →</a></td></tr>';
 
-        ctx.fillStyle = 'rgba(184,134,58,0.7)';
-        var yS = pad.top + (1 - d.S / 0.20) * (H - pad.top - pad.bottom);
-        var hS = Math.max(2, (H - pad.top - pad.bottom) * (d.S / 0.20));
-        ctx.fillRect(x, yS, barW/3, hS);
+    // ── D.3 Component Analysis — Corridor avg vs fleet avg ──
+    var compDefs = [
+      { key: 'C', label: 'Continuity', w: 0.30, color: '#941914' },
+      { key: 'I', label: 'Infrastructure', w: 0.25, color: '#5d8563' },
+      { key: 'S', label: 'Saturation', w: 0.20, color: '#b8863a' },
+      { key: 'V', label: 'Voltage', w: 0.10, color: '#aa4234' },
+      { key: 'E', label: 'Economic', w: 0.10, color: '#3b9eff' },
+      { key: 'T', label: 'Transition', w: 0.05, color: '#22d3ee' }
+    ];
 
-        // Label
-        ctx.font = '500 12px DM Sans, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#2c2420';
-        ctx.fillText(d.name, x + barW/6, H - pad.bottom + 16);
-      });
-
-      // Axes
-      ctx.strokeStyle = '#2c2420';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, H - pad.bottom); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(pad.left, H - pad.bottom); ctx.lineTo(W - pad.right, H - pad.bottom); ctx.stroke();
-
-      // Y-axis labels
-      ctx.font = '400 10px DM Sans, sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#666';
-      [0.00, 0.05, 0.10, 0.15, 0.20].forEach(function(v){
-        var y = pad.top + (1 - v / 0.20) * (H - pad.top - pad.bottom);
-        ctx.fillText(v.toFixed(2), pad.left - 6, y + 4);
-      });
-
-      // Legend
-      ctx.font = '600 11px DM Sans, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillStyle = 'rgba(170,66,52,0.7)';
-      ctx.fillRect(W - pad.right - 100, pad.top, 8, 8);
-      ctx.fillStyle = '#2c2420';
-      ctx.fillText('T (Transition)', W - pad.right - 88, pad.top + 8);
-
-      ctx.fillStyle = 'rgba(184,134,58,0.7)';
-      ctx.fillRect(W - pad.right - 100, pad.top + 16, 8, 8);
-      ctx.fillStyle = '#2c2420';
-      ctx.fillText('S (Saturation)', W - pad.right - 88, pad.top + 24);
+    // Compute averages
+    function avgComp(subs, key) {
+      return subs.reduce(function(a,s){ return a + s.components[key]; }, 0) / subs.length;
+    }
+    function avgMod(subs, key) {
+      return subs.reduce(function(a,s){ return a + (s.modifiers && s.modifiers[key] ? s.modifiers[key] : 1.0); }, 0) / subs.length;
     }
 
-    // ── D.5 Spotlight: Top 10 ──
-    var top10 = corridorSubset.slice().sort(function(a,b){ return b.R_median - a.R_median; }).slice(0, 10);
-    var spotHTML = '<div style="display:grid;gap:8px">';
-    top10.forEach(function(s, idx){
-      spotHTML += '<div style="padding:8px;background:rgba(44,36,32,0.03);border-left:3px solid ' +
-        (s.classification === 'Critical' ? 'var(--crimson)' : 'var(--terracotta)') + '">' +
-        '<div style="font-weight:600">' + (idx+1) + '. ' + s.name + '</div>' +
-        '<div style="font-size:11px;color:var(--warm-grey)">' + s.region + ' · R=' + s.R_median.toFixed(3) +
-        ' · ' + s.classification + '</div></div>';
+    var compBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Component Averages — Corridor vs Fleet</div>';
+    compDefs.forEach(function(c){
+      var cpAvg = avgComp(corridor, c.key);
+      var fltAvg = avgComp(fleet, c.key);
+      var cpPct = Math.min(cpAvg / c.w * 100, 100).toFixed(0);
+      var fltPct = Math.min(fltAvg / c.w * 100, 100).toFixed(0);
+      var delta = ((cpAvg - fltAvg) / fltAvg * 100).toFixed(0);
+      var sign = delta > 0 ? '+' : '';
+      compBarsHTML += '<div style="margin-bottom:10px">' +
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
+          '<span style="font-weight:500">' + c.key + ' — ' + c.label + '</span>' +
+          '<span style="color:var(--warm-grey)">' + cpAvg.toFixed(3) + ' vs ' + fltAvg.toFixed(3) + ' (' + sign + delta + '%)</span></div>' +
+        '<div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative">' +
+          '<div style="position:absolute;width:' + fltPct + '%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div>' +
+          '<div style="position:absolute;width:' + cpPct + '%;height:100%;background:' + c.color + ';border-radius:3px;opacity:0.75"></div>' +
+        '</div></div>';
     });
-    spotHTML += '</div>';
-    document.getElementById('d5-spotlight').innerHTML = spotHTML;
+    document.getElementById('cp-comp-bars').innerHTML = compBarsHTML;
+
+    // Modifier averages
+    var modDefs = [
+      { key: 'R3_C_mult', label: 'R3 Consequence', range: '[0.70, 1.30]' },
+      { key: 'R4_F_topo', label: 'R4 Graph Crit.', range: '[0.80, 1.35]' },
+      { key: 'R6_seismic', label: 'R6 Seismic', range: '[0.95, 1.20]' },
+      { key: 'R6_restoration', label: 'R6a Restoration', range: '[0.90, 1.10]' },
+      { key: 'R7_cyber', label: 'R7 Digital Read.', range: '[0.99, 1.05]' },
+      { key: 'R8_island', label: 'R8 Island Isolation', range: '[1.00, 1.25]' }
+    ];
+    var modBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Modifier Averages — Corridor vs Fleet</div>';
+    modDefs.forEach(function(m){
+      var cpAvg = avgMod(corridor, m.key);
+      var fltAvg = avgMod(fleet, m.key);
+      var dir = cpAvg > 1.01 ? '↑' : cpAvg < 0.99 ? '↓' : '→';
+      var col = cpAvg > fltAvg * 1.01 ? 'var(--crimson)' : cpAvg < fltAvg * 0.99 ? 'var(--sage)' : 'var(--warm-grey)';
+      modBarsHTML += '<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px">' +
+        '<span style="min-width:140px;font-weight:500">' + m.label + '</span>' +
+        '<span style="color:' + col + ';font-weight:600;min-width:45px">' + cpAvg.toFixed(3) + '</span>' +
+        '<span style="color:var(--warm-grey);min-width:55px">fleet ' + fltAvg.toFixed(3) + '</span>' +
+        '<span style="font-size:11px;color:' + col + '">' + dir + '</span></div>';
+    });
+    document.getElementById('cp-mod-bars').innerHTML = modBarsHTML;
+
+    // D.3 Narrative
+    var compRanked = compDefs.slice().sort(function(a,b){
+      return (avgComp(corridor, b.key)/b.w) - (avgComp(corridor, a.key)/a.w);
+    });
+    var c1 = compRanked[0], c2 = compRanked[1];
+    var c1cp = avgComp(corridor, c1.key), c1flt = avgComp(fleet, c1.key);
+    var c2cp = avgComp(corridor, c2.key), c2flt = avgComp(fleet, c2.key);
+    document.getElementById('cp-narrative-d3').innerHTML =
+      'The dominant risk driver across the Crete–Peloponnese corridor is <strong>' + c1.key + ' (' + c1.label + ')</strong>, averaging ' +
+      c1cp.toFixed(3) + ' against a fleet average of ' + c1flt.toFixed(3) + ' — occupying ' +
+      (c1cp / c1.w * 100).toFixed(0) + '% of its weight ceiling (w = ' + c1.w.toFixed(2) + '). ' +
+      'The second contributor is <strong>' + c2.key + ' (' + c2.label + ')</strong> at ' +
+      c2cp.toFixed(3) + ' vs fleet ' + c2flt.toFixed(3) + ' (' + (c2cp / c2.w * 100).toFixed(0) + '% of ceiling). ' +
+      'Among modifiers, the R6 seismic modifier averages ' + avgMod(corridor, 'R6_seismic').toFixed(3) +
+      ' (fleet: ' + avgMod(fleet, 'R6_seismic').toFixed(3) + '), reflecting the Hellenic Arc seismic hazard, while R8 island isolation averages ' +
+      avgMod(corridor, 'R8_island').toFixed(3) + ' — capturing residual islanding risk even post-Crete-HVDC. ' +
+      'These modifiers are orthogonal to traditional grid risk models, revealing the compound vulnerabilities invisible to every competing framework.';
+
+    // ── D.4 Region breakdown ──
+    var regHTML = '<div class="label-xs" style="margin-bottom:10px">Region Risk Profile — Sorted by Mean R</div>' +
+      '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
+    regAvgs.forEach(function(rv){
+      var regSubs = corridor.filter(function(s){ return (s.province || s.region) === rv.name; });
+      var regBands = { Low:0, Medium:0, High:0, Critical:0 };
+      regSubs.forEach(function(s){ regBands[s.classification]++; });
+      var barPct = ((1 - rv.avg) * 100).toFixed(1);
+      var col = rv.avg > 0.6 ? '#941914' : rv.avg > 0.5 ? '#aa4234' : '#b8863a';
+      regHTML += '<div style="margin-bottom:12px">' +
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
+          '<span style="font-weight:600">' + rv.name + '</span>' +
+          '<span style="color:var(--warm-grey)">' + rv.n + ' subs · avg R = ' + rv.avg.toFixed(3) +
+          ' · H:' + regBands.High + (regBands.Critical ? ' C:' + regBands.Critical : '') + ' M:' + regBands.Medium + '</span></div>' +
+        '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">' +
+          '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:4px;opacity:0.7"></div>' +
+        '</div></div>';
+    });
+    document.getElementById('cp-region-bars').innerHTML = regHTML;
+
+    // D.4 Narrative
+    var bestReg = regAvgs[regAvgs.length - 1];
+    document.getElementById('cp-narrative-d4').innerHTML =
+      'The region-level breakdown reveals significant variation within the corridor. <strong>' + worst.name + '</strong> leads with a mean R of ' +
+      worst.avg.toFixed(3) + ' across ' + worst.n + ' substations, while <strong>' + bestReg.name + '</strong> scores ' +
+      bestReg.avg.toFixed(3) + ' — a spread of ' + (worst.avg - bestReg.avg).toFixed(3) +
+      ' within the corridor. This disparity underscores why regional-level metrics (as used by CEER) mask the true distribution of grid stress. ' +
+      'The SSI\'s substation-level granularity reveals that the corridor is not uniformly stressed but contains distinct zones of concentrated risk — ' +
+      'precisely the spatial pattern that investment planning requires for seismic resilience and renewable integration.';
+
+    // D.5 Implications
+    var cpAbove065 = corridor.filter(function(s){ return s.R_median >= 0.65; }).length;
+    document.getElementById('cp-narrative-d5').innerHTML =
+      '<strong>' + cpAbove065 + ' corridor substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
+      'For NECP 2030 investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
+      'where renewable transition stress compounds with seismic hazard and, in Crete, recent but still-stabilizing HVDC interconnection. ' +
+      'The SSI\'s silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only for engineering resilience, ' +
+      'but because the communities they serve — characterised by tourism exposure, energy poverty in islands, and critical lifeline dependencies — are ' +
+      'disproportionately vulnerable to disruption. This integrated intelligence enables Greece to allocate NECP funding with anticipatory precision.';
   });
 })();
 </script>
@@ -1188,204 +1313,220 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <!-- ═══════════════════ E. EUROPEAN CONTEXT CARD ═══════════════════ -->
 <section id="eu" style="margin-bottom:32px">
-<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section E</span>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section E — Recurring Module</span>
 <h2>European Context Card</h2>
 
-<div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-bottom:16px">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Greece in the European Grid Risk Landscape:</strong> The SSI Index is now rolling out across OECD countries, enabling direct comparison of grid risk profiles. Greece's wholesale energy transition — driven by NECP 2030 targets (60% renewable by 2030) and EU Green Deal compliance — creates a unique learning opportunity. The Crete–Peloponnese corridor, combining seismic hazard with high renewable integration and island interconnection, offers strategic insights for Portugal (wildfire risk + renewable transition), Italy (seismic + islands), and the Balkans (similar seismic/island challenges).</p>
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one European Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Crete–Peloponnese corridor analysis hinges on Greece's continuity performance relative to European peers and island penalties. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Germany (003), CMIP6 climate hazard vs Nordic peers (004), etc. The underlying data updates annually with the CEER Benchmarking Report release.</p>
 </div>
 
-<h3>E.1 &ensp; Greece vs European Peers: Grid Risk Benchmarks</h3>
-
-<div class="kpi-grid" style="margin:16px 0" id="eu-benchmark">
-  <div class="kpi-card">
-    <div class="kpi-label">Median Risk (R_median)</div>
-    <div class="kpi-value" style="color:var(--ink)" id="eu-median-r">—</div>
-    <div class="kpi-sub" id="eu-median-sub">Loading…</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-label">High / Critical %</div>
-    <div class="kpi-value" style="color:var(--crimson)" id="eu-hc-pct">—</div>
-    <div class="kpi-sub">vs Italy 89%, Germany 34%</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Seismic Exposure</div>
-    <div class="kpi-value" style="color:var(--terracotta)" id="eu-seismic">—</div>
-    <div class="kpi-sub">Zone I/II (EAK 2003) · vs IT 45%, PT 12%</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Island Substations</div>
-    <div class="kpi-value" style="color:var(--sage)" id="eu-island">—</div>
-    <div class="kpi-sub" id="eu-island-sub">Loading…</div>
-  </div>
-</div>
-
-<!-- SAIDI Benchmarking Chart -->
+<!-- THE CARD ITSELF -->
 <div class="card" style="border-top:3px solid var(--terracotta);margin:20px 0">
   <div style="padding:0;margin:-20px -24px 16px;padding:12px 24px;background:var(--cream-deep);border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px">
     <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">European Context Card — SAIDI Benchmarking</span>
     <span style="font-size:10px;color:var(--warm-grey)">Ed. 001 · April 2026</span>
   </div>
+
   <h3 style="margin-top:0;font-size:14px">Unplanned SAIDI (min/customer/year) — Selected EU Countries</h3>
   <p style="font-size:11px;color:var(--warm-grey);margin:0 0 10px">Longer bar = lower SAIDI = better reliability. Values in min/customer/year.</p>
-  <div id="eu-saidi-chart">Loading SAIDI chart…</div>
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇩🇪 Germany</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:96%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">11.7</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇨🇭 Switzerland</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:95%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~15</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇳🇱 Netherlands</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:92%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">23.9</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇫🇷 France</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:88%;height:100%;background:var(--bronze);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~36</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇬🇧 UK</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:87%;height:100%;background:var(--bronze);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~40</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇪🇸 Spain</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:84%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~48</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding:4px 0;border-bottom:1px solid var(--card-border)">
+      <span style="min-width:130px">🇬🇷 Greece (national)</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:76%;height:100%;background:var(--crimson);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">~72</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px">
+      <span style="min-width:110px">↳ Urban/mainland</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:92%;height:100%;background:#e67e22;border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:#e67e22;font-weight:600">~45</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px;padding-bottom:4px;border-bottom:1px solid var(--card-border)">
+      <span style="min-width:110px">↳ Island/remote</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:57%;height:100%;background:var(--crimson);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--crimson);font-weight:600">~130</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇭🇺 Hungary</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:81%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~57</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇵🇱 Poland</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:68%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~95</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇷🇴 Romania</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:3%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~290</span>
+    </div>
+  </div>
+
   <div style="padding:12px 0;margin-top:12px;border-top:1px solid var(--card-border);font-size:11px;color:var(--warm-grey);line-height:1.6">
     Source: CEER 7th Benchmarking Report (2022); Bundesnetzagentur (2024); DEDDIE/HEDNO Quality Report (2023). Greece sub-categories from DEDDIE territory classification. · Updated annually with CEER BR release.
   </div>
 </div>
 
-<!-- Regional Risk Ranking -->
+<!-- Key insight + regional ranking — auto-populated -->
+<p style="font-size:13px;line-height:1.7" id="eu-insight">Loading European context insight…</p>
+
 <h3 style="margin-top:20px">Regional Risk Ranking — All 13 Periphereies</h3>
-<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does Crete sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison.</p>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does Crete–Peloponnese sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison.</p>
+
 <div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
+
 <p style="font-size:13px;line-height:1.7" id="eu-ranking-narrative">Loading…</p>
-
-<h3>E.2 &ensp; Energy Transition Drivers</h3>
-
-<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:16px 0">
-  <div class="card" style="border-left:3px solid var(--bronze)">
-    <div style="font-weight:600;margin-bottom:8px;color:var(--bronze)">NECP 2030 Renewable Targets</div>
-    <ul style="margin:0;padding-left:16px;font-size:12px;line-height:1.8">
-      <li>60% RES in electricity generation (vs 45% EU average)</li>
-      <li>8.2 GW current DER capacity → 15+ GW target 2030</li>
-      <li>Solar dominates Thessaly/Crete; wind in Peloponnese/Thrace</li>
-      <li>Grid cannot absorb without BESS + smart dispatch</li>
-    </ul>
-  </div>
-  <div class="card" style="border-left:3px solid var(--sage)">
-    <div style="font-weight:600;margin-bottom:8px;color:var(--sage)">EU Green Deal Compliance</div>
-    <ul style="margin:0;padding-left:16px;font-size:12px;line-height:1.8">
-      <li>Carbon neutrality by 2050 (interim: -55% by 2030)</li>
-      <li>Electricity Act 2020: public grid investment earmarked for renewable capacity</li>
-      <li>Disaster Risk Reduction: seismic resilience mandated under EU DRR Directive 2007/60</li>
-      <li>Energy Poverty: EPBD 2021 requires €2B support for vulnerable households</li>
-    </ul>
-  </div>
-</div>
-
-<h3>E.3 &ensp; Crete HVDC Interconnection as EU Pilot</h3>
-
-<p style="font-size:13px;line-height:1.7;margin:16px 0">The 2024 Crete HVDC link is a flagship EU TEN-E project (Trans-European Networks for Energy), establishing a template for Mediterranean island interconnection. The project cost EUR 800+ million and required 15 years of permitting/engineering — demonstrating that island grid decoupling is not a simple problem. The SSI data showing Crete's post-interconnection R8 modifier drop (1.15–1.25 → ~1.00) validates the infrastructure investment's impact on grid risk. This success metric should inform ongoing projects for Cyclades, Dodecanese, and Ionian Islands (EUR 1.5B+ combined, target 2027 completion).</p>
-
-<h3>E.4 &ensp; Strategic Policy Implications</h3>
-
-<div style="display:grid;gap:12px;margin:16px 0">
-  <div class="card" style="border-left:3px solid var(--terracotta)">
-    <div style="font-weight:600;margin-bottom:6px;color:var(--terracotta)">Grid Resilience vs Renewable Integration Trade-Off</div>
-    <p style="font-size:12px;line-height:1.6;margin:0">Greece faces a 10-year window where rising renewable penetration (T & S component stress) coincides with aging grid assets and high seismic exposure. The SSI's integrated scoring reveals this hidden trade-off: substations optimized for NECP 2030 renewable targets may fail under seismic shocks unless investment in both fronts — BESS for grid stability <em>and</em> hardening for earthquake resilience — is coordinated.</p>
-  </div>
-  <div class="card" style="border-left:3px solid var(--sage)">
-    <div style="font-weight:600;margin-bottom:6px;color:var(--sage)">Island Interconnection Economics</div>
-    <p style="font-size:12px;line-height:1.6;margin:0">The Crete HVDC project demonstrates positive ROI through reduced diesel fuel imports (EUR 800M capex × 30-year life → EUR 27M/year operational savings). The SSI enables prioritization for remaining non-interconnected islands: substations with highest R (risk) and lowest R8 (island isolation modifier) should receive HVDC/DC cable projects first.</p>
-  </div>
-</div>
 
 <script>
 (function(){
   fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
-    var n = fleet.length;
+    var corridor = fleet.filter(function(s){ return s.region === 'Crete' || s.region === 'Peloponnese'; });
 
-    // ── E.1 KPIs ──
-    var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
-    var medR = rVals[Math.floor(n/2)];
-    var hcCount = fleet.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
-    var seismicCount = fleet.filter(function(s){ return s.seismic && (s.seismic.zone <= 2 || s.seismic.zone === 'I' || s.seismic.zone === 'II'); }).length;
-    var islandRegions = ['Crete','Ionian Islands','North Aegean','South Aegean'];
-    var islandCount = fleet.filter(function(s){ return islandRegions.indexOf(s.region) >= 0; }).length;
+    // ── Key Insight ──
+    // C component > 70% of weight ceiling (0.30) = high continuity deficit
+    var highC = corridor.filter(function(s){ return s.components.C > 0.21; }).length;
+    var avgC_corridor = corridor.reduce(function(a,s){ return a + s.components.C; }, 0) / corridor.length;
+    var avgC_fleet = fleet.reduce(function(a,s){ return a + s.components.C; }, 0) / fleet.length;
+    var cRatio = (avgC_corridor / avgC_fleet).toFixed(1);
 
-    document.getElementById('eu-median-r').textContent = medR.toFixed(3);
-    document.getElementById('eu-median-sub').textContent = 'Greece fleet median \u00B7 ' + n + ' subs';
-    document.getElementById('eu-hc-pct').textContent = (hcCount / n * 100).toFixed(1) + '%';
-    document.getElementById('eu-seismic').textContent = (seismicCount / n * 100).toFixed(0) + '%';
-    document.getElementById('eu-island').textContent = islandCount;
-    document.getElementById('eu-island-sub').textContent = (islandCount / n * 100).toFixed(1) + '% of fleet \u00B7 4 island regions';
+    document.getElementById('eu-insight').innerHTML =
+      '<strong>This month\'s key insight:</strong> The Crete–Peloponnese corridor deep-dive shows <strong>' + highC +
+      ' substations</strong> (of ' + corridor.length + ') with C-component above 70% of its weight ceiling — ' +
+      'indicating continuity-of-supply performance consistent with island/remote territory class. ' +
+      'The corridor\'s average C of ' + avgC_corridor.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
+      avgC_fleet.toFixed(3) + '. In European terms, these substations individually perform closer to Hungarian or ' +
+      'Polish SAIDI levels (~57–95 min/customer/year) than to Greece\'s own mainland average (~45 min). ' +
+      'The SSI reveals what aggregate CEER statistics conceal: that Greece\'s elevated European position (~72 min) is not a national ' +
+      'condition but a statistical average of urban-quality performance and island-class rural performance — ' +
+      'and the Crete–Peloponnese corridor concentrates the worst of the latter due to island remoteness and seismic fragility.';
 
-    // ── SAIDI Chart ──
-    var saidiData = [
-      { country: '\uD83C\uDDE9\uD83C\uDDEA Germany', val: 11.7, color: 'var(--sage)' },
-      { country: '\uD83C\uDDE8\uD83C\uDDED Switzerland', val: 15, color: 'var(--sage)' },
-      { country: '\uD83C\uDDF3\uD83C\uDDF1 Netherlands', val: 23.9, color: 'var(--sage)' },
-      { country: '\uD83C\uDDEB\uD83C\uDDF7 France', val: 36, color: 'var(--bronze)' },
-      { country: '\uD83C\uDDEC\uD83C\uDDE7 UK', val: 40, color: 'var(--bronze)' },
-      { country: '\uD83C\uDDEE\uD83C\uDDF9 Italy', val: 43, color: 'var(--warm-grey)' },
-      { country: '\uD83C\uDDEA\uD83C\uDDF8 Spain', val: 48, color: 'var(--warm-grey)' },
-      { country: '\uD83C\uDDEC\uD83C\uDDF7 Greece (national)', val: 72, color: 'var(--crimson)', bold: true },
-      { country: '  \u21B3 Urban/mainland', val: 45, color: '#e67e22', indent: true },
-      { country: '  \u21B3 Island/remote', val: 130, color: 'var(--crimson)', indent: true },
-      { country: '\uD83C\uDDED\uD83C\uDDFA Hungary', val: 57, color: 'var(--warm-grey)' },
-      { country: '\uD83C\uDDF5\uD83C\uDDF1 Poland', val: 95, color: 'var(--warm-grey)' },
-      { country: '\uD83C\uDDF7\uD83C\uDDF4 Romania', val: 290, color: 'var(--warm-grey)' }
-    ];
-    var maxSaidi = 300;
-    var saidiHTML = '<div style="display:flex;flex-direction:column;gap:6px">';
-    saidiData.forEach(function(d){
-      var barPct = Math.max(2, (1 - d.val / maxSaidi) * 100).toFixed(0);
-      var fw = d.bold ? 'font-weight:600;' : '';
-      var pl = d.indent ? 'padding-left:20px;' : '';
-      var border = d.bold ? 'padding:4px 0;border-bottom:1px solid var(--card-border);' : '';
-      saidiHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;font-size:12px;' + fw + pl + border + '">' +
-        '<span style="min-width:150px">' + d.country + '</span>' +
-        '<div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">' +
-          '<div style="width:' + barPct + '%;height:100%;background:' + d.color + ';border-radius:4px"></div></div>' +
-        '<span class="num" style="min-width:40px;text-align:right;color:' + d.color + ';font-weight:600">' + (d.val < 20 ? d.val : '~' + d.val) + '</span></div>';
-    });
-    saidiHTML += '</div>';
-    document.getElementById('eu-saidi-chart').innerHTML = saidiHTML;
-
-    // ── Regional Risk Ranking — All 13 Periphereies ──
+    // ── Regional Ranking ──
     var regData = {};
     fleet.forEach(function(s){
-      if (!regData[s.region]) regData[s.region] = { subs: [], sumR: 0 };
-      regData[s.region].subs.push(s);
-      regData[s.region].sumR += s.R_median;
+      var r = s.region;
+      if (!regData[r]) regData[r] = { subs: [], sumR: 0, bands: { Low:0, Medium:0, High:0, Critical:0 } };
+      regData[r].subs.push(s);
+      regData[r].sumR += s.R_median;
+      regData[r].bands[s.classification]++;
     });
-    var regList = Object.keys(regData).map(function(r){
+
+    var regions = Object.keys(regData).map(function(r){
       var d = regData[r];
-      var nn = d.subs.length;
-      var bands = { Low:0, Medium:0, High:0, Critical:0 };
-      d.subs.forEach(function(s){ bands[s.classification]++; });
-      return { name: r, n: nn, avgR: d.sumR / nn, bands: bands };
+      return { name: r, n: d.subs.length, avgR: d.sumR / d.subs.length, bands: d.bands };
     });
-    regList.sort(function(a,b){ return b.avgR - a.avgR; }); // highest risk first
+    regions.sort(function(a,b){ return b.avgR - a.avgR; });
+
+    var fleetAvgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / fleet.length;
+    var maxAvgR = regions[0].avgR;
 
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
-    var regHTML = '';
-    regList.forEach(function(rg, idx){
+    var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
+    regions.forEach(function(reg, idx){
+      var isCorridor = reg.name === 'Crete' || reg.name === 'Peloponnese';
+      var barPct = ((1 - reg.avgR) * 100).toFixed(1);
+      var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
+      var highlight = isCorridor ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
+
+      // Band distribution mini-bar
+      var total = reg.n;
       var bandBar = '';
-      ['Low','Medium','High','Critical'].forEach(function(b){
-        if (rg.bands[b] > 0) {
-          var w = (rg.bands[b] / rg.n * 100).toFixed(1);
-          bandBar += '<div style="width:' + w + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + rg.bands[b] + '"></div>';
+      ['Critical','High','Medium','Low'].forEach(function(b){
+        var w = (reg.bands[b] / total * 100).toFixed(1);
+        if (reg.bands[b] > 0) {
+          bandBar += '<div style="width:' + w + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + reg.bands[b] + '"></div>';
         }
       });
-      var isIsland = islandRegions.indexOf(rg.name) >= 0;
-      var tag = isIsland ? ' <span style="font-size:10px;color:var(--sage)">\uD83C\uDFDD\uFE0F island</span>' : '';
-      regHTML += '<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;' +
-        (isIsland ? 'background:rgba(93,133,99,0.05);padding:4px 6px;border-radius:4px' : '') + '">' +
-        '<span style="min-width:18px;color:var(--warm-grey);font-size:10px">' + (idx+1) + '</span>' +
-        '<span style="min-width:180px;font-weight:500">' + rg.name + tag + '</span>' +
-        '<div style="flex:1;height:8px;border-radius:4px;overflow:hidden;display:flex">' + bandBar + '</div>' +
-        '<span style="min-width:50px;text-align:right;font-family:Consolas,monospace;font-size:10px">' + rg.avgR.toFixed(3) + '</span>' +
-        '<span style="min-width:40px;text-align:right;font-size:10px;color:var(--warm-grey)">' + rg.n + ' subs</span></div>';
+
+      html += '<div style="margin-bottom:8px;' + highlight + '">' +
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline">' +
+          '<span style="font-weight:' + (isCorridor ? '700' : '500') + ';min-width:180px">' +
+            '<span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#' + (idx + 1) + '</span>' +
+            reg.name + '</span>' +
+          '<span style="color:var(--warm-grey);font-size:11px">' + reg.n + ' subs · avg R = ' + reg.avgR.toFixed(3) +
+          ' · H:' + reg.bands.High + (reg.bands.Critical ? ' C:' + reg.bands.Critical : '') + '</span></div>' +
+        '<div style="display:flex;gap:4px;align-items:center">' +
+          '<div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">' +
+            '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:3px;opacity:0.7"></div>' +
+          '</div>' +
+          '<div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+        '</div></div>';
     });
-    document.getElementById('eu-regional-ranking').innerHTML = regHTML;
+    document.getElementById('eu-regional-ranking').innerHTML = html;
 
     // Ranking narrative
-    var worst = regList[0];
-    var best = regList[regList.length - 1];
-    var islandRegs = regList.filter(function(rg){ return islandRegions.indexOf(rg.name) >= 0; });
-    var islandAvg = islandRegs.length ? islandRegs.reduce(function(a,rg){ return a + rg.avgR; }, 0) / islandRegs.length : 0;
-    var mainlandAvg = regList.filter(function(rg){ return islandRegions.indexOf(rg.name) < 0; }).reduce(function(a,rg){ return a + rg.avgR * rg.n; }, 0) /
-      regList.filter(function(rg){ return islandRegions.indexOf(rg.name) < 0; }).reduce(function(a,rg){ return a + rg.n; }, 0);
+    var worstReg = regions[0];
+    var bestReg = regions[regions.length - 1];
+    var islandRegs = ['Crete','Ionian Islands','North Aegean','South Aegean'];
+    var islandRegList = regions.filter(function(rg){ return islandRegs.indexOf(rg.name) >= 0; });
+    var islandAvg = islandRegList.length ? islandRegList.reduce(function(a,rg){ return a + rg.avgR; }, 0) / islandRegList.length : 0;
+    var mainlandRegList = regions.filter(function(rg){ return islandRegs.indexOf(rg.name) < 0; });
+    var mainlandAvg = mainlandRegList.length ? mainlandRegList.reduce(function(a,rg){ return a + rg.avgR * rg.n; }, 0) / mainlandRegList.reduce(function(a,rg){ return a + rg.n; }, 0) : 0;
+
     document.getElementById('eu-ranking-narrative').innerHTML =
-      '<strong>' + worst.name + '</strong> leads the risk ranking with avg R = ' + worst.avgR.toFixed(3) +
-      ', while <strong>' + best.name + '</strong> has the lowest at ' + best.avgR.toFixed(3) + '. ' +
-      'Island periphereies average R = ' + islandAvg.toFixed(3) + ' vs mainland ' + mainlandAvg.toFixed(3) +
-      ' \u2014 a ' + ((islandAvg - mainlandAvg) / mainlandAvg * 100).toFixed(1) + '% premium reflecting ' +
-      'non-interconnection, fuel import dependence, and limited repair logistics. ' +
+      '<strong>' + worstReg.name + '</strong> leads the risk ranking with avg R = ' + worstReg.avgR.toFixed(3) +
+      ', while <strong>' + bestReg.name + '</strong> has the lowest at ' + bestReg.avgR.toFixed(3) + '. ' +
+      'Island Periphereies average R = ' + islandAvg.toFixed(3) + ' vs mainland ' + mainlandAvg.toFixed(3) +
+      ' — a ' + ((islandAvg - mainlandAvg) / mainlandAvg * 100).toFixed(1) + '% premium reflecting ' +
+      'non-interconnection (except Crete post-2024), fuel import dependence, and limited repair logistics. ' +
       'The SAIDI chart shows Greece\'s national average (~72 min/customer/year) significantly above Northern European benchmarks, ' +
-      'with island/remote areas experiencing ~130 min \u2014 nearly double the mainland urban average of ~45 min.';
+      'with island/remote areas experiencing ~130 min — nearly triple the mainland urban average of ~45 min — ' +
+      'a penalty that the SSI quantifies at the asset level for the first time.';
   });
 })();
 </script>
@@ -1400,7 +1541,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h2>SSI Enhanced Neural Network — Monthly Topic</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to actionable risk analytics.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What are the compound risk drivers at this substation — and where should intervention be prioritised?"</em> Each edition explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to BESS valuation platform.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What is a BESS worth at this substation — to the DNO and to the community?"</em> Each edition of this report explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
 </div>
 
 <!-- Architecture overview — always visible -->
@@ -1790,10 +1931,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // Closing paragraph
     document.getElementById('g-closing').innerHTML =
-      'The April 2026 inaugural SSI Index for Greece establishes the baseline for tracking grid resilience under NECP 2030 energy transition targets. ' +
-      'Monthly editions will rotate through Greece\'s 13 regions, deepening intelligence on seismic exposure, renewable integration stress, and island interconnection progress. ' +
-      'Quarterly data refreshes from ADMIE, DEDDIE/HEDNO, RAE, ELSTAT, and Hellenic Scientific agencies will keep the SSI synchronized with real grid conditions. ' +
-      'The next edition focuses on <strong>' + nextDive.region + '</strong> — a critical region for understanding how Greece balances energy transition ambition with geophysical reality.';
+      'Edition 002 will be published on the second Thursday of June 2026. Deep-dive region: Crete — a critical region for understanding how Greece balances energy transition ambition with geophysical reality. To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
   });
 })();
 </script>
