@@ -16,7 +16,7 @@ WARN_MB = 50
 CRITICAL_MB = 100
 
 countries = ['france','italy','uk','spain','germany','switzerland','austria',
-             'us','canada','japan','australia','chile']
+             'us','canada','japan','australia','chile','greece','turkey']
 
 total_size = 0
 issues = []
