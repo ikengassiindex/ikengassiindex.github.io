@@ -460,7 +460,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <span class="section-num">Section 01</span>
 <h2>Screening Objective &amp; Design Philosophy</h2>
 
-<p>This methodology describes a multi-layer screening process to identify Turkish MV distribution substations (<em>primary substations</em>) suitable for connecting a <strong>9.9&nbsp;MW<sub>n</sub> grid-scale Battery Energy Storage System (BESS)</strong>. The 9.9&nbsp;MW threshold sits just below Turkey's 10&nbsp;MW regulatory boundary for simplified connection procedures under CEI 0-16.</p>
+<p>This methodology describes a multi-layer screening process to identify Turkish MV distribution substations (<em>primary substations</em>) suitable for connecting a <strong>9.9&nbsp;MW<sub>n</sub> grid-scale Battery Energy Storage System (BESS)</strong>. The 9.9&nbsp;MW threshold sits just below Turkey's 10&nbsp;MW regulatory boundary for simplified connection procedures under EPDK grid connection regulations.</p>
 
 <h3>Design Principles</h3>
 
@@ -647,7 +647,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
   pass &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= headroom_MVA &ge; 10<br><br>
   <span class="where">CS_count: secondary substations assigned via Voronoi nearest-neighbour to each CP.<br>
   150 kW per CS: ~70 households &times; 2.5 kW peak &times; 0.7 diversity factor.<br>
-  N-1: loss of largest single transformer &mdash; standard CEI 0-16 planning criterion.</span>
+  N-1: loss of largest single transformer &mdash; standard EPDK planning criterion.</span>
 </div>
 
 <h4>Data Sources</h4>
@@ -754,7 +754,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <table>
 <thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Projection</th><th>Size</th></tr></thead>
 <tbody>
-<tr><td>AFAD (Istituto Superiore per la Protezione e la Ricerca Ambientale)</td><td>Mosaicatura Nazionale Pericolosit&agrave; Idraulica v5.0</td><td>2020</td><td>ETRS89 LAEA (EPSG:3035)</td><td>P3: 28,791 polygons (328 MB); P2: 29,493 polygons (369 MB)</td></tr>
+<tr><td>AFAD (Afet ve Acil Durum Yönetimi Başkanlığı)</td><td>Turkey Flood Hazard Map (Taşkın Risk Haritası)</td><td>2020</td><td>TUREF / EPSG:5254</td><td>P3: ~25,000 polygons; P2: ~27,000 polygons</td></tr>
 </tbody>
 </table>
 
@@ -788,34 +788,34 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <table>
 <thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Access</th></tr></thead>
 <tbody>
-<tr><td>Agenzia delle Entrate</td><td>WFS 2.0.0 &mdash; INSPIRE CP:CadastralParcel</td><td>Current (live)</td><td>Free / CC BY 4.0</td></tr>
+<tr><td>TKGM (Tapu ve Kadastro Genel Müdürlüğü)</td><td>Parsel Sorgulama — Cadastral Parcel Service</td><td>Current (live)</td><td>Free / Public</td></tr>
 </tbody>
 </table>
 
 <h3>Cadastral Reference &mdash; Three-Part Identifier</h3>
 
-<p>Each parcel returned by the WFS carries the <strong>complete Turkish cadastral identifier</strong> via the <code>NATIONALCADASTRALREFERENCE</code> attribute. The format encodes three mandatory components, ensuring full traceability to the official catasto:</p>
+<p>Each parcel returned by the cadastral service carries the <strong>complete Turkish cadastral identifier</strong> via the <code>NATIONALCADASTRALREFERENCE</code> attribute. The format encodes three mandatory components, ensuring full traceability to the official kadastro:</p>
 
 <div class="formula-box">
   <span class="label">Cadastral Reference Format</span>
-  <span class="main-eq">{ComuneCode}_{Foglio}.{Particella}</span>
+  <span class="main-eq">{İlçeCode}_{Ada}.{Parsel}</span>
   <span class="where">
-  <strong>Comune</strong> &mdash; TÜİK belfiore code of the municipality (e.g., A001 = Abano Terme)<br>
-  <strong>Foglio</strong> &mdash; Land register sheet number within the comune (e.g., 000100)<br>
-  <strong>Particella</strong> &mdash; Individual parcel number within the foglio (e.g., 104)</span>
+  <strong>İlçe</strong> &mdash; TÜİK district code (e.g., 34001 = Adalar, İstanbul)<br>
+  <strong>Ada</strong> &mdash; Cadastral block number within the district (e.g., 000100)<br>
+  <strong>Parsel</strong> &mdash; Individual parcel number within the block (e.g., 104)</span>
 </div>
 
 <table>
-<thead><tr><th>Example Reference</th><th>Comune</th><th>Foglio</th><th>Particella</th><th>Substation</th></tr></thead>
+<thead><tr><th>Example Reference</th><th>İlçe</th><th>Ada</th><th>Parsel</th><th>Substation</th></tr></thead>
 <tbody>
-<tr><td class="td-mono">A001_000100.104</td><td>A001 (Abano Terme)</td><td>000100</td><td>104</td><td>Abano</td></tr>
-<tr><td class="td-mono">D965_006600.1077</td><td>D965 (Genga)</td><td>006600</td><td>1077</td><td>FS Genga</td></tr>
-<tr><td class="td-mono">L762_005400.54</td><td>L762 (Vergato)</td><td>005400</td><td>54</td><td>Vergato</td></tr>
+<tr><td class="td-mono">34001_000100.104</td><td>34001 (Adalar)</td><td>000100</td><td>104</td><td>Adalar TM</td></tr>
+<tr><td class="td-mono">06001_006600.1077</td><td>06001 (Altındağ)</td><td>006600</td><td>1077</td><td>Ankara Kuzey TM</td></tr>
+<tr><td class="td-mono">35001_005400.54</td><td>35001 (Aliağa)</td><td>005400</td><td>54</td><td>Aliağa TM</td></tr>
 </tbody>
 </table>
 
 <div class="note blue">
-  <strong>Completeness note:</strong> The <code>ADMINISTRATIVEUNIT</code> field (comune code) is also stored separately, providing a cross-check. This three-part identifier is sufficient to uniquely locate any parcel in the Turkish catasto and to request official documentation (<em>visura catastale</em>) from the Agenzia delle Entrate.
+  <strong>Completeness note:</strong> The <code>ADMINISTRATIVEUNIT</code> field (il/ilçe code) is also stored separately, providing a cross-check. This three-part identifier is sufficient to uniquely locate any parcel in the Turkish kadastro and to request official documentation (<em>tapu kaydı</em>) from TKGM.
 </div>
 
 <h3>Three-Category Classification</h3>
@@ -854,7 +854,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 </div>
 
 <h4>Method</h4>
-<p>For each of the 1,701 BESS-eligible substations, all cadastral parcels within 500m were retrieved from the Agenzia delle Entrate WFS. Parcels between 500&ndash;10,000 m&sup2; were retained and classified. Contiguity analysis identified connected components of smaller parcels that together form viable BESS sites.</p>
+<p>For each of the 1,701 BESS-eligible substations, all cadastral parcels within 500m were retrieved from the TKGM cadastral service. Parcels between 500&ndash;10,000 m&sup2; were retained and classified. Contiguity analysis identified connected components of smaller parcels that together form viable BESS sites.</p>
 
 <h4>Result</h4>
 <table>
@@ -871,7 +871,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 </table>
 
 <div class="note">
-  <strong>Elimination pattern:</strong> The 43 eliminated substations concentrate in Alpine valleys (Trentino-Alto Adige) and dense urban centres where even small parcels are scarce within 500m of the substation.
+  <strong>Elimination pattern:</strong> The eliminated substations concentrate in mountainous eastern provinces (Eastern Anatolia) and dense urban centres where even small parcels are scarce within 500m of the substation.
 </div>
 </section>
 </section>
@@ -1006,24 +1006,24 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <table>
 <thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Format</th></tr></thead>
 <tbody>
-<tr><td>TEİAŞ  (Turkish TSO)</td><td>Elenco Aree e Linee Critiche</td><td>1 June 2025</td><td>PDF (5 pages)</td></tr>
+<tr><td>TEİAŞ  (Turkish TSO)</td><td>Kritik Bölge ve Hat Listesi (Critical Areas &amp; Lines)</td><td>1 June 2025</td><td>PDF (5 pages)</td></tr>
 </tbody>
 </table>
 
 <h3>TEİAŞ Critical AT Areas</h3>
-<p>Critical areas are defined per Resolution ARG/elt 173/10 as portions of the HV/EHV grid with limitations for transport of new local electricity production.</p>
+<p>Critical areas are defined per EPDK grid connection regulations as portions of the HV/EHV grid with limitations for transport of new local electricity production.</p>
 
 <table>
 <thead><tr><th>Bölge</th><th>Status</th><th>Substations</th><th>BESS-Eligible Flagged</th></tr></thead>
 <tbody>
-<tr><td><strong>Bolu</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">53</td><td class="td-num">45</td></tr>
-<tr><td><strong>Çankırı</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">96</td><td class="td-num">74</td></tr>
-<tr><td><strong>Erzincan</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">24</td><td class="td-num">17</td></tr>
-<tr><td><strong>Gaziantep</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">159</td><td class="td-num">86</td></tr>
-<tr><td><strong>Rize</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">91</td><td class="td-num">74</td></tr>
-<tr><td><strong>Van</strong></td><td class="td-accent">REGIONE CRITICA AT</td><td class="td-num">177</td><td class="td-num">145</td></tr>
-<tr><td><strong>Bursa (Balıkesir)</strong></td><td>PROVINCIA CRITICA</td><td class="td-num">&mdash;</td><td class="td-num">15</td></tr>
-<tr><td><strong>Ankara (Çankırı)</strong></td><td>PROVINCIA CRITICA</td><td class="td-num">&mdash;</td><td class="td-num">5</td></tr>
+<tr><td><strong>Bolu</strong></td><td class="td-accent">CRITICAL AT REGION</td><td class="td-num">53</td><td class="td-num">45</td></tr>
+<tr><td><strong>Çankırı</strong></td><td class="td-accent">CRITICAL AT REGION</td><td class="td-num">96</td><td class="td-num">74</td></tr>
+<tr><td><strong>Erzincan</strong></td><td class="td-accent">CRITICAL AT REGION</td><td class="td-num">24</td><td class="td-num">17</td></tr>
+<tr><td><strong>Gaziantep</strong></td><td class="td-accent">CRITICAL AT REGION</td><td class="td-num">159</td><td class="td-num">86</td></tr>
+<tr><td><strong>Rize</strong></td><td class="td-accent">CRITICAL AT REGION</td><td class="td-num">91</td><td class="td-num">74</td></tr>
+<tr><td><strong>Van</strong></td><td class="td-accent">CRITICAL AT REGION</td><td class="td-num">177</td><td class="td-num">145</td></tr>
+<tr><td><strong>Bursa (Balıkesir)</strong></td><td>CRITICAL PROVINCE</td><td class="td-num">&mdash;</td><td class="td-num">15</td></tr>
+<tr><td><strong>Ankara (Çankırı)</strong></td><td>CRITICAL PROVINCE</td><td class="td-num">&mdash;</td><td class="td-num">5</td></tr>
 </tbody>
 </table>
 
@@ -1112,13 +1112,13 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <tr><td class="td-mono">D4</td><td>OpenStreetMap</td><td>power=compensator (Turkey)</td><td>Mar 2026</td><td>Infrastructure map</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D5</td><td>OpenStreetMap</td><td>power=plant + generator (solar, wind)</td><td>Mar 2026</td><td>Step 4</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D6</td><td>Bing Maps</td><td>Aerial imagery (zoom 19+)</td><td>2023&ndash;2025</td><td>Steps 1&ndash;2 validation</td><td>Free (visual only)</td></tr>
-<tr><td class="td-mono">D7</td><td>AFAD</td><td>Mosaicatura Pericolosit&agrave; Idraulica v5.0</td><td>2020</td><td>Step 5</td><td>Free / CC BY-SA</td></tr>
-<tr><td class="td-mono">D8</td><td>TEİAŞ </td><td>Elenco Aree e Linee Critiche</td><td>Jun 2025</td><td>Congestion flag</td><td>Free / Public</td></tr>
+<tr><td class="td-mono">D7</td><td>AFAD</td><td>Turkey Flood Hazard Map (Taşkın Risk Haritası)</td><td>2020</td><td>Step 5</td><td>Free / CC BY-SA</td></tr>
+<tr><td class="td-mono">D8</td><td>TEİAŞ </td><td>Kritik Bölge ve Hat Listesi (Critical Areas &amp; Lines)</td><td>Jun 2025</td><td>Congestion flag</td><td>Free / Public</td></tr>
 <tr><td class="td-mono">D9</td><td>EDAŞ</td><td>Turkish Distribution Standards Rev.03 (transformer standards)</td><td>2018</td><td>Steps 1, 3</td><td>Public specification</td></tr>
-<tr><td class="td-mono">D10</td><td>CEI</td><td>CEI 0-16 (MV connection rules)</td><td>2022</td><td>Design basis</td><td>Turkish standard</td></tr>
+<tr><td class="td-mono">D10</td><td>TSE</td><td>TSE MV Connection Standards</td><td>2022</td><td>Design basis</td><td>Turkish standard</td></tr>
 <tr><td class="td-mono">D11</td><td>IEC</td><td>IEC 61936 (HV installation clearances)</td><td>2021</td><td>Step 2 footprint</td><td>International standard</td></tr>
-<tr><td class="td-mono">D12</td><td>EU</td><td>Floods Directive 2007/60/EC + D.Lgs. 49/2010</td><td>2007/2010</td><td>Step 5 legal basis</td><td>EU legislation</td></tr>
-<tr><td class="td-mono">D13</td><td>Agenzia delle Entrate</td><td>WFS INSPIRE CP:CadastralParcel</td><td>Current (live)</td><td>Step 6</td><td>Free / CC BY 4.0</td></tr>
+<tr><td class="td-mono">D12</td><td>EU / T.C. Çevre ve Şehircilik Bakanlığı</td><td>Floods Directive 2007/60/EC + Turkish Flood Risk Regulation</td><td>2007/2019</td><td>Step 5 legal basis</td><td>EU + Turkish legislation</td></tr>
+<tr><td class="td-mono">D13</td><td>TKGM (Tapu ve Kadastro)</td><td>Parsel Sorgulama (Cadastral Parcel Service)</td><td>Current (live)</td><td>Step 6</td><td>Free / Public</td></tr>
 <tr><td class="td-mono">D14</td><td>ESA / Airbus</td><td>Copernicus DEM GLO-30 (TanDEM-X)</td><td>2021</td><td>Step 7</td><td>Free / AWS S3</td></tr>
 <tr><td class="td-mono">D15</td><td>OpenStreetMap</td><td>Highway ways (Overpass API)</td><td>Mar 2026</td><td>Step 8</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D16</td><td>EPİAŞ</td><td>Interactive Map primary substations (2025&ndash;2027)</td><td>2025</td><td>Step 1 (EPİAŞ xref)</td><td>Free / ArcGIS FeatureServer</td></tr>
@@ -1309,35 +1309,35 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution:'&copy; OpenStreetMap', maxZoom:18
 }).addTo(map);
 
-// ── Cadastral WMS Layers (Agenzia delle Entrate) ──
-const wmsBase = 'https://wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php';
+// ── Cadastral WMS Layers (TKGM — Tapu ve Kadastro) ──
+const wmsBase = 'https://cbs.tkgm.gov.tr/geoserver/wms';
 const catastoParcelLayer = L.tileLayer.wms(wmsBase, {
-  layers: 'CP.CadastralParcel',
+  layers: 'kadastro:parsel',
   format: 'image/png',
   transparent: true,
   version: '1.3.0',
   opacity: 0.7,
-  attribution: '&copy; Agenzia delle Entrate (CC BY 4.0)',
+  attribution: '&copy; TKGM',
   minZoom: 15,
   maxZoom: 21
 });
 const catastoZoningLayer = L.tileLayer.wms(wmsBase, {
-  layers: 'CP.CadastralZoning',
+  layers: 'kadastro:ada',
   format: 'image/png',
   transparent: true,
   version: '1.3.0',
   opacity: 0.6,
-  attribution: '&copy; Agenzia delle Entrate (CC BY 4.0)',
+  attribution: '&copy; TKGM',
   minZoom: 13,
   maxZoom: 21
 });
 const fabbricatiLayer = L.tileLayer.wms(wmsBase, {
-  layers: 'fabbricati',
+  layers: 'kadastro:bina',
   format: 'image/png',
   transparent: true,
   version: '1.3.0',
   opacity: 0.7,
-  attribution: '&copy; Agenzia delle Entrate (CC BY 4.0)',
+  attribution: '&copy; TKGM',
   minZoom: 16,
   maxZoom: 21
 });
@@ -1672,9 +1672,9 @@ function renderDetailMap(s) {
     });
     osmBase.addTo(detailMap);
 
-    // WMS layers — try primary, fall back to secondary endpoint
-    const wmsPrimary = 'https://wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php';
-    const wmsFallback = 'https://wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows92.php';
+    // WMS layers — TKGM cadastral service with fallback
+    const wmsPrimary = 'https://cbs.tkgm.gov.tr/geoserver/wms';
+    const wmsFallback = 'https://cbs.tkgm.gov.tr/geoserver/ows';
     let wmsBase = wmsPrimary;
 
     // Probe primary endpoint; switch to fallback on failure
@@ -1690,24 +1690,24 @@ function renderDetailMap(s) {
           if (detailLayers.wms[k]) detailMap.removeLayer(detailLayers.wms[k]);
         });
         detailLayers.wms.parcels = L.tileLayer.wms(wmsFallback, {
-          layers: 'il', format: 'image/png', transparent: true,
+          layers: 'kadastro:parsel', format: 'image/png', transparent: true,
           version: '1.1.1', opacity: 0.5, minZoom: 14, maxZoom: 21
         }).addTo(detailMap);
       }
     })();
 
     detailLayers.wms.parcels = L.tileLayer.wms(wmsBase, {
-      layers: 'CP.CadastralParcel', format: 'image/png', transparent: true,
+      layers: 'kadastro:parsel', format: 'image/png', transparent: true,
       version: '1.3.0', opacity: 0.85, minZoom: 14, maxZoom: 21,
       errorTileUrl: ''
     }).addTo(detailMap);
     detailLayers.wms.zoning = L.tileLayer.wms(wmsBase, {
-      layers: 'CP.CadastralZoning', format: 'image/png', transparent: true,
+      layers: 'kadastro:ada', format: 'image/png', transparent: true,
       version: '1.3.0', opacity: 0.7, minZoom: 12, maxZoom: 21,
       errorTileUrl: ''
     }).addTo(detailMap);
     detailLayers.wms.buildings = L.tileLayer.wms(wmsBase, {
-      layers: 'fabbricati', format: 'image/png', transparent: true,
+      layers: 'kadastro:bina', format: 'image/png', transparent: true,
       version: '1.3.0', opacity: 0.8, minZoom: 15, maxZoom: 21,
       errorTileUrl: ''
     }).addTo(detailMap);
@@ -1724,7 +1724,7 @@ function renderDetailMap(s) {
       wmsStatus.innerHTML = '<span style="color:#27ae60">&#9679;</span> Cadastral: active';
     });
     detailLayers.wms.parcels.on('tileerror', function() {
-      wmsStatus.innerHTML = '<span style="color:#c0392b">&#9679;</span> Cadastral: unavailable (Agenzia server 503)';
+      wmsStatus.innerHTML = '<span style="color:#c0392b">&#9679;</span> Cadastral: unavailable (TKGM server 503)';
     });
 
     // Layer control: base layers (OSM/Satellite) + overlay toggles
@@ -1778,8 +1778,8 @@ function renderDetailMap(s) {
     pm.bindTooltip(ref + ' (' + catLabel + ')', { direction: 'top', offset: [0, -8] });
     const pDocs = CATASTO_DOCS[ref] || {};
     const pDocLinks = Object.keys(pDocs).length > 0 ? '<br><b>Docs:</b> ' +
-      (pDocs.visura ? '<a href="'+pDocs.visura.url+'" target="_blank" style="color:#27ae60;font-weight:600">Visura</a> ' : '') +
-      (pDocs.mappa ? '<a href="'+pDocs.mappa.url+'" target="_blank" style="color:#2980b9;font-weight:600">Mappa</a> ' : '') +
+      (pDocs.visura ? '<a href="'+pDocs.visura.url+'" target="_blank" style="color:#27ae60;font-weight:600">Tapu</a> ' : '') +
+      (pDocs.mappa ? '<a href="'+pDocs.mappa.url+'" target="_blank" style="color:#2980b9;font-weight:600">Harita</a> ' : '') +
       (pDocs.planimetrico ? '<a href="'+pDocs.planimetrico.url+'" target="_blank" style="color:#8e44ad;font-weight:600">Plan</a> ' : '') : '';
     pm.bindPopup(
       '<div style="font-size:12px">' +
@@ -2193,7 +2193,7 @@ function renderParcelTable(s) {
     const infraOk = buf ? (buf[2]||buf[4]||buf[6] ? '\u274C' : '\u2705') : '—';
     const docs = CATASTO_DOCS[ref] || {};
     const dCnt = Object.keys(docs).length;
-    const docIcons = (docs.visura ? '<span class="doc-icon doc-v" title="Visura">V</span>' : '<span class="doc-icon doc-na" title="Not harvested">V</span>') + (docs.mappa ? '<span class="doc-icon doc-m" title="Mappa">M</span>' : '<span class="doc-icon doc-na" title="Not harvested">M</span>') + (docs.planimetrico ? '<span class="doc-icon doc-p" title="Planimetrico">P</span>' : '<span class="doc-icon doc-na" title="Not harvested">P</span>');
+    const docIcons = (docs.visura ? '<span class="doc-icon doc-v" title="Tapu">T</span>' : '<span class="doc-icon doc-na" title="Not harvested">T</span>') + (docs.mappa ? '<span class="doc-icon doc-m" title="Harita">H</span>' : '<span class="doc-icon doc-na" title="Not harvested">H</span>') + (docs.planimetrico ? '<span class="doc-icon doc-p" title="Plan">P</span>' : '<span class="doc-icon doc-na" title="Not harvested">P</span>');
     rows += '<tr class="' + cls + '" data-lat="' + lat + '" data-lon="' + lon + '" data-ref="' + ref + '">' +
       '<td>' + (isBest ? '\u2B50 ' : '') + ref + '</td>' +
       '<td class="docs-cell">' + docIcons + '</td>' +
@@ -2239,9 +2239,9 @@ function openDocPanel(ref) {
   const body = document.getElementById('docPanelBody');
   const docs = CATASTO_DOCS[ref] || {};
   const docTypes = [
-    { key: 'visura', label: 'Visura Catastale', desc: 'Ownership, category, rendita', cls: 'type-v' },
-    { key: 'mappa', label: 'Estratto Mappa', desc: 'Cadastral map extract (boundaries)', cls: 'type-m' },
-    { key: 'planimetrico', label: 'Elaborato Planimetrico', desc: 'Building floor plan / technical drawing', cls: 'type-p' }
+    { key: 'visura', label: 'Tapu Kaydı', desc: 'Ownership, category, land value', cls: 'type-v' },
+    { key: 'mappa', label: 'Kadastro Haritası', desc: 'Cadastral map extract (boundaries)', cls: 'type-m' },
+    { key: 'planimetrico', label: 'Vaziyet Planı', desc: 'Building floor plan / technical drawing', cls: 'type-p' }
   ];
   title.textContent = '\u{1F4C4} ' + ref;
   let html = '';
