@@ -56,7 +56,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   <div class="kpi-card">
     <div class="kpi-label">Substations Scored</div>
     <div class="kpi-value" style="color:var(--ink)">4,092</div>
-    <div class="kpi-sub">475 HV · 3,818 MV</div>
+    <div class="kpi-sub">1,132 HV · 2,960 MV</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
@@ -152,7 +152,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // Basic info
     document.getElementById('focus-name').textContent = s.name;
-    document.getElementById('focus-location').textContent = s.il + ', ' + s.bölge + ' · ' + s.voltage_kv + ' kV';
+    document.getElementById('focus-location').textContent = s.province + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
     document.getElementById('focus-r').textContent = s.R_median.toFixed(3);
     document.getElementById('focus-band').textContent = s.classification;
     document.getElementById('focus-ci').textContent = s.CI_width.toFixed(3);
@@ -267,7 +267,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var d = new Date();
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
-      ' — is <strong>' + s.name + '</strong> in ' + s.il + ', ' + s.bölge +
+      ' — is <strong>' + s.name + '</strong> in ' + s.province + ', ' + s.region +
       '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
       (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
       top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
@@ -289,7 +289,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h2>Cyber &amp; Economic Exposure Monitor</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that PNRR digitalisation planning requires.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that Turkey's grid modernisation investment planning requires.</p>
 </div>
 
 <!-- B.1 KPI boxes -->
@@ -344,15 +344,15 @@ document.addEventListener("ssi-config-ready", function(e) {
 <p style="font-size:13px;line-height:1.7" id="b2-narrative">Loading economic impact analysis…</p>
 
 <!-- B.3 İl Digital Readiness Heatmap -->
-<h3>B.3 &ensp; İl Digital Readiness Ranking</h3>
-<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">İls ranked by average R7 modifier — lower values indicate weaker digital infrastructure (DESI sub-dimensions). Cross-referenced with average R_median to identify ils combining digital exposure with high grid stress.</p>
+<h3>B.3 &ensp; Province Digital Readiness Ranking</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Provinces ranked by average R7 modifier — lower values indicate weaker digital infrastructure. Cross-referenced with average R_median to identify provinces combining digital exposure with high grid stress.</p>
 
 <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
   <canvas id="b3-map" style="flex:1;min-width:260px;height:300px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff"></canvas>
   <div style="flex:1;min-width:260px" id="b3-ranking">Loading…</div>
 </div>
 
-<p style="font-size:13px;line-height:1.7" id="b3-narrative">Loading il digital readiness…</p>
+<p style="font-size:13px;line-height:1.7" id="b3-narrative">Loading province digital readiness…</p>
 
 <!-- B.4 Monthly Pulse -->
 <h3>B.4 &ensp; Monthly Pulse</h3>
@@ -488,7 +488,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     // B.1 Narrative
     var blindSpotBölges = {};
     blindSpots.forEach(function(s){
-      blindSpotBölges[s.bölge] = (blindSpotBölges[s.bölge] || 0) + 1;
+      blindSpotBölges[s.region] = (blindSpotBölges[s.region] || 0) + 1;
     });
     var topBlindBölges = Object.keys(blindSpotBölges).map(function(r){ return { name: r, n: blindSpotBölges[r] }; })
       .sort(function(a,b){ return b.n - a.n; }).slice(0, 3);
@@ -575,25 +575,25 @@ document.addEventListener("ssi-config-ready", function(e) {
     // B.2 Narrative
     var topTierSubs = fleet.filter(tiers[0].filter);
     var topTierBölges = {};
-    topTierSubs.forEach(function(s){ topTierBölges[s.bölge] = (topTierBölges[s.bölge] || 0) + 1; });
+    topTierSubs.forEach(function(s){ topTierBölges[s.region] = (topTierBölges[s.region] || 0) + 1; });
     var topEconBölges = Object.keys(topTierBölges).map(function(r){ return { name: r, n: topTierBölges[r] }; })
       .sort(function(a,b){ return b.n - a.n; }).slice(0, 3);
     var econBölgeStr = topEconBölges.map(function(r){ return r.name + ' (' + r.n + ')'; }).join(', ');
 
-    var avgEP = fleet.reduce(function(a,s){ return a + s.socio_economic.EP_rate_bölge; }, 0) / n;
+    var avgEP = fleet.reduce(function(a,s){ return a + s.socio_economic.EP_rate_region; }, 0) / n;
     document.getElementById('b2-narrative').innerHTML =
-      'The capital-intensive tier concentrates in <strong>' + econBölgeStr + '</strong> — bölges where industrial corridors ' +
+      'The capital-intensive tier concentrates in <strong>' + econBölgeStr + '</strong> — regions where industrial corridors ' +
       'depend on uninterrupted power for continuous processes (steel, glass, automotive). A single hour of unplanned outage at these ' +
       'substations carries an estimated VoLL of ₺15–30/kWh, compared to ₺1–3/kWh in rural agricultural areas. ' +
-      'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp bölgeal variation: ' +
-      'Southern bölges combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
+      'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
+      'Eastern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
       'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
       'to substation-level risk scores.';
 
     // ── B.3 İl Digital Readiness ──
     var provData = {};
     fleet.forEach(function(s){
-      var p = s.il;
+      var p = s.province;
       if (!provData[p]) provData[p] = { subs: [], sumR7: 0, sumR: 0, sumLon: 0, sumLat: 0 };
       provData[p].subs.push(s);
       provData[p].sumR7 += s.modifiers.R7_cyber;
@@ -663,7 +663,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     mctx.fillText('High', 108, 36);
 
     // İl ranking — top 15 worst + top 5 best
-    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Worst Digital Readiness — Top 15 İls</div>' +
+    var rankHTML = '<div class="label-xs" style="margin-bottom:8px">Worst Digital Readiness — Top 15 Provinces</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:6px">Longer bar = higher R7 = better digital infrastructure.</div>';
     var maxR7prov = provList[provList.length - 1].avgR7;
     provList.slice(0, 15).forEach(function(pv, idx){
@@ -683,12 +683,12 @@ document.addEventListener("ssi-config-ready", function(e) {
     var bestProv = provList[provList.length - 1];
     var dualExposed = provList.filter(function(pv){ return pv.avgR7 < medianR7 && pv.avgR > medianR; });
     document.getElementById('b3-narrative').innerHTML =
-      'İl-level analysis reveals a clear North-South digital divide mirroring the broader DESI pattern. ' +
+      'Province-level analysis reveals a clear West-East digital divide in broadband and smart metering coverage. ' +
       '<strong>' + worstProv.name + '</strong> has the lowest average R7 (' + worstProv.avgR7.toFixed(4) + '), while ' +
       '<strong>' + bestProv.name + '</strong> leads at ' + bestProv.avgR7.toFixed(4) + ' — a spread of ' +
       (bestProv.avgR7 - worstProv.avgR7).toFixed(4) + ' across the R7 range. ' +
-      '<strong>' + dualExposed.length + ' ils</strong> combine below-median digital readiness with above-median grid risk, ' +
-      'making them priority targets for PNRR digitalisation investment. ' +
+      '<strong>' + dualExposed.length + ' provinces</strong> combine below-median digital readiness with above-median grid risk, ' +
+      'making them priority targets for grid digitalisation investment. ' +
       'The R7 modifier is intentionally narrow ([0.99, 1.05]) to reflect the current limitations of open DESI data — ' +
       'as NIS2 compliance reporting matures, future editions will expand R7\'s dynamic range and incorporate operational technology (OT) security indicators.';
 
@@ -707,7 +707,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
       blindSpots.length + ' blind-spot substations (High/Critical risk + below-median R7); ' +
       highRiskLowDigital + ' Critical-band substations with below-median digital readiness. ' +
-      'Future editions will track deltas against this baseline, flagging ils where DESI improvements ' +
+      'Future editions will track deltas against this baseline, flagging provinces where digital infrastructure improvements ' +
       '(broadband rollout, smart meter deployment, OT upgrades) translate into measurable R7 shifts. ' +
       'The next material R7 update is expected when Eurostat publishes the 2025 DESI sub-indices (anticipated Q3 2026).';
   });
@@ -912,8 +912,8 @@ document.addEventListener("ssi-config-ready", function(e) {
       ' substation scores remain unchanged</strong> this edition. The fleet median R of ' + median.toFixed(3) +
       ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
       (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
-      'The first material score changes are expected when EPDK publishes the annual TIQE tables (affecting C1–C4 and R6a) ' +
-      'and when EPİAŞ refreshes the Atlaimpianti DER registry (affecting T1). ' +
+      'The first material score changes are expected when EPDK publishes the annual electricity quality tables (affecting C1–C4 and R6a) ' +
+      'and when EPDK refreshes the licensed generation registry (affecting T1). ' +
       'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
       'which have minimal impact on fleet-level score distribution.';
   });
@@ -1026,11 +1026,11 @@ document.addEventListener("ssi-config-ready", function(e) {
 <p style="font-size:13px;line-height:1.7" id="pug-narrative-d3">Loading component analysis…</p>
 
 <!-- D.4 İl Breakdown — auto-populated -->
-<h3>D.4 &ensp; İl Breakdown</h3>
+<h3>D.4 &ensp; Province Breakdown</h3>
 
 <div id="puglia-il-bars" style="margin:16px 0"></div>
 
-<p style="font-size:13px;line-height:1.7" id="pug-narrative-d4">Loading il breakdown…</p>
+<p style="font-size:13px;line-height:1.7" id="pug-narrative-d4">Loading province breakdown…</p>
 
 <!-- D.5 Implications -->
 <h3>D.5 &ensp; Implications</h3>
@@ -1041,7 +1041,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter Marmara ──
-    var puglia = data.substations.filter(function(s){ return s.bölge === 'Marmara'; });
+    var puglia = data.substations.filter(function(s){ return s.region === 'Marmara'; });
     var fleet = data.substations;
     puglia.sort(function(a,b){ return b.R_median - a.R_median; });
 
@@ -1067,9 +1067,9 @@ document.addEventListener("ssi-config-ready", function(e) {
     // Worst il by mean R
     var provSums = {}, provCounts = {};
     puglia.forEach(function(s){
-      if (!provSums[s.il]) { provSums[s.il] = 0; provCounts[s.il] = 0; }
-      provSums[s.il] += s.R_median;
-      provCounts[s.il]++;
+      if (!provSums[s.province]) { provSums[s.province] = 0; provCounts[s.province] = 0; }
+      provSums[s.province] += s.R_median;
+      provCounts[s.province]++;
     });
     var provAvgs = Object.keys(provSums).map(function(p){ return { name: p, avg: provSums[p]/provCounts[p], n: provCounts[p] }; });
     provAvgs.sort(function(a,b){ return b.avg - a.avg; });
@@ -1080,14 +1080,14 @@ document.addEventListener("ssi-config-ready", function(e) {
     // D.1 Narrative
     var pctAboveFleetMedian = (puglia.filter(function(s){ return s.R_median > fleetMedian; }).length / nTotal * 100).toFixed(0);
     document.getElementById('pug-narrative-d1').innerHTML =
-      'Marmara hosts <strong>' + nTotal + ' substations</strong> across 6 ils, making it the 6th largest bölgeal fleet in the SSI dataset. ' +
+      'Marmara hosts <strong>' + nTotal + ' substations</strong> across ' + provAvgs.length + ' provinces, making it the largest regional fleet in the SSI dataset. ' +
       'However, its risk profile is disproportionately concentrated in the upper bands: <strong>' + bands.High + ' substations (' +
       (bands.High/nTotal*100).toFixed(1) + '%)</strong> are classified High' +
       (bands.Critical ? ' and <strong>' + bands.Critical + '</strong> Critical' : '') +
       ', with only <strong>' + bands.Low + '</strong> in the Low band. ' +
       pctAboveFleetMedian + '% of Marmara substations score above the national fleet median of ' + fleetMedian.toFixed(3) +
-      '. The corridor median R of ' + medianR.toFixed(3) + ' places Marmara among the most stressed bölges in the Mezzogiorno, ' +
-      'driven by the combination of high continuity-of-supply deficits, ageing infrastructure, and accelerating DER penetration under PNRR deployment.';
+      '. The corridor median R of ' + medianR.toFixed(3) + ' places Marmara among the most stressed regions in Turkey, ' +
+      'driven by the combination of high continuity-of-supply deficits, ageing infrastructure, and accelerating DER penetration under TEDAŞ modernisation plans.';
 
     // ── D.2 Map ──
     var canvas = document.getElementById('puglia-map');
@@ -1115,7 +1115,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // Draw all non-Marmara substations as faint grey for context
     fleet.forEach(function(s){
-      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && s.bölge !== 'Marmara') {
+      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && s.region !== 'Marmara') {
         var p = proj(s.lon, s.lat);
         ctx.beginPath();
         ctx.arc(p[0], p[1], 2, 0, Math.PI * 2);
@@ -1144,7 +1144,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     ctx.fillStyle = 'rgba(44,36,32,0.5)';
     ctx.textAlign = 'center';
     provAvgs.forEach(function(pv){
-      var provSubs = puglia.filter(function(s){ return s.il === pv.name; });
+      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var avgLon = provSubs.reduce(function(a,s){ return a + s.lon; }, 0) / provSubs.length;
       var avgLat = provSubs.reduce(function(a,s){ return a + s.lat; }, 0) / provSubs.length;
       var p = proj(avgLon, avgLat);
@@ -1161,7 +1161,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       var alertStr = s.alert_components ? s.alert_components.join(', ') : '—';
       return '<tr>' +
         '<td style="' + thStyle + 'font-weight:500">' + s.name + '</td>' +
-        '<td style="' + thStyle + '">' + s.il + '</td>' +
+        '<td style="' + thStyle + '">' + s.province + '</td>' +
         '<td style="' + numStyle + 'color:' + bCol + ';font-weight:600">' + s.R_median.toFixed(3) + '</td>' +
         '<td style="' + thStyle + 'color:' + bCol + ';font-weight:600">' + s.classification + '</td>' +
         '<td style="' + numStyle + '">' + s.components.C.toFixed(3) + '</td>' +
@@ -1250,14 +1250,14 @@ document.addEventListener("ssi-config-ready", function(e) {
       'Among modifiers, the R3 consequence multiplier averages ' + avgMod(puglia, 'R3_C_mult').toFixed(3) +
       ' (fleet: ' + avgMod(fleet, 'R3_C_mult').toFixed(3) + '), reflecting the socio-economic fragility of ' +
       'Marmara\'s service-oriented, tourism-dependent economy. The R6b seismic modifier averages ' +
-      (avgMod(puglia, 'R6_seismic')||1).toFixed(3) + ', capturing the bölge\'s moderate but non-negligible seismic exposure — ' +
+      (avgMod(puglia, 'R6_seismic')||1).toFixed(3) + ', capturing the region\'s moderate but non-negligible seismic exposure — ' +
       'a dimension invisible to every competing framework.';
 
     // ── D.4 İl breakdown ──
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">İl Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){
-      var provSubs = puglia.filter(function(s){ return s.il === pv.name; });
+      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
       var provBands = { Low:0, Medium:0, High:0, Critical:0 };
       provSubs.forEach(function(s){ provBands[s.classification]++; });
       var barPct = ((1 - pv.avg) * 100).toFixed(1);
@@ -1276,10 +1276,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     // D.4 Narrative
     var bestProv = provAvgs[provAvgs.length - 1];
     document.getElementById('pug-narrative-d4').innerHTML =
-      'The il-level breakdown reveals significant intra-bölgeal variation. <strong>' + worst.name + '</strong> leads with a mean R of ' +
+      'The province-level breakdown reveals significant intra-regional variation. <strong>' + worst.name + '</strong> leads with a mean R of ' +
       worst.avg.toFixed(3) + ' across ' + worst.n + ' substations, while <strong>' + bestProv.name + '</strong> scores ' +
       bestProv.avg.toFixed(3) + ' — a spread of ' + (worst.avg - bestProv.avg).toFixed(3) +
-      ' within a single bölge. This disparity underscores why bölgeal-level metrics (as used by CEER and JRC) mask the true distribution of grid stress. ' +
+      ' within a single region. This disparity underscores why regional-level metrics (as used by CEER and JRC) mask the true distribution of grid stress. ' +
       'The SSI\'s substation-level granularity reveals that Marmara is not uniformly stressed but contains distinct corridors of concentrated risk — ' +
       'precisely the kind of spatial pattern that investment planning requires.';
 
@@ -1287,7 +1287,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var pugAbove065 = puglia.filter(function(s){ return s.R_median >= 0.65; }).length;
     document.getElementById('pug-narrative-d5').innerHTML =
       '<strong>' + pugAbove065 + ' Marmara substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
-      'For PNRR investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
+      'For grid investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
       'where DER deployment is accelerating against ageing infrastructure with above-average continuity deficits and significant socio-economic exposure. ' +
       'The SSI\'s silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only because of their engineering condition, ' +
       'but because the communities they serve — characterised by service-economy dependence, tourism exposure, and above-average energy poverty — are disproportionately ' +
@@ -1411,13 +1411,13 @@ document.addEventListener("ssi-config-ready", function(e) {
   </div>
 </div>
 
-<!-- Key insight + bölgeal ranking — auto-populated -->
+<!-- Key insight + regional ranking — auto-populated -->
 <p style="font-size:13px;line-height:1.7" id="eu-insight">Loading European context insight…</p>
 
 <h3 style="margin-top:20px">Bölgeal Risk Ranking — All 20 Turkish Bölges</h3>
 <p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does Marmara sit within the national landscape? Bölges sorted by mean R_median, with band distribution and fleet comparison.</p>
 
-<div id="eu-bölgeal-ranking" style="margin:16px 0">Loading…</div>
+<div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
 
 <p style="font-size:13px;line-height:1.7" id="eu-ranking-narrative">Loading…</p>
 
@@ -1425,7 +1425,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   fetch('ssi-data.json?v=44').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
-    var puglia = fleet.filter(function(s){ return s.bölge === 'Marmara'; });
+    var puglia = fleet.filter(function(s){ return s.region === 'Marmara'; });
 
     // ── Key Insight ──
     // C component > 70% of weight ceiling (0.30) = high continuity deficit ≈ "bassa concentrazione"
@@ -1448,7 +1448,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     // ── Bölgeal Ranking ──
     var regData = {};
     fleet.forEach(function(s){
-      var r = s.bölge;
+      var r = s.region;
       if (!regData[r]) regData[r] = { subs: [], sumR: 0, bands: { Low:0, Medium:0, High:0, Critical:0 } };
       regData[r].subs.push(s);
       regData[r].sumR += s.R_median;
@@ -1496,7 +1496,7 @@ document.addEventListener("ssi-config-ready", function(e) {
           '<div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex">' + bandBar + '</div>' +
         '</div></div>';
     });
-    document.getElementById('eu-bölgeal-ranking').innerHTML = html;
+    document.getElementById('eu-regional-ranking').innerHTML = html;
 
     // Ranking narrative
     var pugliaRank = bölges.findIndex(function(r){ return r.name === 'Marmara'; }) + 1;
@@ -1505,13 +1505,13 @@ document.addEventListener("ssi-config-ready", function(e) {
     var aboveAvg = bölges.filter(function(r){ return r.avgR > fleetAvgR; }).length;
 
     document.getElementById('eu-ranking-narrative').innerHTML =
-      'Marmara ranks <strong>#' + pugliaRank + ' of 20 bölges</strong> by mean R_median, placing it among the upper tier of national risk. ' +
+      'Marmara ranks <strong>#' + pugliaRank + ' of 7 regions</strong> by mean R_median, placing it among the upper tier of national risk. ' +
       'The three most stressed bölges are ' + top3.join(', ') + ', while the three most resilient are ' + bot3.join(', ') + '. ' +
-      aboveAvg + ' of 20 bölges score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
+      aboveAvg + ' of 7 regions score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
       'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DSO or national statistics — ' +
       'reveals the true spatial distribution of grid stress across Turkey. ' +
-      'It is precisely this substation-level granularity that positions the SSI as a tool for PNRR investment prioritisation: ' +
-      'not treating "Southern Turkey" as a monolith, but identifying the specific corridors within each bölge that demand attention.';
+      'It is precisely this substation-level granularity that positions the SSI as a tool for grid investment prioritisation: ' +
+      'not treating "Eastern Turkey" as a monolith, but identifying the specific corridors within each region that demand attention.';
   });
 })();
 </script>
@@ -1564,7 +1564,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       ssiLink: 'valuation' },
     { layer: 2, ref: '§0.4.2', title: 'Community Value Stack (W1–W5)',
       subtitle: 'Social and economic value to the local community — the case for public-interest investment',
-      body: 'While the DNO value stack speaks the language of regulated returns, the community value stack addresses a different audience: bölgeal governments, PNRR allocators, and EU structural fund decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per EU Commission CBA guidance), not the DNO WACC.',
+      body: 'While the DNO value stack speaks the language of regulated returns, the community value stack addresses a different audience: regional governments, national energy fund allocators, and multilateral development bank decision-makers. W1 (Energy Cost Reduction) estimates savings for local consumers from peak-shaving and arbitrage, weighted by the energy poverty rate (EP_rate) from the SSI\'s socio-economic data. W2 (Local Employment) models the O&M jobs created per MW deployed. W3 (Energy Poverty Alleviation) uses the SSI\'s E component to quantify the welfare impact on vulnerable households. W4 (Carbon Reduction) converts dispatched MWh to avoided CO₂ using marginal emissions factors. W5 (Resilience Value) — perhaps the most novel — uses the SSI\'s full R_median distribution to price the avoided cost of extreme events. All five are discounted at the social discount rate (3.0% real, per EU Commission CBA guidance), not the DNO WACC.',
       concepts: ['W1: Energy cost savings weighted by EP_rate', 'W3: Energy poverty alleviation from E component', 'W5: Resilience value from SSI R_median distribution', 'Social discount rate 3.0% (EU CBA guidance)'],
       ssiLink: 'community' },
     { layer: 2, ref: '§0.4.5', title: 'Real Options Pricing Framework',
@@ -1731,7 +1731,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     // Pick a stat relevant to this topic's layer
     var statHTML = '';
     if (topic.layer === 1) {
-      statHTML = 'The SSI Index currently scores <strong>' + n.toLocaleString() + ' substations</strong> across 20 Turkish bölges. ' +
+      statHTML = 'The SSI Index currently scores <strong>' + n.toLocaleString() + ' substations</strong> across 7 Turkish regions. ' +
         'Fleet mean R = ' + avgR.toFixed(3) + ', with an average confidence interval width of ' + avgCI.toFixed(3) +
         ' from 10,000 MC iterations per substation. The dominant component is C (Continuity) at avg ' + compAvgs.C.toFixed(3) +
         ' / 0.30 ceiling (' + (compAvgs.C / 0.30 * 100).toFixed(0) + '% utilisation).';
@@ -1751,11 +1751,11 @@ document.addEventListener("ssi-config-ready", function(e) {
         fleet.filter(function(s){ return s.classification === 'Critical'; }).length + ' Critical — ensures balanced training across all risk bands.';
     } else if (topic.layer === 4) {
       var bölges = {};
-      fleet.forEach(function(s){ bölges[s.bölge] = true; });
+      fleet.forEach(function(s){ bölges[s.region] = true; });
       var ils = {};
-      fleet.forEach(function(s){ ils[s.il] = true; });
+      fleet.forEach(function(s){ ils[s.province] = true; });
       statHTML = 'Turkey\'s coverage: ' + n.toLocaleString() + ' substations across ' +
-        Object.keys(bölges).length + ' bölges and ' + Object.keys(ils).length + ' ils. ' +
+        Object.keys(bölges).length + ' regions and ' + Object.keys(ils).length + ' provinces. ' +
         'This serves as the reference benchmark for the Coverage Quality Scorecard: any country achieving comparable ' +
         'granularity (DCI > 0.70) qualifies for production-grade valuations on the commercial platform.';
     } else {
@@ -1837,18 +1837,18 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   // ── Card 1: Next Edition deep-dive topics ──
   var deepDives = [
-    { bölge: 'Marmara', theme: 'The Marmara–İstanbul Corridor', context: 'SAIDI comparison', contextDetail: 'S/T comparison with Germany and Denmark — NAFZ seismic overlay' },
-    { bölge: 'Ege', theme: 'The Aegean Renewable Belt', context: 'DER saturation analysis', contextDetail: 'Wind + solar penetration stress on the İzmir–Manisa industrial grid' },
-    { bölge: 'Akdeniz', theme: 'The Mediterranean Tourism Grid', context: 'Seasonal load dynamics', contextDetail: 'Summer peak demand amplification from Antalya–Mersin coastal tourism' },
-    { bölge: 'İç Anadolu', theme: 'The Central Anatolia Steppe', context: 'CMIP6 climate hazard', contextDetail: 'Aridification risk and thermal stress on Ankara metropolitan grid' },
-    { bölge: 'Karadeniz', theme: 'The Black Sea Hydropower Corridor', context: 'Hydropower dependency', contextDetail: 'Climate-driven flow variability and dam-cascade grid stability' },
-    { bölge: 'Güneydoğu Anadolu', theme: 'The GAP Energy Complex', context: 'Industrial VoLL exposure', contextDetail: 'Atatürk Dam cascade and cross-border interconnection stress' },
-    { bölge: 'Doğu Anadolu', theme: 'The Eastern Frontier Grid', context: 'Infrastructure age profile', contextDetail: 'Markov degradation analysis on Turkey\'s most remote networks' },
-    { bölge: 'Marmara', theme: 'The Trakya Wind Farm Belt', context: 'Renewable integration stress', contextDetail: 'Wind curtailment risk in the Thrace corridor — grid absorption limits' },
-    { bölge: 'Ege', theme: 'The Aegean Seismic Corridor', context: 'Seismic + economic dual risk', contextDetail: 'Post-2020 İzmir earthquake resilience and industrial continuity' },
-    { bölge: 'Akdeniz', theme: 'The Mersin–Adana Industrial Belt', context: 'Urban saturation dynamics', contextDetail: 'Petrochemical + agricultural load concentration and EV transition readiness' },
-    { bölge: 'İç Anadolu', theme: 'The Konya Solar Plain', context: 'Solar penetration stress', contextDetail: 'Largest solar irradiance zone — grid integration vs curtailment trade-off' },
-    { bölge: 'Karadeniz', theme: 'The Çamlıhemşin Mountain Grid', context: 'Topographic isolation risk', contextDetail: 'Micro-hydro dependency and landslide exposure in steep terrain' }
+    { region: 'Marmara', theme: 'The Marmara–İstanbul Corridor', context: 'SAIDI comparison', contextDetail: 'S/T comparison with Germany and Denmark — NAFZ seismic overlay' },
+    { region: 'Ege', theme: 'The Aegean Renewable Belt', context: 'DER saturation analysis', contextDetail: 'Wind + solar penetration stress on the İzmir–Manisa industrial grid' },
+    { region: 'Akdeniz', theme: 'The Mediterranean Tourism Grid', context: 'Seasonal load dynamics', contextDetail: 'Summer peak demand amplification from Antalya–Mersin coastal tourism' },
+    { region: 'İç Anadolu', theme: 'The Central Anatolia Steppe', context: 'CMIP6 climate hazard', contextDetail: 'Aridification risk and thermal stress on Ankara metropolitan grid' },
+    { region: 'Karadeniz', theme: 'The Black Sea Hydropower Corridor', context: 'Hydropower dependency', contextDetail: 'Climate-driven flow variability and dam-cascade grid stability' },
+    { region: 'Güneydoğu Anadolu', theme: 'The GAP Energy Complex', context: 'Industrial VoLL exposure', contextDetail: 'Atatürk Dam cascade and cross-border interconnection stress' },
+    { region: 'Doğu Anadolu', theme: 'The Eastern Frontier Grid', context: 'Infrastructure age profile', contextDetail: 'Markov degradation analysis on Turkey\'s most remote networks' },
+    { region: 'Marmara', theme: 'The Trakya Wind Farm Belt', context: 'Renewable integration stress', contextDetail: 'Wind curtailment risk in the Thrace corridor — grid absorption limits' },
+    { region: 'Ege', theme: 'The Aegean Seismic Corridor', context: 'Seismic + economic dual risk', contextDetail: 'Post-2020 İzmir earthquake resilience and industrial continuity' },
+    { region: 'Akdeniz', theme: 'The Mersin–Adana Industrial Belt', context: 'Urban saturation dynamics', contextDetail: 'Petrochemical + agricultural load concentration and EV transition readiness' },
+    { region: 'İç Anadolu', theme: 'The Konya Solar Plain', context: 'Solar penetration stress', contextDetail: 'Largest solar irradiance zone — grid integration vs curtailment trade-off' },
+    { region: 'Karadeniz', theme: 'The Çamlıhemşin Mountain Grid', context: 'Topographic isolation risk', contextDetail: 'Micro-hydro dependency and landslide exposure in steep terrain' }
   ];
 
   var nextDiveIdx = seededIndex(nextSeed + 3333, deepDives.length);
@@ -1859,7 +1859,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
     '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
     '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-    'Deep-dive into ' + nextDive.bölge + '\'s grid risk profile — substation map, component analysis, il breakdown. ' +
+    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, province breakdown. ' +
     'European Context Card: ' + nextDive.contextDetail + '.</p>';
 
   // ── Card 2: Next Data Refresh — from SSIMetadata ──
@@ -1918,10 +1918,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     // 1. Most concentrated risk corridor
     var provData = {};
     fleet.forEach(function(s){
-      if (!provData[s.il]) provData[s.il] = { subs: [], sumR: 0, highCrit: 0 };
-      provData[s.il].subs.push(s);
-      provData[s.il].sumR += s.R_median;
-      if (s.classification === 'High' || s.classification === 'Critical') provData[s.il].highCrit++;
+      if (!provData[s.province]) provData[s.province] = { subs: [], sumR: 0, highCrit: 0 };
+      provData[s.province].subs.push(s);
+      provData[s.province].sumR += s.R_median;
+      if (s.classification === 'High' || s.classification === 'Critical') provData[s.province].highCrit++;
     });
     var provList = Object.keys(provData).map(function(p){
       var d = provData[p];
@@ -1941,7 +1941,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var topUncertain = byCIDesc.slice(0, 10);
     var avgCItop = topUncertain.reduce(function(a,s){ return a + s.CI_width; }, 0) / 10;
     var topBölges = {};
-    topUncertain.forEach(function(s){ topBölges[s.bölge] = (topBölges[s.bölge] || 0) + 1; });
+    topUncertain.forEach(function(s){ topBölges[s.region] = (topBölges[s.region] || 0) + 1; });
     var topBölgeStr = Object.keys(topBölges).sort(function(a,b){ return topBölges[b] - topBölges[a]; }).slice(0, 3).join(', ');
     spotlights.push({
       title: 'Highest Uncertainty = Highest Optionality',
@@ -1970,15 +1970,15 @@ document.addEventListener("ssi-config-ready", function(e) {
       body: '<strong>' + seismicHigh.length + ' substations</strong> sit in Turkey\'s highest seismic hazard zone ' +
         '(Zone 1, PGA > 0.25g). Of these, <strong>' + seismicHighRisk.length + '</strong> already score High/Critical — ' +
         'meaning their grid condition is poor <em>before</em> considering earthquake risk. ' +
-        'The R6b seismic modifier (INGV MPS04) captures this compound vulnerability.'
+        'The R6b seismic modifier (AFAD seismic hazard map) captures this compound vulnerability.'
     });
 
     // 5. Energy poverty double jeopardy
-    var highEP = fleet.filter(function(s){ return s.socio_economic && s.socio_economic.EP_rate_bölge > 14; });
+    var highEP = fleet.filter(function(s){ return s.socio_economic && s.socio_economic.EP_rate_region > 14; });
     var highEP_highRisk = highEP.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
     spotlights.push({
       title: 'Energy Poverty Double Jeopardy',
-      body: '<strong>' + highEP.length + ' substations</strong> serve bölges with energy poverty rates above 14% — ' +
+      body: '<strong>' + highEP.length + ' substations</strong> serve regions with energy poverty rates above 14% — ' +
         'and <strong>' + highEP_highRisk.length + '</strong> of these are in the High/Critical risk bands. ' +
         'These communities face a double burden: poor grid reliability and limited capacity to absorb the economic impact of outages. ' +
         'The SSI\'s E component + R3 modifier make this invisible correlation visible.'
@@ -2008,7 +2008,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     // Closing line
     document.getElementById('g-closing').innerHTML =
       'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
-      '. Deep-dive bölge: <strong>' + nextDive.bölge + '</strong>. ' +
+      '. Deep-dive region: <strong>' + nextDive.region + '</strong>. ' +
       'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
   });
 })();
