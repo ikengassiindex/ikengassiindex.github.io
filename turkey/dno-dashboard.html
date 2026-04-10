@@ -1175,12 +1175,12 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <tbody>
 <tr><td class="td-mono">&mdash;</td><td>Steps 2&ndash;4 assessment for 96 new EPİAŞ substations (physical space, electrical headroom, BESS eligibility)</td><td>Bing aerial + load model</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">11</td><td>Road access assessment &mdash; can heavy transport (transformer delivery) reach the substation and BESS site?</td><td>OSM highway network</td><td><span class="tag-pending">PENDING</span></td></tr>
-<tr><td class="td-mono">12</td><td>Environmental restrictions Environmental restrictions &mdash; WDPA (3,958 areas) + SITAP vincoli (5,329 polygons)mdash; WDPA + SITAP vincoli + Art. 142 Ope Legis (7 layers, 28,263 polygons)</td><td>WDPA, SITAP WFS, Art. 142 WFS</td><td><span class="tag-live">LIVE</span></td></tr>
+<tr><td class="td-mono">12</td><td>Environmental restrictions &mdash; WDPA protected areas + Turkish SİT Alanları (designated conservation zones) + Tabiat Varlıkları (natural assets)</td><td>WDPA, T.C. Çevre Bakanlığı, Kültür Bakanlığı</td><td><span class="tag-live">LIVE</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Land-use classification of candidate parcels (agricultural, industrial, etc.)</td><td>Corine Land Cover, OSM</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Operator name normalisation (EDAŞ variant spellings across OSM and EPİAŞ)</td><td>Internal</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>MV voltage inference by bölge (15 kV south vs 20 kV north)</td><td>EDAŞ/regional practice</td><td><span class="tag-pending">PENDING</span></td></tr>
-<tr><td class="td-mono">&mdash;</td><td>TEİAŞ Econnextion connection queue data &mdash; pending connection applications</td><td>TEİAŞ dati.teiaş.it</td><td><span class="tag-pending">DEFERRED</span></td></tr>
-<tr><td class="td-mono">&mdash;</td><td>TEİAŞ TE.R.R.A. microzone congestion analysis (76 zones, quarterly)</td><td>TEİAŞ</td><td><span class="tag-pending">DEFERRED</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>TEİAŞ connection queue data &mdash; pending connection applications</td><td>TEİAŞ</td><td><span class="tag-pending">DEFERRED</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>TEİAŞ regional congestion analysis (transmission zones, quarterly)</td><td>TEİAŞ</td><td><span class="tag-pending">DEFERRED</span></td></tr>
 </tbody>
 </table>
 
@@ -2071,7 +2071,7 @@ function renderChecklist(s) {
       if (!e) return { label: 'Step 10: Environmental (7 layers)', pass: null, val: 'No data', pending: true };
       const st = e[0], np = e[1], nf = e[2], ne = e[3];
       const lc = e[4] || {};
-      const layerNames = {we:'WDPA core',wf:'WDPA buffer',sf:'SITAP vincoli',oc:'Art.142 coasts',of:'Art.142 rivers',ol:'Art.142 lakes',og:'Art.142 woodlands',od:'Art.142 mountains',om:'Art.142 archaeology',op:'Art.142 parks',ou:'Art.142 wetlands',ov:'Art.142 volcanoes',or:'Art.142 fire',oh:'Art.142 civic uses'};
+      const layerNames = {we:'WDPA core',wf:'WDPA buffer',sf:'SİT alanları',oc:'Kıyı koruma',of:'Akarsu koruma',ol:'Göl koruma',og:'Orman alanları',od:'Dağ koruma',om:'Arkeolojik alan',op:'Milli parklar',ou:'Sulak alanlar',ov:'Volkanik alan',or:'Yangın riski',oh:'Mera alanları'};
       let detail = '';
       const codes = Object.keys(lc).sort();
       if (codes.length > 0) {
