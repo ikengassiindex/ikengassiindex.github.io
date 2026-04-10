@@ -504,6 +504,7 @@ def _country_bbox(country):
         "poland":      {"lat_min": 49.0, "lat_max": 54.9, "lon_min": 14.1, "lon_max": 24.2},
         "sweden":      {"lat_min": 55.3, "lat_max": 69.1, "lon_min": 11.0, "lon_max": 24.2},
         "mexico":      {"lat_min": 14.5, "lat_max": 32.8, "lon_min": -118.5, "lon_max": -86.5},
+        "greece":      {"lat_min": 34.5, "lat_max": 42.0, "lon_min": 19.0, "lon_max": 29.5},
     }
     return boxes.get(country)
 

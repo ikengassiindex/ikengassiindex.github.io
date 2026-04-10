@@ -55,6 +55,7 @@ _SOCIO_LOCAL_PATHS = {
     "poland": DATA_DIR / "poland" / "gus_powiat_socioeconomic.csv",
     "sweden": DATA_DIR / "sweden" / "scb_kommun_socioeconomic.csv",
     "mexico": DATA_DIR / "mexico" / "inegi_estado_socioeconomic.csv",
+    "greece": DATA_DIR / "greece" / "elstat_periphereia_socioeconomic.csv",
 }
 
 

@@ -205,6 +205,7 @@ _SEISMIC_LOCAL_PATHS = {
     "poland":      DATA_DIR / "poland" / "igf_pan_pga475.csv",
     "sweden":      DATA_DIR / "sweden" / "snsn_pga475.csv",
     "mexico":      DATA_DIR / "mexico" / "cenapred_pga475.csv",
+    "greece":      DATA_DIR / "greece" / "eak_pga475.csv",
 }
 
 # Live API URLs per country (upgrade path)
@@ -276,6 +277,7 @@ def fetch_seismic_grid(country, cache=True):
         "poland":      ("IGF-PAN",          "https://www.igf.edu.pl/"),
         "sweden":      ("SNSN",             "https://www.snsn.se/"),
         "mexico":      ("CENAPRED/SSN",     "https://www.cenapred.unam.mx/"),
+        "greece":      ("ITSAK/EAK 2003",   "https://www.itsak.gr/"),
     }
     name, url = source_info.get(country, ("national agency", ""))
     expected_path = local_path or DATA_DIR / country / f"seismic_pga475.csv"
@@ -419,7 +421,8 @@ def main():
     parser = argparse.ArgumentParser(description="SSI Pipeline — Seismic PGA Ingestion")
     parser.add_argument("country", choices=["italy", "japan", "us", "spain", "germany",
                                             "france", "uk", "switzerland", "austria", "canada",
-                                            "denmark", "norway", "finland", "poland", "sweden", "mexico"],
+                                            "denmark", "norway", "finland", "poland", "sweden", "mexico",
+                                            "greece"],
                         help="Country to process")
     parser.add_argument("--method", choices=["bilinear", "nearest"], default="bilinear",
                         help="Interpolation method")

@@ -18,6 +18,7 @@ COUNTRIES = [
     "italy", "germany", "france", "spain", "uk",
     "us", "switzerland", "austria", "canada", "japan",
     "denmark", "norway", "finland", "poland", "sweden", "mexico",
+    "greece",
 ]
 
 # Country metadata for ingestion routing
@@ -38,6 +39,7 @@ COUNTRY_META = {
     "poland":      {"iso2": "PL", "iso3": "POL", "nuts0": "PL",  "stats_agency": "GUS",    "seismic_source": "IGF-PAN",    "fields": 61},
     "sweden":      {"iso2": "SE", "iso3": "SWE", "nuts0": "SE",  "stats_agency": "SCB",    "seismic_source": "SNSN",       "fields": 61},
     "mexico":      {"iso2": "MX", "iso3": "MEX", "nuts0": None,   "stats_agency": "INEGI",  "seismic_source": "CENAPRED",   "fields": 95},
+    "greece":      {"iso2": "GR", "iso3": "GRC", "nuts0": "EL",  "stats_agency": "ELSTAT", "seismic_source": "ITSAK/EAK",  "fields": 95},
 }
 
 # ── SSI v4.0.2 Scoring Parameters ─────────────────────────
@@ -133,6 +135,12 @@ CMIP6_PERIOD_FUTURE = (2030, 2050)
 
 # ISTAT Open Data API
 ISTAT_API_BASE = "https://esploradati.istat.it/SDMXWS/rest"
+
+# ELSTAT — Greece statistics open data
+ELSTAT_API_BASE = "https://www.statistics.gr/en/sdmx-rest"
+
+# ITSAK / EAK 2003 — Greece seismic hazard
+ITSAK_HAZARD_URL = "https://www.itsak.gr/db/data/pga"
 
 # ── Logging ───────────────────────────────────────────────
 LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
