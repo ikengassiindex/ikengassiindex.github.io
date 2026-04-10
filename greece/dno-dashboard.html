@@ -544,7 +544,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <h2>Step 1 &mdash; Universe Definition</h2>
 
 <h3>Objective</h3>
-<p>Define the universe of candidate substations: all Greek <code>distribution</code>-type substations (substations) from OpenStreetMap, augmented with HEnEx (Gestore dei Servizi Energetici) substations data.</p>
+<p>Define the universe of candidate substations: all Greek <code>distribution</code>-type substations (substations) from OpenStreetMap, augmented with HEnEx (Hellenic Energy Exchange) substations data.</p>
 
 <div class="formula-box">
   <span class="label">Inclusion Rule</span>
@@ -901,7 +901,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
   slope_dir(&theta;) = |dz/dx &middot; sin(&theta;) + dz/dy &middot; cos(&theta;)| &times; 100<br>
   pass = mean_omnidirectional_slope &le; 6%<br><br>
   <span class="where">DEM tiles: Cloud-Optimized GeoTIFF, 3600&times;3600 pixels, float32, EPSG:4326.<br>
-  67 tiles covering Greek parcel locations (~1.2 GB total).<br>
+  42 tiles covering Greek parcel locations (~1.2 GB total).<br>
   Small parcels (&lt;3 DEM pixels): centroid + 3&times;3 neighbourhood fallback.</span>
 </div>
 
@@ -961,7 +961,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
   3. Snap parcel centroid and substation to nearest graph nodes (max 100m snap distance)<br>
   4. Dijkstra shortest path between snap points<br>
   5. pass = total_distance &le; 450m<br><br>
-  <span class="where">~930 Overpass tiles cached for all of Greece. Grid-cell spatial indexing (~220m cells) for fast nearest-node lookup.<br>
+  <span class="where">~580 Overpass tiles cached for all of Greece. Grid-cell spatial indexing (~220m cells) for fast nearest-node lookup.<br>
   If snap distance &gt;100m for either endpoint, parcel fails (too far from road network).</span>
 </div>
 
@@ -1006,7 +1006,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <table>
 <thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Format</th></tr></thead>
 <tbody>
-<tr><td>ADMIE/IPTO S.p.A. (Greek TSO)</td><td>Elenco Aree e Linee Critiche</td><td>1 June 2025</td><td>PDF (5 pages)</td></tr>
+<tr><td>ADMIE/IPTO S.A. (Greek TSO)</td><td>Elenco Aree e Linee Critiche</td><td>1 June 2025</td><td>PDF (5 pages)</td></tr>
 </tbody>
 </table>
 
@@ -1039,7 +1039,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <p>Of the <strong>215 BESS candidates</strong>: <strong>61 (28.4%)</strong> are flagged for grid congestion (47 in critical regions, 14 in critical regional units). <strong>154 (71.6%)</strong> are in non-critical areas.</p>
 
 <div class="note-red">
-  <strong>Interpretation:</strong> A congestion flag does not mean connection is impossible. A BESS in a critical area may still connect if it provides grid services (frequency regulation, congestion relief) rather than pure export. ADMIE/IPTO's TE.R.R.A. portal (76 microzones, quarterly) and Econnextion dashboard (monthly connection queue) provide additional granularity for site-specific assessment.
+  <strong>Interpretation:</strong> A congestion flag does not mean connection is impossible. A BESS in a critical area may still connect if it provides grid services (frequency regulation, congestion relief) rather than pure export. ADMIE/IPTO's grid transparency portal (76 microzones, quarterly) and Econnextion dashboard (monthly connection queue) provide additional granularity for site-specific assessment.
 </div>
 </section>
 </section>
@@ -1055,11 +1055,11 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <table>
 <thead><tr><th>Source</th><th>Dataset</th><th>Vintage</th><th>Format</th><th>Records</th></tr></thead>
 <tbody>
-<tr><td>HEnEx (Gestore dei Servizi Energetici)</td><td>Mappa Interattiva delle Substations (2025&ndash;2027)</td><td>2025</td><td>ArcGIS FeatureServer (EU1)</td><td>Layer 0: 2,145; Layer 5: 245</td></tr>
+<tr><td>HEnEx (Hellenic Energy Exchange)</td><td>Mappa Interattiva delle Substations (2025&ndash;2027)</td><td>2025</td><td>ArcGIS FeatureServer (EU1)</td><td>Layer 0: 2,145; Layer 5: 245</td></tr>
 </tbody>
 </table>
 
-<p>Each HEnEx polygon represents the <em>service territory</em> (Service Territory) of one substation &mdash; not the physical substation location. After deduplication by COD_AC (11-character area code), 2,143 unique areas remain, operated by 24 distribution companies (DEDDIE/HEDNO: 1,842 areas, 85.9%).</p>
+<p>Each HEnEx polygon represents the <em>service territory</em> (Service Territory) of one substation &mdash; not the physical substation location. After deduplication by COD_AC (11-character area code), 2,143 unique areas remain, operated by 24 distribution companies (DEDDIE/HEDNO: 513 areas, 99.1%).</p>
 
 <h3>Cross-Reference Methodology</h3>
 <p>HEnEx polygon centroids (service area centres, not substation locations) were matched to OSM substations by nearest-neighbour proximity. Since centroids can be several kilometres from the actual substation, distance thresholds were analysed to find the optimal balance:</p>
@@ -1093,7 +1093,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 </div>
 
 <div class="note">
-  <strong>Impact on pipeline:</strong> Steps 2&ndash;8 counts remain at 748 passing substations because the 96 new HEnEx subs lack Steps 2&ndash;4 data (physical space, electrical headroom, BESS eligibility). Once assessed, they will enter the pipeline and may increase the final candidate count.
+  <strong>Impact on pipeline:</strong> Steps 2&ndash;8 counts remain at 748 passing substations because the 24 new HEnEx subs lack Steps 2&ndash;4 data (physical space, electrical headroom, BESS eligibility). Once assessed, they will enter the pipeline and may increase the final candidate count.
 </div>
 </section>
 </section>
@@ -1112,7 +1112,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <tr><td class="td-mono">D5</td><td>OpenStreetMap</td><td>power=plant + generator (solar, wind)</td><td>Mar 2026</td><td>Step 4</td><td>Free / ODbL</td></tr>
 <tr><td class="td-mono">D6</td><td>Bing Maps</td><td>Aerial imagery (zoom 19+)</td><td>2023&ndash;2025</td><td>Steps 1&ndash;2 validation</td><td>Free (visual only)</td></tr>
 <tr><td class="td-mono">D7</td><td>NOA</td><td>Mosaicatura Pericolosit&agrave; Idraulica v5.0</td><td>2020</td><td>Step 5</td><td>Free / CC BY-SA</td></tr>
-<tr><td class="td-mono">D8</td><td>ADMIE/IPTO S.p.A.</td><td>Elenco Aree e Linee Critiche</td><td>Jun 2025</td><td>Congestion flag</td><td>Free / Public</td></tr>
+<tr><td class="td-mono">D8</td><td>ADMIE/IPTO S.A.</td><td>Elenco Aree e Linee Critiche</td><td>Jun 2025</td><td>Congestion flag</td><td>Free / Public</td></tr>
 <tr><td class="td-mono">D9</td><td>DEDDIE</td><td>DEDDIE/HEDNO Standard Specification (transformer standards)</td><td>2018</td><td>Steps 1, 3</td><td>Public specification</td></tr>
 <tr><td class="td-mono">D10</td><td>ELOT</td><td>CDEDDIEEC 50160 (MV connection rules)</td><td>2022</td><td>Design basis</td><td>Greek standard</td></tr>
 <tr><td class="td-mono">D11</td><td>IEC</td><td>IEC 61936 (HV installation clearances)</td><td>2021</td><td>Step 2 footprint</td><td>International standard</td></tr>
@@ -1172,7 +1172,7 @@ body { font-family:'Inter',system-ui,sans-serif; background:#f8f7f4; color:#2d2a
 <table>
 <thead><tr><th>Step</th><th>Description</th><th>Data Source</th><th>Status</th></tr></thead>
 <tbody>
-<tr><td class="td-mono">&mdash;</td><td>Steps 2&ndash;4 assessment for 96 new HEnEx substations (physical space, electrical headroom, BESS eligibility)</td><td>Bing aerial + load model</td><td><span class="tag-pending">PENDING</span></td></tr>
+<tr><td class="td-mono">&mdash;</td><td>Steps 2&ndash;4 assessment for 24 new HEnEx substations (physical space, electrical headroom, BESS eligibility)</td><td>Bing aerial + load model</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">11</td><td>Road access assessment &mdash; can heavy transport (transformer delivery) reach the substation and BESS site?</td><td>OSM highway network</td><td><span class="tag-pending">PENDING</span></td></tr>
 <tr><td class="td-mono">12</td><td>Environmental restrictions Environmental restrictions &mdash; WDPA (3,958 areas) + SITAP vincoli (5,329 polygons)mdash; WDPA + SITAP vincoli + Art. 142 Ope Legis (7 layers, 28,263 polygons)</td><td>WDPA, SITAP WFS, Art. 142 WFS</td><td><span class="tag-live">LIVE</span></td></tr>
 <tr><td class="td-mono">&mdash;</td><td>Land-use classification of candidate parcels (agricultural, industrial, etc.)</td><td>Corine Land Cover, OSM</td><td><span class="tag-pending">PENDING</span></td></tr>
