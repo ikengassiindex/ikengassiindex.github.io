@@ -1509,7 +1509,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     document.getElementById('eu-ranking-narrative').innerHTML =
       'Marmara ranks <strong>#' + pugliaRank + ' of 7 regions</strong> by mean R_median, placing it among the upper tier of national risk. ' +
-      'The three most stressed bölges are ' + top3.join(', ') + ', while the three most resilient are ' + bot3.join(', ') + '. ' +
+      'The three most stressed regions are ' + top3.join(', ') + ', while the three most resilient are ' + bot3.join(', ') + '. ' +
       aboveAvg + ' of 7 regions score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
       'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DSO or national statistics — ' +
       'reveals the true spatial distribution of grid stress across Turkey. ' +
@@ -1582,7 +1582,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       ssiLink: 'revenue' },
     { layer: 3, ref: '§0.5.2', title: 'Neural Network — Ensemble Architecture',
       subtitle: 'GBT + DNN ensemble: why two model families outperform either alone on grid data',
-      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (bölge, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, DNO NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously, forcing the network to learn representations useful for all tasks.',
+      body: 'The SSI-ENN\'s neural network is a weighted ensemble of two complementary model families. Gradient-Boosted Trees (GBT) excel at tabular data with heterogeneous features — they handle the mix of continuous (voltage, load), categorical (region, voltage class), and ordinal (seismic zone) variables that characterise grid data without requiring extensive preprocessing. Deep Neural Networks (DNN) excel at learning complex non-linear interactions and benefit from the high-dimensional feature space. The ensemble weight α is learned during validation: α·GBT + (1-α)·DNN. In practice, GBT dominates for countries with sparse data (high feature missingness), while the DNN contributes more for data-rich countries. The shared feature representation enables multi-task learning: all 7 output heads (R_median, DNO NPV, Community NPV, option value, optimal config, risk band, confidence tier) are predicted simultaneously, forcing the network to learn representations useful for all tasks.',
       concepts: ['Ensemble: α·GBT + (1-α)·DNN, α learned during validation', '7 simultaneous outputs via multi-task learning', 'GBT dominates with sparse data, DNN with dense data', 'Shared representation = implicit regularisation'],
       ssiLink: 'nn' },
     { layer: 3, ref: '§0.5.3', title: 'Transfer Learning & Feature Missingness',
