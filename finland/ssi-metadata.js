@@ -229,7 +229,9 @@ window.SSIMetadata = {
    Used by overview.html, regional.html, map.html
    ═══════════════════════════════════════════════ */
 
-window.SSI_METADATA = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
   country: "Finland",
   country_code: "FI",
   flag: "🇫🇮",
@@ -305,4 +307,7 @@ window.SSI_METADATA = {
     "Lappi",
     "Ahvenanmaa"
   ]
-};
+  };
+})();
+// Compatibility alias
+window.SSI_METADATA = window.SSIMetadata;

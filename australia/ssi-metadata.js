@@ -222,7 +222,9 @@ window.SSIMetadata = {
    Used by overview.html, regional.html, map.html
    ═══════════════════════════════════════════════ */
 
-window.SSI_METADATA = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
   country: "Australia",
   country_code: "AU",
   currency: "AUD",
@@ -277,4 +279,7 @@ window.SSI_METADATA = {
   }),
   monte_carlo: { iterations:10000, correlation_matrix:"20×20", seed:42, confidence_interval:0.95 },
   regions: ["New South Wales","Victoria","Queensland","South Australia","Western Australia","Tasmania","Northern Territory","Australian Capital Territory"]
-};
+  };
+})();
+// Compatibility alias
+window.SSI_METADATA = window.SSIMetadata;

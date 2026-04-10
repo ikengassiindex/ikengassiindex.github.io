@@ -1,3 +1,5 @@
+/* Switzerland — renamed from ssi-metadata-ch.js for cross-country consistency (April 2026) */
+
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (Switzerland)
    95 variables · 25 sources · 20 metrics · 6 components · 5 modifiers

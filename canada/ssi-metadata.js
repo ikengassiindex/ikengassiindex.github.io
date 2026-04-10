@@ -1,7 +1,9 @@
 // SSI v4.0.2 — Canada Metadata
 // Generated 2026-03-13 by Ikenga Project
 
-window.SSI_METADATA = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
 
   country: "Canada",
   country_code: "CA",
@@ -102,6 +104,20 @@ window.SSI_METADATA = {
     YT: "Yukon Utilities Board",
     NT: "Northwest Territories Public Utilities Board",
     NU: "Utility Rates Review Council of Nunavut"
+  },
+
+  // ── Statistics Block ──
+  stats: {
+    variables: 95,
+    metrics: 20,
+    components: 6,
+    modifiers: 5,
+    sources: 35,
+    substations: 24986,
+    powerLines: 37479,
+    mcIterations: 10000,
+    provinces: 13,
+    regions: 13
   }
 };
 
@@ -770,6 +786,8 @@ window.SSI_METADATA.FREQ_DISTRIBUTION = {
     Quarterly: { count: 1, sources: ['DS01'] },
     Annual: { count: 9, sources: ['DS02', 'DS03', 'DS09', 'DS10', 'DS11', 'DS12', 'DS13', 'DS14', 'DS18'] },
     Static: { count: 1, sources: ['DS19'] }
-  };
+    };
+})();
+// Compatibility alias
+window.SSI_METADATA = window.SSIMetadata;
 
-  window.SSIMetadata = window.SSI_METADATA;

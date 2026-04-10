@@ -330,3 +330,5 @@ window.SSIMetadata = (function () {
     }
   };
 })();
+// Compatibility alias
+window.SSI_METADATA = window.SSIMetadata;

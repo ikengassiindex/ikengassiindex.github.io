@@ -229,7 +229,9 @@ window.SSIMetadata = {
    Used by overview.html, regional.html, map.html
    ═══════════════════════════════════════════════ */
 
-window.SSI_METADATA = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
   country: "Poland",
   country_code: "PL",
   flag: "🇵🇱",
@@ -302,4 +304,7 @@ window.SSI_METADATA = {
     "Wielkopolskie",
     "Zachodniopomorskie"
   ]
-};
+  };
+})();
+// Compatibility alias
+window.SSI_METADATA = window.SSIMetadata;

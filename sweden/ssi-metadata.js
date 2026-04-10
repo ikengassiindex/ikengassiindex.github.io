@@ -4,7 +4,9 @@
     Exports:  window.SSIMetadata   (structured, matches Sweden format exactly)
               window.SSI_METADATA  (legacy flat, backward-compat)              */
 
-window.SSIMetadata = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
 
   /* ── Country metadata ── */
   country: "Sweden",
@@ -172,6 +174,29 @@ window.SSIMetadata = {
     { id:"I",   name:"Output Scores + Alert Flags",                 vars:7,  status:"LIVE",    sources:"Fleet Markov Chain · IEEE/CIGRÉ analysis" }
   ],
 
+  /* ── fleet stats (placeholder — updated by ssi-data.json at runtime) ── */
+  FREQ_DISTRIBUTION: {
+      "Real-time": { count: 2, sources: ['Svenska kraftnät Dispatch', 'SMHI Warnings'] },
+      "Hourly":    { count: 1, sources: ['ENTSO-E Flows'] },
+      "Daily":     { count: 1, sources: ['SMHI Weather'] },
+      "Monthly":   { count: 3, sources: ['Copernicus ERA5', 'SMHI Forecasts', 'Swedish Energy Agency Reports'] },
+      "Quarterly": { count: 5, sources: ['Energimarknadsinspektionen Reliability', 'SCB Demographics', 'Riksbank Economics', 'Swedish Wind Energy Assoc', 'SLU Environmental Data'] },
+      "Annual":    { count: 16, sources: ['SCB Census Updates', 'Energimarknadsinspektionen Inspections', 'SMHI Climate', 'SGU Geology', 'Naturvårdsverket Environment', 'DSO Annual Reports', 'Svenska Wind Energy', 'SSM Nuclear Data', 'Transportstyrelsen EV', 'Swedish Energy Agency', 'EUROSTAT Nordic', 'OSM Infrastructure', 'World Bank Benchmarks', 'Vattenfall Reports', 'Forsvaret Defence Data', 'KTH Research'] },
+      "Static":    { count: 1, sources: ['SolarGIS Solar Atlas', 'OpenStreetMap Power'] }
+    },
+  stats: {
+      variables: 95,
+      metrics: 20,
+      components: 6,
+      modifiers: 7,
+      sources: 30,
+      substations: 3872,
+      powerLines: 5808,
+      mcIterations: 10000,
+      län: 21,
+      regions: 21
+    },
+
   /* ── validation framework ── */
   VALIDATION_CHECKS: [
     { check:"North–South latitude gradient",                        criterion:"Northern Sweden (Norrland) R systematically higher than southern regions due to winter conditions",                                      status:"expected" },
@@ -210,7 +235,8 @@ window.SSIMetadata = {
     { id:"SE14", change:"I9 Nuclear Concentration Risk — new metric from SSM nuclear safety data for Forsmark + Ringhals + Barsebäck proximity",            type:"new" },
     { id:"SE15", change:"R2 Adaptive IRI now includes CMIP6 SSP2-4.5 forward projections for Nordic winter extremes & permafrost thaw",                      type:"enhanced" }
   ]
-};
-
-/* ── Legacy flat structure (backward-compat) ── */
+  };
+})();
+// Compatibility alias
 window.SSI_METADATA = window.SSIMetadata;
+

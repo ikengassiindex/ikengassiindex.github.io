@@ -4,7 +4,9 @@
     Exports:  window.SSIMetadata   (structured, matches Mexico format exactly)
               window.SSI_METADATA  (legacy flat, backward-compat)              */
 
-window.SSIMetadata = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
 
   /* ── Country metadata ── */
   country: "Mexico",
@@ -167,6 +169,30 @@ window.SSIMetadata = {
     { id:"I",   name:"Output Scores + Alert Flags",                 vars:7,  status:"LIVE",    sources:"Fleet Markov Chain · IEEE/CIGRÉ analysis" }
   ],
 
+  /* ── fleet stats (placeholder — updated by ssi-data.json at runtime) ── */
+  FREQ_DISTRIBUTION: {
+      "Real-time": { count: 2, sources: ['CENACE Dispatch', 'SMN Warnings'] },
+      "Hourly":    { count: 0, sources: [] },
+      "Daily":     { count: 1, sources: ['SMN Weather'] },
+      "Monthly":   { count: 4, sources: ['Copernicus ERA5', 'SMN Forecasts', 'SENER Reports', 'CONAGUA Hydrology'] },
+      "Quarterly": { count: 2, sources: ['CENACE Reliability Reports', 'CRE Regulation'] },
+      "Biennial":  { count: 1, sources: ['CONEVAL Socio-Economic Survey'] },
+      "Annual":    { count: 14, sources: ['INEGI Census Updates', 'CENACE Inspections', 'SENER Energy Agency', 'CENAPRED Hazard', 'SGM Geology', 'CONAGUA Hydrology', 'CFE Annual Reports', 'SEMARNAT Environment', 'SMN Climate', 'OSM Infrastructure', 'CONEVAL Poverty Index', 'World Bank Benchmarks', 'BANXICO Economics', 'SECRETARIA DE ECONOMIA Industrial Data'] },
+      "Continuous": { count: 1, sources: ['OSM Power Infrastructure'] }
+    },
+  stats: {
+      variables: 95,
+      metrics: 20,
+      components: 6,
+      modifiers: 7,
+      sources: 25,
+      substations: 3140,
+      powerLines: 4710,
+      mcIterations: 10000,
+      estado: 32,
+      regions: 32
+    },
+
   /* ── validation framework ── */
   VALIDATION_CHECKS: [
     { check:"Coastal cyclone vulnerability gradient",               criterion:"Coastal regions (Veracruz, Tamaulipas, Yucatán Peninsula) show higher R systematically due to tropical cyclone exposure vs interior regions", status:"expected" },
@@ -210,7 +236,9 @@ window.SSIMetadata = {
     { id:"MX14", change:"I9 Renewable Capacity Concentration Risk — new metric from SENER/CENACE for major wind/solar farm proximity (northern corridor growth)", type:"new" },
     { id:"MX15", change:"R2 Adaptive IRI now includes climate projections for tropical cyclone intensity, seismic activity, flood risk shifts", type:"enhanced" }
   ]
-};
-
-/* ── Legacy flat structure (backward-compat) ── */
+  };
+})();
+// Compatibility alias
 window.SSI_METADATA = window.SSIMetadata;
+
+

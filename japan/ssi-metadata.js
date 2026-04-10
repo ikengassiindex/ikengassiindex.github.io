@@ -1,7 +1,9 @@
 // SSI v4.0.2 â Japan Metadata
 // Generated 2026-03-13 by Ikenga Project
 
-window.SSIMetadata = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
 
   country: "Japan",
   country_code: "JP",
@@ -250,4 +252,7 @@ window.SSIMetadata = {
     Annual:    { count: 20, sources: ['METI', 'Statistics Bureau', 'MOE', 'FDMA', 'JMA', 'NIED', 'GSJ', 'Cabinet Office', 'JOGMEC', 'JAXA', 'NIES', 'Prefectural Gov', 'TEPCO', 'KEPCO', 'Chubu EPCO', 'Tohoku EPCO', 'Hokkaido EPCO', 'Kyushu EPCO', 'Open-Meteo', 'JRC'] },
     Static:    { count: 8,  sources: ['Dimovski', 'IEEE/IEC/CIGR\u00C9', 'Copernicus CMIP6', 'NIED Seismic', 'GSJ Geology', 'ISO 9223', 'MLIT/GSI', 'OCCTO Standards'] },
   },
-};
+  };
+})();
+// Compatibility alias
+window.SSI_METADATA = window.SSIMetadata;

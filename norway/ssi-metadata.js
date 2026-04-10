@@ -4,7 +4,9 @@
     Exports:  window.SSIMetadata   (structured, matches Norway format exactly)
               window.SSI_METADATA  (legacy flat, backward-compat)              */
 
-window.SSIMetadata = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
 
   /* ── Country metadata ── */
   country: "Norway",
@@ -172,6 +174,30 @@ window.SSIMetadata = {
     { id:"I",   name:"Output Scores + Alert Flags",                 vars:7,  status:"LIVE",    sources:"Fleet Markov Chain · IEEE/CIGRÉ analysis" }
   ],
 
+  /* ── fleet stats (placeholder — updated by ssi-data.json at runtime) ── */
+  FREQ_DISTRIBUTION: {
+      "Real-time": { count: 1, sources: ['Statnett Dispatch'] },
+      "Hourly":    { count: 2, sources: ['ENTSO-E Flows', 'Statnett Generation'] },
+      "Daily":     { count: 1, sources: ['MET Norway Weather'] },
+      "Weekly":    { count: 2, sources: ['DSB Emergency Reports', 'NVE Energy Reports'] },
+      "Monthly":   { count: 3, sources: ['Copernicus ERA5', 'MET Norway Forecasts', 'Kartverket Geospatial'] },
+      "Quarterly": { count: 5, sources: ['NVE Reliability Reports', 'SSB Demographics', 'Norges Bank Economics', 'Enova Programs', 'AMAP Arctic Assessment'] },
+      "Annual":    { count: 13, sources: ['SSB Census Updates', 'NVE Inspections', 'NGU Geology', 'DSB Avalanche Monitoring', 'MET Norway Climate', 'DSO Annual Reports', 'Norwegian Wind Energy Assoc', 'Statkraft Hydro Data', 'EUROSTAT Nordic', 'Traficom EV Data', 'Kartverket Geodesy', 'OSM Infrastructure', 'World Bank Benchmarks'] },
+      "Static":    { count: 1, sources: ['SolarGIS Solar Atlas', 'OpenStreetMap Power'] }
+    },
+  stats: {
+      variables: 95,
+      metrics: 20,
+      components: 6,
+      modifiers: 7,
+      sources: 30,
+      substations: 6495,
+      powerLines: 9742,
+      mcIterations: 10000,
+      fylke: 15,
+      regions: 15
+    },
+
   /* ── validation framework ── */
   VALIDATION_CHECKS: [
     { check:"North–South latitude gradient (Arctic exposure)",       criterion:"Northern Norway (Finnmark/Troms) R systematically higher than southern regions due to winter/avalanche conditions",                                      status:"expected" },
@@ -212,7 +238,9 @@ window.SSIMetadata = {
     { id:"NO14", change:"I9 Hydropower Concentration Risk — new metric from NVE/Statkraft for major reservoir proximity (~90% of Norwegian generation)",         type:"new" },
     { id:"NO15", change:"R2 Adaptive IRI now includes CMIP6 SSP2-4.5 forward projections for Arctic winter extremes, avalanche probability shifts, permafrost change",type:"enhanced" }
   ]
-};
-
-/* ── Legacy flat structure (backward-compat) ── */
+  };
+})();
+// Compatibility alias
 window.SSI_METADATA = window.SSIMetadata;
+
+

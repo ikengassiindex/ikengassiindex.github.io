@@ -229,7 +229,9 @@ window.SSIMetadata = {
    Used by overview.html, regional.html, map.html
    ═══════════════════════════════════════════════ */
 
-window.SSI_METADATA = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
   country: "Chile",
   country_code: "CL",
   flag: "🇨🇱",
@@ -302,4 +304,7 @@ window.SSI_METADATA = {
     "Magallanes y de la Antártica Chilena",
     "Región del Biobío"
   ]
-};
+  };
+})();
+// Compatibility alias
+window.SSI_METADATA = window.SSIMetadata;

@@ -4,7 +4,9 @@
     Exports:  window.SSIMetadata   (structured, matches Denmark format exactly)
               window.SSI_METADATA  (legacy flat, backward-compat)              */
 
-window.SSIMetadata = {
+window.SSIMetadata = (function () {
+  'use strict';
+  return {
 
   /* ── Country metadata ── */
   country: "Denmark",
@@ -171,6 +173,30 @@ window.SSIMetadata = {
     { id:"I",   name:"Output Scores + Alert Flags",                 vars:7,  status:"LIVE",    sources:"Fleet Markov Chain · IEEE/CIGRÉ analysis" }
   ],
 
+  /* ── fleet stats (placeholder — updated by ssi-data.json at runtime) ── */
+  FREQ_DISTRIBUTION: {
+      "Real-time": { count: 1, sources: ['Energinet Dispatch'] },
+      "Hourly":    { count: 2, sources: ['ENTSO-E Flows', 'Nord Pool Bidding Zones'] },
+      "Daily":     { count: 1, sources: ['DMI Weather'] },
+      "Weekly":    { count: 1, sources: ['Energinet Systemtilstand'] },
+      "Monthly":   { count: 3, sources: ['Copernicus ERA5', 'DMI Historical Archive', 'Dansk Energi Reports'] },
+      "Quarterly": { count: 6, sources: ['Forsyningstilsynet DSO Reports', 'CFCS Cybersecurity', 'NBANK Economics', 'Traficom EV Data', 'ENT_HYDRO Hydrology', 'Districtcph Heating'] },
+      "Annual":    { count: 12, sources: ['Danmarks Statistik Census', 'Forsyningstilsynet Inspections', 'GEUS Geology', 'Kystdirektoratet Coastal Monitoring', 'Miljøstyrelsen Environment', 'DSO Annual Reports', 'ENS Energy Agency', 'Geodatastyrelsen Geodata', 'DTU Wind Research', 'DTU Electrical Engineering', 'World Bank Benchmarks', 'Eurostat Nordic Data'] },
+      "Static":    { count: 1, sources: ['SolarGIS Solar Atlas', 'OpenStreetMap Power'] }
+    },
+  stats: {
+      variables: 95,
+      metrics: 20,
+      components: 6,
+      modifiers: 7,
+      sources: 29,
+      substations: 2451,
+      powerLines: 3676,
+      mcIterations: 10000,
+      region: 5,
+      regions: 5
+    },
+
   /* ── validation framework ── */
   VALIDATION_CHECKS: [
     { check:"West-East coastal storm gradient",                     criterion:"Western coastal regions (Jutland/Great Belt) show higher R systematically due to North Sea storm exposure vs eastern regions",                                status:"expected" },
@@ -214,7 +240,9 @@ window.SSIMetadata = {
     { id:"DK14", change:"I9 Offshore Wind Concentration Risk — new metric from Energistyrelsen/Energinet for major wind farm proximity (~50% of Danish generation)", type:"new" },
     { id:"DK15", change:"R2 Adaptive IRI now includes CMIP6 SSP2-4.5 forward projections for North Sea storms, coastal flooding risk shifts, subsidence acceleration", type:"enhanced" }
   ]
-};
-
-/* ── Legacy flat structure (backward-compat) ── */
+  };
+})();
+// Compatibility alias
 window.SSI_METADATA = window.SSIMetadata;
+
+
