@@ -24,7 +24,8 @@ from datetime import datetime
 BASE_URL = "https://ikengassiindex.github.io"
 COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain",
              "switzerland", "austria", "canada", "japan", "australia", "chile",
-             "denmark", "norway", "finland", "poland", "sweden", "mexico"]
+             "denmark", "norway", "finland", "poland", "sweden", "mexico",
+             "greece"]
 ARCHIVE_DIR = Path("archive")
 
 # Pages to capture per country
