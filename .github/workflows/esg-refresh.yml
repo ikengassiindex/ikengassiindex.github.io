@@ -27,7 +27,7 @@ jobs:
         run: |
           STAMP=$(date +%s)
           # denmark norway finland poland sweden mexico: first automated refresh May 2026 (skip April)
-          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece; do
+          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey; do
             if [ -f "${country}/esg-report.html" ]; then
               # Cache-bust the intelligence-loader.js reference
               sed -i "s|intelligence-loader\.js?v=[0-9]*|intelligence-loader.js?v=${STAMP}|g" "${country}/esg-report.html"
@@ -44,7 +44,7 @@ jobs:
         run: |
           REPORT_DATE=$(date +"%d %B %Y")
           # denmark norway finland poland sweden mexico: first automated refresh May 2026 (skip April)
-          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece; do
+          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey; do
             if [ -f "${country}/esg-report.html" ]; then
               sed -i "s|Report generated [0-9]* [A-Za-z]* [0-9]*|Report generated ${REPORT_DATE}|g" "${country}/esg-report.html"
             fi

@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey)\//);
   return match ? match[1] : null;
 })();
 
@@ -36,7 +36,8 @@ var SSI_COUNTRY_LABELS = {
     norway: '🇳🇴 Norway',
     denmark: '🇩🇰 Denmark',
     mexico: '🇲🇽 Mexico',
-    greece: '🇬🇷 Greece'
+    greece: '🇬🇷 Greece',
+    turkey: '🇹🇷 Turkey'
   };
 
 // Ikenga logo
@@ -217,7 +218,8 @@ function renderFooter() {
     spain: '95 variables · 30 sources · 3,793 substations across 52 Provincias · 19 Comunidades Autónomas',
     us: '95 variables · 40 sources · 45,003 substations (1,726 HV · 36,654 MV) across 52 states',
     mexico: '95 variables · 25+ sources · 3,140 substations · 30,396 power lines across 32 Estados',
-    greece: '95 variables · 30 sources · 581 substations (71 HV · 410 MV · 100 LV) across 13 Periphereies'
+    greece: '95 variables · 30 sources · 581 substations (71 HV · 410 MV · 100 LV) across 13 Periphereies',
+    turkey: '95 variables · 30 sources · 4,092 substations (1,011 HV · 870 MV · 2,211 LV) across 81 İller'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
