@@ -1,0 +1,224 @@
+{
+  "version": "4.0.2",
+  "country": "Ireland",
+  "country_code": "IE",
+  "description": "Maps raw Digital Twin module outputs → standardised SSI scoring variables",
+  "variable_count": 95,
+  "mappings": {
+    "C1_SAIDI": {
+      "source_module": "d02_regulator",
+      "source_field": "data[].saidi_minutes",
+      "target_component": "C",
+      "target_metric": "C1",
+      "unit": "minutes/customer/year",
+      "description": "System Average Interruption Duration Index",
+      "refresh": "quarterly"
+    },
+    "C2_SAIFI": {
+      "source_module": "d02_regulator",
+      "source_field": "data[].saifi",
+      "target_component": "C",
+      "target_metric": "C2",
+      "unit": "interruptions/customer/year",
+      "description": "System Average Interruption Frequency Index",
+      "refresh": "quarterly"
+    },
+    "C3_CAIDI": {
+      "source_module": "d02_regulator",
+      "source_field": "data[].caidi_minutes",
+      "target_component": "C",
+      "target_metric": "C3",
+      "unit": "minutes",
+      "description": "Customer Average Interruption Duration Index",
+      "refresh": "quarterly"
+    },
+    "C4_MAIFI": {
+      "source_module": "d02_regulator",
+      "source_field": "data[].maifi",
+      "target_component": "C",
+      "target_metric": "C4",
+      "unit": "momentary interruptions/customer/year",
+      "description": "Momentary Average Interruption Frequency Index",
+      "refresh": "quarterly"
+    },
+    "V_socio": {
+      "source_module": "d04_statistics",
+      "source_field": "data[].socio_vulnerability",
+      "target_component": "V",
+      "target_metric": "V1",
+      "unit": "index 0-1",
+      "description": "Socio-economic vulnerability index",
+      "refresh": "annual"
+    },
+    "I1_snow_ice": {
+      "source_module": "d06_weather",
+      "source_field": "data[].hazard_indices.I1_snow_ice",
+      "target_component": "I",
+      "target_metric": "I1",
+      "unit": "index 0-1",
+      "description": "Snow and ice hazard index",
+      "refresh": "monthly"
+    },
+    "I2_storm": {
+      "source_module": "d06_weather",
+      "source_field": "data[].hazard_indices.I2_storm",
+      "target_component": "I",
+      "target_metric": "I2",
+      "unit": "index 0-1",
+      "description": "Storm and wind hazard index",
+      "refresh": "monthly"
+    },
+    "I3_heat": {
+      "source_module": "d06_weather",
+      "source_field": "data[].hazard_indices.I3_heat",
+      "target_component": "I",
+      "target_metric": "I3",
+      "unit": "index 0-1",
+      "description": "Heat wave hazard index",
+      "refresh": "monthly"
+    },
+    "I5_ambient_temp": {
+      "source_module": "d06_weather",
+      "source_field": "data[].mean_temp_c",
+      "target_component": "I",
+      "target_metric": "I5",
+      "unit": "°C",
+      "description": "Ambient temperature for thermal model",
+      "refresh": "monthly"
+    },
+    "I8_corrosion": {
+      "source_module": "d03_hazard",
+      "source_field": "derived from wind_exposure + coastal proximity",
+      "target_component": "I",
+      "target_metric": "I8",
+      "unit": "ISO 9223 class (C1-C5)",
+      "description": "Atmospheric corrosion classification",
+      "refresh": "annual"
+    },
+    "I9_hydrogeo": {
+      "source_module": "d03_hazard",
+      "source_field": "data[].flood_zone",
+      "target_component": "I",
+      "target_metric": "I9",
+      "unit": "zone classification",
+      "description": "Hydrogeological risk zone",
+      "refresh": "quarterly"
+    },
+    "E_base": {
+      "source_module": "d04_statistics",
+      "source_field": "data[].modernisation_pct",
+      "target_component": "E",
+      "target_metric": "E1",
+      "unit": "percentage",
+      "description": "Equipment modernisation level",
+      "refresh": "annual"
+    },
+    "E2_innovation": {
+      "source_module": "d04_statistics",
+      "source_field": "data[].capex_per_mva_eur",
+      "target_component": "E",
+      "target_metric": "E2",
+      "unit": "EUR/MVA",
+      "description": "Capital expenditure intensity",
+      "refresh": "annual"
+    },
+    "S_seismic": {
+      "source_module": "d03_hazard",
+      "source_field": "data[].pga_g",
+      "target_component": "S",
+      "target_metric": "S1",
+      "unit": "g (acceleration)",
+      "description": "Peak Ground Acceleration (475-year return)",
+      "refresh": "static"
+    },
+    "T1_DER": {
+      "source_module": "d01_tso",
+      "source_field": "derived from capacity + generation mix",
+      "target_component": "T",
+      "target_metric": "T1",
+      "unit": "ratio",
+      "description": "Distributed Energy Resource penetration ratio",
+      "refresh": "quarterly"
+    },
+    "R2_climate_delta": {
+      "source_module": "d07_copernicus",
+      "source_field": "data[].projections.SSP2-4.5.delta_hazard",
+      "target_modifier": "R2",
+      "unit": "multiplier",
+      "description": "Climate trajectory delta for I1-I3",
+      "refresh": "annual"
+    },
+    "R3_population": {
+      "source_module": "d04_statistics",
+      "source_field": "derived from county population + GDP",
+      "target_modifier": "R3",
+      "unit": "multiplier",
+      "description": "Consequence multiplier (population, load, vulnerability)",
+      "refresh": "annual"
+    },
+    "R4_topology": {
+      "source_module": "d05_osm",
+      "source_field": "data.topology.degree, BC_percentile, is_bridge",
+      "target_modifier": "R4",
+      "unit": "multiplier",
+      "description": "Graph topology modifier (degree, betweenness, bridges)",
+      "refresh": "quarterly"
+    },
+    "R6a_restoration": {
+      "source_module": "d02_regulator",
+      "source_field": "data[].caidi_minutes",
+      "target_modifier": "R6a",
+      "unit": "multiplier",
+      "description": "Restoration speed modifier",
+      "refresh": "quarterly"
+    },
+    "R6b_seismic": {
+      "source_module": "d03_hazard",
+      "source_field": "data[].pga_g",
+      "target_modifier": "R6b",
+      "unit": "multiplier",
+      "description": "Seismic exposure modifier",
+      "refresh": "static"
+    },
+    "R7_cyber": {
+      "source_module": "d04_statistics",
+      "source_field": "derived from smart_meter_pct + DESI score",
+      "target_modifier": "R7",
+      "unit": "multiplier",
+      "description": "Cyber-exposure modifier",
+      "refresh": "annual"
+    },
+    "OSM_substations": {
+      "source_module": "d05_osm",
+      "source_field": "data.substations",
+      "target": "spatial_index",
+      "unit": "GeoJSON features",
+      "description": "Geolocated substation inventory",
+      "refresh": "quarterly"
+    },
+    "OSM_powerlines": {
+      "source_module": "d05_osm",
+      "source_field": "data.power_lines",
+      "target": "spatial_index",
+      "unit": "GeoJSON features",
+      "description": "Power line network topology",
+      "refresh": "quarterly"
+    }
+  },
+  "source_institutions": {
+    "EirGrid": {"modules": ["d01_tso"], "url": "eirgrid.ie"},
+    "ESB Networks": {"modules": ["d01_tso", "d04_statistics"], "url": "esbnetworks.ie"},
+    "CRU": {"modules": ["d02_regulator"], "url": "cru.ie"},
+    "GSI": {"modules": ["d03_hazard"], "url": "gsi.ie"},
+    "GFZ Potsdam": {"modules": ["d03_hazard"], "url": "gfz-potsdam.de"},
+    "OPW": {"modules": ["d03_hazard"], "url": "opw.ie"},
+    "CSO": {"modules": ["d04_statistics"], "url": "cso.ie"},
+    "OpenStreetMap": {"modules": ["d05_osm"], "url": "openstreetmap.org"},
+    "Open-Meteo": {"modules": ["d06_weather"], "url": "open-meteo.com"},
+    "ERA5": {"modules": ["d06_weather"], "url": "cds.climate.copernicus.eu"},
+    "Copernicus CDS": {"modules": ["d07_copernicus"], "url": "cds.climate.copernicus.eu"},
+    "Met Éireann": {"modules": ["d06_weather"], "url": "met.ie"},
+    "SEAI": {"modules": ["d04_statistics"], "url": "seai.ie"},
+    "EPA": {"modules": ["d03_hazard"], "url": "epa.ie"}
+  }
+}

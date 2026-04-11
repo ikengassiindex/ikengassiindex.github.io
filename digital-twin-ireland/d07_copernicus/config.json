@@ -1,0 +1,114 @@
+{
+  "module": "d07_copernicus",
+  "country": "Ireland",
+  "country_code": "IE",
+  "description": "Copernicus Climate Data Store (CDS) extraction — CMIP6 climate projections",
+  "data_source": {
+    "provider": "Copernicus Climate Data Store (CDS)",
+    "url": "https://cds.climate.copernicus.eu/",
+    "dataset": "CMIP6 projections",
+    "license": "CC BY 4.0"
+  },
+  "variables": [
+    "surface_solar_radiation",
+    "soil_moisture",
+    "land_cover_classification",
+    "sea_level_rise",
+    "surface_temperature",
+    "precipitation_change",
+    "storm_intensity"
+  ],
+  "climate_scenarios": [
+    {
+      "scenario": "SSP2-4.5",
+      "description": "Intermediate emissions scenario (sustainable pathways)",
+      "warming_trajectory": "1.5-2.0°C by 2050"
+    },
+    {
+      "scenario": "SSP5-8.5",
+      "description": "High emissions scenario (fossil fuel development)",
+      "warming_trajectory": "2.5-3.5°C by 2050"
+    }
+  ],
+  "projection_years": [2030, 2040, 2050],
+  "baseline_period": "1985-2014",
+  "spatial_resolution": {
+    "level": "county",
+    "total_counties": 26,
+    "grid_spacing_km": 10.0
+  },
+  "regional_parameters": {
+    "atlantic_coast_counties": ["Donegal", "Sligo", "Mayo", "Galway", "Kerry", "Clare", "Cork", "Waterford"],
+    "inland_counties": ["Cavan", "Monaghan", "Leitrim", "Roscommon", "Westmeath", "Longford", "Offaly", "Laois"],
+    "southern_counties": ["Cork", "Kerry", "Limerick", "Waterford", "Tipperary", "Carlow", "Wexford"],
+    "northern_counties": ["Donegal", "Leitrim", "Cavan", "Monaghan", "Louth", "Meath"]
+  },
+  "ireland_context": {
+    "climate_change_drivers": [
+      "Rising Atlantic sea levels (0.2-0.5m by 2050)",
+      "Increased storm intensity and frequency",
+      "Mild warming trajectory (slower than European average)",
+      "Shifting precipitation patterns (winter increase, summer decrease)",
+      "Increased soil moisture variability"
+    ],
+    "vulnerable_sectors": [
+      "Coastal protection (Shannon estuary, Dublin Bay)",
+      "Agriculture (changing growing seasons, drainage)",
+      "Fisheries (water temperature shifts)",
+      "Energy systems (wind availability, thermal stress)",
+      "Water resources (summer availability)"
+    ]
+  },
+  "land_cover_classes": [
+    {
+      "id": 10,
+      "name": "Cropland",
+      "percentage_ireland": 15
+    },
+    {
+      "id": 20,
+      "name": "Forest",
+      "percentage_ireland": 11
+    },
+    {
+      "id": 30,
+      "name": "Herbaceous vegetation",
+      "percentage_ireland": 54
+    },
+    {
+      "id": 40,
+      "name": "Shrubland",
+      "percentage_ireland": 8
+    },
+    {
+      "id": 50,
+      "name": "Urban/built-up",
+      "percentage_ireland": 4
+    },
+    {
+      "id": 60,
+      "name": "Bare/sparse vegetation",
+      "percentage_ireland": 5
+    },
+    {
+      "id": 70,
+      "name": "Peatland",
+      "percentage_ireland": 3
+    }
+  ],
+  "validation_ranges": {
+    "temperature_change_celsius": [-1, 4],
+    "precipitation_change_pct": [-30, 30],
+    "sea_level_rise_m": [0, 1.0],
+    "solar_radiation_change_pct": [-10, 10],
+    "soil_moisture_change_pct": [-30, 30],
+    "storm_intensity_change_pct": [-5, 30]
+  },
+  "reference_year": 2025,
+  "refresh_freq": "as_updated_by_CDS",
+  "quality_control": {
+    "ensemble_members": 10,
+    "model_agreement_threshold_pct": 66,
+    "uncertainty_quantification": true
+  }
+}

@@ -1,0 +1,75 @@
+name: Publish to SSI Dashboard — Ireland
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Annual Full Pipeline — Ireland Digital Twin"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Archive previous edition
+        run: |
+          EDITION=$(date -d "last month" +%Y-%m 2>/dev/null || date -v-1m +%Y-%m)
+          mkdir -p archive/${EDITION}
+          cp -f ../ireland/ssi-data.json archive/${EDITION}/ 2>/dev/null || true
+          cp -f ../ireland/grid-geo.json archive/${EDITION}/ 2>/dev/null || true
+          echo "Archived previous edition to archive/${EDITION}/"
+
+      - name: Validate ssi-data.json schema
+        run: |
+          python -c "
+          import json, sys
+          with open('../ireland/ssi-data.json') as f:
+              data = json.load(f)
+          checks = []
+          # Top-level keys
+          for key in ['meta', 'fleet_summary', 'regions', 'substations']:
+              checks.append(('top_level_' + key, key in data))
+          # Substation fields
+          s = data['substations'][0]
+          for field in ['substation_id','lat','lon','R_median','components','classification','markov','seismic','transition','socio_economic','graph_topology']:
+              checks.append(('substation_' + field, field in s))
+          # R_median range
+          r_vals = [s['R_median'] for s in data['substations']]
+          checks.append(('R_median_range', all(0 <= r <= 1 for r in r_vals)))
+          # Coordinate bounds (Ireland)
+          checks.append(('lat_bounds', all(51 < s['lat'] < 56 for s in data['substations'])))
+          checks.append(('lon_bounds', all(-11 < s['lon'] < -5 for s in data['substations'])))
+          # Regions
+          checks.append(('multi_region', len(data['regions']) >= 2))
+
+          passed = sum(1 for _, v in checks if v)
+          total = len(checks)
+          for name, ok in checks:
+              print(f'  {\"✓\" if ok else \"✗\"} {name}')
+          print(f'\nSchema validation: {passed}/{total} checks passed')
+          if passed < total:
+              sys.exit(1)
+          "
+
+      - name: Update dashboard cache busters
+        run: |
+          HASH=$(md5sum ../ireland/ssi-data.json | cut -c1-8)
+          echo "Cache buster hash: ${HASH}"
+
+      - name: Commit and deploy
+        run: |
+          git config user.name "SSI Pipeline Bot"
+          git config user.email "pipeline@ikenga.eu"
+          git add archive/ ../ireland/ssi-data.json ../ireland/grid-geo.json
+          git diff --staged --quiet || git commit -m "deploy: Ireland SSI data published $(date +%Y-%m-%d)"
+          git push

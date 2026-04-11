@@ -196,7 +196,24 @@ def main():
     with open(args.config) as f:
         config = json.load(f)
     with open(args.osm) as f:
-        osm_subs = json.load(f)
+        osm_raw = json.load(f)
+
+    # Support both flat array and Digital Twin d05_osm structured output
+    if isinstance(osm_raw, list):
+        osm_subs = osm_raw
+    elif isinstance(osm_raw, dict):
+        if 'substations' in osm_raw:
+            osm_subs = osm_raw['substations']
+        elif 'data' in osm_raw and isinstance(osm_raw['data'], list):
+            osm_subs = osm_raw['data']
+        elif 'data' in osm_raw and isinstance(osm_raw['data'], dict) and 'substations' in osm_raw['data']:
+            osm_subs = osm_raw['data']['substations']
+        else:
+            print(f"ERROR: Unrecognised OSM format. Top keys: {list(osm_raw.keys())}")
+            sys.exit(1)
+    else:
+        print(f"ERROR: OSM file must be JSON array or object, got {type(osm_raw)}")
+        sys.exit(1)
 
     print(f"Scoring {args.country}: {len(osm_subs)} substations")
 
