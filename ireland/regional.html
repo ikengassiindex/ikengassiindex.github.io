@@ -33,13 +33,13 @@
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
         <h3>Counties Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">13 Counties · sorted worst → best</span>
+        <span class="label-xs" id="ranking-count">26 Counties · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
           <tr>
             <th style="width:30px">#</th>
-            <th>Région</th>
+            <th>County</th>
             <th style="text-align:right">Median R</th>
             <th style="text-align:right">Substations</th>
             <th style="text-align:right">% Critical</th>
@@ -99,8 +99,8 @@
   <div id="tab-decomp" style="display:none">
     <div class="card animate-in">
       <div class="card-header">
-        <h3>Average Component Contribution by Région</h3>
-        <span class="label-xs">Stacked horizontal bars · 13 Counties</span>
+        <h3>Average Component Contribution by County</h3>
+        <span class="label-xs">Stacked horizontal bars · 26 Counties</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
         <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
@@ -365,7 +365,7 @@ function drawRadar(a, b, nameA, nameB) {
 
 // ── Tab 3: Component Decomposition ──
 function renderDecomposition(data) {
-  // Compute per-Région average components
+  // Compute per-County average components
   var regionMap = {};
   data.substations.forEach(function(s) {
     if (!regionMap[s.region]) {

@@ -60,12 +60,12 @@ document.addEventListener("ssi-config-ready", function(e) {
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
-    <div class="kpi-value" style="color:var(--ink)">~12,400</div>
-    <div class="kpi-sub">~105,000 km coverage</div>
+    <div class="kpi-value" style="color:var(--ink)">4,505</div>
+    <div class="kpi-sub">transmission + distribution</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">MC Simulations</div>
-    <div class="kpi-value" style="color:var(--ink)">78.9 M</div>
+    <div class="kpi-value" style="color:var(--ink)">9.9 M</div>
     <div class="kpi-sub">10,000 per substation</div>
   </div>
   <div class="kpi-card">
@@ -1554,9 +1554,9 @@ document.addEventListener("ssi-config-ready", function(e) {
       concepts: ['6 components, 20 sub-metrics, 95 variables', 'Min-max normalisation with winsorised tails', 'Component weights: 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T', 'Each sub-metric traceable to authoritative public source'],
       ssiLink: 'components' },
     { layer: 1, ref: '§0.3.4', title: 'Gaussian Copula Monte Carlo Engine',
-      subtitle: 'How 78.9 million simulations capture the correlation structure across grid risk factors',
-      body: 'The SSI components are not independent — a substation with poor continuity (high C) often also has poor voltage quality (high V), aged infrastructure (high I5), and is located in a rural area with high economic vulnerability (high E). The Gaussian copula captures these dependencies through a 20×20 correlation matrix estimated from the Irish fleet, decomposed via Cholesky factorisation to generate correlated random draws. For each of 994 substations, 10,000 Monte Carlo iterations propagate uncertainty through the full scoring formula, producing not just a point estimate (R_median) but a complete posterior distribution — P5, P50, P95, confidence interval width, and skewness. This is the computational backbone: 78.9 million simulations, 223 million arithmetic operations, yielding the uncertainty quantification that distinguishes the SSI from deterministic indices.',
-      concepts: ['20×20 Gaussian copula with Cholesky decomposition', '10,000 iterations per substation = 78.9M total', 'Full posterior: R_P5, R_median, R_P95, CI_width, skewness', 'Correlation captures systemic clustering of risk factors'],
+      subtitle: 'How 9.9 million simulations capture the correlation structure across grid risk factors',
+      body: 'The SSI components are not independent — a substation with poor continuity (high C) often also has poor voltage quality (high V), aged infrastructure (high I5), and is located in a rural area with high economic vulnerability (high E). The Gaussian copula captures these dependencies through a 20×20 correlation matrix estimated from the Irish fleet, decomposed via Cholesky factorisation to generate correlated random draws. For each of 994 substations, 10,000 Monte Carlo iterations propagate uncertainty through the full scoring formula, producing not just a point estimate (R_median) but a complete posterior distribution — P5, P50, P95, confidence interval width, and skewness. This is the computational backbone: 9.9 million simulations, 223 million arithmetic operations, yielding the uncertainty quantification that distinguishes the SSI from deterministic indices.',
+      concepts: ['20×20 Gaussian copula with Cholesky decomposition', '10,000 iterations per substation = 9.9M total', 'Full posterior: R_P5, R_median, R_P95, CI_width, skewness', 'Correlation captures systemic clustering of risk factors'],
       ssiLink: 'mc' },
     { layer: 2, ref: '§0.4.1', title: 'ESB Networks/EirGrid Value Stack (D1–D5)',
       subtitle: 'What a BESS is worth to the distribution network operator in avoided or deferred costs',
@@ -1732,7 +1732,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     // Pick a stat relevant to this topic's layer
     var statHTML = '';
     if (topic.layer === 1) {
-      statHTML = 'The SSI Index currently scores <strong>' + n.toLocaleString() + ' substations</strong> across 13 Irish counties. ' +
+      statHTML = 'The SSI Index currently scores <strong>' + n.toLocaleString() + ' substations</strong> across ' + data.regions.length + ' Irish counties. ' +
         'Fleet mean R = ' + avgR.toFixed(3) + ', with an average confidence interval width of ' + avgCI.toFixed(3) +
         ' from 10,000 MC iterations per substation. The dominant component is C (Continuity) at avg ' + compAvgs.C.toFixed(3) +
         ' / 0.30 ceiling (' + (compAvgs.C / 0.30 * 100).toFixed(0) + '% utilisation).';
