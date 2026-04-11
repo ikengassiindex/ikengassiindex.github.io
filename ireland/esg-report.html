@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — ESG Report</title>
-<link rel="stylesheet" href="../style.css?v=402">
+<link rel="stylesheet" href="../style.css?v=403">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -213,9 +213,9 @@ p  { margin-bottom: 14px; }
 </script>
 
 
-<script src="../nav.js?v=402"></script>
+<script src="../nav.js?v=403"></script>
 <script src="ssi-metadata.js"></script>
-<script src="../intelligence/intelligence-loader.js?v=402" data-country="auto" id="ssi-esg-page"></script>
+<script src="../intelligence/intelligence-loader.js?v=403" data-country="auto" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
@@ -832,7 +832,7 @@ function readinessText(score) {
 
 /* ── Helper: get data sources filtered for a specific report ── */
 function getReportSources(reportNum) {
-  const country = SSI_COUNTRY || 'italy';
+  const country = SSI_COUNTRY || 'ireland';
   const sources = COUNTRY_SOURCES[country] || COUNTRY_SOURCES.italy;
   const tag = 'R' + reportNum;
   const filtered = sources.filter(row => {
@@ -1211,28 +1211,28 @@ function seededIndex(seed, len) {
 }
 
 const DEMO_SUBSTATION = {
-  substation_id: 'IT_001_000', internal_id: '001_0', version: '4.0.2',
-  name: 'Substation Example', lon: 12.5, lat: 41.9, voltage_kv: 200,
-  region: 'Lazio', province: 'Roma', kreis: 'Roma',
-  classification: 'Low',
-  band_pct: { Low: 100, Medium: 0, High: 0, Critical: 0 },
-  confidence_pct: 'medium', R_median: 0.3231, R_mean: 0.3213,
-  R_P5: 0.2067, R_P95: 0.4292, CI_width: 0.2225,
-  R_base: 0.3286, R_base_median: 0.3286, R_deterministic: 0.3266,
-  modifier_impact: -0.0056, modifier_pct: -1.69,
-  components: { C: 0.5183, V: 0.1535, I: 0.3232, E: 0.2924, S: 0.2474, T: 0.1434 },
-  modifiers: { R3_C_mult: 0.9521, R4_F_topo: 0.9908, R6_restoration: 1.0564, R6_seismic: 1.0, R7_cyber: 0.9973 },
-  fleet_percentile: 0.5968, alert_flag: 0, P_critical: 0, skewness: -0.1636, confidence_tier: 'medium',
-  graph_topology: { degree: 7, BC_percentile: 0.3504, is_bridge: 0, cluster_coeff: 0.0081 },
-  markov: { risk_score: 0.1749, ettc_years: 16.0, p_critical_20yr: 0.0, corrosion_class: 'C3', steady_state: [0.54, 0.251, 0.106, 0.032] },
-  socio_economic: { unemployment_rate: 3.8, gdp_per_capita: 39500, rd_pct_gdp: 5.3, EP_rate_region: 3.5, V_socio: 0.35, E2_local: 1.01 },
-  transition: { T1_score: 0.143, DER_ratio: 1.154, DER_variability: 0.8, EV_load_ratio: 0.1232 },
-  seismic: { zone: '2', pga_g: 0.16, R6_seismic: 1.0 }
+  substation_id: 'IE_100292', internal_id: '100_292', version: '4.0.2',
+  name: 'North Quays 110kV Substation', lon: -7.11, lat: 52.26, voltage_kv: 110,
+  region: 'Waterford', province: 'Munster', tso_zone: 'EirGrid South',
+  classification: 'Medium',
+  band_pct: { Low: 6.7, Medium: 84.4, High: 8.9, Critical: 0.0 },
+  confidence_pct: 'high', R_median: 0.3603, R_mean: 0.3580,
+  R_P5: 0.2410, R_P95: 0.4580, CI_width: 0.2170,
+  R_base: 0.3450, R_base_median: 0.3450, R_deterministic: 0.3430,
+  modifier_impact: -0.0042, modifier_pct: -1.22,
+  components: { C: 0.4820, V: 0.1680, I: 0.3410, E: 0.2750, S: 0.2610, T: 0.1580 },
+  modifiers: { R3_C_mult: 1.0200, R4_F_topo: 0.9850, R6_restoration: 1.0320, R6_seismic: 1.0, R7_cyber: 0.9980 },
+  fleet_percentile: 0.5200, alert_flag: 0, P_critical: 0, skewness: -0.1450, confidence_tier: 'high',
+  graph_topology: { degree: 4, BC_percentile: 28.5, is_bridge: 0, cluster_coeff: 0.012 },
+  markov: { risk_score: 0.1820, ettc_years: 19.5, p_critical_20yr: 0.028, p_crit_20yr: 0.028, corrosion_class: 'C3', steady_state: [0.42, 0.28, 0.18, 0.12] },
+  socio_economic: { unemployment_rate: 4.2, gdp_per_capita: 52800, rd_pct_gdp: 1.15, EP_rate_region: 5.8, V_socio: 0.28, E2_local: 1.08, elderly_pct: 14.8, population: 53504, migration_score: 0.35 },
+  transition: { T1_score: 0.158, DER_ratio: 0.285, DER_variability: 0.72, EV_load_ratio: 0.0580 },
+  seismic: { zone: 'Very Low', pga_g: 0.012, R6_seismic: 1.0 }
 };
 
 async function loadSubstation(country) {
   try {
-    const url = `ssi-data.json?v=402`;
+    const url = `ssi-data.json?v=403`;
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const json = await resp.json();
@@ -1257,7 +1257,7 @@ async function loadSubstation(country) {
 
 /* ── Initialise ── */
 document.addEventListener('DOMContentLoaded', function() {
-  loadSubstation(SSI_COUNTRY || 'italy');
+  loadSubstation(SSI_COUNTRY || 'ireland');
 });
 </script>
 

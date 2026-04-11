@@ -264,8 +264,8 @@
       document.getElementById('kpi-total').textContent = (ssi.fleet_summary.total || 0).toLocaleString();
       document.getElementById('kpi-median').textContent = (ssi.fleet_summary.median_R || ssi.fleet_summary.R_median || 0).toFixed(3);
       document.getElementById('kpi-median-sub').textContent = 'P5 = ' + (ssi.fleet_summary.P5 || ssi.fleet_summary.R_min || 0).toFixed(3) + ' · P95 = ' + (ssi.fleet_summary.P95 || ssi.fleet_summary.R_max || 0).toFixed(3);
-      document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
-      document.getElementById('kpi-critical-sub').textContent = (ssi.fleet_summary.band_pct||{}).Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
+      document.getElementById('kpi-critical').textContent = (ssi.fleet_summary.bands.Critical || 0);
+      document.getElementById('kpi-critical-sub').textContent = ((ssi.fleet_summary.band_pct||{}).Critical || 0).toFixed(1) + '% of fleet · R ≥ 0.75';
       document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
       var hvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 110; }).length;
       var mvCount = ssi.fleet_summary.total - hvCount;
@@ -274,14 +274,14 @@
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;
       var bc = ssi.fleet_summary.bands;
-      document.getElementById('dist-low').style.width = bp.Low + '%';
-      document.getElementById('dist-med').style.width = bp.Medium + '%';
-      document.getElementById('dist-high').style.width = bp.High + '%';
-      document.getElementById('dist-crit').style.width = bp.Critical + '%';
-      document.getElementById('legend-low').textContent = 'Low ' + bc.Low.toLocaleString() + ' (' + bp.Low.toFixed(1) + '%)';
-      document.getElementById('legend-med').textContent = 'Medium ' + bc.Medium.toLocaleString() + ' (' + bp.Medium.toFixed(1) + '%)';
-      document.getElementById('legend-high').textContent = 'High ' + bc.High.toLocaleString() + ' (' + bp.High.toFixed(1) + '%)';
-      document.getElementById('legend-crit').textContent = 'Critical ' + bc.Critical.toLocaleString() + ' (' + bp.Critical.toFixed(1) + '%)';
+      document.getElementById('dist-low').style.width = (bp.Low||0) + '%';
+      document.getElementById('dist-med').style.width = (bp.Medium||0) + '%';
+      document.getElementById('dist-high').style.width = (bp.High||0) + '%';
+      document.getElementById('dist-crit').style.width = (bp.Critical||0) + '%';
+      document.getElementById('legend-low').textContent = 'Low ' + (bc.Low||0).toLocaleString() + ' (' + (bp.Low||0).toFixed(1) + '%)';
+      document.getElementById('legend-med').textContent = 'Medium ' + (bc.Medium||0).toLocaleString() + ' (' + (bp.Medium||0).toFixed(1) + '%)';
+      document.getElementById('legend-high').textContent = 'High ' + (bc.High||0).toLocaleString() + ' (' + (bp.High||0).toFixed(1) + '%)';
+      document.getElementById('legend-crit').textContent = 'Critical ' + (bc.Critical||0).toLocaleString() + ' (' + (bp.Critical||0).toFixed(1) + '%)';
 
       // ── Top critical table ──
       var tbody = document.getElementById('top-critical-tbody');
