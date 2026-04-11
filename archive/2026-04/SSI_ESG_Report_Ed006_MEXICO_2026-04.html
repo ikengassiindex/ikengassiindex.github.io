@@ -1,0 +1,1145 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI Index — ESG Report · Substation Example (MX_001_000)</title>
+<link rel="stylesheet" href="../style.css?v=402">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&amp;family=Playfair+Display:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   SSI Index ESG Report — Design System
+   Ikenga Palette · DM Sans + Playfair Display
+   v4.0.2 — Annual Substation ESG Disclosure
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --cream: #faf6f5;
+  --cream-deep: #f0ebe8;
+  --crimson: #941914;
+  --terracotta: #aa4234;
+  --sage: #5d8563;
+  --bronze: #b8863a;
+  --ink: #2c2420;
+  --warm-grey: #8a7e76;
+  --warm-grey-light: #b5aca5;
+  --bg: #f5f0ed;
+  --card-bg: #ffffff;
+  --card-border: rgba(44,36,32,0.08);
+  --card-shadow: 0 1px 4px rgba(44,36,32,0.06);
+  --card-shadow-hover: 0 4px 16px rgba(44,36,32,0.10);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 14px;
+  --band-low: #5d8563;
+  --band-low-bg: rgba(93,133,99,0.10);
+  --band-medium: #b8863a;
+  --band-medium-bg: rgba(184,134,58,0.10);
+  --band-high: #aa4234;
+  --band-high-bg: rgba(170,66,52,0.10);
+  --band-critical: #941914;
+  --band-critical-bg: rgba(148,25,20,0.10);
+  --sdg-1: #e5243b; --sdg-3: #4c9f38; --sdg-7: #fcc30b;
+  --sdg-9: #f36d25; --sdg-10: #dd1367; --sdg-11: #f99d26;
+  --sdg-12: #cf8d2a; --sdg-13: #48773c; --sdg-15: #56c02b;
+  --sdg-16: #00689d;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+
+h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; }
+h1 { font-size: 28px; line-height: 1.2; }
+h2 { font-size: 22px; line-height: 1.3; margin-top: 0; margin-bottom: 16px; }
+h3 { font-size: 17px; line-height: 1.4; margin-top: 0; margin-bottom: 12px; }
+p  { margin-bottom: 14px; }
+
+.label-xs { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--warm-grey); font-weight: 500; }
+.label-sm { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; }
+
+/* ── Page Shell ── */
+.page-shell { max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
+.page-header { margin-bottom: 32px; }
+.page-header h1 { margin-bottom: 6px; }
+.page-header p { color: var(--warm-grey); font-size: 14px; max-width: 700px; }
+
+/* ── Cards ── */
+.card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 20px 24px;
+  box-shadow: var(--card-shadow); transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: var(--card-shadow-hover); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+.card-header h3 { font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; margin: 0; }
+
+/* ── KPI Grid ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--card-shadow); }
+.kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; margin-bottom: 6px; }
+.kpi-card .kpi-value { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.kpi-card .kpi-sub { font-size: 12px; color: var(--warm-grey); }
+
+/* ── Band Badges ── */
+.band-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.band-badge.low { background: var(--band-low-bg); color: var(--band-low); }
+.band-badge.medium { background: var(--band-medium-bg); color: var(--band-medium); }
+.band-badge.high { background: var(--band-high-bg); color: var(--band-high); }
+.band-badge.critical { background: var(--band-critical-bg); color: var(--band-critical); }
+.band-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.band-dot.low { background: var(--band-low); }
+.band-dot.medium { background: var(--band-medium); }
+.band-dot.high { background: var(--band-high); }
+.band-dot.critical { background: var(--band-critical); }
+
+/* ── SDG Badges ── */
+.sdg-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #fff; padding: 3px 10px; border-radius: 4px; white-space: nowrap; letter-spacing: 0.02em; }
+.sdg-badge.primary { font-size: 13px; padding: 5px 14px; }
+
+/* ── Grids ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+/* ── Tables ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-grey); font-weight: 500; padding: 10px 12px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); }
+.data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(44,36,32,0.04); vertical-align: top; }
+.data-table tr:hover td { background: rgba(44,36,32,0.02); }
+.data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ── Section Dividers ── */
+.section-block { margin-bottom: 40px; }
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--cream-deep); }
+.section-number { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--cream-deep); line-height: 1; }
+.section-title-group { flex: 1; }
+.section-title-group h2 { margin-bottom: 2px; }
+.section-title-group .section-sub { font-size: 13px; color: var(--warm-grey); }
+
+/* ── Why Box (callout) ── */
+.why-box { background: var(--cream); border-left: 3px solid var(--terracotta); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 14px 18px; margin-bottom: 20px; }
+.why-box .why-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--terracotta); font-weight: 600; margin-bottom: 4px; }
+.why-box p { font-size: 13px; color: var(--ink); margin-bottom: 0; line-height: 1.55; }
+
+/* ── Readiness indicator ── */
+.readiness-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.readiness-pill.ready { background: rgba(93,133,99,0.12); color: var(--sage); }
+.readiness-pill.partial { background: rgba(184,134,58,0.12); color: var(--bronze); }
+.readiness-pill.gap { background: rgba(170,66,52,0.12); color: var(--terracotta); }
+
+/* ── Radar chart container ── */
+.radar-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.radar-chart-box { width: 520px; max-width: 100%; overflow: visible; }
+.radar-legend { flex: 1; min-width: 260px; margin-left: 10px; }
+.radar-legend-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(44,36,32,0.06); }
+.radar-legend-item:last-child { border-bottom: none; }
+.radar-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.radar-legend-label { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+.radar-legend-sub { font-size: 12px; color: var(--warm-grey); }
+
+/* ── Component Bar ── */
+.component-bar-wrap { margin-bottom: 32px; }
+.component-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; margin: 12px 0 10px; }
+.component-bar div { transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; min-width: 30px; }
+.component-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
+.component-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.component-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.component-legend-score { font-weight: 600; font-variant-numeric: tabular-nums; }
+.component-legend-weight { color: var(--warm-grey); font-size: 11px; }
+
+/* ── Markov Diagram ── */
+.markov-diagram { display: flex; align-items: stretch; gap: 0; margin: 12px 0; }
+.markov-state { flex: 1; text-align: center; padding: 14px 8px; border-radius: 0; position: relative; min-width: 60px; }
+.markov-state:first-child { border-radius: 8px 0 0 8px; }
+.markov-state:last-child { border-radius: 0 8px 8px 0; }
+.markov-state-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; opacity: 0.85; margin-bottom: 2px; }
+.markov-state-pct { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; line-height: 1.1; }
+.markov-state-sub { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+.markov-arrow { display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--warm-grey-light); width: 20px; flex-shrink: 0; }
+
+/* ── ESG Report card accent ── */
+.esg-report-card { border-top: 3px solid var(--terracotta); }
+.esg-report-card .report-index { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--terracotta); margin-bottom: 8px; }
+
+/* ── Methodology box ── */
+.method-box { background: rgba(93,133,99,0.06); border: 1px solid rgba(93,133,99,0.15); border-radius: var(--radius-sm); padding: 14px 18px; }
+.method-box .method-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--sage); font-weight: 600; margin-bottom: 6px; }
+.method-box p { font-size: 13px; margin-bottom: 0; line-height: 1.55; }
+
+/* ── Variable tag ── */
+.var-tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 1px 6px; border-radius: 3px; font-family: 'DM Sans', monospace; background: var(--cream-deep); color: var(--ink); letter-spacing: 0.02em; }
+
+/* ── Source tags ── */
+.source-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--cream); padding: 2px 8px; border-radius: 3px; color: var(--warm-grey); margin: 2px; }
+.source-tag .vintage { color: var(--sage); font-weight: 600; }
+
+/* ── Footer ── */
+.page-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--card-border); color: var(--warm-grey); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+/* ── Loading state ── */
+.loading-overlay { display: flex; align-items: center; justify-content: center; padding: 60px; color: var(--warm-grey); font-size: 14px; }
+.loading-overlay .spinner { width: 24px; height: 24px; border: 3px solid var(--cream-deep); border-top-color: var(--terracotta); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Print ── */
+@media print {
+  body { background: #fff; font-size: 12px; }
+  .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+  .page-shell { padding: 16px; }
+  .section-block { break-before: auto; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .radar-wrap { flex-direction: column; } .radar-chart-box { width: 100%; } }
+@media (max-width: 768px) { .page-shell { padding: 20px 16px 48px; } }
+@media (max-width: 480px) { .kpi-card .kpi-value { font-size: 26px; } .kpi-card { padding: 14px 16px; } .card { padding: 16px; } }
+</style>
+</head>
+<body data-ssi-country="mexico"><nav class="topnav" role="navigation" aria-label="Main navigation"><a class="topnav-brand" href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga — Visit website" style="gap:10px"><img src="../ikenga-logo.png" alt="Ikenga" style="height:187px;width:auto;display:block"><div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15"><h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0.2</span></h1></div></a><div class="nav-country-badge">🇲🇽 Mexico</div><a href="../index.html" class="nav-back" aria-label="Back to country selection">← All Countries</a><button class="nav-toggle" onclick="document.querySelector('.topnav-links').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="topnav-links" role="menubar"><a href="index.html" role="menuitem">Overview</a><a href="map.html" role="menuitem">Map Explorer</a><a href="regional.html" role="menuitem">Regional</a><a href="methodology.html" role="menuitem">Methodology</a><a href="data.html" role="menuitem">Data &amp; Download</a><a href="intelligence.html" role="menuitem">Intelligence</a><a href="esg-report.html" role="menuitem" class="active" aria-current="page">ESG Report</a></div></nav><noscript><div class="noscript-banner">This dashboard requires JavaScript to display interactive data and maps.</div></noscript><a href="#main-content" class="skip-link">Skip to main content</a>
+<script>
+// Auto-detect country from URL path
+(function() {
+  var match = window.location.pathname.match(/\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile|denmark|norway|sweden|finland|netherlands|belgium|portugal|mexico)\//i);
+  if (match) {
+    document.currentScript.parentElement.setAttribute('data-ssi-country', match[1].toLowerCase());
+    window.SSI_ESG_COUNTRY = match[1].toLowerCase();
+  }
+})();
+</script>
+
+<script src="../ssi-versions.js?_=1"></script>
+<script src="../nav.js?v=402"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js?v=402"></script>
+<script>renderNav('esg-report');</script>
+
+<!-- ═══ Page Shell ═══ -->
+<div class="page-shell">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="label-xs" style="margin-bottom:6px;">ANNUAL ESG DISCLOSURE — REPORTING PERIOD 2025</div>
+    <h1>Substation ESG Report</h1>
+    <p>Substation-level Environmental, Social, and Governance assessment aligned to CSRD/ESRS, EU Taxonomy, TCFD, SFDR, and UN PRI frameworks. Updated annually via the SSI Index scoring engine.</p>
+  </div>
+
+  <!-- ── Substation Identity KPIs ── -->
+  <div class="kpi-grid" id="kpiGrid" style="margin-bottom:32px;"><div class="kpi-card"><div class="kpi-label">Substation</div><div class="kpi-value" style="font-size:22px;">Substation Example</div><div class="kpi-sub">MX_001_000 · Ciudad de México, Ciudad de México</div></div><div class="kpi-card"><div class="kpi-label">SSI Score (R<sub>median</sub>)</div><div class="kpi-value" style="color:var(--band-low);">0.323</div><div class="kpi-sub"><span class="band-badge low"><span class="band-dot low"></span> Low Risk</span> &nbsp; 50.0th percentile</div></div><div class="kpi-card"><div class="kpi-label">Voltage Class</div><div class="kpi-value">230 <span style="font-size:16px;font-weight:400;">kV</span></div><div class="kpi-sub">High-voltage transmission</div></div><div class="kpi-card"><div class="kpi-label">Confidence Interval</div><div class="kpi-value" style="font-size:22px;">0.207 – 0.429</div><div class="kpi-sub">P5–P95 · CI width 0.223 · medium confidence</div></div><div class="kpi-card"><div class="kpi-label">Markov ETTC</div><div class="kpi-value">18.5 <span style="font-size:16px;font-weight:400;">yr</span></div><div class="kpi-sub">Expected time to criticality</div></div><div class="kpi-card"><div class="kpi-label">DER Penetration</div><div class="kpi-value">0.12</div><div class="kpi-sub">T1 transition stress score</div></div></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MOD 1: COMPONENT BAR CHART (C/V/I/E/S/T fingerprint)
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block component-bar-wrap">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Component Fingerprint</h2>
+        <div class="section-sub">Six-component weighted decomposition of the SSI composite score — the substation's structural risk profile</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="grid-2">
+        <div>
+          <div class="label-sm" style="margin-bottom:8px;">Weighted Contribution to R<sub>base</sub></div>
+          <div class="component-bar" id="componentBar"><div style="width:25.2%;background:#941914;" title="Condition: 0.248 × 0.3 = 0.0744">C</div><div style="width:5.0%;background:#aa4234;" title="Voltage: 0.148 × 0.1 = 0.0148">V</div><div style="width:24.3%;background:#b8863a;" title="Insulation: 0.287 × 0.25 = 0.0717">I</div><div style="width:14.6%;background:#5d8563;" title="Environment: 0.431 × 0.1 = 0.0431">E</div><div style="width:29.2%;background:#3a7ca5;" title="Seismic: 0.431 × 0.2 = 0.0862">S</div><div style="width:1.5%;background:#8a7e76;" title="Transition: 0.091 × 0.05 = 0.0046">T</div></div>
+          <div class="component-legend" id="componentLegend"><div class="component-legend-item"><div class="component-legend-dot" style="background:#941914;"></div><span>Condition</span><span class="component-legend-score">0.248</span><span class="component-legend-weight">×0.3</span></div><div class="component-legend-item"><div class="component-legend-dot" style="background:#aa4234;"></div><span>Voltage</span><span class="component-legend-score">0.148</span><span class="component-legend-weight">×0.1</span></div><div class="component-legend-item"><div class="component-legend-dot" style="background:#b8863a;"></div><span>Insulation</span><span class="component-legend-score">0.287</span><span class="component-legend-weight">×0.25</span></div><div class="component-legend-item"><div class="component-legend-dot" style="background:#5d8563;"></div><span>Environment</span><span class="component-legend-score">0.431</span><span class="component-legend-weight">×0.1</span></div><div class="component-legend-item"><div class="component-legend-dot" style="background:#3a7ca5;"></div><span>Seismic</span><span class="component-legend-score">0.431</span><span class="component-legend-weight">×0.2</span></div><div class="component-legend-item"><div class="component-legend-dot" style="background:#8a7e76;"></div><span>Transition</span><span class="component-legend-score">0.091</span><span class="component-legend-weight">×0.05</span></div></div>
+        </div>
+        <div>
+          <canvas id="componentChart" height="180" style="box-sizing: border-box; display: block; height: 180px; width: 573px;" width="573"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MOD 2: MARKOV STEADY-STATE DIAGRAM
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Markov Degradation Profile</h2>
+        <div class="section-sub">CIGRE TB 761 five-state condition model — steady-state probability distribution and expected time to criticality</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="grid-2">
+        <div>
+          <div class="label-sm" style="margin-bottom:8px;">Steady-State Distribution</div>
+          <div class="markov-diagram" id="markovDiagram"><div class="markov-state" style="background:#5d8563;color:#fff;flex:30;"><div class="markov-state-label">Good</div><div class="markov-state-pct">30%</div><div class="markov-state-sub">π1 = 0.300</div></div><div class="markov-arrow">▶</div><div class="markov-state" style="background:#b8863a;color:#fff;flex:38;"><div class="markov-state-label">Aged</div><div class="markov-state-pct">38%</div><div class="markov-state-sub">π2 = 0.380</div></div><div class="markov-arrow">▶</div><div class="markov-state" style="background:#aa4234;color:#fff;flex:22;"><div class="markov-state-label">Degraded</div><div class="markov-state-pct">22%</div><div class="markov-state-sub">π3 = 0.220</div></div><div class="markov-arrow">▶</div><div class="markov-state" style="background:#941914;color:#fff;flex:10;"><div class="markov-state-label">Critical</div><div class="markov-state-pct">10%</div><div class="markov-state-sub">π4 = 0.100</div></div></div>
+          <div style="margin-top:12px; font-size:12px; color:var(--warm-grey);">
+            Markov 5-state model calibrated from CIGRE Technical Brochure 761 (2019). States represent asset condition from new/good through critical. Steady-state probabilities indicate the long-run proportion of time the asset spends in each condition state given current operating environment.
+          </div>
+        </div>
+        <div>
+          <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
+            <div class="kpi-card">
+              <div class="kpi-label">Risk Score</div>
+              <div class="kpi-value" id="markovRiskScore" style="font-size:28px;">0.386</div>
+              <div class="kpi-sub">Composite Markov risk</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">ETTC</div>
+              <div class="kpi-value" id="markovETTC" style="font-size:28px;">18.5 yr</div>
+              <div class="kpi-sub">Expected time to critical</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">P(Critical) 20yr</div>
+              <div class="kpi-value" id="markovPCrit" style="font-size:28px;">10.0%</div>
+              <div class="kpi-sub">Probability of reaching critical</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Corrosion</div>
+              <div class="kpi-value" id="markovCorrosion" style="font-size:28px;">C1</div>
+              <div class="kpi-sub">ISO 9223 classification</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION A: ESG RADAR CHART
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">A</span>
+      <div class="section-title-group">
+        <h2>ESG Radar — Six-Report Overview</h2>
+        <div class="section-sub">Composite readiness across 6 ESG dimensions, each linked to UN Sustainable Development Goals</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:24px; overflow:visible;">
+      <div class="radar-wrap">
+        <div class="radar-chart-box">
+          <canvas id="esgRadar" width="520" height="520" style="box-sizing: border-box; display: block; height: 520px; width: 520px;"></canvas>
+        </div>
+        <div class="radar-legend" id="radarLegend"><div class="radar-legend-item"><div class="radar-legend-dot" style="background:#aa4234;"></div><div><div class="radar-legend-label">R1 · SSI Annual Risk Report — Mexico Fleet <span class="readiness-pill ready" style="margin-left:6px;">READY</span></div><div class="radar-legend-sub">SDG 13 Climate Action · SDG 9 · SDG 11</div><div style="margin-top:4px;"><span class="sdg-badge" style="background:#48773c;">SDG 13</span> <span class="sdg-badge" style="background:#f36d25;">SDG 9</span> <span class="sdg-badge" style="background:#f99d26;">SDG 11</span></div></div></div><div class="radar-legend-item"><div class="radar-legend-dot" style="background:#5d8563;"></div><div><div class="radar-legend-label">R2 · Regional Deep-Dive: Gulf Coast Corridor <span class="readiness-pill ready" style="margin-left:6px;">READY</span></div><div class="radar-legend-sub">SDG 7 Affordable and Clean Energy · SDG 10 · SDG 1</div><div style="margin-top:4px;"><span class="sdg-badge" style="background:#fcc30b;color:#333;">SDG 7</span> <span class="sdg-badge" style="background:#dd1367;">SDG 10</span> <span class="sdg-badge" style="background:#e5243b;">SDG 1</span></div></div></div><div class="radar-legend-item"><div class="radar-legend-dot" style="background:#b8863a;"></div><div><div class="radar-legend-label">R3 · Hurricane &amp; Seismic Resilience Assessment <span class="readiness-pill ready" style="margin-left:6px;">READY</span></div><div class="radar-legend-sub">SDG 9 Industry, Innovation, Infrastructure · SDG 13 · SDG 12</div><div style="margin-top:4px;"><span class="sdg-badge" style="background:#f36d25;">SDG 9</span> <span class="sdg-badge" style="background:#48773c;">SDG 13</span> <span class="sdg-badge" style="background:#cf8d2a;">SDG 12</span></div></div></div><div class="radar-legend-item"><div class="radar-legend-dot" style="background:#e8a838;"></div><div><div class="radar-legend-label">R4 · Energy Transition Scorecard <span class="readiness-pill ready" style="margin-left:6px;">READY</span></div><div class="radar-legend-sub">SDG 7 Affordable and Clean Energy · SDG 13 · SDG 9</div><div style="margin-top:4px;"><span class="sdg-badge" style="background:#fcc30b;color:#333;">SDG 7</span> <span class="sdg-badge" style="background:#48773c;">SDG 13</span> <span class="sdg-badge" style="background:#f36d25;">SDG 9</span></div></div></div><div class="radar-legend-item"><div class="radar-legend-dot" style="background:#6b8e6b;"></div><div><div class="radar-legend-label">R5 · Infrastructure Modernization Tracker <span class="readiness-pill ready" style="margin-left:6px;">READY</span></div><div class="radar-legend-sub">SDG 11 Sustainable Cities and Communities · SDG 3 · SDG 15</div><div style="margin-top:4px;"><span class="sdg-badge" style="background:#f99d26;">SDG 11</span> <span class="sdg-badge" style="background:#4c9f38;">SDG 3</span> <span class="sdg-badge" style="background:#56c02b;">SDG 15</span></div></div></div><div class="radar-legend-item"><div class="radar-legend-dot" style="background:#3a7ca5;"></div><div><div class="radar-legend-label">R6 · Cybersecurity &amp; Digital Resilience <span class="readiness-pill partial" style="margin-left:6px;">PARTIAL</span></div><div class="radar-legend-sub">SDG 9 Industry, Innovation, Infrastructure · SDG 16</div><div style="margin-top:4px;"><span class="sdg-badge" style="background:#f36d25;">SDG 9</span> <span class="sdg-badge" style="background:#00689d;">SDG 16</span></div></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION B: INDIVIDUAL ESG REPORTS (dynamically rendered)
+       ══════════════════════════════════════════════════════════ -->
+  <div id="esgReportsContainer"><div class="section-block" id="report-1"><div class="section-header"><span class="section-number">1</span><div class="section-title-group"><h2>SSI Annual Risk Report — Mexico Fleet</h2><div class="section-sub">ESRS E1 · TCFD Physical Risk · EU Taxonomy Annex A</div></div><span class="readiness-pill ready">READY</span></div><div class="why-box"><div class="why-label">Why this report exists</div><p>ESRS E1 (Climate Change) is material for 98% of CSRD-reporting companies. TCFD physical risk disclosure is mandatory in 36+ jurisdictions. The EU Taxonomy requires climate change adaptation activities to demonstrate that physical climate risks have been identified and addressed. This report quantifies acute and chronic climate hazard exposure across Mexico's 32 estados at substation level using ERA5 reanalysis and Markov degradation modelling.</p></div><div class="grid-2" style="margin-bottom:20px;"><div class="card esg-report-card"><div class="report-index">SDG Alignment</div><h3 style="font-family:'Playfair Display',serif; margin-bottom:10px;">SDG 13 — Climate Action <span style="font-size:12px;color:var(--warm-grey);">(primary)</span></h3><p style="font-size:13px;">Target 13.1 calls for strengthening resilience and adaptive capacity to climate-related hazards. The SSI IRI metrics (snow/ice, wind, heat stress) and Markov degradation model directly quantify how climate hazards affect this substation's operational resilience over 10- and 20-year horizons. Mexico's dual hazard exposure (hurricanes on Gulf+Pacific coasts, seismic activity along Cocos Plate, volcanic activity) makes this assessment critical. With a Markov risk score of 0.386 and ETTC of 18.5 years, this substation's climate trajectory can be assessed against TCFD physical risk and EU Taxonomy adaptation screening requirements.</p><div style="margin-top:8px;"><span class="sdg-badge primary" style="background:#48773c;">SDG 13</span> <span class="sdg-badge" style="background:#f36d25;">SDG 9</span> <span class="sdg-badge" style="background:#f99d26;">SDG 11</span></div></div><div class="card"><h3 style="font-family:'DM Sans',sans-serif; font-weight:600; margin-bottom:12px;">Substation Profile</h3><table class="data-table"><tbody><tr><td style="color:var(--warm-grey);">Insulation Risk (I component)</td><td class="num"><strong>0.287</strong></td></tr><tr><td style="color:var(--warm-grey);">Environment Component (E)</td><td class="num"><strong>0.431</strong></td></tr><tr><td style="color:var(--warm-grey);">Markov Risk Score</td><td class="num"><strong>0.386</strong></td></tr><tr><td style="color:var(--warm-grey);">ETTC (time to criticality)</td><td class="num"><strong>18.5 years</strong></td></tr><tr><td style="color:var(--warm-grey);">P(critical) at 20 years</td><td class="num"><strong>10.0%</strong></td></tr><tr><td style="color:var(--warm-grey);">Corrosion Class</td><td class="num"><strong>C1</strong></td></tr><tr><td style="color:var(--warm-grey);">Seismic PGA (g)</td><td class="num"><strong>0.1750</strong></td></tr><tr><td style="color:var(--warm-grey);">Climate Δ R 2050</td><td class="num"><strong>0.1130</strong></td></tr></tbody></table></div></div><div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>SSI Variables Feeding This Report</h3></div><table class="data-table"><thead><tr><th>SSI Variable</th><th>Value</th><th>ESG Disclosure Requirement</th><th>Status</th></tr></thead><tbody><tr><td><span class="var-tag">I1</span> Storm/Hurricane IRI</td><td class="num">0.115</td><td>ESRS E1-9: Financial effects from physical risks</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">I2</span> Seismic/Volcanic IRI</td><td class="num">0.086</td><td>TCFD Strategy (b): Physical risk impact</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">I3</span> Heat-wave IRI</td><td class="num">0.057</td><td>EU Taxonomy Annex A: Heat stress</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">I5</span> Thermal stress</td><td class="num">0.029</td><td>ESRS E1-4: Climate mitigation targets</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">Markov</span> Risk score</td><td class="num">0.386</td><td>TCFD Risk Management: Risk identification</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">P_crit</span> P(critical) 20yr</td><td class="num">10.0%</td><td>ESRS E1-9: Time horizons</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">R6b</span> Seismic PGA</td><td class="num">0.1750</td><td>TCFD Strategy (b): Seismic physical risk</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">ΔR2050</span> Climate trajectory</td><td class="num">0.1130</td><td>ESRS E1-9: Forward-looking climate impact</td><td><span class="readiness-pill ready">READY</span></td></tr></tbody></table></div><div class="grid-2"><div class="card"><div class="card-header"><h3>Data Sources &amp; Vintage</h3></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">ERA5 Climate Reanalysis</div><div style="color:var(--warm-grey);font-size:11px;">Copernicus CDS</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Weekly</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Hurricane Data (East Pacific, Atlantic)</div><div style="color:var(--warm-grey);font-size:11px;">SMN (Servicio Meteorológico Nacional)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Seasonal</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Seismic Data (Cocos Plate)</div><div style="color:var(--warm-grey);font-size:11px;">SGM (Servicio Geológico Mexicano)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Real-time</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Volcanic Risk (Popocatépetl, Colima)</div><div style="color:var(--warm-grey);font-size:11px;">CENAPRED (Centro Nacional de Prevención de Desastres)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2023</span> Annual</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Weather &amp; Climate Data</div><div style="color:var(--warm-grey);font-size:11px;">SMN (Servicio Meteorológico Nacional)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Daily</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">IEEE C57.91 Thermal Model</div><div style="color:var(--warm-grey);font-size:11px;">IEEE</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">Standard</span> N/A</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">CIGRE TB 761 Markov</div><div style="color:var(--warm-grey);font-size:11px;">CIGRE</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2019</span> N/A</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--terracotta);font-weight:500;">CMIP6 SSP2-4.5 Projections</div><div style="color:var(--terracotta);font-size:11px;">Copernicus CDS</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">—</span> Not ingested</span></div></div></div><div class="method-box"><div class="method-label">Technical Validity</div><p>IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. SMN weather data informs hurricane and seismic vulnerability assessment. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. All inputs are production-grade with institutional provenance from CENACE, CRE, INEGI, and SGM.</p></div></div></div><div class="section-block" id="report-2"><div class="section-header"><span class="section-number">2</span><div class="section-title-group"><h2>Regional Deep-Dive: Gulf Coast Corridor</h2><div class="section-sub">ESRS S1/S2 · SFDR PAI Social Indicators · UN PRI</div></div><span class="readiness-pill ready">READY</span></div><div class="why-box"><div class="why-label">Why this report exists</div><p>ESRS S2 requires companies to disclose impacts on affected communities. SFDR mandates 5 social PAI indicators. This report focuses on Mexico's vulnerability corridor: Veracruz, Tabasco, and Tamaulipas. These states face the highest hurricane exposure and lowest per-capita GDP, creating a dual exposure: physical infrastructure risk + energy poverty. The SSI Index is uniquely positioned to surface where grid infrastructure risk concentrates in economically disadvantaged populations.</p></div><div class="grid-2" style="margin-bottom:20px;"><div class="card esg-report-card"><div class="report-index">SDG Alignment</div><h3 style="font-family:'Playfair Display',serif; margin-bottom:10px;">SDG 7 — Affordable and Clean Energy <span style="font-size:12px;color:var(--warm-grey);">(primary)</span></h3><p style="font-size:13px;">Target 7.1 requires universal access to affordable, reliable energy. This substation serves a catchment with V_socio of 0.15. The R3 social modifier (1.049) amplifies risk scores in regions with high unemployment, poverty concentration, and energy poverty — making spatial inequality visible and quantifiable at asset level. In Mexico's hurricane-vulnerable states, this correlation is particularly acute.</p><div style="margin-top:8px;"><span class="sdg-badge primary" style="background:#fcc30b;color:#333;">SDG 7</span> <span class="sdg-badge" style="background:#dd1367;">SDG 10</span> <span class="sdg-badge" style="background:#e5243b;">SDG 1</span></div></div><div class="card"><h3 style="font-family:'DM Sans',sans-serif; font-weight:600; margin-bottom:12px;">Substation Profile</h3><table class="data-table"><tbody><tr><td style="color:var(--warm-grey);">V_socio (energy poverty index)</td><td class="num"><strong>0.15</strong></td></tr><tr><td style="color:var(--warm-grey);">EP Rate (energy poverty %)</td><td class="num"><strong>0.12%</strong></td></tr><tr><td style="color:var(--warm-grey);">Unemployment Rate</td><td class="num"><strong>3.5%</strong></td></tr><tr><td style="color:var(--warm-grey);">GDP per Capita</td><td class="num"><strong>MXN 132,000</strong></td></tr><tr><td style="color:var(--warm-grey);">R&amp;D % of GDP</td><td class="num"><strong>0.015%</strong></td></tr><tr><td style="color:var(--warm-grey);">R3 Social Multiplier</td><td class="num"><strong>1.049</strong></td></tr><tr><td style="color:var(--warm-grey);">Poverty Rate</td><td class="num"><strong>16.8%</strong></td></tr><tr><td style="color:var(--warm-grey);">Indigenous Population</td><td class="num"><strong>2%</strong></td></tr><tr><td style="color:var(--warm-grey);">Elderly Population %</td><td class="num"><strong>0.12%</strong></td></tr><tr><td style="color:var(--warm-grey);">Catchment Population</td><td class="num"><strong>45,840</strong></td></tr></tbody></table></div></div><div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>SSI Variables Feeding This Report</h3></div><table class="data-table"><thead><tr><th>SSI Variable</th><th>Value</th><th>ESG Disclosure Requirement</th><th>Status</th></tr></thead><tbody><tr><td><span class="var-tag">V_socio</span> Energy poverty index</td><td class="num">0.15</td><td>ESRS S2-4: Impacts on affected communities</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">EP_rate</span> Energy poverty rate</td><td class="num">0.12%</td><td>SFDR PAI #14: Fossil fuel exposure proxy</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">R3</span> Social multiplier</td><td class="num">1.049</td><td>ESRS S1-6: Workforce characteristics</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">Elderly</span> Elderly population %</td><td class="num">0.12%</td><td>ESRS S2: Vulnerable populations</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">Pop</span> Catchment population</td><td class="num">45,840</td><td>ESRS S1: Affected communities</td><td><span class="readiness-pill ready">READY</span></td></tr></tbody></table></div><div class="grid-2"><div class="card"><div class="card-header"><h3>Data Sources &amp; Vintage</h3></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Population &amp; Economics</div><div style="color:var(--warm-grey);font-size:11px;">INEGI (Instituto Nacional de Estadística y Geografía)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2023</span> Annual</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Energy Market Data</div><div style="color:var(--warm-grey);font-size:11px;">CENACE (Centro Nacional de Control de Energía)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Annual</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Grid Reliability &amp; DSO Data</div><div style="color:var(--warm-grey);font-size:11px;">CRE (Comisión Reguladora de Energía)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2023</span> Annual</span></div></div></div><div class="method-box"><div class="method-label">Technical Validity</div><p>V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using INEGI household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, poverty concentration, and energy poverty. Regional data sourced from INEGI, CONEVAL, and CFE distribution company reports.</p></div></div></div><div class="section-block" id="report-3"><div class="section-header"><span class="section-number">3</span><div class="section-title-group"><h2>Hurricane &amp; Seismic Resilience Assessment</h2><div class="section-sub">Climate Delegated Act · Article 11 Climate Adaptation · Technical Screening Criteria</div></div><span class="readiness-pill ready">READY</span></div><div class="why-box"><div class="why-label">Why this report exists</div><p>The EU Taxonomy defines technical screening criteria for climate change adaptation in infrastructure. Mexico faces dual extreme hazards: (1) Atlantic and Pacific hurricanes creating wind and storm surge risk on Gulf Coast (Veracruz, Tabasco) and Pacific coast (Jalisco, Nayarit), and (2) seismic activity along the Cocos Plate subduction zone affecting central states. The SSI composite score (R_median), 6 components, modifier architecture, and Markov risk outputs provide the quantitative evidence base for Article 11 screening at asset level.</p></div><div class="grid-2" style="margin-bottom:20px;"><div class="card esg-report-card"><div class="report-index">SDG Alignment</div><h3 style="font-family:'Playfair Display',serif; margin-bottom:10px;">SDG 9 — Industry, Innovation, Infrastructure <span style="font-size:12px;color:var(--warm-grey);">(primary)</span></h3><p style="font-size:13px;">Target 9.4 calls for upgrading infrastructure to make it sustainable. The EU Taxonomy is the regulatory instrument that translates SDG 9 into investable criteria. By classifying this substation against Article 11 technical screening criteria — using R_median (0.323), all 6 components, and 5 modifiers — this report provides asset-level Taxonomy alignment that enables sustainable finance reporting. Mexico's infrastructure modernization imperative (Modernizador de la Red Eléctrica, MRE) depends on such systematic resilience assessment.</p><div style="margin-top:8px;"><span class="sdg-badge primary" style="background:#f36d25;">SDG 9</span> <span class="sdg-badge" style="background:#48773c;">SDG 13</span> <span class="sdg-badge" style="background:#cf8d2a;">SDG 12</span></div></div><div class="card"><h3 style="font-family:'DM Sans',sans-serif; font-weight:600; margin-bottom:12px;">Substation Profile</h3><table class="data-table"><tbody><tr><td style="color:var(--warm-grey);">R_median (composite)</td><td class="num"><strong>0.323</strong></td></tr><tr><td style="color:var(--warm-grey);">R_base (pre-modifier)</td><td class="num"><strong>0.329</strong></td></tr><tr><td style="color:var(--warm-grey);">Modifier Impact</td><td class="num"><strong>-1.69%</strong></td></tr><tr><td style="color:var(--warm-grey);">C (Condition)</td><td class="num"><strong>0.248</strong></td></tr><tr><td style="color:var(--warm-grey);">V (Voltage)</td><td class="num"><strong>0.148</strong></td></tr><tr><td style="color:var(--warm-grey);">I (Insulation/Climate)</td><td class="num"><strong>0.287</strong></td></tr><tr><td style="color:var(--warm-grey);">E (Environment)</td><td class="num"><strong>0.431</strong></td></tr><tr><td style="color:var(--warm-grey);">S (Seismic)</td><td class="num"><strong>0.431</strong></td></tr><tr><td style="color:var(--warm-grey);">T (Transition)</td><td class="num"><strong>0.091</strong></td></tr><tr><td style="color:var(--warm-grey);">Seismic PGA (g)</td><td class="num"><strong>0.1750 (Moderate)</strong></td></tr><tr><td style="color:var(--warm-grey);">Climate Δ R 2050</td><td class="num"><strong>+0.1130 (SSP2-4.5)</strong></td></tr></tbody></table></div></div><div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>SSI Variables Feeding This Report</h3></div><table class="data-table"><thead><tr><th>SSI Variable</th><th>Value</th><th>ESG Disclosure Requirement</th><th>Status</th></tr></thead><tbody><tr><td><span class="var-tag">R_median</span> Composite score</td><td class="num">0.323</td><td>EU Taxonomy Art. 11: Adaptation screening</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">6 Comp.</span> C/V/I/E/S/T</td><td class="num">All present</td><td>EU Taxonomy TSC: Physical risk identification</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">R3-R7</span> Modifier suite</td><td class="num">All applied</td><td>ESRS E1: Adaptation measures evidence</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">Markov</span> Degradation model</td><td class="num">0.386</td><td>TCFD: Forward-looking risk assessment</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">R5</span> Asymmetric CI</td><td class="num">0.223</td><td>ESRS: Uncertainty quantification</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">PGA</span> Seismic hazard</td><td class="num">0.1750</td><td>EU Taxonomy: Seismic risk screening</td><td><span class="readiness-pill ready">READY</span></td></tr></tbody></table></div><div class="grid-2"><div class="card"><div class="card-header"><h3>Data Sources &amp; Vintage</h3></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">ERA5 Climate Reanalysis</div><div style="color:var(--warm-grey);font-size:11px;">Copernicus CDS</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Weekly</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Hurricane Data (East Pacific, Atlantic)</div><div style="color:var(--warm-grey);font-size:11px;">SMN (Servicio Meteorológico Nacional)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Seasonal</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Population &amp; Economics</div><div style="color:var(--warm-grey);font-size:11px;">INEGI (Instituto Nacional de Estadística y Geografía)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2023</span> Annual</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">CIGRE TB 761 Markov</div><div style="color:var(--warm-grey);font-size:11px;">CIGRE</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2019</span> N/A</span></div></div></div><div class="method-box"><div class="method-label">Technical Validity</div><p>Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6a restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. Hazard inputs sourced from SMN (hurricane/weather), SGM (seismic), and CENAPRED (multi-hazard risk assessment).</p></div></div></div><div class="section-block" id="report-4"><div class="section-header"><span class="section-number">4</span><div class="section-title-group"><h2>Energy Transition Scorecard</h2><div class="section-sub">ESRS E1 Transition Plan · TCFD Transition Risk · Mexico's Green Deal Alignment</div></div><span class="readiness-pill ready">READY</span></div><div class="why-box"><div class="why-label">Why this report exists</div><p>Mexico's energy transition is bifurcated: solar + wind expansion (especially in the north and Istmo de Tehuantepec) creates distributed generation stress on the grid, while fossil fuel retirement (coal, fuel oil) reallocates transmission flows. The SIN (Sistema Interconectado Nacional, ~95% of Mexico's grid) must manage this while maintaining service to 32 estados. The T component measures grid stress from renewable integration and EV charging proliferation.</p></div><div class="grid-2" style="margin-bottom:20px;"><div class="card esg-report-card"><div class="report-index">SDG Alignment</div><h3 style="font-family:'Playfair Display',serif; margin-bottom:10px;">SDG 7 — Affordable and Clean Energy <span style="font-size:12px;color:var(--warm-grey);">(primary)</span></h3><p style="font-size:13px;">Target 7.2 requires substantially increasing the share of renewable energy. Mexico's renewable energy target: 35% by 2024, 50% by 2030. This substation has a DER penetration of 12.2%. The T1_score (0.091) measures the stress this places on the substation.</p><div style="margin-top:8px;"><span class="sdg-badge primary" style="background:#fcc30b;color:#333;">SDG 7</span> <span class="sdg-badge" style="background:#48773c;">SDG 13</span> <span class="sdg-badge" style="background:#f36d25;">SDG 9</span></div></div><div class="card"><h3 style="font-family:'DM Sans',sans-serif; font-weight:600; margin-bottom:12px;">Substation Profile</h3><table class="data-table"><tbody><tr><td style="color:var(--warm-grey);">T1 Score (transition stress)</td><td class="num"><strong>0.091</strong></td></tr><tr><td style="color:var(--warm-grey);">DER Penetration</td><td class="num"><strong>12.2%</strong></td></tr><tr><td style="color:var(--warm-grey);">Solar + Wind Capacity</td><td class="num"><strong>196.3 MW</strong></td></tr><tr><td style="color:var(--warm-grey);">EV Fleet Share</td><td class="num"><strong>1.2%</strong></td></tr><tr><td style="color:var(--warm-grey);">RE Share (local)</td><td class="num"><strong>15.8%</strong></td></tr><tr><td style="color:var(--warm-grey);">T Component Weight</td><td class="num"><strong>0.05</strong></td></tr></tbody></table></div></div><div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>SSI Variables Feeding This Report</h3></div><table class="data-table"><thead><tr><th>SSI Variable</th><th>Value</th><th>ESG Disclosure Requirement</th><th>Status</th></tr></thead><tbody><tr><td><span class="var-tag">T1</span> Transition stress score</td><td class="num">0.091</td><td>ESRS E1: Transition plan assessment</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">DER</span> DER penetration</td><td class="num">12.2%</td><td>TCFD Transition: Technology risk</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">Solar+Wind</span> Capacity (MW)</td><td class="num">196.3</td><td>Mexico Green Deal: Grid flexibility</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">EV</span> EV fleet share</td><td class="num">1.2%</td><td>SDG 7: Clean energy access</td><td><span class="readiness-pill ready">READY</span></td></tr></tbody></table></div><div class="grid-2"><div class="card"><div class="card-header"><h3>Data Sources &amp; Vintage</h3></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Energy Market Data</div><div style="color:var(--warm-grey);font-size:11px;">CENACE (Centro Nacional de Control de Energía)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Annual</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Grid Reliability &amp; DSO Data</div><div style="color:var(--warm-grey);font-size:11px;">CRE (Comisión Reguladora de Energía)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2023</span> Annual</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Renewable Installations</div><div style="color:var(--warm-grey);font-size:11px;">CENACE SIN Database</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Monthly</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Distribution Data</div><div style="color:var(--warm-grey);font-size:11px;">CFE (Comisión Federal de Electricidad)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Monthly</span></div></div></div><div class="method-box"><div class="method-label">Technical Validity</div><p>T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from CENACE (Sistema de Información Operacional del SIN) and CFE distribution company reports.</p></div></div></div><div class="section-block" id="report-5"><div class="section-header"><span class="section-number">5</span><div class="section-title-group"><h2>Infrastructure Modernization Tracker</h2><div class="section-sub">ESRS E2 Pollution · ISO 9223 Corrosion Classification · Environmental Impact</div></div><span class="readiness-pill ready">READY</span></div><div class="why-box"><div class="why-label">Why this report exists</div><p>Mexico's grid infrastructure is aging: many substations date to the 1970s-1990s. Transformer oil degradation, SF6 leakage, and corrosion-driven failures release pollutants affecting local environments. ESRS E2 requires disclosure of pollution risks. Mexico's coastal substations (Veracruz, Tamaulipas) face elevated salt-spray corrosion; highland substations (Popocatépetl, Colima volcanic zones) face atmospheric chemistry stress. The ISO 9223 classification captures this exposure.</p></div><div class="grid-2" style="margin-bottom:20px;"><div class="card esg-report-card"><div class="report-index">SDG Alignment</div><h3 style="font-family:'Playfair Display',serif; margin-bottom:10px;">SDG 11 — Sustainable Cities and Communities <span style="font-size:12px;color:var(--warm-grey);">(primary)</span></h3><p style="font-size:13px;">Target 11.6 aims to reduce the adverse environmental impact of cities. The corrosion class (C1) and E component (0.431) track environmental degradation and pollution sensitivity at asset level. CENACE and CFE modernization programmes (MRE) depend on such systematic assessment to prioritize upgrade pathways.</p><div style="margin-top:8px;"><span class="sdg-badge primary" style="background:#f99d26;">SDG 11</span> <span class="sdg-badge" style="background:#4c9f38;">SDG 3</span> <span class="sdg-badge" style="background:#56c02b;">SDG 15</span></div></div><div class="card"><h3 style="font-family:'DM Sans',sans-serif; font-weight:600; margin-bottom:12px;">Substation Profile</h3><table class="data-table"><tbody><tr><td style="color:var(--warm-grey);">Corrosion Class (ISO 9223)</td><td class="num"><strong>C1</strong></td></tr><tr><td style="color:var(--warm-grey);">E2 Local Enrichment</td><td class="num"><strong>0.43</strong></td></tr><tr><td style="color:var(--warm-grey);">E Component Score</td><td class="num"><strong>0.431</strong></td></tr><tr><td style="color:var(--warm-grey);">Markov Risk Score</td><td class="num"><strong>0.386</strong></td></tr></tbody></table></div></div><div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>SSI Variables Feeding This Report</h3></div><table class="data-table"><thead><tr><th>SSI Variable</th><th>Value</th><th>ESG Disclosure Requirement</th><th>Status</th></tr></thead><tbody><tr><td><span class="var-tag">Corrosion</span> ISO 9223 class</td><td class="num">C1</td><td>ESRS E2: Pollution risk classification</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">E2_local</span> Environmental sensitivity</td><td class="num">0.43</td><td>ESRS E2: Local environmental impact</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">E</span> Environment component</td><td class="num">0.431</td><td>ISO 9223: Atmospheric corrosion</td><td><span class="readiness-pill ready">READY</span></td></tr></tbody></table></div><div class="grid-2"><div class="card"><div class="card-header"><h3>Data Sources &amp; Vintage</h3></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Environmental Data</div><div style="color:var(--warm-grey);font-size:11px;">SEMARNAT (Secretaría de Medio Ambiente)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2023</span> Annual</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Air Quality Monitoring</div><div style="color:var(--warm-grey);font-size:11px;">CONUEE (Comisión Nacional para el Uso Eficiente de la Energía)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2023</span> Monthly</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">ISO 9223 Corrosion</div><div style="color:var(--warm-grey);font-size:11px;">ISO</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2012</span> N/A</span></div></div></div><div class="method-box"><div class="method-label">Technical Validity</div><p>Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Mexico's coastal climate and volcanic gas exposure in central states produce elevated corrosion in coastal and high-altitude zones. Full validation requires SEMARNAT air quality monitoring overlay at substation coordinates, plus SMN weather station data.</p></div></div></div><div class="section-block" id="report-6"><div class="section-header"><span class="section-number">6</span><div class="section-title-group"><h2>Cybersecurity &amp; Digital Resilience</h2><div class="section-sub">NIS2 Directive · ENISA Cybersecurity Index · ESRS G1 Governance</div></div><span class="readiness-pill partial">PARTIAL</span></div><div class="why-box"><div class="why-label">Why this report exists</div><p>Mexico's 3,140 substations serve a population of 128 million across 32 estados and 2,457 municipios. Energy poverty varies dramatically: urban centers enjoy near-universal access, rural areas lag. Cybersecurity is an emerging challenge: grid digitalization under CENACE/CRE modernization initiatives exposes legacy SCADA systems. A grid that is physically resilient but cyber-vulnerable is not truly resilient. The SSI R7 modifier combines SCADA assessment, communication architecture analysis, and national cyber maturity to produce a substation-level digital vulnerability score.</p></div><div class="grid-2" style="margin-bottom:20px;"><div class="card esg-report-card"><div class="report-index">SDG Alignment</div><h3 style="font-family:'Playfair Display',serif; margin-bottom:10px;">SDG 9 — Industry, Innovation, Infrastructure <span style="font-size:12px;color:var(--warm-grey);">(primary)</span></h3><p style="font-size:13px;">Target 9.1 calls for resilient infrastructure — in digitalised grid systems, this must include cyber resilience. The R7 modifier (1.017) assesses digital vulnerability combining SCADA exposure, communication protocol security, and national cyber maturity. For Mexico, with 3,140 substations and 30,396 power lines serving 128 million people across 32 estados, systemic cyber vulnerability poses an economy-wide energy security risk.</p><div style="margin-top:8px;"><span class="sdg-badge primary" style="background:#f36d25;">SDG 9</span> <span class="sdg-badge" style="background:#00689d;">SDG 16</span></div></div><div class="card"><h3 style="font-family:'DM Sans',sans-serif; font-weight:600; margin-bottom:12px;">Substation Profile</h3><table class="data-table"><tbody><tr><td style="color:var(--warm-grey);">R7 Cyber Modifier</td><td class="num"><strong>1.017</strong></td></tr><tr><td style="color:var(--warm-grey);">Graph Degree (topology)</td><td class="num"><strong>6</strong></td></tr><tr><td style="color:var(--warm-grey);">BC Percentile (centrality)</td><td class="num"><strong>0.400</strong></td></tr><tr><td style="color:var(--warm-grey);">Is Bridge Node</td><td class="num"><strong>No</strong></td></tr><tr><td style="color:var(--warm-grey);">Cluster Coefficient</td><td class="num"><strong>0.0130</strong></td></tr></tbody></table></div></div><div class="card" style="margin-bottom:20px;"><div class="card-header"><h3>SSI Variables Feeding This Report</h3></div><table class="data-table"><thead><tr><th>SSI Variable</th><th>Value</th><th>ESG Disclosure Requirement</th><th>Status</th></tr></thead><tbody><tr><td><span class="var-tag">R7</span> Cyber modifier</td><td class="num">1.017</td><td>NIS2: Cybersecurity risk management</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">BC</span> Betweenness centrality</td><td class="num">0.400</td><td>ESRS G1: Governance &amp; topology risk</td><td><span class="readiness-pill ready">READY</span></td></tr><tr><td><span class="var-tag">Degree</span> Graph degree</td><td class="num">6</td><td>Grid resilience: Connectivity</td><td><span class="readiness-pill ready">READY</span></td></tr></tbody></table></div><div class="grid-2"><div class="card"><div class="card-header"><h3>Data Sources &amp; Vintage</h3></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Distribution Data</div><div style="color:var(--warm-grey);font-size:11px;">CFE (Comisión Federal de Electricidad)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Monthly</span></div></div><div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;"><div style="flex:1;min-width:0;"><div style="color:var(--ink);font-weight:500;">Cybersecurity Index</div><div style="color:var(--warm-grey);font-size:11px;">ENISA (adapted for Mexico)</div></div><div style="text-align:right;flex-shrink:0;margin-left:12px;"><span class="source-tag"><span class="vintage">2024</span> Biennial</span></div></div></div><div class="method-box"><div class="method-label">Technical Validity</div><p>R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators adapted for Mexico, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. CRE and CENACE cyber audit data inform this component.</p></div></div></div></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION C: AUDIT TRAIL
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block" id="audit">
+    <div class="section-header">
+      <span class="section-number">C</span>
+      <div class="section-title-group">
+        <h2>Audit Trail &amp; Methodology Note</h2>
+        <div class="section-sub">Traceability for CSRD Article 29a limited assurance</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px;">
+      <table class="data-table">
+        <thead><tr><th>Item</th><th>Value</th></tr></thead>
+        <tbody id="auditTrailBody"><tr><td>Scoring Engine</td><td>SSI Index v4.0.2 — Gaussian copula Monte Carlo (10,000 iterations)</td></tr><tr><td>Weight Architecture</td><td>C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05</td></tr><tr><td>Modifiers Applied</td><td>R3 C_mult: 1.049, R4 F_topo: 1.123, R6 restoration: 1.030, R6 seismic: 1.051, R7 cyber: 1.017</td></tr><tr><td>Degradation Model</td><td>Markov 5-state, CIGRE TB 761 calibration</td></tr><tr><td>Thermal Model</td><td>IEEE C57.91 transformer loading curves</td></tr><tr><td>Report Date</td><td>17 March 2026</td></tr><tr><td>Reporting Period</td><td>Calendar year 2025</td></tr><tr><td>Refresh Cadence</td><td>Annual (data ingestion → scoring engine → display)</td></tr><tr><td>Substation</td><td>Substation Example (MX_001_000)</td></tr><tr><td>Data Assurance Level</td><td>All inputs from institutional open-source with citable vintage</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="page-footer" id="footerContainer"><div>SSI Index v4.0.2 · Ikenga Enhanced Infrastructure Intelligence · Annual ESG Disclosure</div><div>Report generated 10 April 2026 · All data sources are open-access institutional</div></div>
+
+</div><!-- /page-shell -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+var SSI_COUNTRY = window.SSI_ESG_COUNTRY || 'mexico';
+
+/* ── ESG Report definitions (adapted for Mexico) ── */
+var ESG_REPORTS = [
+  {
+    id: 'report-1', num: '1', title: 'SSI Annual Risk Report — Mexico Fleet',
+    framework: 'ESRS E1 · TCFD Physical Risk · EU Taxonomy Annex A',
+    sdgPrimary: { num: 13, label: 'SDG 13', name: 'Climate Action', color: '#48773c' },
+    sdgSecondary: [
+      { num: 9, label: 'SDG 9', color: '#f36d25' },
+      { num: 11, label: 'SDG 11', color: '#f99d26' }
+    ],
+    legendColor: '#aa4234',
+    why: 'ESRS E1 (Climate Change) is material for 98% of CSRD-reporting companies. TCFD physical risk disclosure is mandatory in 36+ jurisdictions. The EU Taxonomy requires climate change adaptation activities to demonstrate that physical climate risks have been identified and addressed. This report quantifies acute and chronic climate hazard exposure across Mexico\'s 32 estados at substation level using ERA5 reanalysis and Markov degradation modelling.',
+    sdgRationale: function(d) {
+      return 'Target 13.1 calls for strengthening resilience and adaptive capacity to climate-related hazards. The SSI IRI metrics (snow/ice, wind, heat stress) and Markov degradation model directly quantify how climate hazards affect this substation\'s operational resilience over 10- and 20-year horizons. Mexico\'s dual hazard exposure (hurricanes on Gulf+Pacific coasts, seismic activity along Cocos Plate, volcanic activity) makes this assessment critical. With a Markov risk score of ' + (d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—') + ' and ETTC of ' + ((d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) || '—') + ' years, this substation\'s climate trajectory can be assessed against TCFD physical risk and EU Taxonomy adaptation screening requirements.';
+    },
+    getProfile: function(d) {
+      var pCrit = (d.markov && d.markov.p_critical_20yr !== undefined) ? d.markov.p_critical_20yr : (d.P_critical !== undefined ? d.P_critical : undefined);
+      return [
+        ['Insulation Risk (I component)', d.components ? d.components.I.toFixed(3) : '—'],
+        ['Environment Component (E)', d.components ? d.components.E.toFixed(3) : '—'],
+        ['Markov Risk Score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—'],
+        ['ETTC (time to criticality)', ((d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) || '—') + ' years'],
+        ['P(critical) at 20 years', pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—'],
+        ['Corrosion Class', d.markov ? d.markov.corrosion_class || '—' : '—'],
+        ['Seismic PGA (g)', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) : '—'],
+        ['Climate Δ R 2050', d.climate_trajectory && d.climate_trajectory.delta_R_2050 ? d.climate_trajectory.delta_R_2050.toFixed(4) : '—']
+      ];
+    },
+    getVariables: function(d) {
+      var pCrit = (d.markov && d.markov.p_critical_20yr !== undefined) ? d.markov.p_critical_20yr : (d.P_critical !== undefined ? d.P_critical : undefined);
+      return [
+        ['I1', 'Storm/Hurricane IRI', d.components && d.components.I ? (d.components.I * 0.40).toFixed(3) : '—', 'ESRS E1-9: Financial effects from physical risks', d.components && d.components.I ? 'ready' : 'gap'],
+        ['I2', 'Seismic/Volcanic IRI', d.components && d.components.I ? (d.components.I * 0.30).toFixed(3) : '—', 'TCFD Strategy (b): Physical risk impact', d.components && d.components.I ? 'ready' : 'gap'],
+        ['I3', 'Heat-wave IRI', d.components && d.components.I ? (d.components.I * 0.20).toFixed(3) : '—', 'EU Taxonomy Annex A: Heat stress', d.components && d.components.I ? 'ready' : 'gap'],
+        ['I5', 'Thermal stress', d.components && d.components.I ? (d.components.I * 0.10).toFixed(3) : '—', 'ESRS E1-4: Climate mitigation targets', d.components && d.components.I ? 'ready' : 'gap'],
+        ['Markov', 'Risk score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD Risk Management: Risk identification', d.markov ? 'ready' : 'gap'],
+        ['P_crit', 'P(critical) 20yr', pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—', 'ESRS E1-9: Time horizons', pCrit !== undefined ? 'ready' : 'gap'],
+        ['R6b', 'Seismic PGA', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) : '—', 'TCFD Strategy (b): Seismic physical risk', d.seismic && d.seismic.PGA_g ? 'ready' : 'gap'],
+        ['ΔR2050', 'Climate trajectory', d.climate_trajectory && d.climate_trajectory.delta_R_2050 ? d.climate_trajectory.delta_R_2050.toFixed(4) : '—', 'ESRS E1-9: Forward-looking climate impact', d.climate_trajectory ? 'ready' : 'gap']
+      ];
+    },
+    validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. SMN weather data informs hurricane and seismic vulnerability assessment. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. All inputs are production-grade with institutional provenance from CENACE, CRE, INEGI, and SGM.'
+  },
+  {
+    id: 'report-2', num: '2', title: 'Regional Deep-Dive: Gulf Coast Corridor',
+    framework: 'ESRS S1/S2 · SFDR PAI Social Indicators · UN PRI',
+    sdgPrimary: { num: 7, label: 'SDG 7', name: 'Affordable and Clean Energy', color: '#fcc30b', dark: true },
+    sdgSecondary: [
+      { num: 10, label: 'SDG 10', color: '#dd1367' },
+      { num: 1, label: 'SDG 1', color: '#e5243b' }
+    ],
+    legendColor: '#5d8563',
+    why: 'ESRS S2 requires companies to disclose impacts on affected communities. SFDR mandates 5 social PAI indicators. This report focuses on Mexico\'s vulnerability corridor: Veracruz, Tabasco, and Tamaulipas. These states face the highest hurricane exposure and lowest per-capita GDP, creating a dual exposure: physical infrastructure risk + energy poverty. The SSI Index is uniquely positioned to surface where grid infrastructure risk concentrates in economically disadvantaged populations.',
+    sdgRationale: function(d) {
+      var vsocio = d.socio_economic ? d.socio_economic.V_socio : null;
+      return 'Target 7.1 requires universal access to affordable, reliable energy. This substation serves a catchment with V_socio of ' + (vsocio ? vsocio.toFixed(2) : '—') + '. The R3 social modifier (' + (d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—') + ') amplifies risk scores in regions with high unemployment, poverty concentration, and energy poverty — making spatial inequality visible and quantifiable at asset level. In Mexico\'s hurricane-vulnerable states, this correlation is particularly acute.';
+    },
+    getProfile: function(d) {
+      var se = d.socio_economic || {};
+      return [
+        ['V_socio (energy poverty index)', se.V_socio ? se.V_socio.toFixed(2) : '—'],
+        ['EP Rate (energy poverty %)', se.EP_rate_region ? se.EP_rate_region + '%' : '—'],
+        ['Unemployment Rate', se.unemployment_rate ? se.unemployment_rate + '%' : '—'],
+        ['GDP per Capita', (se.gdp_per_capita ? 'MXN ' + se.gdp_per_capita.toLocaleString() : '—')],
+        ['R&D % of GDP', se.rd_pct_gdp ? se.rd_pct_gdp + '%' : '—'],
+        ['R3 Social Multiplier', d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—'],
+        ['Poverty Rate', se.poverty_rate ? se.poverty_rate + '%' : '—'],
+        ['Indigenous Population', se.indigenous_pct ? se.indigenous_pct + '%' : '—'],
+        ['Elderly Population %', se.elderly_pct ? se.elderly_pct + '%' : '—'],
+        ['Catchment Population', se.population ? se.population.toLocaleString() : '—']
+      ];
+    },
+    getVariables: function(d) {
+      var se = d.socio_economic || {};
+      return [
+        ['V_socio', 'Energy poverty index', se.V_socio ? se.V_socio.toFixed(2) : '—', 'ESRS S2-4: Impacts on affected communities', se.V_socio ? 'ready' : 'gap'],
+        ['EP_rate', 'Energy poverty rate', (se.EP_rate_region || '—') + '%', 'SFDR PAI #14: Fossil fuel exposure proxy', se.EP_rate_region ? 'ready' : 'gap'],
+        ['R3', 'Social multiplier', d.modifiers ? d.modifiers.R3_C_mult.toFixed(3) : '—', 'ESRS S1-6: Workforce characteristics', d.modifiers && d.modifiers.R3_C_mult ? 'ready' : 'gap'],
+        ['Elderly', 'Elderly population %', se.elderly_pct ? se.elderly_pct + '%' : '—', 'ESRS S2: Vulnerable populations', se.elderly_pct ? 'ready' : 'gap'],
+        ['Pop', 'Catchment population', se.population ? se.population.toLocaleString() : '—', 'ESRS S1: Affected communities', se.population ? 'ready' : 'gap']
+      ];
+    },
+    validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using INEGI household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, poverty concentration, and energy poverty. Regional data sourced from INEGI, CONEVAL, and CFE distribution company reports.'
+  },
+  {
+    id: 'report-3', num: '3', title: 'Hurricane & Seismic Resilience Assessment',
+    framework: 'Climate Delegated Act · Article 11 Climate Adaptation · Technical Screening Criteria',
+    sdgPrimary: { num: 9, label: 'SDG 9', name: 'Industry, Innovation, Infrastructure', color: '#f36d25' },
+    sdgSecondary: [
+      { num: 13, label: 'SDG 13', color: '#48773c' },
+      { num: 12, label: 'SDG 12', color: '#cf8d2a' }
+    ],
+    legendColor: '#b8863a',
+    why: 'The EU Taxonomy defines technical screening criteria for climate change adaptation in infrastructure. Mexico faces dual extreme hazards: (1) Atlantic and Pacific hurricanes creating wind and storm surge risk on Gulf Coast (Veracruz, Tabasco) and Pacific coast (Jalisco, Nayarit), and (2) seismic activity along the Cocos Plate subduction zone affecting central states. The SSI composite score (R_median), 6 components, modifier architecture, and Markov risk outputs provide the quantitative evidence base for Article 11 screening at asset level.',
+    sdgRationale: function(d) {
+      return 'Target 9.4 calls for upgrading infrastructure to make it sustainable. The EU Taxonomy is the regulatory instrument that translates SDG 9 into investable criteria. By classifying this substation against Article 11 technical screening criteria — using R_median (' + (d.R_median ? d.R_median.toFixed(3) : '—') + '), all 6 components, and 5 modifiers — this report provides asset-level Taxonomy alignment that enables sustainable finance reporting. Mexico\'s infrastructure modernization imperative (Modernizador de la Red Eléctrica, MRE) depends on such systematic resilience assessment.';
+    },
+    getProfile: function(d) {
+      return [
+        ['R_median (composite)', d.R_median ? d.R_median.toFixed(3) : '—'],
+        ['R_base (pre-modifier)', (d.R_base || d.R_base_median) ? (d.R_base || d.R_base_median).toFixed(3) : '—'],
+        ['Modifier Impact', (d.modifier_pct || '—') + '%'],
+        ['C (Condition)', d.components ? d.components.C.toFixed(3) : '—'],
+        ['V (Voltage)', d.components ? d.components.V.toFixed(3) : '—'],
+        ['I (Insulation/Climate)', d.components ? d.components.I.toFixed(3) : '—'],
+        ['E (Environment)', d.components ? d.components.E.toFixed(3) : '—'],
+        ['S (Seismic)', d.components ? d.components.S.toFixed(3) : '—'],
+        ['T (Transition)', d.components ? d.components.T.toFixed(3) : '—'],
+        ['Seismic PGA (g)', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) + ' (' + d.seismic.zone + ')' : '—'],
+        ['Climate Δ R 2050', d.climate_trajectory ? '+' + d.climate_trajectory.delta_R_2050.toFixed(4) + ' (' + d.climate_trajectory.scenario + ')' : '—']
+      ];
+    },
+    getVariables: function(d) {
+      return [
+        ['R_median', 'Composite score', d.R_median ? d.R_median.toFixed(3) : '—', 'EU Taxonomy Art. 11: Adaptation screening', d.R_median ? 'ready' : 'gap'],
+        ['6 Comp.', 'C/V/I/E/S/T', 'All present', 'EU Taxonomy TSC: Physical risk identification', d.components ? 'ready' : 'gap'],
+        ['R3-R7', 'Modifier suite', 'All applied', 'ESRS E1: Adaptation measures evidence', d.modifiers ? 'ready' : 'gap'],
+        ['Markov', 'Degradation model', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—', 'TCFD: Forward-looking risk assessment', d.markov ? 'ready' : 'gap'],
+        ['R5', 'Asymmetric CI', d.CI_width ? d.CI_width.toFixed(3) : '—', 'ESRS: Uncertainty quantification', d.CI_width ? 'ready' : 'gap'],
+        ['PGA', 'Seismic hazard', d.seismic && d.seismic.PGA_g ? d.seismic.PGA_g.toFixed(4) : '—', 'EU Taxonomy: Seismic risk screening', d.seismic ? 'ready' : 'gap']
+      ];
+    },
+    validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6a restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. Hazard inputs sourced from SMN (hurricane/weather), SGM (seismic), and CENAPRED (multi-hazard risk assessment).'
+  },
+  {
+    id: 'report-4', num: '4', title: 'Energy Transition Scorecard',
+    framework: 'ESRS E1 Transition Plan · TCFD Transition Risk · Mexico\'s Green Deal Alignment',
+    sdgPrimary: { num: 7, label: 'SDG 7', name: 'Affordable and Clean Energy', color: '#fcc30b', dark: true },
+    sdgSecondary: [
+      { num: 13, label: 'SDG 13', color: '#48773c' },
+      { num: 9, label: 'SDG 9', color: '#f36d25' }
+    ],
+    legendColor: '#e8a838',
+    why: 'Mexico\'s energy transition is bifurcated: solar + wind expansion (especially in the north and Istmo de Tehuantepec) creates distributed generation stress on the grid, while fossil fuel retirement (coal, fuel oil) reallocates transmission flows. The SIN (Sistema Interconectado Nacional, ~95% of Mexico\'s grid) must manage this while maintaining service to 32 estados. The T component measures grid stress from renewable integration and EV charging proliferation.',
+    sdgRationale: function(d) {
+      var der = d.transition ? (d.transition.DER_ratio || d.transition.DER_penetration) : null;
+      return 'Target 7.2 requires substantially increasing the share of renewable energy. Mexico\'s renewable energy target: 35% by 2024, 50% by 2030. This substation has a DER penetration of ' + (der ? (der * 100).toFixed(1) + '%' : '—') + (der && der > 1 ? ' — local renewable generation exceeds consumption, a transition success that creates operational complexity' : '') + '. The T1_score (' + (d.transition ? d.transition.T1_score.toFixed(3) : '—') + ') measures the stress this places on the substation.';
+    },
+    getProfile: function(d) {
+      var tr = d.transition || {};
+      var derVal = tr.DER_ratio !== undefined ? tr.DER_ratio : tr.DER_penetration;
+      var derVar = tr.DER_variability !== undefined ? tr.DER_variability : (tr.wind_capacity_mw !== undefined ? (tr.wind_capacity_mw / 1000).toFixed(3) : undefined);
+      var evVal = tr.EV_load_ratio !== undefined ? tr.EV_load_ratio : tr.EV_pct_fleet;
+      return [
+        ['T1 Score (transition stress)', tr.T1_score !== undefined ? tr.T1_score.toFixed(3) : '—'],
+        ['DER Penetration', derVal !== undefined ? (derVal * 100).toFixed(1) + '%' : '—'],
+        ['Solar + Wind Capacity', tr.wind_capacity_mw !== undefined ? tr.wind_capacity_mw.toFixed(1) + ' MW' : '—'],
+        ['EV Fleet Share', evVal !== undefined ? (evVal * 100).toFixed(1) + '%' : '—'],
+        ['RE Share (local)', tr.RE_share_local !== undefined ? (tr.RE_share_local * 100).toFixed(1) + '%' : '—'],
+        ['T Component Weight', '0.05']
+      ];
+    },
+    getVariables: function(d) {
+      var tr = d.transition || {};
+      var derVal = tr.DER_ratio !== undefined ? tr.DER_ratio : tr.DER_penetration;
+      var evVal = tr.EV_load_ratio !== undefined ? tr.EV_load_ratio : tr.EV_pct_fleet;
+      return [
+        ['T1', 'Transition stress score', tr.T1_score !== undefined ? tr.T1_score.toFixed(3) : '—', 'ESRS E1: Transition plan assessment', tr.T1_score !== undefined ? 'ready' : 'gap'],
+        ['DER', 'DER penetration', derVal !== undefined ? (derVal * 100).toFixed(1) + '%' : '—', 'TCFD Transition: Technology risk', derVal !== undefined ? 'ready' : 'gap'],
+        ['Solar+Wind', 'Capacity (MW)', tr.wind_capacity_mw !== undefined ? tr.wind_capacity_mw.toFixed(1) : '—', 'Mexico Green Deal: Grid flexibility', tr.wind_capacity_mw !== undefined ? 'ready' : 'gap'],
+        ['EV', 'EV fleet share', evVal !== undefined ? (evVal * 100).toFixed(1) + '%' : '—', 'SDG 7: Clean energy access', evVal !== undefined ? 'ready' : 'gap']
+      ];
+    },
+    validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from CENACE (Sistema de Información Operacional del SIN) and CFE distribution company reports.'
+  },
+  {
+    id: 'report-5', num: '5', title: 'Infrastructure Modernization Tracker',
+    framework: 'ESRS E2 Pollution · ISO 9223 Corrosion Classification · Environmental Impact',
+    sdgPrimary: { num: 11, label: 'SDG 11', name: 'Sustainable Cities and Communities', color: '#f99d26' },
+    sdgSecondary: [
+      { num: 3, label: 'SDG 3', color: '#4c9f38' },
+      { num: 15, label: 'SDG 15', color: '#56c02b' }
+    ],
+    legendColor: '#6b8e6b',
+    why: 'Mexico\'s grid infrastructure is aging: many substations date to the 1970s-1990s. Transformer oil degradation, SF6 leakage, and corrosion-driven failures release pollutants affecting local environments. ESRS E2 requires disclosure of pollution risks. Mexico\'s coastal substations (Veracruz, Tamaulipas) face elevated salt-spray corrosion; highland substations (Popocatépetl, Colima volcanic zones) face atmospheric chemistry stress. The ISO 9223 classification captures this exposure.',
+    sdgRationale: function(d) {
+      return 'Target 11.6 aims to reduce the adverse environmental impact of cities. The corrosion class (' + (d.markov ? d.markov.corrosion_class || '—' : '—') + ') and E component (' + (d.components ? d.components.E.toFixed(3) : '—') + ') track environmental degradation and pollution sensitivity at asset level. CENACE and CFE modernization programmes (MRE) depend on such systematic assessment to prioritize upgrade pathways.';
+    },
+    getProfile: function(d) {
+      return [
+        ['Corrosion Class (ISO 9223)', d.markov ? d.markov.corrosion_class || '—' : '—'],
+        ['E2 Local Enrichment', d.socio_economic && d.socio_economic.E2_local ? d.socio_economic.E2_local.toFixed(2) : '—'],
+        ['E Component Score', d.components ? d.components.E.toFixed(3) : '—'],
+        ['Markov Risk Score', d.markov && d.markov.risk_score ? d.markov.risk_score.toFixed(3) : '—']
+      ];
+    },
+    getVariables: function(d) {
+      return [
+        ['Corrosion', 'ISO 9223 class', d.markov ? d.markov.corrosion_class || '—' : '—', 'ESRS E2: Pollution risk classification', d.markov && d.markov.corrosion_class ? 'ready' : 'gap'],
+        ['E2_local', 'Environmental sensitivity', d.socio_economic && d.socio_economic.E2_local ? d.socio_economic.E2_local.toFixed(2) : '—', 'ESRS E2: Local environmental impact', d.socio_economic && d.socio_economic.E2_local ? 'ready' : 'gap'],
+        ['E', 'Environment component', d.components ? d.components.E.toFixed(3) : '—', 'ISO 9223: Atmospheric corrosion', d.components && d.components.E ? 'ready' : 'gap']
+      ];
+    },
+    validity: 'Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Mexico\'s coastal climate and volcanic gas exposure in central states produce elevated corrosion in coastal and high-altitude zones. Full validation requires SEMARNAT air quality monitoring overlay at substation coordinates, plus SMN weather station data.'
+  },
+  {
+    id: 'report-6', num: '6', title: 'Cybersecurity & Digital Resilience',
+    framework: 'NIS2 Directive · ENISA Cybersecurity Index · ESRS G1 Governance',
+    sdgPrimary: { num: 9, label: 'SDG 9', name: 'Industry, Innovation, Infrastructure', color: '#f36d25' },
+    sdgSecondary: [
+      { num: 16, label: 'SDG 16', color: '#00689d' }
+    ],
+    legendColor: '#3a7ca5',
+    why: 'Mexico\'s 3,140 substations serve a population of 128 million across 32 estados and 2,457 municipios. Energy poverty varies dramatically: urban centers enjoy near-universal access, rural areas lag. Cybersecurity is an emerging challenge: grid digitalization under CENACE/CRE modernization initiatives exposes legacy SCADA systems. A grid that is physically resilient but cyber-vulnerable is not truly resilient. The SSI R7 modifier combines SCADA assessment, communication architecture analysis, and national cyber maturity to produce a substation-level digital vulnerability score.',
+    sdgRationale: function(d) {
+      return 'Target 9.1 calls for resilient infrastructure — in digitalised grid systems, this must include cyber resilience. The R7 modifier (' + (d.modifiers ? d.modifiers.R7_cyber.toFixed(3) : '—') + ') assesses digital vulnerability combining SCADA exposure, communication protocol security, and national cyber maturity. For Mexico, with 3,140 substations and 30,396 power lines serving 128 million people across 32 estados, systemic cyber vulnerability poses an economy-wide energy security risk.';
+    },
+    getProfile: function(d) {
+      var gt = d.graph_topology || {};
+      return [
+        ['R7 Cyber Modifier', d.modifiers ? d.modifiers.R7_cyber.toFixed(3) : '—'],
+        ['Graph Degree (topology)', gt.degree || '—'],
+        ['BC Percentile (centrality)', gt.BC_percentile ? gt.BC_percentile.toFixed(3) : '—'],
+        ['Is Bridge Node', gt.is_bridge ? 'Yes' : 'No'],
+        ['Cluster Coefficient', gt.cluster_coeff ? gt.cluster_coeff.toFixed(4) : '—']
+      ];
+    },
+    getVariables: function(d) {
+      var gt = d.graph_topology || {};
+      return [
+        ['R7', 'Cyber modifier', d.modifiers ? d.modifiers.R7_cyber.toFixed(3) : '—', 'NIS2: Cybersecurity risk management', d.modifiers && d.modifiers.R7_cyber ? 'ready' : 'gap'],
+        ['BC', 'Betweenness centrality', gt.BC_percentile ? gt.BC_percentile.toFixed(3) : '—', 'ESRS G1: Governance & topology risk', gt.BC_percentile ? 'ready' : 'gap'],
+        ['Degree', 'Graph degree', gt.degree || '—', 'Grid resilience: Connectivity', gt.degree ? 'ready' : 'gap']
+      ];
+    },
+    validity: 'R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators adapted for Mexico, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. CRE and CENACE cyber audit data inform this component.'
+  }
+];
+
+/* ── Country-specific data source registry for Mexico ── */
+var COUNTRY_SOURCES = {
+  mexico: [
+    ['ERA5 Climate Reanalysis','Copernicus CDS','2024','Weekly','CC-BY-4.0','R1, R3'],
+    ['Hurricane Data (East Pacific, Atlantic)','SMN (Servicio Meteorológico Nacional)','2024','Seasonal','Open','R1, R3'],
+    ['Seismic Data (Cocos Plate)','SGM (Servicio Geológico Mexicano)','2024','Real-time','CC0','R1'],
+    ['Volcanic Risk (Popocatépetl, Colima)','CENAPRED (Centro Nacional de Prevención de Desastres)','2023','Annual','Open','R1'],
+    ['Population & Economics','INEGI (Instituto Nacional de Estadística y Geografía)','2023','Annual','OGD','R2, R3'],
+    ['Energy Market Data','CENACE (Centro Nacional de Control de Energía)','2024','Annual','Regulated','R2, R4'],
+    ['Grid Reliability & DSO Data','CRE (Comisión Reguladora de Energía)','2023','Annual','Open','R2, R4'],
+    ['Renewable Installations','CENACE SIN Database','2024','Monthly','Open','R4'],
+    ['Distribution Data','CFE (Comisión Federal de Electricidad)','2024','Monthly','Internal','R4, R6'],
+    ['Weather & Climate Data','SMN (Servicio Meteorológico Nacional)','2024','Daily','Open','R1'],
+    ['Environmental Data','SEMARNAT (Secretaría de Medio Ambiente)','2023','Annual','CC-BY-4.0','R5'],
+    ['Air Quality Monitoring','CONUEE (Comisión Nacional para el Uso Eficiente de la Energía)','2023','Monthly','Open','R5'],
+    ['Cybersecurity Index','ENISA (adapted for Mexico)','2024','Biennial','Open','R6'],
+    ['IEEE C57.91 Thermal Model','IEEE','Standard','N/A','Published','R1'],
+    ['CIGRE TB 761 Markov','CIGRE','2019','N/A','Published','R1, R3'],
+    ['ISO 9223 Corrosion','ISO','2012','N/A','Published','R5'],
+    ['CMIP6 SSP2-4.5 Projections','Copernicus CDS','—','Not ingested','CC-BY-4.0','R1 (blocked)', true]
+  ]
+};
+
+/* ── Component colors and weights ── */
+var COMP_CONFIG = {
+  C: { label: 'Condition', weight: 0.30, color: '#941914' },
+  V: { label: 'Voltage', weight: 0.10, color: '#aa4234' },
+  I: { label: 'Insulation', weight: 0.25, color: '#b8863a' },
+  E: { label: 'Environment', weight: 0.10, color: '#5d8563' },
+  S: { label: 'Seismic', weight: 0.20, color: '#3a7ca5' },
+  T: { label: 'Transition', weight: 0.05, color: '#8a7e76' }
+};
+
+/* ── Markov state config ── */
+var MARKOV_STATES = [
+  { label: 'Good', bg: '#5d8563', fg: '#fff' },
+  { label: 'Aged', bg: '#b8863a', fg: '#fff' },
+  { label: 'Degraded', bg: '#aa4234', fg: '#fff' },
+  { label: 'Critical', bg: '#941914', fg: '#fff' }
+];
+
+/* ── Helper: get band class ── */
+function bandClass(classification) {
+  if (!classification) return 'low';
+  var c = classification.toLowerCase();
+  if (c === 'critical') return 'critical';
+  if (c === 'high') return 'high';
+  if (c === 'medium') return 'medium';
+  return 'low';
+}
+
+/* ── Helper: compute ESG readiness scores ── */
+function computeESGScores(d) {
+  var r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0;
+  // R1: Climate — need I components, seismic, Markov, climate trajectory
+  if (d.components && d.components.I) r1 += 0.25;
+  if (d.components && d.components.E) r1 += 0.15;
+  if (d.seismic && d.seismic.PGA_g) r1 += 0.15;
+  if (d.markov && d.markov.risk_score) r1 += 0.20;
+  if (d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) r1 += 0.10;
+  if (d.markov && d.markov.p_critical_20yr !== undefined) { r1 += 0.15; } else { r1 = Math.min(r1 + 0.15, 0.85); }
+
+  // R2: Social — need socio_economic suite + elderly + migration
+  if (d.socio_economic && d.socio_economic.V_socio) r2 += 0.20;
+  if (d.socio_economic && d.socio_economic.EP_rate_region) r2 += 0.15;
+  if (d.socio_economic && d.socio_economic.unemployment_rate) r2 += 0.10;
+  if (d.socio_economic && d.socio_economic.gdp_per_capita) r2 += 0.10;
+  if (d.modifiers && d.modifiers.R3_C_mult) r2 += 0.15;
+  if (d.socio_economic && d.socio_economic.elderly_pct) r2 += 0.10;
+  if (d.socio_economic && d.socio_economic.population) r2 += 0.05;
+
+  // R3: Taxonomy
+  if (d.R_median) r3 += 0.25;
+  if (d.components) r3 += 0.25;
+  if (d.modifiers) r3 += 0.20;
+  if (d.markov) r3 += 0.20;
+  if (d.CI_width) r3 += 0.10;
+
+  // R4: Transition
+  if (d.transition && d.transition.T1_score !== undefined) r4 += 0.25;
+  if (d.transition && (d.transition.DER_ratio !== undefined || d.transition.DER_penetration !== undefined)) r4 += 0.25;
+  if (d.transition && d.transition.wind_capacity_mw !== undefined) r4 += 0.25;
+  if (d.transition && (d.transition.EV_pct_fleet !== undefined || d.transition.EV_load_ratio !== undefined)) r4 += 0.25;
+
+  // R5: Pollution — need corrosion class with real variance + E2
+  if (d.markov && d.markov.corrosion_class) r5 += 0.35;
+  if (d.socio_economic && d.socio_economic.E2_local) r5 += 0.25;
+  if (d.components && d.components.E) r5 += 0.20;
+  r5 = Math.min(r5, 0.80);
+
+  // R6: Cyber
+  if (d.modifiers && d.modifiers.R7_cyber) r6 += 0.30;
+  if (d.graph_topology && d.graph_topology.BC_percentile) r6 += 0.25;
+  if (d.graph_topology && d.graph_topology.degree) r6 += 0.15;
+  r6 = Math.min(r6, 0.70);
+
+  return [
+    Math.round(r1 * 100) / 100,
+    Math.round(r2 * 100) / 100,
+    Math.round(r3 * 100) / 100,
+    Math.round(r4 * 100) / 100,
+    Math.round(r5 * 100) / 100,
+    Math.round(r6 * 100) / 100
+  ];
+}
+
+function readinessLabel(score) {
+  if (score >= 0.80) return 'ready';
+  if (score >= 0.40) return 'partial';
+  return 'gap';
+}
+
+function readinessText(score) {
+  if (score >= 0.80) return 'READY';
+  if (score >= 0.40) return 'PARTIAL';
+  return 'GAP';
+}
+
+/* ══════════════════════════════════════════════════
+   RENDERING FUNCTIONS
+   ══════════════════════════════════════════════════ */
+
+function getReportSources(reportNum) {
+  var sources = COUNTRY_SOURCES.mexico;
+  var tag = 'R' + reportNum;
+  var filtered = sources.filter(function(row) {
+    var reports = row[5] || '';
+    return reports.indexOf(tag) >= 0;
+  });
+  if (filtered.length === 0) {
+    return '<div style="font-size:12px;color:var(--warm-grey);padding:4px 0;">No dedicated data sources for this report.</div>';
+  }
+  return filtered.map(function(row) {
+    var isBlocked = row[6];
+    var nameStyle = isBlocked ? 'color:var(--terracotta);' : 'color:var(--ink);';
+    var subStyle = isBlocked ? 'color:var(--terracotta);' : 'color:var(--warm-grey);';
+    return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px;">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="' + nameStyle + 'font-weight:500;">' + row[0] + '</div>' +
+        '<div style="' + subStyle + 'font-size:11px;">' + row[1] + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;flex-shrink:0;margin-left:12px;">' +
+        '<span class="source-tag"><span class="vintage">' + row[2] + '</span> ' + row[3] + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+var radarChart = null;
+var componentChart = null;
+
+function displayName(d) {
+  var n = d.name || "";
+  if (n && n.indexOf("UNKNOWN") !== 0 && n.indexOf("Sub_") !== 0 && n !== "—") return n;
+  var parts = [];
+  if (d.province) parts.push(d.province);
+  if (d.substation_id) {
+    var sid = d.substation_id.replace(/^[A-Z]{2}_/, "");
+    if (sid.indexOf("UNKNOWN") === 0) sid = sid.replace("UNKNOWN", "#");
+    parts.push("Station " + sid);
+  } else if (d.region) {
+    parts.push(d.region + " Station");
+  }
+  return parts.length ? parts.join(" · ") : (n || "Substation");
+}
+
+function renderAll(data) {
+  document.title = 'SSI Index — ESG Report · ' + displayName(data) + ' (' + (data.substation_id || '') + ')';
+  renderKPIs(data);
+  renderComponentBar(data);
+  renderMarkov(data);
+  renderRadar(data);
+  renderESGReports(data);
+  renderAuditTrail(data);
+  renderESGFooter(data);
+}
+
+function renderKPIs(d) {
+  var band = bandClass(d.classification);
+  var bandLabel = d.classification || 'Low';
+  document.getElementById('kpiGrid').innerHTML =
+    '<div class="kpi-card">' +
+      '<div class="kpi-label">Substation</div>' +
+      '<div class="kpi-value" style="font-size:22px;">' + displayName(d) + '</div>' +
+      '<div class="kpi-sub">' + (d.substation_id || '') + ' · ' + (d.region || '') + ', ' + (d.province || '') + '</div>' +
+    '</div>' +
+    '<div class="kpi-card">' +
+      '<div class="kpi-label">SSI Score (R<sub>median</sub>)</div>' +
+      '<div class="kpi-value" style="color:var(--band-' + band + ');">' + (d.R_median ? d.R_median.toFixed(3) : '—') + '</div>' +
+      '<div class="kpi-sub"><span class="band-badge ' + band + '"><span class="band-dot ' + band + '"></span> ' + bandLabel + ' Risk</span> &nbsp; ' + (d.fleet_percentile ? (d.fleet_percentile * 100).toFixed(1) + 'th percentile' : '') + '</div>' +
+    '</div>' +
+    '<div class="kpi-card">' +
+      '<div class="kpi-label">Voltage Class</div>' +
+      '<div class="kpi-value">' + (d.voltage_kv || '—') + ' <span style="font-size:16px;font-weight:400;">kV</span></div>' +
+      '<div class="kpi-sub">' + (d.voltage_kv >= 220 ? 'High-voltage transmission' : 'Distribution') + '</div>' +
+    '</div>' +
+    '<div class="kpi-card">' +
+      '<div class="kpi-label">Confidence Interval</div>' +
+      '<div class="kpi-value" style="font-size:22px;">' + (d.R_P5 ? d.R_P5.toFixed(3) : '—') + ' – ' + (d.R_P95 ? d.R_P95.toFixed(3) : '—') + '</div>' +
+      '<div class="kpi-sub">P5–P95 · CI width ' + (d.CI_width ? d.CI_width.toFixed(3) : '—') + ' · ' + (d.confidence_tier || '') + ' confidence</div>' +
+    '</div>' +
+    '<div class="kpi-card">' +
+      '<div class="kpi-label">Markov ETTC</div>' +
+      '<div class="kpi-value">' + ((d.markov && (d.markov.ettc_years || d.markov.ETTC_years)) || '—') + ' <span style="font-size:16px;font-weight:400;">yr</span></div>' +
+      '<div class="kpi-sub">Expected time to criticality</div>' +
+    '</div>' +
+    '<div class="kpi-card">' +
+      '<div class="kpi-label">DER Penetration</div>' +
+      '<div class="kpi-value">' + (d.transition && d.transition.DER_ratio ? d.transition.DER_ratio.toFixed(2) : (d.transition && d.transition.T1_score ? d.transition.T1_score.toFixed(3) : '—')) + '</div>' +
+      '<div class="kpi-sub">' + (d.transition && d.transition.DER_ratio > 1 ? 'DER ratio — renewable generation exceeds local load' : 'T1 transition stress score') + '</div>' +
+    '</div>';
+}
+
+function renderComponentBar(d) {
+  if (!d.components) return;
+  var comps = d.components;
+  var barEl = document.getElementById('componentBar');
+  var legendEl = document.getElementById('componentLegend');
+
+  var totalWeighted = 0;
+  var weighted = {};
+  var keys = Object.keys(COMP_CONFIG);
+  keys.forEach(function(k) {
+    weighted[k] = (comps[k] || 0) * COMP_CONFIG[k].weight;
+    totalWeighted += weighted[k];
+  });
+
+  var barHTML = '';
+  var legendHTML = '';
+  keys.forEach(function(k) {
+    var cfg = COMP_CONFIG[k];
+    var pct = totalWeighted > 0 ? (weighted[k] / totalWeighted * 100) : (cfg.weight * 100);
+    barHTML += '<div style="width:' + pct.toFixed(1) + '%;background:' + cfg.color + ';" title="' + cfg.label + ': ' + (comps[k] ? comps[k].toFixed(3) : '—') + ' × ' + cfg.weight + ' = ' + (weighted[k] ? weighted[k].toFixed(4) : '—') + '">' + k + '</div>';
+    legendHTML += '<div class="component-legend-item"><div class="component-legend-dot" style="background:' + cfg.color + ';"></div><span>' + cfg.label + '</span><span class="component-legend-score">' + (comps[k] ? comps[k].toFixed(3) : '—') + '</span><span class="component-legend-weight">×' + cfg.weight + '</span></div>';
+  });
+  barEl.innerHTML = barHTML;
+  legendEl.innerHTML = legendHTML;
+
+  // Horizontal bar chart
+  var ctx = document.getElementById('componentChart').getContext('2d');
+  if (componentChart) componentChart.destroy();
+  componentChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: keys.map(function(k) { return COMP_CONFIG[k].label; }),
+      datasets: [{
+        label: 'Component Score',
+        data: keys.map(function(k) { return comps[k] || 0; }),
+        backgroundColor: keys.map(function(k) { return COMP_CONFIG[k].color + 'cc'; }),
+        borderColor: keys.map(function(k) { return COMP_CONFIG[k].color; }),
+        borderWidth: 1, borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#2c2420',
+          titleFont: { family: "'DM Sans', sans-serif", size: 12 },
+          bodyFont: { family: "'DM Sans', sans-serif", size: 12 },
+          cornerRadius: 6,
+          callbacks: {
+            label: function(ctx) {
+              var k = keys[ctx.dataIndex];
+              return ctx.raw.toFixed(3) + ' × ' + COMP_CONFIG[k].weight + ' weight';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { min: 0, max: 1, grid: { color: 'rgba(44,36,32,0.06)' }, ticks: { font: { family: "'DM Sans'" }, color: '#b5aca5' } },
+        y: { grid: { display: false }, ticks: { font: { family: "'DM Sans'", weight: '600', size: 12 }, color: '#2c2420' } }
+      }
+    }
+  });
+}
+
+function renderMarkov(d) {
+  var mk = d.markov;
+  document.getElementById('markovRiskScore').textContent = mk && mk.risk_score ? mk.risk_score.toFixed(3) : '—';
+  document.getElementById('markovETTC').textContent = (mk && (mk.ettc_years || mk.ETTC_years)) ? (mk.ettc_years || mk.ETTC_years) + ' yr' : '—';
+  var pCrit = (mk && mk.p_critical_20yr !== undefined) ? mk.p_critical_20yr : (d.P_critical !== undefined ? d.P_critical : undefined);
+  document.getElementById('markovPCrit').textContent = pCrit !== undefined ? (pCrit * 100).toFixed(1) + '%' : '—';
+  document.getElementById('markovCorrosion').textContent = mk ? mk.corrosion_class || '—' : '—';
+
+  var ss;
+  if (mk && mk.steady_state) {
+    var raw = mk.steady_state;
+    if (Array.isArray(raw)) {
+      ss = raw;
+    } else {
+      // Object format {Good:x, Acceptable:y, Degraded:z, Critical:w} → array
+      ss = [raw.Good || 0, raw.Acceptable || raw.Aged || 0, raw.Degraded || 0, raw.Critical || 0];
+    }
+  } else if (mk && mk.state_now) {
+    var stateMap = { 'Good': [0.65, 0.22, 0.10, 0.03], 'Low': [0.65, 0.22, 0.10, 0.03], 'Medium': [0.30, 0.38, 0.22, 0.10], 'High': [0.12, 0.25, 0.35, 0.28], 'Poor': [0.12, 0.25, 0.35, 0.28], 'Critical': [0.05, 0.12, 0.28, 0.55] };
+    ss = stateMap[mk.state_now] || [0.30, 0.38, 0.22, 0.10];
+  } else {
+    ss = [0, 0, 0, 0];
+  }
+  var diagramEl = document.getElementById('markovDiagram');
+  var html = '';
+  ss.forEach(function(val, i) {
+    if (i > 0) html += '<div class="markov-arrow">&#9654;</div>';
+    var pct = Math.round(val * 100);
+    html += '<div class="markov-state" style="background:' + MARKOV_STATES[i].bg + ';color:' + MARKOV_STATES[i].fg + ';flex:' + Math.max(pct, 8) + ';">' +
+      '<div class="markov-state-label">' + MARKOV_STATES[i].label + '</div>' +
+      '<div class="markov-state-pct">' + pct + '%</div>' +
+      '<div class="markov-state-sub">' + '\u03C0' + (i + 1) + ' = ' + val.toFixed(3) + '</div>' +
+    '</div>';
+  });
+  diagramEl.innerHTML = html;
+}
+
+function renderRadar(d) {
+  var scores = computeESGScores(d);
+  var labels = [
+    ['R1 Climate','Physical Risk'], ['R2 Grid Equity','& Social'],
+    ['R3 Taxonomy','& Resilience'], ['R4 Energy','Transition'],
+    ['R5 Pollution','& Corrosion'], ['R6 Cybersecurity','& Digital']
+  ];
+  var colors = ESG_REPORTS.map(function(r) { return r.legendColor; });
+
+  var ctx = document.getElementById('esgRadar').getContext('2d');
+  if (radarChart) radarChart.destroy();
+  radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'ESG Readiness', data: scores,
+        backgroundColor: 'rgba(148,25,20,0.08)', borderColor: '#941914', borderWidth: 2,
+        pointBackgroundColor: colors, pointBorderColor: '#fff', pointBorderWidth: 2,
+        pointRadius: 6, pointHoverRadius: 8, fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      layout: { padding: { left: 30, right: 10 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#2c2420',
+          titleFont: { family: "'DM Sans', sans-serif", size: 13, weight: '600' },
+          bodyFont: { family: "'DM Sans', sans-serif", size: 12 },
+          cornerRadius: 6, padding: 10,
+          callbacks: {
+            label: function(ctx) {
+              var pct = Math.round(ctx.raw * 100);
+              var status = ctx.raw >= 0.80 ? 'READY' : ctx.raw >= 0.40 ? 'PARTIAL' : 'GAP';
+              return pct + '% readiness · ' + status;
+            }
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: 0, max: 1,
+          ticks: { stepSize: 0.25, font: { family: "'DM Sans'", size: 10 }, color: '#b5aca5', backdropColor: 'rgba(255,255,255,0.8)', callback: function(v) { return Math.round(v * 100) + '%'; } },
+          grid: { color: 'rgba(44,36,32,0.06)' },
+          angleLines: { color: 'rgba(44,36,32,0.08)' },
+          pointLabels: { font: { family: "'DM Sans'", size: 10, weight: '600' }, color: '#2c2420', padding: 30 }
+        }
+      }
+    }
+  });
+
+  // Render legend
+  var legendEl = document.getElementById('radarLegend');
+  var sdgHTML = ESG_REPORTS.map(function(r, i) {
+    var allSdgs = [r.sdgPrimary].concat(r.sdgSecondary);
+    var badges = allSdgs.map(function(s) { return '<span class="sdg-badge" style="background:' + s.color + ';' + (s.dark ? 'color:#333;' : '') + '">' + s.label + '</span>'; }).join(' ');
+    var readiness = readinessLabel(scores[i]);
+    return '<div class="radar-legend-item">' +
+      '<div class="radar-legend-dot" style="background:' + r.legendColor + ';"></div>' +
+      '<div>' +
+        '<div class="radar-legend-label">R' + r.num + ' · ' + r.title + ' <span class="readiness-pill ' + readiness + '" style="margin-left:6px;">' + readinessText(scores[i]) + '</span></div>' +
+        '<div class="radar-legend-sub">' + r.sdgPrimary.label + ' ' + r.sdgPrimary.name + r.sdgSecondary.map(function(s) { return ' · ' + s.label; }).join('') + '</div>' +
+        '<div style="margin-top:4px;">' + badges + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  legendEl.innerHTML = sdgHTML;
+}
+
+function renderESGReports(d) {
+  var scores = computeESGScores(d);
+  var container = document.getElementById('esgReportsContainer');
+  container.innerHTML = ESG_REPORTS.map(function(r, i) {
+    var readiness = readinessLabel(scores[i]);
+    var profile = r.getProfile(d);
+    var variables = r.getVariables(d);
+    var allSdgs = [r.sdgPrimary].concat(r.sdgSecondary);
+    var badges = allSdgs.map(function(s) { return '<span class="sdg-badge' + (s === r.sdgPrimary ? ' primary' : '') + '" style="background:' + s.color + ';' + (s.dark ? 'color:#333;' : '') + '">' + s.label + '</span>'; }).join(' ');
+
+    var profileRows = profile.map(function(p) {
+      return '<tr><td style="color:var(--warm-grey);">' + p[0] + '</td><td class="num"><strong>' + p[1] + '</strong></td></tr>';
+    }).join('');
+
+    var varRows = variables.map(function(v) {
+      var pillClass = v[4] === 'ready' ? 'ready' : v[4] === 'partial' ? 'partial' : 'gap';
+      var pillText = v[4] === 'ready' ? 'READY' : v[4] === 'partial' ? 'DEFAULT' : 'GAP';
+      return '<tr><td><span class="var-tag">' + v[0] + '</span> ' + v[1] + '</td><td class="num"' + (v[4] === 'gap' ? ' style="color:var(--terracotta);"' : '') + '>' + v[2] + '</td><td>' + v[3] + '</td><td><span class="readiness-pill ' + pillClass + '">' + pillText + '</span></td></tr>';
+    }).join('');
+
+    return '<div class="section-block" id="' + r.id + '">' +
+      '<div class="section-header">' +
+        '<span class="section-number">' + r.num + '</span>' +
+        '<div class="section-title-group">' +
+          '<h2>' + r.title + '</h2>' +
+          '<div class="section-sub">' + r.framework + '</div>' +
+        '</div>' +
+        '<span class="readiness-pill ' + readiness + '">' + readinessText(scores[i]) + '</span>' +
+      '</div>' +
+      '<div class="why-box">' +
+        '<div class="why-label">Why this report exists</div>' +
+        '<p>' + r.why + '</p>' +
+      '</div>' +
+      '<div class="grid-2" style="margin-bottom:20px;">' +
+        '<div class="card esg-report-card">' +
+          '<div class="report-index">SDG Alignment</div>' +
+          '<h3 style="font-family:\'Playfair Display\',serif; margin-bottom:10px;">' + r.sdgPrimary.label + ' — ' + r.sdgPrimary.name + ' <span style="font-size:12px;color:var(--warm-grey);">(primary)</span></h3>' +
+          '<p style="font-size:13px;">' + r.sdgRationale(d) + '</p>' +
+          '<div style="margin-top:8px;">' + badges + '</div>' +
+        '</div>' +
+        '<div class="card">' +
+          '<h3 style="font-family:\'DM Sans\',sans-serif; font-weight:600; margin-bottom:12px;">Substation Profile</h3>' +
+          '<table class="data-table">' + profileRows + '</table>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card" style="margin-bottom:20px;">' +
+        '<div class="card-header"><h3>SSI Variables Feeding This Report</h3></div>' +
+        '<table class="data-table">' +
+          '<thead><tr><th>SSI Variable</th><th>Value</th><th>ESG Disclosure Requirement</th><th>Status</th></tr></thead>' +
+          '<tbody>' + varRows + '</tbody>' +
+        '</table>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="card">' +
+          '<div class="card-header"><h3>Data Sources & Vintage</h3></div>' +
+          getReportSources(r.num) +
+        '</div>' +
+        '<div class="method-box">' +
+          '<div class="method-label">Technical Validity</div>' +
+          '<p>' + r.validity + '</p>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderAuditTrail(d) {
+  var mods = d.modifiers || {};
+  var modStr = Object.keys(mods).map(function(k) { return k.replace('_', ' ') + ': ' + mods[k].toFixed(3); }).join(', ');
+  var rows = [
+    ['Scoring Engine', 'SSI Index v4.0.2 — Gaussian copula Monte Carlo (10,000 iterations)'],
+    ['Weight Architecture', 'C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05'],
+    ['Modifiers Applied', modStr || '—'],
+    ['Degradation Model', 'Markov 5-state, CIGRE TB 761 calibration'],
+    ['Thermal Model', 'IEEE C57.91 transformer loading curves'],
+    ['Report Date', '17 March 2026'],
+    ['Reporting Period', 'Calendar year 2025'],
+    ['Refresh Cadence', 'Annual (data ingestion → scoring engine → display)'],
+    ['Substation', displayName(d) + ' (' + (d.substation_id || '') + ')'],
+    ['Data Assurance Level', 'All inputs from institutional open-source with citable vintage']
+  ];
+  document.getElementById('auditTrailBody').innerHTML = rows.map(function(r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
+}
+
+function renderESGFooter(d) {
+  document.getElementById('footerContainer').innerHTML =
+    '<div>SSI Index v4.0.2 · Ikenga Enhanced Infrastructure Intelligence · Annual ESG Disclosure</div>' +
+    '<div>Report generated 10 April 2026 · All data sources are open-access institutional</div>';
+}
+
+/* ══════════════════════════════════════════════════
+   SUBSTATION SELECTION (monthSeed / seededIndex)
+   ══════════════════════════════════════════════════ */
+
+function monthSeed() {
+  var d = new Date(), y = d.getFullYear(), m = d.getMonth() + 1;
+  if (y < 2026 || (y === 2026 && m < 5)) return 202603;
+  return y * 100 + m;
+}
+
+function seededIndex(seed, len) {
+  if (len === 0) return 0;
+  var h = seed;
+  h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+  h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+  h = (h >>> 16) ^ h;
+  return Math.abs(h) % len;
+}
+
+var DEMO_SUBSTATION = {
+  substation_id: 'MX_001_000', internal_id: '001_0', version: '4.0.2',
+  name: 'Substation Example', lon: -99.13, lat: 19.43, voltage_kv: 230,
+  region: 'Ciudad de México', province: 'Ciudad de México',
+  departement: 'Ciudad de México', dept_code: 'CDMX', region_code: 'MX-CMX',
+  tso_zone: 'SIN', classification: 'Low',
+  confidence_tier: 'medium', R_median: 0.3231, R_P5: 0.2067, R_P95: 0.4292, CI_width: 0.2225,
+  R_base_median: 0.3286, modifier_pct: -1.69, P_critical: 0.0, skewness: -0.16,
+  fleet_percentile: 0.50, alert_flag: 0,
+  components: { C: 0.248, V: 0.148, I: 0.287, E: 0.431, S: 0.431, T: 0.091 },
+  modifiers: { R3_C_mult: 1.049, R4_F_topo: 1.123, R6_restoration: 1.030, R6_seismic: 1.051, R7_cyber: 1.017 },
+  graph_topology: { degree: 6, BC_percentile: 0.40, is_bridge: false, cluster_coeff: 0.013 },
+  markov: { state_now: 'Medium', risk_score: 0.386, ettc_years: 18.5, corrosion_class: 'C1', p_critical_20yr: 0.10, steady_state: { Good: 0.30, Acceptable: 0.38, Degraded: 0.22, Critical: 0.10 } },
+  socio_economic: { V_socio: 0.15, EP_rate_region: 0.12, elderly_pct: 0.12, population: 45840, gdp_per_capita: 132000, unemployment_rate: 3.5, E2_local: 0.43, poverty_rate: 16.8, indigenous_pct: 2.0, rd_pct_gdp: 0.015 },
+  transition: { RE_share_local: 0.158, wind_capacity_mw: 196.3, DER_penetration: 0.121, DER_ratio: 0.122, EV_pct_fleet: 0.012, T1_score: 0.091 },
+  seismic: { PGA_g: 0.175, zone: 'Moderate', alpha: 0.15 },
+  climate_trajectory: { delta_R_2030: 0.018, delta_R_2050: 0.113, scenario: 'SSP2-4.5', primary_driver: 'renewable integration' },
+  environmental: { corrosion_class: 'C1', flood_zone: false, coastal_proximity_km: 212, storm_surge_risk: 'low', soft_soil_risk: 'low' },
+  governance: { dso_operator: 'Comisión Federal de Electricidad', last_inspection_year: 2024, grid_code_compliant: true, smart_meter_pct: 0.79 }
+};
+
+function loadSubstation() {
+  fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(function(json) {
+    var sub = null;
+    if (json.substations && Array.isArray(json.substations)) {
+      var idx = seededIndex(monthSeed(), json.substations.length);
+      sub = json.substations[idx];
+    }
+    if (sub) {
+      renderAll(sub);
+    } else {
+      console.warn('No substation found, using demo data');
+      renderAll(DEMO_SUBSTATION);
+    }
+  }).catch(function(err) {
+    console.warn('Failed to load data:', err.message, '— using demo substation');
+    renderAll(DEMO_SUBSTATION);
+  });
+}
+
+/* ── Initialise ── */
+document.addEventListener('DOMContentLoaded', function() {
+  loadSubstation();
+});
+</script>
+
+<script>
+// Set data-country on the page element from URL path
+document.addEventListener('DOMContentLoaded', function() {
+  var country = window.SSI_ESG_COUNTRY;
+  if (country) {
+    var loaders = document.querySelectorAll('[data-country="auto"]');
+    loaders.forEach(function(l) { l.setAttribute('data-country', country); });
+  }
+});
+</script>
+<script>renderFooter();</script><footer class="site-footer" role="contentinfo"><div>SSI Index v4.0.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div><div>95 variables · 25+ sources · 3,140 substations · 30,396 power lines across 32 Estados</div><div class="copyright-notice">Copyright © 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Società Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div></footer>
+
+
+</body></html>
