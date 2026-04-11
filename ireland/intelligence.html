@@ -914,7 +914,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
       (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
       'The first material score changes are expected when CRU publishes the annual CRU-Quality indicators (affecting C1–C4 and R6a) ' +
-      'and when ESBN-Data refreshes the Registre National des Installations (affecting T1). ' +
+      'and when ESBN-Data refreshes the DER installation register (affecting T1). ' +
       'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
       'which have minimal impact on fleet-level score distribution.';
   });
@@ -959,7 +959,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <!-- D.1 KPI summary — auto-populated -->
 <h3>D.1 &ensp; Why the Dublin–Cork Corridor, Why Now</h3>
 
-<div class="kpi-grid" style="margin:16px 0" id="puglia-kpis">
+<div class="kpi-grid" style="margin:16px 0" id="leinster-kpis">
   <div class="kpi-card">
     <div class="kpi-label">Dublin–Cork Corridor Substations</div>
     <div class="kpi-value" style="color:var(--ink)" id="pug-total">—</div>
@@ -988,7 +988,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h3>D.2 &ensp; Corridor Map and Scoring</h3>
 
 <div style="position:relative;height:380px;background:var(--cream-deep);border-radius:var(--radius);overflow:hidden;margin:16px 0">
-  <canvas id="puglia-map" style="width:100%;height:100%"></canvas>
+  <canvas id="leinster-map" style="width:100%;height:100%"></canvas>
   <div style="position:absolute;bottom:8px;right:12px;display:flex;gap:10px;font-size:10px;color:var(--warm-grey)">
     <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-low);margin-right:3px"></span>Low</span>
     <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-medium);margin-right:3px"></span>Medium</span>
@@ -1011,7 +1011,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">T</th>
   <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Alert</th>
 </tr></thead>
-<tbody id="puglia-tbody">
+<tbody id="leinster-tbody">
   <tr><td colspan="11" style="text-align:center;color:var(--warm-grey);padding:24px">Loading…</td></tr>
 </tbody>
 </table>
@@ -1020,8 +1020,8 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h3>D.3 &ensp; Component Analysis</h3>
 
 <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
-  <div style="flex:1;min-width:280px" id="puglia-comp-bars"></div>
-  <div style="flex:1;min-width:280px" id="puglia-mod-bars"></div>
+  <div style="flex:1;min-width:280px" id="leinster-comp-bars"></div>
+  <div style="flex:1;min-width:280px" id="leinster-mod-bars"></div>
 </div>
 
 <p style="font-size:13px;line-height:1.7" id="pug-narrative-d3">Loading component analysis…</p>
@@ -1029,7 +1029,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <!-- D.4 County Breakdown — auto-populated -->
 <h3>D.4 &ensp; County Breakdown</h3>
 
-<div id="puglia-province-bars" style="margin:16px 0"></div>
+<div id="leinster-province-bars" style="margin:16px 0"></div>
 
 <p style="font-size:13px;line-height:1.7" id="pug-narrative-d4">Loading province breakdown…</p>
 
@@ -1042,23 +1042,23 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter Dublin–Cork corridor ──
-    var puglia = data.substations.filter(function(s){ return s.region === 'Leinster'; });
+    var leinster = data.substations.filter(function(s){ return s.region === 'Leinster'; });
     var fleet = data.substations;
-    puglia.sort(function(a,b){ return b.R_median - a.R_median; });
+    leinster.sort(function(a,b){ return b.R_median - a.R_median; });
 
     // ── D.1 KPIs ──
-    var nTotal = puglia.length;
-    var nHV = puglia.filter(function(s){ return s.voltage_kv >= 132; }).length;
+    var nTotal = leinster.length;
+    var nHV = leinster.filter(function(s){ return s.voltage_kv >= 132; }).length;
     var nMV = nTotal - nHV;
     document.getElementById('pug-total').textContent = nTotal;
     document.getElementById('pug-total-sub').textContent = nHV + ' EHV · ' + nMV + ' HV';
 
     var bands = { Low:0, Medium:0, High:0, Critical:0 };
-    puglia.forEach(function(s){ bands[s.classification]++; });
+    leinster.forEach(function(s){ bands[s.classification]++; });
     document.getElementById('pug-high').textContent = bands.High + (bands.Critical ? ' + ' + bands.Critical : '');
     document.getElementById('pug-high-sub').textContent = ((bands.High + bands.Critical) / nTotal * 100).toFixed(1) + '% of corridor';
 
-    var rVals = puglia.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
+    var rVals = leinster.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
     var medianR = rVals[Math.floor(rVals.length / 2)];
     var fleetRVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; });
     var fleetMedian = fleetRVals[Math.floor(fleetRVals.length / 2)];
@@ -1067,7 +1067,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // Worst province by mean R
     var provSums = {}, provCounts = {};
-    puglia.forEach(function(s){
+    leinster.forEach(function(s){
       if (!provSums[s.province]) { provSums[s.province] = 0; provCounts[s.province] = 0; }
       provSums[s.province] += s.R_median;
       provCounts[s.province]++;
@@ -1079,7 +1079,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('pug-worst-sub').textContent = 'Avg R: ' + worst.avg.toFixed(3) + ' · ' + worst.n + ' substations';
 
     // D.1 Narrative
-    var pctAboveFleetMedian = (puglia.filter(function(s){ return s.R_median > fleetMedian; }).length / nTotal * 100).toFixed(0);
+    var pctAboveFleetMedian = (leinster.filter(function(s){ return s.R_median > fleetMedian; }).length / nTotal * 100).toFixed(0);
     document.getElementById('pug-narrative-d1').innerHTML =
       'The Dublin–Cork corridor hosts <strong>' + nTotal + ' substations</strong> across six counties, making it one of the most energy-critical corridors in Europe. ' +
       'However, its risk profile is disproportionately concentrated in the upper bands: <strong>' + bands.High + ' substations (' +
@@ -1091,7 +1091,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'The SSI flags continuity-of-supply deficits, infrastructure age mismatches with modern demand patterns, and grid modernization lag under Ireland 2030 timelines.';
 
     // ── D.2 Map ──
-    var canvas = document.getElementById('puglia-map');
+    var canvas = document.getElementById('leinster-map');
     var dpr = window.devicePixelRatio || 1;
     canvas.width = canvas.offsetWidth * dpr;
     canvas.height = canvas.offsetHeight * dpr;
@@ -1100,8 +1100,8 @@ document.addEventListener("ssi-config-ready", function(e) {
     var W = canvas.offsetWidth, H = canvas.offsetHeight;
 
     // Compute bounds
-    var lons = puglia.map(function(s){ return s.lon; });
-    var lats = puglia.map(function(s){ return s.lat; });
+    var lons = leinster.map(function(s){ return s.lon; });
+    var lats = leinster.map(function(s){ return s.lat; });
     var minLon = Math.min.apply(null, lons) - 0.15, maxLon = Math.max.apply(null, lons) + 0.15;
     var minLat = Math.min.apply(null, lats) - 0.1, maxLat = Math.max.apply(null, lats) + 0.1;
     var lonSpan = maxLon - minLon, latSpan = maxLat - minLat;
@@ -1126,7 +1126,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     });
 
     // Draw corridor substations
-    puglia.forEach(function(s){
+    leinster.forEach(function(s){
       var p = proj(s.lon, s.lat);
       var r = s.classification === 'Critical' ? 6 : s.classification === 'High' ? 4.5 : 3.5;
       ctx.beginPath();
@@ -1145,7 +1145,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     ctx.fillStyle = 'rgba(44,36,32,0.5)';
     ctx.textAlign = 'center';
     provAvgs.forEach(function(pv){  // county iteration
-      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
+      var provSubs = leinster.filter(function(s){ return s.province === pv.name; });
       var avgLon = provSubs.reduce(function(a,s){ return a + s.lon; }, 0) / provSubs.length;
       var avgLat = provSubs.reduce(function(a,s){ return a + s.lat; }, 0) / provSubs.length;
       var p = proj(avgLon, avgLat);
@@ -1153,8 +1153,8 @@ document.addEventListener("ssi-config-ready", function(e) {
     });
 
     // ── D.2 Table — Top 10 ──
-    var top10 = puglia.slice(0, 10);
-    var tbody = document.getElementById('puglia-tbody');
+    var top10 = leinster.slice(0, 10);
+    var tbody = document.getElementById('leinster-tbody');
     var thStyle = 'padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;';
     var numStyle = thStyle + 'text-align:right;font-family:"Playfair Display",serif;font-weight:500;';
     tbody.innerHTML = top10.map(function(s){
@@ -1196,7 +1196,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     var compBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Component Averages — Dublin–Cork Corridor vs Fleet</div>';
     compDefs.forEach(function(c){
-      var pugAvg = avgComp(puglia, c.key);
+      var pugAvg = avgComp(leinster, c.key);
       var fltAvg = avgComp(fleet, c.key);
       var pugPct = Math.min(pugAvg / c.w * 100, 100).toFixed(0);
       var fltPct = Math.min(fltAvg / c.w * 100, 100).toFixed(0);
@@ -1211,7 +1211,7 @@ document.addEventListener("ssi-config-ready", function(e) {
           '<div style="position:absolute;width:' + pugPct + '%;height:100%;background:' + c.color + ';border-radius:3px;opacity:0.75"></div>' +
         '</div></div>';
     });
-    document.getElementById('puglia-comp-bars').innerHTML = compBarsHTML;
+    document.getElementById('leinster-comp-bars').innerHTML = compBarsHTML;
 
     // Modifier averages
     var modDefs = [
@@ -1223,7 +1223,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     ];
     var modBarsHTML = '<div class="label-xs" style="margin-bottom:10px">Modifier Averages — Dublin–Cork Corridor vs Fleet</div>';
     modDefs.forEach(function(m){
-      var pugAvg = avgMod(puglia, m.key);
+      var pugAvg = avgMod(leinster, m.key);
       var fltAvg = avgMod(fleet, m.key);
       var dir = pugAvg > 1.01 ? '↑' : pugAvg < 0.99 ? '↓' : '→';
       var col = pugAvg > fltAvg * 1.01 ? 'var(--crimson)' : pugAvg < fltAvg * 0.99 ? 'var(--sage)' : 'var(--warm-grey)';
@@ -1233,32 +1233,32 @@ document.addEventListener("ssi-config-ready", function(e) {
         '<span style="color:var(--warm-grey);min-width:55px">fleet ' + fltAvg.toFixed(3) + '</span>' +
         '<span style="font-size:11px;color:' + col + '">' + dir + '</span></div>';
     });
-    document.getElementById('puglia-mod-bars').innerHTML = modBarsHTML;
+    document.getElementById('leinster-mod-bars').innerHTML = modBarsHTML;
 
     // D.3 Narrative
     var compRanked = compDefs.slice().sort(function(a,b){
-      return (avgComp(puglia, b.key)/b.w) - (avgComp(puglia, a.key)/a.w);
+      return (avgComp(leinster, b.key)/b.w) - (avgComp(leinster, a.key)/a.w);
     });
     var c1 = compRanked[0], c2 = compRanked[1];
-    var c1pug = avgComp(puglia, c1.key), c1flt = avgComp(fleet, c1.key);
-    var c2pug = avgComp(puglia, c2.key), c2flt = avgComp(fleet, c2.key);
+    var c1pug = avgComp(leinster, c1.key), c1flt = avgComp(fleet, c1.key);
+    var c2pug = avgComp(leinster, c2.key), c2flt = avgComp(fleet, c2.key);
     document.getElementById('pug-narrative-d3').innerHTML =
       'The dominant risk driver across the Dublin–Cork corridor is <strong>' + c1.key + ' (' + c1.label + ')</strong>, averaging ' +
       c1pug.toFixed(3) + ' against a fleet average of ' + c1flt.toFixed(3) + ' — occupying ' +
       (c1pug / c1.w * 100).toFixed(0) + '% of its weight ceiling (w = ' + c1.w.toFixed(2) + '). ' +
       'The second contributor is <strong>' + c2.key + ' (' + c2.label + ')</strong> at ' +
       c2pug.toFixed(3) + ' vs fleet ' + c2flt.toFixed(3) + ' (' + (c2pug / c2.w * 100).toFixed(0) + '% of ceiling). ' +
-      'Among modifiers, the R3 consequence multiplier averages ' + avgMod(puglia, 'R3_C_mult').toFixed(3) +
+      'Among modifiers, the R3 consequence multiplier averages ' + avgMod(leinster, 'R3_C_mult').toFixed(3) +
       ' (fleet: ' + avgMod(fleet, 'R3_C_mult').toFixed(3) + '), reflecting the socio-economic fragility of ' +
       'The Dublin–Cork Corridor\'s service-oriented economy with significant wind energy integration and growing data centre demand. The R6b seismic modifier averages ' +
-      avgMod(puglia, 'R6_seismic').toFixed(3) + ', capturing the region\'s moderate but non-negligible seismic exposure — ' +
+      avgMod(leinster, 'R6_seismic').toFixed(3) + ', capturing the region\'s moderate but non-negligible seismic exposure — ' +
       'a dimension invisible to every competing framework.';
 
     // ── D.4 Province breakdown ──
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">Province Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){  // county iteration
-      var provSubs = puglia.filter(function(s){ return s.province === pv.name; });
+      var provSubs = leinster.filter(function(s){ return s.province === pv.name; });
       var provBands = { Low:0, Medium:0, High:0, Critical:0 };
       provSubs.forEach(function(s){ provBands[s.classification]++; });
       var barPct = ((1 - pv.avg) * 100).toFixed(1);
@@ -1272,7 +1272,7 @@ document.addEventListener("ssi-config-ready", function(e) {
           '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:4px;opacity:0.7"></div>' +
         '</div></div>';
     });
-    document.getElementById('puglia-province-bars').innerHTML = provHTML;
+    document.getElementById('leinster-province-bars').innerHTML = provHTML;
 
     // D.4 Narrative
     var bestProv = provAvgs[provAvgs.length - 1];
@@ -1285,7 +1285,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       'precisely the kind of spatial pattern that investment planning requires.';
 
     // D.5 Implications
-    var pugAbove065 = puglia.filter(function(s){ return s.R_median >= 0.65; }).length;
+    var pugAbove065 = leinster.filter(function(s){ return s.R_median >= 0.65; }).length;
     document.getElementById('pug-narrative-d5').innerHTML =
       '<strong>' + pugAbove065 + ' Dublin–Cork corridor substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. ' +
       'For PPE (Programmation Pluriannuelle de l\'Énergie) investment prioritisation, this analysis identifies the ' + worst.name + ' corridor as the highest-priority target — ' +
@@ -1426,18 +1426,18 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
-    var puglia = fleet.filter(function(s){ return s.region === 'Leinster'; });
+    var leinster = fleet.filter(function(s){ return s.region === 'Leinster'; });
 
     // ── Key Insight ──
-    // C component > 70% of weight ceiling (0.30) = high continuity deficit ≈ "bassa concentrazione"
-    var highC = puglia.filter(function(s){ return s.components.C > 0.21; }).length;
-    var avgC_pug = puglia.reduce(function(a,s){ return a + s.components.C; }, 0) / puglia.length;
+    // C component > 70% of weight ceiling (0.30) = high continuity deficit
+    var highC = leinster.filter(function(s){ return s.components.C > 0.21; }).length;
+    var avgC_pug = leinster.reduce(function(a,s){ return a + s.components.C; }, 0) / leinster.length;
     var avgC_fleet = fleet.reduce(function(a,s){ return a + s.components.C; }, 0) / fleet.length;
     var cRatio = (avgC_pug / avgC_fleet).toFixed(1);
 
     document.getElementById('eu-insight').innerHTML =
       '<strong>This month\'s key insight:</strong> The Dublin–Cork corridor deep-dive shows <strong>' + highC +
-      ' substations</strong> (of ' + puglia.length + ') with C-component above 70% of its weight ceiling — ' +
+      ' substations</strong> (of ' + leinster.length + ') with C-component above 70% of its weight ceiling — ' +
       'indicating continuity-of-supply performance consistent with Ireland\'s rural territory classification. ' +
       'The Dublin–Cork Corridor\'s average C of ' + avgC_pug.toFixed(3) + ' is <strong>' + cRatio + '× the fleet average</strong> of ' +
       avgC_fleet.toFixed(3) + '. In European terms, these substations individually perform closer to Hungarian or ' +
@@ -1611,7 +1611,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
       subtitle: 'Adapting the SSI model across different national grid characteristics',
       body: 'The SSI v4.0 architecture was designed to be transferable across European grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., CRU/ESBN-Data for Ireland, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Irish data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
-      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'CRU/ESBN-Data (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
+      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'CRU/ESBN-Data (IE), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
       ssiLink: 'transfer-protocol' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
       subtitle: 'From raw analytical outputs to four commercial product formats',
@@ -1839,16 +1839,16 @@ document.addEventListener("ssi-config-ready", function(e) {
   // ── Card 1: Next Edition deep-dive topics ──
   var deepDives = [
     { region: 'Leinster', theme: 'The Dublin–Cork Grid Corridor', context: 'SAIDI comparison', contextDetail: 'S/T comparison with UK and Denmark' },
-    { region: 'Île-de-Ireland', theme: 'The Île-de-Ireland Metropolitan Load', context: 'Urban saturation dynamics', contextDetail: 'DER + EV penetration stress on the Paris metropolitan grid' },
-    { region: 'Hauts-de-Ireland', theme: 'The Hauts-de-Ireland Industrial Belt', context: 'Industrial VoLL exposure', contextDetail: 'Post-industrial corridor where grid ageing meets reindustrialisation' },
-    { region: 'Grand Est', theme: 'The Grand Est Nuclear Corridor', context: 'Nuclear baseload dependency', contextDetail: 'Fessenheim closure impact and cross-border interconnection with Germany' },
-    { region: 'Nouvelle-Aquitaine', theme: 'The Nouvelle-Aquitaine Transition', context: 'Renewable integration stress', contextDetail: 'Solar + wind penetration rates vs grid absorption capacity' },
+    { region: 'Leinster', theme: 'The Greater Dublin Metropolitan Load', context: 'Urban saturation dynamics', contextDetail: 'DER + EV penetration stress on the Dublin metropolitan grid and data centre demand' },
+    { region: 'Leinster', theme: 'The East Coast Industrial Corridor', context: 'Industrial VoLL exposure', contextDetail: 'Pharma and tech manufacturing corridor where grid ageing meets rapid demand growth' },
+    { region: 'Connacht', theme: 'The Western Renewables Corridor', context: 'Wind integration stress', contextDetail: 'Atlantic wind resource exploitation and grid absorption capacity constraints' },
+    { region: 'Munster', theme: 'The Munster Energy Transition', context: 'Renewable integration stress', contextDetail: 'Wind + solar penetration rates vs grid absorption capacity in the south-west' },
     { region: 'Munster', theme: 'The Munster Wind Belt', context: 'DER saturation analysis', contextDetail: 'Ireland\'s highest wind density — grid absorption limits and curtailment risk' },
     { region: 'Connacht', theme: 'The Atlantic Seaboard Grid', context: 'CMIP6 climate hazard', contextDetail: 'Atlantic storm exposure trajectory and coastal corrosion risk' },
     { region: 'Ulster', theme: 'The Border Counties Grid', context: 'Cross-border grid topology', contextDetail: 'North–South interconnection dependency and cross-border flows' },
-    { region: 'Normandie', theme: 'The Normandie Energy Nexus', context: 'Nuclear + offshore wind', contextDetail: 'Grid readiness for Flamanville EPR and Channel offshore wind farms' },
+    { region: 'Munster', theme: 'The Celtic Sea Offshore Wind Nexus', context: 'Offshore wind integration', contextDetail: 'Grid readiness for Celtic Sea offshore wind farms and southern interconnection' },
     { region: 'Leinster', theme: 'The Greater Dublin Grid', context: 'Data centre density analysis', contextDetail: 'How concentrated data centre demand amplifies aggregate VoLL exposure' },
-    { region: 'Bourgogne-Franche-Comté', theme: 'The Bourgogne-Franche-Comté Heritage Grid', context: 'Infrastructure age profile', contextDetail: 'Markov degradation analysis on one of Ireland\'s oldest networks' },
+    { region: 'Ulster', theme: 'The North-West Heritage Grid', context: 'Infrastructure age profile', contextDetail: 'Markov degradation analysis on some of Ireland\'s oldest networks in the border counties' },
     { region: 'Munster', theme: 'The South-West Wind Hub', context: 'Wind concentration risk', contextDetail: 'Offshore wind farms — grid dependency and interconnection analysis' }
   ];
 
@@ -1902,7 +1902,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
       '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
       '<strong>' + qtrSources + '</strong> are due for refresh in ' + qLabels[nextQ] + '. ' +
-      'Impact: ESBN-Data (Registre National des Installations) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
+      'Impact: ESBN-Data (DER installation register) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
       'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong> (' +
       (annualHighImpact ? annualHighImpact.vars : '?') + ' variables → ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
   }
