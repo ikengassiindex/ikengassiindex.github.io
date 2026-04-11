@@ -242,7 +242,19 @@
           fs.band_pct = {};
           for (var b in fs.bands) { fs.band_pct[b] = (fs.bands[b] / t) * 100; }
         }
-        if (!fs.confidence_pct) fs.confidence_pct = {};
+        if (!fs.confidence_pct || !fs.confidence_pct.high) {
+          // Compute confidence tiers from substations
+          var hi = 0, med = 0, lo = 0;
+          ssi.substations.forEach(function(s) {
+            var ratio = s.R_median > 0 ? s.CI_width / s.R_median : 1;
+            if (ratio < 0.50) hi++;
+            else if (ratio <= 0.70) med++;
+            else lo++;
+          });
+          var tn = ssi.substations.length || 1;
+          fs.confidence_pct = { high: hi/tn*100, medium: med/tn*100, low: lo/tn*100 };
+          fs.confidence_tiers = { high: hi, medium: med, low: lo };
+        }
         if (!fs.confidence_tiers) fs.confidence_tiers = {};
         if (!fs.median_R) fs.median_R = fs.R_median || 0;
         if (!fs.mean_R) fs.mean_R = fs.R_median || fs.median_R || 0;
