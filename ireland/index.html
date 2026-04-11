@@ -267,9 +267,9 @@
       document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
       document.getElementById('kpi-critical-sub').textContent = (ssi.fleet_summary.band_pct||{}).Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
       document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
-      var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 225; }).length;
-      var hvCount = ssi.fleet_summary.total - ehvCount;
-      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' HV · ' + hvCount.toLocaleString() + ' MV · ' + ssi.regions.length + ' counties · 4 provinces';
+      var hvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 110; }).length;
+      var mvCount = ssi.fleet_summary.total - hvCount;
+      document.getElementById('kpi-total-sub').textContent = hvCount.toLocaleString() + ' HV · ' + mvCount.toLocaleString() + ' MV · ' + ssi.regions.length + ' counties · 4 provinces';
 
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;
