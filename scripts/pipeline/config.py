@@ -18,7 +18,7 @@ COUNTRIES = [
     "italy", "germany", "france", "spain", "uk",
     "us", "switzerland", "austria", "canada", "japan",
     "denmark", "norway", "finland", "poland", "sweden", "mexico",
-    "greece",
+    "greece", "turkey", "ireland",
 ]
 
 # Country metadata for ingestion routing
@@ -40,6 +40,8 @@ COUNTRY_META = {
     "sweden":      {"iso2": "SE", "iso3": "SWE", "nuts0": "SE",  "stats_agency": "SCB",    "seismic_source": "SNSN",       "fields": 61},
     "mexico":      {"iso2": "MX", "iso3": "MEX", "nuts0": None,   "stats_agency": "INEGI",  "seismic_source": "CENAPRED",   "fields": 95},
     "greece":      {"iso2": "GR", "iso3": "GRC", "nuts0": "EL",  "stats_agency": "ELSTAT", "seismic_source": "ITSAK/EAK",  "fields": 95},
+    "turkey":      {"iso2": "TR", "iso3": "TUR", "nuts0": None,   "stats_agency": "TÜİK",   "seismic_source": "AFAD",       "fields": 95},
+    "ireland":     {"iso2": "IE", "iso3": "IRL", "nuts0": "IE",  "stats_agency": "CSO",    "seismic_source": "DIAS/GSI",   "fields": 95},
 }
 
 # ── SSI v4.0.2 Scoring Parameters ─────────────────────────
