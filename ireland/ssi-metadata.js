@@ -270,7 +270,7 @@ window.SSIMetadata = (function () {
     { id: 'L5', section: '§8, §12', change: '95/95 variables operational (100%). 35 data sources total.', type: 'data' },
     { id: 'G1', section: '§12',    change: 'd02 ESBN upgraded to quarterly registry — County-level DER registry', type: 'data' },
     { id: 'G2', section: '§12',    change: 'd05 BRGM upgraded to live API — County-level geological data', type: 'data' },
-    { id: 'G3', section: '§12',    change: 'd06 OSM upgraded to Overpass API — 7,898 real substations', type: 'data' },
+    { id: 'G3', section: '§12',    change: 'd06 OSM upgraded to Overpass API — 994 real substations', type: 'data' },
     { id: 'G4', section: '§5',     change: 'R6b Network Topology modifier — centrality + ring analysis from OSM graph', type: 'new' },
     { id: 'G5', section: '§12',    change: 'Network & Topology layer (H): 7 variables — EirGrid TDP (Transmission Development Plan), ring analysis', type: 'new' },
     { id: 'G6', section: '§12',    change: 'Output Scores layer (I): 7 variables — risk_score, ETTC, stationary probs', type: 'new' },
