@@ -453,7 +453,7 @@ def process_country(country):
 
 if __name__ == '__main__':
     countries = ['germany', 'france', 'spain', 'uk', 'switzerland', 'japan',
-                 'canada', 'us', 'greece', 'turkey']
+                 'canada', 'us', 'greece', 'turkey','ireland']
     # Italy and Austria are already complete — skip
 
     print("═══ ESG Gap Enrichment ═══\n")
