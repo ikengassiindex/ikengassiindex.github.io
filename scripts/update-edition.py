@@ -15,7 +15,7 @@ from pathlib import Path
 CONFIG_PATH = Path('intelligence/edition-config.json')
 # denmark, norway, finland, poland, sweden, mexico: first automated refresh May 2026 (skip April)
 COUNTRIES = ['france','italy','uk','us','germany','spain','switzerland','austria','canada','japan','australia','chile',
-             'denmark','norway','finland','poland','sweden','mexico','greece','turkey','ireland','portugal']
+             'denmark','norway','finland','poland','sweden','mexico','greece','turkey','ireland','portugal','new-zealand']
 
 def main():
     if not CONFIG_PATH.exists():
