@@ -420,11 +420,12 @@ const ESG_REPORTS = [
         ['V_socio (energy poverty index)', se.V_socio?.toFixed(2) || '—'],
         ['EP Rate (energy poverty %)', (se.EP_rate_region || '—') + '%'],
         ['Unemployment Rate', (se.unemployment_rate || '—') + '%'],
-        ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
+        ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('NZ_')===0?'NZ$':id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
         ['R&D % of GDP', (se.rd_pct_gdp || '—') + '%'],
         ['R3 Social Multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—'],
         ['Elderly Vulnerability', d.socio_economic?.elderly_pct ? d.socio_economic.elderly_pct + '%' : '—'],
-        ['Catchment Population', d.socio_economic?.population ? d.socio_economic.population.toLocaleString() : '—']
+        ['Catchment Population', d.socio_economic?.population ? d.socio_economic.population.toLocaleString() : '—'],
+        ['Migration Score', d.socio_economic?.migration_score !== undefined ? d.socio_economic.migration_score.toFixed(2) : '—']
       ];
     },
     getVariables: function(d) {
@@ -776,6 +777,7 @@ function computeESGScores(d) {
   // elderly/migration: check if data exists
   if (d.socio_economic?.elderly_pct) r2 += 0.10;
   if (d.socio_economic?.population) r2 += 0.05;
+  if (d.socio_economic?.migration_score !== undefined) r2 += 0.10;
 
   // R3: Taxonomy — need R_median, 6 components, modifiers, Markov
   if (d.R_median) r3 += 0.25;
