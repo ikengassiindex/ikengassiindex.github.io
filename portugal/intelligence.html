@@ -1823,9 +1823,9 @@ document.addEventListener("ssi-config-ready", function(e) {
   var year = now.getFullYear();
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-  // Next month
-  var nextMonth = month + 1 > 11 ? 0 : month + 1;
-  var nextYear = month + 1 > 11 ? year + 1 : year;
+  // Next edition month (skip one month — bimonthly cadence)
+  var nextMonth = (month + 2) % 12;
+  var nextYear = (month + 2) > 11 ? year + 1 : year;
   var editionNum = (year - 2026) * 12 + (month + 1) - 2; // March 2026 = 1
   var nextEdition = String(Math.max(1, editionNum)).padStart(3, '0');
 
