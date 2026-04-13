@@ -424,7 +424,7 @@ const ESG_REPORTS = [
         ['R&D % of GDP', (se.rd_pct_gdp || '—') + '%'],
         ['R3 Social Multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—'],
         ['Elderly Vulnerability', d.socio_economic?.elderly_pct ? d.socio_economic.elderly_pct + '%' : '—'],
-        ['Migration Score', d.socio_economic?.migration_score !== undefined ? d.socio_economic.migration_score.toFixed(2) : '—']
+        ['Catchment Population', d.socio_economic?.population ? d.socio_economic.population.toLocaleString() : '—']
       ];
     },
     getVariables: function(d) {
@@ -557,8 +557,8 @@ const ESG_REPORTS = [
       const gt = d.graph_topology || {};
       return [
         ['R7 Cyber Modifier', d.modifiers?.R7_cyber?.toFixed(3) || '—'],
-        ['Graph Degree (topology)', gt.degree || '—'],
-        ['BC Percentile (centrality)', gt.BC_percentile?.toFixed(3) || '—'],
+        ['Graph Degree (topology)', gt.degree !== undefined ? gt.degree : '—'],
+        ['BC Percentile (centrality)', gt.BC_percentile !== undefined ? gt.BC_percentile.toFixed(3) : '—'],
         ['Is Bridge Node', gt.is_bridge ? 'Yes' : 'No'],
         ['Cluster Coefficient', gt.cluster_coeff?.toFixed(4) || '—']
       ];
@@ -567,8 +567,8 @@ const ESG_REPORTS = [
       const gt = d.graph_topology || {};
       return [
         ['R7', 'Cyber modifier', d.modifiers?.R7_cyber?.toFixed(3) || '—', 'NIS2: Cybersecurity risk management', d.modifiers?.R7_cyber ? 'ready' : 'gap'],
-        ['BC', 'Betweenness centrality', gt.BC_percentile?.toFixed(3) || '—', 'ESRS G1: Governance & topology risk', gt.BC_percentile ? 'ready' : 'gap'],
-        ['Degree', 'Graph degree', gt.degree || '—', 'Grid resilience: Connectivity', gt.degree ? 'ready' : 'gap']
+        ['BC', 'Betweenness centrality', gt.BC_percentile !== undefined ? gt.BC_percentile.toFixed(3) : '—', 'ESRS G1: Governance & topology risk', gt.BC_percentile !== undefined ? 'ready' : 'gap'],
+        ['Degree', 'Graph degree', gt.degree !== undefined ? gt.degree : '—', 'Grid resilience: Connectivity', gt.degree !== undefined ? 'ready' : 'gap']
       ];
     },
     validity: 'R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. Substation-level SCADA data is operator-proprietary — the national-level proxy provides a baseline but not asset-specific granularity.'
