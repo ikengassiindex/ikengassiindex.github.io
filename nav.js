@@ -6,13 +6,13 @@
 // Detect base path — are we in a country subfolder?
 var SSI_BASE = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey|ireland)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey|ireland|portugal)\//);
   return match ? '../' : '';
 })();
 
 var SSI_COUNTRY = (function() {
   var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey|ireland)\//);
+  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey|ireland|portugal)\//);
   return match ? match[1] : null;
 })();
 
@@ -38,7 +38,8 @@ var SSI_COUNTRY_LABELS = {
     mexico: '🇲🇽 Mexico',
     greece: '🇬🇷 Greece',
     turkey: '🇹🇷 Turkey',
-    ireland: '🇮🇪 Ireland'
+    ireland: '🇮🇪 Ireland',
+    portugal: '🇵🇹 Portugal'
   };
 
 // Ikenga logo
@@ -221,7 +222,8 @@ function renderFooter() {
     mexico: '95 variables · 25+ sources · 3,140 substations · 30,396 power lines across 32 Estados',
     greece: '95 variables · 30 sources · 581 substations (71 HV · 410 MV · 100 LV) across 13 Periphereies',
     turkey: '95 variables · 30 sources · 4,092 substations (1,132 HV · 2,960 MV) across 81 İller',
-    ireland: '95 variables · 30 sources · 994 substations (319 HV · 675 MV) · 4,505 power lines across 26 Counties · 4 Provinces'
+    ireland: '95 variables · 30 sources · 994 substations (319 HV · 675 MV) · 4,505 power lines across 26 Counties · 4 Provinces',
+    portugal: '95 variables · 28 sources · 10,191 substations (168 HV · 708 MV) · 11,043 power lines across 20 Distritos · 7 Regiões'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
