@@ -1,0 +1,86 @@
+{
+  "module": "d06_weather",
+  "country": "New Zealand",
+  "country_code": "NZ",
+  "description": "NIWA/MetService weather extraction — region-level climate statistics",
+  "data_sources": [
+    "NIWA (National Institute of Water and Atmospheric Research) climate records",
+    "MetService observations and reanalysis",
+    "MERRA-2 reanalysis (NASA)"
+  ],
+  "climate_profile": {
+    "classification": "Temperate oceanic (northern) to cool temperate (southern)",
+    "characteristics": [
+      "Northern subtropical influences (Northland 15-16°C mean)",
+      "Central temperate (Wellington/Waikato 13-14°C mean)",
+      "Southern cool/cold (Otago/Southland 10-12°C mean)",
+      "Extreme W-E precipitation variation (West Coast 5000-11000mm vs Canterbury 600mm)",
+      "Wellington wind capital (avg 22 km/h, gusts 25+ m/s)",
+      "Alpine snow significant (South Island mountains)",
+      "Cyclone exposed (northern regions)"
+    ]
+  },
+  "variables": [
+    "temperature_2m",
+    "wind_speed_10m",
+    "wind_direction_10m",
+    "precipitation",
+    "snowfall",
+    "ice_days",
+    "frost_days",
+    "relative_humidity"
+  ],
+  "temporal_coverage": {
+    "baseline_period": "2020-2025",
+    "years": 5,
+    "temporal_resolution": "daily"
+  },
+  "spatial_resolution": {
+    "level": "region",
+    "total_regions": 16,
+    "grid_spacing_km": 5.0
+  },
+  "validation_ranges": {
+    "temperature_2m_celsius": [-10, 35],
+    "wind_speed_10m_ms": [0, 35],
+    "precipitation_mm": [0, 500],
+    "snowfall_cm": [0, 150],
+    "relative_humidity_pct": [0, 100],
+    "ice_days_per_year": [0, 80]
+  },
+  "regional_parameters": {
+    "northern_regions": ["Northland", "Auckland"],
+    "southern_regions": ["Otago", "Southland"],
+    "coastal_regions": ["Northland", "Auckland", "Bay of Plenty", "Gisborne", "Hawke's Bay", "Taranaki", "Wellington", "Tasman", "Nelson", "Marlborough", "West Coast", "Canterbury"],
+    "alpine_regions": ["Tasman", "Marlborough", "West Coast", "Canterbury", "Otago"],
+    "west_coast_regions": ["West Coast"],
+    "north_island_regions": ["Northland", "Auckland", "Waikato", "Bay of Plenty", "Gisborne", "Hawke's Bay", "Taranaki", "Manawatu-Whanganui", "Wellington"],
+    "south_island_regions": ["Tasman", "Nelson", "Marlborough", "West Coast", "Canterbury", "Otago", "Southland"]
+  },
+  "hazard_indices": {
+    "I1": {
+      "name": "Snow/Ice hazard",
+      "components": ["snowfall", "ice_days", "frost_days"],
+      "weight": 0.2
+    },
+    "I2": {
+      "name": "Storm/Wind hazard",
+      "components": ["wind_speed_10m", "precipitation"],
+      "weight": 0.5,
+      "note": "Highest weight for NZ cyclone exposure"
+    },
+    "I3": {
+      "name": "Heat hazard",
+      "components": ["temperature_2m"],
+      "weight": 0.3,
+      "note": "Lower for temperate regions"
+    }
+  },
+  "reference_year": 2025,
+  "refresh_freq": "annual",
+  "quality_control": {
+    "missing_data_tolerance_pct": 5,
+    "outlier_detection": true,
+    "interpolation_method": "kriging"
+  }
+}

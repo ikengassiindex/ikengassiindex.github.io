@@ -1,0 +1,155 @@
+{
+  "module": "d05_osm",
+  "country": "New Zealand",
+  "country_code": "NZ",
+  "description": "OpenStreetMap power infrastructure extraction — substations and transmission lines",
+  "data_source": {
+    "api": "Overpass API",
+    "mirror": "https://overpass.kumi.systems/api/interpreter",
+    "reference_url": "https://wiki.openstreetmap.org/wiki/Power_infrastructure",
+    "usage_policy": "ODbL open access"
+  },
+  "spatial_bounds": {
+    "region": "New Zealand (excluding Chatham Islands)",
+    "exclude_chatham_islands": true,
+    "lat_min": -47.5,
+    "lat_max": -34.0,
+    "lon_min": 165.5,
+    "lon_max": 179.0,
+    "note": "Chatham Islands excluded (lon > 176.5 AND lat < -43.5)"
+  },
+  "regions": {
+    "Northland": {
+      "bounds": {"lat_min": -34.4, "lat_max": -35.8, "lon_min": 173.0, "lon_max": 174.8}
+    },
+    "Auckland": {
+      "bounds": {"lat_min": -36.4, "lat_max": -37.2, "lon_min": 174.3, "lon_max": 175.4}
+    },
+    "Waikato": {
+      "bounds": {"lat_min": -37.0, "lat_max": -38.6, "lon_min": 174.8, "lon_max": 176.6}
+    },
+    "Bay of Plenty": {
+      "bounds": {"lat_min": -37.4, "lat_max": -38.2, "lon_min": 175.8, "lon_max": 177.4}
+    },
+    "Gisborne": {
+      "bounds": {"lat_min": -37.8, "lat_max": -38.8, "lon_min": 177.0, "lon_max": 178.6}
+    },
+    "Hawke's Bay": {
+      "bounds": {"lat_min": -38.5, "lat_max": -40.0, "lon_min": 175.8, "lon_max": 177.6}
+    },
+    "Taranaki": {
+      "bounds": {"lat_min": -38.6, "lat_max": -39.6, "lon_min": 173.5, "lon_max": 174.8}
+    },
+    "Manawatu-Whanganui": {
+      "bounds": {"lat_min": -38.8, "lat_max": -40.4, "lon_min": 174.8, "lon_max": 176.6}
+    },
+    "Wellington": {
+      "bounds": {"lat_min": -40.6, "lat_max": -41.6, "lon_min": 174.4, "lon_max": 176.2}
+    },
+    "Tasman": {
+      "bounds": {"lat_min": -40.5, "lat_max": -42.0, "lon_min": 171.5, "lon_max": 173.5}
+    },
+    "Nelson": {
+      "bounds": {"lat_min": -41.2, "lat_max": -41.4, "lon_min": 173.2, "lon_max": 173.4}
+    },
+    "Marlborough": {
+      "bounds": {"lat_min": -41.0, "lat_max": -42.4, "lon_min": 173.0, "lon_max": 174.5}
+    },
+    "West Coast": {
+      "bounds": {"lat_min": -41.5, "lat_max": -44.5, "lon_min": 168.0, "lon_max": 172.0}
+    },
+    "Canterbury": {
+      "bounds": {"lat_min": -42.0, "lat_max": -44.6, "lon_min": 170.0, "lon_max": 173.5}
+    },
+    "Otago": {
+      "bounds": {"lat_min": -44.0, "lat_max": -46.6, "lon_min": 168.0, "lon_max": 171.5}
+    },
+    "Southland": {
+      "bounds": {"lat_min": -45.5, "lat_max": -47.0, "lon_min": 166.0, "lon_max": 169.5}
+    }
+  },
+  "region_population_weights": {
+    "Auckland": 0.35,
+    "Canterbury": 0.14,
+    "Wellington": 0.12,
+    "Waikato": 0.10,
+    "Bay of Plenty": 0.08,
+    "Hawke's Bay": 0.07,
+    "Manawatu-Whanganui": 0.06,
+    "Otago": 0.04,
+    "Tasman": 0.02,
+    "Gisborne": 0.015,
+    "Taranaki": 0.015,
+    "Southland": 0.01,
+    "Northland": 0.01,
+    "Marlborough": 0.008,
+    "West Coast": 0.005,
+    "Nelson": 0.003
+  },
+  "operators": [
+    "Transpower",
+    "Vector",
+    "Orion",
+    "Powerco",
+    "Wellington Electricity",
+    "OtagoNet",
+    "Horizon Energy",
+    "Top Energy",
+    "Unison",
+    "Counties Power"
+  ],
+  "osm_queries": [
+    {
+      "feature": "power=substation",
+      "description": "All mapped electrical substations",
+      "expected_count": 600
+    },
+    {
+      "feature": "power=sub_station",
+      "description": "Alternative tagging for substations",
+      "expected_count": 100
+    },
+    {
+      "feature": "power=line",
+      "description": "Overhead transmission lines",
+      "expected_count": "variable"
+    },
+    {
+      "feature": "power=cable",
+      "description": "Underground/submarine cables",
+      "expected_count": "variable"
+    }
+  ],
+  "voltage_filter": {
+    "transmission_kv": [400, 220, 110],
+    "distribution_kv": [66, 33, 11],
+    "hv_threshold_kv": 110,
+    "mv_threshold_kv": 11,
+    "include_unknowns": true,
+    "note": "HV (≥110kV), MV (11-109kV), LV (<11kV)"
+  },
+  "target_statistics": {
+    "total_substations": 11500,
+    "hv_substations": 170,
+    "mv_substations": 3500,
+    "lv_substations": 7830,
+    "transmission_lines_km": 15000,
+    "distribution_lines_km": 180000
+  },
+  "regions_list": [
+    "Northland", "Auckland", "Waikato", "Bay of Plenty", "Gisborne",
+    "Hawke's Bay", "Taranaki", "Manawatu-Whanganui", "Wellington",
+    "Tasman", "Nelson", "Marlborough", "West Coast", "Canterbury",
+    "Otago", "Southland"
+  ],
+  "validation": {
+    "coordinate_check": true,
+    "voltage_parsing": true,
+    "deduplication": true,
+    "name_enrichment": true
+  },
+  "output_format": "GeoJSON with properties",
+  "reference_year": 2025,
+  "refresh_freq": "quarterly",
+  "license": "ODbL 1.0"
+}
