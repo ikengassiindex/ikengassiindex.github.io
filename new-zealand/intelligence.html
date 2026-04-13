@@ -517,18 +517,18 @@ document.addEventListener("ssi-config-ready", function(e) {
     // Tier by R3 (consequence multiplier) and E component
     // New Zealand R3 range: 0.85–1.05; tiers calibrated to actual fleet distribution
     var tiers = [
-      { label: 'Metropolitan / High-Consequence', desc: 'Auckland metro, Wellington CBD — finance, tech, logistics, port infrastructure — highest GDP per capita and economic density per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.04; }, color: '#941914', icon: '🏛️',
-        voll: 'NZ$14–25/kWh' },
-      { label: 'Urban-Industrial', desc: 'Hamilton, Tauranga, Christchurch corridors — dairy/forestry supply chains, food processing, continuous-process industrial dependence',
+      { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, large manufacturing — highest economic loss per interruption',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.04; }, color: '#941914', icon: '🏭',
+        voll: 'NZ$15–30/kWh' },
+      { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, food processing — significant continuity requirements',
         filter: function(s){ return s.modifiers.R3_C_mult >= 1.02 && s.modifiers.R3_C_mult < 1.04; }, color: '#aa4234', icon: '🔧',
-        voll: 'NZ$7–14/kWh' },
-      { label: 'Semi-Urban / SME-Dense', desc: 'Tourism, retail, wine/viticulture, horticulture — moderate individual VoLL but high aggregate SME exposure across ~99.9% small-business economy',
+        voll: 'NZ$8–15/kWh' },
+      { label: 'Commercial / SME-Dense', desc: 'Service economy, retail, tourism — moderate individual impact but high aggregate exposure',
         filter: function(s){ return s.modifiers.R3_C_mult >= 0.96 && s.modifiers.R3_C_mult < 1.02; }, color: '#b8863a', icon: '🏪',
-        voll: 'NZ$3–7/kWh' },
-      { label: 'Rural / Agricultural', desc: 'Interior regions — sparse economic activity, pastoral farming, forestry — lower VoLL but higher social vulnerability and energy poverty',
+        voll: 'NZ$3–8/kWh' },
+      { label: 'Light / Agricultural / Rural', desc: 'Sparse economic activity, agricultural land — lower VoLL but higher social vulnerability',
         filter: function(s){ return s.modifiers.R3_C_mult < 0.96; }, color: '#5d8563', icon: '🌾',
-        voll: 'NZ$0.7–3/kWh' }
+        voll: 'NZ$1–3/kWh' }
     ];
 
     var tiersHTML = '';
