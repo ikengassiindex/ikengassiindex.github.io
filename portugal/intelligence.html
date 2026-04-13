@@ -56,7 +56,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   <div class="kpi-card">
     <div class="kpi-label">Substations Scored</div>
     <div class="kpi-value" style="color:var(--ink)">10,191</div>
-    <div class="kpi-sub">168 EHV · 708 HV · 9,315 MV/LV</div>
+    <div class="kpi-sub">168 HV · 708 MV · 9,315 MV/LV</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Grid Lines Mapped</div>
@@ -917,7 +917,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       ' (mean ' + mean.toFixed(3) + ') reflects a distribution skewed toward the lower bands, with ' +
       (bands.Low / n * 100).toFixed(1) + '% in Low and ' + (bands.Medium / n * 100).toFixed(1) + '% in Medium. ' +
       'The first material score changes are expected when ERSE publishes the annual TIQE indicators (affecting C1–C4 and R6a) ' +
-      'and when DGEG refreshes the Registre National des Installations (affecting T1). ' +
+      'and when DGEG refreshes the Registo de Instalações de Produção (affecting T1). ' +
       'High-frequency sources (OSM, Open-Meteo) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), ' +
       'which have minimal impact on fleet-level score distribution.';
   });
@@ -1051,10 +1051,10 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // ── D.1 KPIs ──
     var nTotal = puglia.length;
-    var nHV = puglia.filter(function(s){ return s.voltage_kv >= 132; }).length;
+    var nHV = puglia.filter(function(s){ return s.voltage_kv >= 150; }).length;
     var nMV = nTotal - nHV;
     document.getElementById('pug-total').textContent = nTotal;
-    document.getElementById('pug-total-sub').textContent = nHV + ' EHV · ' + nMV + ' HV';
+    document.getElementById('pug-total-sub').textContent = nHV + ' HV · ' + nMV + ' MV';
 
     var bands = { Low:0, Medium:0, High:0, Critical:0 };
     puglia.forEach(function(s){ bands[s.classification]++; });
@@ -1614,7 +1614,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     { layer: 4, ref: '§0.6.4', title: 'SSI Transfer & Calibration Protocol',
       subtitle: 'Adapting the SSI model across different national grid characteristics',
       body: 'The SSI v4.0 architecture was designed to be transferable across European grid infrastructures. Deploying it in each country requires adapting three elements: the data sources (map to country-equivalent sources — e.g., ERSE/DGEG for Portugal, BNetzA/MaStR for Germany, ARERA/Terna for Italy), the calibration parameters (voltage thresholds, outage duration benchmarks, economic indicators that are country-specific), and the regulatory context (grid codes, market mechanisms, connection rules). The transfer protocol follows a structured 5-step process: (1) source mapping — identify country-equivalent for each of the 35 Portuguese data sources; (2) gap analysis — flag sources with no equivalent; (3) recalibration — adjust normalisation bounds to country-specific distributions; (4) cross-validation — compare NN predictions against any available ground-truth data; (5) coverage scorecard — assess whether the country meets production-readiness criteria.',
-      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'ERSE/DGEG (FR), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
+      concepts: ['5-step protocol: source mapping → gap → recalibration → validation → scorecard', 'ERSE/DGEG (PT), BNetzA (DE), ARERA (IT), Ofgem (UK) etc.', 'Normalisation bounds adjusted per country distribution', 'Production-readiness requires passing Coverage Quality Scorecard'],
       ssiLink: 'transfer-protocol' },
     { layer: 5, ref: '§0.7.1', title: 'Platform — Product Delivery Pipeline',
       subtitle: 'From raw analytical outputs to four commercial product formats',
@@ -1900,7 +1900,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
       '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
       '<strong>' + qtrSources + '</strong> are due for refresh in ' + qLabels[nextQ] + '. ' +
-      'Impact: DGEG (Registre National des Installations) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
+      'Impact: DGEG (Registo de Instalações de Produção) data refresh schedule (T1), business fabric indicators (E2), macro-economic data. ' +
       'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong> (' +
       (annualHighImpact ? annualHighImpact.vars : '?') + ' variables → ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
   }

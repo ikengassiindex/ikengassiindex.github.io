@@ -832,8 +832,8 @@ function readinessText(score) {
 
 /* ── Helper: get data sources filtered for a specific report ── */
 function getReportSources(reportNum) {
-  const country = SSI_COUNTRY || 'italy';
-  const sources = COUNTRY_SOURCES[country] || COUNTRY_SOURCES.italy;
+  const country = SSI_COUNTRY || 'portugal';
+  const sources = COUNTRY_SOURCES[country] || COUNTRY_SOURCES.portugal;
   const tag = 'R' + reportNum;
   const filtered = sources.filter(row => {
     const reports = row[5] || '';
@@ -1211,23 +1211,23 @@ function seededIndex(seed, len) {
 }
 
 const DEMO_SUBSTATION = {
-  substation_id: 'IT_001_000', internal_id: '001_0', version: '4.0.2',
-  name: 'Substation Example', lon: 12.5, lat: 41.9, voltage_kv: 200,
-  region: 'Lazio', province: 'Roma', kreis: 'Roma',
-  classification: 'Low',
-  band_pct: { Low: 100, Medium: 0, High: 0, Critical: 0 },
-  confidence_pct: 'medium', R_median: 0.3231, R_mean: 0.3213,
-  R_P5: 0.2067, R_P95: 0.4292, CI_width: 0.2225,
-  R_base: 0.3286, R_base_median: 0.3286, R_deterministic: 0.3266,
-  modifier_impact: -0.0056, modifier_pct: -1.69,
-  components: { C: 0.5183, V: 0.1535, I: 0.3232, E: 0.2924, S: 0.2474, T: 0.1434 },
-  modifiers: { R3_C_mult: 0.9521, R4_F_topo: 0.9908, R6_restoration: 1.0564, R6_seismic: 1.0, R7_cyber: 0.9973 },
-  fleet_percentile: 0.5968, alert_flag: 0, P_critical: 0, skewness: -0.1636, confidence_tier: 'medium',
-  graph_topology: { degree: 7, BC_percentile: 0.3504, is_bridge: 0, cluster_coeff: 0.0081 },
-  markov: { risk_score: 0.1749, ettc_years: 16.0, p_critical_20yr: 0.0, corrosion_class: 'C3', steady_state: [0.54, 0.251, 0.106, 0.032] },
-  socio_economic: { unemployment_rate: 3.8, gdp_per_capita: 39500, rd_pct_gdp: 5.3, EP_rate_region: 3.5, V_socio: 0.35, E2_local: 1.01 },
-  transition: { T1_score: 0.143, DER_ratio: 1.154, DER_variability: 0.8, EV_load_ratio: 0.1232 },
-  seismic: { zone: '2', pga_g: 0.16, R6_seismic: 1.0 }
+  substation_id: 'PT_001_000', internal_id: '001_0', version: '4.0.2',
+  name: 'Subestação Exemplo', lon: -9.14, lat: 38.74, voltage_kv: 150,
+  region: 'Área Metropolitana de Lisboa', province: 'Lisboa', departement: 'Lisboa',
+  classification: 'Medium',
+  band_pct: { Low: 4.8, Medium: 64.8, High: 21.3, Critical: 9.1 },
+  confidence_pct: 'medium', R_median: 0.3811, R_mean: 0.4397,
+  R_P5: 0.2505, R_P95: 0.8002, CI_width: 0.5497,
+  R_base: 0.3900, R_base_median: 0.3900, R_deterministic: 0.3850,
+  modifier_impact: -0.0089, modifier_pct: -2.28,
+  components: { C: 0.4800, V: 0.1400, I: 0.3500, E: 0.2200, S: 0.2600, T: 0.1500 },
+  modifiers: { R3_C_mult: 1.0974, R4_F_topo: 0.9900, R6_restoration: 1.0200, R6_seismic: 1.25, R7_cyber: 0.9980 },
+  fleet_percentile: 0.5000, alert_flag: 0, P_critical: 0, skewness: -0.12, confidence_tier: 'medium',
+  graph_topology: { degree: 3, BC_percentile: 0.2500, is_bridge: 0, cluster_coeff: 0.0120 },
+  markov: { risk_score: 0.1800, ettc_years: 15.0, p_critical_20yr: 0.0, corrosion_class: 'C3', steady_state: [0.52, 0.26, 0.11, 0.04] },
+  socio_economic: { unemployment_rate: 6.5, gdp_per_capita: 32500, population: 85000, rd_pct_gdp: 1.6, EP_rate_region: 12.0, V_socio: 0.42, E2_local: 0.95, elderly_pct: 22.5 },
+  transition: { T1_score: 0.150, DER_ratio: 1.200, DER_variability: 0.75, EV_load_ratio: 0.0900 },
+  seismic: { zone: '1.3', pga_g: 0.15, R6_seismic: 1.25 }
 };
 
 async function loadSubstation(country) {
@@ -1257,7 +1257,7 @@ async function loadSubstation(country) {
 
 /* ── Initialise ── */
 document.addEventListener('DOMContentLoaded', function() {
-  loadSubstation(SSI_COUNTRY || 'italy');
+  loadSubstation(SSI_COUNTRY || 'portugal');
 });
 </script>
 
