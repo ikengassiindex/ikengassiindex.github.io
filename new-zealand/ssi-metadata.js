@@ -201,10 +201,10 @@ window.SSIMetadata = (function () {
 
   // ─── Normalisation Methods ────────────────────────────────
   const NORM_METHODS = [
-    { code: 'A', name: 'Fleet Percentile', desc: 'P5 → 0.00, P95 → 1.00 (linear interp)', applies_to: 'C1, C2, C4, E1, I7–I9' },
-    { code: 'B', name: 'Bounded Log-Linear', desc: 'Ratio-based with bounds [0,1], applies sigmoid if needed', applies_to: 'I1–I6, E2, S1, R6a, all R2–R7 inputs' },
-    { code: 'C', name: 'Percentage Scale', desc: 'Already [0,1] or [0,100%], clip to [0,1]', applies_to: 'C3, I1–I3, S2 continuous' },
-    { code: 'D', name: 'Categorical Integer', desc: 'Map {Low, Medium, High, Critical} → {0, 0.33, 0.67, 1.0}', applies_to: 'S2, S3' },
+    { id: 'A', name: 'Fleet Percentile (robust)',   formula: 'N(x) = soft_clip((x − P₅) / (P₉₅ − P₅))', applies: 'C1, C2, C4, E1, I7–I9' },
+    { id: 'B', name: 'Bounded Log-Linear',          formula: 'N(x) = clip(ln(1 + x/x_ref) / ln(1 + x_max/x_ref), 0, 1)', applies: 'I1–I6, E2, S1, R6a, all R2–R7 inputs' },
+    { id: 'C', name: 'Bounded Rescaling',            formula: 'N(x) = (x − x_min) / (x_max − x_min)', applies: 'C3 [0%, 100%], I1–I3 [0, 0.30], S2 continuous' },
+    { id: 'D', name: 'Categorical Mapping',           formula: 'S2: {No RPF→0, >1%→0.5, >5%→1.0} · S3: {Low→0, Med→0.33, High→0.67, Crit→1.0}', applies: 'S2, S3' },
   ];
 
   // ─── Classification Bands ─────────────────────────────────
