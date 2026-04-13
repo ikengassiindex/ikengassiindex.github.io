@@ -40,7 +40,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     <a href="#cyber-econ" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">B</span> Cyber &amp; Economic Exposure Monitor</a>
     <a href="#data" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">C</span> Data Refresh &amp; Changelog</a>
     <a href="#deep" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">D</span> Deep-Dive: The Waikato River Valley Corridor</a>
-    <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> Pacific Context Card</a>
+    <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> OECD Context Card</a>
     <a href="#enn" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F</span> SSI Enhanced Neural Network</a>
     <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">G</span> Looking Ahead</a>
   </div>
@@ -374,11 +374,19 @@ document.addEventListener("ssi-config-ready", function(e) {
     var medianR7 = medianR7arr[Math.floor(n/2)];
     var medianR = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a-b; })[Math.floor(n/2)];
 
-    // Cyber classification counts
+    // Cyber classification: derive from R7 thresholds since cyber_classification field may not exist
     var cyberCounts = { LOW: 0, MEDIUM: 0, HIGH: 0 };
     fleet.forEach(function(s){
-      var cls = (s.cyber_classification || '').split(' ')[0].toUpperCase();
-      if (cyberCounts[cls] !== undefined) cyberCounts[cls]++;
+      var r7 = s.modifiers.R7_cyber;
+      if (s.cyber_classification) {
+        var cls = s.cyber_classification.split(' ')[0].toUpperCase();
+        if (cyberCounts[cls] !== undefined) cyberCounts[cls]++;
+      } else {
+        // Derive from R7 value: HIGH if R7 >= 1.03, LOW if R7 < 0.99, else MEDIUM
+        if (r7 >= 1.03) cyberCounts.HIGH++;
+        else if (r7 < 0.99) cyberCounts.LOW++;
+        else cyberCounts.MEDIUM++;
+      }
     });
 
     // Blind spots: High/Critical band + R7 below median (low digital readiness)
@@ -386,8 +394,8 @@ document.addEventListener("ssi-config-ready", function(e) {
       return (s.classification === 'High' || s.classification === 'Critical') && s.modifiers.R7_cyber < medianR7;
     });
 
-    // High-consequence: R3 >= 1.08 (metropolitan tier for New Zealand)
-    var highConseq = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.08; });
+    // High-consequence: R3 >= 1.04 (metropolitan tier for New Zealand)
+    var highConseq = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.04; });
 
     // ── B.1 KPIs ──
     document.getElementById('b1-cyber-high').textContent = cyberCounts.HIGH;
@@ -396,7 +404,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('b1-blindspots-sub').textContent = 'High/Critical + R7 < median';
     document.getElementById('b1-avg-r7').textContent = avgR7.toFixed(4);
     document.getElementById('b1-high-conseq').textContent = highConseq.length.toLocaleString();
-    document.getElementById('b1-high-conseq-sub').textContent = (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ 1.08';
+    document.getElementById('b1-high-conseq-sub').textContent = (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ 1.04';
 
     // ── B.1 Matrix canvas ──
     var canvas = document.getElementById('b1-matrix');
@@ -408,8 +416,8 @@ document.addEventListener("ssi-config-ready", function(e) {
     var W = canvas.offsetWidth, H = canvas.offsetHeight;
     var pad = { top: 20, right: 30, bottom: 40, left: 50 };
 
-    // R7 range for x-axis
-    var r7Min = 0.98, r7Max = 1.02;
+    // R7 range for x-axis — calibrated to actual NZ fleet range (0.96–1.00)
+    var r7Min = 0.955, r7Max = 1.005;
     // R_median range for y-axis
     var rMin = 0.10, rMax = 0.85;
 
@@ -507,19 +515,19 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // ── B.2 Economic Impact by Business Fabric ──
     // Tier by R3 (consequence multiplier) and E component
-    // New Zealand R3 range: 0.94–1.12; tiers calibrated to actual distribution
+    // New Zealand R3 range: 0.85–1.05; tiers calibrated to actual fleet distribution
     var tiers = [
-      { label: 'Metropolitan / High-Consequence', desc: 'Auckland metro — finance, tech, logistics, port infrastructure — highest GDP per capita and economic density per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.08; }, color: '#941914', icon: '🏛️',
+      { label: 'Metropolitan / High-Consequence', desc: 'Auckland metro, Wellington CBD — finance, tech, logistics, port infrastructure — highest GDP per capita and economic density per interruption',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.04; }, color: '#941914', icon: '🏛️',
         voll: 'NZ$14–25/kWh' },
-      { label: 'Urban-Industrial', desc: 'Wellington corridor, Hamilton, Tauranga — automotive parts (dairy and forestry supply chains), continuous-process dependence',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.04 && s.modifiers.R3_C_mult < 1.08; }, color: '#aa4234', icon: '🔧',
+      { label: 'Urban-Industrial', desc: 'Hamilton, Tauranga, Christchurch corridors — dairy/forestry supply chains, food processing, continuous-process industrial dependence',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.02 && s.modifiers.R3_C_mult < 1.04; }, color: '#aa4234', icon: '🔧',
         voll: 'NZ$7–14/kWh' },
-      { label: 'Semi-Urban / SME-Dense', desc: 'Tourism, retail, wine/viticulture, food processing — moderate individual VoLL but high aggregate SME exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.00 && s.modifiers.R3_C_mult < 1.04; }, color: '#b8863a', icon: '🏪',
+      { label: 'Semi-Urban / SME-Dense', desc: 'Tourism, retail, wine/viticulture, horticulture — moderate individual VoLL but high aggregate SME exposure across ~99.9% small-business economy',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 0.96 && s.modifiers.R3_C_mult < 1.02; }, color: '#b8863a', icon: '🏪',
         voll: 'NZ$3–7/kWh' },
-      { label: 'Rural / Agricultural', desc: 'Interior regions — sparse economic activity, agriculture, forestry — lower VoLL but higher social vulnerability and energy poverty',
-        filter: function(s){ return s.modifiers.R3_C_mult < 1.00; }, color: '#5d8563', icon: '🌾',
+      { label: 'Rural / Agricultural', desc: 'Interior regions — sparse economic activity, pastoral farming, forestry — lower VoLL but higher social vulnerability and energy poverty',
+        filter: function(s){ return s.modifiers.R3_C_mult < 0.96; }, color: '#5d8563', icon: '🌾',
         voll: 'NZ$0.7–3/kWh' }
     ];
 
@@ -565,14 +573,14 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // VoLL context note
     var totalHighConseqHighRisk = fleet.filter(function(s){
-      return s.modifiers.R3_C_mult >= 1.08 && (s.classification === 'High' || s.classification === 'Critical');
+      return s.modifiers.R3_C_mult >= 1.04 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
-    var metroSubs = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.08; }).length;
+    var metroSubs = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.04; }).length;
     document.getElementById('b2-voll-note').innerHTML =
       '<strong>Value of Lost Load (VoLL) context:</strong> The Electricity Authority\'s regulatory framework places New Zealand\'s average VoLL at approximately ' +
       'NZ$12.5/kWh for industrial customers and NZ$3.8/kWh for residential — reflecting mid-high developed-country GDP per capita. ' +
       'The SSI\'s R3 consequence multiplier identifies which substations serve the most economically exposed territories. ' +
-      '<strong>' + metroSubs + ' metropolitan substations</strong> (R3 ≥ 1.08) concentrate in the Auckland corridor, of which ' +
+      '<strong>' + metroSubs + ' metropolitan substations</strong> (R3 ≥ 1.04) concentrate in the Auckland–Wellington corridor, of which ' +
       '<strong>' + totalHighConseqHighRisk + '</strong> also carry High or Critical risk — representing the highest VoLL-weighted exposure in the fleet.';
 
     // B.2 Narrative
@@ -1304,19 +1312,19 @@ document.addEventListener("ssi-config-ready", function(e) {
 <div style="margin:32px 0"></div>
 
 
-<!-- ═══════════════════ E. EUROPEAN CONTEXT CARD ═══════════════════ -->
+<!-- ═══════════════════ E. OECD CONTEXT CARD ═══════════════════ -->
 <section id="eu" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section E — Recurring Module</span>
-<h2>Pacific Context Card</h2>
+<h2>OECD Context Card</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one Pacific Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Waikato River Valley corridor analysis hinges on New Zealand's continuity performance relative to European peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Germany (003), CMIP6 climate hazard vs Nordic peers (004), etc. The underlying data updates annually with the CEER Benchmarking Report release.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one OECD Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Waikato River Valley corridor analysis hinges on New Zealand's continuity performance relative to European peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Germany (003), CMIP6 climate hazard vs Nordic peers (004), etc. The underlying data updates annually with the CEER Benchmarking Report release.</p>
 </div>
 
 <!-- THE CARD ITSELF -->
 <div class="card" style="border-top:3px solid var(--terracotta);margin:20px 0">
   <div style="padding:0;margin:-20px -24px 16px;padding:12px 24px;background:var(--cream-deep);border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px">
-    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">Pacific Context Card — SAIDI Benchmarking</span>
+    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">OECD Context Card — SAIDI Benchmarking</span>
     <span style="font-size:10px;color:var(--warm-grey)">Ed. 001 · April 2026</span>
   </div>
 
@@ -1859,7 +1867,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
     '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
     'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, province breakdown. ' +
-    'Pacific Context Card: ' + nextDive.contextDetail + '.</p>';
+    'OECD Context Card: ' + nextDive.contextDetail + '.</p>';
 
   // ── Card 2: Next Data Refresh — from SSIMetadata ──
   var meta = window.SSIMetadata;
