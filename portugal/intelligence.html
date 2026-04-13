@@ -313,7 +313,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   <div class="kpi-card">
     <div class="kpi-label">High-Consequence Subs</div>
     <div class="kpi-value" style="color:var(--ink)" id="b1-high-conseq">—</div>
-    <div class="kpi-sub" id="b1-high-conseq-sub">R3 ≥ 1.12</div>
+    <div class="kpi-sub" id="b1-high-conseq-sub">R3 ≥ 1.08</div>
   </div>
 </div>
 
@@ -386,8 +386,8 @@ document.addEventListener("ssi-config-ready", function(e) {
       return (s.classification === 'High' || s.classification === 'Critical') && s.modifiers.R7_cyber < medianR7;
     });
 
-    // High-consequence: R3 >= 1.12
-    var highConseq = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.12; });
+    // High-consequence: R3 >= 1.08 (metropolitan tier for Portugal)
+    var highConseq = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.08; });
 
     // ── B.1 KPIs ──
     document.getElementById('b1-cyber-high').textContent = cyberCounts.HIGH;
@@ -396,7 +396,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('b1-blindspots-sub').textContent = 'High/Critical + R7 < median';
     document.getElementById('b1-avg-r7').textContent = avgR7.toFixed(4);
     document.getElementById('b1-high-conseq').textContent = highConseq.length.toLocaleString();
-    document.getElementById('b1-high-conseq-sub').textContent = (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ 1.12';
+    document.getElementById('b1-high-conseq-sub').textContent = (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ 1.08';
 
     // ── B.1 Matrix canvas ──
     var canvas = document.getElementById('b1-matrix');
@@ -507,20 +507,20 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // ── B.2 Economic Impact by Business Fabric ──
     // Tier by R3 (consequence multiplier) and E component
-    // R3 tiers: Capital-intensive (>= 1.15), Industrial (1.10-1.15), Commercial (1.05-1.10), Light/Rural (<1.05)
+    // Portugal R3 range: 0.96–1.10; tiers calibrated to actual distribution
     var tiers = [
-      { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, large manufacturing — highest economic loss per interruption',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
-        voll: '€15–30/kWh' },
-      { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, food processing — significant continuity requirements',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
-        voll: '€8–15/kWh' },
-      { label: 'Commercial / SME-Dense', desc: 'Service economy, retail, tourism — moderate individual impact but high aggregate exposure',
-        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏪',
-        voll: '€3–8/kWh' },
-      { label: 'Light / Agricultural / Rural', desc: 'Sparse economic activity, agricultural land — lower VoLL but higher social vulnerability',
-        filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
-        voll: '€1–3/kWh' }
+      { label: 'Metropolitan / High-Consequence', desc: 'Lisbon metro — finance, tech, logistics, port infrastructure — highest GDP per capita and economic density per interruption',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.08; }, color: '#941914', icon: '🏛️',
+        voll: '€10–18/kWh' },
+      { label: 'Urban-Industrial', desc: 'Porto corridor, Aveiro, Braga — automotive parts (Autoeuropa supply chain), textiles, footwear, ceramics — continuous-process dependence',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.04 && s.modifiers.R3_C_mult < 1.08; }, color: '#aa4234', icon: '🔧',
+        voll: '€5–10/kWh' },
+      { label: 'Semi-Urban / SME-Dense', desc: 'Tourism, retail, cork and paper/pulp, food processing — moderate individual VoLL but high aggregate SME exposure',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.00 && s.modifiers.R3_C_mult < 1.04; }, color: '#b8863a', icon: '🏪',
+        voll: '€2–5/kWh' },
+      { label: 'Rural / Agricultural', desc: 'Interior Alentejo, Trás-os-Montes — sparse economic activity, agriculture, forestry — lower VoLL but higher social vulnerability and energy poverty',
+        filter: function(s){ return s.modifiers.R3_C_mult < 1.00; }, color: '#5d8563', icon: '🌾',
+        voll: '€0.5–2/kWh' }
     ];
 
     var tiersHTML = '';
@@ -565,13 +565,15 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // VoLL context note
     var totalHighConseqHighRisk = fleet.filter(function(s){
-      return s.modifiers.R3_C_mult >= 1.14 && (s.classification === 'High' || s.classification === 'Critical');
+      return s.modifiers.R3_C_mult >= 1.08 && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
+    var metroSubs = fleet.filter(function(s){ return s.modifiers.R3_C_mult >= 1.08; }).length;
     document.getElementById('b2-voll-note').innerHTML =
-      '<strong>Value of Lost Load (VoLL) context:</strong> ACER\'s 2023 estimate for Portugal places average VoLL at €13.1/kWh for industrial customers ' +
-      'and €3.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
-      'exposed territories. <strong>' + totalHighConseqHighRisk + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ 1.14) with ' +
-      'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.';
+      '<strong>Value of Lost Load (VoLL) context:</strong> ERSE\'s regulatory framework and CEER benchmarks place Portugal\'s average VoLL at approximately ' +
+      '€8.7/kWh for industrial customers and €2.4/kWh for residential — below the EU-27 average, reflecting lower GDP per capita. ' +
+      'The SSI\'s R3 consequence multiplier identifies which substations serve the most economically exposed territories. ' +
+      '<strong>' + metroSubs + ' metropolitan substations</strong> (R3 ≥ 1.08) concentrate in the Lisbon corridor, of which ' +
+      '<strong>' + totalHighConseqHighRisk + '</strong> also carry High or Critical risk — representing the highest VoLL-weighted exposure in the fleet.';
 
     // B.2 Narrative
     var topTierSubs = fleet.filter(tiers[0].filter);
@@ -583,13 +585,14 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     var avgEP = fleet.reduce(function(a,s){ return a + s.socio_economic.EP_rate_region; }, 0) / n;
     document.getElementById('b2-narrative').innerHTML =
-      'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
-      'depend on uninterrupted power for continuous processes (steel, glass, automotive). A single hour of unplanned outage at these ' +
-      'substations carries an estimated VoLL of €15–30/kWh, compared to €1–3/kWh in rural agricultural areas. ' +
-      'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
-      'Southern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
-      'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
-      'to substation-level risk scores.';
+      'The metropolitan tier concentrates in <strong>' + econRegionStr + '</strong> — where financial services, technology, ' +
+      'port logistics, and the Autoeuropa automotive supply chain depend on uninterrupted power. Portugal\'s economic fabric is heavily ' +
+      'SME-driven (~99.9% of firms), meaning outage costs propagate through dense networks of small businesses rather than a few large plants. ' +
+      'The fleet-wide average energy poverty rate is <strong>' + avgEP.toFixed(1) + '%</strong> — significantly above the EU average (~8%) — ' +
+      'with sharp regional variation: interior districts (Guarda, Bragança, Portalegre) combine the highest energy poverty with aging grid ' +
+      'infrastructure, creating a double vulnerability that the E component captures. ' +
+      'This cross-referencing of economic fabric with grid condition is a distinctive feature of the SSI — linking VoLL exposure ' +
+      'to substation-level risk in a way that conventional frameworks do not.';
 
     // ── B.3 Province Digital Readiness ──
     var provData = {};
