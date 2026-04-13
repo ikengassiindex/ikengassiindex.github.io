@@ -1224,8 +1224,8 @@ if (!hasNested) {
     // Load data
     const basePath = options.basePath || '';
     Promise.all([
-      fetch(basePath + 'grid-geo.json?v=406').then(r => r.json()),
-      fetch(basePath + 'ssi-data.json?v=406').then(r => r.json())
+      fetch(basePath + 'grid-geo.json?v=407').then(r => r.json()),
+      fetch(basePath + 'ssi-data.json?v=407').then(r => r.json())
     ]).then(([geo, ssi]) => {
       GEO = geo;
       SSI = ssi;
@@ -1312,6 +1312,15 @@ if (!hasNested) {
         if (sub.internal_id) ssiMap[sub.internal_id] = sub;
         if (sub.substation_id) ssiMap[sub.substation_id] = sub;
         if (sub.name) ssiMap[sub.name] = sub;
+        if (sub.osm_id) ssiMap[String(sub.osm_id)] = sub;
+      }
+      // Cross-reference GEO keys (OSM IDs) with SSI substations by name match
+      if (GEO && GEO.s) {
+        for (const [geoKey, geoNode] of Object.entries(GEO.s)) {
+          if (!ssiMap[geoKey] && geoNode.n && ssiMap[geoNode.n]) {
+            ssiMap[geoKey] = ssiMap[geoNode.n];
+          }
+        }
       }
 
       // Build lookup: line.i --- line object (fast O(1) instead of O(n) find)
