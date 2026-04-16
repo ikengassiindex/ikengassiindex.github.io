@@ -202,6 +202,7 @@ p  { margin-bottom: 14px; }
 </head>
 <body>
 <script src="../nav.js?v=1777000000"></script>
+<script src="../esg-helpers.js?v=1777500000"></script>
 <script src="ssi-metadata.js"></script>
 <script src="../intelligence/intelligence-loader.js?v=1777000000" data-country="ireland" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
@@ -734,15 +735,6 @@ const MARKOV_STATES = [
 ];
 
 /* ── Helper: get band class ── */
-function bandClass(classification) {
-  if (!classification) return 'low';
-  const c = classification.toLowerCase();
-  if (c === 'critical') return 'critical';
-  if (c === 'high') return 'high';
-  if (c === 'medium') return 'medium';
-  return 'low';
-}
-
 /* ── Helper: compute ESG readiness scores ── */
 function computeESGScores(d) {
   let r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0;
@@ -802,18 +794,6 @@ function computeESGScores(d) {
   ];
 }
 
-function readinessLabel(score) {
-  if (score >= 0.80) return 'ready';
-  if (score >= 0.40) return 'partial';
-  return 'gap';
-}
-
-function readinessText(score) {
-  if (score >= 0.80) return 'READY';
-  if (score >= 0.40) return 'PARTIAL';
-  return 'GAP';
-}
-
 /* ══════════════════════════════════════════════════
    RENDERING FUNCTIONS
    ══════════════════════════════════════════════════ */
@@ -848,21 +828,6 @@ function getReportSources(reportNum) {
 
 let radarChart = null;
 let componentChart = null;
-
-function displayName(d) {
-  var n = d.name || "";
-  if (n && !n.startsWith("UNKNOWN") && !n.startsWith("Sub_") && n !== "—") return n;
-  var parts = [];
-  if (d.province) parts.push(d.province);
-  if (d.substation_id) {
-    var sid = d.substation_id.replace(/^[A-Z]{2}_/, "");
-    if (sid.startsWith("UNKNOWN")) sid = sid.replace("UNKNOWN", "#");
-    parts.push("Station " + sid);
-  } else if (d.region) {
-    parts.push(d.region + " Station");
-  }
-  return parts.length ? parts.join(" · ") : (n || "Substation");
-}
 
 function renderAll(data) {
   document.title = `SSI Index — ESG Report · ${displayName(data)} (${data.substation_id || ''})`;
@@ -1181,22 +1146,6 @@ function renderESGFooter(d) {
 /* ══════════════════════════════════════════════════
    SUBSTATION SELECTION (monthSeed / seededIndex)
    ══════════════════════════════════════════════════ */
-
-function monthSeed() {
-  // Monthly rotation starts May 2026; keep March substation until then
-  var d = new Date(), y = d.getFullYear(), m = d.getMonth() + 1;
-  if (y < 2026 || (y === 2026 && m < 5)) return 202603;
-  return y * 100 + m;
-}
-
-function seededIndex(seed, len) {
-  if (len === 0) return 0;
-  var h = seed;
-  h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
-  h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
-  h = (h >>> 16) ^ h;
-  return Math.abs(h) % len;
-}
 
 const DEMO_SUBSTATION = {
   substation_id: 'IE_100292', internal_id: '100_292', version: '4.0.2',
