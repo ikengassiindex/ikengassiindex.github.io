@@ -22,31 +22,17 @@ from pathlib import Path
 from datetime import datetime
 
 BASE_URL = "https://ikengassiindex.github.io"
-COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain",
-             "switzerland", "austria", "canada", "japan", "australia", "chile",
-             "denmark", "norway", "finland", "poland", "sweden", "mexico",
-             "greece", "turkey", "ireland", "portugal", "new-zealand",
-             "greenland"]
-# Countries with a first-automated-refresh gate (skip monthly runs before this YYYY-MM).
-FIRST_REFRESH = {
-    "denmark": "2026-05", "norway": "2026-05", "finland": "2026-05",
-    "poland":  "2026-05", "sweden": "2026-05", "mexico":  "2026-05",
-    "new-zealand": "2026-06",
-    # Greenland Session 1 completed 2026-04-16 (brought forward from 2026-07).
-    # First automated refresh = Edition 002 on the second Thursday of June 2026
-    # (bimonthly cadence after Session 1 to give Nukissiorfiit / Afbrydelsestatistik
-    # data a full cycle before the first delta reading).
-    "greenland": "2026-06",
-}
-# Archive bundles: forward-looking metadata documenting shared-sovereignty
-# groupings. Greenland is an autonomous territory of the Kingdom of Denmark
-# with an independent grid but a shared OECD umbrella. The current flat-email
-# architecture already delivers all countries as a single monthly email, so
-# bundling is implicit once FIRST_REFRESH is reached; this dict exists for
-# documentation and for any future per-bundle email splitting.
-ARCHIVE_BUNDLES = {
-    "denmark": ["greenland"],
-}
+
+# ── Single source of truth: intelligence/countries.json ──
+# Loaded at module import so any downstream script referencing COUNTRIES
+# or FIRST_REFRESH sees a single authoritative copy. The workflow YAML
+# reads the same file via a tiny python shim (see monthly-refresh.yml).
+_COUNTRIES_JSON = Path(__file__).resolve().parent.parent / "intelligence" / "countries.json"
+with _COUNTRIES_JSON.open("r", encoding="utf-8") as _fh:
+    _COUNTRIES_CONF = json.load(_fh)
+COUNTRIES = list(_COUNTRIES_CONF["slugs"])
+FIRST_REFRESH = dict(_COUNTRIES_CONF["first_refresh"])
+ARCHIVE_BUNDLES = dict(_COUNTRIES_CONF.get("archive_bundles", {}))
 ARCHIVE_DIR = Path("archive")
 
 # Pages to capture per country

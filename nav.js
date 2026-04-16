@@ -3,18 +3,18 @@
    v4.1 — Multi-country support (landing page + country subfolders)
    ═══════════════════════════════════════════════════════════ */
 
-// Detect base path — are we in a country subfolder?
-var SSI_BASE = (function() {
-  var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey|ireland|portugal|new-zealand|greenland)\//);
-  return match ? '../' : '';
-})();
+// ── Single source of truth for supported country slugs ──
+var SSI_COUNTRY_SLUGS = [
+  'australia','austria','canada','chile','denmark','finland','france','germany',
+  'greece','greenland','ireland','italy','japan','mexico','new-zealand','norway',
+  'poland','portugal','spain','sweden','switzerland','turkey','uk','us'
+];
+var SSI_COUNTRY_PATH_RE = new RegExp('/(' + SSI_COUNTRY_SLUGS.join('|') + ')/');
 
-var SSI_COUNTRY = (function() {
-  var path = window.location.pathname;
-  var match = path.match(/\/(canada|chile|italy|germany|switzerland|australia|austria|france|spain|uk|us|japan|poland|finland|sweden|norway|denmark|mexico|greece|turkey|ireland|portugal|new-zealand|greenland)\//);
-  return match ? match[1] : null;
-})();
+// Detect base path + active country from URL
+var _ssiPathMatch = window.location.pathname.match(SSI_COUNTRY_PATH_RE);
+var SSI_BASE = _ssiPathMatch ? '../' : '';
+var SSI_COUNTRY = _ssiPathMatch ? _ssiPathMatch[1] : null;
 
 var SSI_COUNTRY_LABELS = {
   italy: '🇮🇹 Italy',

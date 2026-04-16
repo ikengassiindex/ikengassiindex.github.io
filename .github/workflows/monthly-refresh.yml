@@ -71,16 +71,11 @@ jobs:
         run: |
           STAMP=$(date +%s)
           CURRENT_YM=$(date -u +%Y-%m)
-          # Per-country first-refresh gates:
-          #   denmark norway finland poland sweden mexico → 2026-05
-          #   new-zealand                                 → 2026-06
-          #   greenland                                   → 2026-06 (Edition 002, bimonthly after Session 1 / 2026-04-16)
-          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey ireland portugal new-zealand greenland; do
-            case "$country" in
-              denmark|norway|finland|poland|sweden|mexico) FIRST="2026-05" ;;
-              new-zealand|greenland)                       FIRST="2026-06" ;;
-              *)                                           FIRST="" ;;
-            esac
+          # Country slugs + first-refresh gates come from intelligence/countries.json
+          # (single source of truth, also consumed by scripts/archive-and-email.py).
+          COUNTRIES=$(python3 -c "import json; print(' '.join(json.load(open('intelligence/countries.json'))['slugs']))")
+          for country in $COUNTRIES; do
+            FIRST=$(python3 -c "import json; print(json.load(open('intelligence/countries.json'))['first_refresh'].get('$country', ''))")
             if [ -n "$FIRST" ] && [ "$CURRENT_YM" \< "$FIRST" ]; then
               echo "  SKIP ${country}: first automated refresh ${FIRST} (current ${CURRENT_YM})"
               continue

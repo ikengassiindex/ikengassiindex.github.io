@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — ESG Report</title>
-<link rel="stylesheet" href="../style.css?v=1773921819">
+<link rel="stylesheet" href="../style.css?v=1777000000">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -201,21 +201,14 @@ p  { margin-bottom: 14px; }
 </style>
 </head>
 <body>
-<script>
-// Auto-detect country from URL path
-(function() {
-  var match = window.location.pathname.match(/\/(france|italy|uk|spain|germany|switzerland|austria|us|canada|japan|australia|chile)\//i);
-  if (match) {
-    document.currentScript.parentElement.setAttribute('data-ssi-country', match[1].toLowerCase());
-    window.SSI_ESG_COUNTRY = match[1].toLowerCase();
-  }
-})();
-</script>
-
-
-<script src="../nav.js?v=111773921819"></script>
+<!-- NOTE: esg-report-shared.html is a reference template. When copying to a
+     country subfolder, substitute {{COUNTRY_SLUG}} below with the actual
+     slug (e.g. "france"). Do NOT leave it as "auto" — the intelligence-loader
+     captures data-country during parsing and rotation.countries["auto"]
+     returns undefined. -->
+<script src="../nav.js?v=1777000000"></script>
 <script src="ssi-metadata.js"></script>
-<script src="../intelligence/intelligence-loader.js" data-country="auto" id="ssi-esg-page"></script>
+<script src="../intelligence/intelligence-loader.js" data-country="{{COUNTRY_SLUG}}" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
@@ -1261,18 +1254,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<script>
-// Set data-country on the page element from URL path
-document.addEventListener('DOMContentLoaded', function() {
-  var country = window.SSI_ESG_COUNTRY;
-  if (country) {
-    var el = document.getElementById('ssi-esg-page');
-    if (el) el.setAttribute('data-country', country);
-    // Also set on intelligence-loader if present
-    var loaders = document.querySelectorAll('[data-country="auto"]');
-    loaders.forEach(function(l) { l.setAttribute('data-country', country); });
-  }
-});
-</script>
 </body>
 </html>
