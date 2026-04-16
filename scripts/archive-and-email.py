@@ -26,6 +26,12 @@ COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain",
              "switzerland", "austria", "canada", "japan", "australia", "chile",
              "denmark", "norway", "finland", "poland", "sweden", "mexico",
              "greece", "turkey", "ireland", "portugal", "new-zealand"]
+# Countries with a first-automated-refresh gate (skip monthly runs before this YYYY-MM).
+FIRST_REFRESH = {
+    "denmark": "2026-05", "norway": "2026-05", "finland": "2026-05",
+    "poland":  "2026-05", "sweden": "2026-05", "mexico":  "2026-05",
+    "new-zealand": "2026-06",
+}
 ARCHIVE_DIR = Path("archive")
 
 # Pages to capture per country
@@ -185,7 +191,12 @@ def capture_pages():
     with sync_playwright() as p:
         browser = p.chromium.launch()
 
+        current_ym = datetime.utcnow().strftime("%Y-%m")
         for country in COUNTRIES:
+            first_ym = FIRST_REFRESH.get(country)
+            if first_ym and current_ym < first_ym:
+                print(f"  SKIP {country}: first automated refresh {first_ym} (current {current_ym})")
+                continue
             for page_def in PAGES:
                 url = f"{BASE_URL}/{country}/{page_def['file']}"
                 name_base = f"SSI_{page_def['label']}_Ed{edition_label}_{country.upper()}_{edition_key}"

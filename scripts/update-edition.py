@@ -14,8 +14,14 @@ from pathlib import Path
 
 CONFIG_PATH = Path('intelligence/edition-config.json')
 # denmark, norway, finland, poland, sweden, mexico: first automated refresh May 2026 (skip April)
+# new-zealand: first automated refresh June 2026 (skip April + May)
 COUNTRIES = ['france','italy','uk','us','germany','spain','switzerland','austria','canada','japan','australia','chile',
              'denmark','norway','finland','poland','sweden','mexico','greece','turkey','ireland','portugal','new-zealand']
+FIRST_REFRESH = {
+    'denmark': '2026-05', 'norway': '2026-05', 'finland': '2026-05',
+    'poland':  '2026-05', 'sweden': '2026-05', 'mexico':  '2026-05',
+    'new-zealand': '2026-06',
+}
 
 def main():
     if not CONFIG_PATH.exists():
@@ -71,7 +77,12 @@ def main():
 
     # Update ssi-data.json timestamps
     today = now.strftime('%Y-%m-%d')
+    current_ym = now.strftime('%Y-%m')
     for country in COUNTRIES:
+        first_ym = FIRST_REFRESH.get(country)
+        if first_ym and current_ym < first_ym:
+            print(f"  SKIP {country}: first automated refresh {first_ym} (current {current_ym})")
+            continue
         data_path = Path(country) / 'ssi-data.json'
         if not data_path.exists():
             print(f"  SKIP {country}: no ssi-data.json")
