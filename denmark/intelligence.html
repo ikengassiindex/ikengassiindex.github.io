@@ -1288,9 +1288,255 @@ The Great Belt interconnect linking Jutland's wind generation complex with Zeala
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section G</span>
 <h2>Looking Ahead</h2>
 
-<p style="font-size:13px;line-height:1.7">
-<strong>Q2 2026 Priorities:</strong> Energinet data integration (DSO SCADA harmonisation + transmission real-time feeds). District heating CHP correlation refinement — R3 consequence modifier expansion to include thermal grid coupling risk. Offshore wind farm impact modelling (R6b enhancement for floating platform storm surge). Integration with Forsyningstilsynet's emerging resilience reporting framework (DSO transparency mandate). Competitive benchmarking vs emerging EU digital grid standards (CEER, TSC requirements). All roadmap milestones tracked in open GitHub issues with monthly transparency reports.
-</p>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0">
+  <!-- Card 1: Next Edition — deterministic deep-dive rotation -->
+  <div class="card" style="border-top:3px solid var(--bronze)" id="g-next-edition">
+    <span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+  <!-- Card 2: Next Data Refresh — from SSIMetadata source frequencies -->
+  <div class="card" style="border-top:3px solid var(--sage)" id="g-data-refresh">
+    <span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+  <!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json -->
+  <div class="card" style="border-top:3px solid var(--crimson)" id="g-spotlight">
+    <span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="g-closing">Loading…</p>
+
+<script>
+(function(){
+  var now = new Date();
+  var month = now.getMonth(); // 0-indexed
+  var year = now.getFullYear();
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // Next month (monthly cadence, first automated refresh 2026-05)
+  var nextMonth = month + 1 > 11 ? 0 : month + 1;
+  var nextYear = month + 1 > 11 ? year + 1 : year;
+  // Edition numbering: April 2026 = Edition 002 (May 2026 first automated refresh = Edition 003 etc.)
+  var editionNum = (year - 2026) * 12 + (month + 1) - 2;
+  var nextEdition = String(Math.max(1, editionNum)).padStart(3, '0');
+
+  // Deterministic seed
+  function seededIndex(s, len) {
+    var h = s;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = (h >>> 16) ^ h;
+    return Math.abs(h) % Math.max(1, len);
+  }
+  var nextSeed = nextYear * 100 + (nextMonth + 1);
+
+  // ── Card 1: Next Edition deep-dive topics (Denmark's 5 Regioner + pan-fleet themes) ──
+  var deepDives = [
+    { region: 'Hovedstaden', theme: 'The Copenhagen Metro Load', context: 'Urban saturation + data-centre spike', contextDetail: 'Københavns Kommune + Amager data-centre cluster (Apple, Microsoft) — DK2 bidding-zone stress and Øresund cross-border flows' },
+    { region: 'Sjælland', theme: 'The Zealand CHP Corridor', context: 'CHP decommissioning exposure', contextDetail: 'Asnæs + Avedøre legacy CHP retirement, Roskilde–Køge industrial load and DK2 eastern balancing' },
+    { region: 'Syddanmark', theme: 'Horns Rev & the Esbjerg Landing', context: 'Offshore wind landing-point stress', contextDetail: 'Horns Rev 1–3 + Kriegers Flak DK1 landing points, Esbjerg hub, Funen (Fyn) DER penetration and Odense Facebook data centre' },
+    { region: 'Midtjylland', theme: 'The Central Jutland Wind Corridor', context: 'Onshore wind + data-centre load', contextDetail: 'Herning–Holstebro onshore wind concentration, Apple Viborg data centre, Samsø carbon-neutral island and Aarhus industrial base' },
+    { region: 'Nordjylland', theme: 'The Skagerrak Landing & DK1 Balancing', context: 'North Sea wind + cross-border HVDC', contextDetail: 'Thy/Nissum wind corridor, Aalborg industrial, Skagerrak + North Sea Link HVDC interconnectors, DK1–Norway balancing' },
+    { region: 'Bornholm', theme: 'The Bornholm Island Grid', context: 'Baltic isolated grid', contextDetail: 'BornholmsEnergi operator, separate bidding zone (DK2–Bornholm), Energy Island Bornholm offshore-wind hub due 2030 — current R6b baseline' },
+    { region: 'Pan-Fleet', theme: 'The Data-Centre Load Cluster', context: 'Hyperscale E-component exposure', contextDetail: 'Apple Viborg, Facebook Odense, Microsoft Høje-Taastrup — hyperscale data-centre R3 consequence stack and flex-load contribution' },
+    { region: 'Pan-Fleet', theme: 'DK1–DK2 Storebælt HVDC', context: 'Bidding-zone split risk', contextDetail: 'Great Belt HVDC link between DK1 (Jutland/Funen) and DK2 (Zealand) — R4 topology criticality and price-area divergence' },
+    { region: 'Pan-Fleet', theme: 'District Heating × CHP Coupling', context: 'Thermal-electric correlation', contextDetail: 'Dansk Fjernvarme network: 64% heat demand via district heating — CHP phase-out, large heat-pump rollout and R3 thermal-coupling penalty' },
+    { region: 'Pan-Fleet', theme: 'Kystdirektoratet Storm-Surge Envelope', context: 'Coastal R6b uplift', contextDetail: 'Storm-surge and sea-level-rise projections along the Limfjord, Øresund and Wadden coasts — corrosion + flooding compound on coastal substations' }
+  ];
+
+  var nextDiveIdx = seededIndex(nextSeed + 3333, deepDives.length);
+  var nextDive = deepDives[nextDiveIdx];
+
+  var card1 = document.getElementById('g-next-edition');
+  card1.innerHTML =
+    '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
+    '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
+    '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, kommune breakdown. ' +
+    'Nordic Context Card: ' + nextDive.contextDetail + '.</p>';
+
+  // ── Card 2: Next Data Refresh — from SSIMetadata ──
+  var meta = window.SSIMetadata;
+  if (meta && meta.FREQ_DISTRIBUTION) {
+    var currentQ = Math.floor(month / 3) + 1;
+    var nextQ = currentQ >= 4 ? 1 : currentQ + 1;
+    var nextQYear = currentQ >= 4 ? year + 1 : year;
+    var qLabels = { 1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4' };
+
+    var annualHighImpact = (meta.DATA_SOURCES || []).filter(function(s){ return s.freq === 'Annual'; })
+      .sort(function(a,b){ return (b.vars||0) - (a.vars||0); })[0];
+
+    var qtrFD = meta.FREQ_DISTRIBUTION.Quarterly;
+    var qtrSources = qtrFD ? qtrFD.sources.join(', ') : 'none';
+    var qtrCount = qtrFD ? qtrFD.count : 0;
+
+    var card2 = document.getElementById('g-data-refresh');
+    card2.innerHTML =
+      '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
+      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + qtrCount + ' Quarterly Sources</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+      '<strong>' + qtrSources + '</strong> due for refresh in ' + qLabels[nextQ] + '. ' +
+      'Impact: Forsyningstilsynet DSO SAIDI/SAIFI counters (C1–C4), CFCS cybersecurity baseline (R7), Nationalbanken economic cycle (E1–E3), Dansk Fjernvarme district-heating dispatch and Energinet hydrology feeds. ' +
+      'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong>' +
+      (annualHighImpact ? ' (' + (annualHighImpact.vars||'?') + ' variables → ' + (annualHighImpact.feeds||'') + ')' : '') + '.</p>';
+  } else {
+    document.getElementById('g-data-refresh').innerHTML =
+      '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
+      '<h3 style="margin-top:0;font-size:15px">Monthly Cadence — Edition ' + nextEdition + '</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+      'Energinet real-time counters, DMI daily weather and Forsyningstilsynet quarterly DSO reports re-ingest on the monthly refresh.</p>';
+  }
+
+  // ── Card 3: Fleet Spotlight — rotating stat ──
+  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = (data && data.substations) || [];
+    var seed = year * 100 + (month + 1);
+
+    var spotlights = [];
+
+    // Denmark has no High/Critical at Edition 001 — use R_median > 0.50 as the "elevated" bucket
+    var elevated = function(s){ return s.R_median != null && s.R_median > 0.50; };
+    var classification_elevated = function(s){ return s.classification === 'High' || s.classification === 'Critical' || elevated(s); };
+
+    // 1. Region with the highest elevated-R share (5 Regioner)
+    var rData = {};
+    fleet.forEach(function(s){
+      var r = s.region || 'Unknown';
+      if (!rData[r]) rData[r] = { subs: [], sumR: 0, elev: 0 };
+      rData[r].subs.push(s);
+      rData[r].sumR += (s.R_median || 0);
+      if (elevated(s)) rData[r].elev++;
+    });
+    var rList = Object.keys(rData).map(function(r){
+      var d = rData[r];
+      return { name: r, n: d.subs.length, avg: d.subs.length ? d.sumR / d.subs.length : 0, elev: d.elev, pct: d.subs.length ? d.elev / d.subs.length : 0 };
+    });
+    rList.sort(function(a,b){ return b.pct - a.pct || b.avg - a.avg; });
+    var riskiest = rList[0];
+    if (riskiest && riskiest.n) {
+      spotlights.push({
+        title: riskiest.name + ': Highest Elevated-R Share',
+        body: '<strong>' + riskiest.name + '</strong> has the highest share of elevated-risk substations (R<sub>median</sub> &gt; 0.50): <strong>' +
+          riskiest.elev + ' of ' + riskiest.n + ' (' + (riskiest.pct * 100).toFixed(0) + '%)</strong> — ' +
+          'region avg R_median = ' + riskiest.avg.toFixed(3) + '. Denmark\'s fleet sits overwhelmingly in the Medium band at Edition 001, so the regional gradient is where future deltas will first surface.'
+      });
+    }
+
+    // 2. Widest uncertainty = highest optionality
+    var byCIDesc = fleet.slice().filter(function(s){ return s.CI_width != null; }).sort(function(a,b){ return b.CI_width - a.CI_width; });
+    var topUncertain = byCIDesc.slice(0, 25);
+    if (topUncertain.length) {
+      var avgCItop = topUncertain.reduce(function(a,s){ return a + (s.CI_width||0); }, 0) / topUncertain.length;
+      var topRegions = {};
+      topUncertain.forEach(function(s){ var k = s.region || '—'; topRegions[k] = (topRegions[k] || 0) + 1; });
+      var topRegionStr = Object.keys(topRegions).sort(function(a,b){ return topRegions[b] - topRegions[a]; }).slice(0, 3).join(', ');
+      spotlights.push({
+        title: 'Highest Uncertainty = Highest Optionality',
+        body: 'The ' + topUncertain.length + ' substations with the widest confidence intervals (avg CI = ' + avgCItop.toFixed(3) +
+          ') represent the highest <em>option value</em> for BESS + flex-load investment — uncertainty creates optionality. ' +
+          'They concentrate in <strong>' + topRegionStr + '</strong>. In the SSI-ENN framework, these nodes ' +
+          'generate the largest real-options premium above base DCF valuation.'
+      });
+    }
+
+    // 3. Bridge substations — critical topology nodes
+    var bridges = fleet.filter(function(s){ return s.graph_topology && s.graph_topology.is_bridge; });
+    var bridgeElev = bridges.filter(elevated);
+    spotlights.push({
+      title: bridges.length + ' Bridge Substations — Single Points of Failure',
+      body: '<strong>' + bridges.length + ' of ' + fleet.length + ' substations</strong> are topological bridges — their failure disconnects ' +
+        'part of the network. Of these, <strong>' + bridgeElev.length + '</strong> sit in the elevated-R bucket (R_median &gt; 0.50). ' +
+        'These are the fleet\'s single points of failure: high R4 graph centrality combined with elevated baseline risk ' +
+        'makes them priority candidates for both grid reinforcement and BESS deployment along the Storebælt / Øresund / Lillebælt crossings.'
+    });
+
+    // 4. Coastal corrosion (C3 class) — replaces the seismic spotlight (Denmark seismic = negligible)
+    var coastal = fleet.filter(function(s){ return s.markov && s.markov.corrosion_class === 'C3'; });
+    var coastalElev = coastal.filter(elevated);
+    spotlights.push({
+      title: coastal.length + ' Substations in Coastal Corrosion Class C3',
+      body: 'Denmark\'s seismic hazard is <strong>negligible</strong> across the fleet — the dominant physical-hazard driver is the North Sea / Baltic coastal envelope. ' +
+        '<strong>' + coastal.length + ' of ' + fleet.length + ' substations</strong> sit in ISO 9223 atmospheric-corrosion class <strong>C3</strong> ' +
+        '(urban/coastal, SO₂ + marine salinity), with <strong>' + coastalElev.length + '</strong> already in the elevated-R bucket. ' +
+        'The R6b compound (Kystdirektoratet storm-surge + DMI wind loading + GEUS subsidence) will concentrate in Wadden-coast Syddanmark and Limfjord Nordjylland at Edition 002+.'
+    });
+
+    // 5. Energy poverty double jeopardy (EP_rate stored as fraction 0–1 on DK; median ≈ 0.27)
+    var epThresh = 0.28;
+    var highEP = fleet.filter(function(s){ return s.socio_economic && s.socio_economic.EP_rate_region > epThresh; });
+    var highEP_elev = highEP.filter(elevated);
+    spotlights.push({
+      title: 'Energy Poverty Double Jeopardy',
+      body: '<strong>' + highEP.length + ' substations</strong> serve regions with energy-poverty rates above ' + (epThresh*100).toFixed(0) + '% ' +
+        '(Danmarks Statistik + Eurostat EU-SILC Nordic panel) — and <strong>' + highEP_elev.length + '</strong> of these sit in the elevated-R bucket. ' +
+        'These communities face a double burden: softer grid reliability and limited capacity to absorb outage cost. ' +
+        'The SSI\'s E component + R3 modifier make this invisible correlation visible.'
+    });
+
+    // 6. Markov degradation — ETTC-based framing (DK schema has no stationary_critical field)
+    var markovRisky = fleet.filter(function(s){ return s.markov && s.markov.ettc_years != null && s.markov.ettc_years < 35; });
+    if (markovRisky.length) {
+      var avgE = markovRisky.reduce(function(a,s){ return a + (s.markov.ettc_years||0); }, 0) / markovRisky.length;
+      spotlights.push({
+        title: markovRisky.length + ' Substations With ETTC Below 35 Years',
+        body: 'The SSI\'s 4-state Markov degradation model identifies <strong>' + markovRisky.length +
+          ' substations</strong> with estimated time-to-critical (ETTC) below 35 years — ' +
+          'average <strong>ETTC = ' + avgE.toFixed(1) + ' years</strong>. ' +
+          'Fleet-wide median ETTC is 44.4 years (Denmark\'s grid is one of Europe\'s best-maintained), ' +
+          'so this tail is where Forsyningstilsynet\'s DSO inspection-priority lists and Energinet N-1 reinforcement CAPEX should concentrate.'
+      });
+    }
+
+    // 7. Data-centre / hyperscale load cluster
+    var dcKommuner = ['København', 'Viborg', 'Odense', 'Høje-Taastrup', 'Ballerup', 'Fredericia'];
+    var dcSubs = fleet.filter(function(s){ return s.province && dcKommuner.indexOf(s.province) >= 0; });
+    if (dcSubs.length) {
+      var dcAvgR = dcSubs.reduce(function(a,s){ return a + (s.R_median||0); }, 0) / dcSubs.length;
+      spotlights.push({
+        title: 'Hyperscale Data-Centre Load Cluster — ' + dcSubs.length + ' Substations',
+        body: '<strong>' + dcSubs.length + ' substations</strong> sit in Denmark\'s hyperscale data-centre kommuner ' +
+          '(Apple Viborg, Facebook Odense, Microsoft Høje-Taastrup, and the Copenhagen ring) — avg R_median = <strong>' + dcAvgR.toFixed(3) + '</strong>. ' +
+          'These nodes carry the heaviest E-component and R3 consequence stack in the fleet: a single outage cascades into several hundred MW of IT load and billion-DKK service-level penalties. ' +
+          'The T-component flex-load signal (data-centre demand-response) is the main lever to absorb the North Sea wind-generation peak.'
+      });
+    }
+
+    // Pick this month's spotlight
+    var spotIdx = seededIndex(seed + 5555, spotlights.length);
+    var spot = spotlights[spotIdx] || spotlights[0] || { title: 'Fleet Spotlight', body: 'Loading fleet statistics…' };
+
+    var card3 = document.getElementById('g-spotlight');
+    card3.innerHTML =
+      '<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span>' +
+      '<h3 style="margin-top:0;font-size:15px">' + spot.title + '</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' + spot.body + '</p>';
+
+    // Closing line
+    document.getElementById('g-closing').innerHTML =
+      'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
+      '. Deep-dive: <strong>' + nextDive.theme + '</strong> (' + nextDive.region + '). ' +
+      'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
+  }).catch(function(){
+    document.getElementById('g-spotlight').innerHTML =
+      '<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span>' +
+      '<h3 style="margin-top:0;font-size:15px">ssi-data.json unavailable</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Fleet statistics could not be loaded for this spotlight.</p>';
+    document.getElementById('g-closing').innerHTML =
+      'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
+      '. Deep-dive: <strong>' + nextDive.theme + '</strong> (' + nextDive.region + '). ' +
+      'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
+  });
+})();
+</script>
+
+<div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
+  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent Energinet, Forsyningstilsynet, a Danish DSO (Radius, Cerius, N1, Trefor, Energi Fyn, KONSTANT, NOE, BornholmsEnergi, …), Dansk Fjernvarme, Energistyrelsen, a Kommune, a hyperscale data-centre operator, DTU Wind / DTU Elektro, or another Danish utility, regulator or academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
+</div>
 </section>
 
 </main>
