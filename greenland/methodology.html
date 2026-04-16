@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 6 modifiers, 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="description" content="SSI v4.0.2 methodology for Greenland — master equation, 6 components, 6 modifiers, 95 variables, 25+ public data sources, Monte Carlo uncertainty, §7 Pituffik exclusion, §8 small-N guardrail. Open, reproducible.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Methodology</title>
 <link rel="stylesheet" href="../style.css?v=402">
@@ -18,7 +18,12 @@
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
     <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible. Greenland-specific annex (§7 Pituffik, §8 Small-N guardrail, Arctic modifier calibration) applies on top of the pan-OECD base.</p>
+  </div>
+
+  <div class="card animate-in" style="border-left:3px solid var(--bronze);background:linear-gradient(135deg,#fff8eb 0%,var(--cream) 100%);margin-bottom:24px;padding:10px 14px">
+    <span class="label-xs" style="color:var(--bronze)">PROVISIONAL · bootstrap 2026-04-16 · Session 1 gated to 2026-07</span>
+    <span style="font-size:12.5px;color:var(--warm-grey);margin-left:8px">N = 36 substations at bootstrap (projected ~250 at Session 1 once the Nukissiorfiit asset register supplements OSM). R3 tier-balance is relaxed to the small-N range (2–50% per tier) and Monte Carlo is deferred — see §8.</span>
   </div>
 
   <!-- Thesis -->
@@ -320,6 +325,52 @@
     </table>
   </div>
 
+  <!-- §7 Pituffik Exclusion -->
+  <div class="card animate-in" style="margin-bottom:24px;border-left:3px solid var(--terracotta)">
+    <div class="card-header">
+      <h3>§7 &ensp; Pituffik Space Base — Exclusion</h3>
+      <span class="label-xs">Avannaata Kommune</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:10px">
+      Pituffik Space Base (formerly Thule Air Base) is a U.S. Space Force installation in northern Avannaata Kommune. It operates an independent electrical grid outside of Nukissiorfiit's scope, with asset data that is not publicly available. In line with the SSI's public-data-only policy, <strong>all Pituffik assets are excluded</strong> from ingestion, scoring, reporting and fleet summaries.
+    </p>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:10px">
+      Implementation: the OSM ingestion query strips any node inside the geographic box <code>lat ∈ [75.5°, 77.5°]</code>, <code>lon ∈ [−71°, −66°]</code>, as well as any asset whose <code>operator</code> tag references the U.S. Navy, U.S. Space Force, U.S. Air Force or Pituffik itself. The exclusion is logged in <code>ssi-data.json · meta.pituffik_excluded = true</code> and echoed on the index, data and methodology pages.
+    </p>
+    <p style="font-size:12.5px;line-height:1.7;color:var(--warm-grey);margin:0">
+      Related exclusions: Qulliq Energy Corporation (Nunavut), Hydro-Québec, RARIK and Veitur (Iceland) — filtered out at ingestion when the initial OSM bounding box incidentally captured neighbouring territories. See the Data Ingestion Audit for the full exclusion list.
+    </p>
+  </div>
+
+  <!-- §8 Small-N Guardrail -->
+  <div class="card animate-in" style="margin-bottom:32px;border-left:3px solid var(--bronze)">
+    <div class="card-header">
+      <h3>§8 &ensp; Small-N Guardrail &amp; First-Refresh Gate</h3>
+      <span class="label-xs">bootstrap N=36 · Session 1 2026-07</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div class="label-xs" style="margin-bottom:6px">§8.1 R3 tier-balance relaxation</div>
+        <p style="font-size:12.5px;line-height:1.7;margin:0">Standard pan-OECD policy requires every band (Low / Medium / High / Critical) to hold 5–45% of the fleet. At N=36 this is arithmetically impossible. For small-N entities (N&lt;500) the bounds relax to <strong>2–50% per band</strong>. The rule is retained as default; the relaxation is logged against each violated band with reason <code>small_N_relaxation</code>.</p>
+      </div>
+      <div>
+        <div class="label-xs" style="margin-bottom:6px">§8.2 Monte-Carlo deferral</div>
+        <p style="font-size:12.5px;line-height:1.7;margin:0">Full 10,000-iteration MC per substation is deferred until Session 1 ingests Nukissiorfiit reliability data. The engine fields (R_median, R_P5, R_P95, CI_width, classification, modifier_impact, P_critical) are emitted as <code>null</code> with <code>data_status="PROVISIONAL"</code>.</p>
+      </div>
+      <div>
+        <div class="label-xs" style="margin-bottom:6px">§8.3 Graph topology — within-island only</div>
+        <p style="font-size:12.5px;line-height:1.7;margin:0">R4 graph criticality is computed per islanded micro-grid. Cross-settlement edges are <em>never</em> synthesised — Greenland has no inter-kommune HV interconnector. Graph degree is LIVE at bootstrap (avg 0.8 Kujalleq, 1.0 Sermersooq, 0.3 Qeqqata, 0.0 Qeqertalik).</p>
+      </div>
+      <div>
+        <div class="label-xs" style="margin-bottom:6px">§8.4 FIRST_REFRESH gate = 2026-07</div>
+        <p style="font-size:12.5px;line-height:1.7;margin:0">Greenland skips the April, May and June monthly runs. The first quantitative refresh is the July 2026 Session 1, which ingests Nukissiorfiit asset/outage data, Asiaq climate &amp; permafrost, GEUS bedrock, and Stat.gl socio-economic overlays. From July onwards Greenland is bundled with Denmark's archive (<code>ARCHIVE_BUNDLES</code>).</p>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:12px;color:var(--warm-grey)">
+      Current bootstrap (2026-04-16): <strong>36</strong> substations across <strong>4</strong> active Kommuner · <strong>74</strong> plants / generators · <strong>125</strong> power-line segments · <strong>8</strong> of 95 fields LIVE · <strong>87</strong> fields pending Session 1.
+    </div>
+  </div>
+
   <!-- Competitive Positioning Note -->
   <div class="card animate-in" style="border-left:3px solid var(--sage)">
     <div class="card-header">
@@ -327,7 +378,7 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC Nukissiorfiit distribution Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive regulatory reporting data) and asset health (requires proprietary distribution company data the SSI deliberately avoids) remain as acknowledged gaps.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRÉ/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive regulatory reporting data) and asset health (requires proprietary distribution company data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
 </main>
