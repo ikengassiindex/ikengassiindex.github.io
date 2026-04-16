@@ -63,18 +63,6 @@
   <p>First scored edition of the Greenland fleet — 37 substations, 74 plants and 125 power-line segments across all 5 Kommuner, scored 2026-04-16 with Arctic/Greenland-calibrated inputs. Fleet median R_median = 0.779 · 29 of 37 substations in the Critical band. Arctic R6a restoration (α ∈ [0.55, 0.90]) and GEUS stable-craton R6b (α ∈ [0.05, 0.15]) live. SSI v4.0.2 · April 2026.</p>
 </div>
 
-<!-- OFFICIAL BANNER -->
-<div class="card animate-in delay-1" style="border-left:3px solid var(--sage);background:linear-gradient(135deg,#f5f2ea 0%,var(--cream) 100%);margin-bottom:24px;padding:12px 16px">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-    <span class="label-xs" style="color:var(--sage);font-weight:700">OFFICIAL · EDITION 001 · SESSION 1 SCORED 2026-04-16</span>
-    <span style="font-size:10px;color:var(--warm-grey)">data_status = OFFICIAL · fields_scored = 95/95 · MC = 1,000 × 37 = 37,000 draws</span>
-  </div>
-  <p style="font-size:12.5px;color:var(--warm-grey);margin:0;line-height:1.6">
-    Every component, modifier and Monte Carlo interval is populated. Geometry: 37 substations across Kujalleq (20), Qeqertalik (12), Qeqqata (3), Sermersooq (1) and Avannaata (1 — Ilulissat transformer, OSM node/11958572184). Scoring is calibrated against Stat.gl 2024/25 socio-economic data, Nukissiorfiit 2024 Annual Report (CAIDI ≈ 8h, RE share ≈ 70%), Asiaq/DMI climate trajectories and GEUS stable-craton seismic. §8 Small-N guardrail is active (N=37 · R3 tier-balance 2–50% · no Gaussian copula — see Methodology §8.2). The Session 1 gate was brought forward from 2026-07 to 2026-04; standard monthly cadence begins 2026-05.
-  </p>
-</div>
-
-
 <!-- ═══════════════════ TABLE OF CONTENTS ═══════════════════ -->
 <div class="card animate-in delay-1" style="margin-bottom:24px">
   <span class="label-xs" style="margin-bottom:12px;display:block">Contents</span>
@@ -86,7 +74,7 @@
     <a href="#deep" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> Deep-Dive: The Buksefjord Corridor</a>
     <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F</span> European Context Card</a>
     <a href="#enn" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">G</span> SSI Enhanced Neural Network</a>
-    <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">H</span> Session 1 → Edition 002</a>
+    <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">H</span> Looking Ahead</a>
   </div>
 </div>
 
@@ -163,6 +151,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div style="width:220px;flex-shrink:0">
+      <canvas id="focus-radar" width="220" height="180"></canvas>
     </div>
   </div>
   <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);display:flex;gap:16px;flex-wrap:wrap">
@@ -278,6 +269,76 @@
       '<div><strong>coord:</strong> ' + latStr + ', ' + lonStr + '</div>' +
       '<div><strong>degree:</strong> ' + deg + ' · <strong>PGA:</strong> ' + pga + '</div>' +
       '<div><strong>MC:</strong> 1,000 iter · R∈[' + fmt(rP5,3) + ', ' + fmt(rP95,3) + ']</div>';
+
+    // Radar chart on canvas (C/V/I/E/S/T) — normalised against component weight ceilings
+    (function drawRadar(){
+      var canvas = document.getElementById('focus-radar');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var W = canvas.width, H = canvas.height;
+      var cx = W / 2, cy = H / 2 + 6;
+      var R = 68;
+      var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
+      var weights = [0.30, 0.10, 0.25, 0.10, 0.20, 0.05];
+      var compSum = labels.reduce(function(sum, k){ return sum + (comp[k] || 0); }, 0);
+      var isWeighted = compSum <= 1.0;
+      var vals = labels.map(function(k, i){
+        var v = comp[k];
+        if (v == null) return 0;
+        return isWeighted ? v / weights[i] : v;
+      });
+      var n = labels.length;
+
+      // Concentric rings
+      ctx.strokeStyle = 'rgba(44,36,32,0.08)';
+      ctx.lineWidth = 1;
+      [0.25, 0.5, 0.75, 1.0].forEach(function(ring){
+        ctx.beginPath();
+        for (var i = 0; i <= n; i++) {
+          var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+          var x = cx + R * ring * Math.cos(angle);
+          var y = cy + R * ring * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      });
+
+      // Axes
+      for (var i = 0; i < n; i++) {
+        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+        ctx.stroke();
+      }
+
+      // Data polygon
+      ctx.fillStyle = 'rgba(148,25,20,0.15)';
+      ctx.strokeStyle = 'rgba(148,25,20,0.7)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++) {
+        var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+        var v = Math.min(vals[i % n], 1);
+        var x = cx + R * v * Math.cos(angle);
+        var y = cy + R * v * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      // Labels
+      ctx.fillStyle = '#2c2420';
+      ctx.font = '600 11px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      for (var i = 0; i < n; i++) {
+        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        var lx = cx + (R + 16) * Math.cos(angle);
+        var ly = cy + (R + 16) * Math.sin(angle);
+        ctx.fillText(labels[i], lx, ly);
+      }
+    })();
 
     // Dominant component + modifier
     var domComp = null, domVal = -1;
@@ -733,23 +794,241 @@ Because Sermersooq only contains <strong>1 OSM-tagged substation</strong> in the
 <div style="margin:32px 0"></div>
 
 
-<!-- ═══════════════════ H. SESSION 1 → EDITION 002 ═══════════════════ -->
+<!-- ═══════════════════ H. LOOKING AHEAD ═══════════════════ -->
 <section id="ahead" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section H</span>
-<h2>Session 1 → Edition 002 (May 2026)</h2>
+<h2>Looking Ahead</h2>
 
-<p style="font-size:13px;line-height:1.7">
-<strong>Session 1 complete.</strong> The <code>FIRST_REFRESH</code> gate was brought forward from 2026-07 to 2026-04-16 once the Arctic / Greenland calibration inputs converged — Stat.gl 2024/25 socio-economic coverage, Nukissiorfiit 2024 Annual Report (CAIDI ≈ 8h, RE share ≈ 70%), Asiaq/DMI climate trajectories and GEUS stable-craton seismic. The scoring engine executed its first end-to-end pass: geometry → component rollup (C/V/I/E/S/T) → modifier stack (R3 / R4 / R6a / R6b / R7) → Monte Carlo (1,000 iterations × 37 substations = 37,000 draws, components perturbed independently) → R_median, P5 / P95 bounds, classification band, CI width → publication. Fleet median R = <strong>0.779</strong>; 29 of 37 substations sit in the Critical band; Avannaata–Sermersooq risk gradient spans 0.213 R.
-</p>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0">
+  <!-- Card 1: Next Edition — deterministic deep-dive rotation -->
+  <div class="card" style="border-top:3px solid var(--bronze)" id="h-next-edition">
+    <span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+  <!-- Card 2: Next Data Refresh — from SSIMetadata source frequencies -->
+  <div class="card" style="border-top:3px solid var(--sage)" id="h-data-refresh">
+    <span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+  <!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json -->
+  <div class="card" style="border-top:3px solid var(--crimson)" id="h-spotlight">
+    <span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+</div>
 
-<p style="font-size:13px;line-height:1.7">
-<strong>Edition 002 priorities (May 2026).</strong> (1) Nukissiorfiit 2025 transmission + distribution SCADA ingest, if published — refines C1–C4 and R6a restoration. (2) Any Departementet for Boliger og Infrastruktur Afbrydelsestatistik 2025 release — tightens SAIDI reference and R3 consequence multiplier. (3) GEUS bedrock + permafrost update — refines I3 and R6b ice-accretion. (4) CMIP6 Arctic regional downscaling refresh — refines R6b polar-low storm, freezing-spray, surge. (5) First pulse reading: Edition 002 vs Edition 001 R_median delta per substation, surfacing any movement outside the ±0.04–0.06 MC CI width. (6) First SSI-ENN Layer 2 valuation outputs anchored to Buksefjord and Sisimiut hydro.
-</p>
+<p style="font-size:13px;line-height:1.7" id="h-closing">Loading…</p>
 
-<p style="font-size:13px;line-height:1.7">
-<strong>What Edition 001 establishes.</strong> A verified 37-substation / 74-plant / 125-line scored fleet, Pituffik correctly excluded, Avannaata coverage closed via OSM node/11958572184, the §8 Small-N Guardrail running as intended (MC 1,000 iter, R3 tier-balance 2–50%, Gaussian copula held off), and the full Arctic / Greenland R6a/R6b calibration live. From this foundation, every subsequent edition becomes a delta against a known baseline — the exact transparency standard the SSI is built to maintain.
-</p>
+<script>
+(function(){
+  var now = new Date();
+  var month = now.getMonth(); // 0-indexed
+  var year = now.getFullYear();
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+  // Next edition = next month (monthly cadence, Edition 001 = April 2026)
+  var nextMonth = (month + 1) % 12;
+  var nextYear = (month + 1) > 11 ? year + 1 : year;
+  // Edition number: April 2026 = 1, May 2026 = 2, ...
+  var editionNum = (year - 2026) * 12 + (month + 1) - 3;
+  var nextEditionNum = editionNum + 1;
+  var nextEdition = String(Math.max(1, nextEditionNum)).padStart(3, '0');
+
+  // Deterministic seed
+  function seededIndex(s, len) {
+    var h = s;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+    h = (h >>> 16) ^ h;
+    return Math.abs(h) % len;
+  }
+  var nextSeed = nextYear * 100 + (nextMonth + 1);
+
+  // ── Card 1: Next Edition deep-dive topics ──
+  var deepDives = [
+    { region: 'Sermersooq', theme: 'The Buksefjord Hydro Corridor', context: 'Hydro + Nuuk metro load', contextDetail: 'Buksefjord 45 MW, Nuuk metro concentration — SSI-ENN Layer 2 valuation anchor and R3 consequence profile' },
+    { region: 'Avannaata', theme: 'Ilulissat & the Arctic Frontier', context: 'High-Arctic isolation', contextDetail: 'Single transformer at 69.22°N, longest restoration timeline, R6a α → 0.90 envelope and polar-low exposure' },
+    { region: 'Qeqqata', theme: 'Sisimiut & the Hydro Uprate', context: 'West-coast hydro capacity', contextDetail: 'Sisimiut hydro uprate scenario, second-best fleet R_median, R6a α ≈ 0.70 — where Edition 002 movement is most likely' },
+    { region: 'Kujalleq', theme: 'South Greenland Micro-Grids', context: 'Settlement-cluster grid topology', contextDetail: 'Qaqortoq–Narsaq–Nanortalik micro-grids: 20 substations, highest N in fleet, R3 settlement tier dominant' },
+    { region: 'Qeqertalik', theme: 'The Disko Bay Nodes', context: 'Coastal Bay cluster', contextDetail: 'Aasiaat–Qasigiannguit–Qeqertarsuaq: 12 substations, tidewater glacier proximity, sea-ice logistics for spares' },
+    { region: 'Pan-Fleet', theme: 'Permafrost Degradation & R6b', context: 'Asiaq + GEUS ground ice signals', contextDetail: 'Asiaq continuous-permafrost retreat and GEUS bedrock data feeding R6b ice-accretion and foundation-stability penalties' },
+    { region: 'Pan-Fleet', theme: 'R7 Digital Readiness Uplift', context: 'Greenland Connect + Nukissiorfiit OT', contextDetail: 'Tele Greenland backhaul and smart-meter pilot rollout — the levers that could compress the 1.04–1.08 R7 band in Edition 002+' }
+  ];
+
+  var nextDiveIdx = seededIndex(nextSeed + 3333, deepDives.length);
+  var nextDive = deepDives[nextDiveIdx];
+
+  var card1 = document.getElementById('h-next-edition');
+  card1.innerHTML =
+    '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
+    '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
+    '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, kommune breakdown. ' +
+    'European Context Card: ' + nextDive.contextDetail + '.</p>';
+
+  // ── Card 2: Next Data Refresh — from SSIMetadata ──
+  var meta = window.SSIMetadata;
+  if (meta && meta.FREQ_DISTRIBUTION) {
+    var currentQ = Math.floor(month / 3) + 1;
+    var nextQ = currentQ >= 4 ? 1 : currentQ + 1;
+    var nextQYear = currentQ >= 4 ? year + 1 : year;
+    var qLabels = { 1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4' };
+
+    // Find highest-impact annual source by variables covered
+    var annualHighImpact = (meta.DATA_SOURCES || []).filter(function(s){ return s.freq === 'Annual'; })
+      .sort(function(a,b){ return (b.vars||0) - (a.vars||0); })[0];
+
+    var qtrFD = meta.FREQ_DISTRIBUTION.Quarterly;
+    var qtrSources = qtrFD ? qtrFD.sources.join(', ') : 'none';
+    var qtrCount = qtrFD ? qtrFD.count : 0;
+
+    var card2 = document.getElementById('h-data-refresh');
+    card2.innerHTML =
+      '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
+      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + qtrCount + ' Quarterly Sources</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+      '<strong>' + qtrSources + '</strong> due for refresh in ' + qLabels[nextQ] + '. ' +
+      'Impact: Nukissiorfiit reliability counters, Asiaq/DMI climate trajectories, CMIP6 Arctic downscaling refresh (R6b polar-low, freezing-spray, surge). ' +
+      'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong>' +
+      (annualHighImpact ? ' (' + (annualHighImpact.vars||'?') + ' variables → ' + (annualHighImpact.feeds||'') + ')' : '') + '.</p>';
+  } else {
+    document.getElementById('h-data-refresh').innerHTML =
+      '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
+      '<h3 style="margin-top:0;font-size:15px">Monthly Cadence — Edition ' + nextEdition + '</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
+      'Nukissiorfiit reliability counters, Asiaq/DMI climate trajectories and CMIP6 Arctic downscaling re-ingest on the monthly refresh. ' +
+      'First pulse reading: Edition 002 vs Edition 001 R_median delta per substation, surfacing any movement outside the ±0.04–0.06 MC CI width.</p>';
+  }
+
+  // ── Card 3: Fleet Spotlight — rotating stat ──
+  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+    var fleet = (data && data.substations) || [];
+    var seed = year * 100 + (month + 1);
+
+    var spotlights = [];
+
+    // 1. Kommune with the highest risk concentration
+    var kData = {};
+    fleet.forEach(function(s){
+      var k = s.region || s.kommune || 'Unknown';
+      if (!kData[k]) kData[k] = { subs: [], sumR: 0, highCrit: 0 };
+      kData[k].subs.push(s);
+      kData[k].sumR += (s.R_median || 0);
+      if (s.classification === 'High' || s.classification === 'Critical') kData[k].highCrit++;
+    });
+    var kList = Object.keys(kData).map(function(k){
+      var d = kData[k];
+      return { name: k, n: d.subs.length, avg: d.subs.length ? d.sumR / d.subs.length : 0, highCrit: d.highCrit, pctHC: d.subs.length ? d.highCrit / d.subs.length : 0 };
+    });
+    kList.sort(function(a,b){ return b.pctHC - a.pctHC || b.avg - a.avg; });
+    var riskiest = kList[0];
+    if (riskiest) {
+      spotlights.push({
+        title: riskiest.name + ': Highest Risk Concentration',
+        body: '<strong>' + riskiest.name + '</strong> has the highest concentration of High/Critical substations: <strong>' +
+          riskiest.highCrit + ' of ' + riskiest.n + ' (' + (riskiest.pctHC * 100).toFixed(0) + '%)</strong> in the upper risk bands — ' +
+          'avg R_median = ' + riskiest.avg.toFixed(3) + '. This is the most acute kommune in the Session 1 fleet.'
+      });
+    }
+
+    // 2. Widest uncertainty — highest optionality
+    var byCIDesc = fleet.slice().filter(function(s){ return s.CI_width != null; }).sort(function(a,b){ return b.CI_width - a.CI_width; });
+    var topUncertain = byCIDesc.slice(0, 10);
+    if (topUncertain.length) {
+      var avgCItop = topUncertain.reduce(function(a,s){ return a + (s.CI_width||0); }, 0) / topUncertain.length;
+      var topRegions = {};
+      topUncertain.forEach(function(s){ var k = s.region || s.kommune || '—'; topRegions[k] = (topRegions[k] || 0) + 1; });
+      var topRegionStr = Object.keys(topRegions).sort(function(a,b){ return topRegions[b] - topRegions[a]; }).slice(0, 3).join(', ');
+      spotlights.push({
+        title: 'Highest Uncertainty = Highest Optionality',
+        body: 'The ' + topUncertain.length + ' substations with the widest confidence intervals (avg CI = ' + avgCItop.toFixed(3) +
+          ') represent the highest <em>option value</em> for BESS and hydro uprate investment — uncertainty creates optionality. ' +
+          'They concentrate in <strong>' + topRegionStr + '</strong>. In the SSI-ENN framework, these substations ' +
+          'would generate the largest real-options premium above base DCF valuation.'
+      });
+    }
+
+    // 3. Isolated within-island topology — every substation a "bridge"
+    var bridges = fleet.filter(function(s){ return s.graph_topology && s.graph_topology.is_bridge; });
+    var isolated = fleet.filter(function(s){ return s.graph_topology && (s.graph_topology.degree === 0); });
+    spotlights.push({
+      title: isolated.length + ' Isolated Nodes — Every Substation a Single Point of Failure',
+      body: 'Greenland\'s grid is a set of <strong>isolated within-island networks</strong>: ' +
+        '<strong>' + isolated.length + ' of ' + fleet.length + '</strong> substations have graph degree 0 — no inter-settlement edges — ' +
+        'and <strong>' + bridges.length + '</strong> are flagged as topological bridges. ' +
+        'In the SSI-ENN framework this collapses the R4 graph-criticality modifier into a binary: every node is a single point of failure for its settlement. ' +
+        'R6a Arctic restoration (α ∈ [0.55, 0.90]) therefore dominates — faster mutual aid cannot substitute for in-place redundancy.'
+    });
+
+    // 4. Arctic storm + permafrost — replaces the seismic spotlight
+    var arcticHigh = fleet.filter(function(s){ return (s.region === 'Avannaata' || s.region === 'Qeqertalik') && (s.classification === 'High' || s.classification === 'Critical'); });
+    spotlights.push({
+      title: 'Arctic Storm + Permafrost: The R6b Compound',
+      body: 'All 37 substations sit on the <strong>GEUS stable craton</strong> — seismic R6b is uniformly α ∈ [0.05, 0.15], effectively neutral. ' +
+        'The dominant physical-hazard modifier is instead <strong>Arctic storm + freezing-spray + permafrost foundation creep</strong>. ' +
+        '<strong>' + arcticHigh.length + ' High/Critical substations</strong> sit in Avannaata and Qeqertalik — the highest-latitude kommuner — ' +
+        'where polar-low storm frequency and continuous-permafrost retreat compound into the heaviest R6b penalty. ' +
+        'CMIP6 Arctic downscaling ingests will tighten this envelope at Edition 002.'
+    });
+
+    // 5. Economic fragility — Kujalleq + Qeqertalik settlement tier
+    var settlementHigh = fleet.filter(function(s){ return (s.region === 'Kujalleq' || s.region === 'Qeqertalik') && (s.classification === 'High' || s.classification === 'Critical'); });
+    spotlights.push({
+      title: 'Settlement Tier: ' + settlementHigh.length + ' High/Critical Nodes in Kujalleq + Qeqertalik',
+      body: 'South and central-west Greenland\'s settlement clusters carry the compressed-high R3 consequence multiplier: ' +
+        'elderly share 13–16%, unemployment 11–13%, GDP/cap DKK 205–235k — all below the pan-OECD median. ' +
+        '<strong>' + settlementHigh.length + '</strong> Kujalleq + Qeqertalik substations score High or Critical, meaning grid fragility ' +
+        'intersects with limited socio-economic capacity to absorb outage cost. The SSI\'s E component + R3 modifier make this invisible correlation visible.'
+    });
+
+    // 6. Markov degradation — 1-year degrade probability
+    var markovRisky = fleet.filter(function(s){ return s.markov && s.markov.P_degrade_1yr != null && s.markov.P_degrade_1yr > 0.25; });
+    if (markovRisky.length) {
+      var avgP = markovRisky.reduce(function(a,s){ return a + (s.markov.P_degrade_1yr||0); }, 0) / markovRisky.length;
+      spotlights.push({
+        title: markovRisky.length + ' Substations With Elevated 1-Year Degrade Probability',
+        body: 'The SSI\'s 4-state Markov degradation model identifies <strong>' + markovRisky.length +
+          ' substations</strong> with a 1-year transition-to-worse probability above 25% — ' +
+          'average P_degrade_1yr = <strong>' + avgP.toFixed(3) + '</strong>. ' +
+          'Without intervention, these substations will trend toward degraded or critical state on the next cycle. ' +
+          'Edition 002 will surface the per-node 3-year expected-state trajectory and compare against the Arctic R6a restoration envelope.'
+      });
+    }
+
+    // Pick this month's spotlight
+    var spotIdx = seededIndex(seed + 5555, spotlights.length);
+    var spot = spotlights[spotIdx] || spotlights[0] || { title: 'Fleet Spotlight', body: 'Loading fleet statistics…' };
+
+    var card3 = document.getElementById('h-spotlight');
+    card3.innerHTML =
+      '<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span>' +
+      '<h3 style="margin-top:0;font-size:15px">' + spot.title + '</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' + spot.body + '</p>';
+
+    // Closing line
+    document.getElementById('h-closing').innerHTML =
+      'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
+      '. Deep-dive: <strong>' + nextDive.theme + '</strong> (' + nextDive.region + '). ' +
+      'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
+  }).catch(function(){
+    document.getElementById('h-spotlight').innerHTML =
+      '<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span>' +
+      '<h3 style="margin-top:0;font-size:15px">ssi-data.json unavailable</h3>' +
+      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Fleet statistics could not be loaded for this spotlight.</p>';
+    document.getElementById('h-closing').innerHTML =
+      'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
+      '. Deep-dive: <strong>' + nextDive.theme + '</strong> (' + nextDive.region + '). ' +
+      'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
+  });
+})();
+</script>
+
+<div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
+  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent Nukissiorfiit, Departementet for Boliger og Infrastruktur, a Kommune, GEUS, Asiaq, Grønlands Statistik or an academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
+</div>
 </section>
 
 </main>
