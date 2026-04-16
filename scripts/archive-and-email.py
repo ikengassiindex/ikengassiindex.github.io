@@ -32,8 +32,11 @@ FIRST_REFRESH = {
     "denmark": "2026-05", "norway": "2026-05", "finland": "2026-05",
     "poland":  "2026-05", "sweden": "2026-05", "mexico":  "2026-05",
     "new-zealand": "2026-06",
-    # greenland Session 1 completed 2026-04-16 (brought forward from 2026-07);
-    # standard monthly cadence from 2026-05.
+    # Greenland Session 1 completed 2026-04-16 (brought forward from 2026-07).
+    # First automated refresh = Edition 002 on the second Thursday of June 2026
+    # (bimonthly cadence after Session 1 to give Nukissiorfiit / Afbrydelsestatistik
+    # data a full cycle before the first delta reading).
+    "greenland": "2026-06",
 }
 # Archive bundles: forward-looking metadata documenting shared-sovereignty
 # groupings. Greenland is an autonomous territory of the Kingdom of Denmark
