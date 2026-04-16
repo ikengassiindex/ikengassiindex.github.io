@@ -226,7 +226,7 @@ function renderFooter() {
     turkey: '95 variables · 30 sources · 4,092 substations (1,132 HV · 2,960 MV) across 81 İller',
     ireland: '95 variables · 30 sources · 994 substations (319 HV · 675 MV) · 4,505 power lines across 26 Counties · 4 Provinces',
     portugal: '95 variables · 28 sources · 10,191 substations (168 HV · 708 MV) · 11,043 power lines across 20 Distritos · 7 Regiões',
-    'new-zealand': '95 variables · 28 sources · 11,500 substations (170 Transmission · 11,330 Distribution) · 12,400 power lines across 16 Regions · 2 Islands',
+    'new-zealand': '95 variables · 28 sources · 1,558 substations (200 HV ≥110 kV · 1,358 MV <110 kV) across 16 Regions · 2 Islands',
     greenland: '95 variables · 25 sources · ~250 substations (15 HV · 235 MV) · ~70 islanded micro-grids across 5 Kommuner · Pituffik excluded'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';

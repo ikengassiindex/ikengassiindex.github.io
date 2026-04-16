@@ -305,7 +305,7 @@ window.SSIMetadata = (function () {
       components: 6,
       modifiers: 5,
       sources: 28,
-      substations: 11500,
+      substations: 1558,
       powerLines: 12400,
       mcIterations: 10000,
       regions: 16,
