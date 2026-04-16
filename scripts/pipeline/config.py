@@ -19,6 +19,8 @@ COUNTRIES = [
     "us", "switzerland", "austria", "canada", "japan",
     "denmark", "norway", "finland", "poland", "sweden", "mexico",
     "greece", "turkey", "ireland", "portugal", "new-zealand",
+    "greenland",  # Autonomous territory within the Kingdom of Denmark — not an OECD member,
+                  # but included for pan-Arctic coverage. Archive bundled with DK.
 ]
 
 # Country metadata for ingestion routing
@@ -44,6 +46,7 @@ COUNTRY_META = {
     "ireland":     {"iso2": "IE", "iso3": "IRL", "nuts0": "IE",  "stats_agency": "CSO",    "seismic_source": "DIAS/GSI",   "fields": 95},
     "portugal":    {"iso2": "PT", "iso3": "PRT", "nuts0": "PT",  "stats_agency": "INE",    "seismic_source": "IPMA/LNEG",  "fields": 95},
     "new-zealand": {"iso2": "NZ", "iso3": "NZL", "nuts0": None,  "stats_agency": "StatsNZ","seismic_source": "GNS/GeoNet", "fields": 95},
+    "greenland":   {"iso2": "GL", "iso3": "GRL", "nuts0": None,  "stats_agency": "Stat.gl","seismic_source": "GEUS/DMI",   "fields": 95},
 }
 
 # ── SSI v4.0.2 Scoring Parameters ─────────────────────────

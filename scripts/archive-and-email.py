@@ -25,12 +25,23 @@ BASE_URL = "https://ikengassiindex.github.io"
 COUNTRIES = ["france", "italy", "uk", "us", "germany", "spain",
              "switzerland", "austria", "canada", "japan", "australia", "chile",
              "denmark", "norway", "finland", "poland", "sweden", "mexico",
-             "greece", "turkey", "ireland", "portugal", "new-zealand"]
+             "greece", "turkey", "ireland", "portugal", "new-zealand",
+             "greenland"]
 # Countries with a first-automated-refresh gate (skip monthly runs before this YYYY-MM).
 FIRST_REFRESH = {
     "denmark": "2026-05", "norway": "2026-05", "finland": "2026-05",
     "poland":  "2026-05", "sweden": "2026-05", "mexico":  "2026-05",
     "new-zealand": "2026-06",
+    "greenland":   "2026-07",
+}
+# Archive bundles: forward-looking metadata documenting shared-sovereignty
+# groupings. Greenland is an autonomous territory of the Kingdom of Denmark
+# with an independent grid but a shared OECD umbrella. The current flat-email
+# architecture already delivers all countries as a single monthly email, so
+# bundling is implicit once FIRST_REFRESH is reached; this dict exists for
+# documentation and for any future per-bundle email splitting.
+ARCHIVE_BUNDLES = {
+    "denmark": ["greenland"],
 }
 ARCHIVE_DIR = Path("archive")
 

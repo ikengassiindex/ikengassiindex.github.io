@@ -74,10 +74,12 @@ jobs:
           # Per-country first-refresh gates:
           #   denmark norway finland poland sweden mexico → 2026-05
           #   new-zealand                                 → 2026-06
-          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey ireland portugal new-zealand; do
+          #   greenland                                   → 2026-07 (bundled with Denmark archive)
+          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey ireland portugal new-zealand greenland; do
             case "$country" in
               denmark|norway|finland|poland|sweden|mexico) FIRST="2026-05" ;;
               new-zealand)                                 FIRST="2026-06" ;;
+              greenland)                                   FIRST="2026-07" ;;
               *)                                           FIRST="" ;;
             esac
             if [ -n "$FIRST" ] && [ "$CURRENT_YM" \< "$FIRST" ]; then
