@@ -48,6 +48,15 @@ jobs:
           ARCHIVE_EMAIL: ssi_index@ikenga.eu
         run: python3 scripts/archive-and-email.py
 
+      - name: Upload run log artifact
+        if: ${{ always() && github.event.inputs.skip_archive != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ssi-archive-run-log
+          path: archive/_logs/run-*.json
+          if-no-files-found: warn
+          retention-days: 90
+
       # ── Step 2: Update edition config ──
       - name: Update edition config
         run: python3 scripts/update-edition.py

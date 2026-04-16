@@ -1,7 +1,16 @@
 /**
- * SSI Intelligence Loader v1.0
- * Auto-populates edition metadata from edition-config.json
- * Usage: <script src="../intelligence/intelligence-loader.js" data-country="france"></script>
+ * SSI Intelligence Loader v1.1
+ * Auto-populates edition metadata from edition-config.json.
+ *
+ * Usage on the intelligence page (full integration — sets <title> + edition text):
+ *   <script src="../intelligence/intelligence-loader.js" data-country="france"></script>
+ *
+ * Usage on an ESG page (metadata only, leaves page <title> alone):
+ *   <script src="../intelligence/intelligence-loader.js"
+ *           data-country="france" id="ssi-esg-page"></script>
+ *
+ * If the country is not in the active rotation, the loader exits quietly.
+ * Pre-launch countries (listed in PRE_LAUNCH_COUNTRIES) don't even log.
  */
 (function() {
   'use strict';
@@ -15,6 +24,14 @@
     var pathParts = window.location.pathname.split('/').filter(Boolean);
     COUNTRY = pathParts.length > 0 ? pathParts[0] : '';
   }
+
+  // Skip title rewrite for pages that have their own title (e.g. ESG report).
+  var SKIP_TITLE = thisScript.id === 'ssi-esg-page' ||
+                   thisScript.getAttribute('data-skip-title') === 'true';
+
+  // Countries that are provisioned but not yet in the active rotation.
+  // Silences the "No config for country" warning until they're live.
+  var PRE_LAUNCH_COUNTRIES = ['portugal', 'new-zealand'];
 
   // Month names for display
   var MONTHS = ['January','February','March','April','May','June',
@@ -57,7 +74,11 @@
 
       var countryConf = rotation.countries[COUNTRY];
       if (!countryConf) {
-        console.warn('[SSI-Loader] No config for country:', COUNTRY);
+        if (PRE_LAUNCH_COUNTRIES.indexOf(COUNTRY) === -1) {
+          // Unexpected miss: log loudly so ops notices.
+          console.warn('[SSI-Loader] No config for country:', COUNTRY);
+        }
+        document.dispatchEvent(new CustomEvent('ssi-config-ready', { detail: null }));
         return;
       }
 
@@ -115,8 +136,10 @@
       }
     });
 
-    // Also populate <title>
-    document.title = 'SSI Monthly Intelligence \u2014 Edition ' + ed.label;
+    // Also populate <title> — skipped on ESG pages (they manage their own title).
+    if (!SKIP_TITLE) {
+      document.title = 'SSI Monthly Intelligence \u2014 Edition ' + ed.label;
+    }
 
     // Populate the 12-month rotation box if it exists
     var rotationEl = document.getElementById('edition-rotation');

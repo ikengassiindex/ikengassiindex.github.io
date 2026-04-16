@@ -15,13 +15,62 @@ Environment variables required:
 import json
 import os
 import sys
+import time
+import random
 import base64
+import traceback
 import urllib.request
 import urllib.parse
 from pathlib import Path
 from datetime import datetime
 
 BASE_URL = "https://ikengassiindex.github.io"
+
+# ── Retry defaults — applied to transient Playwright + Graph API calls ──
+RETRY_MAX_ATTEMPTS = 3
+RETRY_BASE_DELAY = 2.0  # seconds; exponential: 2s, 4s, 8s with jitter
+
+# ── Structured run log — written as JSON artifact so the workflow can
+# surface capture/email health without scraping stdout. ──
+RUN_LOG = {
+    "started_at": datetime.utcnow().isoformat() + "Z",
+    "finished_at": None,
+    "edition_key": None,
+    "edition_label": None,
+    "countries_total": 0,
+    "countries_skipped_pre_launch": [],
+    "captures": [],   # list of {country, page, url, status, attempts, error?}
+    "email": None,    # {status, attempts, recipient, attachments, skipped?, error?}
+    "preflight": {},  # {missing_rotation: [...], warnings: [...]}
+}
+
+
+def retry_with_backoff(label, fn, max_attempts=RETRY_MAX_ATTEMPTS,
+                       base_delay=RETRY_BASE_DELAY, retry_on=(Exception,)):
+    """Call fn() with exponential backoff + jitter. Returns (result, attempts, error).
+
+    - label      : short string used in log lines (e.g. "graph-token")
+    - fn         : zero-arg callable
+    - retry_on   : tuple of exception classes that should trigger a retry
+
+    Non-retryable exceptions propagate immediately. On exhausted retries the
+    last exception is returned in the tuple rather than raised, so the caller
+    can decide to continue, skip, or abort.
+    """
+    last_exc = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            result = fn()
+            return result, attempt, None
+        except retry_on as e:
+            last_exc = e
+            if attempt >= max_attempts:
+                print(f"    [{label}] attempt {attempt}/{max_attempts} FAILED — giving up: {e}")
+                break
+            delay = base_delay * (2 ** (attempt - 1)) + random.uniform(0, 1)
+            print(f"    [{label}] attempt {attempt}/{max_attempts} failed: {e}. Retrying in {delay:.1f}s…")
+            time.sleep(delay)
+    return None, max_attempts, last_exc
 
 # ── Single source of truth: intelligence/countries.json ──
 # Loaded at module import so any downstream script referencing COUNTRIES
@@ -69,19 +118,20 @@ def get_graph_token():
     req = urllib.request.Request(token_url, data=data, method="POST")
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
 
-    try:
+    def _do_token_request():
         with urllib.request.urlopen(req, timeout=30) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-            token = body.get("access_token")
-            if token:
-                print("  OAuth2 token acquired successfully")
-                return token
-            else:
-                print(f"  ERROR: No access_token in response: {body}")
-                return None
-    except Exception as e:
-        print(f"  ERROR acquiring token: {e}")
+            return json.loads(resp.read().decode("utf-8"))
+
+    body, attempts, err = retry_with_backoff("graph-token", _do_token_request)
+    if err is not None:
+        print(f"  ERROR acquiring token after {attempts} attempts: {err}")
         return None
+    token = body.get("access_token")
+    if token:
+        print(f"  OAuth2 token acquired successfully (attempt {attempts})")
+        return token
+    print(f"  ERROR: No access_token in response: {body}")
+    return None
 
 
 def send_email_graph(files, edition_label, edition_key):
@@ -155,22 +205,95 @@ def send_email_graph(files, edition_label, edition_key):
     req.add_header("Authorization", f"Bearer {token}")
     req.add_header("Content-Type", "application/json")
 
+    # 4xx client errors (bad payload, auth) are not retryable; 5xx + network
+    # blips are. We wrap urlopen so only retryable exceptions bubble back
+    # into retry_with_backoff.
+    def _do_send_mail():
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return {"status": resp.status, "terminal_error": None}
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace")
+            if 400 <= e.code < 500:
+                # Terminal — return it so retry_with_backoff treats success.
+                return {"status": e.code, "terminal_error": f"HTTP {e.code} — {body[:500]}"}
+            # 5xx — raise as retryable
+            raise RuntimeError(f"HTTP {e.code} — {body[:500]}")
+
+    result, attempts, err = retry_with_backoff(
+        "graph-sendmail", _do_send_mail,
+        retry_on=(RuntimeError, urllib.error.URLError, TimeoutError),
+    )
+    RUN_LOG["email"] = {
+        "status": None,
+        "attempts": attempts,
+        "recipient": recipient,
+        "attachments": len(attachments),
+        "skipped": skipped,
+    }
+    if err is not None:
+        RUN_LOG["email"]["status"] = "failed"
+        RUN_LOG["email"]["error"] = str(err)
+        print(f"  ERROR sending email after {attempts} attempts: {err}")
+        return False
+    if result.get("terminal_error"):
+        RUN_LOG["email"]["status"] = "failed"
+        RUN_LOG["email"]["error"] = result["terminal_error"]
+        print(f"  ERROR sending email (terminal): {result['terminal_error']}")
+        return False
+    status = result["status"]
+    if status == 202:
+        print(f"  Email sent to {recipient} with {len(attachments)} attachments (HTTP 202 Accepted, attempt {attempts})")
+        RUN_LOG["email"]["status"] = "sent"
+        return True
+    print(f"  Unexpected response: HTTP {status}")
+    RUN_LOG["email"]["status"] = "unexpected"
+    RUN_LOG["email"]["error"] = f"HTTP {status}"
+    return False
+
+
+def preflight_rotation_check():
+    """Before we spend 5 min driving Playwright, check that every country past
+    its FIRST_REFRESH gate has a rotation entry in edition-config.json.
+
+    Returns a dict with {missing: [...], warnings: [...]}. Not fatal — the
+    loader already tolerates missing rotation, but surfacing it here makes
+    the monthly workflow loud about silent drift.
+    """
+    result = {"missing_rotation": [], "warnings": []}
+    config_path = Path("intelligence/edition-config.json")
+    if not config_path.exists():
+        result["warnings"].append("edition-config.json not found — cannot preflight.")
+        return result
     try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            status = resp.status
-            if status == 202:
-                print(f"  Email sent to {recipient} with {len(attachments)} attachments (HTTP 202 Accepted)")
-                return True
-            else:
-                print(f"  Unexpected response: HTTP {status}")
-                return False
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8", errors="replace")
-        print(f"  ERROR sending email: HTTP {e.code} — {error_body[:500]}")
-        return False
+        config = json.load(open(config_path, "r", encoding="utf-8"))
     except Exception as e:
-        print(f"  ERROR sending email: {e}")
-        return False
+        result["warnings"].append(f"edition-config.json parse error: {e}")
+        return result
+
+    key = config.get("active_edition_key")
+    if not key:
+        result["warnings"].append("No active_edition_key set (pre-launch).")
+        return result
+
+    rotation = (config.get("rotation") or {}).get(key) or {}
+    rotation_countries = rotation.get("countries") or {}
+    current_ym = datetime.utcnow().strftime("%Y-%m")
+
+    for country in COUNTRIES:
+        first_ym = FIRST_REFRESH.get(country)
+        if first_ym and current_ym < first_ym:
+            continue  # pre-launch — don't care yet
+        if country not in rotation_countries:
+            result["missing_rotation"].append(country)
+
+    if result["missing_rotation"]:
+        print(f"  PRE-FLIGHT WARNING: {len(result['missing_rotation'])} country(ies) past FIRST_REFRESH lack a rotation entry:")
+        for c in result["missing_rotation"]:
+            print(f"    - {c}")
+    else:
+        print("  Pre-flight OK: all active countries have a rotation entry.")
+    return result
 
 
 def capture_pages():
@@ -183,6 +306,8 @@ def capture_pages():
     edition_key = config.get("active_edition_key") or datetime.utcnow().strftime("%Y-%m")
     edition_num = config.get("current_edition", 0)
     edition_label = f"{edition_num:03d}"
+    RUN_LOG["edition_key"] = edition_key
+    RUN_LOG["edition_label"] = edition_label
 
     # Create archive folder: archive/YYYY-MM/
     month_dir = ARCHIVE_DIR / edition_key
@@ -197,15 +322,37 @@ def capture_pages():
             first_ym = FIRST_REFRESH.get(country)
             if first_ym and current_ym < first_ym:
                 print(f"  SKIP {country}: first automated refresh {first_ym} (current {current_ym})")
+                RUN_LOG["countries_skipped_pre_launch"].append(country)
                 continue
             for page_def in PAGES:
                 url = f"{BASE_URL}/{country}/{page_def['file']}"
                 name_base = f"SSI_{page_def['label']}_Ed{edition_label}_{country.upper()}_{edition_key}"
                 print(f"  Capturing {country}/{page_def['slug']}: {url}")
+                capture_entry = {
+                    "country": country,
+                    "page": page_def["slug"],
+                    "url": url,
+                    "status": "pending",
+                    "attempts": 0,
+                }
 
+                page = None
                 try:
                     page = browser.new_page()
-                    page.goto(url, wait_until="networkidle", timeout=60000)
+
+                    # Retry page.goto — covers network blips and GitHub Pages
+                    # cold-cache timeouts. Downstream rendering waits don't
+                    # need retry since they already have soft fallbacks.
+                    def _do_goto(p=page, u=url):
+                        p.goto(u, wait_until="networkidle", timeout=60000)
+                        return True
+
+                    _, attempts, goto_err = retry_with_backoff(
+                        f"goto:{country}/{page_def['slug']}", _do_goto,
+                    )
+                    capture_entry["attempts"] = attempts
+                    if goto_err is not None:
+                        raise goto_err
 
                     # Wait for data to load
                     if page_def["slug"] == "intelligence":
@@ -244,13 +391,40 @@ def capture_pages():
                     files.append(html_path)
                     print(f"    HTML: {html_path.name} ({html_path.stat().st_size / 1024:.0f} KB)")
 
-                    page.close()
+                    capture_entry["status"] = "ok"
+                    capture_entry["pdf_bytes"] = pdf_path.stat().st_size
+                    capture_entry["html_bytes"] = html_path.stat().st_size
                 except Exception as e:
                     print(f"    ERROR capturing {country}/{page_def['slug']}: {e}")
+                    capture_entry["status"] = "failed"
+                    capture_entry["error"] = str(e)
+                finally:
+                    if page is not None:
+                        try:
+                            page.close()
+                        except Exception:
+                            pass
+                    RUN_LOG["captures"].append(capture_entry)
 
         browser.close()
 
     return files, edition_label, edition_key, month_dir
+
+
+def write_run_log():
+    """Persist RUN_LOG as a JSON artifact the workflow uploads."""
+    RUN_LOG["finished_at"] = datetime.utcnow().isoformat() + "Z"
+    log_dir = ARCHIVE_DIR / "_logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    key = RUN_LOG.get("edition_key") or datetime.utcnow().strftime("%Y-%m")
+    log_path = log_dir / f"run-{key}.json"
+    try:
+        with log_path.open("w", encoding="utf-8") as fh:
+            json.dump(RUN_LOG, fh, indent=2, ensure_ascii=False)
+            fh.write("\n")
+        print(f"  Run log written: {log_path}")
+    except Exception as e:
+        print(f"  WARNING: failed to write run log: {e}")
 
 
 def main():
@@ -258,25 +432,38 @@ def main():
     print(f"Date: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}")
     print(f"Countries: {len(COUNTRIES)}")
     print(f"Pages per country: {len(PAGES)} (Intelligence + ESG Report)")
+    RUN_LOG["countries_total"] = len(COUNTRIES)
     print()
 
-    print("Step 1: Capturing pages as PDF + HTML...")
-    files, edition_label, edition_key, month_dir = capture_pages()
+    print("Step 0: Pre-flight rotation check…")
+    RUN_LOG["preflight"] = preflight_rotation_check()
+    print()
 
-    if not files:
-        print("No files captured. Aborting.")
-        return
+    try:
+        print("Step 1: Capturing pages as PDF + HTML...")
+        files, edition_label, edition_key, month_dir = capture_pages()
 
-    pdfs = [f for f in files if f.suffix == ".pdf"]
-    htmls = [f for f in files if f.suffix == ".html"]
-    print(f"\nCaptured: {len(pdfs)} PDFs + {len(htmls)} HTMLs in {month_dir}/")
+        if not files:
+            print("No files captured. Aborting.")
+            return
 
-    print(f"\nStep 2: Emailing {len(files)} files to ssi_index@ikenga.eu via Graph API...")
-    send_email_graph(files, edition_label, edition_key)
+        pdfs = [f for f in files if f.suffix == ".pdf"]
+        htmls = [f for f in files if f.suffix == ".html"]
+        print(f"\nCaptured: {len(pdfs)} PDFs + {len(htmls)} HTMLs in {month_dir}/")
 
-    # Files in archive/ will be committed by the workflow
-    print(f"\nStep 3: Archive files ready in {month_dir}/ for git commit")
-    print("=== Archive complete ===")
+        print(f"\nStep 2: Emailing {len(files)} files to ssi_index@ikenga.eu via Graph API...")
+        send_email_graph(files, edition_label, edition_key)
+
+        # Files in archive/ will be committed by the workflow
+        print(f"\nStep 3: Archive files ready in {month_dir}/ for git commit")
+        print("=== Archive complete ===")
+    except Exception as e:
+        print(f"FATAL: {e}")
+        print(traceback.format_exc())
+        RUN_LOG["fatal_error"] = str(e)
+        raise
+    finally:
+        write_run_log()
 
 
 if __name__ == "__main__":
