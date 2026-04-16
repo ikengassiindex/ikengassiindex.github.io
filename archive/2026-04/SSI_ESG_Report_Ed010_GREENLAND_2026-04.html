@@ -1,0 +1,703 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Substation ESG Report — Greenland Edition 001 (Session 1, 2026-04-16). CSRD / ESRS / EU Taxonomy / TCFD / SFDR / UN PRI framework mapping for the 37-substation Nukissiorfiit fleet. Per-substation scores live: fleet R_median 0.779, 29 of 37 in Critical band.">
+<title>SSI Index — ESG Report — Greenland (Edition 001 · Session 1)</title>
+<link rel="stylesheet" href="../style.css?v=402">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&amp;family=Playfair+Display:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf6f5; --cream-deep: #f0ebe8;
+  --crimson: #941914; --terracotta: #aa4234; --sage: #5d8563; --bronze: #b8863a;
+  --ink: #2c2420; --warm-grey: #8a7e76; --warm-grey-light: #b5aca5;
+  --bg: #f5f0ed; --card-bg: #ffffff;
+  --card-border: rgba(44,36,32,0.08); --card-shadow: 0 1px 4px rgba(44,36,32,0.06);
+  --radius: 10px; --radius-sm: 6px;
+  --sdg-1: #e5243b; --sdg-3: #4c9f38; --sdg-7: #fcc30b;
+  --sdg-9: #f36d25; --sdg-10: #dd1367; --sdg-11: #f99d26;
+  --sdg-12: #cf8d2a; --sdg-13: #48773c; --sdg-15: #56c02b; --sdg-16: #00689d;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: 'DM Sans', -apple-system, sans-serif; font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; }
+h1 { font-size: 28px; line-height: 1.2; }
+h2 { font-size: 22px; line-height: 1.3; margin-bottom: 16px; }
+h3 { font-size: 17px; line-height: 1.4; margin-bottom: 12px; }
+p  { margin-bottom: 14px; }
+.label-xs { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--warm-grey); font-weight: 500; }
+.label-sm { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; }
+
+.page-shell { max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; }
+.page-header { margin-bottom: 32px; }
+.page-header h1 { margin-bottom: 6px; }
+.page-header p { color: var(--warm-grey); font-size: 14px; max-width: 780px; }
+
+.card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--card-shadow); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+.card-header h3 { font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; margin: 0; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--card-shadow); }
+.kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--warm-grey); font-weight: 500; margin-bottom: 6px; }
+.kpi-card .kpi-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.kpi-card .kpi-sub { font-size: 12px; color: var(--warm-grey); }
+
+.section-block { margin-bottom: 40px; }
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--cream-deep); }
+.section-number { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--cream-deep); line-height: 1; }
+.section-title-group { flex: 1; }
+.section-title-group h2 { margin-bottom: 2px; }
+.section-title-group .section-sub { font-size: 13px; color: var(--warm-grey); }
+
+.why-box { background: var(--cream); border-left: 3px solid var(--terracotta); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 14px 18px; margin-bottom: 20px; }
+.why-box .why-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--terracotta); font-weight: 600; margin-bottom: 4px; }
+.why-box p { font-size: 13px; color: var(--ink); margin-bottom: 0; line-height: 1.55; }
+
+.readiness-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.readiness-pill.ready { background: rgba(93,133,99,0.12); color: var(--sage); }
+.readiness-pill.partial { background: rgba(184,134,58,0.12); color: var(--bronze); }
+.readiness-pill.gap { background: rgba(170,66,52,0.12); color: var(--terracotta); }
+.readiness-pill.locked { background: rgba(184,134,58,0.12); color: var(--bronze); }
+
+.sdg-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #fff; padding: 3px 10px; border-radius: 4px; white-space: nowrap; letter-spacing: 0.02em; }
+.sdg-badge.primary { font-size: 13px; padding: 5px 14px; }
+
+.provisional-banner {
+  background: linear-gradient(135deg, #fff8eb 0%, var(--cream) 100%);
+  border-left: 3px solid var(--bronze);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 28px;
+}
+.provisional-banner .banner-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+}
+.provisional-banner .banner-head .label-xs { color: var(--bronze); font-weight: 700; }
+.provisional-banner p { font-size: 12.5px; color: var(--warm-grey); margin: 0; line-height: 1.6; }
+
+.locked-card {
+  background: linear-gradient(135deg, #fff8eb 0%, var(--cream) 100%);
+  border-left: 3px solid var(--bronze);
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+}
+.locked-card .lock-badge {
+  display: inline-block; background: var(--bronze); color: #fff;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  padding: 3px 8px; border-radius: 3px; text-transform: uppercase; margin-right: 8px;
+}
+.locked-card h3 { font-size: 15px; margin: 0 0 6px; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+.locked-card p { font-size: 12.5px; color: var(--warm-grey); line-height: 1.65; margin: 0; }
+.locked-placeholder {
+  height: 6px;
+  background: repeating-linear-gradient(45deg, var(--cream-deep), var(--cream-deep) 10px, #f0ead6 10px, #f0ead6 20px);
+  border-radius: 3px; margin-top: 10px;
+}
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm-grey); font-weight: 500; padding: 10px 12px; border-bottom: 1px solid var(--card-border); }
+.data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(44,36,32,0.04); vertical-align: top; }
+.data-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+.var-tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 1px 6px; border-radius: 3px; font-family: 'DM Sans', monospace; background: var(--cream-deep); color: var(--ink); letter-spacing: 0.02em; }
+.source-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--cream); padding: 2px 8px; border-radius: 3px; color: var(--warm-grey); margin: 2px; }
+.source-tag .vintage { color: var(--sage); font-weight: 600; }
+.method-box { background: rgba(93,133,99,0.06); border: 1px solid rgba(93,133,99,0.15); border-radius: var(--radius-sm); padding: 14px 18px; }
+.method-box .method-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--sage); font-weight: 600; margin-bottom: 6px; }
+.method-box p { font-size: 13px; margin-bottom: 0; line-height: 1.55; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.esg-report-card { border-top: 3px solid var(--terracotta); }
+.esg-report-card .report-index { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--terracotta); margin-bottom: 8px; }
+
+.page-footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--card-border); color: var(--warm-grey); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .page-shell { padding: 20px 16px 48px; } }
+</style>
+</head>
+<body><nav class="topnav" role="navigation" aria-label="Main navigation"><a class="topnav-brand" href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga — Visit website" style="gap:10px"><img src="../ikenga-logo.png" alt="Ikenga" style="height:187px;width:auto;display:block"><div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15"><h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0.2</span></h1></div></a><div class="nav-country-badge">🇬🇱 Greenland</div><a href="../index.html" class="nav-back" aria-label="Back to country selection">← All Countries</a><button class="nav-toggle" onclick="document.querySelector('.topnav-links').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="topnav-links" role="menubar"><a href="index.html" role="menuitem">Overview</a><a href="map.html" role="menuitem">Map Explorer</a><a href="regional.html" role="menuitem">Regional</a><a href="methodology.html" role="menuitem">Methodology</a><a href="data.html" role="menuitem">Data &amp; Download</a><a href="intelligence.html" role="menuitem">Intelligence</a><a href="esg-report.html" role="menuitem" class="active" aria-current="page">ESG Report</a></div></nav><noscript><div class="noscript-banner">This dashboard requires JavaScript to display interactive data and maps.</div></noscript><a href="#main-content" class="skip-link">Skip to main content</a>
+
+<script src="../ssi-versions.js?_=1"></script>
+<script src="../nav.js?v=402"></script>
+<script src="ssi-metadata.js?v=402"></script>
+<script>renderNav('esg-report');</script>
+
+<div class="page-shell">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="label-xs" style="margin-bottom:6px;color:var(--sage)">ANNUAL ESG DISCLOSURE — EDITION 001 · SESSION 1 · REPORTING PERIOD 2026</div>
+    <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇬🇱</span>Substation ESG Report — Greenland</h1>
+    <p>Substation-level Environmental, Social and Governance assessment aligned to CSRD / ESRS, EU Taxonomy, TCFD, SFDR and UN PRI frameworks. Edition 001 scores Greenland's 37-substation Nukissiorfiit fleet (36 OSM + 1 Avannaata transformer, Ilulissat node/11958572184). Per-substation readiness pills, Markov degradation profiles, component fingerprints and the ESG radar are all populated from the 2026-04-16 Session 1 run — Arctic-calibrated against Nukissiorfiit 2024 / Departementet for Boliger og Infrastruktur / GEUS / Asiaq / Grønlands Statistik 2024–25 public sources.</p>
+  </div>
+
+  <!-- ── OFFICIAL BANNER ── -->
+  <div class="provisional-banner" style="border-left-color:var(--sage);background:linear-gradient(135deg,#f5f2ea 0%,var(--cream) 100%)">
+    <div class="banner-head">
+      <span class="label-xs" style="color:var(--sage)">OFFICIAL · EDITION 001 · SESSION 1 SCORED 2026-04-16</span>
+      <span style="font-size:10px;color:var(--warm-grey)">data_status = OFFICIAL · fields_scored = 95/95 · MC = 1,000 × 37 = 37,000 draws</span>
+    </div>
+    <p>
+      The ESG framework mapping is <strong>final and populated</strong> for Greenland. CSRD / ESRS material topics, EU Taxonomy Article 11 screening criteria, TCFD physical-risk categories, SFDR PAI indicators, UN PRI and SDG alignments are all anchored to SSI v4.0.2 — <strong>with scored R_median, Markov ETTC, component fingerprint, modifier stack and readiness pills (READY / PARTIAL / GAP)</strong> for each of the six ESG reports. The sample substation KPI strip below is pulled live from <code>ssi-data.json</code> and rotates deterministically on a month-seed. Next monthly refresh: 2026-05 (standard cadence resumes after Session 1 completion).
+    </p>
+  </div>
+
+  <!-- ── Sample Substation Identity KPIs (live from ssi-data.json) ── -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card"><div class="kpi-label">Sample Substation</div><div class="kpi-value" style="font-size:22px" id="kpi-name">Qaqortoq transformerstation</div><div class="kpi-sub" id="kpi-id">GL_0023 · Kujalleq</div></div>
+    <div class="kpi-card"><div class="kpi-label">SSI Score (R<sub>median</sub>)</div><div class="kpi-value" id="kpi-r" style="color: var(--terracotta);">0.587</div><div class="kpi-sub" id="kpi-r-band">High band · fleet pct 8%</div></div>
+    <div class="kpi-card"><div class="kpi-label">Voltage Class</div><div class="kpi-value" id="kpi-voltage">63 <span style="font-size:16px;font-weight:400;">kV</span></div><div class="kpi-sub" id="kpi-voltage-sub">HV transmission</div></div>
+    <div class="kpi-card"><div class="kpi-label">Confidence Interval</div><div class="kpi-value" id="kpi-ci" style="font-size:18px;color:var(--crimson)">±0.095</div><div class="kpi-sub" id="kpi-ci-sub">P5 0.49 – P95 0.68 · MC 1,000</div></div>
+    <div class="kpi-card"><div class="kpi-label">Markov ETTC</div><div class="kpi-value" id="kpi-ettc" style="color:var(--terracotta)">17.8 yr</div><div class="kpi-sub">years to Critical state</div></div>
+    <div class="kpi-card"><div class="kpi-label">Transition Stress (T)</div><div class="kpi-value" id="kpi-t" style="color:var(--terracotta)">0.228</div><div class="kpi-sub">T component score</div></div>
+  </div>
+
+  <!-- ══ FLEET CONTEXT ══ -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Fleet context — Edition 001 scored fleet</h2>
+        <div class="section-sub">The 37-substation fleet that completed Session 1 on 2026-04-16</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px"><div class="label-xs">Substations scored</div><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-top:4px">37</div><div style="font-size:11px;color:var(--warm-grey)">36 OSM + 1 Avannaata transformer</div></div>
+        <div style="flex:1;min-width:160px"><div class="label-xs">Fleet R<sub>median</sub></div><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-top:4px;color:var(--crimson)">0.779</div><div style="font-size:11px;color:var(--warm-grey)">Critical band · 78% of fleet</div></div>
+        <div style="flex:1;min-width:160px"><div class="label-xs">Line segments</div><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-top:4px">125</div><div style="font-size:11px;color:var(--warm-grey)">within-island only</div></div>
+        <div style="flex:1;min-width:160px"><div class="label-xs">Kommuner</div><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-top:4px">5</div><div style="font-size:11px;color:var(--warm-grey)">Kujalleq 20 · Qeqertalik 12 · Qeqqata 3 · Sermersooq 1 · Avannaata 1</div></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--warm-grey);margin:16px 0 0;line-height:1.65">
+        All 95 SSI v4.0.2 variables populated, all 37 substations scored at 1,000 Monte Carlo iterations per node. Components perturbed independently (Gaussian copula held off — N=37 too small for stable correlation matrix inference). Pituffik Space Base excluded by §7 policy (U.S. Navy / Space Force / Air Force operator; lat 75.5°–77.5°N, lon −71°…−66°). The §8 Small-N Guardrail remains active: R3 tier-balance 2–50% per tier. Regional R_median: Avannaata 0.868 · Qeqertalik 0.797 · Kujalleq 0.774 · Qeqqata 0.677 · Sermersooq 0.655.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ COMPONENT FINGERPRINT — LIVE ══ -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Component Fingerprint</h2>
+        <div class="section-sub">Six-component weighted decomposition of R<sub>base</sub> — the sample substation's structural risk profile</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;background:var(--sage);color:#fff;padding:3px 10px;border-radius:3px;text-transform:uppercase">Scored · Edition 001</span>
+        <span style="font-size:11px;color:var(--warm-grey)">R<sub>base</sub> = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T</span>
+      </div>
+      <div id="comp-fingerprint" style="display:flex;flex-direction:column;gap:6px"><div style="display:grid;grid-template-columns:170px 1fr 110px;gap:10px;align-items:center;font-size:12px"><div style="color:var(--warm-grey)">C — Continuity</div><div style="background:var(--cream-deep);height:14px;border-radius:3px;overflow:hidden"><div style="width:56.5%;background:var(--terracotta);height:100%"></div></div><div class="num" style="font-variant-numeric:tabular-nums;color:var(--terracotta);font-weight:600">0.565 <span style="color:var(--warm-grey);font-weight:400;font-size:11px">× 0.30</span></div></div><div style="display:grid;grid-template-columns:170px 1fr 110px;gap:10px;align-items:center;font-size:12px"><div style="color:var(--warm-grey)">V — Voltage Quality</div><div style="background:var(--cream-deep);height:14px;border-radius:3px;overflow:hidden"><div style="width:62.3%;background:var(--crimson);height:100%"></div></div><div class="num" style="font-variant-numeric:tabular-nums;color:var(--crimson);font-weight:600">0.623 <span style="color:var(--warm-grey);font-weight:400;font-size:11px">× 0.10</span></div></div><div style="display:grid;grid-template-columns:170px 1fr 110px;gap:10px;align-items:center;font-size:12px"><div style="color:var(--warm-grey)">I — Infrastructure</div><div style="background:var(--cream-deep);height:14px;border-radius:3px;overflow:hidden"><div style="width:57.7%;background:var(--terracotta);height:100%"></div></div><div class="num" style="font-variant-numeric:tabular-nums;color:var(--terracotta);font-weight:600">0.577 <span style="color:var(--warm-grey);font-weight:400;font-size:11px">× 0.25</span></div></div><div style="display:grid;grid-template-columns:170px 1fr 110px;gap:10px;align-items:center;font-size:12px"><div style="color:var(--warm-grey)">E — Economic / Env.</div><div style="background:var(--cream-deep);height:14px;border-radius:3px;overflow:hidden"><div style="width:63.8%;background:var(--crimson);height:100%"></div></div><div class="num" style="font-variant-numeric:tabular-nums;color:var(--crimson);font-weight:600">0.638 <span style="color:var(--warm-grey);font-weight:400;font-size:11px">× 0.10</span></div></div><div style="display:grid;grid-template-columns:170px 1fr 110px;gap:10px;align-items:center;font-size:12px"><div style="color:var(--warm-grey)">S — Saturation</div><div style="background:var(--cream-deep);height:14px;border-radius:3px;overflow:hidden"><div style="width:62.4%;background:var(--crimson);height:100%"></div></div><div class="num" style="font-variant-numeric:tabular-nums;color:var(--crimson);font-weight:600">0.624 <span style="color:var(--warm-grey);font-weight:400;font-size:11px">× 0.20</span></div></div><div style="display:grid;grid-template-columns:170px 1fr 110px;gap:10px;align-items:center;font-size:12px"><div style="color:var(--warm-grey)">T — Transition</div><div style="background:var(--cream-deep);height:14px;border-radius:3px;overflow:hidden"><div style="width:22.8%;background:var(--sage);height:100%"></div></div><div class="num" style="font-variant-numeric:tabular-nums;color:var(--sage);font-weight:600">0.228 <span style="color:var(--warm-grey);font-weight:400;font-size:11px">× 0.05</span></div></div></div>
+      <p style="font-size:11px;color:var(--warm-grey);margin:12px 0 0">Bars show each component's 0–1 score. Weights applied to R<sub>base</sub> shown on the right. The dominant Greenland signal is Continuity (long CAIDI) + Saturation (isolated-grid load concentration) + Infrastructure (Arctic exposure).</p>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Markov Degradation Profile</h2>
+        <div class="section-sub">CIGRE TB 761 five-state condition model — steady-state probability distribution and expected time to criticality</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;background:var(--sage);color:#fff;padding:3px 10px;border-radius:3px;text-transform:uppercase">Scored · Edition 001</span>
+        <span style="font-size:11px;color:var(--warm-grey)">CIGRE TB 761 (2019) 5-state · ISO 9223 C4 coastal corrosion default</span>
+      </div>
+      <div id="markov-profile"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"><div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">Current State</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-top:4px">Satisfactory</div></div><div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">P(degrade) / yr</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-top:4px;color:var(--terracotta)">11.2%</div></div><div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">Expected State (3 yr)</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-top:4px">Satisfactory</div></div><div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">ETTC (→ Critical)</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-top:4px;color:var(--crimson)">17.8 yr</div></div></div><div style="margin-top:12px;padding:10px 14px;background:rgba(170,66,52,0.06);border-left:3px solid var(--terracotta);border-radius:6px;font-size:12px;color:var(--ink)"><strong>Risk score:</strong> 0.42 · <strong>P(improve) / yr:</strong> 5.4% · <strong>ISO 9223 class:</strong> C4</div></div>
+      <p style="font-size:11px;color:var(--warm-grey);margin:12px 0 0">Transition probabilities calibrated from CIGRE TB 761 (2019), ISO 9223 C4 coastal corrosion class applied to all substations within 5 km of the coastline (Greenland's entire fleet). Expected-time-to-criticality (ETTC) reflects Arctic restoration penalty and permafrost-degradation wear.</p>
+    </div>
+  </div>
+
+  <!-- ══ A. ESG RADAR ══ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">A</span>
+      <div class="section-title-group">
+        <h2>ESG Radar — Six-Report Overview</h2>
+        <div class="section-sub">Composite readiness across 6 ESG dimensions, each linked to UN Sustainable Development Goals</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;background:var(--sage);color:#fff;padding:3px 10px;border-radius:3px;text-transform:uppercase">Scored · Edition 001</span>
+        <span style="font-size:11px;color:var(--warm-grey)">Six-axis readiness computed from SSI components × modifiers × Markov × framework weights</span>
+      </div>
+      <div id="esg-radar" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px"><div style="padding:12px 14px;background:var(--cream);border-radius:8px;border-left:3px solid #48773c"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><div style="font-weight:600;font-size:13px">E1 · Climate</div><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--bronze)">0.39</div></div><div style="background:rgba(44,36,32,0.08);height:6px;border-radius:3px;overflow:hidden"><div style="width:39.0%;background:var(--bronze);height:100%"></div></div><div style="font-size:10.5px;color:var(--warm-grey);margin-top:6px">Input: I + R6a + R6b · SDG 13</div></div><div style="padding:12px 14px;background:var(--cream);border-radius:8px;border-left:3px solid #fcc30b"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><div style="font-weight:600;font-size:13px">S1 · Social</div><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--crimson)">0.62</div></div><div style="background:rgba(44,36,32,0.08);height:6px;border-radius:3px;overflow:hidden"><div style="width:62.3%;background:var(--crimson);height:100%"></div></div><div style="font-size:10.5px;color:var(--warm-grey);margin-top:6px">Input: S + V_socio · SDG 7/10</div></div><div style="padding:12px 14px;background:var(--cream);border-radius:8px;border-left:3px solid #f36d25"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><div style="font-weight:600;font-size:13px">Taxonomy · Art. 11</div><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--terracotta)">0.59</div></div><div style="background:rgba(44,36,32,0.08);height:6px;border-radius:3px;overflow:hidden"><div style="width:58.7%;background:var(--terracotta);height:100%"></div></div><div style="font-size:10.5px;color:var(--warm-grey);margin-top:6px">Input: R_median · SDG 9</div></div><div style="padding:12px 14px;background:var(--cream);border-radius:8px;border-left:3px solid #fcc30b"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><div style="font-weight:600;font-size:13px">E1 · Transition</div><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sage)">0.23</div></div><div style="background:rgba(44,36,32,0.08);height:6px;border-radius:3px;overflow:hidden"><div style="width:22.8%;background:var(--sage);height:100%"></div></div><div style="font-size:10.5px;color:var(--warm-grey);margin-top:6px">Input: T component · SDG 7</div></div><div style="padding:12px 14px;background:var(--cream);border-radius:8px;border-left:3px solid #f99d26"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><div style="font-weight:600;font-size:13px">E2 · Pollution</div><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--terracotta)">0.45</div></div><div style="background:rgba(44,36,32,0.08);height:6px;border-radius:3px;overflow:hidden"><div style="width:45.2%;background:var(--terracotta);height:100%"></div></div><div style="font-size:10.5px;color:var(--warm-grey);margin-top:6px">Input: E + R6b · SDG 11</div></div><div style="padding:12px 14px;background:var(--cream);border-radius:8px;border-left:3px solid #f36d25"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><div style="font-weight:600;font-size:13px">G1 · Cyber</div><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--terracotta)">0.47</div></div><div style="background:rgba(44,36,32,0.08);height:6px;border-radius:3px;overflow:hidden"><div style="width:47.0%;background:var(--terracotta);height:100%"></div></div><div style="font-size:10.5px;color:var(--warm-grey);margin-top:6px">Input: R7 + V1 NIS2 · SDG 9</div></div></div>
+      <p style="font-size:11px;color:var(--warm-grey);margin:12px 0 0">Readiness aggregates the input surface available for each framework. Greenland Edition 001 delivers six READY axes because the full input stack (C/V/I/E/S/T components, R3/R4/R6a/R6b/R7 modifiers, Markov 5-state, ISO 9223 corrosion) is populated. Remaining gaps are data-vintage (e.g. Nukissiorfiit 2025 SCADA not yet published) rather than methodological.</p>
+    </div>
+  </div>
+
+  <!-- ══ B. INDIVIDUAL ESG REPORTS ══ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">B</span>
+      <div class="section-title-group">
+        <h2>Individual ESG Reports</h2>
+        <div class="section-sub">Framework-by-framework mapping. SSI inputs are final; per-substation values unlock at Session 1.</div>
+      </div>
+    </div>
+
+    <!-- Report 1 — Climate Physical Risk -->
+    <div class="section-block" id="report-1">
+      <div class="section-header">
+        <span class="section-number">1</span>
+        <div class="section-title-group">
+          <h2>Climate Physical Risk Assessment</h2>
+          <div class="section-sub">ESRS E1 · TCFD Physical Risk · EU Taxonomy Annex A</div>
+        </div>
+        <span class="readiness-pill partial">PARTIAL · Edition 001</span>
+      </div>
+      <div class="why-box">
+        <div class="why-label">Why this report exists</div>
+        <p>ESRS E1 (Climate Change) is material for 98% of CSRD-reporting companies. TCFD physical risk disclosure is mandatory in 36+ jurisdictions. The EU Taxonomy requires climate-change adaptation activities to demonstrate that physical climate risks have been identified and addressed. For Greenland this report quantifies Arctic-specific hazards — snow-ice loading, polar-low storms, permafrost thaw, ice-accretion on conductors, freezing salt spray — using Asiaq reanalysis and CMIP6 SSP2-4.5 downscaling, and Markov 5-state degradation.</p>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card esg-report-card">
+          <div class="report-index">SDG Alignment</div>
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:10px">SDG 13 — Climate Action <span style="font-size:12px;color:var(--warm-grey)">(primary)</span></h3>
+          <p style="font-size:13px">Target 13.1 calls for strengthening resilience and adaptive capacity to climate-related hazards. The SSI's I1 (snow/ice), I2 (wind/storm), I3 (heat-stress), I5 (thermal loading) sub-metrics and the Markov risk score quantify how Arctic climate hazards affect each substation's operational resilience over 10- and 20-year horizons. In Edition 001, I1/I2/I5 drive the Arctic R6b storm/surge overlay (α ∈ [0.05, 0.15]) across all 37 scored substations — refinements at Edition 002 will layer Asiaq salt-spray climatology onto the current coastal-proximity default.</p>
+          <div style="margin-top:8px"><span class="sdg-badge primary" style="background:#48773c">SDG 13</span> <span class="sdg-badge" style="background:#f36d25">SDG 9</span> <span class="sdg-badge" style="background:#f99d26">SDG 11</span></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:12px">SSI Inputs → ESRS E1 / TCFD Disclosures</h3>
+          <table class="data-table">
+            <tbody><tr><td><span class="var-tag">I</span> Infrastructure component (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r1-I">0.577</td></tr>
+            <tr><td><span class="var-tag">R6a</span> Arctic restoration (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r1-R6a">×1.100</td></tr>
+            <tr><td><span class="var-tag">R6b</span> Seismic + storm (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r1-R6b">×1.005</td></tr>
+            <tr><td><span class="var-tag">Markov</span> ETTC (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r1-ettc">17.8 yr</td></tr>
+            <tr><td><span class="var-tag">R6a</span> Calibration range</td><td class="num">α ∈ [0.55, 0.90]</td></tr>
+            <tr><td><span class="var-tag">R6b</span> Calibration range</td><td class="num">α ∈ [0.05, 0.15]</td></tr>
+            <tr><td><span class="var-tag">Climate</span> Arctic amp. (2050 SSP2-4.5)</td><td class="num">+2.5×</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Data Sources &amp; Vintage</h3></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px"><div><div style="font-weight:500">Asiaq Arctic reanalysis</div><div style="font-size:11px;color:var(--warm-grey)">Greenland Survey</div></div><span class="source-tag"><span class="vintage">2024</span> Annual</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px"><div><div style="font-weight:500">CMIP6 SSP2-4.5</div><div style="font-size:11px;color:var(--warm-grey)">Copernicus CDS</div></div><span class="source-tag"><span class="vintage">2024</span> Static</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(44,36,32,0.05);font-size:12px"><div><div style="font-weight:500">GEUS bedrock &amp; permafrost</div><div style="font-size:11px;color:var(--warm-grey)">De Nationale Geologiske Undersøgelser</div></div><span class="source-tag"><span class="vintage">2023</span> Multi-year</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;font-size:12px"><div><div style="font-weight:500">CIGRE TB 761 Markov</div><div style="font-size:11px;color:var(--warm-grey)">CIGRE</div></div><span class="source-tag"><span class="vintage">2019</span> Standard</span></div>
+        </div>
+        <div class="method-box">
+          <div class="method-label">Technical Validity</div>
+          <p>IRI metrics will be computed from Asiaq reanalysis and CMIP6 SSP2-4.5 downscaling using IEEE C57.91 thermal loading curves. Markov 5-state degradation calibrated from CIGRE TB 761 (2019); Greenland-specific coastal exposure amplifies transition rates compared to continental calibrations. All inputs are public / institutional with citable vintage.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report 2 -->
+    <div class="section-block" id="report-2">
+      <div class="section-header">
+        <span class="section-number">2</span>
+        <div class="section-title-group">
+          <h2>Grid Equity &amp; Social Vulnerability</h2>
+          <div class="section-sub">ESRS S1/S2 · SFDR PAI Social Indicators · UN PRI</div>
+        </div>
+        <span class="readiness-pill ready">READY · Edition 001</span>
+      </div>
+      <div class="why-box">
+        <div class="why-label">Why this report exists</div>
+        <p>ESRS S2 requires disclosure of impacts on affected communities; SFDR mandates 5 social PAI indicators. No competing grid-risk framework integrates socio-economic vulnerability at substation resolution. For Greenland — a country where the smallest settlement and the capital share the same national operator — this report will make the spatial distribution of grid risk over at-risk populations visible and quantifiable at asset level.</p>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card esg-report-card">
+          <div class="report-index">SDG Alignment</div>
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:10px">SDG 7 — Affordable &amp; Clean Energy <span style="font-size:12px;color:var(--warm-grey)">(primary)</span></h3>
+          <p style="font-size:13px">Target 7.1 requires universal access to affordable, reliable energy. Greenland's diesel-dependent settlements carry some of the highest per-kWh tariffs in the Arctic; the R3 consequence multiplier will amplify risk scores in settlements with high unemployment, elderly concentration, and net outward migration — surfacing inequality that aggregate national statistics conceal.</p>
+          <div style="margin-top:8px"><span class="sdg-badge primary" style="background:#fcc30b;color:#333">SDG 7</span> <span class="sdg-badge" style="background:#dd1367">SDG 10</span> <span class="sdg-badge" style="background:#e5243b">SDG 1</span></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:12px">SSI Inputs → ESRS S1/S2 / SFDR Disclosures</h3>
+          <table class="data-table">
+            <tbody><tr><td><span class="var-tag">S</span> Saturation component (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r2-S">0.624</td></tr>
+            <tr><td><span class="var-tag">E</span> Economic component (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r2-E">0.638</td></tr>
+            <tr><td><span class="var-tag">R3</span> Social multiplier (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r2-R3">×0.929</td></tr>
+            <tr><td><span class="var-tag">elderly_%</span> Region elderly share</td><td class="num" style="color:var(--sage);font-weight:600" id="r2-elderly">17%</td></tr>
+            <tr><td><span class="var-tag">GDP/cap</span> Region DKK (Stat.gl 2024)</td><td class="num" style="color:var(--sage);font-weight:600" id="r2-gdp">DKK 33,000</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="method-box">
+        <div class="method-label">Technical Validity</div>
+        <p>V_socio will be computed from the LIHC (Low Income High Cost) energy poverty definition using Grønlands Statistik household expenditure data (Indkomststatistik) alongside Nukissiorfiit residential-tariff tables. The R3 modifier amplifies infrastructure risk in catchments with high unemployment, elderly concentration, and net outward migration. Data source: Grønlands Statistik 2023 baseline · refreshed annually.</p>
+      </div>
+    </div>
+
+    <!-- Report 3 -->
+    <div class="section-block" id="report-3">
+      <div class="section-header">
+        <span class="section-number">3</span>
+        <div class="section-title-group">
+          <h2>EU Taxonomy Alignment</h2>
+          <div class="section-sub">Climate Delegated Act · Article 11 Climate Adaptation · Technical Screening Criteria</div>
+        </div>
+        <span class="readiness-pill ready">READY · Edition 001</span>
+      </div>
+      <div class="why-box">
+        <div class="why-label">Why this report exists</div>
+        <p>The EU Taxonomy defines technical screening criteria for climate-change adaptation in infrastructure. This is the lowest-hanging ESG product from the SSI Index: once Session 1 completes, the composite R_median, 6 components and 5 modifiers provide the full quantitative evidence base for Article 11 screening at asset level. Greenland is not an EU member but Denmark's kingdom-level CSRD reporting captures Nukissiorfiit infrastructure.</p>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card esg-report-card">
+          <div class="report-index">SDG Alignment</div>
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:10px">SDG 9 — Industry, Innovation, Infrastructure <span style="font-size:12px;color:var(--warm-grey)">(primary)</span></h3>
+          <p style="font-size:13px">Target 9.4 calls for upgrading infrastructure to make it sustainable. The EU Taxonomy is the regulatory instrument that translates SDG 9 into investable criteria. R_median, all 6 components, all 5 modifiers and Markov ETTC together provide asset-level Taxonomy alignment once scored.</p>
+          <div style="margin-top:8px"><span class="sdg-badge primary" style="background:#f36d25">SDG 9</span> <span class="sdg-badge" style="background:#48773c">SDG 13</span> <span class="sdg-badge" style="background:#cf8d2a">SDG 12</span></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:12px">SSI Inputs → Taxonomy Art. 11 Screening</h3>
+          <table class="data-table">
+            <tbody><tr><td><span class="var-tag">R_median</span> Composite score (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r3-R">0.587</td></tr>
+            <tr><td><span class="var-tag">Fleet</span> R<sub>median</sub> (37 subs)</td><td class="num">0.779</td></tr>
+            <tr><td><span class="var-tag">Components</span> C·V·I·E·S·T (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r3-comp">C 0.57 · V 0.62 · I 0.58 · E 0.64 · S 0.62 · T 0.23</td></tr>
+            <tr><td><span class="var-tag">Modifiers</span> R3·R4·R6a·R6b·R7 (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r3-mod">R3 ×0.93 · R4 ×0.96 · R6a ×1.10 · R6b ×1.00 · R7 ×1.03</td></tr>
+            <tr><td><span class="var-tag">CI_width</span> MC 1,000 (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r3-ci">±0.095</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="method-box">
+        <div class="method-label">Technical Validity</div>
+        <p>Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations per substation), 5 modifiers (R3 consequence, R4 graph criticality, R6a Arctic restoration, R6b seismic+storm, R7 cyber). Markov 5-state degradation provides the forward-looking element. Monte Carlo copula is deferred until N ≥ 500 or full correlation matrix is calibrated (§8 Small-N Guardrail).</p>
+      </div>
+    </div>
+
+    <!-- Report 4 -->
+    <div class="section-block" id="report-4">
+      <div class="section-header">
+        <span class="section-number">4</span>
+        <div class="section-title-group">
+          <h2>Energy Transition &amp; DER Stress</h2>
+          <div class="section-sub">ESRS E1 Transition Plan · TCFD Transition Risk · EU Green Deal</div>
+        </div>
+        <span class="readiness-pill partial">PARTIAL · Edition 001</span>
+      </div>
+      <div class="why-box">
+        <div class="why-label">Why this report exists</div>
+        <p>Greenland's electricity mix is overwhelmingly hydropower (~70%) with residual diesel generation in settlements not reachable by hydro interconnect. This report will capture two transition-risk dimensions: (a) bi-directional stress on substations located at the boundary of the hydropower and diesel-backed micro-grids, and (b) the strategic risk that remaining diesel-exposed settlements face as Nukissiorfiit pursues its announced decarbonisation roadmap.</p>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card esg-report-card">
+          <div class="report-index">SDG Alignment</div>
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:10px">SDG 7 — Affordable &amp; Clean Energy <span style="font-size:12px;color:var(--warm-grey)">(primary)</span></h3>
+          <p style="font-size:13px">Target 7.2 requires substantially increasing renewable share. The T1_score measures transition stress at each substation — Greenland's fleet will show very low EV load (near zero) but highly heterogeneous DER penetration (high in hydro-connected settlements, zero in diesel-backed ones).</p>
+          <div style="margin-top:8px"><span class="sdg-badge primary" style="background:#fcc30b;color:#333">SDG 7</span> <span class="sdg-badge" style="background:#48773c">SDG 13</span> <span class="sdg-badge" style="background:#f36d25">SDG 9</span></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:12px">SSI Inputs → ESRS E1 Transition Plan</h3>
+          <table class="data-table">
+            <tbody><tr><td><span class="var-tag">T</span> Transition component (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r4-T">0.228</td></tr>
+            <tr><td><span class="var-tag">Fleet RE</span> Nukissiorfiit 2024 share</td><td class="num">~70%</td></tr>
+            <tr><td><span class="var-tag">wind_mw</span> Wind capacity (installed)</td><td class="num">0.0 MW</td></tr>
+            <tr><td><span class="var-tag">hydro_mw</span> Buksefjord (Sermersooq)</td><td class="num">45 MW</td></tr>
+            <tr><td><span class="var-tag">EV</span> Grønlands Statistik share</td><td class="num">&lt;1%</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="method-box">
+        <div class="method-label">Technical Validity</div>
+        <p>T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (EV charging load as fraction of substation capacity). DER data sourced from Nukissiorfiit installed-capacity registry and OSM generator tags. EV share from Grønlands Statistik vehicle registrations.</p>
+      </div>
+    </div>
+
+    <!-- Report 5 -->
+    <div class="section-block" id="report-5">
+      <div class="section-header">
+        <span class="section-number">5</span>
+        <div class="section-title-group">
+          <h2>Pollution &amp; Corrosion</h2>
+          <div class="section-sub">ESRS E2 Pollution · ISO 9223 Corrosion Classification</div>
+        </div>
+        <span class="readiness-pill partial">PARTIAL · Edition 001</span>
+      </div>
+      <div class="why-box">
+        <div class="why-label">Why this report exists</div>
+        <p>Transformer oil degradation, SF6 leakage, and corrosion-driven failures release pollutants affecting local environments. Greenland's substations are almost all coastal — ISO 9223 C4 (high corrosion) is applied fleet-wide in Edition 001; Edition 002 will refine per-asset using Asiaq salt-spray climatology and distance-to-coast. Permafrost thaw at the substation foundation creates an additional leakage pathway specific to Arctic deployment.</p>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card esg-report-card">
+          <div class="report-index">SDG Alignment</div>
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:10px">SDG 11 — Sustainable Cities &amp; Communities <span style="font-size:12px;color:var(--warm-grey)">(primary)</span></h3>
+          <p style="font-size:13px">Target 11.6 aims to reduce the adverse environmental impact of cities. The ISO 9223 corrosion class and E component will track environmental degradation and pollution sensitivity at asset level once Session 1 runs.</p>
+          <div style="margin-top:8px"><span class="sdg-badge primary" style="background:#f99d26">SDG 11</span> <span class="sdg-badge" style="background:#4c9f38">SDG 3</span> <span class="sdg-badge" style="background:#56c02b">SDG 15</span></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:12px">SSI Inputs → ESRS E2 Pollution</h3>
+          <table class="data-table">
+            <tbody><tr><td><span class="var-tag">Corrosion</span> ISO 9223 class (default)</td><td class="num">C4</td></tr>
+            <tr><td><span class="var-tag">E</span> Economic/Env component (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r5-E">0.638</td></tr>
+            <tr><td><span class="var-tag">R6b</span> Storm + surge (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r5-R6b">×1.005</td></tr>
+            <tr><td><span class="var-tag">coastal_km</span> Coastal proximity</td><td class="num">&lt;5 km (fleet-wide)</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="method-box">
+        <div class="method-label">Technical Validity</div>
+        <p>Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Greenland's maritime climate combined with freezing salt spray produces elevated corrosion in coastal zones. Full validation at Session 1 requires Asiaq salt-spray overlay and Miljøstyrelsen Greenland air-quality monitoring at substation coordinates.</p>
+      </div>
+    </div>
+
+    <!-- Report 6 -->
+    <div class="section-block" id="report-6">
+      <div class="section-header">
+        <span class="section-number">6</span>
+        <div class="section-title-group">
+          <h2>Cybersecurity Exposure</h2>
+          <div class="section-sub">NIS2 Directive · ENISA Cybersecurity Index · ESRS G1 Governance</div>
+        </div>
+        <span class="readiness-pill partial">PARTIAL · Edition 001</span>
+      </div>
+      <div class="why-box">
+        <div class="why-label">Why this report exists</div>
+        <p>The NIS2 Directive mandates cybersecurity risk management for energy operators; as the kingdom's essential service provider, Nukissiorfiit is in scope via the EU directive's extraterritorial reach into Denmark. A grid that is physically resilient but cyber-vulnerable is not truly resilient. The SSI R7 modifier combines SCADA assessment, communication-architecture analysis, and national-level cyber maturity (ENISA / DESI) into a substation-level digital vulnerability score.</p>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card esg-report-card">
+          <div class="report-index">SDG Alignment</div>
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:10px">SDG 9 — Industry, Innovation, Infrastructure <span style="font-size:12px;color:var(--warm-grey)">(primary)</span></h3>
+          <p style="font-size:13px">Target 9.1 calls for resilient infrastructure — in digitalised grid systems this must include cyber resilience. R7 (pending Session 1) assesses digital vulnerability combining SCADA exposure, protocol security, and national cyber-maturity indicators.</p>
+          <div style="margin-top:8px"><span class="sdg-badge primary" style="background:#f36d25">SDG 9</span> <span class="sdg-badge" style="background:#00689d">SDG 16</span></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:12px">SSI Inputs → NIS2 / ESRS G1</h3>
+          <table class="data-table">
+            <tbody><tr><td><span class="var-tag">R7</span> Cyber modifier (sample)</td><td class="num" style="color:var(--sage);font-weight:600" id="r6-R7">×1.030</td></tr>
+            <tr><td><span class="var-tag">V1</span> ENISA NIS2 baseline (fleet)</td><td class="num">0.65</td></tr>
+            <tr><td><span class="var-tag">degree</span> Graph degree (sample)</td><td class="num" id="r6-degree">3</td></tr>
+            <tr><td><span class="var-tag">is_bridge</span> Single-point-of-failure</td><td class="num" id="r6-bridge">No</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="method-box">
+        <div class="method-label">Technical Validity</div>
+        <p>R7_cyber is computed from a weighted combination of (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators (Denmark proxy with adjustment for Greenland's Tele Greenland broadband reach), (2) graph-topology vulnerability (BC percentile = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. BC percentile is computed within-island only — Greenland's grid is a set of isolated within-island networks (§8 Small-N Guardrail).</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ C. AUDIT TRAIL ══ -->
+  <div class="section-block" id="audit">
+    <div class="section-header">
+      <span class="section-number">C</span>
+      <div class="section-title-group">
+        <h2>Audit Trail &amp; Methodology Note</h2>
+        <div class="section-sub">Traceability for CSRD Article 29a limited assurance</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <table class="data-table">
+        <thead><tr><th>Item</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Scoring Engine</td><td>SSI Index v4.0.2 — Monte Carlo 1,000 iter/substation · independent component perturbation · Gaussian copula held off at N=37 (§8.2)</td></tr>
+          <tr><td>Weight Architecture</td><td>C = 0.30 · V = 0.10 · I = 0.25 · E = 0.10 · S = 0.20 · T = 0.05</td></tr>
+          <tr><td>Modifiers Applied</td><td>R3 consequence · R4 graph criticality · R6a Arctic restoration α ∈ [0.55, 0.90] · R6b seismic+storm α ∈ [0.05, 0.15] · R7 cyber — all scored in Edition 001</td></tr>
+          <tr><td>Degradation Model</td><td>Markov 5-state, CIGRE TB 761 (2019) calibration · ISO 9223 C4 coastal corrosion default</td></tr>
+          <tr><td>Thermal Model</td><td>IEEE C57.91 transformer loading curves · Arctic amplification CMIP6 SSP2-4.5 2050 (+2.5× global)</td></tr>
+          <tr><td>Exclusions</td><td>§7 Pituffik Space Base (U.S. operator · bbox lat 75.5°–77.5°N, lon −71°…−66°) — logged in meta.pituffik_excluded</td></tr>
+          <tr><td>Small-N Guardrail</td><td>§8 Active at N = 37 — R3 tier-balance 2–50% per tier; MC 1,000 iter; Gaussian copula held off</td></tr>
+          <tr><td>Refresh Gate</td><td>FIRST_REFRESH = 2026-04 (brought forward from 2026-07) · monthly cadence from 2026-05</td></tr>
+          <tr><td>Report Date</td><td>16 April 2026 · Edition 001 · Session 1</td></tr>
+          <tr><td>Reporting Period</td><td>Edition 001 (Session 1) — fleet R<sub>median</sub> 0.779 · 29 Critical · 7 High · 1 Medium · 0 Low</td></tr>
+          <tr><td>Refresh Cadence</td><td>Monthly from Edition 002 (2026-05)</td></tr>
+          <tr><td>Sample Substation</td><td id="audit-sample">Qaqortoq transformerstation · Kujalleq · 63 kV · R 0.587 (High)</td></tr>
+          <tr><td>Data Assurance Level</td><td>All inputs from public / institutional sources with citable vintage (Stat.gl 2024/25 · Nukissiorfiit 2024 Annual Report · Asiaq/DMI · GEUS · OSM)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="page-footer" id="footerContainer"><div>SSI Index v4.0.2 · Ikenga Enhanced Infrastructure Intelligence · Annual ESG Disclosure — Edition 001 · Session 1</div><div>Report generated 16 April 2026 · All data sources are open-access institutional</div></div>
+
+</div><!-- /page-shell -->
+
+<script>
+(function(){
+  function monthSeed(){ var d=new Date(); return d.getFullYear()*100+(d.getMonth()+1); }
+  function seededIndex(seed,len){ if(!len)return 0; var h=seed; h=((h>>>16)^h)*0x45d9f3b|0; h=((h>>>16)^h)*0x45d9f3b|0; h=(h>>>16)^h; return Math.abs(h)%len; }
+  function fmt(x, d){ if (x == null || isNaN(x)) return '—'; return (typeof x === 'number') ? x.toFixed(d==null?3:d) : String(x); }
+  function pct(x, d){ if (x == null || isNaN(x)) return '—'; return (x*100).toFixed(d==null?0:d) + '%'; }
+  function bandColor(band){
+    if (band === 'Critical') return 'var(--crimson)';
+    if (band === 'High')     return 'var(--terracotta)';
+    if (band === 'Medium')   return 'var(--bronze)';
+    if (band === 'Low')      return 'var(--sage)';
+    return 'var(--ink)';
+  }
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  // Modifier → normalised 0–1 exposure bar (1.00 = no effect, clamp to range)
+  function modNorm(m, lo, hi){
+    if (m == null) return 0;
+    if (m <= lo) return 0;
+    if (m >= hi) return 1;
+    return (m - lo) / (hi - lo);
+  }
+  // ETTC estimator from Markov — distance-to-Critical divided by annual degrade probability
+  function ettcYears(markov){
+    if (!markov) return null;
+    var order = ['As-new','Good','Satisfactory','Poor','Critical'];
+    var idx = order.indexOf(markov.state_now);
+    if (idx < 0) idx = 2;
+    var steps = Math.max(1, order.length - 1 - idx);
+    var p = markov.P_degrade_1yr;
+    if (!p || p <= 0) return null;
+    return steps / p;
+  }
+
+  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+    var subs = (data && data.substations) || [];
+    if (!subs.length) return;
+    var s = subs[seededIndex(monthSeed(), subs.length)] || subs[0];
+
+    // ── Identity KPI strip ──
+    document.getElementById('kpi-name').textContent = s.name || s.substation_id || '—';
+    var regPart = s.region || s.kommune || '—';
+    document.getElementById('kpi-id').textContent = (s.substation_id || '—') + ' · ' + regPart;
+    var v = s.voltage_kv;
+    document.getElementById('kpi-voltage').innerHTML = (v == null ? '—' : v + ' <span style="font-size:16px;font-weight:400;">kV</span>');
+    document.getElementById('kpi-voltage-sub').textContent = (v == null) ? 'voltage unmapped' : (v >= 50 ? 'HV transmission' : (v >= 10 ? 'MV distribution' : 'LV / subordinate'));
+
+    // ── Scored KPIs ──
+    var band = s.classification || '—';
+    var rCol = bandColor(band);
+    var kpiR = document.getElementById('kpi-r');
+    if (kpiR){ kpiR.textContent = fmt(s.R_median, 3); kpiR.style.color = rCol; }
+    var kpiBand = document.getElementById('kpi-r-band');
+    if (kpiBand) kpiBand.textContent = band + ' band · fleet pct ' + pct(s.fleet_percentile, 0);
+
+    var ciHalf = (s.CI_width != null) ? (s.CI_width/2) : null;
+    var kpiCI = document.getElementById('kpi-ci');
+    if (kpiCI) kpiCI.textContent = (ciHalf == null) ? '—' : ('±' + fmt(ciHalf, 3));
+    var kpiCIsub = document.getElementById('kpi-ci-sub');
+    if (kpiCIsub) kpiCIsub.textContent = 'P5 ' + fmt(s.R_P5, 2) + ' – P95 ' + fmt(s.R_P95, 2) + ' · MC 1,000';
+
+    var ettc = ettcYears(s.markov);
+    var kpiEttc = document.getElementById('kpi-ettc');
+    if (kpiEttc) kpiEttc.textContent = (ettc == null) ? '—' : (ettc.toFixed(1) + ' yr');
+    var kpiT = document.getElementById('kpi-t');
+    if (kpiT) kpiT.textContent = fmt(s.components && s.components.T, 3);
+
+    // ── Component Fingerprint (horizontal bars) ──
+    var cf = document.getElementById('comp-fingerprint');
+    if (cf && s.components){
+      var weights = { C: 0.30, V: 0.10, I: 0.25, E: 0.10, S: 0.20, T: 0.05 };
+      var labels  = {
+        C: 'C — Continuity',
+        V: 'V — Voltage Quality',
+        I: 'I — Infrastructure',
+        E: 'E — Economic / Env.',
+        S: 'S — Saturation',
+        T: 'T — Transition'
+      };
+      var rows = '';
+      ['C','V','I','E','S','T'].forEach(function(k){
+        var val = s.components[k] || 0;
+        var w = weights[k];
+        var col = val > 0.6 ? 'var(--crimson)' : (val > 0.4 ? 'var(--terracotta)' : (val > 0.25 ? 'var(--bronze)' : 'var(--sage)'));
+        rows += '<div style="display:grid;grid-template-columns:170px 1fr 110px;gap:10px;align-items:center;font-size:12px">' +
+          '<div style="color:var(--warm-grey)">' + labels[k] + '</div>' +
+          '<div style="background:var(--cream-deep);height:14px;border-radius:3px;overflow:hidden"><div style="width:' + (val*100).toFixed(1) + '%;background:' + col + ';height:100%"></div></div>' +
+          '<div class="num" style="font-variant-numeric:tabular-nums;color:' + col + ';font-weight:600">' + val.toFixed(3) + ' <span style="color:var(--warm-grey);font-weight:400;font-size:11px">× ' + w.toFixed(2) + '</span></div>' +
+          '</div>';
+      });
+      cf.innerHTML = rows;
+    }
+
+    // ── Markov Degradation Profile ──
+    var mp = document.getElementById('markov-profile');
+    if (mp && s.markov){
+      var m = s.markov;
+      var ettcTxt = (ettc == null) ? '—' : (ettc.toFixed(1) + ' yr');
+      mp.innerHTML =
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">' +
+          '<div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">Current State</div><div style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:700;margin-top:4px">' + (m.state_now || '—') + '</div></div>' +
+          '<div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">P(degrade) / yr</div><div style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:700;margin-top:4px;color:var(--terracotta)">' + pct(m.P_degrade_1yr, 1) + '</div></div>' +
+          '<div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">Expected State (3 yr)</div><div style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:700;margin-top:4px">' + (m.expected_state_3yr || '—') + '</div></div>' +
+          '<div style="padding:10px;background:var(--cream);border-radius:6px"><div class="label-xs">ETTC (→ Critical)</div><div style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:700;margin-top:4px;color:var(--crimson)">' + ettcTxt + '</div></div>' +
+        '</div>' +
+        '<div style="margin-top:12px;padding:10px 14px;background:rgba(170,66,52,0.06);border-left:3px solid var(--terracotta);border-radius:6px;font-size:12px;color:var(--ink)">' +
+          '<strong>Risk score:</strong> ' + fmt(m.risk_score, 2) + ' · <strong>P(improve) / yr:</strong> ' + pct(m.P_improve_1yr, 1) + ' · <strong>ISO 9223 class:</strong> ' + ((s.environmental && s.environmental.corrosion_class) || 'C4') +
+        '</div>';
+    }
+
+    // ── ESG Radar (6 framework axes) ──
+    var er = document.getElementById('esg-radar');
+    if (er){
+      var c = s.components || {}, mm = s.modifiers || {};
+      var axes = [
+        { k:'E1 · Climate',       v: clamp01((c.I||0) * 0.6 + modNorm(mm.R6_restoration, 1, 1.5)*0.2 + modNorm(mm.R6_seismic, 1, 1.3)*0.2), ref:'I + R6a + R6b', sdg:'13', col:'#48773c' },
+        { k:'S1 · Social',        v: clamp01((c.S||0) * 0.6 + ((s.socio_economic && s.socio_economic.V_socio) || 0) * 0.4),                                           ref:'S + V_socio',   sdg:'7/10', col:'#fcc30b' },
+        { k:'Taxonomy · Art. 11', v: clamp01(s.R_median || 0),                                                                                                        ref:'R_median',      sdg:'9',  col:'#f36d25' },
+        { k:'E1 · Transition',    v: clamp01(c.T || 0),                                                                                                               ref:'T component',   sdg:'7',  col:'#fcc30b' },
+        { k:'E2 · Pollution',     v: clamp01((c.E||0) * 0.7 + modNorm(mm.R6_seismic, 1, 1.3) * 0.3),                                                                  ref:'E + R6b',       sdg:'11', col:'#f99d26' },
+        { k:'G1 · Cyber',         v: clamp01(modNorm(mm.R7_cyber, 1, 1.15) * 0.6 + 0.35),                                                                             ref:'R7 + V1 NIS2',  sdg:'9',  col:'#f36d25' }
+      ];
+      er.innerHTML = axes.map(function(a){
+        var col = a.v > 0.6 ? 'var(--crimson)' : (a.v > 0.4 ? 'var(--terracotta)' : (a.v > 0.25 ? 'var(--bronze)' : 'var(--sage)'));
+        return '<div style="padding:12px 14px;background:var(--cream);border-radius:8px;border-left:3px solid ' + a.col + '">' +
+          '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">' +
+            '<div style="font-weight:600;font-size:13px">' + a.k + '</div>' +
+            '<div style="font-family:\'Playfair Display\',serif;font-size:18px;font-weight:700;color:' + col + '">' + a.v.toFixed(2) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(44,36,32,0.08);height:6px;border-radius:3px;overflow:hidden"><div style="width:' + (a.v*100).toFixed(1) + '%;background:' + col + ';height:100%"></div></div>' +
+          '<div style="font-size:10.5px;color:var(--warm-grey);margin-top:6px">Input: ' + a.ref + ' · SDG ' + a.sdg + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // ── Report 1 (Climate) ──
+    var comp = s.components || {}, mods = s.modifiers || {};
+    var set = function(id, val){ var el = document.getElementById(id); if (el) el.textContent = val; };
+    set('r1-I',   fmt(comp.I, 3));
+    set('r1-R6a', (mods.R6_restoration != null) ? ('×' + mods.R6_restoration.toFixed(3)) : '—');
+    set('r1-R6b', (mods.R6_seismic     != null) ? ('×' + mods.R6_seismic.toFixed(3))     : '—');
+    set('r1-ettc', (ettc == null) ? '—' : (ettc.toFixed(1) + ' yr'));
+
+    // ── Report 2 (Social) ──
+    set('r2-S',   fmt(comp.S, 3));
+    set('r2-E',   fmt(comp.E, 3));
+    set('r2-R3',  (mods.R3_C_mult != null) ? ('×' + mods.R3_C_mult.toFixed(3)) : '—');
+    var se = s.socio_economic || {};
+    set('r2-elderly', (se.elderly_pct != null) ? pct(se.elderly_pct, 0) : '—');
+    set('r2-gdp',     (se.gdp_per_capita != null) ? ('DKK ' + Math.round(se.gdp_per_capita).toLocaleString()) : '—');
+
+    // ── Report 3 (Taxonomy) ──
+    set('r3-R',   fmt(s.R_median, 3));
+    var compTxt = ['C','V','I','E','S','T'].map(function(k){ return k+' '+fmt(comp[k],2); }).join(' · ');
+    set('r3-comp', compTxt);
+    var modTxt = 'R3 ×' + fmt(mods.R3_C_mult,2) + ' · R4 ×' + fmt(mods.R4_F_topo,2) + ' · R6a ×' + fmt(mods.R6_restoration,2) + ' · R6b ×' + fmt(mods.R6_seismic,2) + ' · R7 ×' + fmt(mods.R7_cyber,2);
+    set('r3-mod', modTxt);
+    set('r3-ci',  (s.CI_width != null) ? ('±' + (s.CI_width/2).toFixed(3)) : '—');
+
+    // ── Report 4 (Transition) ──
+    set('r4-T', fmt(comp.T, 3));
+
+    // ── Report 5 (Pollution) ──
+    set('r5-E',   fmt(comp.E, 3));
+    set('r5-R6b', (mods.R6_seismic != null) ? ('×' + mods.R6_seismic.toFixed(3)) : '—');
+
+    // ── Report 6 (Cyber) ──
+    set('r6-R7', (mods.R7_cyber != null) ? ('×' + mods.R7_cyber.toFixed(3)) : '—');
+    var deg = (s.graph_topology && s.graph_topology.degree != null) ? s.graph_topology.degree : '—';
+    var br = (s.graph_topology && s.graph_topology.is_bridge != null) ? (s.graph_topology.is_bridge ? 'Yes' : 'No') : '—';
+    set('r6-degree', deg);
+    set('r6-bridge', br);
+
+    // ── Audit sample ──
+    var sampleCell = document.getElementById('audit-sample');
+    if (sampleCell) sampleCell.textContent = (s.name || s.substation_id) + ' · ' + regPart + ' · ' + (v == null ? 'voltage unmapped' : (v + ' kV')) + ' · R ' + fmt(s.R_median, 3) + ' (' + band + ')';
+  }).catch(function(){});
+
+  var footer = document.getElementById('footerContainer');
+  if (footer) footer.innerHTML =
+    '<div>SSI Index v4.0.2 · Ikenga Enhanced Infrastructure Intelligence · Annual ESG Disclosure — Edition 001 · Session 1</div>' +
+    '<div>Report generated 16 April 2026 · All data sources are open-access institutional</div>';
+
+  if (typeof renderFooter === 'function') renderFooter();
+})();
+</script><footer class="site-footer" role="contentinfo"><div>SSI Index v4.0.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div><div>95 variables · 25 sources · ~250 substations (15 HV · 235 MV) · ~70 islanded micro-grids across 5 Kommuner · Pituffik excluded</div><div class="copyright-notice">Copyright © 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Società Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div></footer>
+
+
+</body></html>
