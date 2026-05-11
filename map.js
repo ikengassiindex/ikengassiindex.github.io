@@ -1370,7 +1370,7 @@ if (!hasNested) {
       // Detect if fleet has meaningful classification spread
       var _classif = {};
       (SSI.substations || []).forEach(function(s) { _classif[s.classification] = (_classif[s.classification]||0)+1; });
-      window._ssiHasSpread = Object.keys(_classif).length >= 3;
+      window._ssiHasSpread = Object.keys(_classif).length >= 1;  // (was >=3 — uniformly-classified fleets like LU were falling through to percentile fallback)
       wireFilters();
       clearDetailPanel();
 
