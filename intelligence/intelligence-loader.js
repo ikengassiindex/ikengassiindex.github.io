@@ -31,7 +31,7 @@
 
   // Countries that are provisioned but not yet in the active rotation.
   // Silences the "No config for country" warning until they're live.
-  var PRE_LAUNCH_COUNTRIES = ['portugal', 'new-zealand'];
+  var PRE_LAUNCH_COUNTRIES = ['portugal', 'new-zealand', 'czechia'];
 
   // Month names for display
   var MONTHS = ['January','February','March','April','May','June',
