@@ -5,7 +5,7 @@
 
 // ── Single source of truth for supported country slugs ──
 var SSI_COUNTRY_SLUGS = [
-  'australia','austria','canada','chile','denmark','finland','france','germany',
+  'australia','austria','canada','chile','czechia','denmark','finland','france','germany',
   'greece','greenland','ireland','italy','japan','mexico','new-zealand','norway',
   'poland','portugal','spain','sweden','switzerland','turkey','uk','us'
 ];
@@ -41,7 +41,8 @@ var SSI_COUNTRY_LABELS = {
     ireland: '🇮🇪 Ireland',
     portugal: '🇵🇹 Portugal',
     'new-zealand': '🇳🇿 New Zealand',
-    greenland: '🇬🇱 Greenland'
+    greenland: '🇬🇱 Greenland',
+    czechia: '🇨🇿 Czechia'
   };
 
 // Ikenga logo
@@ -227,7 +228,8 @@ function renderFooter() {
     ireland: '95 variables · 30 sources · 994 substations (319 HV · 675 MV) · 4,505 power lines across 26 Counties · 4 Provinces',
     portugal: '95 variables · 28 sources · 10,191 substations (168 HV · 708 MV) · 11,043 power lines across 20 Distritos · 7 Regiões',
     'new-zealand': '95 variables · 28 sources · 1,558 substations (200 HV ≥110 kV · 1,358 MV <110 kV) across 16 Regions · 2 Islands',
-    greenland: '95 variables · 25 sources · ~250 substations (15 HV · 235 MV) · ~70 islanded micro-grids across 5 Kommuner · Pituffik excluded'
+    greenland: '95 variables · 25 sources · ~250 substations (15 HV · 235 MV) · ~70 islanded micro-grids across 5 Kommuner · Pituffik excluded',
+    czechia: '95 variables · 30 sources · 1,077 substations (7 HV · 288 MV · 782 distribution-tier) · 6,484 power lines across 14 Kraje · 206 ORP'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
