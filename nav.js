@@ -6,7 +6,7 @@
 // ── Single source of truth for supported country slugs ──
 var SSI_COUNTRY_SLUGS = [
   'australia','austria','canada','chile','czechia','denmark','finland','france','germany',
-  'greece','greenland','ireland','italy','japan','mexico','new-zealand','norway',
+  'greece','greenland','ireland','italy','japan','luxembourg','mexico','new-zealand','norway',
   'poland','portugal','spain','sweden','switzerland','turkey','uk','us'
 ];
 var SSI_COUNTRY_PATH_RE = new RegExp('/(' + SSI_COUNTRY_SLUGS.join('|') + ')/');
@@ -42,7 +42,8 @@ var SSI_COUNTRY_LABELS = {
     portugal: '🇵🇹 Portugal',
     'new-zealand': '🇳🇿 New Zealand',
     greenland: '🇬🇱 Greenland',
-    czechia: '🇨🇿 Czechia'
+    czechia: '🇨🇿 Czechia',
+    luxembourg: '🇱🇺 Luxembourg'
   };
 
 // Ikenga logo
