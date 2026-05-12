@@ -19,6 +19,7 @@
   // ------ State ------
   let GEO = null;           // grid-geo.json { l, s, a }
   let SSI = null;            // ssi-data.json { meta, fleet_summary, regions, substations }
+  let BOUNDS = null;         // bounds.json (optional country/province polygon GeoJSON)
   let ssiMap = {};           // internal_id  substation record (fast lookup)
   let lineById = {};         // line.i  line object (fast lookup)
   let canvas, ctx;
@@ -164,6 +165,35 @@
     const subRadius = Math.max(1.5, Math.min(s * 1.8, 6));
     const isSelecting = sel.type !== null;
     const isFiltering = filters.band !== 'all' || filters.region !== 'all' || filters.voltage !== 'all' || searchQuery;
+
+    // --- Draw admin bounds (provinces/regions polygon outline) ---
+    if (BOUNDS && BOUNDS.features) {
+      ctx.save();
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'rgba(44, 36, 32, 0.55)';      // warm-grey border, visible at default zoom
+      ctx.fillStyle   = 'rgba(232, 220, 205, 0.78)';   // warm tan fill — distinct from cream-deep background
+      ctx.lineWidth   = 1.4;
+      for (const f of BOUNDS.features) {
+        const g = f.geometry;
+        if (!g) continue;
+        const polys = (g.type === 'Polygon') ? [g.coordinates] : (g.type === 'MultiPolygon') ? g.coordinates : [];
+        for (const poly of polys) {
+          ctx.beginPath();
+          for (let ri = 0; ri < poly.length; ri++) {
+            const ring = poly[ri];
+            for (let j = 0; j < ring.length; j++) {
+              const [sx, sy] = geoToScreen(ring[j][0], ring[j][1]);
+              if (j === 0) ctx.moveTo(sx, sy);
+              else ctx.lineTo(sx, sy);
+            }
+            ctx.closePath();
+          }
+          ctx.fill('evenodd');
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
 
     // --- Draw lines ---
     const voltageActive = filters.voltage !== 'all';
@@ -1223,12 +1253,18 @@ if (!hasNested) {
 
     // Load data
     const basePath = options.basePath || '';
+    // bounds.json is optional — countries without an admin-polygon file get a 404 and a silent no-op
     Promise.all([
       fetch(basePath + 'grid-geo.json?v=407').then(r => r.json()),
-      fetch(basePath + 'ssi-data.json?v=407').then(r => r.json())
-    ]).then(([geo, ssi]) => {
+      fetch(basePath + 'ssi-data.json?v=407').then(r => r.json()),
+      fetch(basePath + 'bounds.json?v=407').then(r => r.ok ? r.json() : null).catch(() => null)
+    ]).then(([geo, ssi, bounds]) => {
       GEO = geo;
       SSI = ssi;
+      BOUNDS = bounds;
+      if (bounds && bounds.features) {
+        console.log(`SSI Map: loaded admin bounds — ${bounds.features.length} polygons`);
+      }
 
       // ------ Compact format adapter ------
       // If substations are arrays (US compact format), expand to objects
@@ -1342,19 +1378,47 @@ if (!hasNested) {
         fleetMedian[k] = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
       }
 
-      // Auto-center map on data centroid
+      // Auto-fit map to bbox of substations (or bounds polygon if present)
+      // — uses the min/max of geographic coords + a 6% margin so the country
+      // fills the canvas without clipping. Falls back to centroid-only if subs missing.
       const subEntries = Object.values(GEO.s);
       if (subEntries.length > 0) {
-        let sumLon = 0, sumLat = 0;
-        for (const s of subEntries) {
-          sumLon += s.x;
-          sumLat += s.y;
+        let minLon=Infinity,maxLon=-Infinity,minLat=Infinity,maxLat=-Infinity;
+        // Prefer bounds polygon extent when available — gives a country-shaped frame
+        // rather than a substation-cluster frame (which can omit corners like coastline).
+        if (BOUNDS && BOUNDS.features) {
+          for (const f of BOUNDS.features) {
+            const polys = (f.geometry.type === 'Polygon') ? [f.geometry.coordinates] : f.geometry.coordinates;
+            for (const poly of polys) for (const ring of poly) for (const [lo,la] of ring) {
+              if (lo<minLon) minLon=lo; if (lo>maxLon) maxLon=lo;
+              if (la<minLat) minLat=la; if (la>maxLat) maxLat=la;
+            }
+          }
+        } else {
+          for (const s of subEntries) {
+            if (s.x<minLon) minLon=s.x; if (s.x>maxLon) maxLon=s.x;
+            if (s.y<minLat) minLat=s.y; if (s.y>maxLat) maxLat=s.y;
+          }
         }
-        view.cx = sumLon / subEntries.length;
-        view.cy = sumLat / subEntries.length;
+        view.cx = (minLon + maxLon) / 2;
+        view.cy = (minLat + maxLat) / 2;
+        // Wait for first resize() to know W,H then compute fit-scale below.
+        view._fitBbox = { minLon, maxLon, minLat, maxLat };
       }
 
       resize();
+      // After resize() sets W,H, compute fit-to-country scale
+      if (view._fitBbox && W > 0 && H > 0) {
+        const b = view._fitBbox;
+        const lonSpan = Math.max(0.01, (b.maxLon - b.minLon) * COS42);
+        const latSpan = Math.max(0.01, (b.maxLat - b.minLat));
+        const margin = 0.92; // 8% padding around country
+        const scaleX = (W * margin) / (lonSpan * (W / 12.3));
+        const scaleY = (H * margin) / (latSpan * (W / 12.3));
+        view.scale = Math.max(0.5, Math.min(scaleX, scaleY));
+        delete view._fitBbox;
+        requestDraw();
+      }
       if (SSI.regions && !Array.isArray(SSI.regions)) SSI.regions = Object.values(SSI.regions);
 
       if (!SSI.regions) {
