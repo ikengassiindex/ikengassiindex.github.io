@@ -5,9 +5,34 @@
 
 // ── Single source of truth for supported country slugs ──
 var SSI_COUNTRY_SLUGS = [
-  'australia','austria','canada','chile','czechia','denmark','finland','france','germany',
-  'greece','greenland','ireland','italy','japan','luxembourg','mexico','new-zealand','norway',
-  'poland','portugal','spain','sweden','switzerland','turkey','uk','us'
+  'australia',
+  'austria',
+  'belgium',
+  'canada',
+  'chile',
+  'czechia',
+  'denmark',
+  'finland',
+  'france',
+  'germany',
+  'greece',
+  'greenland',
+  'ireland',
+  'italy',
+  'japan',
+  'luxembourg',
+  'mexico',
+  'netherlands',
+  'new-zealand',
+  'norway',
+  'poland',
+  'portugal',
+  'spain',
+  'sweden',
+  'switzerland',
+  'turkey',
+  'uk',
+  'us'
 ];
 var SSI_COUNTRY_PATH_RE = new RegExp('/(' + SSI_COUNTRY_SLUGS.join('|') + ')/');
 
@@ -43,7 +68,9 @@ var SSI_COUNTRY_LABELS = {
     'new-zealand': '🇳🇿 New Zealand',
     greenland: '🇬🇱 Greenland',
     czechia: '🇨🇿 Czechia',
-    luxembourg: '🇱🇺 Luxembourg'
+    luxembourg: '🇱🇺 Luxembourg',
+    belgium: '🇧🇪 Belgium',
+    netherlands: '🇳🇱 Netherlands'
   };
 
 // Ikenga logo
@@ -230,7 +257,9 @@ function renderFooter() {
     portugal: '95 variables · 28 sources · 10,191 substations (168 HV · 708 MV) · 11,043 power lines across 20 Distritos · 7 Regiões',
     'new-zealand': '95 variables · 28 sources · 1,558 substations (200 HV ≥110 kV · 1,358 MV <110 kV) across 16 Regions · 2 Islands',
     greenland: '95 variables · 25 sources · ~250 substations (15 HV · 235 MV) · ~70 islanded micro-grids across 5 Kommuner · Pituffik excluded',
-    czechia: '95 variables · 30 sources · 1,077 substations (7 HV · 288 MV · 782 distribution-tier) · 6,484 power lines across 14 Kraje · 206 ORP'
+    czechia: '95 variables · 30 sources · 1,077 substations (7 HV · 288 MV · 782 distribution-tier) · 6,484 power lines across 14 Kraje · 206 ORP',
+    belgium: '95 variables · 28 sources · 1,220 substations (254 HV ≥110 kV · 202 MV 20–110 kV · 764 distribution-tier) · 4,017 power lines across 11 Provinces · 581 Communes/Gemeenten',
+    netherlands: '95 variables · 28 sources · 1,640 substations (528 HV ≥110 kV · 265 MV 20–110 kV · 847 distribution-tier) · 4,757 power lines across 12 Provinces · 342 Gemeenten'
   };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
