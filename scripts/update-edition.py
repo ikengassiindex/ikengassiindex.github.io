@@ -17,15 +17,20 @@ CONFIG_PATH = Path('intelligence/edition-config.json')
 # new-zealand: first automated refresh June 2026 (skip April + May)
 # greenland:   Session 1 scored 2026-04-16 (brought forward from 2026-07). Bundled with Denmark for archive/email from next cycle.
 COUNTRIES = ['france','italy','uk','us','germany','spain','switzerland','austria','canada','japan','australia','chile','czechia',
-             'denmark','norway','finland','poland','sweden','mexico','greece','turkey','ireland','portugal','new-zealand','greenland']
+             'denmark','norway','finland','poland','sweden','mexico','greece','turkey','ireland','portugal','new-zealand','greenland',
+             'luxembourg',
+             'belgium',
+             'netherlands']
 FIRST_REFRESH = {
     'denmark': '2026-05', 'norway': '2026-05', 'finland': '2026-05',
     'poland':  '2026-05', 'sweden': '2026-05', 'mexico':  '2026-05',
     'new-zealand': '2026-06',
     'czechia':     '2026-06',
     # 'greenland' removed — Session 1 completed 2026-04-16 (early bring-forward);
-    # subsequent refreshes follow standard monthly cadence starting 2026-05.
-}
+    # subsequent refreshes follow standard monthly cadence starting 2026-05.,
+    'luxembourg': '2026-07',
+    'belgium': '2026-08',
+    'netherlands': '2026-09'}
 
 def main():
     if not CONFIG_PATH.exists():
