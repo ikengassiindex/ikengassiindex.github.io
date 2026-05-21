@@ -6,13 +6,13 @@
 <meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 28 verified public data sources, 95 variables, 11 data layers.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Latvia · Data Sources</title>
-<link rel="stylesheet" href="../style.css?v=417">
+<link rel="stylesheet" href="../style.css?v=416">
 </head>
 <body>
 <script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=417"></script>
+<script src="../nav.js?v=416"></script>
 <script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js?v=417"></script>
+<script src="ssi-metadata.js?v=416"></script>
 <script>renderNav('data');</script>
 
 <main class="page-shell">
@@ -317,7 +317,7 @@ fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(functio
         head: [['ID', 'Name', 'NUTS-3 region', 'NUTS-3 region', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6a', 'R6b', 'R7', 'Network', 'Output', 'Tier']],
         body: ssi.substations.map(function(s) {
           return [
-            s.internal_id, s.name, s.region, s.NUTS-3 region, s.voltage_kv,
+            s.internal_id, s.name, s.region, s.region, s.voltage_kv,
             s.R_median.toFixed(3), s.R_P5.toFixed(3), s.R_P95.toFixed(3), s.CI_width.toFixed(3),
             s.classification, (s.fleet_percentile * 100).toFixed(0) + '%',
             s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
@@ -447,7 +447,7 @@ fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(functio
         head: [['ID', 'Name', 'NUTS-3 region', 'NUTS-3 region', 'Longitude', 'Latitude', 'kV', 'R_median', 'Band', 'C', 'V', 'I', 'E', 'S', 'T']],
         body: ssi.substations.map(function(s) {
           return [
-            s.internal_id, s.name, s.region, s.NUTS-3 region,
+            s.internal_id, s.name, s.region, s.region,
             s.lon.toFixed(5), s.lat.toFixed(5), s.voltage_kv,
             s.R_median.toFixed(3), s.classification,
             s.components.C.toFixed(2), s.components.V.toFixed(2), s.components.I.toFixed(2),
@@ -508,7 +508,7 @@ fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(functio
     '  <span class="hl-var">"substation_id"</span>: <span class="hl-num">"' + s.substation_id + '"</span>,\n' +
     '  <span class="hl-var">"version"</span>: <span class="hl-num">"' + s.version + '"</span>,\n' +
     '  <span class="hl-var">"name"</span>: <span class="hl-num">"' + s.name + '"</span>,\n' +
-    '  <span class="hl-var">"region"</span>: <span class="hl-num">"' + s.region + '"</span>,  <span class="hl-var">"NUTS-3 region"</span>: <span class="hl-num">"' + s.NUTS-3 region + '"</span>,\n' +
+    '  <span class="hl-var">"region"</span>: <span class="hl-num">"' + s.region + '"</span>,  <span class="hl-var">"NUTS-3 region"</span>: <span class="hl-num">"' + s.region + '"</span>,\n' +
     '  <span class="hl-var">"R_median"</span>: <span class="hl-num">' + s.R_median.toFixed(4) + '</span>,\n' +
     '  <span class="hl-var">"R_P5"</span>: <span class="hl-num">' + s.R_P5.toFixed(4) + '</span>,  <span class="hl-var">"R_P95"</span>: <span class="hl-num">' + s.R_P95.toFixed(4) + '</span>,\n' +
     '  <span class="hl-var">"classification"</span>: <span class="hl-num">"' + s.classification + '"</span>,\n' +

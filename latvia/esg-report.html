@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — Latvia · ESG Report</title>
-<link rel="stylesheet" href="../style.css?v=417">
+<link rel="stylesheet" href="../style.css?v=416">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -13,9 +13,9 @@
 <link rel="stylesheet" href="../esg-report.css?v=416">
 </head>
 <body>
-<script src="../nav.js?v=417"></script>
-<script src="../esg-helpers.js?v=417"></script>
-<script src="ssi-metadata.js?v=417"></script>
+<script src="../nav.js?v=416"></script>
+<script src="../esg-helpers.js?v=416"></script>
+<script src="ssi-metadata.js?v=416"></script>
 <script src="../intelligence/intelligence-loader.js?v=416" data-country="latvia" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
@@ -239,7 +239,7 @@ const ESG_REPORTS = [
           const cz = {BEL:0.95, CAP:0.78, JHM:0.68, PLK:0.55, HKK:0.50, PAK:0.50,
                        LBK:0.48, OLK:0.45, ZLK:0.45, CLE:0.42, VYS:0.40,
                        ULK:0.30, MSK:0.28, WIL:0.20};
-          const v = cz[d.NUTS-3 region_id] ?? 0.50;
+          const v = cz[d.region_id] ?? 0.50;
           return v.toFixed(2);
         })()]
       ];
@@ -704,7 +704,7 @@ function renderKPIs(d) {
     <div class="kpi-card">
       <div class="kpi-label">Substation</div>
       <div class="kpi-value" style="font-size:22px;">${displayName(d)}</div>
-      <div class="kpi-sub">${d.substation_id || ''} · ${d.NUTS-3 region || ''}, ${d.region || ''}</div>
+      <div class="kpi-sub">${d.substation_id || ''} · ${d.region || ''}, ${d.region || ''}</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">SSI Score (R<sub>median</sub>)</div>
@@ -1007,7 +1007,7 @@ function renderESGFooter(d) {
 const DEMO_SUBSTATION = {
   substation_id: 'IT_001_000', internal_id: '001_0', version: '4.0.2',
   name: 'Substation Example', lon: 12.5, lat: 41.9, voltage_kv: 200,
-  region: 'Lazio', NUTS-3 region: 'Roma', kreis: 'Roma',
+  region: 'Lazio', region: 'Roma', kreis: 'Roma',
   classification: 'Low',
   band_pct: { Low: 100, Medium: 0, High: 0, Critical: 0 },
   confidence_pct: 'medium', R_median: 0.3231, R_mean: 0.3213,

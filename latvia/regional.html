@@ -6,13 +6,13 @@
 <meta name="description" content="Compare Latvia NUTS-3 regions by SSI resilience score, component breakdown, and socio-economic context.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Latvia · Regional · 6 NUTS-3 statistical regions (LV admin)</title>
-<link rel="stylesheet" href="../style.css?v=417">
+<link rel="stylesheet" href="../style.css?v=416">
 </head>
 <body>
 <script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=417"></script>
+<script src="../nav.js?v=416"></script>
 <script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js?v=417"></script>
+<script src="ssi-metadata.js?v=416"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
@@ -121,7 +121,7 @@
 renderFooter();
 
 var SSI = null;
-var NUTS-3 regionData = {};
+var regionData = {};
 
 function switchTab(btn, tabId) {
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -183,13 +183,13 @@ function renderRanking(data) {
 }
 
 // ── Tab 2: NUTS-3 region Comparison ──
-function buildNUTS-3 regionData(data) {
+function buildRegionData(data) {
   var map = {};
   data.substations.forEach(function(s) {
-    if (!map[s.NUTS-3 region]) {
-      map[s.NUTS-3 region] = { NUTS-3 region: s.NUTS-3 region, region: s.region, subs: [] };
+    if (!map[s.region]) {
+      map[s.region] = { region: s.region, region: s.region, subs: [] };
     }
-    map[s.NUTS-3 region].subs.push(s);
+    map[s.region].subs.push(s);
   });
   // Compute aggregates
   Object.keys(map).forEach(function(p) {
@@ -223,18 +223,18 @@ function buildNUTS-3 regionData(data) {
   return map;
 }
 
-function populateNUTS-3 regionSelects() {
-  var provNames = Object.keys(NUTS-3 regionData).sort();
+function populateRegionSelects() {
+  var provNames = Object.keys(regionData).sort();
   var selA = document.getElementById('prov-a');
   var selB = document.getElementById('prov-b');
   var html = provNames.map(function(p) {
-    return '<option value="' + p + '">' + p + ' (' + NUTS-3 regionData[p].count + ')</option>';
+    return '<option value="' + p + '">' + p + ' (' + regionData[p].count + ')</option>';
   }).join('');
   selA.innerHTML = html;
   selB.innerHTML = html;
 
   // Smart defaults: pick a high-risk and low-risk NUTS-3 region
-  var sorted = provNames.slice().sort(function(a, b) { return NUTS-3 regionData[b].median_R - NUTS-3 regionData[a].median_R; });
+  var sorted = provNames.slice().sort(function(a, b) { return regionData[b].median_R - regionData[a].median_R; });
   selA.value = sorted[0] || provNames[0]; // worst NUTS-3 region
   // Find best NUTS-3 region
   var bestIdx = sorted.length - 1;
@@ -248,8 +248,8 @@ function populateNUTS-3 regionSelects() {
 function updateComparison() {
   var nameA = document.getElementById('prov-a').value;
   var nameB = document.getElementById('prov-b').value;
-  var a = NUTS-3 regionData[nameA];
-  var b = NUTS-3 regionData[nameB];
+  var a = regionData[nameA];
+  var b = regionData[nameB];
   if (!a || !b) return;
 
   document.getElementById('th-prov-a').textContent = nameA;
@@ -432,9 +432,9 @@ function renderDecomposition(data) {
 // ── Load Data ──
 fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(function(data) {
   SSI = data;
-  NUTS-3 regionData = buildNUTS-3 regionData(data);
+  regionData = buildRegionData(data);
   renderRanking(data);
-  populateNUTS-3 regionSelects();
+  populateRegionSelects();
   renderDecomposition(data);
 }).catch(function(err) {
   console.error('Failed to load SSI data:', err);

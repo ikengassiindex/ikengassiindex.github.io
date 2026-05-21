@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — Latvia · Intelligence</title>
-<link rel="stylesheet" href="../style.css?v=417">
+<link rel="stylesheet" href="../style.css?v=416">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 </head>
 <body>
-<script src="../nav.js?v=417"></script>
-<script src="ssi-metadata.js?v=417"></script>
+<script src="../nav.js?v=416"></script>
+<script src="ssi-metadata.js?v=416"></script>
 <script src="../intelligence/intelligence-loader.js" data-country="latvia"></script>
 <script>
 // Config-ready bridge: SSI_EDITION available for all inline scripts
@@ -151,7 +151,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // Basic info
     document.getElementById('focus-name').textContent = s.name;
-    document.getElementById('focus-location').textContent = s.NUTS-3 region + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
+    document.getElementById('focus-location').textContent = s.region + ', ' + s.region + ' · ' + s.voltage_kv + ' kV';
     document.getElementById('focus-r').textContent = s.R_median.toFixed(3);
     document.getElementById('focus-band').textContent = s.classification;
     document.getElementById('focus-ci').textContent = s.CI_width.toFixed(3);
@@ -267,7 +267,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var monthNames = ['January','February','March','April','May','June','July','September','September','October','November','December'];
     var d = new Date();
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
-      ' — is <strong>' + s.name + '</strong> in ' + s.NUTS-3 region + ', ' + s.region +
+      ' — is <strong>' + s.name + '</strong> in ' + s.region + ', ' + s.region +
       '. With an R_final of ' + s.R_median.toFixed(3) + ' (' + s.classification + ' band, ' +
       (s.fleet_percentile * 100).toFixed(0) + 'th fleet percentile), its risk profile is dominated by the ' +
       top1.key + ' (' + top1.label + ') component at ' + (s.components[top1.key] / top1.w * 100).toFixed(0) +
@@ -603,7 +603,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     // ── B.3 NUTS-3 region Digital Readiness ──
     var provData = {};
     fleet.forEach(function(s){
-      var p = s.NUTS-3 region;
+      var p = s.region;
       if (!provData[p]) provData[p] = { subs: [], sumR7: 0, sumR: 0, sumLon: 0, sumLat: 0 };
       provData[p].subs.push(s);
       provData[p].sumR7 += s.modifiers.R7_cyber;
@@ -1077,9 +1077,9 @@ document.addEventListener("ssi-config-ready", function(e) {
     // Worst NUTS-3 region by mean R
     var provSums = {}, provCounts = {};
     ne_stressed.forEach(function(s){
-      if (!provSums[s.NUTS-3 region]) { provSums[s.NUTS-3 region] = 0; provCounts[s.NUTS-3 region] = 0; }
-      provSums[s.NUTS-3 region] += s.R_median;
-      provCounts[s.NUTS-3 region]++;
+      if (!provSums[s.region]) { provSums[s.region] = 0; provCounts[s.region] = 0; }
+      provSums[s.region] += s.R_median;
+      provCounts[s.region]++;
     });
     var provAvgs = Object.keys(provSums).map(function(p){ return { name: p, avg: provSums[p]/provCounts[p], n: provCounts[p] }; });
     provAvgs.sort(function(a,b){ return b.avg - a.avg; });
@@ -1154,7 +1154,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     ctx.fillStyle = 'rgba(44,36,32,0.5)';
     ctx.textAlign = 'center';
     provAvgs.forEach(function(pv){  // NUTS-3 region iteration
-      var provSubs = ne_stressed.filter(function(s){ return s.NUTS-3 region === pv.name; });
+      var provSubs = ne_stressed.filter(function(s){ return s.region === pv.name; });
       var avgLon = provSubs.reduce(function(a,s){ return a + s.lon; }, 0) / provSubs.length;
       var avgLat = provSubs.reduce(function(a,s){ return a + s.lat; }, 0) / provSubs.length;
       var p = proj(avgLon, avgLat);
@@ -1171,7 +1171,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       var alertStr = s.alert_components ? s.alert_components.join(', ') : '—';
       return '<tr>' +
         '<td style="' + thStyle + 'font-weight:500">' + s.name + '</td>' +
-        '<td style="' + thStyle + '">' + s.NUTS-3 region + '</td>' +
+        '<td style="' + thStyle + '">' + s.region + '</td>' +
         '<td style="' + numStyle + 'color:' + bCol + ';font-weight:600">' + s.R_median.toFixed(3) + '</td>' +
         '<td style="' + thStyle + 'color:' + bCol + ';font-weight:600">' + s.classification + '</td>' +
         '<td style="' + numStyle + '">' + s.components.C.toFixed(3) + '</td>' +
@@ -1267,7 +1267,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">NUTS-3 region Risk Profile — Sorted by Mean R</div>' +
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function(pv){  // NUTS-3 region iteration
-      var provSubs = ne_stressed.filter(function(s){ return s.NUTS-3 region === pv.name; });
+      var provSubs = ne_stressed.filter(function(s){ return s.region === pv.name; });
       var provBands = { Low:0, Medium:0, High:0, Critical:0 };
       provSubs.forEach(function(s){ provBands[s.classification]++; });
       var barPct = ((1 - pv.avg) * 100).toFixed(1);
@@ -1763,7 +1763,7 @@ document.addEventListener("ssi-config-ready", function(e) {
       var regions = {};
       fleet.forEach(function(s){ regions[s.region] = true; });
       var NUTS-3 regions = {};
-      fleet.forEach(function(s){ NUTS-3 regions[s.NUTS-3 region] = true; });
+      fleet.forEach(function(s){ NUTS-3 regions[s.region] = true; });
       statHTML = 'Latvia\'s coverage: ' + n.toLocaleString() + ' substations across ' +
         Object.keys(regions).length + ' NUTS-3 regions and ' + Object.keys(NUTS-3 regions).length + ' NUTS-3 region. ' +
         'This serves as the reference benchmark for the Coverage Quality Scorecard: any country achieving comparable ' +
@@ -1957,10 +1957,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     // 1. Most concentrated risk corridor
     var provData = {};
     fleet.forEach(function(s){
-      if (!provData[s.NUTS-3 region]) provData[s.NUTS-3 region] = { subs: [], sumR: 0, highCrit: 0 };
-      provData[s.NUTS-3 region].subs.push(s);
-      provData[s.NUTS-3 region].sumR += s.R_median;
-      if (s.classification === 'High' || s.classification === 'Critical') provData[s.NUTS-3 region].highCrit++;
+      if (!provData[s.region]) provData[s.region] = { subs: [], sumR: 0, highCrit: 0 };
+      provData[s.region].subs.push(s);
+      provData[s.region].sumR += s.R_median;
+      if (s.classification === 'High' || s.classification === 'Critical') provData[s.region].highCrit++;
     });
     var provList = Object.keys(provData).map(function(p){
       var d = provData[p];
