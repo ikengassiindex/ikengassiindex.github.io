@@ -1,0 +1,227 @@
+# .github/workflows/runtime-audit.yml
+# Stage 7e — Runtime audit harness (KB §49.10).
+#
+# Every Monday 06:00 UTC, and on-demand via workflow_dispatch, render
+# every country's dashboard pages in headless Chromium, scan for known
+# residue patterns, diff each ssi-data.json against the Latvia reference
+# schema, and report findings via:
+#
+#   1. JSON artifact `runtime-audit-report`  (90-day retention)
+#   2. Job step summary (Markdown table)
+#   3. Tracking issue `Runtime audit — open findings` (created / updated)
+#   4. Microsoft Graph email digest to ssi_index@ikenga.eu
+#
+# Secrets required (same set as monthly-refresh.yml):
+#   AZURE_TENANT_ID
+#   AZURE_CLIENT_ID
+#   AZURE_CLIENT_SECRET
+#
+# Failure semantics:
+#   - The harness itself returns exit 1 if critical findings exist.
+#   - We swallow that exit code at the run level (continue-on-error)
+#     because the audit's purpose is to *report*, not to gate deploys.
+#     If a country gates new commits, that's a separate validate.yml job.
+
+name: Stage 7e — Runtime Audit
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'        # Mondays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      countries:
+        description: 'CSV of country slugs (empty = all)'
+        required: false
+        default: ''
+        type: string
+      send_email:
+        description: 'Send Graph email digest'
+        required: false
+        default: true
+        type: boolean
+      always_send:
+        description: 'Send even with zero findings'
+        required: false
+        default: false
+        type: boolean
+
+# KB §49.7 — Prevent commit-push race when two workflows push to main
+concurrency:
+  group: runtime-audit-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues:   write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            intelligence/
+            scripts/
+            automation/
+            .github/
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Playwright + Chromium
+        run: |
+          pip install --upgrade pip
+          pip install playwright==1.45.0
+          python -m playwright install --with-deps chromium
+
+      - name: Run runtime audit
+        id: audit
+        continue-on-error: true   # findings ≠ workflow failure
+        env:
+          GITHUB_STEP_SUMMARY: ${{ env.GITHUB_STEP_SUMMARY }}
+        run: |
+          mkdir -p audit/_logs audit/_summary
+          python3 automation/scripts/runtime_audit.py \
+            --countries "${{ github.event.inputs.countries }}" \
+            --out-dir audit
+          echo "report_path=$(ls -t audit/_logs/runtime-audit-*.json | head -n1)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload JSON report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-audit-report
+          path: audit/_logs/runtime-audit-*.json
+          retention-days: 90
+
+      - name: Upload Markdown summary artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-audit-summary
+          path: audit/_summary/SUMMARY.md
+          retention-days: 90
+
+      # ── Tracking issue: create or update a single canonical issue per
+      #    audit run so the project board doesn't accumulate hundreds.
+      - name: Update tracking issue
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          REPORT_PATH: ${{ steps.audit.outputs.report_path }}
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = process.env.REPORT_PATH;
+            if (!reportPath || !fs.existsSync(reportPath)) {
+              core.warning('No audit report — skipping tracking issue update');
+              return;
+            }
+            const data = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            const crit = data.critical_count || 0;
+            const warn = data.warning_count || 0;
+            const n    = data.countries_scanned || 0;
+            const started = (data.started_at || '').slice(0, 10);
+
+            // Build a compact body
+            let lines = [
+              `**Run**: ${started} UTC · ${n} countries scanned`,
+              `**Findings**: ${crit} critical · ${warn} warning · ${data.total_findings} total`,
+              ``,
+              `| Country | Status | Critical | Warning |`,
+              `|---|---|---:|---:|`,
+            ];
+            const sorted = [...(data.per_country || [])].sort((a, b) =>
+              (b.summary.critical || 0) - (a.summary.critical || 0));
+            for (const r of sorted) {
+              const status = r.pre_launch ? '⏸ pre-launch'
+                : (r.summary.critical || 0) > 0 ? '✗ critical'
+                : (r.summary.warning || 0) > 0 ? '⚠ warning' : '✓ clean';
+              lines.push(`| ${r.slug} | ${status} | ${r.summary.critical || 0} | ${r.summary.warning || 0} |`);
+            }
+            lines.push('');
+            lines.push(`_Updated automatically by .github/workflows/runtime-audit.yml · Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}_`);
+            const body = lines.join('\n');
+
+            // Find existing tracking issue
+            const title = 'Runtime audit — open findings';
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              state: 'open',
+              labels: 'runtime-audit',
+              per_page: 20,
+            });
+            const existing = issues.data.find(i => i.title === title);
+
+            if (crit === 0 && warn === 0) {
+              // Clean run — close existing if any
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: existing.number,
+                  body: `✓ Clean run on ${started} — closing.\n\n${body}`,
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: existing.number,
+                  state: 'closed',
+                });
+                core.info(`Closed tracking issue #${existing.number}`);
+              } else {
+                core.info('Clean run, no existing issue — nothing to do');
+              }
+              return;
+            }
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+              core.info(`Updated tracking issue #${existing.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title,
+                body,
+                labels: ['runtime-audit'],
+              });
+              core.info(`Created tracking issue #${created.data.number}`);
+            }
+
+      # ── Microsoft Graph email digest
+      - name: Send Graph email digest
+        if: ${{ github.event.inputs.send_email != 'false' }}
+        continue-on-error: true   # email failure must not mark the audit failed
+        env:
+          AZURE_TENANT_ID:     ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID:     ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          GRAPH_SENDER_UPN:    ssi_index@ikenga.eu
+          AUDIT_DIGEST_TO:     ssi_index@ikenga.eu
+          RUNTIME_AUDIT_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          ALWAYS=""
+          if [[ "${{ github.event.inputs.always_send }}" == "true" ]]; then
+            ALWAYS="--always-send"
+          fi
+          python3 automation/scripts/send_audit_digest.py \
+            --latest audit/_logs/ $ALWAYS
+
+      # ── Final status — fail the workflow only on critical findings,
+      #    AND only if the user explicitly asked for gate semantics.
+      #    Default behaviour: green even with findings, so the cron can
+      #    just run quietly. The tracking issue + email are the signal.
+      - name: Note critical findings (informational)
+        if: ${{ steps.audit.outcome == 'failure' }}
+        run: |
+          echo "::warning::Audit found critical issues — see tracking issue + email digest"
