@@ -5,7 +5,7 @@
 
 // ── Single source of truth for supported country slugs ──
 var SSI_COUNTRY_SLUGS = [
-  'australia','austria','belgium','canada','chile','czechia','denmark','finland','france','germany','greece','greenland','ireland','italy','japan','luxembourg','mexico','netherlands','new-zealand','norway','poland','portugal','spain','sweden','switzerland','turkey','uk','us','estonia','latvia'
+  'australia','austria','belgium','canada','chile','czechia','denmark','finland','france','germany','greece','greenland','ireland','italy','japan','luxembourg','mexico','netherlands','new-zealand','norway','poland','portugal','spain','sweden','switzerland','turkey','uk','us','estonia','latvia','lithuania'
 ];
 var SSI_COUNTRY_PATH_RE = new RegExp('/(' + SSI_COUNTRY_SLUGS.join('|') + ')/');
 
@@ -45,7 +45,8 @@ var SSI_COUNTRY_LABELS = {
     belgium: '🇧🇪 Belgium',
     netherlands: '🇳🇱 Netherlands',
   estonia: '\uD83C\uDDEA\uD83C\uDDEA Estonia',
-  latvia: '\uD83C\uDDF1\uD83C\uDDFB Latvia'
+  latvia: '\uD83C\uDDF1\uD83C\uDDFB Latvia',
+  lithuania: '\uD83C\uDDF1\uD83C\uDDF9 Lithuania'
 };
 
 // Ikenga logo
@@ -236,7 +237,8 @@ function renderFooter() {
     belgium: '95 variables · 28 sources · 1,220 substations (254 HV ≥110 kV · 202 MV 20–110 kV · 764 distribution-tier) · 4,017 power lines across 11 Provinces · 581 Communes/Gemeenten',
     netherlands: '95 variables · 28 sources · 1,640 substations (528 HV ≥110 kV · 265 MV 20–110 kV · 847 distribution-tier) · 4,757 power lines across 12 Provinces · 342 Gemeenten',
   estonia: '95 variables · 28 sources · 614 substations (165 HV · 37 MV · 412 distribution-tier) · 3,769 power lines / 9,484 km transmission network across 15 Maakond · 79 Omavalitsus',
-  latvia: '95 variables · 28 sources · 1,219 substations (132 HV ≥330 kV · 628 HV 110-330 kV · 459 distribution-tier) · 16,245 power lines / 27,056 km transmission network across 6 NUTS-3 regions · 43 novadi (post-2021 reform)'
+  latvia: '95 variables · 28 sources · 1,219 substations (132 HV ≥330 kV · 628 HV 110-330 kV · 459 distribution-tier) · 16,245 power lines / 27,056 km transmission network across 6 NUTS-3 regions · 43 novadi (post-2021 reform)',
+  lithuania: '95 variables · 28 sources · 505 substations (298 HV ≥110 kV · 170 MV 33-110 kV · 24 MV-low · 13 untagged) · 2,527 power lines across 10 NUTS-3 apskritys · 60 savivaldybės (LAU)'
 };
   var stats = SSI_COUNTRY && countryStats[SSI_COUNTRY] ? countryStats[SSI_COUNTRY] : 'Open data, open methodology · Pan-European grid resilience';
 
