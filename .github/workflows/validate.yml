@@ -6,7 +6,7 @@ on:
       - '*/ssi-data.json'
       - '*/grid-geo.json'
       - 'versions.json'
-      - 'countries.json'
+      - 'intelligence/countries.json'
   pull_request:
     paths:
       - '*/ssi-data.json'
@@ -21,7 +21,7 @@ jobs:
           sparse-checkout: |
             scripts/
             versions.json
-            countries.json
+            intelligence/
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
@@ -33,16 +33,23 @@ jobs:
         run: |
           python3 -c "import json; json.load(open('versions.json')); print('versions.json: valid JSON')"
 
-      - name: Validate countries.json
+      - name: Validate intelligence/countries.json (canonical SoT)
         run: |
           python3 -c "
-          import json
-          cfg = json.load(open('countries.json'))
-          assert len(cfg) >= 12, f'Expected 12+ countries, got {len(cfg)}'
-          for code, c in cfg.items():
-            for key in ['name','flag','currency','admin_l1','prefix']:
-              assert key in c, f'{code} missing {key}'
-          print(f'countries.json: {len(cfg)} countries validated')
+          import json, re
+          cfg = json.load(open('intelligence/countries.json'))
+          slugs = cfg.get('slugs', [])
+          fr = cfg.get('first_refresh', {})
+          assert len(slugs) >= 20, f'Expected 20+ country slugs, got {len(slugs)}'
+          # first_refresh is OPTIONAL per slug — entries without one are treated
+          # as 'already past' (legacy countries deployed before the gating system).
+          # But every PRESENT entry must parse as YYYY-MM or YYYY-MM-DD.
+          for slug, date in fr.items():
+            assert re.match(r'^\d{4}-\d{2}(-\d{2})?\$', date), f'{slug}: bad first_refresh {date!r}'
+          # And every key in first_refresh must be a real slug (catches typos)
+          orphans = [s for s in fr if s not in slugs]
+          assert not orphans, f'first_refresh keys not in slugs[]: {orphans}'
+          print(f'intelligence/countries.json: {len(slugs)} slugs · {len(fr)} first_refresh dates · all parse OK')
           "
 
       - name: Check data file sizes
