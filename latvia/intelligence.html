@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — Latvia · Intelligence</title>
-<link rel="stylesheet" href="../style.css?v=416">
+<link rel="stylesheet" href="../style.css?v=417">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 </head>
 <body>
-<script src="../nav.js?v=416"></script>
-<script src="ssi-metadata.js?v=416"></script>
-<script src="../intelligence/intelligence-loader.js" data-country="latvia"></script>
+<script src="../nav.js?v=417"></script>
+<script src="ssi-metadata.js?v=417"></script>
+<script src="../intelligence/intelligence-loader.js?v=417" data-country="latvia"></script>
 <script>
 // Config-ready bridge: SSI_EDITION available for all inline scripts
 window.SSI_EDITION = window.SSI_EDITION || null;
@@ -144,7 +144,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -363,7 +363,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -869,7 +869,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
 
   // ── C.2 Fleet Score Snapshot — from ssi-data.json ──
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -1049,7 +1049,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter NE-stressed cluster ──
     var ne_stressed = data.substations.filter(function(s){ return ['Latgale','Krāslava','(no island)','Kurzeme-cluster','Sēlija-cluster'].indexOf(s.region) >= 0; });
     var fleet = data.substations;
@@ -1433,7 +1433,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var ne_stressed = fleet.filter(function(s){ return ['Latgale','Krāslava','(no island)','Kurzeme-cluster','Sēlija-cluster'].indexOf(s.region) >= 0; });
 
@@ -1709,8 +1709,8 @@ document.addEventListener("ssi-config-ready", function(e) {
       '<span>' + c + '</span></div>';
   }).join('');
 
-  var editionNum = (now.getFullYear() - 2026) * 12 + (now.getMonth() + 1) - 2; // March 2026 = Ed 001
-  var editionStr = String(Math.max(1, editionNum)).padStart(3, '0');
+  var editionNum = (now.getFullYear() - 2026) * 12 + (now.getMonth() + 1) - 4; // May 2026 = Ed 01 (LV inaugural)
+  var editionStr = String(Math.max(1, editionNum)).padStart(2, '0');
 
   document.getElementById('enn-topic').innerHTML =
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
@@ -1725,7 +1725,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '</div>';
 
   // ── SSI Data Connection — pull live stats to anchor the topic ──
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1834,16 +1834,18 @@ document.addEventListener("ssi-config-ready", function(e) {
   // 2nd Thursday of either next month or month-after-next, whichever's first
   // 2nd Thursday is at least ~10 days in the future.
   var d = now.getDate();   // <-- variable here is `now`, not `today`
-  var skipToMonthAfter = d >= 21;  // past 3rd week of current month → skip
+  // KB §47.14 — Cutoff was `d >= 21` (BE/NL pattern, prematurely skips a month).
+  // For Latvia inaugural: 2nd Thu of next month is 14-28 days after 21st of current
+  // month, which is ≥10-day buffer; no need to skip.  Push cutoff to month-end.
+  var skipToMonthAfter = d >= 28;  // only skip into month-after-next in last days
   var addMonths = skipToMonthAfter ? 2 : 1;
   var nextMonth = (month + addMonths) % 12;
   var nextYear  = month + addMonths > 11 ? year + 1 : year;
-  // NL pre-launch baseline: May 2026 = Edition 01 (Latvia inaugural)
-  //                        August 2026 = Edition 02 (next publication)
-  // Compute from nextMonth/nextYear (not current) so the closing line reads
-  // the right number for the next published edition, not the current one.
+  // LV pre-launch baseline: May 2026 = Edition 01 (Latvia inaugural)
+  //                         June 2026 = Edition 02 (next publication, 2nd Thu = 11 June)
+  // Offset −4 so that month=5 (May) → 1, month=6 (June) → 2, etc.
   var nextEditionNum = (nextYear - 2026) * 12 + (nextMonth + 1) - 4;
-  var nextEdition = String(Math.max(1, nextEditionNum)).padStart(3, '0');
+  var nextEdition = String(Math.max(1, nextEditionNum)).padStart(2, '0');
   var editionNum = nextEditionNum;  // back-compat alias used downstream
 
   // Deterministic seed
@@ -1946,7 +1948,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   }
 
   // ── Card 3: Fleet Spotlight — rotating stat ──
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);
