@@ -15,6 +15,12 @@ on:
         default: 'false'
         type: string
 
+
+# KB §49.7 — Prevent commit-push race when two workflows push to main
+concurrency:
+  group: monthly-refresh-main
+  cancel-in-progress: false
+
 permissions:
   contents: write
 

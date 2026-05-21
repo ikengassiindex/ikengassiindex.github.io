@@ -11,6 +11,12 @@ on:
         default: 'true'
         type: string
 
+
+# KB §49.7 — Prevent commit-push race when two workflows push to main
+concurrency:
+  group: esg-refresh-main
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
