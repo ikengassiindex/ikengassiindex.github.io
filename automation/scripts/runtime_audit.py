@@ -223,10 +223,18 @@ def scan_schema(slug: str) -> list[dict]:
                 "missing": sorted(missing_meta),
             })
 
-    # First substation
-    subs = data.get("substations", [])
-    if subs:
-        s0 = subs[0]
+    # First substation — tolerate list or dict shape
+    subs_raw = data.get("substations")
+    s0 = None
+    if isinstance(subs_raw, list) and subs_raw:
+        if isinstance(subs_raw[0], dict):
+            s0 = subs_raw[0]
+    elif isinstance(subs_raw, dict) and subs_raw:
+        for v in subs_raw.values():
+            if isinstance(v, dict):
+                s0 = v
+                break
+    if s0 is not None:
         missing_sub = LV_REFERENCE_KEYS["substation"] - set(s0.keys())
         if missing_sub:
             findings.append({
@@ -255,10 +263,22 @@ def scan_schema(slug: str) -> list[dict]:
                     "missing": sorted(missing_mk),
                 })
 
-    # regions[]
-    regions = data.get("regions", [])
-    if regions:
-        missing_reg = LV_REFERENCE_KEYS["regions[]"] - set(regions[0].keys())
+    # regions — tolerate both shapes:
+    #   list-form (LV/LT convention):  [{"region":"...","R_median":...}, ...]
+    #   dict-form (legacy convention): {"region_name": {"R_median":...}, ...}
+    regions_raw = data.get("regions")
+    first_region = None
+    if isinstance(regions_raw, list) and regions_raw:
+        if isinstance(regions_raw[0], dict):
+            first_region = regions_raw[0]
+    elif isinstance(regions_raw, dict) and regions_raw:
+        # Pick first value that is itself a dict
+        for v in regions_raw.values():
+            if isinstance(v, dict):
+                first_region = v
+                break
+    if first_region is not None:
+        missing_reg = LV_REFERENCE_KEYS["regions[]"] - set(first_region.keys())
         if missing_reg:
             findings.append({
                 "type": "schema",
