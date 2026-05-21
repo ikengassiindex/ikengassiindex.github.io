@@ -14,7 +14,7 @@ window.SSI_METADATA = {
   bbox: { lon_min: 20.97, lon_max: 28.24, lat_min: 55.67, lat_max: 58.09 },
   admin_levels: { L1: { count: 6, label: 'NUTS-3 region' }, L2: { count: 43, label: 'Novads' } },
 
-  stats: { sources: 28, variables: 95, components: 6, modifiers: 6, substations: 1219, region: 15,
+  stats: { sources: 28, variables: 95, components: 6, modifiers: 6, substations: 1219, regions: 6,
            fleet_median_R: 0.439, Critical: 13, High: 89, Medium: 276, Low: 236 },
 
   R3_calibration: { thresholds: { Capital_Intensive: 1.02, Industrial: 1.04, Commercial: 1.06, Light_Rural: 1.08 }},
