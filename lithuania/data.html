@@ -292,12 +292,12 @@ function pdfFooter(doc) {
   }
 })();
 
-fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(function(ssi) {
+fetch('ssi-data.json?v=404').then(function(r) { return r.json(); }).then(function(ssi) {
   var n = ssi.substations.length;
 
   // Update KPI (happens before jsPDF lookup so a CDN failure doesn't blank the KPI)
   document.getElementById('data-subs').textContent = n.toLocaleString();
-  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + ssi.meta.total_departments + ' Vallad · ' + ssi.regions.length + ' NUTS-3 regions';
+  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + ssi.meta.total_departments + ' savivaldybės · ' + ssi.regions.length + ' NUTS-3 regions';
   document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' substations · all fields';
 
   var jsPDF = (window.jspdf && window.jspdf.jsPDF) || null;

@@ -23,7 +23,7 @@
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
     <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
-    <p>A composite resilience score for Lithuania's electrical grid — 505 substations (live OSM) — 132 HV (≥330 kV) + 628 HV (110-330 kV) (≥110 kV) · 0 MV 33-110 kV (structural absence) (20-110 kV) · 15,085 distribution-tier — across 10 NUTS-3 statistical regions (LV admin) & 79 Vallad — 95 variables, 28 public data sources, zero proprietary dependencies.</p>
+    <p>A composite resilience score for Lithuania's electrical grid — 505 substations (live OSM) — 132 HV (≥330 kV) + 628 HV (110-330 kV) (≥110 kV) · 0 MV 33-110 kV (structural absence) (20-110 kV) · 15,085 distribution-tier — across 10 NUTS-3 statistical regions (LV admin) & 79 savivaldybės — 95 variables, 28 public data sources, zero proprietary dependencies.</p>
     <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
   </div>
 
@@ -48,7 +48,7 @@
     <div class="kpi-card animate-in delay-1">
       <div class="kpi-label">Substations Scored</div>
       <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
-      <div class="kpi-sub" id="kpi-total-sub">11 HV · 15 MV · 65 distribution-tier · 79 Vallad · 10 NUTS-3 statistical regions (LV admin)</div>
+      <div class="kpi-sub" id="kpi-total-sub">11 HV · 15 MV · 65 distribution-tier · 79 savivaldybės · 10 NUTS-3 statistical regions (LV admin)</div>
     </div>
     <div class="kpi-card animate-in delay-2">
       <div class="kpi-label">Fleet Median R</div>
@@ -156,7 +156,7 @@
       <script>
       (function(){
         function fmt(v){if(v>=1e9)return(v/1e9).toFixed(2)+' B';if(v>=1e6)return(v/1e6).toFixed(1)+' M';if(v>=1e3)return v.toLocaleString('en-US');return String(v)}
-        fetch('ssi-data.json?v=402').then(function(r){return r.json()}).then(function(data){
+        fetch('ssi-data.json?v=404').then(function(r){return r.json()}).then(function(data){
           var subs=data.substations,n=subs.length;
           var isArr=Array.isArray(subs[0]);
           // LU tiers: HV ≥110 kV (220 kV import corridors), MV 20–65 kV (sub-transmission + primary distribution), distribution-tier = no explicit voltage tag.
@@ -186,7 +186,7 @@
         });
       })();
       </script>
-              <div><strong>102</strong> Vallad · 10 NUTS-3 statistical regions (LV admin)</div>
+              <div><strong>102</strong> savivaldybės · 10 NUTS-3 statistical regions (LV admin)</div>
             </div>
           </div>
         </div>
@@ -282,7 +282,7 @@
       document.getElementById('kpi-total-sub').textContent =
         hvCount.toLocaleString() + ' HV · ' + mvCount.toLocaleString() + ' MV · ' +
         dtCount.toLocaleString() + ' distribution-tier · ' +
-        communesCount + ' Vallad · ' + ssi.regions.length + ' NUTS-3 regions';
+        communesCount + ' savivaldybės · ' + ssi.regions.length + ' NUTS-3 regions';
 
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;

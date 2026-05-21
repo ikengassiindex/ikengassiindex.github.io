@@ -144,7 +144,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=404').then(function(r){ return r.json(); }).then(function(data){
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -363,7 +363,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=404').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -869,7 +869,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
 
   // ── C.2 Fleet Score Snapshot — from ssi-data.json ──
-  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=404').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -1049,9 +1049,9 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=404').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter NE-stressed cluster ──
-    var ne_stressed = data.substations.filter(function(s){ return ['Utena','Krāslava','(no island)','Šiauliai-cluster','Sēlija-cluster'].indexOf(s.region) >= 0; });
+    var ne_stressed = data.substations.filter(function(s){ return ['Utenos','Tauragės','Telšių','Alytaus','Marijampolės'].indexOf(s.region) >= 0; });
     var fleet = data.substations;
     ne_stressed.sort(function(a,b){ return b.R_median - a.R_median; });
 
@@ -1125,7 +1125,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
     // Draw all non-NE-stressed cluster substations as faint grey for context
     fleet.forEach(function(s){
-      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && ['Utena','Krāslava','(no island)','Šiauliai-cluster','Sēlija-cluster'].indexOf(s.region) < 0) {
+      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && ['Utenos','Tauragės','Telšių','Alytaus','Marijampolės'].indexOf(s.region) < 0) {
         var p = proj(s.lon, s.lat);
         ctx.beginPath();
         ctx.arc(p[0], p[1], 2, 0, Math.PI * 2);
@@ -1433,9 +1433,9 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=404').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
-    var ne_stressed = fleet.filter(function(s){ return ['Utena','Krāslava','(no island)','Šiauliai-cluster','Sēlija-cluster'].indexOf(s.region) >= 0; });
+    var ne_stressed = fleet.filter(function(s){ return ['Utenos','Tauragės','Telšių','Alytaus','Marijampolės'].indexOf(s.region) >= 0; });
 
     // ── Key Insight ──
     // C component > 70% of weight ceiling (0.30) = high continuity deficit ≈ "high continuity deficit"
@@ -1477,7 +1477,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
     var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
     regions.forEach(function(reg, idx){
-      var isNE = ['Utena','Krāslava','(no island)','Šiauliai-cluster','Sēlija-cluster'].indexOf(reg.name) >= 0;
+      var isNE = ['Utenos','Tauragės','Telšių','Alytaus','Marijampolės'].indexOf(reg.name) >= 0;
       var barPct = ((1 - reg.avgR) * 100).toFixed(1);
       var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
       var highlight = isNE ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
@@ -1509,7 +1509,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     document.getElementById('eu-regional-ranking').innerHTML = html;
 
     // Ranking narrative
-    var neRank = regions.findIndex(function(r){ return ['Utena','Krāslava','(no island)','Šiauliai-cluster','Sēlija-cluster'].indexOf(r.name) >= 0; }) + 1;
+    var neRank = regions.findIndex(function(r){ return ['Utenos','Tauragės','Telšių','Alytaus','Marijampolės'].indexOf(r.name) >= 0; }) + 1;
     var top3 = regions.slice(0, 3).map(function(r){ return r.name; });
     var bot3 = regions.slice(-2).reverse().map(function(r){ return r.name; });
     var aboveAvg = regions.filter(function(r){ return r.avgR > fleetAvgR; }).length;
@@ -1725,7 +1725,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     '</div>';
 
   // ── SSI Data Connection — pull live stats to anchor the topic ──
-  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=404').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1860,35 +1860,35 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   // ── Card 1: Next Edition deep-dive topics — 15 EE NUTS-3 region (Session 17) ──
   var deepDives = [
-    { region: 'Vilnius', theme: 'Vilnius — Vilnius e-Lithuania Tech Hub + Muuga Port', context: 'Industrial R3 tier · highest GDP/cap',
+    { region: 'Vilniaus', theme: 'Vilnius — Vilnius e-Lithuania Tech Hub + Muuga Port', context: 'Industrial R3 tier · highest GDP/cap',
       contextDetail: 'Vilnius capital region: Vilnius commercial center + Port of Vilnius + RTU tech corridor; Muuga deep-water port; Ignitis Group HQ + Litgrid HQ; 109 substations (18% of fleet); ESO SAIDI 58 min (best in fleet); GDP/cap €47,800 (2.43× the Valka floor); R3 = 1.02 — Industrial tier; R median 0.316 (best in fleet); zero critical-band substations' },
-    { region: 'Daugavpils', theme: 'Daugavpils — University Town + Biotech Cluster', context: 'Commercial R3 tier · second-best resilience',
+    { region: 'Kauno', theme: 'Daugavpils — University Town + Biotech Cluster', context: 'Commercial R3 tier · second-best resilience',
       contextDetail: 'University of Lithuania (Latvijas Universitāte) (Lithuania’s oldest, R&D 4.12% of regional GDP — highest in fleet); biotech cluster around Biomeditsiinikeskus; (no equivalent) + BMC (Lithuanian Biomedical Research Centre); 67 substations; ESO SAIDI 78 min; GDP/cap €31,200; R3 = 1.04 — Commercial tier; R median 0.312 (second-best after Vilnius); modernised grid post-2010 EU funds' },
-    { region: 'Utena', theme: 'Utena — Oil-Shale Phase-Out + Just-Transition Fund', context: 'Light/Rural R3 tier · worst median R · 5 critical-band',
+    { region: 'Utenos', theme: 'Utena — Oil-Shale Phase-Out + Just-Transition Fund', context: 'Light/Rural R3 tier · worst median R · 5 critical-band',
       contextDetail: 'Daugava hydro cascade oil-shale power complex (~75% of EE historical generation, phasing out 2024-2026); (no equivalent — LV has no oil-shale) chemical campus Kohtla-Järve; (no LV equivalent) rare-earth refining (Silmet, only OECD source of separated rare earths outside China); Russian-era 1960s-80s grid infrastructure now reversing investment trend; EU Just Transition Fund €354M committed 2021-2027; 83 substations; ESO SAIDI 142 min (worst on mainland); R3 = 1.06 — Light/Rural tier; R median 0.524 + 5 critical-band substations (most in fleet) — the legacy infrastructure pinch point' },
-    { region: 'Liepāja', theme: 'Liepāja — Summer Capital + Wendre Textiles', context: 'Commercial R3 tier · tourism load swing',
+    { region: 'Klaipėdos', theme: 'Liepāja — Summer Capital + Wendre Textiles', context: 'Commercial R3 tier · tourism load swing',
       contextDetail: 'Lithuania’s "summer capital" with population swing 87k → 180k during July-August (load profile non-trivial for distribution); Wendre AS textile manufacturer; Selver retail chain HQ; Liepāja Hospital regional referral centre; 38 substations; ESO SAIDI 85 min; R3 = 1.04 — Commercial tier; R median 0.489 — moderate stress from seasonal tourism load + aging coastal feeders' },
-    { region: 'Klaipėda', theme: 'Klaipėda — Rakvere Meat + Kunda Cement', context: 'Light/Rural R3 tier · industrial heritage',
+    { region: 'Klaipėdos', theme: 'Klaipėda — Rakvere Meat + Kunda Cement', context: 'Light/Rural R3 tier · industrial heritage',
       contextDetail: 'Rakvere Meat Processing (HKScan subsidiary, EE largest meat producer); Kunda Nordic Cement (Nordic’s largest cement plant, CO2-intensive industrial load); Lithuanian Cell (pulp + paper, Kunda); 90 substations; ESO SAIDI 119 min; R3 = 1.06; R median 0.433 — moderate; legacy industrial grid carrying heavy continuous-process loads' },
     { region: 'Šiauliai-coast', theme: 'Šiauliai-coast — Coastal + Island Undersea Cable Anchor', context: 'Light/Rural R3 tier · island dependency',
       contextDetail: 'Haapsalu coastal resort town; mainland anchor for (no island)maa undersea cable (110 kV submarine link); Lihula bog ecosystem; mostly low-density agricultural with long radial feeders; 28 substations; ESO SAIDI 162 min — second-worst in fleet; R3 = 1.06; R median 0.588 — high stress from undersea cable single-point-of-failure + long feeders' },
-    { region: 'Šiauliai-cluster', theme: 'Šiauliai-cluster — Mulgi Agricultural Heartland + Suure-Jaani Peat', context: 'Light/Rural R3 tier · agri-rural',
+    { region: 'Šiaulių', theme: 'Šiauliai-cluster — Mulgi Agricultural Heartland + Suure-Jaani Peat', context: 'Light/Rural R3 tier · agri-rural',
       contextDetail: 'Mulgimaa cultural-agricultural heart of Lithuania; historic Suure-Jaani peat extraction (now mostly closed for emissions reasons); Šiauliai-cluster Hospital + Šiauliai-cluster Culture Academy; 85 substations; ESO SAIDI 118 min; R3 = 1.06; R median 0.458 — mid-rural; older grid with seasonal agri-load peaks (grain drying, dairy refrigeration)' },
     { region: 'Panevėžys-cluster', theme: 'Panevėžys-cluster — Paide Centre + Türi Cattle Country', context: 'Light/Rural R3 tier · cattle + agri',
       contextDetail: 'Paide town (geographical centre of EE) + Türi cattle/dairy region; Roosna-Alliku stud farm legacy; 31 substations; ESO SAIDI 115 min; R3 = 1.06; R median 0.473; balanced rural grid; mid-stress from dispersed dairy refrigeration + grain drying loads' },
-    { region: 'Tukums', theme: 'Tukums — Vilnius Commuter Belt + Forestry', context: 'Light/Rural R3 tier · transit corridor',
+    { region: 'Marijampolės', theme: 'Tukums — Vilnius Commuter Belt + Forestry', context: 'Light/Rural R3 tier · transit corridor',
       contextDetail: 'Tukums town as Vilnius-Liepāja rail+road corridor midpoint; Märjamaa forestry; growing peri-urban commuter population from Vilnius out-migration; 36 substations; ESO SAIDI 108 min; R3 = 1.06; R median 0.420 — moderate-good (newer commuter-belt grid investment); mixed rural-suburban' },
-    { region: 'Sēlija-cluster', theme: 'Sēlija-cluster — Põltsamaa Wine + Lake Peipus Border', context: 'Light/Rural R3 tier · agricultural + Russian border',
+    { region: 'Panevėžio', theme: 'Sēlija-cluster — Põltsamaa Wine + Lake Peipus Border', context: 'Light/Rural R3 tier · agricultural + Russian border',
       contextDetail: 'Põltsamaa wine + Mustvee on Lake Peipus (EE/Russia border); historic Old Believers (Russian Orthodox minority); Põltsamaa Felix food processing; 16 substations (small fleet); ESO SAIDI 133 min; R3 = 1.06; R median 0.428 — moderate; sparse rural grid with cross-border seasonal load patterns' },
-    { region: 'Madona', theme: 'Madona — Setomaa Heritage + Forest Industry', context: 'Light/Rural R3 tier · sparse',
+    { region: 'Alytaus', theme: 'Madona — Setomaa Heritage + Forest Industry', context: 'Light/Rural R3 tier · sparse',
       contextDetail: 'Setomaa traditional Seto cultural region (UNESCO ICH); Räpina paper mill; mostly forested with dispersed villages; 8 substations (sparse — among smallest in fleet); ESO SAIDI 128 min; R3 = 1.06; R median 0.551 — high stress from very long radial feeders + extreme spatial dispersion' },
-    { region: '(no LV island)', theme: '(no LV island) — (no LV island)maa Island + Dolomite Quarries', context: 'Light/Rural R3 tier · island grid',
+    { region: 'Telšių', theme: '(no LV island) — (no LV island)maa Island + Dolomite Quarries', context: 'Light/Rural R3 tier · island grid',
       contextDetail: '(no LV island)maa island (largest EE island, 2,673 km²); Kuressaare administrative + tourism centre; Orissaare dolomite quarries (EU-supplier); 110 kV undersea cable to mainland Šiauliai-coast; OffshoreWindPark "(no LV island)-Liivi" planned 2027-2030; 9 substations; ESO SAIDI 187 min — third-worst in fleet (island isolation); R3 = 1.06; R median 0.430 — moderate (mostly modern post-EU-funded grid)' },
-    { region: 'Valka', theme: 'Valka — Lithuanian Border Twin-Town + Logistics', context: 'Light/Rural R3 tier · lowest GDP/cap',
+    { region: 'Tauragės', theme: 'Valka — Lithuanian Border Twin-Town + Logistics', context: 'Light/Rural R3 tier · lowest GDP/cap',
       contextDetail: 'Valka/Valka twin-town divided by EE/LV border (population 12k EE side); cross-border industrial park; rail+road logistics corridor; 11 substations; ESO SAIDI 124 min; GDP/cap €19,700 (lowest in EE — the R3 floor); R3 = 1.06; R median 0.497; one critical-band substation' },
-    { region: 'Krāslava', theme: 'Krāslava — Southernmost + Suur Munamägi Tower', context: 'Light/Rural R3 tier · smallest mainland fleet',
+    { region: 'Utenos', theme: 'Krāslava — Southernmost + Suur Munamägi Tower', context: 'Light/Rural R3 tier · smallest mainland fleet',
       contextDetail: 'Southernmost NUTS-3 region (borders LV + Russia); Suur Munamägi observation tower (highest point in Baltics, 318 m); Krāslava farming + lake tourism; smallest mainland fleet (only 2 substations after KB §38 filter); ESO SAIDI 136 min; R3 = 1.06; R median 0.687 — highest in fleet but extreme small-sample variance (n=2)' },
-    { region: '(no island)', theme: '(no island) — (no island)maa Island + Smallest Population', context: 'Light/Rural R3 tier · island, smallest fleet',
+    { region: 'Telšių', theme: '(no island) — (no island)maa Island + Smallest Population', context: 'Light/Rural R3 tier · island, smallest fleet',
       contextDetail: '(no island)maa island (smallest EE NUTS-3 region, population 9,500); Kärdla administrative centre; primary 110 kV submarine cable to Rohuküla (Šiauliai-coast) — single-point-of-failure on island grid; tourism + small-scale forestry; 1 substation after KB §38 filter (limited OSM coverage); ESO SAIDI 198 min — worst in fleet (island isolation); R3 = 1.06; R median 0.464 — moderate; future (no island)maa wind farm planned (~120 MW) requires undersea cable upgrade by 2028' }
   ];
 
@@ -1948,7 +1948,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   }
 
   // ── Card 3: Fleet Spotlight — rotating stat ──
-  fetch('ssi-data.json?v=403').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json?v=404').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);
