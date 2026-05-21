@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — Latvia · Intelligence</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<link rel="stylesheet" href="../style.css?v=417">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 </head>
 <body>
-<script src="../nav.js?v=418"></script>
-<script src="ssi-metadata.js?v=418"></script>
+<script src="../nav.js?v=417"></script>
+<script src="ssi-metadata.js?v=417"></script>
 <script src="../intelligence/intelligence-loader.js?v=417" data-country="latvia"></script>
 <script>
 // Config-ready bridge: SSI_EDITION available for all inline scripts
@@ -1834,17 +1834,17 @@ document.addEventListener("ssi-config-ready", function(e) {
   // 2nd Thursday of either next month or month-after-next, whichever's first
   // 2nd Thursday is at least ~10 days in the future.
   var d = now.getDate();   // <-- variable here is `now`, not `today`
-  // KB §47.14 — Cutoff was `d >= 21` (BE/NL pattern, prematurely skips a month).
-  // For Latvia inaugural: 2nd Thu of next month is 14-28 days after 21st of current
-  // month, which is ≥10-day buffer; no need to skip.  Push cutoff to month-end.
-  var skipToMonthAfter = d >= 28;  // only skip into month-after-next in last days
+  // KB §49.4 — Baltic-cohort synchronised publication: EE + LV + LT all
+  // publish Edition 02 on 2nd Thursday of July 2026 regardless of individual
+  // inaugural month. Cutoff stays at d>=21 (BE/NL pattern) so May 21 visit
+  // skips to July; offset −5 lines up so July = Edition 02.
+  var skipToMonthAfter = d >= 21;  // skip to month-after-next from 3rd-week onwards
   var addMonths = skipToMonthAfter ? 2 : 1;
   var nextMonth = (month + addMonths) % 12;
   var nextYear  = month + addMonths > 11 ? year + 1 : year;
-  // LV pre-launch baseline: May 2026 = Edition 01 (Latvia inaugural)
-  //                         June 2026 = Edition 02 (next publication, 2nd Thu = 11 June)
-  // Offset −4 so that month=5 (May) → 1, month=6 (June) → 2, etc.
-  var nextEditionNum = (nextYear - 2026) * 12 + (nextMonth + 1) - 4;
+  // LV inaugural: May 2026 = Edition 01 · July 2026 (2nd Thu = 9 July) = Edition 02
+  // Offset −5 so that nextMonth=July (6) → Edition (0+7-5) = 2 → "02".
+  var nextEditionNum = (nextYear - 2026) * 12 + (nextMonth + 1) - 5;
   var nextEdition = String(Math.max(1, nextEditionNum)).padStart(2, '0');
   var editionNum = nextEditionNum;  // back-compat alias used downstream
 
