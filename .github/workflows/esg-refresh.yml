@@ -26,8 +26,17 @@ jobs:
       - name: Cache-bust ESG report assets
         run: |
           STAMP=$(date +%s)
-          # denmark norway finland poland sweden mexico: first automated refresh May 2026 (skip April)
-          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey ireland portugal new-zealand greenland; do
+          # Country slugs come from intelligence/countries.json single source of truth
+          # (KB §45.2). Backfills czechia / belgium / netherlands / luxembourg /
+          # estonia / latvia / lithuania which the prior hardcoded list missed.
+          CURRENT_YM=$(date -u +%Y-%m)
+          COUNTRIES=$(python3 -c "import json; print(' '.join(json.load(open('intelligence/countries.json'))['slugs']))")
+          for country in $COUNTRIES; do
+            FIRST=$(python3 -c "import json; print(json.load(open('intelligence/countries.json'))['first_refresh'].get('$country', ''))")
+            if [ -n "$FIRST" ] && [ "$CURRENT_YM" \< "${FIRST:0:7}" ]; then
+              echo "  SKIP ${country}: first automated refresh ${FIRST} (current ${CURRENT_YM})"
+              continue
+            fi
             if [ -f "${country}/esg-report.html" ]; then
               # Cache-bust the intelligence-loader.js reference
               sed -i "s|intelligence-loader\.js?v=[0-9]*|intelligence-loader.js?v=${STAMP}|g" "${country}/esg-report.html"
@@ -43,8 +52,17 @@ jobs:
       - name: Update report generation date
         run: |
           REPORT_DATE=$(date +"%d %B %Y")
-          # denmark norway finland poland sweden mexico: first automated refresh May 2026 (skip April)
-          for country in france italy uk us germany spain switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey ireland portugal new-zealand greenland; do
+          # Country slugs come from intelligence/countries.json single source of truth
+          # (KB §45.2). Backfills czechia / belgium / netherlands / luxembourg /
+          # estonia / latvia / lithuania which the prior hardcoded list missed.
+          CURRENT_YM=$(date -u +%Y-%m)
+          COUNTRIES=$(python3 -c "import json; print(' '.join(json.load(open('intelligence/countries.json'))['slugs']))")
+          for country in $COUNTRIES; do
+            FIRST=$(python3 -c "import json; print(json.load(open('intelligence/countries.json'))['first_refresh'].get('$country', ''))")
+            if [ -n "$FIRST" ] && [ "$CURRENT_YM" \< "${FIRST:0:7}" ]; then
+              echo "  SKIP ${country}: first automated refresh ${FIRST} (current ${CURRENT_YM})"
+              continue
+            fi
             if [ -f "${country}/esg-report.html" ]; then
               sed -i "s|Report generated [0-9]* [A-Za-z]* [0-9]*|Report generated ${REPORT_DATE}|g" "${country}/esg-report.html"
             fi
