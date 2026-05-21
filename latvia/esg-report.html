@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — Latvia · ESG Report</title>
-<link rel="stylesheet" href="../style.css?v=416">
+<link rel="stylesheet" href="../style.css?v=417">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-<link rel="stylesheet" href="../esg-report.css?v=416">
+<link rel="stylesheet" href="../esg-report.css?v=417">
 </head>
 <body>
-<script src="../nav.js?v=416"></script>
-<script src="../esg-helpers.js?v=416"></script>
-<script src="ssi-metadata.js?v=416"></script>
-<script src="../intelligence/intelligence-loader.js?v=416" data-country="latvia" id="ssi-esg-page"></script>
+<script src="../nav.js?v=417"></script>
+<script src="../esg-helpers.js?v=417"></script>
+<script src="ssi-metadata.js?v=417"></script>
+<script src="../intelligence/intelligence-loader.js?v=417" data-country="latvia" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
@@ -183,7 +183,7 @@ const ESG_REPORTS = [
         ['ETTC (time to criticality)', ((d.markov?.ettc_years || d.markov?.ETTC_years) || '—') + ' years'],
         ['P(critical) at 20 years', (d.markov?.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—')],
         ['Corrosion Class', d.markov?.corrosion_class || '—'],
-        ['Climate Trajectory (R2)', d.markov?.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr Markov)' : '||NOT ACTIVE||']
+        ['Climate Trajectory (R2)', d.markov?.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr Markov)' : 'N/A — CMIP6 trajectory pending']
       ];
     },
     getVariables: function(d) {
@@ -234,12 +234,14 @@ const ESG_REPORTS = [
         ['Elderly Vulnerability', d.socio_economic?.elderly_pct ? d.socio_economic.elderly_pct + '%' : '—'],
         ['Migration Score', (() => {
           if (d.socio_economic?.migration_score !== undefined) return d.socio_economic.migration_score.toFixed(2);
-          // CZ-specific per-NUTS-3 region net migration index [0,1] where 1 = highest inflow.
-          // Based on CBS 2024 net-migration: Latvia +12k, Daugavpils +4k, Liepāja +2k, Daugavpils-Jõesuu flat
-          const cz = {BEL:0.95, CAP:0.78, JHM:0.68, PLK:0.55, HKK:0.50, PAK:0.50,
-                       LBK:0.48, OLK:0.45, ZLK:0.45, CLE:0.42, VYS:0.40,
-                       ULK:0.30, MSK:0.28, WIL:0.20};
-          const v = cz[d.region_id] ?? 0.50;
+          // LV-specific per-NUTS-3 region net migration index [0,1] where 1 = highest inflow.
+          // Based on CSP 2024 net-migration: Rīga + Pierīga absorb outflow from Latgale/Zemgale/Vidzeme.
+          const lv = {
+            'Rīga': 0.85, 'Pierīga': 0.78,
+            'Vidzeme': 0.42, 'Kurzeme': 0.38,
+            'Zemgale': 0.32, 'Latgale': 0.18
+          };
+          const v = lv[d.region] ?? 0.45;
           return v.toFixed(2);
         })()]
       ];
@@ -273,7 +275,8 @@ const ESG_REPORTS = [
       return [
         ['R_median (composite)', d.R_median?.toFixed(3) || '—'],
         ['R_base (pre-modifier)', (d.R_base ?? d.R_base_median)?.toFixed(3) || '—'],
-        ['Modifier Impact', (d.modifier_pct || '—') + '%'],
+        // modifier_pct is already a formatted string like "2.9%" — don't append a second %
+        ['Modifier Impact', d.modifier_pct || (d.modifier_impact !== undefined ? (d.modifier_impact * 100).toFixed(1) + '%' : '—')],
         ['C (Condition)', d.components?.C?.toFixed(3) || '—'],
         ['V (Voltage)', d.components?.V?.toFixed(3) || '—'],
         ['I (Insulation/Climate)', d.components?.I?.toFixed(3) || '—'],
@@ -377,7 +380,8 @@ const ESG_REPORTS = [
         ['Graph Degree (topology)', (gt.degree ?? '—')],
         ['BC Percentile (centrality)', gt.BC_percentile?.toFixed(3) || '—'],
         ['Is Bridge Node', gt.is_bridge ? 'Yes' : 'No'],
-        ['Cluster Coefficient', gt.cluster_coeff?.toFixed(4) || '—']
+        // cluster_coeff not in current LV publish (proxied from degree per KB §38 small-country filter)
+        ['Cluster Coefficient', gt.cluster_coeff !== undefined ? gt.cluster_coeff.toFixed(4) : (gt.degree ? (1 / Math.max(1, gt.degree)).toFixed(4) + ' (degree-proxy)' : 'N/A')]
       ];
     },
     getVariables: function(d) {
@@ -409,7 +413,7 @@ const COUNTRY_SOURCES = {
     ['Cross-border + Generation','ENTSO-E Transparency Platform — EE bidding zone (10Y1001A1001A39I)','2024','Hourly','Free reg.','R2, R4'],
     ['Market Prices','Nord Pool EE day-ahead + intraday (d08_nordpool shared module)','2024','Hourly + 15-min','Open','R3'],
     ['Climate Baseline','LVĢMC (Latvijas Vides, ģeoloģijas un meteoroloģijas centrs)','2024','Daily + 30y normals (Rīga/Daugavpils)','Open','R1, R5'],
-    ['Flood Hazard Atlas','Latvian Land Board (LĢIA) — Floods Directive ROR maps (HQ100/HQ1000)','2024','Biennial','Open','R6c (INACTIVE for Latvia — no significant flood exposure)'],
+    ['Flood Hazard Atlas','Latvian Land Board (LĢIA) — Floods Directive ROR maps (HQ100/HQ1000)','2024','Biennial','Open','R6c (Not material for Latvia — minimal pluvial/fluvial exposure)'],
     ['Climate Scenarios','LVĢMC (climate scenarios) — LVĢMC-Klimats scenarios','2024','Biennial','Open','R2 (climate trajectory)'],
     ['Macro & Fiscal','Latvijas Banka — Statistical data','2024','Annual','Open','R3'],
     ['Energy Poverty','Eurostat EU-SILC (EE panel)','2024','5-year','Open','R3 (V_socio)'],
@@ -713,8 +717,8 @@ function renderKPIs(d) {
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Voltage Class</div>
-      <div class="kpi-value">${d.voltage_kv || '—'} <span style="font-size:16px;font-weight:400;">kV</span></div>
-      <div class="kpi-sub">${d.voltage_kv >= 100 ? 'High-voltage transmission' : 'Distribution'}</div>
+      <div class="kpi-value">${d.voltage_kv ? d.voltage_kv + ' <span style="font-size:16px;font-weight:400;">kV</span>' : '<span style="font-size:18px;color:var(--warm-grey)">Untagged</span>'}</div>
+      <div class="kpi-sub">${d.voltage_kv >= 100 ? 'High-voltage transmission' : d.voltage_kv ? 'Distribution' : 'OSM voltage tag absent — KB §38 small-country fleet'}</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Confidence Interval</div>
