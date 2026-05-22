@@ -69,55 +69,137 @@ RESIDUE_PATTERNS = [
     ("Double percent",            r"\b\d+(\.\d+)?%%",                                "critical"),
 ]
 
-# Schema-key reference — taken from Latvia's deployed ssi-data.json (post-§49.5)
+# ──────────────────────────────────────────────────────────────────────
+# Schema-key reference — intersection of LV (post-§49.5 reference) AND
+# FR (OECD-15 legacy reference). These are the keys EVERY country in
+# the live fleet is known to emit. Anything missing here is a real gap.
+#
+# Calibrated 2026-05-22 from live JSONs at:
+#   https://ikengassiindex.github.io/{latvia,france,lithuania}/ssi-data.json
+# (KB §49.11 — schema parity sweep, intersection-based reference)
+# ──────────────────────────────────────────────────────────────────────
 LV_REFERENCE_KEYS = {
     "top_level": {
-        "country", "iso2", "country_number", "oecd_number", "edition",
-        "first_refresh", "session", "generated_utc",
-        "fleet_summary", "regions", "substations", "sobol_first_order",
-        "markov_handling", "kb_refs", "meta", "stats",
+        # Both LV and FR emit these. LV adds many provenance fields
+        # (country, iso2, edition, generated_utc, session, kb_refs, …)
+        # but FR omits them — they're informational, not required.
+        "fleet_summary", "regions", "substations", "meta",
     },
     "fleet_summary": {
-        "total_substations", "total", "R_median", "median_R", "mean_R",
-        "R_p5", "R_p95", "P5", "P95",
-        "low_band", "medium_band", "high_band", "critical_band",
-        "bands", "band_pct", "confidence_pct", "alert_flag_count",
+        # Statistical block both emit (FR uses P5/P95; LV uses both
+        # P5/P95 and R_p5/R_p95 — SYNONYM_GROUPS bridges that).
+        "P5", "P95", "mean_R", "median_R", "total",
+        "bands", "band_pct", "confidence_pct",
     },
     "meta": {
-        "mc_iterations", "sobol_iterations", "variables", "data_sources",
-        "total_departments", "country_name", "iso2", "engine_version",
-        "session", "total_lines", "total_km",
+        # Sparse intersection — FR emits country/version/note/generator/
+        # enrichment_run; LV emits country_name/iso2/engine_version/session.
+        # Both emit:
+        "data_sources", "mc_iterations", "total_departments", "variables",
     },
     "substation": {
+        # Core per-substation fields — both schemas emit these.
         "substation_id", "internal_id", "lat", "lon", "voltage_kv",
-        "name", "operator", "region", "province",
-        "R_median", "R_P5", "R_P95", "R_base", "R_base_median", "R_unclipped",
-        "CI_width", "CI_lower", "CI_upper", "CI_ratio",
+        "name", "region", "province",
+        "R_median", "R_P5", "R_P95", "R_base_median", "R_unclipped",
+        "CI_width",
         "classification", "confidence_tier", "fleet_percentile",
         "modifier_impact", "modifier_pct",
-        "components", "components_norm", "alert_components",
-        "modifiers", "markov", "mc",
+        "components", "alert_components",
+        "modifiers", "markov",
         "socio_economic", "seismic", "climate_trajectory",
         "graph_topology", "transition",
         "version",
     },
     "modifiers": {
-        "R3", "R3_tier", "R3_C_mult", "R4_F_topo",
-        "R6b", "R6_seismic", "R6_restoration", "R6c_flood",
-        "R7", "R7_cyber", "compound",
+        # Derived-alias style — these are what the dashboard JS reads.
+        # The raw forms (R3, R3_tier, R6b, R6c_flood, R7, compound)
+        # are emitted by LV/LT only and aren't strictly required —
+        # see LV_ONLY_KEYS below for the warning-level set.
+        "R3_C_mult", "R4_F_topo", "R6_seismic", "R6_restoration", "R7_cyber",
     },
     "markov": {
-        "risk_score", "p_critical_20yr", "p_critical_10yr",
-        "p_crit_20yr", "ETTC_years", "ettc_years",
-        "confidence_tier", "review_date", "corrosion_class",
-        "steady_state", "stationary_critical",
+        # 20-year horizon is universal; 10-year exists in both fleets
+        # under different names — SYNONYM_GROUPS handles that.
+        "risk_score", "p_critical_20yr", "p_crit_20yr",
+        "ettc_years", "corrosion_class", "steady_state",
     },
     "regions[]": {
-        "region", "substation_count", "count",
-        "R_median", "median_R", "mean_R", "R_p5", "R_p95",
-        "low_count", "medium_count", "high_count", "critical_count",
-        "bands", "pct_critical", "pct_high", "pct_medium", "pct_low",
+        # Both LV and FR emit these per-region.
+        "region", "count", "mean_R", "median_R",
+        "bands", "pct_critical", "pct_high",
     },
+}
+
+# ──────────────────────────────────────────────────────────────────────
+# LV-only keys — present in the post-§49.5 fleet (LV/LT/EE/CZ/LU/BE/NL)
+# but NOT in the OECD-15 legacy fleet. Missing these is a WARNING for
+# new countries (we want all new builds to match LV), but a legacy
+# country missing them is informational, not a real gap.
+#
+# Audit uses this set to flag "country could be enriched with these
+# fields" rather than "country is broken".
+# ──────────────────────────────────────────────────────────────────────
+LV_ONLY_KEYS = {
+    "top_level": {
+        "country", "iso2", "country_number", "oecd_number",
+        "edition", "first_refresh", "session", "generated_utc",
+        "sobol_first_order", "markov_handling", "kb_refs",
+    },
+    "fleet_summary": {
+        "R_median", "R_p5", "R_p95", "alert_flag_count",
+        "low_band", "medium_band", "high_band", "critical_band",
+        "total_substations",
+    },
+    "meta": {
+        "country_name", "iso2", "engine_version", "session",
+        "sobol_iterations", "total_km", "total_lines",
+    },
+    "substation": {
+        "operator", "R_base", "R_final",
+        "CI_lower", "CI_upper", "CI_ratio",
+        "components_norm", "mc",
+        "osm_id", "osm_type", "ref", "substation_type",
+        "cyber_classification",
+    },
+    "modifiers": {
+        # Raw forms — LV emits both raw AND derived; FR emits derived only.
+        "R3", "R3_tier", "R6b", "R6c_flood", "R7", "compound",
+    },
+    "markov": {
+        "ETTC_years", "p_critical_10yr", "confidence_tier",
+        "review_date", "stationary_critical",
+    },
+    "regions[]": {
+        "R_median", "R_p5", "R_p95",
+        "low_count", "medium_count", "high_count", "critical_count",
+        "substation_count", "pct_low", "pct_medium",
+    },
+}
+
+# ──────────────────────────────────────────────────────────────────────
+# SYNONYM_GROUPS — pairs/groups of equivalent key names. When checking
+# missing keys, if ANY synonym in a group is present, the requirement
+# is satisfied. This eliminates false positives where two countries
+# emit the same metric under different names.
+#
+# Standardised target per KB §49.11 user decision: prefer the LV form
+# (p_critical_10yr). Standardisation happens at publish.py level via
+# follow-up patches; the audit just stops flagging the drift here.
+# ──────────────────────────────────────────────────────────────────────
+SYNONYM_GROUPS = {
+    "fleet_summary": [
+        # Percentile naming drift (FR ≡ LV)
+        ("P5",  "R_p5"),
+        ("P95", "R_p95"),
+        ("total", "total_substations"),
+    ],
+    "markov": [
+        # 10-year and 20-year horizons under both naming conventions
+        ("p_crit_10yr", "p_critical_10yr"),
+        ("p_crit_20yr", "p_critical_20yr"),
+        ("ettc_years",  "ETTC_years"),
+    ],
 }
 
 
@@ -136,6 +218,24 @@ def is_pre_launch(slug: str, fr_map: dict, today: datetime.date) -> bool:
         return today < datetime.date(y, m, 1)
     except (ValueError, IndexError):
         return False
+
+
+def missing_keys(required: set[str], present: set[str],
+                 synonym_groups: list[tuple] | None = None) -> set[str]:
+    """Subtract present keys from required, honouring synonym groups.
+
+    For each synonym tuple, if ANY synonym is in `present`, ALL members
+    of that tuple are treated as satisfied (removed from the missing set).
+    """
+    missing = set(required) - set(present)
+    if not synonym_groups:
+        return missing
+    for group in synonym_groups:
+        group_set = set(group)
+        if group_set & set(present):
+            # At least one member is present — drop all from missing
+            missing -= group_set
+    return missing
 
 
 def scan_residue(html: str, slug: str) -> list[dict]:
@@ -191,37 +291,40 @@ def scan_schema(slug: str) -> list[dict]:
             })
             return findings
 
+    def check(cat: str, label: str, present: set[str]):
+        """Emit a critical finding for missing intersection keys, and an
+        info-level finding for missing LV_ONLY keys (recommended-not-required)."""
+        syns = SYNONYM_GROUPS.get(cat)
+        miss_req = missing_keys(LV_REFERENCE_KEYS.get(cat, set()), present, syns)
+        if miss_req:
+            findings.append({
+                "type": "schema",
+                "severity": "warning",
+                "label": label,
+                "missing": sorted(miss_req),
+            })
+        # LV_ONLY = enrichment opportunities, not bugs — flag as info
+        miss_opt = missing_keys(LV_ONLY_KEYS.get(cat, set()), present, syns)
+        # Don't double-report anything already in required-missing
+        miss_opt -= miss_req
+        if miss_opt:
+            findings.append({
+                "type": "schema",
+                "severity": "info",
+                "label": f"{label} — recommended additions (LV-only)",
+                "missing": sorted(miss_opt),
+            })
+
     # Top-level
-    missing_top = LV_REFERENCE_KEYS["top_level"] - set(data.keys())
-    if missing_top:
-        findings.append({
-            "type": "schema",
-            "severity": "warning",
-            "label": "ssi-data.json top-level keys",
-            "missing": sorted(missing_top),
-        })
+    check("top_level", "ssi-data.json top-level keys", set(data.keys()))
 
     # fleet_summary
     if isinstance(data.get("fleet_summary"), dict):
-        missing_fs = LV_REFERENCE_KEYS["fleet_summary"] - set(data["fleet_summary"].keys())
-        if missing_fs:
-            findings.append({
-                "type": "schema",
-                "severity": "warning",
-                "label": "fleet_summary keys",
-                "missing": sorted(missing_fs),
-            })
+        check("fleet_summary", "fleet_summary keys", set(data["fleet_summary"].keys()))
 
     # meta
     if isinstance(data.get("meta"), dict):
-        missing_meta = LV_REFERENCE_KEYS["meta"] - set(data["meta"].keys())
-        if missing_meta:
-            findings.append({
-                "type": "schema",
-                "severity": "warning",
-                "label": "meta keys",
-                "missing": sorted(missing_meta),
-            })
+        check("meta", "meta keys", set(data["meta"].keys()))
 
     # First substation — tolerate list or dict shape
     subs_raw = data.get("substations")
@@ -235,33 +338,39 @@ def scan_schema(slug: str) -> list[dict]:
                 s0 = v
                 break
     if s0 is not None:
-        missing_sub = LV_REFERENCE_KEYS["substation"] - set(s0.keys())
-        if missing_sub:
-            findings.append({
-                "type": "schema",
-                "severity": "warning",
-                "label": "substations[0] keys",
-                "missing": sorted(missing_sub),
-            })
+        check("substation", "substations[0] keys", set(s0.keys()))
         if isinstance(s0.get("modifiers"), dict):
-            missing_mod = LV_REFERENCE_KEYS["modifiers"] - set(s0["modifiers"].keys())
-            if missing_mod:
+            # Modifiers retain CRITICAL severity for the required set
+            # because missing them = JS TypeError on .toFixed.
+            syns_mod = SYNONYM_GROUPS.get("modifiers")
+            miss_mod = missing_keys(
+                LV_REFERENCE_KEYS["modifiers"],
+                set(s0["modifiers"].keys()),
+                syns_mod,
+            )
+            if miss_mod:
                 findings.append({
                     "type": "schema",
                     "severity": "critical",
                     "label": "substations[0].modifiers keys",
-                    "missing": sorted(missing_mod),
+                    "missing": sorted(miss_mod),
                     "details": "Without these aliases the dashboard pages throw TypeError on .toFixed",
                 })
-        if isinstance(s0.get("markov"), dict):
-            missing_mk = LV_REFERENCE_KEYS["markov"] - set(s0["markov"].keys())
-            if missing_mk:
+            # LV-only mods = info-level (raw R3/R7/compound etc.)
+            miss_mod_info = missing_keys(
+                LV_ONLY_KEYS.get("modifiers", set()),
+                set(s0["modifiers"].keys()),
+                syns_mod,
+            ) - miss_mod
+            if miss_mod_info:
                 findings.append({
                     "type": "schema",
-                    "severity": "warning",
-                    "label": "substations[0].markov keys",
-                    "missing": sorted(missing_mk),
+                    "severity": "info",
+                    "label": "substations[0].modifiers — recommended additions (LV-only)",
+                    "missing": sorted(miss_mod_info),
                 })
+        if isinstance(s0.get("markov"), dict):
+            check("markov", "substations[0].markov keys", set(s0["markov"].keys()))
 
     # regions — tolerate both shapes:
     #   list-form (LV/LT convention):  [{"region":"...","R_median":...}, ...]
@@ -278,14 +387,7 @@ def scan_schema(slug: str) -> list[dict]:
                 first_region = v
                 break
     if first_region is not None:
-        missing_reg = LV_REFERENCE_KEYS["regions[]"] - set(first_region.keys())
-        if missing_reg:
-            findings.append({
-                "type": "schema",
-                "severity": "warning",
-                "label": "regions[0] keys",
-                "missing": sorted(missing_reg),
-            })
+        check("regions[]", "regions[0] keys", set(first_region.keys()))
 
     return findings
 
@@ -301,8 +403,14 @@ def audit_country(slug: str, fr_map: dict, today: datetime.date,
         "schema_findings": [],
         "summary": {"critical": 0, "warning": 0, "info": 0},
     }
+    # Pre-launch: skip the residue scan (pages won't render meaningfully
+    # before the first refresh has fired) but ALWAYS run the schema diff
+    # — the JSON is already deployed and is testable from day one.
+    # KB §49.11 — schema diff is shape-only, not time-gated.
     if result["pre_launch"]:
-        # Don't render pre-launch pages — they won't have meaningful data yet
+        result["schema_findings"] = scan_schema(slug)
+        for f in result["schema_findings"]:
+            result["summary"][f["severity"]] = result["summary"].get(f["severity"], 0) + 1
         return result
 
     # ── Pass 1: Residue scan via Playwright ──
