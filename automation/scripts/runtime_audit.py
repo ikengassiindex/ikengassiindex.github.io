@@ -92,10 +92,13 @@ LV_REFERENCE_KEYS = {
         "bands", "band_pct", "confidence_pct",
     },
     "meta": {
-        # Sparse intersection — FR emits country/version/note/generator/
-        # enrichment_run; LV emits country_name/iso2/engine_version/session.
-        # Both emit:
-        "data_sources", "mc_iterations", "total_departments", "variables",
+        # Empty: even the LV ∩ FR sample suggested
+        # {data_sources, mc_iterations, total_departments, variables} were
+        # universal, but the 31-country sweep showed Australia/Canada/
+        # Chile/Japan/US (et al.) routinely omit them. These have been
+        # moved to LV_ONLY_KEYS["meta"] as recommended additions.
+        # The meta block has no truly universal keys — it's pure
+        # provenance metadata, country-specific by nature.
     },
     "substation": {
         # Core per-substation fields — both schemas emit these.
@@ -152,6 +155,12 @@ LV_ONLY_KEYS = {
         "total_substations",
     },
     "meta": {
+        # Calibrated after sweep 2026-05-22: legacy fleet (AU/CA/CL/IE/JP/US…)
+        # is much leaner than FR. These four were in LV_REFERENCE_KEYS but
+        # only because FR happened to emit them — most legacy countries
+        # don't, so they're optional metadata, not gaps.
+        "data_sources", "mc_iterations", "total_departments", "variables",
+        # Original LV-only set:
         "country_name", "iso2", "engine_version", "session",
         "sobol_iterations", "total_km", "total_lines",
     },
