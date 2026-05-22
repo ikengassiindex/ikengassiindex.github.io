@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Compare Swiss Cantons and Bezirke by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="description" content="Compare Swiss Kantone and districts by SSI resilience score, component breakdown, and socio-economic context across ~1,250 substations.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Regional Analysis</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Switzerland · Regional · 26 Kantone · 148 districts</title>
+<link rel="stylesheet" href="../style.css?v=421">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-versions.js?v=421"></script>
+<script src="../nav.js?v=421"></script>
+<script src="../ssi-engine.js?v=421"></script>
+<script src="ssi-metadata.js?v=421"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
   <div class="page-header animate-in">
-    <h1>Regional Analysis</h1>
-    <p>Compare Cantons and Bezirke by SSI score, component breakdown, and socio-economic context across 947 real OSM substations (147 HV, 776 MV) in Switzerland's 26 Cantons and 160 Bezirke.</p>
+    <h1><span style="font-size:0.75em;vertical-align:0.15em;margin-right:6px">🇨🇭</span>Regional Analysis</h1>
+    <p>Compare Switzerland's 26 Kantone and 148 districts by SSI score, component breakdown, and socio-economic context — ~1,250 substations across the federal grid (Swissgrid TSO + 600+ DSOs led by BKW, Romande Énergie, IWB, EWZ, CKW, Repower).</p>
   </div>
 
   <!-- Tabs -->
   <div class="tabs animate-in delay-1">
     <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regional Ranking</button>
-    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Bezirk Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">District Comparison</button>
     <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
   </div>
 
@@ -32,14 +32,14 @@
   <div id="tab-ranking">
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
-        <h3>Cantons Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">26 Cantons · sorted worst → best</span>
+        <h3>Kantone Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">26 Kantone · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
           <tr>
             <th style="width:30px">#</th>
-            <th>Canton</th>
+            <th>Kanton</th>
             <th style="text-align:right">Median R</th>
             <th style="text-align:right">Substations</th>
             <th style="text-align:right">% Critical</th>
@@ -54,19 +54,19 @@
     </div>
   </div>
 
-  <!-- Tab: Bezirk Comparison -->
+  <!-- Tab: District Comparison -->
   <div id="tab-compare" style="display:none">
     <div class="grid-2" style="margin-bottom:24px">
       <div class="card">
-        <div class="card-header"><h3>Select Bezirke to Compare</h3></div>
+        <div class="card-header"><h3>Select Districts to Compare</h3></div>
         <div style="display:flex;gap:12px;margin-bottom:16px">
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">Bezirk A</div>
+            <div class="label-xs" style="margin-bottom:6px">District A</div>
             <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">Bezirk B</div>
+            <div class="label-xs" style="margin-bottom:6px">District B</div>
             <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
@@ -77,7 +77,7 @@
             <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">—</th><th style="text-align:right" id="th-prov-b">—</th><th style="text-align:right">Delta</th></tr>
           </thead>
           <tbody id="compare-tbody">
-            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select Bezirke above</td></tr>
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select districts above</td></tr>
           </tbody>
         </table>
       </div>
@@ -99,8 +99,8 @@
   <div id="tab-decomp" style="display:none">
     <div class="card animate-in">
       <div class="card-header">
-        <h3>Average Component Contribution by Canton</h3>
-        <span class="label-xs">Stacked horizontal bars · 26 Cantons</span>
+        <h3>Average Component Contribution by Kanton</h3>
+        <span class="label-xs">Stacked horizontal bars · 26 Kantone</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
         <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
@@ -117,11 +117,13 @@
   </div>
 </main>
 
+<div class="page-footer" id="footerContainer"></div>
+
 <script>
 renderFooter();
 
 var SSI = null;
-var provinceData = {};
+var districtData = {};
 
 function switchTab(btn, tabId) {
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -132,6 +134,7 @@ function switchTab(btn, tabId) {
 
 // ── Color helpers ──
 function scoreColor(val) {
+  if (val == null) return 'var(--warm-grey)';
   if (val >= 0.75) return 'var(--crimson)';
   if (val >= 0.50) return 'var(--terracotta)';
   if (val >= 0.25) return 'var(--bronze)';
@@ -144,26 +147,46 @@ function deltaColor(d) {
   return 'var(--warm-grey)';
 }
 
-function fmt(v, dp) { return v.toFixed(dp === undefined ? 3 : dp); }
-function pct(v) { return v.toFixed(1) + '%'; }
+function fmt(v, dp) { return (v == null) ? '—' : v.toFixed(dp === undefined ? 3 : dp); }
+function pct(v) { return (v == null) ? '—' : v.toFixed(1) + '%'; }
 
 // ── Tab 1: Regional Ranking ──
+// CH 26 Kantone canonical order (BFS Gemeindeverzeichnis)
+var KANTON_ORDER = ['Zürich','Bern','Luzern','Uri','Schwyz','Obwalden','Nidwalden','Glarus','Zug','Fribourg','Solothurn','Basel-Stadt','Basel-Landschaft','Schaffhausen','Appenzell Ausserrhoden','Appenzell Innerrhoden','St. Gallen','Graubünden','Aargau','Thurgau','Ticino','Vaud','Valais','Neuchâtel','Genève','Jura'];
+
 function renderRanking(data) {
-  var regions = data.regions.slice().sort(function(a, b) { return b.median_R - a.median_R; });
+  var regions = data.regions.slice().sort(function(a, b) {
+    if (a.median_R == null && b.median_R == null) return 0;
+    if (a.median_R == null) return 1;
+    if (b.median_R == null) return -1;
+    return b.median_R - a.median_R;
+  });
   var tbody = document.getElementById('ranking-tbody');
-  document.getElementById('ranking-count').textContent = regions.length + ' Cantons · sorted worst → best';
+  document.getElementById('ranking-count').textContent = regions.length + ' Kantone · sorted worst → best';
 
   tbody.innerHTML = regions.map(function(r, i) {
-    var total = r.count;
-    var pLow = ((r.bands.Low / total) * 100).toFixed(0);
-    var pMed = ((r.bands.Medium / total) * 100).toFixed(0);
-    var pHigh = ((r.bands.High / total) * 100).toFixed(0);
-    var pCrit = ((r.bands.Critical / total) * 100).toFixed(0);
+    // §52.7.3 schema-compat shim: supports both {count, bands{Low,Medium,High,Critical}} (raw counts)
+    // and {n_substations, band_distribution{Low,Medium,High,Critical}} (percentages).
+    var total = (r.count != null) ? r.count : r.n_substations;
+    var pLow, pMed, pHigh, pCrit;
+    if (r.bands) {
+      pLow  = total > 0 ? ((r.bands.Low      / total) * 100).toFixed(0) : 0;
+      pMed  = total > 0 ? ((r.bands.Medium   / total) * 100).toFixed(0) : 0;
+      pHigh = total > 0 ? ((r.bands.High     / total) * 100).toFixed(0) : 0;
+      pCrit = total > 0 ? ((r.bands.Critical / total) * 100).toFixed(0) : 0;
+    } else {
+      var bd = r.band_distribution || { Low: 0, Medium: 0, High: 0, Critical: 0 };
+      pLow  = (bd.Low      || 0).toFixed(0);
+      pMed  = (bd.Medium   || 0).toFixed(0);
+      pHigh = (bd.High     || 0).toFixed(0);
+      pCrit = (bd.Critical || 0).toFixed(0);
+    }
+    var medColor = (r.median_R == null) ? 'var(--warm-grey)' : scoreColor(r.median_R);
     return '<tr>' +
       '<td style="color:var(--warm-grey)">' + (i + 1) + '</td>' +
       '<td style="font-weight:500">' + r.region + '</td>' +
-      '<td class="num" style="color:' + scoreColor(r.median_R) + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
-      '<td class="num">' + r.count + '</td>' +
+      '<td class="num" style="color:' + medColor + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
+      '<td class="num">' + total + '</td>' +
       '<td class="num">' + pct(r.pct_critical) + '</td>' +
       '<td class="num">' + pct(r.pct_high) + '</td>' +
       '<td><div class="dist-bar" style="margin:0;width:140px;height:6px">' +
@@ -175,14 +198,15 @@ function renderRanking(data) {
   }).join('');
 }
 
-// ── Tab 2: Bezirk Comparison ──
-function buildProvinceData(data) {
+// ── Tab 2: District Comparison ──
+function buildDistrictData(data) {
   var map = {};
   data.substations.forEach(function(s) {
-    if (!map[s.province]) {
-      map[s.province] = { province: s.province, region: s.region, subs: [] };
+    var districtKey = s.district || s.province || s.region;
+    if (!map[districtKey]) {
+      map[districtKey] = { district: districtKey, region: s.region, subs: [] };
     }
-    map[s.province].subs.push(s);
+    map[districtKey].subs.push(s);
   });
   // Compute aggregates
   Object.keys(map).forEach(function(p) {
@@ -194,7 +218,7 @@ function buildProvinceData(data) {
     map[p].count = n;
     // Average components
     var comps = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 };
-    var mods = { R3: 0, R4: 0, R6a: 0, R6b: 0, R7: 0 };
+    var mods = { R3: 0, R4: 0, R6a: 0, R6b: 0, R6c: 0, R7: 0 };
     var epSum = 0, degSum = 0;
     arr.forEach(function(s) {
       Object.keys(comps).forEach(function(k) { comps[k] += s.components[k]; });
@@ -202,6 +226,7 @@ function buildProvinceData(data) {
       mods.R4 += s.modifiers.R4_F_topo;
       mods.R6a += s.modifiers.R6_restoration;
       mods.R6b += (s.modifiers.R6_seismic || 1.0);
+      mods.R6c += (s.modifiers.R6c_flood || 1.0);
       mods.R7 += s.modifiers.R7_cyber;
       epSum += (s.socio_economic.EP_rate_region || s.socio_economic.unemployment_rate || 0);
       degSum += (s.graph_topology ? s.graph_topology.degree : 0);
@@ -216,23 +241,21 @@ function buildProvinceData(data) {
   return map;
 }
 
-function populateProvinceSelects() {
-  var provNames = Object.keys(provinceData).sort();
+function populateDistrictSelects() {
+  var provNames = Object.keys(districtData).sort();
   var selA = document.getElementById('prov-a');
   var selB = document.getElementById('prov-b');
   var html = provNames.map(function(p) {
-    return '<option value="' + p + '">' + p + ' (' + provinceData[p].count + ')</option>';
+    return '<option value="' + p + '">' + p + ' (' + districtData[p].count + ')</option>';
   }).join('');
   selA.innerHTML = html;
   selB.innerHTML = html;
 
-  // Smart defaults: pick a high-risk and low-risk Bezirk
-  var sorted = provNames.slice().sort(function(a, b) { return provinceData[b].median_R - provinceData[a].median_R; });
-  selA.value = sorted[0] || provNames[0]; // worst Bezirk
-  // Find Zürich or best Bezirk
+  // Smart defaults: pick a high-risk and low-risk district
+  var sorted = provNames.slice().sort(function(a, b) { return districtData[b].median_R - districtData[a].median_R; });
+  selA.value = sorted[0] || provNames[0]; // worst district
   var bestIdx = sorted.length - 1;
-  var zhIdx = sorted.indexOf('Zürich');
-  selB.value = zhIdx >= 0 ? 'Zürich' : sorted[bestIdx];
+  selB.value = sorted[bestIdx];
 
   selA.addEventListener('change', updateComparison);
   selB.addEventListener('change', updateComparison);
@@ -242,8 +265,8 @@ function populateProvinceSelects() {
 function updateComparison() {
   var nameA = document.getElementById('prov-a').value;
   var nameB = document.getElementById('prov-b').value;
-  var a = provinceData[nameA];
-  var b = provinceData[nameB];
+  var a = districtData[nameA];
+  var b = districtData[nameB];
   if (!a || !b) return;
 
   document.getElementById('th-prov-a').textContent = nameA;
@@ -274,7 +297,7 @@ function updateComparison() {
   addRow('T Transition', a.components.T, b.components.T);
 
   rows.push('<tr style="border-top:2px solid var(--card-border)"></tr>');
-  addRow('Energy Poverty', a.EP_rate, b.EP_rate, pct, 'pp');
+  addRow('Unemployment Rate', a.EP_rate, b.EP_rate, pct, 'pp');
   addRow('Avg Graph Degree', a.avg_degree, b.avg_degree, function(v) { return v.toFixed(1); }, 'int');
   addRow('Substations', a.count, b.count, function(v) { return v.toFixed(0); }, 'int');
 
@@ -294,7 +317,7 @@ function drawRadar(a, b, nameA, nameB) {
   comps.forEach(function(k) {
     maxVal = Math.max(maxVal, a.components[k], b.components[k]);
   });
-  maxVal = Math.max(maxVal, 0.05); // floor
+  maxVal = Math.max(maxVal, 0.05);
 
   function polar(i, val) {
     var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
@@ -303,7 +326,6 @@ function drawRadar(a, b, nameA, nameB) {
   }
 
   var html = '';
-  // Grid rings
   [0.33, 0.66, 1.0].forEach(function(frac) {
     var pts = [];
     for (var i = 0; i < 6; i++) {
@@ -313,7 +335,6 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="rgba(44,36,32,0.08)" stroke-width="1"/>';
   });
 
-  // Axes
   for (var i = 0; i < 6; i++) {
     var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
     var x2 = cx + R * Math.cos(angle);
@@ -321,15 +342,12 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="rgba(44,36,32,0.06)" stroke-width="1"/>';
   }
 
-  // Bezirk A polygon
   var ptsA = comps.map(function(k, i) { var p = polar(i, a.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsA + '" fill="rgba(148,25,20,0.12)" stroke="var(--crimson)" stroke-width="1.5"/>';
 
-  // Bezirk B polygon
   var ptsB = comps.map(function(k, i) { var p = polar(i, b.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsB + '" fill="rgba(93,133,99,0.12)" stroke="var(--sage)" stroke-width="1.5"/>';
 
-  // Vertex dots
   comps.forEach(function(k, i) {
     var pa = polar(i, a.components[k]);
     html += '<circle cx="' + pa[0].toFixed(1) + '" cy="' + pa[1].toFixed(1) + '" r="3" fill="var(--crimson)"/>';
@@ -337,7 +355,6 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<circle cx="' + pb[0].toFixed(1) + '" cy="' + pb[1].toFixed(1) + '" r="3" fill="var(--sage)"/>';
   });
 
-  // Labels
   var labelOffset = 16;
   comps.forEach(function(k, i) {
     var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
@@ -349,13 +366,11 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--warm-grey)" font-family="DM Sans" font-weight="500">' + labels[i] + '</text>';
   });
 
-  // Scale labels — center = worst (maxVal), edge = best (0)
   html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">0 (best)</text>';
   html += '<text x="' + (cx + 4) + '" y="' + (cy + 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
 
   svg.innerHTML = html;
 
-  // Legend
   document.getElementById('radar-legend').innerHTML =
     '<div style="display:flex;justify-content:center;gap:16px">' +
       '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--crimson);border-radius:2px"></div>' + nameA + '</div>' +
@@ -366,7 +381,6 @@ function drawRadar(a, b, nameA, nameB) {
 
 // ── Tab 3: Component Decomposition ──
 function renderDecomposition(data) {
-  // Compute per-Canton average components
   var regionMap = {};
   data.substations.forEach(function(s) {
     if (!regionMap[s.region]) {
@@ -397,7 +411,7 @@ function renderDecomposition(data) {
     };
   }).sort(function(a, b) { return b.mean_R - a.mean_R; });
 
-  var maxR = regions[0].mean_R || 1;
+  var maxR = regions[0] ? regions[0].mean_R || 1 : 1;
   var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
   var colors = ['var(--crimson)', 'var(--terracotta)', 'var(--sage)', '#3b9eff', 'var(--bronze)', '#22d3ee'];
 
@@ -424,11 +438,16 @@ function renderDecomposition(data) {
 }
 
 // ── Load Data ──
-fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(function(data) {
+fetch('ssi-data.json?v=421').then(function(r) { return r.json(); }).then(function(data) {
+  // §52.7.3 schema-compat shim: tolerate dict-or-list for substations + regions
+  var subsRaw = data.substations;
+  data.substations = Array.isArray(subsRaw) ? subsRaw : Object.values(subsRaw || {});
+  var regsRaw = data.regions;
+  data.regions = Array.isArray(regsRaw) ? regsRaw : Object.values(regsRaw || {});
   SSI = data;
-  provinceData = buildProvinceData(data);
+  districtData = buildDistrictData(data);
   renderRanking(data);
-  populateProvinceSelects();
+  populateDistrictSelects();
   renderDecomposition(data);
 }).catch(function(err) {
   console.error('Failed to load SSI data:', err);

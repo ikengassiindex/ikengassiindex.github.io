@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index — Switzerland DSO segmented view. BKW (Bern) + Romande Energie (Vaud) + IWB (Basel-Stadt) + EWZ (Zurich City) + Repower (Graubunden/Ticino) + CKW (Luzern): SAIDI, customers, canton served.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Switzerland · DSO Dashboard">
+<meta property="og:description" content="Federalised 600+-utility market across 26 Kantone · Swissgrid single TSO · Alpine + Rhone + Rhine hazard mix.">
+<meta property="og:type" content="website">
+<title>SSI Index — Switzerland · DSO Dashboard</title>
+<link rel="stylesheet" href="../style.css?v=421">
+<style>
+  .dso-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .dso-grid { grid-template-columns: 1fr; } }
+  .dso-card { padding: 20px; background: var(--card-bg); border: 1px solid var(--card-border);
+              border-radius: var(--radius); box-shadow: var(--card-shadow); position: relative; }
+  .dso-card h3 { margin: 0 0 6px 0; font-size: 17px; }
+  .dso-card .pct { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; }
+  .dso-card .saidi { font-size: 22px; font-weight: 600; color: var(--terracotta); margin-top: 6px; }
+  .dso-card .meta { font-size: 12px; color: var(--warm-grey); line-height: 1.6; margin-top: 8px; }
+  .dso-card.border-bkw      { border-left: 4px solid #941914; }
+  .dso-card.border-romande  { border-left: 4px solid #b8863a; }
+  .dso-card.border-iwb      { border-left: 4px solid #5d8563; }
+  .dso-card.border-ewz      { border-left: 4px solid #2e5e8a; }
+  .dso-card.border-repower  { border-left: 4px solid #6c4a8a; }
+  .dso-card.border-ckw      { border-left: 4px solid #8a6c4a; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th, .compare-table td { padding: 10px 12px; text-align: left;
+                                          border-bottom: 1px solid var(--card-border); }
+  .compare-table th { background: var(--cream-deep); font-weight: 600; }
+  .compare-table tr:hover { background: var(--cream-deep); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+            font-weight: 500; }
+  .badge-bkw      { background: #fbe9e7; color: #941914; }
+  .badge-romande  { background: #fdf3df; color: #b8863a; }
+  .badge-iwb      { background: #e6efe7; color: #5d8563; }
+  .badge-ewz      { background: #e0eaf3; color: #2e5e8a; }
+  .badge-repower  { background: #ece4f3; color: #6c4a8a; }
+  .badge-ckw      { background: #f3ece4; color: #8a6c4a; }
+</style>
+</head>
+<body>
+<script src="../nav.js?v=421"></script>
+<script src="../ssi-versions.js?v=421"></script>
+<script src="ssi-metadata.js?v=421"></script>
+<script>renderNav('dno');</script>
+
+<main class="page-shell">
+
+<div class="page-header animate-in">
+  <h1>DSO Segmented Dashboard — Switzerland</h1>
+  <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">Federalised 600+-utility market · ~4.5 M HV/MV connection points · 26 Kantone · ~1,250 substations (post-§38 OSM filter)</div>
+  <p>Switzerland's distribution market is the most-fragmented in the OECD: more than 600 utilities operate across the 26 Kantone, with the top six covering roughly 44% of customers and the long tail of ~550 cantonal and municipal operators carrying the rest. The transmission backbone is operated by <strong>Swissgrid</strong> as single TSO (380 / 220 kV, ~6,700 km), formed in 2009 through pooling of the previously cantonal grids. Switzerland sits outside the EU but is the densest cross-border node in continental Europe via 41 interconnection lines with 5 neighbours; the bidding zone has been CH standalone since the EU-CH electricity agreement stalled. Per KB §53, R3 socio-economic calibration uses a 4-tier schedule with Zurich + Basel-Stadt + Geneva as capital-intensive outliers (1.02) and the small rural Cantons (Uri, Glarus, Appenzell, Obwalden, Nidwalden, Schaffhausen) at 1.08.</p>
+</div>
+
+<div class="dso-grid">
+  <div class="dso-card border-bkw animate-in delay-1">
+    <span class="badge badge-bkw">~14%</span>
+    <h3 style="margin-top:8px">BKW Energie AG</h3>
+    <div class="pct" style="color:#941914">~1.1 M</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (Bern + parts of Jura + Solothurn)</div>
+    <div class="saidi">19 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (mixed urban + alpine)</div>
+    <div class="meta">
+      <strong>Parent:</strong> BKW AG (Canton of Bern 52% + free float)<br>
+      <strong>Canton served:</strong> Bern (primary) + Jura + Solothurn fringe<br>
+      <strong>Network length:</strong> ~21,600 km (MV + LV)<br>
+      <strong>Smart-meter penetration:</strong> ~78% (Swiss federal mandate 2027)<br>
+      <strong>Source:</strong> <a href="https://www.bkw.ch" target="_blank">bkw.ch</a> annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-romande animate-in delay-2">
+    <span class="badge badge-romande">~9%</span>
+    <h3 style="margin-top:8px">Romande Énergie SA</h3>
+    <div class="pct" style="color:#b8863a">~310 k</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (Vaud + west Fribourg + west Valais)</div>
+    <div class="saidi">17 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (lake-shore + foothills)</div>
+    <div class="meta">
+      <strong>Parent:</strong> Romande Énergie Holding (Canton de Vaud + municipal shareholders)<br>
+      <strong>Canton served:</strong> Vaud (primary) + Fribourg + Valais west fringe<br>
+      <strong>Network length:</strong> ~10,500 km<br>
+      <strong>Key context:</strong> Rhône floodplain assets — R6c flood watchlist for Chablais + Lavaux corridors<br>
+      <strong>Source:</strong> Romande Énergie annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-iwb animate-in delay-3">
+    <span class="badge badge-iwb">~6%</span>
+    <h3 style="margin-top:8px">Industrielle Werke Basel (IWB)</h3>
+    <div class="pct" style="color:#5d8563">~210 k</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (Basel-Stadt + edges of BL)</div>
+    <div class="saidi">14 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (urban + industrial)</div>
+    <div class="meta">
+      <strong>Parent:</strong> IWB (Basel-Stadt city-owned)<br>
+      <strong>Canton served:</strong> Basel-Stadt (sole) + edge Basel-Landschaft municipalities<br>
+      <strong>Network length:</strong> ~3,400 km<br>
+      <strong>Key context:</strong> Chemical-pharma industrial loads (Roche + Novartis + Syngenta); Rhine port; corrosion class C4 for the inner industrial zone<br>
+      <strong>Source:</strong> IWB annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-ewz animate-in delay-1">
+    <span class="badge badge-ewz">~6%</span>
+    <h3 style="margin-top:8px">Elektrizitätswerk der Stadt Zürich (EWZ)</h3>
+    <div class="pct" style="color:#2e5e8a">~230 k</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (Zürich City)</div>
+    <div class="saidi">11 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (best-in-class urban)</div>
+    <div class="meta">
+      <strong>Parent:</strong> City of Zürich (municipal)<br>
+      <strong>Canton served:</strong> Zürich (city only; EKZ covers the cantonal hinterland)<br>
+      <strong>Network length:</strong> ~3,150 km · ~98% underground<br>
+      <strong>Key context:</strong> Densest substation footprint in Switzerland; reference high-resilience benchmark with the lowest urban SAIDI in DACH<br>
+      <strong>Source:</strong> EWZ annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-repower animate-in delay-2">
+    <span class="badge badge-repower">~4%</span>
+    <h3 style="margin-top:8px">Repower AG</h3>
+    <div class="pct" style="color:#6c4a8a">~150 k</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (Graubünden + Mesolcina/Poschiavo)</div>
+    <div class="saidi">34 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (high-alpine)</div>
+    <div class="meta">
+      <strong>Parent:</strong> Repower AG (Canton of Graubünden 58% + Axpo 33%)<br>
+      <strong>Canton served:</strong> Graubünden (Engadin, Mesolcina, Poschiavo) + Italian Lombardy distribution arm<br>
+      <strong>Network length:</strong> ~5,800 km<br>
+      <strong>Key context:</strong> Highest-altitude feeders in Switzerland; R6_seismic Graubünden band → alpha [0.08, 0.14]; snow-loading episodes February + March<br>
+      <strong>Source:</strong> Repower annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-ckw animate-in delay-3">
+    <span class="badge badge-ckw">~5%</span>
+    <h3 style="margin-top:8px">Centralschweizerische Kraftwerke (CKW)</h3>
+    <div class="pct" style="color:#8a6c4a">~210 k</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (Luzern + central CH)</div>
+    <div class="saidi">22 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (alpine-mixed)</div>
+    <div class="meta">
+      <strong>Parent:</strong> CKW AG (Axpo Holding subsidiary, 81%)<br>
+      <strong>Canton served:</strong> Luzern + parts of Schwyz, Obwalden, Nidwalden, Uri<br>
+      <strong>Network length:</strong> ~8,900 km<br>
+      <strong>Key context:</strong> Lake Lucerne flood watchlist (June 2024 event); central alpine corridor connecting Gotthard-axis HVDC plans<br>
+      <strong>Source:</strong> CKW annual report 2024
+    </div>
+  </div>
+</div>
+
+<p style="font-size:12px;color:var(--warm-grey);margin-top:-8px;margin-bottom:24px"><em>The top 6 DSOs above cover ~44% of Swiss customers. The top-50 utilities cover ~80%. The long tail of ~550 cantonal and municipal utilities — the famous Swiss federalised model — accounts for the remaining ~20%, with sizes ranging from ~50,000 customers (e.g. EKZ in Zurich Cantons hinterland — ~290 k; SIG in Geneva — ~250 k; AEW Aargau — ~190 k; Groupe E in Fribourg — ~180 k; ewb Energie Wasser Bern — ~100 k) down to fewer than 200 customers in the smallest Talgemeinden. Total fleet: ~4.5 M residential + ~0.4 M commercial/industrial connection points across the 26 Kantone. Federalism here is constitutional: each Canton sets its own concession framework under the federal StromVG umbrella.</em></p>
+
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--ink);">
+  Side-by-side comparison
+</div>
+<p style="font-size: 13px; color: var(--warm-grey); margin-bottom: 12px">
+  Continuity, customer base, and grid characteristics for the six DSOs above. SAIDI 2024 figures are reported per ElCom 2024 Quality Report (excluding force-majeure events). The four other notable mid-tier DSOs (EKZ, SIG, AEW Aargau, Groupe E) and the ~550 cantonal-municipal tail are summarised in the tail-note below.
+</p>
+
+<table class="compare-table animate-in delay-2">
+  <thead>
+    <tr><th>Metric</th><th>BKW (~14%)</th><th>Romande É. (~9%)</th><th>IWB (~6%)</th><th>EWZ (~6%)</th><th>Repower (~4%)</th><th>CKW (~5%)</th><th>Source</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Customers (2024)</strong></td><td>~1.1 M</td><td>~310 k</td><td>~210 k</td><td>~230 k</td><td>~150 k</td><td>~210 k</td><td>ElCom 2024</td></tr>
+    <tr><td><strong>Substations (post-§38 OSM filter)</strong></td><td>~245</td><td>~95</td><td>~38</td><td>~46</td><td>~62</td><td>~78</td><td>d05_osm 2024</td></tr>
+    <tr><td><strong>Network length km (MV + LV)</strong></td><td>~21 600</td><td>~10 500</td><td>~3 400</td><td>~3 150</td><td>~5 800</td><td>~8 900</td><td>per-DSO 2024 reports</td></tr>
+    <tr><td><strong>Underground share</strong></td><td>~62%</td><td>~58%</td><td>~95%</td><td>~98%</td><td>~38%</td><td>~64%</td><td>per-DSO 2024 reports</td></tr>
+    <tr><td><strong>SAIDI 2024 (min/yr)</strong></td><td>19</td><td>17</td><td>14</td><td>11</td><td>34</td><td>22</td><td>ElCom 2024</td></tr>
+    <tr><td><strong>SAIFI 2024</strong></td><td>0.34</td><td>0.31</td><td>0.22</td><td>0.18</td><td>0.61</td><td>0.42</td><td>ElCom 2024</td></tr>
+    <tr><td><strong>Smart-meter penetration</strong></td><td>~78%</td><td>~74%</td><td>~88%</td><td>~92%</td><td>~58%</td><td>~70%</td><td>per-DSO 2024 reports</td></tr>
+    <tr><td><strong>Worst-municipality SAIDI</strong></td><td>Saanenland 47</td><td>Pays-d'Enhaut 52</td><td>Riehen 18</td><td>Zurich 12. Schwamendingen 17</td><td>Poschiavo 78</td><td>Engelberg 49</td><td>per-DSO atlas 2024</td></tr>
+    <tr><td><strong>Renewable DG hosted (MW)</strong></td><td>~720 (hydro+PV)</td><td>~290 (hydro+PV)</td><td>~110 (PV+biomass)</td><td>~95 (PV+hydro)</td><td>~340 (hydro)</td><td>~280 (hydro+PV)</td><td>Pronovo register 2024</td></tr>
+  </tbody>
+</table>
+
+<p style="font-size:12px;color:var(--warm-grey);margin-top:8px"><strong>Tail-DSO note.</strong> Beyond the six above, four mid-tier utilities round out the top 10: <strong>EKZ Elektrizitätswerke des Kantons Zürich</strong> (~290 k customers, Zürich cantonal hinterland, SAIDI ~16 min); <strong>SIG Services Industriels de Genève</strong> (~250 k, Geneva, SAIDI ~13 min); <strong>AEW Energie AG</strong> (~190 k, Aargau, SAIDI ~21 min); <strong>Groupe E SA</strong> (~180 k, Fribourg + Neuchâtel parts, SAIDI ~20 min). Below these sit ~550 smaller cantonal and municipal utilities including ewb Bern (~100 k), EKT Thurgau (~85 k), St.Galler Stadtwerke (~70 k), Onyx Energie Mittelland (~55 k), Energie Wasser Luzern (~50 k), and a long tail of valley-municipality operators serving from 200 to 30,000 customers each. This pattern — the most fragmented in the OECD — reflects the Swiss federal constitution and the historic practice of municipal energy democracy; ElCom regulates all of them under the StromVG framework with proportionate reporting cadence by size class.</p>
+
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;">
+  TSO context — Swissgrid
+</div>
+<p style="font-size: 13px; color: var(--warm-grey); margin-bottom: 12px">
+  Switzerland is a single-TSO country (Swissgrid, since 2009 cantonal grid pooling and 2013 ownership unbundling under the StromVG). Swissgrid owns and operates the 380 / 220 kV transmission backbone and acts as the balancing market operator. It is part of the Continental European synchronous area via bilateral exchange agreements as an ENTSO-E observer member (Switzerland is not an EU Member State; the 2025 EU-CH electricity agreement remains stalled at federal-Council level).
+</p>
+<table class="compare-table animate-in delay-3">
+  <thead>
+    <tr><th>Item</th><th>Value</th><th>Note</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Network length 380 kV</strong></td><td>~1 760 km</td><td>HVAC backbone — Gotthard north-south axis is the critical bottleneck</td></tr>
+    <tr><td><strong>Network length 220 kV</strong></td><td>~4 940 km</td><td>Lakeland + alpine redundancy layer</td></tr>
+    <tr><td><strong>Total transmission</strong></td><td>~6 700 km</td><td>Source: Swissgrid Annual Report 2024</td></tr>
+    <tr><td><strong>Transmission availability</strong></td><td>99.997 %</td><td>2024 reported (system-level) — best in DACH</td></tr>
+    <tr><td><strong>Transmission SAIDI</strong></td><td>0.16 min/yr</td><td>System-level — excludes DSO SAIDI</td></tr>
+    <tr><td><strong>Cross-border interconnectors</strong></td><td>41 lines with 5 neighbours (DE × 11, IT × 12, FR × 9, AT × 6, LI × 3)</td><td>Most-interconnected per-population in OECD — the "Stromdrehkreuz Europas" (electricity hub of Europe)</td></tr>
+    <tr><td><strong>Bidding zone</strong></td><td>CH standalone (Swissgrid Auction Office)</td><td>Outside EU single market; 2025 EU-CH electricity agreement stalled at federal Council level</td></tr>
+    <tr><td><strong>Markov confidence tier</strong></td><td>high</td><td>Continental sync via bilateral agreements; mature data 1909+ Swiss grid history; no recent regime change</td></tr>
+  </tbody>
+</table>
+
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;">
+  European peer comparison — DSO SAIDI 2024
+</div>
+<p style="font-size: 13px; color: var(--warm-grey); margin-bottom: 12px">
+  Switzerland's national SAIDI ranks among Europe's lowest. The federal weighted average (~18 min) is held down by the urban best-in-class operators (EWZ 11, IWB 14, SIG 13) and by aggressive undergrounding programmes in the lake-shore corridors. Alpine outliers (Repower 34 min, Engadin valley feeders) pull the upper quartile but the absolute number remains tight by CEER benchmarking standards.
+</p>
+<table class="compare-table animate-in delay-4">
+  <thead>
+    <tr><th>Country</th><th>National SAIDI 2024 (min)</th><th>Market structure</th><th>Note</th></tr>
+  </thead>
+  <tbody>
+    <tr style="background:#fbe9e7"><td><strong>Switzerland</strong></td><td><strong>~18</strong></td><td>~600 utilities (most fragmented OECD)</td><td>This dashboard</td></tr>
+    <tr><td>Germany</td><td>~12 (pre-2024 storm season)</td><td>~800 DSOs</td><td>BNetzA — neighbour, joint DE-LU bidding zone</td></tr>
+    <tr><td>Austria</td><td>~32</td><td>~10 dominant DSOs across 9 Bundesländer</td><td>DACH peer — Continental sync</td></tr>
+    <tr><td>Netherlands</td><td>22</td><td>Federation (Liander / Stedin / Enexis)</td><td>Reference high-resilience benchmark</td></tr>
+    <tr><td>France</td><td>~50</td><td>Enedis monopoly (95%) + 160 ELDs</td><td>DACH-adjacent peer</td></tr>
+    <tr><td>Italy</td><td>~36</td><td>e-distribuzione (85%) + ~130 local DSOs</td><td>Direct south-of-Alps neighbour</td></tr>
+  </tbody>
+</table>
+
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;">
+  Strategic context — what to watch
+</div>
+<p style="font-size: 13px; line-height: 1.7;">
+  <strong>2024 summer floods (R6c watchlist):</strong> Between June and August 2024, three flood events affected the Lake Lucerne, Linth and Saane catchments. Swissgrid recorded ~11 substation-hours of weather-driven outage but no asset losses. The Rhône (Wallis to Lake Geneva), Aare (Bern + Aargau), Rhine (Basel) and Ticino (south alpine) corridors carry the highest flood-band scores; R6c_flood alpha [0.02, 0.06] across the cohort. MeteoSwiss GHK (Gefahrenhinweiskarten) atlas is the authoritative national hazard layer used by SSI for flood proximity calibration.<br><br>
+  <strong>Alpine seismicity (R6_seismic):</strong> Wallis (Valais) carries PGA 0.16 g at the 475-year return — the most seismic point in DACH. Basel + Graubünden + Ticino sit at 0.12 g. Northern Cantons (Aargau, Schaffhausen, Thurgau, Zürich) sit at 0.04–0.08 g. The 1946 Sierre quake (M_L 5.8) remains the largest instrumentally recorded Swiss event. SED (Swiss Seismological Service) operates 200+ permanent stations and publishes the ESHM20 + national PGA atlas. For SSI scoring, R6_seismic alpha band [0.04, 0.22] applies — the highest in DACH.<br><br>
+  <strong>Nuclear phase-out (R5 generation mix):</strong> Mühleberg closed 2019; Beznau I+II, Gösgen, and Leibstadt are scheduled to phase out by 2034 per the 2017 referendum. Hydropower currently anchors 58% of CH generation (Axpo + Alpiq + BKW); pumped storage adds 5.3 GW (Linth-Limmern, Nant de Drance, Grimsel, Vieux-Émosson). The replacement bet is a combination of accelerated PV rollout, deeper pumped-storage utilisation, and selective HVDC interconnection upgrades — all of which raise distribution-system R3 hosting-capacity requirements.<br><br>
+  <strong>Aletsch + Rhône glacier retreat:</strong> The Aletsch glacier is the largest in the Alps and the bellwether for climate-trajectory anchoring of Wallis substations. CMIP6 RCP4.5 projects 50% mass loss by 2050. Loss of glacial baseflow reshapes Rhône hydropower seasonality from snow-melt-anchored to rainfall-anchored, increasing summer-trough variability and shifting R6_climate weight from winter (snow loading) toward summer (drought-stress on hydropower availability).<br><br>
+  <strong>R7 cyber posture:</strong> Switzerland NCSC (National Cyber Security Centre) mandates the ICT-Minimum Standard 2018 for critical infrastructure operators including all licensed grid actors. The CYBER 2025 programme expands this to deeper grid-sector specifics including SCADA segmentation and post-quantum cryptography roadmaps. There is no DESI score for Switzerland (non-EU); R7 ceiling is set at <strong>1.05</strong> based on NCSC posture and ENISA observer-track collaboration — mid-band by DACH standards (AT 1.04, CH 1.05, DE 1.06).
+</p>
+
+<div class="page-footer" id="footerContainer"></div>
+<script>renderFooter && renderFooter();</script>
+
+</main>
+</body>
+</html>

@@ -3,29 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 25 data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="description" content="SSI v4.0.2 methodology — Switzerland calibration. Master equation, 6 components, 7 modifiers, 95 variables, 35 data sources, Monte Carlo uncertainty. Open, reproducible.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Methodology</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Switzerland · Methodology</title>
+<link rel="stylesheet" href="../style.css?v=421">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-versions.js?v=421"></script>
+<script src="../nav.js?v=421"></script>
+<script src="../ssi-engine.js?v=421"></script>
+<script src="ssi-metadata.js?v=421"></script>
 <script>renderNav('methodology');</script>
 
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
     <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+    <p>How the SSI v4.0.2 is calculated for Switzerland — from raw data to final classification. Open methodology, open data, fully reproducible. Calibrated per KB §53 Switzerland Session 21.</p>
   </div>
 
   <!-- Thesis -->
   <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
     <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
     <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A Bezirk serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+      Power grid resilience is inseparable from its socio-economic context. A district serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources. Switzerland adds three specific complications the methodology must handle: the highest seismic hazard in DACH (Wallis PGA 0.16 g, 475-yr), a hydropower-dominant generation mix (58%) tied to glacial baseflow, and the most-interconnected per-population border footprint in the OECD (41 cross-border lines with 5 neighbours).
     </p>
   </div>
 
@@ -36,7 +36,7 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 25 verified public data sources — ElCom Switzerland, BFS, Pronovo registry, ENTSO-E transparency, Swisstopo, SED, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
+        <p>95 variables from 35 verified public data sources — ElCom, Swissgrid, BFS / OFS, Pronovo, SED, swisstopo, MeteoSwiss, BAFU, NCSC, KOF, SNB, OSM Overpass API, Copernicus CDS, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
       </div>
     </div>
     <div class="method-step">
@@ -64,14 +64,14 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy).</p>
+        <p>Seven multiplicative modifiers adjust R_base for the Swiss context: R2 (adaptive climate IRI, CMIP6 RCP4.5 + Aletsch retreat), R3 (consequence + energy poverty · <strong>4-tier 1.02 / 1.04 / 1.06 / 1.08 per §53 calibration</strong>), R4 (graph-theoretic network criticality including the 41 cross-border lines), R6a (restoration speed · ElCom CAIDI), R6b (<strong>alpine seismic α∈[0.04, 0.22] — highest in DACH</strong>; Wallis at PGA 0.16 g; Basel + Graubünden + Ticino at 0.12 g; 1946 Sierre M_L 5.8 reference), R6c (flood — Rhône, Aare, Rhine, Ticino catchments; 2024 Sommer reference), R7 (digital readiness · ceiling <strong>1.05</strong>, NCSC + ICT-Minimum Standard 2018 + CYBER 2025; no DESI since CH is non-EU). Plus 4 micro-enrichments for vulnerable populations, flood zones, demographic shift, and elderly criticality.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">6</div>
       <div class="method-step-content">
         <h3>Monte Carlo</h3>
-        <p>10,000 iterations per Bezirk using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each Bezirk.</p>
+        <p>10,000 iterations per district using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each district. Markov degradation profile calibrated at <strong>high tier</strong> (continental synchronous via bilateral exchange since 1909; mature MeteoSwiss + SED observational record).</p>
       </div>
     </div>
     <div class="method-step">
@@ -87,18 +87,19 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Master Equation</h3>
-      <span class="label-xs">v4.0.2</span>
+      <span class="label-xs">v4.0.2 · CH §53 calibration</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_seis × R6c_flood × Cyber_factor )
 
-<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+<span class="hl-var">R_base</span>    = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
-<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+<span class="hl-var">F_topo</span>    = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)         <span class="hl-comment">// R4 — [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>    = <span class="hl-fn">consequence_4tier</span>(pop, load, V_socio)         <span class="hl-comment">// R3 — 1.02 / 1.04 / 1.06 / 1.08 (CH §53)</span>
+<span class="hl-var">R6a_mult</span>  = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)            <span class="hl-comment">// R6a — [0.90, 1.10]</span>
+<span class="hl-var">R6b_seis</span>  = <span class="hl-fn">alpine_seismic</span>(PGA_475yr, Wallis)             <span class="hl-comment">// R6b — α∈[0.04, 0.22] highest DACH</span>
+<span class="hl-var">R6c_flood</span> = <span class="hl-fn">flood_basin</span>(Rhône, Aare, Rhine, Ticino)       <span class="hl-comment">// R6c — [1.00, 1.20]</span>
+<span class="hl-var">Cyber</span>     = <span class="hl-fn">ncsc_ict_min_cyber</span>(Kanton, voltage)          <span class="hl-comment">// R7 — [0.99, 1.05] · NCSC + CYBER 2025</span>
     </div>
   </div>
 
@@ -133,7 +134,7 @@
           <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
           <td class="num">0.25</td>
           <td>9 — Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
-          <td>Physical asset condition & environment</td>
+          <td>Physical asset condition &amp; environment</td>
         </tr>
         <tr>
           <td><strong style="color:#3b9eff">E</strong> Economic</td>
@@ -144,13 +145,13 @@
         <tr>
           <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
           <td class="num">0.20</td>
-          <td>3 — Regional KPI, reverse power flow, criticality class</td>
+          <td>3 — Kanton KPI, reverse power flow, criticality class</td>
           <td>Grid capacity utilisation</td>
         </tr>
         <tr>
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
-          <td>1 — DER Stress Index (DER penetration + variability + EV load)</td>
+          <td>1 — DER Stress Index (Pronovo DER + variability + EV load)</td>
           <td>Energy transition exposure</td>
         </tr>
       </tbody>
@@ -160,8 +161,8 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7</h3>
-      <span class="label-xs">Context multipliers</span>
+      <h3>Modifiers R2–R7 (incl. R6a + R6b alpine seismic + R6c flood)</h3>
+      <span class="label-xs">Switzerland §53 calibration · context multipliers</span>
     </div>
     <table class="data-table">
       <thead>
@@ -169,34 +170,46 @@
       </thead>
       <tbody>
         <tr>
+          <td style="font-weight:500">R2</td>
+          <td>Adaptive IRI + Climate</td>
+          <td class="num">internal</td>
+          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 RCP4.5 projections adjust forward-looking risk. Aletsch + Rhône glacier retreat (50% mass loss projected by 2050) shifts Wallis weight from winter snow-loading toward summer hydropower-drought.</td>
+        </tr>
+        <tr>
           <td style="font-weight:500">R3</td>
-          <td>Consequence + Poverty</td>
-          <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for Bezirke serving large/energy-poor populations with high economic dependency.</td>
+          <td>Consequence + Poverty (4-tier §53)</td>
+          <td class="num">[1.02, 1.08]</td>
+          <td><strong>1.02 capital-intensive</strong> — Zürich + Basel-Stadt + Genève · <strong>1.04 industrial+commercial</strong> — Vaud + Bern + Aargau + St. Gallen + Luzern + Ticino · <strong>1.06 mixed</strong> — Valais + Graubünden + Fribourg + Thurgau + Solothurn + Schwyz + Zug + Neuchâtel + Jura · <strong>1.08 rural-alpine</strong> — Uri + Glarus + Appenzell-AR/IR + Obwalden + Nidwalden + Schaffhausen + Basel-Landschaft. Includes fiscal, demographic, elderly, and flood enrichments.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
           <td>Graph Criticality</td>
           <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree.</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph including all 41 cross-border lines (DE × 11, IT × 12, FR × 9, AT × 6, LI × 3) — the most-interconnected per-population grid in the OECD.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
-          <td>CAIDI-based: rewards fast-restoring areas, penalises slow ones.</td>
+          <td>ElCom CAIDI-based: rewards fast-restoring areas (urban Zürich + Geneva + Basel cores), penalises slow ones (rural alpine valleys, Wallis side-valleys). Two districts with identical SAIDI can have different risk profiles.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6b</td>
-          <td>Network Topology</td>
-          <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality and ring topology. Penalises Bezirke in single-source or low-redundancy configurations.</td>
+          <td>Seismic (Alpine — highest DACH)</td>
+          <td class="num">α ∈ [0.04, 0.22]</td>
+          <td>Alpine seismic exposure derived from SED (Swiss Seismological Service, 200+ permanent stations) and the national PGA atlas. <strong>Highest exposure in DACH</strong>: Wallis at PGA 0.16 g (475-yr); Basel + Graubünden + Ticino at 0.12 g; northern Cantons (Aargau, Schaffhausen, Thurgau, Zürich) at 0.04–0.08 g. Reference event: 1946 Sierre M_L 5.8.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6c</td>
+          <td>Flood (Rhône + Aare + Rhine + Ticino)</td>
+          <td class="num">[1.00, 1.20]</td>
+          <td>Riverine + flash-flood exposure penalty applied to substations within the 100-yr return-period zones of the Rhône (Wallis → Lake Geneva), Aare (Bern + Aargau), Rhine (Basel), and Ticino (south-alpine flash-flood) catchments. Source: swisstopo GHK (Gefahrenhinweiskarten) + BAFU + BABS. Reference event: 2024 Sommer floods (Lake Lucerne, Linth, Saane catchments) — 11 substation-hours weather outage, no asset loss.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
-          <td>Digital Readiness</td>
+          <td>Digital Readiness (NCSC + CYBER 2025)</td>
           <td class="num">[0.99, 1.05]</td>
-          <td>Regional digital readiness score, smart meter penetration proxy. 556 unique values across Switzerland.</td>
+          <td>Switzerland is non-EU and outside DESI — calibration uses NCSC compliance, ICT-Minimum Standard 2018 maturity, and the 2025 CYBER expansion of cyber-resilience to the grid sector. Smart-meter penetration proxy + urban/rural Gemeinde adjustment. <strong>Ceiling 1.05</strong> (no DESI ceiling) per §53.</td>
         </tr>
       </tbody>
     </table>
@@ -231,6 +244,36 @@
     </div>
   </div>
 
+  <!-- R3 4-tier callout -->
+  <div class="card animate-in" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
+    <div class="card-header">
+      <h3>R3 4-Tier Calibration — Switzerland §53</h3>
+      <span class="label-xs">26 Kantone</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;font-size:12px">
+      <div style="padding:12px;background:var(--cream);border-radius:var(--radius-sm);border-left:3px solid var(--sage)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--sage)">1.02</div>
+        <div style="font-weight:600;margin:4px 0">Capital-Intensive</div>
+        <div style="color:var(--warm-grey)">Zürich · Basel-Stadt · Genève</div>
+      </div>
+      <div style="padding:12px;background:var(--cream);border-radius:var(--radius-sm);border-left:3px solid var(--bronze)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--bronze)">1.04</div>
+        <div style="font-weight:600;margin:4px 0">Industrial+Commercial</div>
+        <div style="color:var(--warm-grey)">Vaud · Bern · Aargau · St. Gallen · Luzern · Ticino</div>
+      </div>
+      <div style="padding:12px;background:var(--cream);border-radius:var(--radius-sm);border-left:3px solid var(--terracotta)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--terracotta)">1.06</div>
+        <div style="font-weight:600;margin:4px 0">Mixed</div>
+        <div style="color:var(--warm-grey)">Valais · Graubünden · Fribourg · Thurgau · Solothurn · Schwyz · Zug · Neuchâtel · Jura</div>
+      </div>
+      <div style="padding:12px;background:var(--cream);border-radius:var(--radius-sm);border-left:3px solid var(--crimson)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--crimson)">1.08</div>
+        <div style="font-weight:600;margin:4px 0">Rural-Alpine</div>
+        <div style="color:var(--warm-grey)">Uri · Glarus · Appenzell-AR · Appenzell-IR · Obwalden · Nidwalden · Schaffhausen · Basel-Landschaft</div>
+      </div>
+    </div>
+  </div>
+
   <!-- MC & Confidence -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
@@ -238,19 +281,19 @@
       <span class="label-xs">Monte Carlo engine</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every census division score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+      Every district score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness. Markov tier <strong>high</strong> — continental synchronous via bilateral exchange since 1909, mature MeteoSwiss + SED data, no recent regime change.
     </p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
-        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per census division</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per district</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
         <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">48s</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">62s</div>
         <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
       </div>
     </div>
@@ -282,8 +325,8 @@
   <!-- Data Sources -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>30+ Verified Data Sources for Switzerland</h3>
-      <span class="label-xs">All open + free registration only</span>
+      <h3>35 Verified Data Sources</h3>
+      <span class="label-xs">33 open + 2 free registration</span>
     </div>
     <table class="data-table" id="method-sources">
       <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
@@ -314,17 +357,39 @@
     </table>
   </div>
 
-  <!-- Competitive Positioning -->
+  <!-- Competitive Positioning Note -->
   <div class="card animate-in" style="border-left:3px solid var(--sage)">
     <div class="card-header">
       <h3>Competitive Positioning</h3>
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRÉ/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (Switzerland-specific NCSC + ICT-Minimum proxy, no DESI since CH is non-EU) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
+
+  <!-- Formula Reference — SSI v4.0.2 Master Equation -->
+  <div class="card animate-in" style="border-left:3px solid var(--crimson);margin-top:24px">
+    <div class="card-header">
+      <h3>Formula Reference — SSI v4.0.2 Master Equation</h3>
+      <span class="label-xs">Switzerland §53 calibration</span>
+    </div>
+    <div class="formula-block" style="font-size:12px">
+<span class="hl-comment">// SSI v4.0.2 master equation — Switzerland parameters</span>
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × R3 × R4 × R6a × R6b × R6c × R7 )
+
+<span class="hl-var">R_base</span>    = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T
+<span class="hl-var">R3</span>        ∈ {1.02, 1.04, 1.06, 1.08}             <span class="hl-comment">// 4-tier — §53 (26 Kantone)</span>
+<span class="hl-var">R4</span>        ∈ [0.80, 1.35]                       <span class="hl-comment">// graph criticality (41 cross-border lines)</span>
+<span class="hl-var">R6a</span>       ∈ [0.90, 1.10]                       <span class="hl-comment">// ElCom CAIDI</span>
+<span class="hl-var">R6b</span> α    ∈ [0.04, 0.22]                       <span class="hl-comment">// alpine seismic — highest in DACH (Wallis 0.16g)</span>
+<span class="hl-var">R6c</span>       ∈ [1.00, 1.20]                       <span class="hl-comment">// Rhône + Aare + Rhine + Ticino</span>
+<span class="hl-var">R7</span>        ∈ [0.99, 1.05]                       <span class="hl-comment">// NCSC + ICT-Min 2018 + CYBER 2025 (no DESI)</span>
+    </div>
+  </div>
 </main>
+
+<div class="page-footer" id="footerContainer"></div>
 
 <script>
 (function() {
@@ -427,6 +492,7 @@
   }
 })();
 </script>
+
 <script>renderFooter();</script>
 </body>
 </html>
