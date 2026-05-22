@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Interactive map of Austria's electrical grid with SSI v4.0.2 resilience scores for 1,406 substations across 85 Bezirke and 9 Bundesländer. 95 variables, topology network + E-Control registry risk.">
+<meta name="description" content="1,406 substations · 9 Bundesländer · 95 Bezirke — Interactive map of Austria's electrical grid with SSI v4.0.2 resilience scores. 95 variables, topology network + E-Control registry risk.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Map Explorer</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Austria · Map Explorer</title>
+<link rel="stylesheet" href="../style.css?v=420">
 <style>
   .map-container {
     position: relative;
@@ -134,16 +134,16 @@
 </style>
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-versions.js?v=420"></script>
+<script src="../nav.js?v=420"></script>
+<script src="../ssi-engine.js?v=420"></script>
+<script src="ssi-metadata.js?v=420"></script>
 <script>renderNav('map');</script>
 
 <main class="page-shell" style="max-width:1440px">
   <div class="page-header animate-in">
-    <h1>Map Explorer</h1>
-    <p>Explore 1,406 substations across Austria's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
+    <h1><span style="font-size:0.75em;vertical-align:0.15em;margin-right:6px">🇦🇹</span>Map Explorer</h1>
+    <p>Explore 1,406 substations across Austria's transmission and distribution grid — 9 Bundesländer · 95 Bezirke. Click to inspect scores, components, and modifiers. Bundesland boundary overlay from bounds.json.</p>
   </div>
 
   <!-- Filter Bar -->
@@ -178,6 +178,10 @@
       <option value="S">S — Saturation</option>
       <option value="T">T — Energy Transition</option>
     </select>
+    <label style="margin-left:8px;display:flex;align-items:center;gap:6px;font-size:12px">
+      <input type="checkbox" id="filter-bounds" checked>
+      Bundesländer outlines
+    </label>
     <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
   </div>
 
@@ -219,18 +223,39 @@
   </div>
 </main>
 
-<script src="../map.js?v=418"></script>
+<div class="page-footer" id="footerContainer"></div>
+
+<script src="../map.js?v=420"></script>
 <script>
+  // Austria geographic centre — close to St. Johann am Walde
   SSIMap.init('ssi-map-canvas', {
+    center: { lat: 47.59, lon: 14.13 },
+    zoom: 7,
+    boundsUrl: 'bounds.json?v=420',
+    showBounds: true,
     onLoaded: function(ssi) {
       var stats = document.getElementById('map-stats');
       if (stats) {
-        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + ssi.meta.total_kreise + ' Bezirke · 9 Bundesländer · ' +
-          '<b>' + ssi.fleet_summary.bands.Critical + '</b> critical · ' +
-          'median R = <b>' + ssi.fleet_summary.median_R.toFixed(3) + '</b>';
+        var totalKreise = (ssi.meta && (ssi.meta.total_kreise || ssi.meta.n_bezirke)) || 95;
+        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + totalKreise + ' Bezirke · ' + ssi.regions.length + ' Bundesländer · ' +
+          '<b>' + (ssi.fleet_summary.bands ? ssi.fleet_summary.bands.Critical : 0) + '</b> critical · ' +
+          'median R = <b>' + (ssi.fleet_summary.median_R || ssi.fleet_summary.fleet_median_R).toFixed(3) + '</b>';
       }
     }
   });
+
+  // Wire Bundesländer outline toggle (if map.js exposes setShowBounds)
+  var boundsToggle = document.getElementById('filter-bounds');
+  if (boundsToggle) {
+    boundsToggle.addEventListener('change', function() {
+      if (typeof SSIMap.setShowBounds === 'function') {
+        SSIMap.setShowBounds(this.checked);
+      } else if (SSIMap.state) {
+        SSIMap.state.showBounds = this.checked;
+        if (typeof SSIMap.redraw === 'function') SSIMap.redraw();
+      }
+    });
+  }
 </script>
 <script>renderFooter();</script>
 </body>

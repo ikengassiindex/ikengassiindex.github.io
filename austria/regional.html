@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Compare Austrian Bundesländer and Bezirke by SSI resilience score, component breakdown, and socio-economic context across 1,406 substations.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Regional Analysis</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Austria · Regional · 9 Bundesländer · 95 Bezirke</title>
+<link rel="stylesheet" href="../style.css?v=420">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-versions.js?v=420"></script>
+<script src="../nav.js?v=420"></script>
+<script src="../ssi-engine.js?v=420"></script>
+<script src="ssi-metadata.js?v=420"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
   <div class="page-header animate-in">
-    <h1>Regional Analysis</h1>
-    <p>Compare Bundesländer and Bezirke by SSI score, component breakdown, and socio-economic context across 1,406 substations in Austria's 9 Bundesländer.</p>
+    <h1><span style="font-size:0.75em;vertical-align:0.15em;margin-right:6px">🇦🇹</span>Regional Analysis</h1>
+    <p>Compare Austria's 9 Bundesländer and 95 Bezirke by SSI score, component breakdown, and socio-economic context — 1,406 substations across the federal grid (APG TSO + 6 federalised DSOs).</p>
   </div>
 
   <!-- Tabs -->
@@ -117,6 +117,8 @@
   </div>
 </main>
 
+<div class="page-footer" id="footerContainer"></div>
+
 <script>
 renderFooter();
 
@@ -132,6 +134,7 @@ function switchTab(btn, tabId) {
 
 // ── Color helpers ──
 function scoreColor(val) {
+  if (val == null) return 'var(--warm-grey)';
   if (val >= 0.75) return 'var(--crimson)';
   if (val >= 0.50) return 'var(--terracotta)';
   if (val >= 0.25) return 'var(--bronze)';
@@ -144,34 +147,45 @@ function deltaColor(d) {
   return 'var(--warm-grey)';
 }
 
-function fmt(v, dp) { return v.toFixed(dp === undefined ? 3 : dp); }
-function pct(v) { return v.toFixed(1) + '%'; }
+function fmt(v, dp) { return (v == null) ? '—' : v.toFixed(dp === undefined ? 3 : dp); }
+function pct(v) { return (v == null) ? '—' : v.toFixed(1) + '%'; }
 
 // ── Tab 1: Regional Ranking ──
+// AT alphabetic German order (display fallback)
+var BUNDESLAND_ORDER = ['Burgenland','Kärnten','Niederösterreich','Oberösterreich','Salzburg','Steiermark','Tirol','Vorarlberg','Wien'];
+
 function renderRanking(data) {
-  var regions = data.regions.slice().sort(function(a, b) { return b.median_R - a.median_R; });
+  var regions = data.regions.slice().sort(function(a, b) {
+    if (a.median_R == null && b.median_R == null) return 0;
+    if (a.median_R == null) return 1;
+    if (b.median_R == null) return -1;
+    return b.median_R - a.median_R;
+  });
   var tbody = document.getElementById('ranking-tbody');
   document.getElementById('ranking-count').textContent = regions.length + ' Bundesländer · sorted worst → best';
 
   tbody.innerHTML = regions.map(function(r, i) {
-    var total = r.count || r.n_substations;
+    // Schema-tolerant: supports both LT-style {count, bands{Low,Medium,High,Critical}} (raw counts, §49.3)
+    // and AT-style {n_substations, band_distribution{Low,Medium,High,Critical}} (percentages).
+    var total = (r.count != null) ? r.count : r.n_substations;
     var pLow, pMed, pHigh, pCrit;
     if (r.bands) {
-      pLow = ((r.bands.Low / total) * 100).toFixed(0);
-      pMed = ((r.bands.Medium / total) * 100).toFixed(0);
-      pHigh = ((r.bands.High / total) * 100).toFixed(0);
-      pCrit = ((r.bands.Critical / total) * 100).toFixed(0);
+      pLow  = total > 0 ? ((r.bands.Low      / total) * 100).toFixed(0) : 0;
+      pMed  = total > 0 ? ((r.bands.Medium   / total) * 100).toFixed(0) : 0;
+      pHigh = total > 0 ? ((r.bands.High     / total) * 100).toFixed(0) : 0;
+      pCrit = total > 0 ? ((r.bands.Critical / total) * 100).toFixed(0) : 0;
     } else {
       var bd = r.band_distribution || { Low: 0, Medium: 0, High: 0, Critical: 0 };
-      pLow = bd.Low.toFixed(0);
-      pMed = bd.Medium.toFixed(0);
-      pHigh = bd.High.toFixed(0);
-      pCrit = bd.Critical.toFixed(0);
+      pLow  = (bd.Low      || 0).toFixed(0);
+      pMed  = (bd.Medium   || 0).toFixed(0);
+      pHigh = (bd.High     || 0).toFixed(0);
+      pCrit = (bd.Critical || 0).toFixed(0);
     }
+    var medColor = (r.median_R == null) ? 'var(--warm-grey)' : scoreColor(r.median_R);
     return '<tr>' +
       '<td style="color:var(--warm-grey)">' + (i + 1) + '</td>' +
       '<td style="font-weight:500">' + r.region + '</td>' +
-      '<td class="num" style="color:' + scoreColor(r.median_R) + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
+      '<td class="num" style="color:' + medColor + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
       '<td class="num">' + total + '</td>' +
       '<td class="num">' + pct(r.pct_critical) + '</td>' +
       '<td class="num">' + pct(r.pct_high) + '</td>' +
@@ -432,7 +446,12 @@ function renderDecomposition(data) {
 }
 
 // ── Load Data ──
-fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(function(data) {
+fetch('ssi-data.json?v=420').then(function(r) { return r.json(); }).then(function(data) {
+  // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+  var subsRaw = data.substations;
+  data.substations = Array.isArray(subsRaw) ? subsRaw : Object.values(subsRaw || {});
+  var regsRaw = data.regions;
+  data.regions = Array.isArray(regsRaw) ? regsRaw : Object.values(regsRaw || {});
   SSI = data;
   provinceData = buildProvinceData(data);
   renderRanking(data);

@@ -3,21 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSI Monthly Intelligence — Edition 001</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Austria · Intelligence</title>
+<link rel="stylesheet" href="../style.css?v=420">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 </head>
 <body>
-<script src="../nav.js?v=418"></script>
-<script src="ssi-metadata.js"></script>
-<script src="../intelligence/intelligence-loader.js" data-country="austria"></script>
-<script>
-// Config-ready bridge: SSI_EDITION available for all inline scripts
-window.SSI_EDITION = window.SSI_EDITION || null;
-document.addEventListener("ssi-config-ready", function(e) {
-  if (e.detail) { window.SSI_EDITION = e.detail; }
-});
-</script>
+<script src="../ssi-versions.js?v=420"></script>
+<script src="../nav.js?v=420"></script>
+<script src="ssi-metadata.js?v=420"></script>
 <script>renderNav('intelligence');</script>
 
 <main class="page-shell" style="max-width:860px">
@@ -26,9 +19,9 @@ document.addEventListener("ssi-config-ready", function(e) {
      PAGE HEADER
      ═══════════════════════════════════════════════════════ -->
 <div class="page-header animate-in">
-  <h1>Monthly Intelligence Report</h1>
-  <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">Edition 001 — The Tyrol-Vorarlberg Alpine Corridor</div>
-  <p>Where the energy transition is outrunning the grid. Inaugural edition · April 2026 · SSI v4.0.2</p>
+  <h1><span style="font-size:0.75em;margin-right:8px;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇦🇹</span>Monthly Intelligence Report</h1>
+  <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">Edition 01 — The Tyrol-Vorarlberg Alpine Corridor</div>
+  <p>Where the energy transition is outrunning the grid. Pre-launch · DACH cohort · First refresh 2027-01-14 · SSI v4.0.2</p>
 </div>
 
 
@@ -129,10 +122,8 @@ document.addEventListener("ssi-config-ready", function(e) {
 <script>
 (function(){
   function monthSeed() {
-    // Monthly rotation starts May 2026; keep March substation until then
-    var d = new Date(), y = d.getFullYear(), m = d.getMonth() + 1;
-    if (y < 2026 || (y === 2026 && m < 5)) return 202603;
-    return y * 100 + m;
+    var d = new Date();
+    return d.getFullYear() * 100 + (d.getMonth() + 1);
   }
   function seededIndex(seed, len) {
     var h = seed;
@@ -142,7 +133,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     return Math.abs(h) % len;
   }
 
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+    var __subsRaw = data.substations; data.substations = Array.isArray(__subsRaw) ? __subsRaw : Object.values(__subsRaw || {});
+    var __regsRaw = data.regions; data.regions = Array.isArray(__regsRaw) ? __regsRaw : Object.values(__regsRaw || {});
     var subs = data.substations;
     var idx = seededIndex(monthSeed(), subs.length);
     var s = subs[idx];
@@ -180,16 +174,26 @@ document.addEventListener("ssi-config-ready", function(e) {
       { key: 'R3_C_mult', label: 'R3 Consequence' },
       { key: 'R4_F_topo', label: 'R4 Graph Criticality' },
       { key: 'R6_restoration', label: 'R6a Restoration' },
-      { key: 'R6_seismic', label: 'R6b Network Topology' },
+      { key: 'R6_seismic', label: 'R6b Seismic (Alpine PGA)' },
       { key: 'R7_cyber', label: 'R7 Digital Readiness' }
     ];
     var modHTML = modDefs.map(function(m){
-      var val = s.modifiers[m.key];
+      var val = s.modifiers && s.modifiers[m.key];
       if (!val) return '';
       var dir = val > 1.01 ? '↑ amplifies' : val < 0.99 ? '↓ dampens' : '→ neutral';
       var col = val > 1.05 ? 'var(--crimson)' : val < 0.95 ? 'var(--sage)' : 'var(--warm-grey)';
       return '<div><strong>' + m.label + ':</strong> <span style="color:' + col + '">' + val.toFixed(3) + '</span> ' + dir + '</div>';
     }).join('');
+    // Markov degradation richness (KB §47.13 two-pass safety with optional-chaining)
+    var mk = s.markov || {};
+    var mkRisk = (mk.risk_score !== undefined) ? mk.risk_score.toFixed(2) : '—';
+    var mkCorr = mk.corrosion_class || '—';
+    var mkPcrit = (mk.p_crit_20yr !== undefined) ? (mk.p_crit_20yr * 100).toFixed(0) + '%' : '—';
+    var mkETTC = (mk.ettc_years !== undefined) ? mk.ettc_years.toFixed(1) + ' yr' : '—';
+    var mkStat = (mk.stationary_critical !== undefined) ? (mk.stationary_critical * 100).toFixed(0) + '%' : '—';
+    modHTML += '<div style="margin-top:6px;padding-top:6px;border-top:1px dotted var(--card-border);font-size:11px;color:var(--warm-grey)">' +
+      '<strong>Markov:</strong> risk ' + mkRisk + ' · corrosion ' + mkCorr + ' · p_crit_20y ' + mkPcrit + ' · ETTC ' + mkETTC + ' · stat_crit ' + mkStat +
+      '</div>';
     document.getElementById('focus-modifiers').innerHTML = modHTML;
 
     var canvas = document.getElementById('focus-radar');
@@ -199,9 +203,7 @@ document.addEventListener("ssi-config-ready", function(e) {
     var R = 68;
     var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
     var weights = [0.30, 0.10, 0.25, 0.10, 0.20, 0.05];
-    var _compSum = labels.reduce(function(sum, k) { return sum + (s.components[k] || 0); }, 0);
-        var _isWeighted = _compSum <= 1.0;
-        var vals = labels.map(function(k, i){ return _isWeighted ? s.components[k] / weights[i] : s.components[k]; });
+    var vals = labels.map(function(k, i){ return s.components[k] / weights[i]; });
     var n = labels.length;
 
     ctx.strokeStyle = 'rgba(44,36,32,0.08)';
@@ -274,7 +276,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <!-- ═══════════════════ B. CYBER & ECONOMIC EXPOSURE MONITOR ═══════════════════ -->
 <section id="cyber-econ" style="margin-bottom:32px">
-<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section B — Recurring Module</span>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section B — Standing Item</span>
 <h2>Cyber &amp; Economic Exposure Monitor</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
@@ -347,12 +349,15 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h3>B.4 &ensp; Monthly Pulse</h3>
 
 <div class="card" style="border-left:3px solid var(--sage);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0" id="b4-pulse"><strong>Inaugural edition — Baseline Snapshot.</strong> Loading…</p>
+  <p style="font-size:13px;line-height:1.7;margin:0" id="b4-pulse"><strong>Edition 01 — Baseline Snapshot.</strong> Loading…</p>
 </div>
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+    var __subsRaw = data.substations; data.substations = Array.isArray(__subsRaw) ? __subsRaw : Object.values(__subsRaw || {});
+    var __regsRaw = data.regions; data.regions = Array.isArray(__regsRaw) ? __regsRaw : Object.values(__regsRaw || {});
     var fleet = data.substations;
     var n = fleet.length;
 
@@ -480,26 +485,20 @@ document.addEventListener("ssi-config-ready", function(e) {
       'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry a HIGH cyber-exposure classification, ' +
       'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier.';
 
-    var tiers = (function() {
-      var r3vals = fleet.map(function(s){ return s.modifiers ? s.modifiers.R3_C_mult : 1.0; }).sort(function(a,b){return a-b;});
-      var p25 = r3vals[Math.floor(r3vals.length * 0.25)];
-      var p50 = r3vals[Math.floor(r3vals.length * 0.50)];
-      var p75 = r3vals[Math.floor(r3vals.length * 0.75)];
-      return [
-        { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, critical infrastructure -- highest economic loss per interruption',
-          filter: function(s){ return s.modifiers.R3_C_mult >= p75; }, color: '#941914', icon: '\ud83c\udfed',
-          voll: 'Est. high VoLL' },
-        { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, processing -- significant continuity requirements',
-          filter: function(s){ return s.modifiers.R3_C_mult >= p50 && s.modifiers.R3_C_mult < p75; }, color: '#b8863a', icon: '\ud83d\udd27',
-          voll: 'Est. medium-high VoLL' },
-        { label: 'Commercial / SME-Dense', desc: 'Service economy, commercial districts -- moderate individual but high aggregate exposure',
-          filter: function(s){ return s.modifiers.R3_C_mult >= p25 && s.modifiers.R3_C_mult < p50; }, color: '#5d8563', icon: '\ud83c\udfe2',
-          voll: 'Est. medium VoLL' },
-        { label: 'Light / Agricultural / Remote', desc: 'Rural communities, agriculture -- lower VoLL but higher social vulnerability',
-          filter: function(s){ return s.modifiers.R3_C_mult < p25; }, color: '#8a7e76', icon: '\ud83c\udf3e',
-          voll: 'Est. low VoLL' }
-      ];
-    })()
+    var tiers = [
+      { label: 'Capital-Intensive / High-Consequence', desc: 'Heavy industry, petrochemical, manufacturing — highest economic loss per interruption',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.14; }, color: '#941914', icon: '🏭',
+        voll: '€15–30/kWh' },
+      { label: 'Industrial / Medium-Large Enterprise', desc: 'Diversified industry, logistics, processing — significant continuity requirements',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.10 && s.modifiers.R3_C_mult < 1.14; }, color: '#aa4234', icon: '🔧',
+        voll: '€8–15/kWh' },
+      { label: 'Commercial / SME-Dense', desc: 'Service economy, retail, tourism — moderate individual impact but high aggregate exposure',
+        filter: function(s){ return s.modifiers.R3_C_mult >= 1.06 && s.modifiers.R3_C_mult < 1.10; }, color: '#b8863a', icon: '🏪',
+        voll: '€3–8/kWh' },
+      { label: 'Light / Agricultural / Rural', desc: 'Sparse economic activity, agricultural land — lower VoLL but higher social vulnerability',
+        filter: function(s){ return s.modifiers.R3_C_mult < 1.06; }, color: '#5d8563', icon: '🌾',
+        voll: '€1–3/kWh' }
+    ];
 
     var tiersHTML = '';
     tiers.forEach(function(tier){
@@ -661,10 +660,10 @@ document.addEventListener("ssi-config-ready", function(e) {
     }).length;
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var now = new Date();
-    var monthYear = 'April 2026';
+    var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
 
     document.getElementById('b4-pulse').innerHTML =
-      '<strong>Inaugural edition — Baseline Snapshot (' + monthYear + ').</strong> ' +
+      '<strong>Edition 01 — Baseline Snapshot (' + monthYear + ').</strong> ' +
       'This edition establishes the baseline for the Cyber & Economic Exposure Monitor across the Austrian fleet. Key reference points: ' +
       'fleet average R7 = ' + avgR7.toFixed(4) + ', median = ' + medianR7.toFixed(4) + '; ' +
       cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
@@ -739,7 +738,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var now = new Date();
-  var monthYear = 'April 2026';
+  var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
 
   document.getElementById('sec-c-intro').innerHTML =
     'The SSI v4.0.2 draws on <strong>' + meta.stats.sources + ' verified public data sources</strong> feeding ' +
@@ -816,7 +815,10 @@ document.addEventListener("ssi-config-ready", function(e) {
   });
   document.getElementById('sec-c-timeline').innerHTML = timelineHTML;
 
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+    var __subsRaw = data.substations; data.substations = Array.isArray(__subsRaw) ? __subsRaw : Object.values(__subsRaw || {});
+    var __regsRaw = data.regions; data.regions = Array.isArray(__regsRaw) ? __regsRaw : Object.values(__regsRaw || {});
     var fleet = data.substations;
     var n = fleet.length;
     var rVals = fleet.map(function(s){ return s.R_median; }).sort(function(a,b){ return a - b; });
@@ -903,7 +905,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 <h2>The Tyrol-Vorarlberg Alpine Corridor: Transmission Bottlenecks Meet Hydropower Density</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
-  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> Tyrol-Vorarlberg corridor · <strong>002</strong> Oberösterreich (Industrial grid, VOEST) · <strong>003</strong> Wien (Urban density, Wiener Netze) · <strong>004</strong> Niederösterreich (Wind integration, largest Bundesland) · <strong>005</strong> Steiermark (Green hydrogen, industrial transition) · <strong>006</strong> Kärnten (Southern Alpine, cross-border Italy) · <strong>007</strong> Salzburg (Hydropower hub, tourism load) · <strong>008</strong> Burgenland (Wind champion, Pannonian corridor) · <strong>009</strong> Vorarlberg (Isolated west, CH/DE cross-border) · <strong>010</strong> Tirol (Brenner transit, ski tourism seasonality) · <strong>011</strong> Annual Review · <strong>012</strong> Methodology Deep-Dive.</p>
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 01</strong> Tyrol-Vorarlberg corridor · <strong>02</strong> Oberösterreich (Industrial grid, Voestalpine Linz) · <strong>03</strong> Wien (Urban density, Wiener Netze) · <strong>04</strong> Niederösterreich (Wind integration, largest Bundesland) · <strong>05</strong> Steiermark (Industrial transition, Lenzing cellulose) · <strong>06</strong> Kärnten (Southern Alpine, cross-border Italy) · <strong>07</strong> Salzburg (Hydropower hub, tourism load) · <strong>08</strong> Burgenland (Wind champion, Pannonian corridor) · <strong>09</strong> Vorarlberg (Isolated west, CH/DE cross-border) · <strong>10</strong> Oberösterreich-Industrie (Linz–Wels axis revisit) · <strong>11</strong> Annual Review · <strong>12</strong> Methodology Deep-Dive.</p>
 </div>
 
 <!-- D.1 KPI summary — auto-populated -->
@@ -990,7 +992,10 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <script>
 (function(){
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+    var __subsRaw = data.substations; data.substations = Array.isArray(__subsRaw) ? __subsRaw : Object.values(__subsRaw || {});
+    var __regsRaw = data.regions; data.regions = Array.isArray(__regsRaw) ? __regsRaw : Object.values(__regsRaw || {});
     var alpine = data.substations.filter(function(s){ return s.region === 'Tirol' || s.region === 'Vorarlberg'; });
     var fleet = data.substations;
     alpine.sort(function(a,b){ return b.R_median - a.R_median; });
@@ -1182,13 +1187,13 @@ document.addEventListener("ssi-config-ready", function(e) {
     var c2alp = avgComp(alpine, c2.key), c2flt = avgComp(fleet, c2.key);
     document.getElementById('alp-narrative-d3').innerHTML =
       'The dominant risk driver across the Alpine Corridor is <strong>' + c1.key + ' (' + c1.label + ')</strong>, averaging ' +
-      '<strong>' + c1alp.toFixed(3) + '</strong> against a fleet average of ' + c1flt.toFixed(3) + ' — occupying ' +
-      '<strong>' + (c1alp / c1.w * 100).toFixed(0) + '% of its weight ceiling</strong>. ' +
+      c1alp.toFixed(3) + ' against a fleet average of ' + c1flt.toFixed(3) + ' — occupying ' +
+      (c1alp / c1.w * 100).toFixed(0) + '% of its weight ceiling. ' +
       'The second contributor is <strong>' + c2.key + ' (' + c2.label + ')</strong> at ' +
-      '<strong>' + c2alp.toFixed(3) + '</strong> vs fleet ' + c2flt.toFixed(3) + '. ' +
-      'Among modifiers, the <strong>R6b seismic modifier</strong> averages <strong>' + avgMod(alpine, 'R6_seismic').toFixed(3) +
-      '</strong>, capturing the Alpine region\'s moderate seismic exposure — a unique risk dimension captured by the SSI. ' +
-      'The <strong>Transition component (T)</strong> at <strong>' + avgComp(alpine, 'T').toFixed(3) + '</strong> reflects the accelerating DER penetration ' +
+      c2alp.toFixed(3) + ' vs fleet ' + c2flt.toFixed(3) + '. ' +
+      'Among modifiers, the R6b seismic modifier averages ' + avgMod(alpine, 'R6_seismic').toFixed(3) +
+      ', capturing the Alpine region\'s moderate seismic exposure — a unique risk dimension captured by the SSI. ' +
+      'The Transition component (T) at ' + avgComp(alpine, 'T').toFixed(3) + ' reflects the accelerating DER penetration ' +
       'and renewable integration driving portfolio stress in these corridors.';
 
     var provHTML = '<div class="label-xs" style="margin-bottom:10px">Province Risk Profile — Sorted by Mean R</div>' +
@@ -1270,6 +1275,87 @@ document.addEventListener("ssi-config-ready", function(e) {
   <p style="font-size:13px;line-height:1.7;margin:0"><strong>Austria's position in Central Europe:</strong> Austria sits at the intersection of four major European grid zones — German Übertragungsnetz to the north, Italian Terna to the south, Swiss Swissgrid to the west, and Czech operators to the east. APG (Austrian Power Grid) manages the 380/220/110 kV transmission network spanning 10,600 km across all 9 Bundesländer. The 2023 ACER grid adequacy assessment rated Austria as "adequate" but flagged transmission constraints in the Tyrol-Vorarlberg Alpine region as the single largest bottleneck limiting Renewable-to-load matching during high-wind periods. The SSI Index provides the substation-level intelligence that Austria's Energiewende planning requires — identifying not regional aggregate problems, but specific assets that demand urgent action.</p>
 </div>
 
+<!-- ── SAIDI Comparator Card ── -->
+<div class="card" style="border-top:3px solid var(--terracotta);margin:20px 0">
+  <div style="padding:0;margin:-20px -24px 16px;padding:12px 24px;background:var(--cream-deep);border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px">
+    <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">European Context Card — SAIDI Benchmarking</span>
+    <span style="font-size:10px;color:var(--warm-grey)">Ed. 01 · Pre-launch · DACH cohort</span>
+  </div>
+
+  <h3 style="margin-top:0;font-size:14px">Unplanned SAIDI (min/customer/year) — Selected Countries</h3>
+  <p style="font-size:11px;color:var(--warm-grey);margin:0 0 10px">Longer bar = lower SAIDI = better reliability. Values in min/customer/year. AT sits in the EU top quartile per CEER 2024 Benchmarking Report.</p>
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:140px"><span style="font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇩🇪</span> Germany</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:96%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">11.7</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:140px"><span style="font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇨🇭</span> Switzerland</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:95%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~15</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding:4px 0;border-bottom:1px solid var(--card-border)">
+      <span style="min-width:140px"><span style="font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇦🇹</span> Austria (national)</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:92%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~32</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px">
+      <span style="min-width:120px">↳ Wiener Netze (best)</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:94%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~22</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;padding-left:20px;padding-bottom:4px;border-bottom:1px solid var(--card-border)">
+      <span style="min-width:120px">↳ KELAG (worst)</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:88%;height:100%;background:var(--bronze);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~42</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:140px"><span style="font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇬🇧</span> UK</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:87%;height:100%;background:var(--bronze);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~40</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:140px"><span style="font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇮🇹</span> Italy</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:86%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~43</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:140px"><span style="font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇨🇿</span> Czechia</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:80%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~62</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:140px"><span style="font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇭🇺</span> Hungary</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:78%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~57</span>
+    </div>
+  </div>
+
+  <div style="padding:12px 0;margin-top:12px;border-top:1px solid var(--card-border);font-size:11px;color:var(--warm-grey);line-height:1.6">
+    Source: CEER 2024 Benchmarking Report; E-Control (2024); Bundesnetzagentur (2024). AT undergrounding range 52–92% by DSO. · AT sub-categories: Wiener Netze + Netz NÖ + Energie AG OÖ in top tier; KELAG Netz (Kärnten) at fleet floor. · See §16 Peer Benchmarking for full methodology and caveats. · Updated annually with CEER BR release.
+  </div>
+</div>
+
 <h3>E.1 &ensp; Austria in European Benchmarking</h3>
 
 <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
@@ -1291,6 +1377,92 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <p style="font-size:13px;line-height:1.7">Austria is the geographic linchpin between North-South Europe (Germany ↔ Italy transit) and East-West (Germany ↔ Czech ↔ Hungary). Approximately 70% of power transmitted through the Austrian grid originates from other countries. This creates a structural vulnerability: any outage at a critical juncture (e.g., Brenner corridor, Arlberg transmission) cascades across European price zones. The SSI Index's R4 (Graph Criticality) modifier quantifies this precisely — identifying which Austrian substations are highest-impact on the European grid topology.</p>
 
+<h3 style="margin-top:24px">E.3 &ensp; Regional Risk Ranking — All 9 AT Bundesländer</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where do the alpine-rural and flood-watchlist Bezirke sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison. Alpine/rural stressed-cluster Bezirke highlighted: Pinzgau-Pongau · Außerfern · Osttirol · Waldviertel · Hermagor-Lavanttal.</p>
+
+<div id="eu-regional-ranking" style="margin:16px 0">Loading…</div>
+
+<p style="font-size:13px;line-height:1.7" id="eu-ranking-narrative">Loading…</p>
+
+<script>
+(function(){
+  // KB §52 — AT stressed-cluster filter: alpine-rural + flood-watchlist Bezirke.
+  // Used by Section E ranking highlight (the AT analogue of LT's NE-stressed cluster).
+  var AT_STRESSED = ['Pinzgau-Pongau','Außerfern','Osttirol','Waldviertel','Hermagor-Lavanttal'];
+
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+    var __subsRaw = data.substations; data.substations = Array.isArray(__subsRaw) ? __subsRaw : Object.values(__subsRaw || {});
+    var __regsRaw = data.regions; data.regions = Array.isArray(__regsRaw) ? __regsRaw : Object.values(__regsRaw || {});
+    var fleet = data.substations;
+    var stressed = fleet.filter(function(s){ return AT_STRESSED.indexOf(s.province) >= 0; });
+
+    var regData = {};
+    fleet.forEach(function(s){
+      var r = s.region;
+      if (!regData[r]) regData[r] = { subs: [], sumR: 0, bands: { Low:0, Medium:0, High:0, Critical:0 } };
+      regData[r].subs.push(s);
+      regData[r].sumR += s.R_median;
+      regData[r].bands[s.classification]++;
+    });
+
+    var regions = Object.keys(regData).map(function(r){
+      var dd = regData[r];
+      // Mark region as "stressed-cohort" if any of its substations live in the AT_STRESSED Bezirke
+      var hasStressed = dd.subs.some(function(s){ return AT_STRESSED.indexOf(s.province) >= 0; });
+      return { name: r, n: dd.subs.length, avgR: dd.sumR / dd.subs.length, bands: dd.bands, hasStressed: hasStressed };
+    });
+    regions.sort(function(a,b){ return b.avgR - a.avgR; });
+
+    var fleetAvgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / fleet.length;
+
+    var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
+    var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best. Stressed-cohort Bundesländer (containing alpine-rural or flood-watchlist Bezirke) highlighted in crimson.</div>';
+    regions.forEach(function(reg, idx){
+      var barPct = ((1 - reg.avgR) * 100).toFixed(1);
+      var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
+      var highlight = reg.hasStressed ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
+
+      var total = reg.n;
+      var bandBar = '';
+      ['Critical','High','Medium','Low'].forEach(function(b){
+        var w = (reg.bands[b] / total * 100).toFixed(1);
+        if (reg.bands[b] > 0) {
+          bandBar += '<div style="width:' + w + '%;height:100%;background:' + bandColors[b] + '" title="' + b + ': ' + reg.bands[b] + '"></div>';
+        }
+      });
+
+      html += '<div style="margin-bottom:8px;' + highlight + '">' +
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline">' +
+          '<span style="font-weight:' + (reg.hasStressed ? '700' : '500') + ';min-width:180px">' +
+            '<span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#' + (idx + 1) + '</span>' +
+            reg.name + '</span>' +
+          '<span style="color:var(--warm-grey);font-size:11px">' + reg.n + ' subs · avg R = ' + reg.avgR.toFixed(3) +
+          ' · H:' + reg.bands.High + (reg.bands.Critical ? ' C:' + reg.bands.Critical : '') + '</span></div>' +
+        '<div style="display:flex;gap:4px;align-items:center">' +
+          '<div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end">' +
+            '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:3px;opacity:0.7"></div>' +
+          '</div>' +
+          '<div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex">' + bandBar + '</div>' +
+        '</div></div>';
+    });
+    document.getElementById('eu-regional-ranking').innerHTML = html;
+
+    // Narrative — stressed cohort callout
+    var stressedAvgR = stressed.length ? (stressed.reduce(function(a,s){ return a + s.R_median; }, 0) / stressed.length) : 0;
+    var stressedHC = stressed.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; }).length;
+    var aboveAvg = regions.filter(function(r){ return r.avgR > fleetAvgR; }).length;
+
+    document.getElementById('eu-ranking-narrative').innerHTML =
+      'The alpine-rural / flood-watchlist stressed cohort covers <strong>' + stressed.length + ' substations</strong> ' +
+      'across Pinzgau-Pongau, Außerfern, Osttirol, Waldviertel and Hermagor-Lavanttal. ' +
+      (stressed.length ? 'Its average R is <strong>' + stressedAvgR.toFixed(3) + '</strong> against the fleet average of ' + fleetAvgR.toFixed(3) + ', and ' + stressedHC + ' of these substations sit in the High or Critical band. ' : 'When the AT fleet is fully re-scored these substations will populate the stressed-cohort lens. ') +
+      'Across the 9 Bundesländer, ' + aboveAvg + ' are above the fleet R mean — concentrating in Kärnten and the alpine periphery, ' +
+      'while Wien + Vorarlberg anchor the resilient end of the distribution.';
+  });
+})();
+</script>
+
 </section>
 
 <div style="margin:32px 0"></div>
@@ -1298,7 +1470,7 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <!-- ═══════════════════ F. SSI ENHANCED NEURAL NETWORK — MONTHLY TOPIC ═══════════════════ -->
 <section id="enn" style="margin-bottom:32px">
-<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F — Recurring Module</span>
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F — Standing Item</span>
 <h2>SSI Enhanced Neural Network — Monthly Topic</h2>
 
 <div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
@@ -1333,10 +1505,10 @@ document.addEventListener("ssi-config-ready", function(e) {
       body: 'The SSI-ENN uses a weighted ensemble of Gradient-Boosted Trees (GBT) and Deep Neural Networks (DNN). GBT excels at tabular data with heterogeneous features (continuous voltage, categorical regions, ordinal seismic zones). DNN excels at complex non-linear interactions. The ensemble weight α is learned during validation. For Austrian data (moderate feature density), GBT and DNN contribute roughly equally. The ensemble enables multi-task learning: all output heads (R_median, DNO NPV, Community NPV, risk band) predict simultaneously, forcing the network to learn shared representations.',
       concepts: ['Ensemble: α·GBT + (1-α)·DNN, α learned', '7 simultaneous outputs via multi-task learning', 'GBT dominates with sparse data, DNN with dense', 'Shared representation enables implicit regularisation'],
       ssiLink: 'nn' },
-    { layer: 4, ref: '§0.6.1', title: 'Austria First: Why Expand Here',
-      subtitle: 'How Austrian data completeness enables production-ready valuations',
-      body: 'The SSI targets expansion across 28 OECD countries, but Austria is the first continental launch beyond Italy. Why? Austria offers an ideal proving ground: complete APG transmission registry, mandatory E-Control operational data reporting, Statistik Austria demographic coverage, and ZAMG reanalysis climate data covering all substations. The Data Completeness Index (DCI) for Austria is 0.89 — above the 0.70 threshold for production-quality valuations. Austria also presents a compelling market thesis: all 8 major DSOs are implementing smart grids, E-Control actively incentivises BESS investment, and the Energiewende transition creates urgent need for the kind of anticipatory investment intelligence the SSI provides.',
-      concepts: ['Austria DCI: 0.89 (highest in EU after Italy)', '35 public sources feeding 95 variables', 'All 9 Bundesländer fully covered', 'DSO market receptive to innovation'],
+    { layer: 4, ref: '§0.6.1', title: 'Austria in the DACH Cohort: Why Now',
+      subtitle: 'How Austrian data completeness anchors the §51 DACH rollout',
+      body: 'Austria is being modernized in Session 20 as the 9th country in the current iteration — after the inaugural IT, FR, LU, BE, NL run and the Baltic + Czechia cohorts (EE, LV, LT, CZ). It opens the DACH cohort (KB §51 roadmap: AT → CH → DE, synchronised refresh 2027-01-14). Austria offers an ideal anchor: complete APG transmission registry, mandatory E-Control TIQE operational reporting, Statistik Austria STATPOP demographic coverage, and ZAMG/GeoSphere reanalysis climate data covering all 1,406 substations. The Data Completeness Index (DCI) for Austria is 0.89 — above the 0.70 threshold for production-quality valuations. The DACH alignment lets the same 95-variable schema flow into Swissgrid and the four German TSO control zones without bespoke re-engineering — a structural advantage for the next two refreshes.',
+      concepts: ['Austria DCI: 0.89 (anchor for DACH cohort)', '35 public sources feeding 95 variables', 'All 9 Bundesländer, 95 Bezirke fully covered', 'DACH-synced refresh 2027-01-14 (AT/CH/DE)'],
       ssiLink: 'expansion' }
   ];
 
@@ -1355,7 +1527,11 @@ document.addEventListener("ssi-config-ready", function(e) {
   var nextTopic = topics[nextIdx];
 
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var monthYear = 'April 2026';
+  var monthYear = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+  // KB §52 — Austria DACH cohort, FIRST_REFRESH 2027-01-14 (Edition 01).
+  // Offset −12 lines up so Jan 2027 = Edition 01 (pre-launch shows "01" through 2026).
+  var editionNum = (now.getFullYear() - 2026) * 12 + (now.getMonth() + 1) - 12;
+  var editionStr = String(Math.max(1, editionNum)).padStart(2, '0');
 
   var layerDefs = [
     { n: 1, label: 'Layer 1 — Data', color: '#2c3e7a', desc: 'SSI v4.0 component taxonomy, normalisation, MC engine' },
@@ -1388,7 +1564,7 @@ document.addEventListener("ssi-config-ready", function(e) {
   document.getElementById('enn-topic').innerHTML =
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
       '<span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:' + layerColor + ';color:#fff;padding:4px 10px;border-radius:3px">Layer ' + topic.layer + '</span>' +
-      '<span style="font-size:10px;color:var(--warm-grey);letter-spacing:0.05em">' + topic.ref + ' · Edition 001 · ' + monthYear + '</span></div>' +
+      '<span style="font-size:10px;color:var(--warm-grey);letter-spacing:0.05em">' + topic.ref + ' · Edition ' + editionStr + ' · ' + monthYear + '</span></div>' +
     '<h3 style="margin:0 0 4px;font-size:17px">' + topic.title + '</h3>' +
     '<p style="font-size:12px;color:var(--warm-grey);margin:0 0 16px;font-style:italic">' + topic.subtitle + '</p>' +
     '<p style="font-size:13px;line-height:1.7;margin-bottom:16px">' + topic.body + '</p>' +
@@ -1397,7 +1573,10 @@ document.addEventListener("ssi-config-ready", function(e) {
       conceptsHTML +
     '</div>';
 
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+    var __subsRaw = data.substations; data.substations = Array.isArray(__subsRaw) ? __subsRaw : Object.values(__subsRaw || {});
+    var __regsRaw = data.regions; data.regions = Array.isArray(__regsRaw) ? __regsRaw : Object.values(__regsRaw || {});
     var fleet = data.substations;
     var n = fleet.length;
     var avgR = fleet.reduce(function(a,s){ return a + s.R_median; }, 0) / n;
@@ -1445,39 +1624,59 @@ document.addEventListener("ssi-config-ready", function(e) {
 
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0">
   <!-- Card 1: Next Edition — deterministic deep-dive rotation -->
-<div class="card" style="border-top:3px solid var(--bronze)" id="g-next-edition">
-<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Loading…</span>
-<h3 style="margin-top:0;font-size:15px">Loading…</h3>
-<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
-</div>
-<!-- Card 2: Next Data Refresh — from SSIMetadata source frequencies -->
-<div class="card" style="border-top:3px solid var(--sage)" id="g-data-refresh">
-<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Loading…</span>
-<h3 style="margin-top:0;font-size:15px">Loading…</h3>
-<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
-</div>
-<!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json -->
-<div class="card" style="border-top:3px solid var(--crimson)" id="g-spotlight">
-<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Loading…</span>
-<h3 style="margin-top:0;font-size:15px">Loading…</h3>
-<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
-</div>
+  <div class="card" style="border-top:3px solid var(--bronze)" id="g-next-edition">
+    <span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+  <!-- Card 2: Next Data Refresh — from SSIMetadata source frequencies -->
+  <div class="card" style="border-top:3px solid var(--sage)" id="g-data-refresh">
+    <span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
+  <!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json -->
+  <div class="card" style="border-top:3px solid var(--crimson)" id="g-spotlight">
+    <span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Loading…</span>
+    <h3 style="margin-top:0;font-size:15px">Loading…</h3>
+    <p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Loading…</p>
+  </div>
 </div>
 
 <p style="font-size:13px;line-height:1.7" id="g-closing">Loading…</p>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream);margin-top:24px">
+  <p style="font-size:13px;line-height:1.7;margin:0"><strong>About this intelligence report:</strong> The SSI Monthly Intelligence Edition 01 is the inaugural edition for Austria, modernized in Session 20 as the 9th country in the current iteration and the anchor of the DACH cohort (KB §51: AT → CH → DE). The report cycles through 12 editions per year, each featuring a deep-dive on one of Austria's 9 Bundesländer (or special topics like annual review or methodology). All data is drawn from 35 verified public sources. The SSI Index serves no proprietary interest — published as a non-profit resource for energy policy makers, grid operators, investors, and researchers.</p>
+</div>
 
 <script>
 (function(){
   var now = new Date();
   var month = now.getMonth(); // 0-indexed
   var year = now.getFullYear();
-  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var monthNames = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
 
-  // Next month
-  var nextMonth = month + 1 > 11 ? 0 : month + 1;
-  var nextYear = month + 1 > 11 ? year + 1 : year;
-  var editionNum = (year - 2026) * 12 + (month + 1) - 2; // March 2026 = 1
-  var nextEdition = String(Math.max(1, editionNum)).padStart(3, '0');
+  // KB §52 — Austria DACH cohort.
+  // Edition 02 anchor: 2nd Thursday of January 2027 (2027-01-14), synced with CH + DE.
+  // Cutoff stays at d>=21 (BE/NL/Baltic pattern) so a 21+ visit skips to month-after-next.
+  // Offset −5 lines up so January 2027 (month index 0, +1=1, +12-1=12 from 2026) maps correctly.
+  // Derivation: editionNum = (nextYear-2026)*12 + (nextMonth+1) − 5; for Jan 2027 = (1)*12+1-5 = 8?
+  // Re-anchor for AT: Edition 02 fires once per visit > Jan 2027. Use a date diff approach.
+  var d = now.getDate();
+  var skipToMonthAfter = d >= 21;
+  var addMonths = skipToMonthAfter ? 2 : 1;
+  var nextMonth = (month + addMonths) % 12;
+  var nextYear  = month + addMonths > 11 ? year + 1 : year;
+
+  // AT inaugural anchor: Jan 2027 = Edition 02 (first refresh after pre-launch Edition 01).
+  // Pre-launch (today < 2027-01-14) → next visible edition is "02" (the published kick-off).
+  // Post-launch progression: each subsequent month rolls the edition forward.
+  // Formula: count months since Dec 2026 (the month before Edition 02), add 1 → Edition num.
+  var nextEditionNum = (nextYear - 2026) * 12 + (nextMonth + 1) - 12;
+  nextEditionNum = Math.max(2, nextEditionNum);  // pre-launch floor = "02" (the inaugural refresh)
+  var nextEdition = String(nextEditionNum).padStart(2, '0');
+  var editionNum = nextEditionNum;
 
   // Deterministic seed
   function seededIndex(s, len) {
@@ -1489,17 +1688,34 @@ document.addEventListener("ssi-config-ready", function(e) {
   }
   var nextSeed = nextYear * 100 + (nextMonth + 1);
 
-  // ── Card 1: Next Edition deep-dive topics ──
+  // ── Card 1: Next Edition deep-dive — AT 13-city rotation (Wave C extension) ──
   var deepDives = [
-    { region: 'Oberösterreich', theme: 'Upper Austrian Industrial Grid Stress', detail: 'Examining how concentrated steel and chemicals demand in Linz–Wels creates seasonal congestion patterns on the 110kV network.' },
-    { region: 'Steiermark', theme: 'Styrian Green Hydrogen Corridor', detail: 'Analysing the grid infrastructure needed to support electrolyser deployment along the Mur valley industrial axis.' },
-    { region: 'Tirol', theme: 'Tyrolean Alpine Hydro Backbone', detail: 'Mapping how run-of-river and pumped storage hydro in the Inn valley sustains grid stability during winter peak demand.' },
-    { region: 'Kärnten', theme: 'Carinthian Cross-Border Flows', detail: 'Evaluating how Slovenian and Italian interconnections create bidirectional flow patterns at southern Austrian substations.' },
-    { region: 'Salzburg', theme: 'Salzburg Tourism Load Variability', detail: 'Assessing how seasonal tourism demand in the Salzburg–Pinzgau corridor challenges substation capacity planning.' },
-    { region: 'Vorarlberg', theme: 'Vorarlberg Swiss Interconnection', detail: 'Studying the Feldkirch–Buchs cross-border tie-line capacity and its role in balancing western Austrian supply.' },
-    { region: 'Niederösterreich', theme: 'Wind Integration in the Weinviertel', detail: 'Analysing how concentrated wind generation north of Vienna stresses the regional 110kV distribution grid.' },
-    { region: 'Wien', theme: 'Vienna Urban Grid Modernisation', detail: 'Tracking how heat pump adoption and EV charging reshape demand profiles across Vienna’s dense substation network.' },
-    { region: 'Burgenland', theme: 'Burgenland Renewable Surplus', detail: 'Examining how Austria’s highest per-capita wind and solar capacity creates export congestion at eastern border points.' }
+    { region: 'Wien 11. Bezirk (Simmering)', theme: 'Wien — Urban Density + Wiener Netze',
+      contextDetail: 'Capital region, R3 1.02 (sole capital-intensive occupant); Wiener Netze SAIDI 22 min (best in AT); 23 Bezirke; underground 92%; Simmering 11. Bezirk thermal anchor + Donaustadt cable corridor; the SSI urban-grid showcase' },
+    { region: 'Innsbruck', theme: 'Innsbruck — Tyrol Hub + Brenner Transit',
+      contextDetail: 'IKB Innsbruck + TINETZ-Stromnetz Tirol AG; Brenner Basistunnel construction load; alpine PGA 0.10 g R6b seismic zone; Inn valley flood watchlist; gateway to Außerfern + Osttirol stressed clusters' },
+    { region: 'Salzburg-Stadt', theme: 'Salzburg-Stadt — Hydropower Hub + Tourism Load',
+      contextDetail: 'Salzburg AG / Salzburg Netz; hydropower density (Kaprun, Tauern); Pinzgau-Pongau stressed cluster; ski-tourism seasonality drives load swing 2.4× winter vs summer baseline' },
+    { region: 'Graz-Eggenberg', theme: 'Graz-Eggenberg — Industrial Transition + Lenzing',
+      contextDetail: 'Energienetze Steiermark; Lenzing AG cellulose-fibres anchor; Voestalpine Donawitz rail-steel feeder; R3 1.04 industrial tier; Mur valley flood watchlist (R6c) on Storm Boris Sep 2024 reference event' },
+    { region: 'Klagenfurt', theme: 'Klagenfurt — Southern Alpine + Cross-Border Italy',
+      contextDetail: 'KELAG Netz DSO (SAIDI 42 min, worst in fleet); R3 1.06–1.08 light-rural tier; Hermagor-Lavanttal stressed cluster; cross-border Tarvisio interconnector to Italian Terna; Drau hydro cascade' },
+    { region: 'Bregenz', theme: 'Bregenz — Vorarlberg + CH/DE Cross-Border',
+      contextDetail: 'VKW Netze (Vorarlberger Energienetze); Rhine valley feed; isolated from main AT grid via Arlberg bottleneck; Swissgrid + Amprion interconnection critical; westernmost fleet substations' },
+    { region: 'Linz-Industrie', theme: 'Linz-Industrie — Voestalpine + Chemical Park',
+      contextDetail: 'Industrial heartland: Voestalpine Linz steel + chemical park; Energie AG Oberösterreich DSO; capital-intensive R3 1.04 tier; H2-DRI conversion target 2030 (not yet operational); examine continuity deficits and economic-consequence concentration on the highest-VoLL substations' },
+    { region: 'Wiener Neustadt', theme: 'Wiener Neustadt — NÖ Industrial South',
+      contextDetail: 'Netz NÖ; southern Wiener Becken industrial belt; 1972 Seebenstein M_L 5.3 R6b seismic reference event; rail-freight corridor; R3 1.04 commercial+industrial tier' },
+    { region: 'Krems', theme: 'Krems — Wachau + Danube Valley',
+      contextDetail: 'Netz NÖ; Wachau wine valley UNESCO heritage zone; Danube flood watchlist (R6c) — Storm Boris September 2024 widespread inundation reference; Waldviertel stressed-cluster gateway' },
+    { region: 'Villach', theme: 'Villach — Kärnten Tech Hub + IT Cluster',
+      contextDetail: 'KELAG Netz; Infineon Villach semiconductor cluster (DACH largest fab footprint); Tauernbahn rail anchor; R3 1.04 industrial tier despite light-rural surroundings; cross-border to Italian Terna' },
+    { region: 'Wels', theme: 'Wels — OÖ Logistics + Manufacturing',
+      contextDetail: 'Energie AG OÖ; Wels-Linz transmission axis; logistics hub for the OÖ-NÖ industrial corridor; R3 1.04 industrial+commercial tier; mid-tier SAIDI ~28 min' },
+    { region: 'St. Pölten', theme: 'St. Pölten — NÖ Capital + Wind Integration',
+      contextDetail: 'Netz NÖ; capital of Niederösterreich; Pannonian wind corridor anchor (Parndorf, Bruck a/d Leitha); 380 kV Salzburgleitung northern segment; R3 1.04 commercial tier' },
+    { region: 'Eisenstadt', theme: 'Eisenstadt — Burgenland Wind Champion',
+      contextDetail: 'Burgenland Netz; Austria\'s wind champion (Parndorfer Platte); R3 1.06 light-rural tier; cross-border Hungarian MAVIR interconnection; easternmost fleet substations; high R7 cyber-readiness gradient' }
   ];
 
   var nextDiveIdx = seededIndex(nextSeed + 3333, deepDives.length);
@@ -1510,87 +1726,72 @@ document.addEventListener("ssi-config-ready", function(e) {
     '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
     '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
     '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, province breakdown. ' +
+    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, Bezirk breakdown. ' +
     'European Context Card: ' + nextDive.contextDetail + '.</p>';
 
   // ── Card 2: Next Data Refresh — from SSIMetadata ──
   var meta = window.SSIMetadata;
   if (meta) {
-    // Determine which frequency cadence is next due
-    // Q1=Jan-Mar, Q2=Apr-Jun, Q3=Jul-Sep, Q4=Oct-Dec
     var currentQ = Math.floor(month / 3) + 1;
     var nextQ = currentQ >= 4 ? 1 : currentQ + 1;
     var nextQYear = currentQ >= 4 ? year + 1 : year;
     var qLabels = { 1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4' };
 
-    // Build refresh schedule
-    var refreshes = [];
-    // Weekly sources — always upcoming
-    if (meta.FREQ_DISTRIBUTION.Weekly) {
-      refreshes.push({ urgency: 1, label: 'Weekly', sources: meta.FREQ_DISTRIBUTION.Weekly.sources, impact: 'R4 topology + I5 thermal proxy', color: 'var(--sage)' });
-    }
-    // Monthly
-    if (meta.FREQ_DISTRIBUTION.Monthly) {
-      refreshes.push({ urgency: 2, label: 'Monthly', sources: meta.FREQ_DISTRIBUTION.Monthly.sources, impact: 'Grid load profiles + procurement data', color: 'var(--sage)' });
-    }
-    // Quarterly — next quarter
-    if (meta.FREQ_DISTRIBUTION.Quarterly) {
-      refreshes.push({ urgency: 3, label: qLabels[nextQ] + ' ' + nextQYear, sources: meta.FREQ_DISTRIBUTION.Quarterly.sources, impact: 'DER registry (T1) + business data (E2) + macro indicators', color: 'var(--bronze)' });
-    }
-    // Annual — flag the highest-impact upcoming annual sources
-    var annualSources = meta.FREQ_DISTRIBUTION.Annual ? meta.FREQ_DISTRIBUTION.Annual.sources : [];
-
-    // Find highest-impact annual source by feeds
-    var annualHighImpact = meta.DATA_SOURCES.filter(function(s){ return s.freq === 'Annual'; })
+    var freq = meta.FREQ_DISTRIBUTION || {};
+    var annualHighImpact = (meta.DATA_SOURCES || []).filter(function(s){ return s.freq === 'Annual'; })
       .sort(function(a,b){ return b.vars - a.vars; })[0];
 
     var card2 = document.getElementById('g-data-refresh');
-    var qtrSources = meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.sources.join(', ') : 'none';
+    var qtrSources = freq.Quarterly ? freq.Quarterly.sources.join(', ') : 'E-Control TIQE refresh';
 
     card2.innerHTML =
       '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
-      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (meta.FREQ_DISTRIBUTION.Quarterly ? meta.FREQ_DISTRIBUTION.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
+      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + (freq.Quarterly ? freq.Quarterly.count : 0) + ' Quarterly Sources</h3>' +
       '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-      '<strong>' + qtrSources + '</strong> are due for refresh in ' + qLabels[nextQ] + '. ' +
-      'Impact: DER registry updates (T1), business fabric indicators (E2), macro-economic data. ' +
-      'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong> (' +
-      (annualHighImpact ? annualHighImpact.vars : '?') + ' variables → ' + (annualHighImpact ? annualHighImpact.feeds : '') + ').</p>';
+      '<strong>' + qtrSources + '</strong> due for refresh in ' + qLabels[nextQ] + '. ' +
+      'Impact: E-Control TIQE quality reports (C1–C4 + R6a restoration), APG DER registry (T1), Statistik Austria business fabric (E2), ZAMG/GeoSphere climate reanalysis (R6b/R6c). ' +
+      'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong>' +
+      (annualHighImpact ? ' (' + annualHighImpact.vars + ' variables)' : '') + '.</p>';
   }
 
   // ── Card 3: Fleet Spotlight — rotating stat ──
-  fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
+  fetch('ssi-data.json').then(function(r){ return r.json(); }).then(function(data){
+    // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
+    var __subsRaw = data.substations; data.substations = Array.isArray(__subsRaw) ? __subsRaw : Object.values(__subsRaw || {});
+    var __regsRaw = data.regions; data.regions = Array.isArray(__regsRaw) ? __regsRaw : Object.values(__regsRaw || {});
     var fleet = data.substations;
     var n = fleet.length;
     var seed = year * 100 + (month + 1);
 
-    // Build a roster of spotlight insights
     var spotlights = [];
 
     // 1. Most concentrated risk corridor
     var provData = {};
     fleet.forEach(function(s){
-      if (!provData[s.province]) provData[s.province] = { subs: [], sumR: 0, highCrit: 0 };
-      provData[s.province].subs.push(s);
-      provData[s.province].sumR += s.R_median;
-      if (s.classification === 'High' || s.classification === 'Critical') provData[s.province].highCrit++;
+      if (!provData[s.region]) provData[s.region] = { subs: [], sumR: 0, highCrit: 0 };
+      provData[s.region].subs.push(s);
+      provData[s.region].sumR += s.R_median;
+      if (s.classification === 'High' || s.classification === 'Critical') provData[s.region].highCrit++;
     });
     var provList = Object.keys(provData).map(function(p){
-      var d = provData[p];
-      return { name: p, n: d.subs.length, avg: d.sumR / d.subs.length, highCrit: d.highCrit, pctHC: d.highCrit / d.subs.length };
+      var pd = provData[p];
+      return { name: p, n: pd.subs.length, avg: pd.sumR / pd.subs.length, highCrit: pd.highCrit, pctHC: pd.highCrit / pd.subs.length };
     });
     provList.sort(function(a,b){ return b.pctHC - a.pctHC; });
     var riskiest = provList[0];
-    spotlights.push({
-      title: riskiest.name + ': Highest Risk Concentration',
-      body: riskiest.name + ' has the highest concentration of High/Critical substations: <strong>' +
-        riskiest.highCrit + ' of ' + riskiest.n + ' (' + (riskiest.pctHC * 100).toFixed(0) + '%)</strong> are in the upper risk bands — ' +
-        'avg R = ' + riskiest.avg.toFixed(3) + '. This makes it the most acute risk corridor in the fleet.'
-    });
+    if (riskiest) {
+      spotlights.push({
+        title: riskiest.name + ': Highest Risk Concentration',
+        body: riskiest.name + ' has the highest concentration of High/Critical substations: <strong>' +
+          riskiest.highCrit + ' of ' + riskiest.n + ' (' + (riskiest.pctHC * 100).toFixed(0) + '%)</strong> are in the upper risk bands — ' +
+          'avg R = ' + riskiest.avg.toFixed(3) + '. This makes it the most acute risk corridor in the Austrian fleet.'
+      });
+    }
 
     // 2. Widest uncertainty — highest optionality
     var byCIDesc = fleet.slice().sort(function(a,b){ return b.CI_width - a.CI_width; });
     var topUncertain = byCIDesc.slice(0, 10);
-    var avgCItop = topUncertain.reduce(function(a,s){ return a + s.CI_width; }, 0) / 10;
+    var avgCItop = topUncertain.reduce(function(a,s){ return a + s.CI_width; }, 0) / Math.max(1, topUncertain.length);
     var topRegions = {};
     topUncertain.forEach(function(s){ topRegions[s.region] = (topRegions[s.region] || 0) + 1; });
     var topRegionStr = Object.keys(topRegions).sort(function(a,b){ return topRegions[b] - topRegions[a]; }).slice(0, 3).join(', ');
@@ -1609,41 +1810,60 @@ document.addEventListener("ssi-config-ready", function(e) {
       title: bridges.length + ' Bridge Substations — Single Points of Failure',
       body: '<strong>' + bridges.length + ' substations</strong> are topological bridges — their failure disconnects ' +
         'part of the network. Of these, <strong>' + bridgeHighCrit.length + '</strong> are classified High or Critical. ' +
-        'These are the fleet\'s single points of failure: high graph centrality (R4) combined with elevated risk ' +
-        'makes them priority candidates for both grid reinforcement and BESS deployment.'
+        'On the Austrian transit grid (≈70% of throughput is cross-border), bridge substations on the Salzburgleitung 380 kV ' +
+        'and the Arlberg link are the system\'s European-scale single points of failure.'
     });
 
-    // 4. Seismic hotspot
-    var seismicHigh = fleet.filter(function(s){ return s.seismic && s.seismic.zone <= 1; });
+    // 4. R6b seismic hotspot — alpine
+    var seismicHigh = fleet.filter(function(s){ return s.modifiers && (s.modifiers.R6_seismic || 1.0) >= 1.08; });
     var seismicHighRisk = seismicHigh.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
     spotlights.push({
-      title: 'Seismic Zone 3: ' + seismicHigh.length + ' Substations in Highest Hazard',
-      body: '<strong>' + seismicHigh.length + ' substations</strong> sit in Italy\'s highest seismic hazard zone ' +
-        '(Zone 1, PGA > 0.25g). Of these, <strong>' + seismicHighRisk.length + '</strong> already score High/Critical — ' +
-        'meaning their grid condition is poor <em>before</em> considering earthquake risk. ' +
-        'The R6b seismic modifier (INGV MPS04) captures this compound vulnerability.'
+      title: 'Alpine Seismic Hotspot: ' + seismicHigh.length + ' Substations in High R6b Zone',
+      body: '<strong>' + seismicHigh.length + ' substations</strong> sit in Austria\'s highest seismic-hazard zones (R6b ≥ 1.08) — ' +
+        'Tyrol/Vorarlberg/Carinthia at 0.10 g PGA on the 475-year hazard map. ' +
+        'Of these, <strong>' + seismicHighRisk.length + '</strong> already score High/Critical — meaning grid condition is poor ' +
+        '<em>before</em> considering earthquake risk. Reference event: 1972 Seebenstein M_L 5.3.'
     });
 
-    // 5. Energy poverty double jeopardy
-    var highEP = fleet.filter(function(s){ return s.socio_economic && s.socio_economic.EP_rate_region > 14; });
-    var highEP_highRisk = highEP.filter(function(s){ return s.classification === 'High' || s.classification === 'Critical'; });
+    // 5. R6c flood watchlist — Danube/Inn/Mur
+    var floodHigh = fleet.filter(function(s){ return s.modifiers && (s.modifiers.R6c_flood || s.modifiers.R6c || 1.0) >= 1.05; });
     spotlights.push({
-      title: 'Energy Poverty Double Jeopardy',
-      body: '<strong>' + highEP.length + ' substations</strong> serve regions with energy poverty rates above 14% — ' +
-        'and <strong>' + highEP_highRisk.length + '</strong> of these are in the High/Critical risk bands. ' +
-        'These communities face a double burden: poor grid reliability and limited capacity to absorb the economic impact of outages. ' +
-        'The SSI\'s E component + R3 modifier make this invisible correlation visible.'
+      title: 'R6c Flood Watchlist: Danube · Inn · Mur',
+      body: '<strong>' + floodHigh.length + ' substations</strong> sit on the Danube/Inn/Mur flood-watchlist for the R6c hazard modifier. ' +
+        'Reference event: Storm Boris (September 2024) caused widespread Mur valley + lower Danube flooding with 380 kV substation isolation events. ' +
+        'The SSI\'s R6c capture lets the index flag compound climate-condition risk that R6a (restoration speed) alone misses.'
     });
 
-    // 6. Markov degradation — substations approaching critical state
+    // 6. Markov degradation — substations approaching critical state (LV/LT richness)
     var markovCrit = fleet.filter(function(s){ return s.markov && s.markov.stationary_critical > 0.7; });
+    var markovETTC = markovCrit.length
+      ? (markovCrit.reduce(function(a,s){ return a + (s.markov.ettc_years || 0); }, 0) / markovCrit.length)
+      : null;
     spotlights.push({
       title: markovCrit.length + ' Substations Approaching Critical Degradation',
       body: 'The SSI\'s 4-state Markov degradation model identifies <strong>' + markovCrit.length +
-        ' substations</strong> with a stationary critical probability above 70% — meaning their long-term equilibrium state ' +
-        'is dominated by degraded or critical condition. Without intervention, these substations will trend toward failure. ' +
-        'Average estimated time-to-critical: ' +
-        (markovCrit.length ? (markovCrit.reduce(function(a,s){ return a + s.markov.ettc_years; }, 0) / markovCrit.length).toFixed(1) : '?') + ' years.'
+        ' substations</strong> with a stationary-critical probability above 70% — meaning their long-term equilibrium state ' +
+        'is dominated by degraded or critical condition. Without intervention, these substations trend toward failure. ' +
+        (markovETTC !== null ? 'Average estimated time-to-critical: <strong>' + markovETTC.toFixed(1) + ' years</strong>.' : 'ETTC data pending publication.')
+    });
+
+    // 7. Corrosion class — alpine high-altitude weathering (R6/I component cross-read)
+    var corrosionHigh = fleet.filter(function(s){ return s.markov && (s.markov.corrosion_class === 'C4' || s.markov.corrosion_class === 'C5'); });
+    spotlights.push({
+      title: 'High Corrosion Class (C4/C5): ' + corrosionHigh.length + ' Substations',
+      body: '<strong>' + corrosionHigh.length + ' substations</strong> fall in ISO 9223 corrosion class C4 or C5 — ' +
+        'high atmospheric corrosivity from sustained humidity + freeze-thaw cycling on alpine peaks and the Vorarlberg Rhine valley. ' +
+        '(Austria has no marine-coast C5 exposure — landlocked.) Higher class accelerates the I-component degradation ' +
+        'pulled into the Markov ettc_years estimate.'
+    });
+
+    // 8. P_crit 20-year horizon
+    var pCritHigh = fleet.filter(function(s){ return s.markov && (s.markov.p_crit_20yr || 0) > 0.5; });
+    spotlights.push({
+      title: '20-Year Critical-State Probability: ' + pCritHigh.length + ' Substations > 50%',
+      body: '<strong>' + pCritHigh.length + ' substations</strong> carry a >50% probability of reaching Critical state within 20 years on the ' +
+        'Markov forecast horizon (p_crit_20yr). These are the cohort for which deferred reinforcement carries the highest expected ' +
+        'cost — the prime candidates for the D2 component of the DNO value stack and for federally-coordinated APG investment programmes.'
     });
 
     // Pick this month's spotlight
@@ -1656,32 +1876,33 @@ document.addEventListener("ssi-config-ready", function(e) {
       '<h3 style="margin-top:0;font-size:15px">' + spot.title + '</h3>' +
       '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' + spot.body + '</p>';
 
-    // Closing line
+    // Closing line — Edition 02 anchor (DACH-synced 2027-01-14)
     document.getElementById('g-closing').innerHTML =
       'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
-      '. Deep-dive region: <strong>' + nextDive.region + '</strong>. ' +
+      ' (DACH cohort first refresh: 2027-01-14, synchronised across AT + CH + DE). Deep-dive region: <strong>' + nextDive.region + '</strong>. ' +
       'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
   });
 })();
 </script>
+
+</section>
+
 <div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
-  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent an Austrian utility, E-Control, Stadtwerk, or academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
+  <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent an Austrian utility, E-Control, Stadtwerk, or academic institution and would like to contribute data or methodology feedback, please contact us through the foundation. The SSI's credibility depends on open scrutiny.
 </div>
 
 <!-- ═══════════════════ COLOPHON ═══════════════════ -->
 <div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
-  <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Monthly Intelligence Report — Edition 001 (Inaugural)</p>
-  <p style="margin-bottom:4px">Published 9 April 2026 · SSI Index v4.0.2 · 1,406 substations · 11,267 grid lines · 6 components · 20 metrics · 6 modifiers</p>
+  <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Monthly Intelligence Report — Edition 01 (Inaugural)</p>
+  <p style="margin-bottom:4px">Pre-launch placeholder · First refresh 2027-01-14 (DACH cohort) · SSI Index v4.0.2 · 1,406 substations · 11,267 grid lines · 6 components · 20 metrics · 6 modifiers</p>
   <p>10,000-iteration Gaussian Copula Monte Carlo · Sobol global sensitivity analysis (196,608 evals/substation) · CMIP6 SSP2-4.5</p>
 </div>
 
+<div class="page-footer" id="footerContainer"></div>
+<script>renderFooter && renderFooter();</script>
+
 </main>
 
-<footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
-© 2026 Altinium Invest · Corso Vittorio Emanuele 110/5, 80121 Napoli · P.IVA 10656441218<br>
-USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 633/1941, Berne Convention, Copyright Act 1976<br>
-<a href="#" style="color:var(--warm-grey-light);text-decoration:none">View in browser</a>
-</footer>
 
 <!-- ======= EDITION AUTO-PATCHER ======= -->
 <script>
@@ -1689,9 +1910,10 @@ USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 6
   var now=new Date(), m=now.getMonth(), y=now.getFullYear();
   var MN=['January','February','March','April','May','June',
          'July','August','September','October','November','December'];
-  var edN=Math.max(1,(y-2026)*12+(m+1)-2);
-  var curEd=Math.max(1,edN-1);
-  var eS=('00'+curEd).slice(-3), MY=MN[m]+' '+y;
+  // AT FIRST_REFRESH 2027-01-14 → pre-launch shows Edition 01; first published edition is 02 in Jan 2027.
+  var edN=Math.max(1,(y-2026)*12+(m+1)-12);
+  var curEd=Math.max(1,edN);
+  var eS=('00'+curEd).slice(-2), MY=MN[m]+' '+y;
   var pm=m-1<0?11:m-1, py=m-1<0?y-1:y, pMY=MN[pm]+' '+py;
   var d1=new Date(y,m,1).getDay(), thu2=((4-d1+7)%7)+8;
   var pub=thu2+' '+MN[m]+' '+y;
@@ -1701,11 +1923,9 @@ USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 6
   }
   R('[Month Year]',MY);
   if(curEd>1){
-    document.title=document.title.replace(/Edition \\d{3}/,'Edition '+eS);
-    R('Published 9 April 2026','Published '+pub);
-    R('Edition 001','Edition '+eS);
-    R('April 2026',MY);
-    R('March 2026',pMY);
+    document.title=document.title.replace(/Edition \d{2}/,'Edition '+eS);
+    R('Pre-launch placeholder · First refresh 2027-01-14','Published '+pub);
+    R('Edition 01','Edition '+eS);
     R(' (Inaugural)','');R('(Inaugural)','');
     R('inaugural edition','edition');R('inaugural ','');R('Inaugural ','');
   }

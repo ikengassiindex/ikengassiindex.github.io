@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 35 data sources, Monte Carlo uncertainty. Open, reproducible.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Methodology</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Austria · Methodology</title>
+<link rel="stylesheet" href="../style.css?v=420">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-versions.js?v=420"></script>
+<script src="../nav.js?v=420"></script>
+<script src="../ssi-engine.js?v=420"></script>
+<script src="ssi-metadata.js?v=420"></script>
 <script>renderNav('methodology');</script>
 
 <main class="page-shell" style="max-width:860px">
@@ -64,7 +64,7 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
+        <p>Seven multiplicative modifiers adjust R_base for the Austrian context: R2 (adaptive climate IRI), R3 (consequence + energy poverty · 4-tier 1.02 / 1.04 / 1.06 / 1.08 per §52 calibration), R4 (graph-theoretic network criticality), R6a (restoration speed · E-Control TIQE), R6b (alpine seismic, α∈[0.04, 0.18]), R6c (flood — Danube + Inn + Mur basins), R7 (digital readiness · ceiling 1.04, DESI 0.65, NIS2 transposed Q4 2024). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
       </div>
     </div>
     <div class="method-step">
@@ -90,15 +90,16 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_seis × R6c_flood × Cyber_factor )
 
 <span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
-<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+<span class="hl-var">F_topo</span>    = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)         <span class="hl-comment">// R4 — [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>    = <span class="hl-fn">consequence_4tier</span>(pop, load, V_socio)         <span class="hl-comment">// R3 — 1.02 / 1.04 / 1.06 / 1.08 (AT §52)</span>
+<span class="hl-var">R6a_mult</span>  = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)            <span class="hl-comment">// R6a — [0.90, 1.10]</span>
+<span class="hl-var">R6b_seis</span>  = <span class="hl-fn">alpine_seismic</span>(PGA_475yr, mur_inn)            <span class="hl-comment">// R6b — α∈[0.04, 0.18]</span>
+<span class="hl-var">R6c_flood</span> = <span class="hl-fn">flood_basin</span>(danube, inn, mur)                <span class="hl-comment">// R6c — [1.00, 1.20]</span>
+<span class="hl-var">Cyber</span>     = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.04] · DESI 0.65 · NIS2 Q4 2024</span>
     </div>
   </div>
 
@@ -160,8 +161,8 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
-      <span class="label-xs">Context multipliers</span>
+      <h3>Modifiers R2–R7 (incl. R6a + R6b alpine seismic + R6c flood)</h3>
+      <span class="label-xs">Austria §52 calibration · context multipliers</span>
     </div>
     <table class="data-table">
       <thead>
@@ -176,9 +177,9 @@
         </tr>
         <tr>
           <td style="font-weight:500">R3</td>
-          <td>Consequence + Poverty</td>
-          <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for Bezirke serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
+          <td>Consequence + Poverty (4-tier)</td>
+          <td class="num">[1.02, 1.08]</td>
+          <td>Amplifies risk for Bezirke serving large/energy-poor populations with high economic dependency. Austria §52 4-tier calibration: <strong>1.02 · 1.04 · 1.06 · 1.08</strong> across rural / mixed / industrial / Vienna-metro consequence brackets. Includes fiscal, demographic, elderly, and flood enrichments.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
@@ -190,19 +191,25 @@
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
-          <td>CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two Bezirke with identical SAIDI can have different risk profiles.</td>
+          <td>E-Control TIQE CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two Bezirke with identical SAIDI can have different risk profiles.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6b</td>
-          <td>Network Topology</td>
-          <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality and ring topology. Penalises Bezirke in single-source or low-redundancy configurations. Based on physical network analysis.</td>
+          <td>Seismic (Alpine)</td>
+          <td class="num">α ∈ [0.04, 0.18]</td>
+          <td>Alpine seismic exposure derived from GBA / EFEHR ESHM20 PGA-475yr. Austria carries non-trivial seismic risk along the Mur–Mürz line and Inntal — α multiplier range [0.04, 0.18] in the network-topology composite reflects this alpine context (vs ~0 for Baltic flatlands).</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6c</td>
+          <td>Flood (Danube + Inn + Mur)</td>
+          <td class="num">[1.00, 1.20]</td>
+          <td>Riverine flood exposure penalty applied to substations within the 100-yr return-period zones of the Danube, Inn, and Mur river basins. Source: BMI civil-protection flood maps + BMLRT hydrological registry.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
           <td>Digital Readiness</td>
-          <td class="num">[0.99, 1.05]</td>
-          <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability. 556 unique values across Austria.</td>
+          <td class="num">[0.99, 1.04]</td>
+          <td>Regional DESI digital readiness score (Austria DESI 0.65, EU avg ~0.55) and smart-meter penetration proxy. NIS2 directive transposed Q4 2024 lifts the cyber-resilience floor. Ceiling clipped to 1.04 per §51 Austria calibration.</td>
         </tr>
       </tbody>
     </table>
@@ -328,10 +335,32 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data — Austria transposed Q4 2024) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
+
+  <!-- Formula Reference — SSI v4.0.2 Master Equation -->
+  <div class="card animate-in" style="border-left:3px solid var(--crimson);margin-top:24px">
+    <div class="card-header">
+      <h3>Formula Reference — SSI v4.0.2 Master Equation</h3>
+      <span class="label-xs">Austria §51/§52 calibration</span>
+    </div>
+    <div class="formula-block" style="font-size:12px">
+<span class="hl-comment">// SSI v4.0.2 master equation — Austria parameters</span>
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × R3 × R4 × R6a × R6b × R6c × R7 )
+
+<span class="hl-var">R_base</span>    = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T
+<span class="hl-var">R3</span>        ∈ {1.02, 1.04, 1.06, 1.08}             <span class="hl-comment">// 4-tier — §52</span>
+<span class="hl-var">R4</span>        ∈ [0.80, 1.35]                       <span class="hl-comment">// graph criticality</span>
+<span class="hl-var">R6a</span>       ∈ [0.90, 1.10]                       <span class="hl-comment">// E-Control TIQE CAIDI</span>
+<span class="hl-var">R6b</span> α    ∈ [0.04, 0.18]                       <span class="hl-comment">// alpine seismic</span>
+<span class="hl-var">R6c</span>       ∈ [1.00, 1.20]                       <span class="hl-comment">// Danube + Inn + Mur flood</span>
+<span class="hl-var">R7</span>        ∈ [0.99, 1.04]                       <span class="hl-comment">// DESI 0.65 · NIS2 Q4 2024</span>
+    </div>
+  </div>
 </main>
+
+<div class="page-footer" id="footerContainer"></div>
 
 <script>
 (function() {
