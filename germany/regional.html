@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Compare German Bundesländer and Kreise by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="description" content="Compare German Länder and Landkreise by SSI resilience score, component breakdown, and socio-economic context across 5,000–8,000 substations. Per-Land TSO control-area mapping (50Hertz · Amprion · TenneT TSO DE · TransnetBW).">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Regional Analysis</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Germany · Regional · 16 Länder · 401 Landkreise</title>
+<link rel="stylesheet" href="../style.css?v=422">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-versions.js?v=422"></script>
+<script src="../nav.js?v=422"></script>
+<script src="../ssi-engine.js?v=422"></script>
+<script src="ssi-metadata.js?v=422"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
   <div class="page-header animate-in">
-    <h1>Regional Analysis</h1>
-    <p>Compare Bundesländer and Kreise by SSI score, component breakdown, and socio-economic context across 13,251 substations in Germany's 16 Bundesländer.</p>
+    <h1><span style="font-size:0.75em;vertical-align:0.15em;margin-right:6px">🇩🇪</span>Regional Analysis</h1>
+    <p>Compare Germany's 16 Länder and 401 Landkreise by SSI score, component breakdown, and socio-economic context — 5,000–8,000 substations across the federal grid (4 TSO control areas + ~800 DSOs). Each Land is annotated with its TSO control-area attribution (50Hertz · Amprion · TenneT TSO DE · TransnetBW).</p>
   </div>
 
   <!-- Tabs -->
   <div class="tabs animate-in delay-1">
     <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regional Ranking</button>
-    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Kreis Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Land Comparison</button>
     <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
   </div>
 
@@ -32,14 +32,15 @@
   <div id="tab-ranking">
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
-        <h3>Bundesländer Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">16 Bundesländer · sorted worst → best</span>
+        <h3>Länder Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">16 Länder · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
           <tr>
             <th style="width:30px">#</th>
-            <th>Bundesland</th>
+            <th>Land</th>
+            <th>TSO</th>
             <th style="text-align:right">Median R</th>
             <th style="text-align:right">Substations</th>
             <th style="text-align:right">% Critical</th>
@@ -48,25 +49,48 @@
           </tr>
         </thead>
         <tbody id="ranking-tbody">
-          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</td></tr>
+          <tr><td colspan="8" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</td></tr>
         </tbody>
       </table>
     </div>
+
+    <!-- TSO Control-Area Legend -->
+    <div class="card animate-in delay-3" style="margin-bottom:24px;background:var(--cream);border-left:3px solid var(--bronze)">
+      <div class="card-header"><h3 style="margin:0">TSO Control-Area Attribution</h3><span class="label-xs">Germany is the only DACH country with multiple TSOs — 4 control areas</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:12px;font-size:12px;line-height:1.6">
+        <div>
+          <div style="font-weight:600;color:#1a6b4a;margin-bottom:4px">50Hertz (NE)</div>
+          <div style="color:var(--warm-grey)">Berlin · Brandenburg · Mecklenburg-Vorpommern · Sachsen · Sachsen-Anhalt · Thüringen · Hamburg (partial)</div>
+        </div>
+        <div>
+          <div style="font-weight:600;color:#c0392b;margin-bottom:4px">Amprion (W)</div>
+          <div style="color:var(--warm-grey)">Nordrhein-Westfalen · Rheinland-Pfalz · Saarland</div>
+        </div>
+        <div>
+          <div style="font-weight:600;color:#2c3e7a;margin-bottom:4px">TenneT TSO DE (N-S corridor)</div>
+          <div style="color:var(--warm-grey)">Schleswig-Holstein · Niedersachsen · Bremen · Hessen · Bayern · Hamburg (partial)</div>
+        </div>
+        <div>
+          <div style="font-weight:600;color:#6c3483;margin-bottom:4px">TransnetBW (SW)</div>
+          <div style="color:var(--warm-grey)">Baden-Württemberg (sole control area)</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Tab: Kreis Comparison -->
+  <!-- Tab: Land Comparison -->
   <div id="tab-compare" style="display:none">
     <div class="grid-2" style="margin-bottom:24px">
       <div class="card">
-        <div class="card-header"><h3>Select Kreise to Compare</h3></div>
+        <div class="card-header"><h3>Select Länder to Compare</h3></div>
         <div style="display:flex;gap:12px;margin-bottom:16px">
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">Kreis A</div>
+            <div class="label-xs" style="margin-bottom:6px">Land A</div>
             <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
           <div style="flex:1">
-            <div class="label-xs" style="margin-bottom:6px">Kreis B</div>
+            <div class="label-xs" style="margin-bottom:6px">Land B</div>
             <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
             </select>
           </div>
@@ -77,7 +101,7 @@
             <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">—</th><th style="text-align:right" id="th-prov-b">—</th><th style="text-align:right">Delta</th></tr>
           </thead>
           <tbody id="compare-tbody">
-            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select Kreise above</td></tr>
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select Länder above</td></tr>
           </tbody>
         </table>
       </div>
@@ -99,8 +123,8 @@
   <div id="tab-decomp" style="display:none">
     <div class="card animate-in">
       <div class="card-header">
-        <h3>Average Component Contribution by Bundesland</h3>
-        <span class="label-xs">Stacked horizontal bars · 16 Bundesländer</span>
+        <h3>Average Component Contribution by Land</h3>
+        <span class="label-xs">Stacked horizontal bars · 16 Länder</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
         <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
@@ -117,6 +141,8 @@
   </div>
 </main>
 
+<div class="page-footer" id="footerContainer"></div>
+
 <script>
 renderFooter();
 
@@ -132,6 +158,7 @@ function switchTab(btn, tabId) {
 
 // ── Color helpers ──
 function scoreColor(val) {
+  if (val == null) return 'var(--warm-grey)';
   if (val >= 0.75) return 'var(--crimson)';
   if (val >= 0.50) return 'var(--terracotta)';
   if (val >= 0.25) return 'var(--bronze)';
@@ -144,26 +171,74 @@ function deltaColor(d) {
   return 'var(--warm-grey)';
 }
 
-function fmt(v, dp) { return v.toFixed(dp === undefined ? 3 : dp); }
-function pct(v) { return v.toFixed(1) + '%'; }
+function fmt(v, dp) { return (v == null) ? '—' : v.toFixed(dp === undefined ? 3 : dp); }
+function pct(v) { return (v == null) ? '—' : v.toFixed(1) + '%'; }
+
+// ── DE 16 Länder + per-Land TSO control-area mapping ──
+// Germany is the only DACH country with multiple TSOs (4 control areas).
+var LAND_TSO = {
+  'Baden-Württemberg':      'TransnetBW',
+  'Bayern':                 'TenneT TSO DE',
+  'Berlin':                 '50Hertz',
+  'Brandenburg':            '50Hertz',
+  'Bremen':                 'TenneT TSO DE',
+  'Hamburg':                '50Hertz / TenneT TSO DE',
+  'Hessen':                 'TenneT TSO DE',
+  'Mecklenburg-Vorpommern': '50Hertz',
+  'Niedersachsen':          'TenneT TSO DE',
+  'Nordrhein-Westfalen':    'Amprion',
+  'Rheinland-Pfalz':        'Amprion',
+  'Saarland':               'Amprion',
+  'Sachsen':                '50Hertz',
+  'Sachsen-Anhalt':         '50Hertz',
+  'Schleswig-Holstein':     'TenneT TSO DE',
+  'Thüringen':              '50Hertz'
+};
+function tsoFor(land) { return LAND_TSO[land] || '—'; }
+function tsoColor(tso) {
+  if (tso.indexOf('50Hertz') === 0) return '#1a6b4a';
+  if (tso === 'Amprion') return '#c0392b';
+  if (tso.indexOf('TenneT') === 0) return '#2c3e7a';
+  if (tso === 'TransnetBW') return '#6c3483';
+  return 'var(--warm-grey)';
+}
 
 // ── Tab 1: Regional Ranking ──
 function renderRanking(data) {
-  var regions = data.regions.slice().sort(function(a, b) { return b.median_R - a.median_R; });
+  var regions = data.regions.slice().sort(function(a, b) {
+    if (a.median_R == null && b.median_R == null) return 0;
+    if (a.median_R == null) return 1;
+    if (b.median_R == null) return -1;
+    return b.median_R - a.median_R;
+  });
   var tbody = document.getElementById('ranking-tbody');
-  document.getElementById('ranking-count').textContent = regions.length + ' Bundesländer · sorted worst → best';
+  document.getElementById('ranking-count').textContent = regions.length + ' Länder · sorted worst → best';
 
   tbody.innerHTML = regions.map(function(r, i) {
-    var total = r.count;
-    var pLow = ((r.bands.Low / total) * 100).toFixed(0);
-    var pMed = ((r.bands.Medium / total) * 100).toFixed(0);
-    var pHigh = ((r.bands.High / total) * 100).toFixed(0);
-    var pCrit = ((r.bands.Critical / total) * 100).toFixed(0);
+    // Schema-tolerant: supports both LT-style {count, bands{Low,Medium,High,Critical}} (raw counts)
+    // and AT-style {n_substations, band_distribution{Low,Medium,High,Critical}} (percentages).
+    var total = (r.count != null) ? r.count : r.n_substations;
+    var pLow, pMed, pHigh, pCrit;
+    if (r.bands) {
+      pLow  = total > 0 ? ((r.bands.Low      / total) * 100).toFixed(0) : 0;
+      pMed  = total > 0 ? ((r.bands.Medium   / total) * 100).toFixed(0) : 0;
+      pHigh = total > 0 ? ((r.bands.High     / total) * 100).toFixed(0) : 0;
+      pCrit = total > 0 ? ((r.bands.Critical / total) * 100).toFixed(0) : 0;
+    } else {
+      var bd = r.band_distribution || { Low: 0, Medium: 0, High: 0, Critical: 0 };
+      pLow  = (bd.Low      || 0).toFixed(0);
+      pMed  = (bd.Medium   || 0).toFixed(0);
+      pHigh = (bd.High     || 0).toFixed(0);
+      pCrit = (bd.Critical || 0).toFixed(0);
+    }
+    var medColor = (r.median_R == null) ? 'var(--warm-grey)' : scoreColor(r.median_R);
+    var tso = tsoFor(r.region);
     return '<tr>' +
       '<td style="color:var(--warm-grey)">' + (i + 1) + '</td>' +
       '<td style="font-weight:500">' + r.region + '</td>' +
-      '<td class="num" style="color:' + scoreColor(r.median_R) + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
-      '<td class="num">' + r.count + '</td>' +
+      '<td style="font-size:11px;color:' + tsoColor(tso) + ';font-weight:500">' + tso + '</td>' +
+      '<td class="num" style="color:' + medColor + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
+      '<td class="num">' + total + '</td>' +
       '<td class="num">' + pct(r.pct_critical) + '</td>' +
       '<td class="num">' + pct(r.pct_high) + '</td>' +
       '<td><div class="dist-bar" style="margin:0;width:140px;height:6px">' +
@@ -175,7 +250,7 @@ function renderRanking(data) {
   }).join('');
 }
 
-// ── Tab 2: Kreis Comparison ──
+// ── Tab 2: Land Comparison ──
 function buildProvinceData(data) {
   var map = {};
   data.substations.forEach(function(s) {
@@ -226,10 +301,9 @@ function populateProvinceSelects() {
   selA.innerHTML = html;
   selB.innerHTML = html;
 
-  // Smart defaults: pick a high-risk and low-risk Kreis
+  // Smart defaults: pick a high-risk and low-risk Land
   var sorted = provNames.slice().sort(function(a, b) { return provinceData[b].median_R - provinceData[a].median_R; });
-  selA.value = sorted[0] || provNames[0]; // worst Kreis
-  // Find best Kreis
+  selA.value = sorted[0] || provNames[0]; // worst
   var bestIdx = sorted.length - 1;
   selB.value = sorted[bestIdx];
 
@@ -288,12 +362,11 @@ function drawRadar(a, b, nameA, nameB) {
   var comps = ['C', 'V', 'I', 'E', 'S', 'T'];
   var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
 
-  // Find max for scaling
   var maxVal = 0;
   comps.forEach(function(k) {
     maxVal = Math.max(maxVal, a.components[k], b.components[k]);
   });
-  maxVal = Math.max(maxVal, 0.05); // floor
+  maxVal = Math.max(maxVal, 0.05);
 
   function polar(i, val) {
     var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
@@ -302,7 +375,6 @@ function drawRadar(a, b, nameA, nameB) {
   }
 
   var html = '';
-  // Grid rings
   [0.33, 0.66, 1.0].forEach(function(frac) {
     var pts = [];
     for (var i = 0; i < 6; i++) {
@@ -312,7 +384,6 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="rgba(44,36,32,0.08)" stroke-width="1"/>';
   });
 
-  // Axes
   for (var i = 0; i < 6; i++) {
     var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
     var x2 = cx + R * Math.cos(angle);
@@ -320,15 +391,12 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="rgba(44,36,32,0.06)" stroke-width="1"/>';
   }
 
-  // Kreis A polygon
   var ptsA = comps.map(function(k, i) { var p = polar(i, a.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsA + '" fill="rgba(148,25,20,0.12)" stroke="var(--crimson)" stroke-width="1.5"/>';
 
-  // Kreis B polygon
   var ptsB = comps.map(function(k, i) { var p = polar(i, b.components[k]); return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
   html += '<polygon points="' + ptsB + '" fill="rgba(93,133,99,0.12)" stroke="var(--sage)" stroke-width="1.5"/>';
 
-  // Vertex dots
   comps.forEach(function(k, i) {
     var pa = polar(i, a.components[k]);
     html += '<circle cx="' + pa[0].toFixed(1) + '" cy="' + pa[1].toFixed(1) + '" r="3" fill="var(--crimson)"/>';
@@ -336,7 +404,6 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<circle cx="' + pb[0].toFixed(1) + '" cy="' + pb[1].toFixed(1) + '" r="3" fill="var(--sage)"/>';
   });
 
-  // Labels
   var labelOffset = 16;
   comps.forEach(function(k, i) {
     var angle = (Math.PI * 2 * i / 6) - Math.PI / 2;
@@ -348,13 +415,11 @@ function drawRadar(a, b, nameA, nameB) {
     html += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--warm-grey)" font-family="DM Sans" font-weight="500">' + labels[i] + '</text>';
   });
 
-  // Scale labels — center = worst (maxVal), edge = best (0)
   html += '<text x="' + (cx + 4) + '" y="' + (cy - R - 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">0 (best)</text>';
   html += '<text x="' + (cx + 4) + '" y="' + (cy + 6) + '" font-size="9" fill="var(--warm-grey-light)" font-family="DM Sans">' + maxVal.toFixed(3) + '</text>';
 
   svg.innerHTML = html;
 
-  // Legend
   document.getElementById('radar-legend').innerHTML =
     '<div style="display:flex;justify-content:center;gap:16px">' +
       '<div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:3px;background:var(--crimson);border-radius:2px"></div>' + nameA + '</div>' +
@@ -365,7 +430,6 @@ function drawRadar(a, b, nameA, nameB) {
 
 // ── Tab 3: Component Decomposition ──
 function renderDecomposition(data) {
-  // Compute per-Bundesland average components
   var regionMap = {};
   data.substations.forEach(function(s) {
     if (!regionMap[s.region]) {
@@ -423,7 +487,12 @@ function renderDecomposition(data) {
 }
 
 // ── Load Data ──
-fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(function(data) {
+fetch('ssi-data.json?v=422').then(function(r) { return r.json(); }).then(function(data) {
+  // Schema-compat shim (KB §52.7.3): tolerate dict-or-list for substations + regions
+  var subsRaw = data.substations;
+  data.substations = Array.isArray(subsRaw) ? subsRaw : Object.values(subsRaw || {});
+  var regsRaw = data.regions;
+  data.regions = Array.isArray(regsRaw) ? regsRaw : Object.values(regsRaw || {});
   SSI = data;
   provinceData = buildProvinceData(data);
   renderRanking(data);
@@ -431,7 +500,7 @@ fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(functio
   renderDecomposition(data);
 }).catch(function(err) {
   console.error('Failed to load SSI data:', err);
-  document.getElementById('ranking-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--crimson);padding:32px">Failed to load data. Check console.</td></tr>';
+  document.getElementById('ranking-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--crimson);padding:32px">Failed to load data. Check console.</td></tr>';
 });
 </script>
 </body>

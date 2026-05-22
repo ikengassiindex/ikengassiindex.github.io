@@ -3,29 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 35 data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 7 modifiers (incl. R6c flood), 95 variables, 35 data sources, Monte Carlo uncertainty. Germany §54 5-tier R3 calibration (East/West differential).">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Methodology</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<title>SSI Index — Germany · Methodology</title>
+<link rel="stylesheet" href="../style.css?v=422">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-versions.js?v=422"></script>
+<script src="../nav.js?v=422"></script>
+<script src="../ssi-engine.js?v=422"></script>
+<script src="ssi-metadata.js?v=422"></script>
 <script>renderNav('methodology');</script>
 
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
     <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+    <p>How the SSI v4.0.2 is calculated for Germany — from raw data to final classification. Open methodology, open data, fully reproducible. 5-tier R3 calibration reflects DE's East/West socio-economic differential (KB §54).</p>
   </div>
 
   <!-- Thesis -->
   <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
     <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
     <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A Kreis serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+      Power grid resilience is inseparable from its socio-economic context. A Landkreis serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources. For Germany specifically, the 5-tier R3 calibration captures the post-reunification East/West differential that 4-tier models miss.
     </p>
   </div>
 
@@ -36,7 +36,7 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 35 verified public data sources — Bundesnetzagentur, Destatis, MaStR bulk registry, SMARD, BGR, OSM Overpass API, Copernicus CDS, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
+        <p>95 variables from 35 verified public data sources — BNetzA, DESTATIS, the 4 TSO Netzentwicklungsplane (50Hertz · Amprion · TenneT TSO DE · TransnetBW), DWD, BGR, BfG + LfU Bayern, dena, BSI KRITIS, BMU, Bundesbank, OSM Overpass API, Copernicus CDS, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
       </div>
     </div>
     <div class="method-step">
@@ -64,14 +64,14 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
+        <p>Seven multiplicative modifiers adjust R_base for the German context: R2 (adaptive climate IRI), R3 (consequence + energy poverty · <strong>5-tier 1.02 / 1.04 / 1.06 / 1.08 / 1.10</strong> per §54 calibration — DE East/West differential), R4 (graph-theoretic network criticality), R6a (restoration speed · BNetzA Monitoring), R6b (Rhine Graben seismic, α∈[0.02, 0.12]), R6c (flood — Rhine + Elbe + Danube + North Sea storm surge; largest exposure footprint in DACH), R7 (digital readiness · ceiling 1.06, DESI 0.61, NIS2 transposed Q4 2024 late EU; 4 TSO + 800 DSO attack surface). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">6</div>
       <div class="method-step-content">
         <h3>Monte Carlo</h3>
-        <p>10,000 iterations per Kreis using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each Kreis.</p>
+        <p>10,000 iterations per Landkreis using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each Landkreis.</p>
       </div>
     </div>
     <div class="method-step">
@@ -90,15 +90,16 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_seis × R6c_flood × Cyber_factor )
 
 <span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
-<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+<span class="hl-var">F_topo</span>    = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)         <span class="hl-comment">// R4 — [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>    = <span class="hl-fn">consequence_5tier</span>(pop, load, V_socio)         <span class="hl-comment">// R3 — 1.02 / 1.04 / 1.06 / 1.08 / 1.10 (DE §54 — East/West)</span>
+<span class="hl-var">R6a_mult</span>  = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)            <span class="hl-comment">// R6a — [1.00, 1.04] (BNetzA)</span>
+<span class="hl-var">R6b_seis</span>  = <span class="hl-fn">rhine_graben_seismic</span>(PGA_475yr)              <span class="hl-comment">// R6b — α∈[0.02, 0.12]</span>
+<span class="hl-var">R6c_flood</span> = <span class="hl-fn">flood_basin</span>(rhine, elbe, danube, north_sea)  <span class="hl-comment">// R6c — [1.00, 1.20] · 2021 Ahr ref</span>
+<span class="hl-var">Cyber</span>     = <span class="hl-fn">desi_digital_index</span>(region, voltage, KRITIS)  <span class="hl-comment">// R7 — [0.99, 1.06] · DESI 0.61 · NIS2 Q4 2024</span>
     </div>
   </div>
 
@@ -133,7 +134,7 @@
           <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
           <td class="num">0.25</td>
           <td>9 — Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
-          <td>Physical asset condition & environment</td>
+          <td>Physical asset condition &amp; environment</td>
         </tr>
         <tr>
           <td><strong style="color:#3b9eff">E</strong> Economic</td>
@@ -151,7 +152,7 @@
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
           <td>1 — DER Stress Index (DER penetration + variability + EV load)</td>
-          <td>Energy transition exposure</td>
+          <td>Energy transition exposure (Energiewende 60% → 80% by 2030)</td>
         </tr>
       </tbody>
     </table>
@@ -160,8 +161,8 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
-      <span class="label-xs">Context multipliers</span>
+      <h3>Modifiers R2–R7 (incl. R6a + R6b Rhine Graben + R6c flood)</h3>
+      <span class="label-xs">Germany §54 calibration · context multipliers</span>
     </div>
     <table class="data-table">
       <thead>
@@ -176,33 +177,48 @@
         </tr>
         <tr>
           <td style="font-weight:500">R3</td>
-          <td>Consequence + Poverty</td>
-          <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for Kreise serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
+          <td>Consequence + Poverty (<strong>5-tier</strong>)</td>
+          <td class="num">[1.02, 1.10]</td>
+          <td>Amplifies risk for Landkreise serving large/energy-poor populations with high economic dependency. <strong>Germany §54 5-tier calibration</strong> — unique to DE in DACH cohort, capturing the post-reunification East/West socio-economic differential:
+            <ul style="margin:6px 0 6px 16px;padding:0;font-size:12px;line-height:1.6">
+              <li><strong>1.02 Capital-Intensive</strong>: München + Hamburg + Frankfurt + Stuttgart (highest GDP per capita, lowest energy poverty)</li>
+              <li><strong>1.04 Industrial</strong>: Berlin + Köln + Düsseldorf + Bremen + Hannover (heavy industry, dense load)</li>
+              <li><strong>1.06 Commercial</strong>: NRW remainder + Hessen + Baden-Württemberg (mixed industrial/SME)</li>
+              <li><strong>1.08 Light-Industrial</strong>: Saarland + Rheinland-Pfalz + Niedersachsen (declining heavy industry, transition stress)</li>
+              <li><strong>1.10 Light-Rural former-East</strong>: Brandenburg + Mecklenburg-Vorpommern + Sachsen-Anhalt + Thüringen + Sachsen rural (Just Transition Fund €40B+ Lausitz; coal phase-out 2038; persistent income gap)</li>
+            </ul>
+            Includes fiscal, demographic, elderly, and flood enrichments.
+          </td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
           <td>Graph Criticality</td>
           <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph. The 4 north-south HVDC corridors under construction (SuedLink + SuedOstLink + A-Nord + Ultranet, targeting 2028-2030) will reshape this graph significantly.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
-          <td class="num">[0.90, 1.10]</td>
-          <td>CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two Kreise with identical SAIDI can have different risk profiles.</td>
+          <td class="num">[1.00, 1.04]</td>
+          <td>BNetzA Monitoring CAIDI-based: rewards fast-restoring areas, penalises slow ones. Germany's SAIDI ~11.7 min is EU-best, but rural-urban spread is significant.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6b</td>
-          <td>Network Topology</td>
-          <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality and ring topology. Penalises Kreise in single-source or low-redundancy configurations. Based on physical network analysis.</td>
+          <td>Seismic (Rhine Graben)</td>
+          <td class="num">α ∈ [0.02, 0.12]</td>
+          <td>Rhine Graben seismic exposure derived from BGR / EFEHR ESHM20 PGA-475yr. Karlsruhe + Köln + Aachen + Mainz are the highest PGA areas (0.08g 475-yr — highest in DE); Bavarian Alps southern edge 0.06g; rest of DE essentially aseismic (0.02–0.04g). α multiplier range [0.02, 0.12] reflects this gradient.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6c</td>
+          <td>Flood (Rhine · Elbe · Danube · North Sea)</td>
+          <td class="num">[1.00, 1.20]</td>
+          <td><strong>Largest flood exposure footprint in DACH.</strong> Rhine basin dominant (NRW + Hessen + RP — 2021 Ahr valley reference event: 134 deaths, €33B damages); Elbe (Sachsen + Sachsen-Anhalt + Niedersachsen); Danube (Bayern + BW); North Sea storm surge (Niedersachsen + Schleswig-Holstein). Source: BfG hydrological registry + LfU Bayern + Landesumweltämter.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
           <td>Digital Readiness</td>
-          <td class="num">[0.99, 1.05]</td>
-          <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability. 556 unique values across Germany.</td>
+          <td class="num">[0.99, 1.06]</td>
+          <td>Regional DESI digital readiness score (Germany DESI 0.61, EU avg ~0.55) and smart-meter penetration proxy. BSI KRITIS regulation since 2015 mandates per-asset cyber audits for grid. NIS2 directive transposed Q4 2024 (one of last EU members to do so). <strong>R7 ceiling 1.06</strong> per §54 — DE has the largest attack surface in DACH (4 TSOs + ~800 DSOs) which raises the baseline.</td>
         </tr>
       </tbody>
     </table>
@@ -244,20 +260,20 @@
       <span class="label-xs">Monte Carlo engine</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every Kreis score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+      Every Landkreis score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
     </p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
-        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per Kreis</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per Landkreis</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
         <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">67s</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~280s</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime (largest in OECD)</div>
       </div>
     </div>
   </div>
@@ -289,7 +305,6 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>35 Verified Data Sources</h3>
-      <!-- Note: All P2 variables derive from existing sources (BNA, Copernicus, MaStR) -->
       <span class="label-xs">33 open + 2 free registration</span>
     </div>
     <table class="data-table" id="method-sources">
@@ -328,10 +343,51 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data — Germany transposed Q4 2024 as one of last EU members) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
+    </p>
+  </div>
+
+  <!-- Formula Reference — SSI v4.0.2 Master Equation -->
+  <div class="card animate-in" style="border-left:3px solid var(--crimson);margin-top:24px">
+    <div class="card-header">
+      <h3>Formula Reference — SSI v4.0.2 Master Equation</h3>
+      <span class="label-xs">Germany §54 calibration</span>
+    </div>
+    <div class="formula-block" style="font-size:12px">
+<span class="hl-comment">// SSI v4.0.2 master equation — Germany parameters</span>
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × R3 × R4 × R6a × R6b × R6c × R7 )
+
+<span class="hl-var">R_base</span>    = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T
+<span class="hl-var">R3</span>        ∈ {1.02, 1.04, 1.06, 1.08, 1.10}        <span class="hl-comment">// 5-tier — §54 — East/West differential</span>
+<span class="hl-var">R4</span>        ∈ [0.80, 1.35]                       <span class="hl-comment">// graph criticality</span>
+<span class="hl-var">R6a</span>       ∈ [1.00, 1.04]                       <span class="hl-comment">// BNetzA Monitoring CAIDI</span>
+<span class="hl-var">R6b</span> α    ∈ [0.02, 0.12]                       <span class="hl-comment">// Rhine Graben seismic (Karlsruhe/Köln/Aachen/Mainz)</span>
+<span class="hl-var">R6c</span>       ∈ [1.00, 1.20]                       <span class="hl-comment">// Rhine + Elbe + Danube + North Sea flood</span>
+<span class="hl-var">R7</span>        ∈ [0.99, 1.06]                       <span class="hl-comment">// DESI 0.61 · NIS2 Q4 2024 · BSI KRITIS</span>
+    </div>
+  </div>
+
+  <!-- Germany 5-Tier R3 Narrative -->
+  <div class="card animate-in" style="border-left:3px solid var(--bronze);margin-top:24px;background:var(--cream)">
+    <div class="card-header">
+      <h3>Why 5 Tiers? The Germany East/West Differential</h3>
+      <span class="label-xs">§54 calibration narrative</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7">
+      Germany is the only DACH country whose R3 consequence calibration requires a fifth tier. Lithuania, Latvia, Austria, and (in the planned CH refresh) Switzerland all fit the 4-tier 1.02 / 1.04 / 1.06 / 1.08 ladder. Germany's post-reunification socio-economic geography demands an additional <strong>1.10 Light-Rural former-East</strong> tier covering Brandenburg, Mecklenburg-Vorpommern, Sachsen-Anhalt, Thüringen, and the rural parts of Sachsen. Three structural facts drive this departure:
+    </p>
+    <ul style="font-size:13px;line-height:1.7;margin:0 0 12px 18px;padding:0">
+      <li><strong>Persistent income gap.</strong> Per-capita GDP in the eastern Länder remains ~25% below the western average 35 years after reunification. WIFO + Bundesbank regional accounts confirm the gap is structural, not cyclical.</li>
+      <li><strong>Coal phase-out concentration.</strong> The Lausitz Just Transition Fund (€40B+, 2038 coal phase-out target) is geographically concentrated in Brandenburg + Sachsen. Substations serving these regions face simultaneous economic transition stress (industrial decline) and grid topology stress (lignite-mine substation closures).</li>
+      <li><strong>Energy poverty headroom.</strong> DESTATIS Mikrozensus consistently records higher energy-poverty incidence in former-East Länder (12–15%) than former-West (6–9%). The 1.10 tier captures this Landkreis-vulnerability headroom that would otherwise be capped at 1.08.</li>
+    </ul>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:0">
+      Practically, the 5-tier ladder shifts ~8–12% of eastern-Länder substations from "Light-Industrial 1.08" into the higher "Light-Rural 1.10" bracket, which materially affects the R_final ordering when CI overlap is narrow. Visual representation in intelligence.html B.2 Business Fabric shows 5 bars (not 4) to reflect this calibration.
     </p>
   </div>
 </main>
+
+<div class="page-footer" id="footerContainer"></div>
 
 <script>
 (function() {

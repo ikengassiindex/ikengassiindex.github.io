@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index — Germany DSO segmented view. Top-6 of ~800 DSOs covering ~50% of customers; 4-TSO panel (50Hertz · Amprion · TenneT TSO DE · TransnetBW). World's most fragmented distribution market.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Germany · DSO Dashboard">
+<meta property="og:description" content="World's most fragmented distribution market — ~800 DSOs across 16 Bundesländer · 4-TSO transmission · joint EPEX SPOT DE-LU bidding zone.">
+<meta property="og:type" content="website">
+<title>SSI Index — Germany · DSO Dashboard</title>
+<link rel="stylesheet" href="../style.css?v=422">
+<style>
+  .dso-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .dso-grid { grid-template-columns: 1fr; } }
+  .dso-card { padding: 20px; background: var(--card-bg); border: 1px solid var(--card-border);
+              border-radius: var(--radius); box-shadow: var(--card-shadow); position: relative; }
+  .dso-card h3 { margin: 0 0 6px 0; font-size: 17px; }
+  .dso-card .pct { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; }
+  .dso-card .saidi { font-size: 22px; font-weight: 600; color: var(--terracotta); margin-top: 6px; }
+  .dso-card .meta { font-size: 12px; color: var(--warm-grey); line-height: 1.6; margin-top: 8px; }
+  .dso-card.border-eon        { border-left: 4px solid #941914; }
+  .dso-card.border-enbw       { border-left: 4px solid #b8863a; }
+  .dso-card.border-munic      { border-left: 4px solid #5d8563; }
+  .dso-card.border-ewe        { border-left: 4px solid #2e5e8a; }
+  .dso-card.border-avacon     { border-left: 4px solid #6c4a8a; }
+  .dso-card.border-pfalz      { border-left: 4px solid #8a6c4a; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th, .compare-table td { padding: 10px 12px; text-align: left;
+                                          border-bottom: 1px solid var(--card-border); }
+  .compare-table th { background: var(--cream-deep); font-weight: 600; }
+  .compare-table tr:hover { background: var(--cream-deep); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+            font-weight: 500; }
+  .badge-eon        { background: #fbe9e7; color: #941914; }
+  .badge-enbw       { background: #fdf3df; color: #b8863a; }
+  .badge-munic      { background: #e6efe7; color: #5d8563; }
+  .badge-ewe        { background: #e0eaf3; color: #2e5e8a; }
+  .badge-avacon     { background: #ece4f3; color: #6c4a8a; }
+  .badge-pfalz      { background: #f3ece4; color: #8a6c4a; }
+  .tso-card { padding: 16px 20px; background: var(--card-bg); border: 1px solid var(--card-border);
+              border-radius: var(--radius); box-shadow: var(--card-shadow); margin-bottom: 12px; }
+  .tso-card h4 { margin: 0 0 4px 0; font-size: 15px; }
+  .tso-card .tso-meta { font-size: 12px; color: var(--warm-grey); line-height: 1.6; }
+  .tso-card .tso-area { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--terracotta); }
+</style>
+</head>
+<body>
+<script src="../nav.js?v=422"></script>
+<script src="../ssi-versions.js?v=422"></script>
+<script src="ssi-metadata.js?v=422"></script>
+<script>renderNav('dno');</script>
+
+<main class="page-shell">
+
+<div class="page-header animate-in">
+  <h1><span style="font-size:0.75em;margin-right:8px;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">🇩🇪</span>DSO Segmented Dashboard — Germany</h1>
+  <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">World's most fragmented distribution market · ~800 DSOs across 16 Bundesländer · ~50 M HV/MV connection points · ~5,000–8,000 substations (post-§38 OSM filter)</div>
+  <p>Germany's distribution market is the most fragmented in the OECD: approximately <strong>800 DSOs</strong> operate across the 16 Bundesländer — more than any other country in the SSI Index. The <strong>top 6 DSOs cover roughly 50% of customers</strong>, while the long tail of ~795 smaller regional and municipal Stadtwerke serves the remaining ~50%. This dwarfs the fragmentation in France (Enedis monopoly ~95%), Italy (e-distribuzione ~85%), the UK (6 regional DNOs), and even Switzerland (~600 utilities — similar pattern but on a much smaller base). The transmission backbone is operated by <strong>four TSOs</strong> in a unique 4-control-area architecture: <strong>50Hertz Transmission</strong> (north-east), <strong>Amprion</strong> (west), <strong>TenneT TSO DE</strong> (north-south corridor) and <strong>TransnetBW</strong> (south-west). Under KB §54, R3 socio-economic calibration uses a <strong>DACH-unique 5-tier schedule</strong> reflecting the persistent East/West differential, ranging from 1.02 (München + Hamburg + Frankfurt + Stuttgart) to 1.10 (former-East rural BB + MV + ST + TH + SN rural).</p>
+</div>
+
+<!-- TOP-6 DSO CARDS -->
+<div class="dso-grid">
+  <div class="dso-card border-eon animate-in delay-1">
+    <span class="badge badge-eon">~30%</span>
+    <h3 style="margin-top:8px">E.ON (consolidated DSO group)</h3>
+    <div class="pct" style="color:#941914">~14 M</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (multi-Land E.ON DSO holdings)</div>
+    <div class="saidi">12 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (group-weighted)</div>
+    <div class="meta">
+      <strong>Parent:</strong> E.ON SE (Essen, NRW)<br>
+      <strong>Sub-DSOs covered:</strong> Bayernwerk (Bayern) + edis (Brandenburg + MV) + Schleswig-Holstein Netz + E.ON Avacon (NI + ST partial) + others<br>
+      <strong>Bundesländer served:</strong> Multi-Land (BY · BB · MV · SH · NI · ST partial)<br>
+      <strong>Network length:</strong> ~700,000 km (MV + LV combined)<br>
+      <strong>TSO interface:</strong> All 4 (50Hertz · Amprion · TenneT · TransnetBW)<br>
+      <strong>Source:</strong> E.ON SE annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-enbw animate-in delay-2">
+    <span class="badge badge-enbw">~13%</span>
+    <h3 style="margin-top:8px">EnBW (Netze BW + SWM Netze)</h3>
+    <div class="pct" style="color:#b8863a">~6 M</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (BW + München City)</div>
+    <div class="saidi">11 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (mixed urban + rural)</div>
+    <div class="meta">
+      <strong>Parent:</strong> EnBW Energie Baden-Württemberg AG + Stadtwerke München (München Netze)<br>
+      <strong>Sub-DSOs:</strong> Netze BW (BW state-wide) + Stadtwerke München Netze (München City)<br>
+      <strong>Bundesländer served:</strong> Baden-Württemberg (full) + Bayern (München urban)<br>
+      <strong>Network length:</strong> ~210,000 km<br>
+      <strong>TSO interface:</strong> TransnetBW (BW) + TenneT TSO DE (München via Bayern)<br>
+      <strong>Source:</strong> EnBW + SWM annual reports 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-munic animate-in delay-3">
+    <span class="badge badge-munic">~8%</span>
+    <h3 style="margin-top:8px">Major-city Stadtwerke (aggregate)</h3>
+    <div class="pct" style="color:#5d8563">~4 M</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (top-5 municipal DSOs combined)</div>
+    <div class="saidi">10 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (best-in-class urban)</div>
+    <div class="meta">
+      <strong>Members:</strong> Westfalen Weser Netz (Detmold) + RheinEnergie (Köln) + Mainova (Frankfurt) + Stadtwerke Hannover + Westnetz partial (RWE municipal joint)<br>
+      <strong>Bundesländer served:</strong> NRW + Hessen + Niedersachsen (dense urban cores)<br>
+      <strong>Network length:</strong> ~85,000 km combined<br>
+      <strong>TSO interface:</strong> Amprion (W) + TenneT TSO DE (Frankfurt + Hannover)<br>
+      <strong>Key context:</strong> Dense urban municipal model; corrosion class C4 in Ruhr industrial inner zones; reference low-SAIDI urban benchmark<br>
+      <strong>Source:</strong> Member DSO annual reports 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-ewe animate-in delay-1">
+    <span class="badge badge-ewe">~3%</span>
+    <h3 style="margin-top:8px">EWE NETZ GmbH</h3>
+    <div class="pct" style="color:#2e5e8a">~1.4 M</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (NI + HB + BB partial)</div>
+    <div class="saidi">14 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (coastal + rural)</div>
+    <div class="meta">
+      <strong>Parent:</strong> EWE AG (Oldenburg) — regional energy utility<br>
+      <strong>Bundesländer served:</strong> Niedersachsen (Weser-Ems) + Bremen + Brandenburg (partial)<br>
+      <strong>Network length:</strong> ~84,000 km<br>
+      <strong>TSO interface:</strong> TenneT TSO DE (NI + HB) + 50Hertz (BB partial)<br>
+      <strong>Key context:</strong> Coastal exposure — Friesland + Weser estuary corrosion C4–C5; major North Sea offshore wind connection cluster<br>
+      <strong>Source:</strong> EWE NETZ annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-avacon animate-in delay-2">
+    <span class="badge badge-avacon">~2%</span>
+    <h3 style="margin-top:8px">Avacon Netz GmbH</h3>
+    <div class="pct" style="color:#6c4a8a">~1.1 M</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (NI + ST + partial HE)</div>
+    <div class="saidi">16 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (rural + former-East fringe)</div>
+    <div class="meta">
+      <strong>Parent:</strong> Avacon AG (E.ON 73.8% + regional Bundesländer + municipal 26.2%)<br>
+      <strong>Bundesländer served:</strong> Niedersachsen (south-east) + Sachsen-Anhalt + Hessen partial<br>
+      <strong>Network length:</strong> ~62,000 km<br>
+      <strong>TSO interface:</strong> TenneT TSO DE (NI + HE) + 50Hertz (ST)<br>
+      <strong>Key context:</strong> East/West DSO border crossing — Avacon sits across the former-FRG/GDR demarcation, exposing the 5-tier R3 differential within a single distribution business<br>
+      <strong>Source:</strong> Avacon Netz annual report 2024
+    </div>
+  </div>
+
+  <div class="dso-card border-pfalz animate-in delay-3">
+    <span class="badge badge-pfalz">~1.5%</span>
+    <h3 style="margin-top:8px">Pfalzwerke Netz AG</h3>
+    <div class="pct" style="color:#8a6c4a">~700 k</div>
+    <div style="font-size:11px;color:var(--warm-grey)">customers (Rheinland-Pfalz)</div>
+    <div class="saidi">15 min/yr</div>
+    <div style="font-size:11px;color:var(--warm-grey)">SAIDI 2024 (vineyard + Ahr-affected)</div>
+    <div class="meta">
+      <strong>Parent:</strong> Pfalzwerke AG (Ludwigshafen; municipal-shareholder consortium)<br>
+      <strong>Bundesländer served:</strong> Rheinland-Pfalz (Pfalz + Vorderpfalz)<br>
+      <strong>Network length:</strong> ~17,500 km<br>
+      <strong>TSO interface:</strong> Amprion<br>
+      <strong>Key context:</strong> 2021 Ahr valley flood reference DSO — substantive retrofit programme post-July 2021; R6c_flood watchlist alpha [0.04, 0.10] for Ahrweiler + Bad Neuenahr corridor<br>
+      <strong>Source:</strong> Pfalzwerke Netz annual report 2024
+    </div>
+  </div>
+</div>
+
+<p style="font-size:12px;color:var(--warm-grey);margin-top:-8px;margin-bottom:24px"><em><strong>Top-6 covers ~50% of customers; the long-tail of ~795 smaller DSOs forms the world's most fragmented distribution market.</strong> This pattern is unique in the OECD and differs sharply from France (single Enedis monopoly serving ~95% of customers), Italy (e-distribuzione ~85%), the UK (6 regional DNOs covering 100%), and Switzerland (~600 utilities, a similar fragmentation pattern but on a much smaller customer base of ~4.5 M vs ~50 M for Germany). Beyond the top six, the tail is dominated by hundreds of municipal <em>Stadtwerke</em> serving from 200 customers (smallest Talgemeinde-equivalent operators) up to several hundred thousand (e.g. Vattenfall Stromnetz Berlin ~3.5 M Berlin metro, Mainova Frankfurt ~1.1 M, RheinEnergie Köln ~700 k, Stadtwerke München ~840 k municipal portion outside SWM Netze). Total fleet: ~50 M residential + ~3 M commercial/industrial connection points across the 16 Bundesländer. The framework is constitutional: Article 28 GG (Grundgesetz) entrenches municipal self-administration (kommunale Selbstverwaltung), which underwrites the Stadtwerke model; BNetzA regulates all ~800 operators under a single national Anreizregulierungsverordnung (ARegV) tariff framework with proportionate reporting cadence by size class.</em></p>
+
+<!-- SIDE-BY-SIDE COMPARISON TABLE -->
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--ink);">
+  Side-by-side comparison
+</div>
+<p style="font-size: 13px; color: var(--warm-grey); margin-bottom: 12px">
+  Continuity, customer base, and grid characteristics for the six DSOs above. SAIDI 2024 figures are reported per BNetzA SAIDI/SAIFI Annual Report (excluding force-majeure events under §11 EnWG). Vattenfall Stromnetz Berlin, Mainova, RheinEnergie and others not shown individually are summarised in the tail-note below.
+</p>
+
+<table class="compare-table animate-in delay-2">
+  <thead>
+    <tr><th>Metric</th><th>E.ON (~30%)</th><th>EnBW (~13%)</th><th>Munic. agg. (~8%)</th><th>EWE (~3%)</th><th>Avacon (~2%)</th><th>Pfalzwerke (~1.5%)</th><th>Source</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Customers (2024)</strong></td><td>~14 M</td><td>~6 M</td><td>~4 M</td><td>~1.4 M</td><td>~1.1 M</td><td>~700 k</td><td>BNetzA 2024</td></tr>
+    <tr><td><strong>Substations (post-§38 OSM filter, est.)</strong></td><td>~2,100</td><td>~890</td><td>~520</td><td>~310</td><td>~270</td><td>~140</td><td>d05_osm 2024</td></tr>
+    <tr><td><strong>Network length km (MV + LV)</strong></td><td>~700,000</td><td>~210,000</td><td>~85,000</td><td>~84,000</td><td>~62,000</td><td>~17,500</td><td>per-DSO 2024 reports</td></tr>
+    <tr><td><strong>Underground share</strong></td><td>~74%</td><td>~80%</td><td>~92%</td><td>~64%</td><td>~58%</td><td>~71%</td><td>per-DSO 2024 reports</td></tr>
+    <tr><td><strong>SAIDI 2024 (min/yr)</strong></td><td>12</td><td>11</td><td>10</td><td>14</td><td>16</td><td>15</td><td>BNetzA 2024</td></tr>
+    <tr><td><strong>SAIFI 2024</strong></td><td>0.24</td><td>0.21</td><td>0.18</td><td>0.31</td><td>0.36</td><td>0.30</td><td>BNetzA 2024</td></tr>
+    <tr><td><strong>Smart-meter penetration</strong></td><td>~38%</td><td>~42%</td><td>~46%</td><td>~32%</td><td>~28%</td><td>~30%</td><td>BSI + dena 2024</td></tr>
+    <tr><td><strong>Worst-Land SAIDI</strong></td><td>MV ~22</td><td>BW ~13</td><td>NRW Ruhr ~15</td><td>NI coast ~19</td><td>ST ~24</td><td>Ahr corridor ~28</td><td>per-DSO atlas 2024</td></tr>
+    <tr><td><strong>Renewable DG hosted (GW)</strong></td><td>~38 (wind+PV)</td><td>~12 (PV+hydro)</td><td>~8 (PV+biomass)</td><td>~6 (offshore-wind grid-in)</td><td>~3 (wind+PV)</td><td>~1.3 (PV+wind)</td><td>EEG-Anlagenregister 2024</td></tr>
+  </tbody>
+</table>
+
+<p style="font-size:12px;color:var(--warm-grey);margin-top:8px"><strong>Tail-DSO note.</strong> Beyond the six above, the German distribution landscape includes ~795 additional operators. The next 10 by customer count include: <strong>Vattenfall Eurogrid GmbH (Stromnetz Berlin)</strong> (~3.5 M, Berlin, SAIDI ~12 min); <strong>Stadtwerke München Netze</strong> (~840 k municipal portion separate from SWM-EnBW); <strong>RheinEnergie / Netz Köln</strong> (~700 k, Köln, SAIDI ~10 min); <strong>Mainova / Netz Frankfurt</strong> (~1.1 M, Frankfurt, SAIDI ~9 min); <strong>Stadtwerke Hannover / enercity Netz</strong> (~360 k, Hannover, SAIDI ~13 min); <strong>Stadtwerke Leipzig Netz</strong> (~280 k, Leipzig, SAIDI ~14 min); <strong>SWB Netze Bremen</strong> (~360 k); <strong>Dortmunder Netz</strong> (~320 k); <strong>Stadtwerke Düsseldorf Netz</strong> (~310 k); <strong>WSW Netz Wuppertal</strong> (~210 k). Below these sit ~785 smaller municipal and regional operators serving from 200 customers (smallest village Stadtwerke) up to ~150,000 customers, including dozens of Eastern Bundesländer regional carriers (envia Mitteldeutsche Energie subsidiaries — MITNETZ STROM serving Sachsen + Sachsen-Anhalt + Thüringen + Brandenburg with ~2.3 M but operated as DSO holding rather than top-tier consolidated entity). This pattern — the most fragmented in the OECD by a wide margin — reflects Article 28 GG (kommunale Selbstverwaltung) and the historic practice of municipal energy democracy; BNetzA regulates all of them under the ARegV framework with proportionate reporting cadence by size class.</p>
+
+<!-- TSO PANEL — 4 TSOs -->
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;">
+  TSO panel — the 4 German Transmission System Operators
+</div>
+<p style="font-size: 13px; color: var(--warm-grey); margin-bottom: 12px">
+  Germany has the <strong>most-fragmented TSO market in the OECD</strong>: four separate control-area operators replace what is a single national TSO in most peer countries. The 4-control-area architecture dates from the 1990s liberalisation and the 2009 unbundling, and persists because of the joint structural constraints of the former-East / former-West asymmetry (50Hertz inherits the former GDR Verbundnetz) and the BNetzA-mandated zone separation. All four TSOs are part of the Continental European synchronous area and contribute jointly to the <strong>EPEX SPOT DE-LU bidding zone</strong> (joint with Luxembourg since the 2018 DE-AT zone separation, per KB §43). Total combined transmission length is approximately <strong>~37,600 km</strong> across the 380/220 kV backbone, with ~38 cross-border ties to neighbouring countries.
+</p>
+
+<div class="tso-card animate-in delay-1">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:240px">
+      <h4>50Hertz Transmission GmbH</h4>
+      <div class="tso-meta">
+        <strong>Region:</strong> North-East (Berlin + Brandenburg + Hamburg part + Mecklenburg-Vorpommern + Sachsen + Sachsen-Anhalt + Thüringen)<br>
+        <strong>Voltage:</strong> 380 / 220 kV · <strong>Length:</strong> ~10,400 km<br>
+        <strong>Owner:</strong> Elia Group (Belgium-listed); 100% Elia<br>
+        <strong>Key context:</strong> Inherits former GDR Verbundnetz; high renewable-injection from Baltic + Brandenburg + Sachsen-Anhalt wind; HVDC corridor SuedOstLink + A-Nord termination zone
+      </div>
+    </div>
+    <div class="tso-area" style="min-width:120px;text-align:right">~18.6 M<br><span style="font-size:11px;font-weight:400;color:var(--warm-grey)">control-area pop.</span></div>
+  </div>
+</div>
+
+<div class="tso-card animate-in delay-2">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:240px">
+      <h4>Amprion GmbH</h4>
+      <div class="tso-meta">
+        <strong>Region:</strong> West (Nordrhein-Westfalen + Rheinland-Pfalz + Saarland + part of Hessen + Niedersachsen)<br>
+        <strong>Voltage:</strong> 380 / 220 kV · <strong>Length:</strong> ~11,000 km<br>
+        <strong>Owner:</strong> RWE-affiliated minority + Amprion GmbH consortium (incl. Land + institutional investors)<br>
+        <strong>Key context:</strong> Largest control-area population; serves Ruhr industrial cluster + BASF Ludwigshafen + Saar steel; HVDC corridor Ultranet + A-Nord south terminus; 2021 Ahr valley flood retrofit weight
+      </div>
+    </div>
+    <div class="tso-area" style="min-width:120px;text-align:right">~28 M<br><span style="font-size:11px;font-weight:400;color:var(--warm-grey)">control-area pop.</span></div>
+  </div>
+</div>
+
+<div class="tso-card animate-in delay-3">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:240px">
+      <h4>TenneT TSO GmbH (DE)</h4>
+      <div class="tso-meta">
+        <strong>Region:</strong> North-South corridor (Schleswig-Holstein + Hamburg part + Bremen + Niedersachsen + Hessen + Bayern)<br>
+        <strong>Voltage:</strong> 380 / 220 kV · <strong>Length:</strong> ~13,000 km (largest of the 4)<br>
+        <strong>Owner:</strong> TenneT Holding B.V. (Netherlands state — 100% Dutch sovereign)<br>
+        <strong>Key context:</strong> The critical N-S corridor TSO — must transmit North Sea offshore wind to Bayern industrial loads; HVDC SuedLink primary owner; North Sea grid-connection cluster operator
+      </div>
+    </div>
+    <div class="tso-area" style="min-width:120px;text-align:right">~24 M<br><span style="font-size:11px;font-weight:400;color:var(--warm-grey)">control-area pop.</span></div>
+  </div>
+</div>
+
+<div class="tso-card animate-in delay-4">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:240px">
+      <h4>TransnetBW GmbH</h4>
+      <div class="tso-meta">
+        <strong>Region:</strong> South-West (Baden-Württemberg sole control area)<br>
+        <strong>Voltage:</strong> 380 / 220 kV · <strong>Length:</strong> ~3,200 km<br>
+        <strong>Owner:</strong> EnBW Energie Baden-Württemberg AG (100% EnBW)<br>
+        <strong>Key context:</strong> Smallest of the 4 by length but highest industrial-load density (Stuttgart Daimler + Bosch + Porsche cluster); HVDC SuedLink + Ultranet south terminus; cross-border to France + Switzerland + Austria
+      </div>
+    </div>
+    <div class="tso-area" style="min-width:120px;text-align:right">~11 M<br><span style="font-size:11px;font-weight:400;color:var(--warm-grey)">control-area pop.</span></div>
+  </div>
+</div>
+
+<table class="compare-table animate-in delay-4" style="margin-top:16px">
+  <thead>
+    <tr><th>Item</th><th>Value</th><th>Note</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Combined network length 380 + 220 kV</strong></td><td>~37,600 km</td><td>50Hertz 10,400 + Amprion 11,000 + TenneT 13,000 + TransnetBW 3,200</td></tr>
+    <tr><td><strong>Cross-border interconnectors</strong></td><td>~38 lines with 9 neighbours</td><td>DK · NL · BE · LU · FR · CH · AT · CZ · PL (+ DC links to NO/SE/UK)</td></tr>
+    <tr><td><strong>Bidding zone</strong></td><td>EPEX SPOT DE-LU (joint with Luxembourg)</td><td>Per KB §43 — Luxembourg joined the German bidding zone after the 2018 DE-AT zone separation</td></tr>
+    <tr><td><strong>HVDC corridors under construction</strong></td><td>4 N-S DC links</td><td>SuedLink (TenneT + TransnetBW) · SuedOstLink (TenneT + 50Hertz) · A-Nord (Amprion + TenneT) · Ultranet (Amprion + TransnetBW). Target: 2028–2030</td></tr>
+    <tr><td><strong>Transmission availability (2024)</strong></td><td>99.996% (4-TSO weighted)</td><td>Reported jointly to BNetzA under §11 EnWG</td></tr>
+    <tr><td><strong>Transmission SAIDI</strong></td><td>~0.4 min/yr (system-level)</td><td>4-TSO weighted; excludes DSO SAIDI</td></tr>
+    <tr><td><strong>Markov confidence tier</strong></td><td>high</td><td>Continental sync since 1958; mature 4-TSO operational record; no recent regime change</td></tr>
+  </tbody>
+</table>
+
+<!-- EU PEER COMPARISON -->
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;">
+  European peer comparison — DSO market structure
+</div>
+<p style="font-size: 13px; color: var(--warm-grey); margin-bottom: 12px">
+  Germany's DSO market structure is the most fragmented in the OECD. The contrast with the European peer set is stark: most large European countries operate with one dominant national DSO (FR, IT) or a small handful of regional DSOs (UK, NL, BE). Germany and Switzerland are the two outliers — but Switzerland's fragmentation is on a much smaller customer base (~4.5 M vs ~50 M for Germany).
+</p>
+<table class="compare-table animate-in delay-4">
+  <thead>
+    <tr><th>Country</th><th>National SAIDI 2024 (min)</th><th>Market structure</th><th>Note</th></tr>
+  </thead>
+  <tbody>
+    <tr style="background:#fbe9e7"><td><strong>Germany</strong></td><td><strong>~12</strong> (pre-2024 storm season)</td><td><strong>~800 DSOs · 4 TSOs</strong> (most fragmented OECD)</td><td>This dashboard</td></tr>
+    <tr><td>Switzerland</td><td>~18</td><td>~600 utilities (most fragmented per capita)</td><td>DACH peer · similar fragmentation pattern, much smaller base</td></tr>
+    <tr><td>Austria</td><td>~32</td><td>~10 dominant DSOs across 9 Bundesländer</td><td>DACH peer · APG single TSO</td></tr>
+    <tr><td>France</td><td>~50</td><td>Enedis monopoly (~95%) + 160 ELDs</td><td>Single-TSO (RTE) + single-DSO model</td></tr>
+    <tr><td>Italy</td><td>~36</td><td>e-distribuzione (~85%) + ~130 local DSOs</td><td>Single-TSO (Terna) + dominant-DSO model</td></tr>
+    <tr><td>United Kingdom</td><td>~36</td><td>6 regional DNOs (UKPN, WPD, SPEN, ENWL, NPg, SSE)</td><td>Single-TSO (NGESO) + 6 regional DNOs</td></tr>
+    <tr><td>Netherlands</td><td>~22</td><td>Federation (Liander / Stedin / Enexis)</td><td>Single-TSO (TenneT NL) + 3 dominant DSOs</td></tr>
+  </tbody>
+</table>
+
+<!-- STRATEGIC CONTEXT -->
+<div style="margin: 32px 0 12px 0; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;">
+  Strategic context — what to watch
+</div>
+<p style="font-size: 13px; line-height: 1.7;">
+  <strong>2021 Ahr valley flood (R6c reference event):</strong> The July 2021 Ahr valley flood in Rheinland-Pfalz and Nordrhein-Westfalen caused 134 confirmed deaths and approximately €33B in direct damages — the largest single flood event in modern German history. Multiple substation assets were lost in the Ahrweiler / Bad Neuenahr corridor. Post-event, BfG and the per-Land Landesumweltämter re-issued HQ100/HQ200 maps for the entire Rhine basin with tighter buffers; Pfalzwerke Netz and Amprion completed multi-year retrofit programmes. R6c_flood alpha [0.04, 0.10] applies in this corridor, with Pfalzwerke Netz the reference DSO.<br><br>
+  <strong>North-South HVDC corridor (4 links under construction):</strong> Germany's North-South generation/load asymmetry — North Sea offshore wind in NI + SH versus industrial demand in BY + BW — is being closed by four HVDC corridors: <strong>SuedLink</strong> (TenneT + TransnetBW, ~700 km, target 2028), <strong>SuedOstLink</strong> (TenneT + 50Hertz, target 2028), <strong>A-Nord</strong> (Amprion + TenneT, target 2030), and <strong>Ultranet</strong> (Amprion + TransnetBW, target 2030). These are the largest single transmission programme in DACH history and the largest Natura 2000 negotiation in German grid history. SSI tracks each corridor as a separate T1 (transition stress) modifier.<br><br>
+  <strong>Rhine Graben seismicity (R6_seismic):</strong> The Rhine Graben quadrant (Karlsruhe + Köln + Aachen + Mainz) carries PGA ≈ 0.08 g at the 475-year return — moderate by European standards but the highest seismic exposure in Germany. The Bavarian Alps zone sits at ≈ 0.06 g. BGR (Bundesanstalt für Geowissenschaften und Rohstoffe) publishes the ESHM20 + national PGA atlas. For SSI scoring, R6_seismic alpha band [0.02, 0.12] applies — moderate by DACH standards (AT [0.04, 0.18], CH [0.04, 0.22]).<br><br>
+  <strong>Energiewende + nuclear phase-out (T1 transition stress):</strong> Germany completed its nuclear phase-out on 15 April 2023 (final closure of Isar 2, Neckarwestheim 2, and Emsland — the last three operating reactors). 2024 renewable electricity share reached 60%, with a 2030 target of 80%. The brown-coal phase-out under the Kohleausstiegsgesetz is scheduled for 2038 (Lausitz region — Brandenburg + Sachsen, with the €40B+ Just Transition Fund). This drives the most aggressive T1 modifier in DACH, particularly for Lausitz and Rhineland lignite-zone substations.<br><br>
+  <strong>R7 cyber posture (BSI + KRITIS + NIS2):</strong> Germany's BSI (Bundesamt für Sicherheit in der Informationstechnik) has supervised KRITIS-classified critical-infrastructure operators since the IT-Sicherheitsgesetz 2015 — a 9-year head-start over the EU NIS2 transposition. NIS2 was transposed into German law in Q4 2024 (late by EU schedule). DESI 2024 score is 0.61 (mid-band EU). R7 ceiling is set at <strong>1.06</strong> — the highest in DACH (AT 1.04, CH 1.05, DE 1.06) — reflecting the largest attack surface (4 TSOs + ~800 DSOs).
+</p>
+
+<div class="page-footer" id="footerContainer"></div>
+<script>renderFooter && renderFooter();</script>
+
+<!-- DYNAMIC DATA (best-effort; degrades gracefully) -->
+<script>
+(function(){
+  'use strict';
+  // KB §50.9 — minified-compatible: no hardcoded JSON literals; fetch+parse only.
+  // KB §52.7.3 schema-compat shim — substations may be array or dict.
+  fetch('ssi-data.json?v=422')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if (!data) return;
+      var subsRaw = data.substations || [];
+      var subs = Array.isArray(subsRaw) ? subsRaw : Object.values(subsRaw || {});
+      // Currently no hard-coded DSO totals to override; the dashboard is narrative-led.
+      // Future hook: surface fleet count + classification mix on the strategic-context panel.
+      void subs;
+    })
+    .catch(function(){ /* silent — page degrades gracefully */ });
+})();
+</script>
+
+</main>
+</body>
+</html>
