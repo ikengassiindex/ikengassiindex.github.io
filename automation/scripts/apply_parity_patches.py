@@ -249,6 +249,10 @@ def main():
                    help="Print what would change; do not write files")
     p.add_argument("--countries", default="",
                    help="CSV slugs (default: all 6)")
+    p.add_argument("--minify", action="store_true",
+                   help="Emit minified JSON (no whitespace) — ~35%% smaller. "
+                        "Recommended for countries near GitHub's 50MB size threshold; "
+                        "the dashboard JS reads both pretty and minified equivalently.")
     args = p.parse_args()
 
     clone = Path(args.clone)
@@ -294,8 +298,15 @@ def main():
             country_dir = clone / slug
             country_dir.mkdir(parents=True, exist_ok=True)
             out_path = country_dir / "ssi-data.json"
-            out_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
-            print(f"  → wrote {out_path} ({out_path.stat().st_size:,} bytes)")
+            if args.minify:
+                # KB §50.9 — minified emission for countries near GitHub's 50MB
+                # advisory threshold. ~35% size reduction vs indent=2.
+                payload = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+            else:
+                payload = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+            out_path.write_text(payload)
+            print(f"  → wrote {out_path} ({out_path.stat().st_size:,} bytes"
+                  + (" — minified)" if args.minify else ")"))
 
         all_summaries.append(summary)
 
