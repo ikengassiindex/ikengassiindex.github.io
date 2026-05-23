@@ -107,7 +107,12 @@ jobs:
         if: github.event.inputs.dry_run != 'true'
         run: |
           STAMP=$(date +%s)
-          for DIR in italy germany france spain uk us switzerland austria canada japan australia chile denmark norway finland poland sweden mexico greece turkey ireland portugal new-zealand greenland; do
+          # KB §57 — iterate countries.json single source of truth (no more hardcoded list).
+          # Previously hardcoded 24 countries here, silently excluding BE/NL/LU/CZ/LV/LT/EE
+          # from the monthly enrichment loop. Per KB §49.8, the slug list lives in
+          # intelligence/countries.json and is the only place it should ever live.
+          COUNTRIES=$(python3 -c "import json; print(' '.join(json.load(open('intelligence/countries.json'))['slugs']))")
+          for DIR in $COUNTRIES; do
             if [ -f "$DIR/esg-report.html" ]; then
               sed -i "s|intelligence-loader\.js[^\"]*|intelligence-loader.js?v=${STAMP}|g" "$DIR/esg-report.html"
               sed -i "s|nav\.js[^\"]*|nav.js?v=${STAMP}|g" "$DIR/esg-report.html"

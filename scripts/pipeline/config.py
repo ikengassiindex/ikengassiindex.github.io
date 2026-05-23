@@ -14,14 +14,21 @@ CACHE_DIR = PIPELINE_DIR / ".cache"
 CACHE_DIR.mkdir(exist_ok=True)
 
 # ── Countries ─────────────────────────────────────────────
-COUNTRIES = [
-    "italy", "germany", "france", "spain", "uk",
-    "us", "switzerland", "austria", "canada", "japan",
-    "denmark", "norway", "finland", "poland", "sweden", "mexico",
-    "greece", "turkey", "ireland", "portugal", "new-zealand",
-    "greenland",  # Autonomous territory within the Kingdom of Denmark — not an OECD member,
-                  # but included for pan-Arctic coverage. Archive bundled with DK.
-]
+# KB §49.8 / §57 (Normalization) — single source of truth.
+# Slugs live in intelligence/countries.json. The pipeline must NEVER carry
+# a private hardcoded list — that path drifts and excludes new countries
+# from monthly automation (e.g. the BE/NL/LU/CZ/LV/LT/EE pipeline-enrichment
+# fleet-floor hole, May 2026).
+def _load_countries_from_sot():
+    import json
+    sot = REPO_ROOT / "intelligence" / "countries.json"
+    if not sot.exists():
+        # Fallback for tests / standalone runs where the repo SoT is unavailable.
+        return ["france", "italy", "germany", "spain", "uk", "us"]
+    with open(sot) as f:
+        return list(json.load(f)["slugs"])
+
+COUNTRIES = _load_countries_from_sot()
 
 # Country metadata for ingestion routing
 COUNTRY_META = {

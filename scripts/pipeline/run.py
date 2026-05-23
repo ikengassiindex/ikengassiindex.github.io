@@ -15,6 +15,7 @@ Usage:
 import argparse
 import json
 import logging
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -95,6 +96,41 @@ def run_pipeline(country, skip_seismic=False, skip_climate=False, skip_socio=Fal
         rescore=rescore,
         dry_run=dry_run,
     )
+
+    # ── Phase 2b: KB §56 Fleet-Floor Gate ──
+    # Per KB §56 (Stub Deploy Regression, May 2026 incident): the cron-driven
+    # path previously committed rescored data without running validate-schema.py.
+    # Call it now and abort the country if MIN_FLEET is breached. Other
+    # countries in the batch must continue uninterrupted.
+    if not dry_run:
+        scripts_dir = Path(__file__).resolve().parent.parent  # → scripts/
+        validator = scripts_dir / "validate-schema.py"
+        output_json = REPO_ROOT / country / "ssi-data.json"
+        if validator.exists() and output_json.exists():
+            logger.info("Phase 2b: Fleet-floor validation (KB §56)")
+            result = subprocess.run(
+                ["python3", str(validator), str(output_json)],
+                capture_output=True, text=True,
+            )
+            if result.returncode != 0:
+                logger.error(f"  ✗ KB §56 FLEET-FLOOR FAILED for {country} — skipping commit, page not updated")
+                if result.stdout:
+                    logger.error(result.stdout.rstrip())
+                if result.stderr:
+                    logger.error(result.stderr.rstrip())
+                stats["validation_failed"] = True
+                stats["validation_output"] = (result.stdout or "") + (result.stderr or "")
+                stats["elapsed_seconds"] = round(time.time() - t0, 1)
+                # Raise so the outer per-country try/except marks this country as failed
+                # while continuing the loop for the rest.
+                raise RuntimeError(
+                    f"KB §56 fleet-floor validation failed for {country}; refusing to commit."
+                )
+        else:
+            logger.warning(
+                f"  ⚠ KB §56 validator or output missing (validator={validator.exists()}, "
+                f"output={output_json.exists()}) — fleet-floor check skipped for {country}"
+            )
 
     elapsed = time.time() - t0
     stats["elapsed_seconds"] = round(elapsed, 1)

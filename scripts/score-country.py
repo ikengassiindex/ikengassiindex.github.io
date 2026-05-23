@@ -19,9 +19,25 @@ This ensures every country goes through the SAME scoring pipeline,
 producing consistent ssi-data.json with identical schema.
 """
 import json, hashlib, math, argparse, os, sys
+from pathlib import Path
 
 # ═══ SSI v4.0.2 Constants ═══
 WEIGHTS = {'C': 0.30, 'V': 0.10, 'I': 0.25, 'E': 0.10, 'S': 0.20, 'T': 0.05}
+
+# KB §56 — Fleet-size floors (mirrors scripts/validate-schema.py::MIN_FLEET).
+# Inlined here because validate-schema.py has a hyphen in its filename and is
+# not safely importable as a module. Keep these two in lock-step.
+MIN_FLEET = {
+    "AT": 1200, "CH": 800,  "DE": 10000,
+    "IT": 4000, "ES": 3500, "IE": 1000, "JP": 4500,
+    "LU": 700,  "BE": 1000, "NL": 1300, "CZ": 800,
+    "LV": 1000, "LT": 400,  "EE": 500,
+    "FR": 6500,
+    "AU": 5000, "CA": 8000, "CL": 1500, "DK": 1500,
+    "FI": 3000, "GR": 1500, "GL": 100,  "MX": 4000,
+    "NZ": 1000, "NO": 4000, "PL": 3000, "PT": 1500,
+    "SE": 3500, "TR": 4000, "GB": 2500, "US": 30000,
+}
 
 CLASSIFICATION_BANDS = [
     (0.75, 'Critical'),
@@ -190,7 +206,13 @@ def main():
     parser.add_argument('--country', required=True, help='Country name')
     parser.add_argument('--config', required=True, help='Country config JSON file')
     parser.add_argument('--osm', required=True, help='OSM substations JSON file')
-    parser.add_argument('--output', required=True, help='Output ssi-data.json path')
+    default_output = str(Path(__file__).resolve().parent.parent / "scoring-output" / "ssi-data.json")
+    parser.add_argument('--output', default=default_output,
+        help='Output ssi-data.json path. Defaults to scoring-output/ssi-data.json '
+             '(staging). Use --release to write to <country>/ssi-data.json after fleet-floor gate.')
+    parser.add_argument('--release', action='store_true',
+        help='KB §56 — write to <country>-pages/ssi-data.json (deploy folder) AFTER fleet-floor check. '
+             'Without this flag, output stays in scoring-output/ for review.')
     args = parser.parse_args()
 
     with open(args.config) as f:
@@ -239,6 +261,24 @@ def main():
     with open(args.output, 'w') as f:
         json.dump(data, f, separators=(',', ':'))
     print(f"Saved: {args.output} ({os.path.getsize(args.output)/1024/1024:.1f} MB)")
+
+    # KB §56 — Release gate. Without --release, output stays in scoring-output/
+    # for review. With --release, we run the fleet-floor check first and refuse
+    # to publish (exit 2) if MIN_FLEET is breached for this country.
+    if args.release:
+        with open(args.output) as f:
+            d = json.load(f)
+        subs = d.get('substations', [])
+        if isinstance(subs, dict):
+            subs = list(subs.values())
+        iso2 = (d.get('iso2') or d.get('meta', {}).get('iso2')
+                or config.get('iso2') or config.get('code')
+                or args.country.upper()[:2])
+        floor = MIN_FLEET.get(iso2)
+        if floor and len(subs) < floor:
+            print(f"✗ RELEASE GATE FAILED (KB §56): {iso2} has {len(subs)} < MIN_FLEET ({floor})")
+            sys.exit(2)
+        print(f"✓ RELEASE GATE PASSED (KB §56): {iso2} {len(subs)} >= MIN_FLEET ({floor or 'unset'})")
 
 
 if __name__ == '__main__':

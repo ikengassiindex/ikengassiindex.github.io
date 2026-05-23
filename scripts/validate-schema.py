@@ -46,6 +46,54 @@ COUNTRY_BOUNDS = {
 
 WEIGHTS = {'C': 0.30, 'V': 0.10, 'I': 0.25, 'E': 0.10, 'S': 0.20, 'T': 0.05}
 
+# KB §56 — Stub Deploy Regression prophylactic (May 2026 incident).
+# Per-country fleet-size floors. Any ssi-data.json with substation_count
+# below the floor is presumed STUB DATA and fails validation.
+MIN_FLEET = {
+    "AT": 1200, "CH": 800,  "DE": 10000,
+    "IT": 4000, "ES": 3500, "IE": 1000, "JP": 4500,
+    "LU": 700,  "BE": 1000, "NL": 1300, "CZ": 800,
+    "LV": 1000, "LT": 400,  "EE": 500,
+    "FR": 6500,
+    # Other live countries — set conservative floors based on live ssi-data.json counts
+    "AU": 5000, "CA": 8000, "CL": 1500, "DK": 1500,
+    "FI": 3000, "GR": 1500, "GL": 100,  "MX": 4000,
+    "NZ": 1000, "NO": 4000, "PL": 3000, "PT": 1500,
+    "SE": 3500, "TR": 4000, "GB": 2500, "US": 30000,
+}
+
+# Country slug → ISO2 (used to derive iso2 from filepath when data lacks an iso2 key)
+_SLUG_TO_ISO2 = {
+    'france': 'FR', 'italy': 'IT', 'uk': 'GB', 'spain': 'ES',
+    'germany': 'DE', 'switzerland': 'CH', 'austria': 'AT',
+    'us': 'US', 'canada': 'CA', 'japan': 'JP', 'australia': 'AU',
+    'chile': 'CL', 'portugal': 'PT', 'new-zealand': 'NZ',
+    'greenland': 'GL', 'czechia': 'CZ', 'luxembourg': 'LU',
+    'belgium': 'BE', 'netherlands': 'NL', 'estonia': 'EE',
+    'latvia': 'LV', 'lithuania': 'LT', 'denmark': 'DK',
+    'norway': 'NO', 'finland': 'FI', 'poland': 'PL',
+    'sweden': 'SE', 'mexico': 'MX', 'greece': 'GR',
+    'turkey': 'TR', 'ireland': 'IE',
+}
+
+
+def check_fleet_floor(data, iso2):
+    """KB §56 — fail if substation count < MIN_FLEET[iso2]. Returns list of errors."""
+    floor = MIN_FLEET.get(iso2)
+    if floor is None:
+        return []  # no floor defined; permissive
+    subs = data.get("substations", [])
+    if isinstance(subs, dict):
+        subs = list(subs.values())
+    actual = len(subs)
+    if actual < floor:
+        return [
+            f"FLEET-FLOOR FAILED (KB §56): {iso2} has {actual} substations < MIN_FLEET ({floor}). "
+            f"Likely STUB DATA from placeholder OSM input. Refuse to publish."
+        ]
+    return []
+
+
 def validate_file(filepath):
     """Validate a single ssi-data.json file."""
     errors = []
@@ -75,6 +123,11 @@ def validate_file(filepath):
     if not substations:
         errors.append("No substations found")
         return errors, warnings
+
+    # KB §56 — Fleet-floor check (prophylactic against stub-data deploys).
+    iso2 = data.get('iso2') or (_SLUG_TO_ISO2.get(country) if country else None)
+    if iso2:
+        errors.extend(check_fleet_floor(data, iso2))
 
     # 2. Regions
     regions = data.get('regions', [])
