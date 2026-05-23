@@ -5,14 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 35 verified public data sources, 95 variables, 11 data layers.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Austria · Data Sources</title>
-<link rel="stylesheet" href="../style.css?v=420">
+<title>SSI Index — Data &amp; Download</title>
+<link rel="stylesheet" href="../style.css?v=3">
 </head>
 <body>
-<script src="../ssi-versions.js?v=420"></script>
-<script src="../nav.js?v=420"></script>
-<script src="../ssi-engine.js?v=420"></script>
-<script src="ssi-metadata.js?v=420"></script>
+<script src="../nav.js?v=15"></script>
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js"></script>
 <script>renderNav('data');</script>
 
 <main class="page-shell">
@@ -132,7 +131,7 @@
           <td>Environmental Hazards</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">EEA · GBA · GeoSphere · ISO 9223 · Copernicus</td>
+          <td style="font-size:12px">EEA · BGR · GFZ · ISO 9223 · Copernicus</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#3b9eff">E</td>
@@ -160,7 +159,7 @@
           <td>Network & Topology</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">E-Control · APG Netzentwicklungsplan · GBA · OSM</td>
+          <td style="font-size:12px">E-Control · APG Netzentwicklungsplan · GFZ · OSM</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#8e44ad">I</td>
@@ -222,8 +221,6 @@
     </div>
   </div>
 </main>
-
-<div class="page-footer" id="footerContainer"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -294,18 +291,13 @@ function pdfFooter(doc) {
   }
 })();
 
-fetch('ssi-data.json?v=420').then(function(r) { return r.json(); }).then(function(ssi) {
-  // Schema-compat shim (KB §50): tolerate dict-or-list for substations + regions
-  var subsRaw = ssi.substations;
-  ssi.substations = Array.isArray(subsRaw) ? subsRaw : Object.values(subsRaw || {});
-  var regsRaw = ssi.regions;
-  ssi.regions = Array.isArray(regsRaw) ? regsRaw : Object.values(regsRaw || {});
+fetch('ssi-data.json?v=3').then(function(r) { return r.json(); }).then(function(ssi) {
   var n = ssi.substations.length;
   var jsPDF = window.jspdf.jsPDF;
 
   // Update KPI
   document.getElementById('data-subs').textContent = n.toLocaleString();
-  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + ((ssi.meta && (ssi.meta.total_bezirke || ssi.meta.total_departments)) || 95) + ' Bezirke · ' + ssi.regions.length + ' Bundesländer';
+  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + ssi.meta.total_kreise + ' Bezirke · ' + ssi.regions.length + ' Bundesländer';
   document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' substations · all fields';
 
   // ── Full Dataset PDF (registration-gated) ──

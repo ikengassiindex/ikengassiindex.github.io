@@ -313,19 +313,8 @@ window.SSIMetadata = (function () {
       substations: 1406,
       powerLines: 11267,
       mcIterations: 10000,
-      bezirke: 95,
+      kreise: 85,
       regions: 9
     }
   };
 })();
-
-// ─────────────────────────────────────────────────────────────────────
-// KB §45.6 — dual-global alias (back-compat for deploy gate + loaders)
-// The IIFE above assigns window.SSIMetadata as the canonical form for
-// this country (legacy March-2026 convention). The deploy script gate
-// at §45.6 requires BOTH globals exist + the reverse alias direction
-// for cross-country grep consistency with LV/LT/EE/CZ/LU/BE/NL pattern.
-// ─────────────────────────────────────────────────────────────────────
-window.SSI_METADATA = window.SSIMetadata;
-window.SSIMetadata = window.SSI_METADATA;
-

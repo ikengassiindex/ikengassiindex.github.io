@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="~1,250 substations · 26 Kantone · 148 districts — Interactive map of Switzerland's electrical grid with SSI v4.0.2 resilience scores. 95 variables, topology network + ElCom registry risk.">
+<meta name="description" content="Interactive map of Switzerland's electrical grid with SSI v4.0.2 resilience scores for 947 real OSM substations (147 HV, 776 MV) and 625 power lines (~8,000 km) across 160 Bezirke.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Switzerland · Map Explorer</title>
-<link rel="stylesheet" href="../style.css?v=421">
+<title>SSI Index — Map Explorer</title>
+<link rel="stylesheet" href="../style.css?v=3">
 <style>
   .map-container {
     position: relative;
@@ -134,16 +134,15 @@
 </style>
 </head>
 <body>
-<script src="../ssi-versions.js?v=421"></script>
-<script src="../nav.js?v=421"></script>
-<script src="../ssi-engine.js?v=421"></script>
-<script src="ssi-metadata.js?v=421"></script>
+<script src="../nav.js?v=15"></script>
+<script src="../ssi-engine.js"></script>
+<script src="../ssi-metadata-ch.js"></script>
 <script>renderNav('map');</script>
 
 <main class="page-shell" style="max-width:1440px">
   <div class="page-header animate-in">
-    <h1><span style="font-size:0.75em;vertical-align:0.15em;margin-right:6px">🇨🇭</span>Map Explorer</h1>
-    <p>Explore ~1,250 substations across Switzerland's transmission and distribution grid — 26 Kantone · 148 districts. Click to inspect scores, components, and modifiers. Kanton boundary overlay from bounds.json.</p>
+    <h1>Map Explorer</h1>
+    <p>Explore 947 substations across Switzerland's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
   </div>
 
   <!-- Filter Bar -->
@@ -156,9 +155,9 @@
       <option value="High">High (0.50–0.75)</option>
       <option value="Critical">Critical (0.75–1.00)</option>
     </select>
-    <label>Kanton</label>
+    <label>Canton</label>
     <select id="filter-region">
-      <option value="all">All Kantone</option>
+      <option value="all">All Cantons</option>
     </select>
     <label>Power Voltage</label>
     <select id="filter-voltage">
@@ -178,10 +177,6 @@
       <option value="S">S — Saturation</option>
       <option value="T">T — Energy Transition</option>
     </select>
-    <label style="margin-left:8px;display:flex;align-items:center;gap:6px;font-size:12px">
-      <input type="checkbox" id="filter-bounds" checked>
-      Kanton outlines
-    </label>
     <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
   </div>
 
@@ -223,39 +218,18 @@
   </div>
 </main>
 
-<div class="page-footer" id="footerContainer"></div>
-
-<script src="../map.js?v=421"></script>
+<script src="../map.js?v=38"></script>
 <script>
-  // Switzerland geographic centre — close to Sarnen, Obwalden
   SSIMap.init('ssi-map-canvas', {
-    center: { lat: 46.8, lon: 8.2 },
-    zoom: 8,
-    boundsUrl: 'bounds.json?v=421',
-    showBounds: true,
     onLoaded: function(ssi) {
       var stats = document.getElementById('map-stats');
       if (stats) {
-        var totalDistricts = (ssi.meta && (ssi.meta.total_districts || ssi.meta.n_districts)) || 148;
-        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + totalDistricts + ' districts · ' + ssi.regions.length + ' Kantone · ' +
-          '<b>' + (ssi.fleet_summary.bands ? ssi.fleet_summary.bands.Critical : 0) + '</b> critical · ' +
-          'median R = <b>' + (ssi.fleet_summary.median_R || ssi.fleet_summary.fleet_median_R).toFixed(3) + '</b>';
+        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + ssi.meta.total_kreise + ' Bezirke · 26 Cantons · ' +
+          '<b>' + ssi.fleet_summary.bands.Critical + '</b> critical · ' +
+          'median R = <b>' + ssi.fleet_summary.median_R.toFixed(3) + '</b>';
       }
     }
   });
-
-  // Wire Kantone outline toggle
-  var boundsToggle = document.getElementById('filter-bounds');
-  if (boundsToggle) {
-    boundsToggle.addEventListener('change', function() {
-      if (typeof SSIMap.setShowBounds === 'function') {
-        SSIMap.setShowBounds(this.checked);
-      } else if (SSIMap.state) {
-        SSIMap.state.showBounds = this.checked;
-        if (typeof SSIMap.redraw === 'function') SSIMap.redraw();
-      }
-    });
-  }
 </script>
 <script>renderFooter();</script>
 </body>

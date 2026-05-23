@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="5,000–8,000 substations · 16 Länder · 401 Landkreise — Interactive map of Germany's electrical grid with SSI v4.0.2 resilience scores. 95 variables, 4 TSO control areas (50Hertz · Amprion · TenneT TSO DE · TransnetBW), BNetzA registry risk.">
+<meta name="description" content="Interactive map of Germany's electrical grid with SSI v4.0.2 resilience scores for 13,251 substations across 401 Kreise. 95 variables, topology network + MaStR registry risk.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Germany · Map Explorer</title>
-<link rel="stylesheet" href="../style.css?v=422">
+<title>SSI Index — Map Explorer</title>
+<link rel="stylesheet" href="../style.css?v=3">
 <style>
   .map-container {
     position: relative;
@@ -68,13 +68,6 @@
     gap: 7px;
     margin-bottom: 3px;
     font-size: 11px;
-  }
-  .tso-dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
   }
 
   .map-zoom {
@@ -141,16 +134,15 @@
 </style>
 </head>
 <body>
-<script src="../ssi-versions.js?v=422"></script>
-<script src="../nav.js?v=422"></script>
-<script src="../ssi-engine.js?v=422"></script>
-<script src="ssi-metadata.js?v=422"></script>
+<script src="../nav.js?v=15"></script>
+<script src="../ssi-engine.js"></script>
+<script src="../ssi-metadata.js"></script>
 <script>renderNav('map');</script>
 
 <main class="page-shell" style="max-width:1440px">
   <div class="page-header animate-in">
-    <h1><span style="font-size:0.75em;vertical-align:0.15em;margin-right:6px">🇩🇪</span>Map Explorer</h1>
-    <p>Explore 5,000–8,000 substations across Germany's transmission and distribution grid — 16 Länder · 401 Landkreise. Click to inspect scores, components, and modifiers. Land boundary overlay from bounds.json. TSO control-area legend shows the 4 German TSOs (50Hertz · Amprion · TenneT TSO DE · TransnetBW).</p>
+    <h1>Map Explorer</h1>
+    <p>Explore 13,251 substations across Germany's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
   </div>
 
   <!-- Filter Bar -->
@@ -163,25 +155,17 @@
       <option value="High">High (0.50–0.75)</option>
       <option value="Critical">Critical (0.75–1.00)</option>
     </select>
-    <label>Land</label>
+    <label>Bundesland</label>
     <select id="filter-region">
-      <option value="all">All Länder</option>
-    </select>
-    <label>TSO</label>
-    <select id="filter-tso">
-      <option value="all">All TSOs</option>
-      <option value="50Hertz">50Hertz (NE)</option>
-      <option value="Amprion">Amprion (W)</option>
-      <option value="TenneT">TenneT TSO DE (N-S corridor)</option>
-      <option value="TransnetBW">TransnetBW (SW)</option>
+      <option value="all">All Bundesländer</option>
     </select>
     <label>Power Voltage</label>
     <select id="filter-voltage">
       <option value="all">All Voltages</option>
       <option value="380">≥ 380 kV</option>
       <option value="220">220 kV</option>
-      <option value="110">110 kV</option>
-      <option value="other">&lt; 110 kV</option>
+      <option value="132">132–150 kV</option>
+      <option value="other">&lt; 132 kV</option>
     </select>
     <label>Component Focus</label>
     <select id="filter-component">
@@ -193,10 +177,6 @@
       <option value="S">S — Saturation</option>
       <option value="T">T — Energy Transition</option>
     </select>
-    <label style="margin-left:8px;display:flex;align-items:center;gap:6px;font-size:12px">
-      <input type="checkbox" id="filter-bounds" checked>
-      Länder outlines
-    </label>
     <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
   </div>
 
@@ -214,13 +194,6 @@
           <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25–0.50)</div>
           <div class="map-legend-item"><div class="band-dot high"></div> High (0.50–0.75)</div>
           <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75–1.00)</div>
-          <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(44,36,32,0.08)">
-            <h4>TSO Control Area</h4>
-            <div class="map-legend-item"><span class="tso-dot" style="background:#1a6b4a"></span> 50Hertz (NE)</div>
-            <div class="map-legend-item"><span class="tso-dot" style="background:#c0392b"></span> Amprion (W)</div>
-            <div class="map-legend-item"><span class="tso-dot" style="background:#2c3e7a"></span> TenneT TSO DE (N-S)</div>
-            <div class="map-legend-item"><span class="tso-dot" style="background:#6c3483"></span> TransnetBW (SW)</div>
-          </div>
           <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(44,36,32,0.08);font-size:10px;color:var(--warm-grey);line-height:1.5">
             Scroll to zoom · Drag to pan<br>Click substation to inspect
           </div>
@@ -245,39 +218,18 @@
   </div>
 </main>
 
-<div class="page-footer" id="footerContainer"></div>
-
-<script src="../map.js?v=422"></script>
+<script src="../map.js?v=38"></script>
 <script>
-  // Germany geographic centre — near Niederdorla, Thüringen (51.0, 10.5)
   SSIMap.init('ssi-map-canvas', {
-    center: { lat: 51.0, lon: 10.5 },
-    zoom: 6,
-    boundsUrl: 'bounds.json?v=422',
-    showBounds: true,
     onLoaded: function(ssi) {
       var stats = document.getElementById('map-stats');
       if (stats) {
-        var totalKreise = (ssi.meta && (ssi.meta.total_kreise || ssi.meta.n_landkreise)) || 401;
-        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + totalKreise + ' Landkreise · ' + ssi.regions.length + ' Länder · ' +
-          '<b>' + (ssi.fleet_summary.bands ? ssi.fleet_summary.bands.Critical : 0) + '</b> critical · ' +
-          'median R = <b>' + (ssi.fleet_summary.median_R || ssi.fleet_summary.fleet_median_R).toFixed(3) + '</b>';
+        stats.innerHTML = '<b>' + ssi.fleet_summary.total.toLocaleString() + '</b> substations · ' + ssi.meta.total_kreise + ' Kreise · 16 Bundesländer · ' +
+          '<b>' + ssi.fleet_summary.bands.Critical + '</b> critical · ' +
+          'median R = <b>' + ssi.fleet_summary.median_R.toFixed(3) + '</b>';
       }
     }
   });
-
-  // Wire Länder outline toggle (if map.js exposes setShowBounds)
-  var boundsToggle = document.getElementById('filter-bounds');
-  if (boundsToggle) {
-    boundsToggle.addEventListener('change', function() {
-      if (typeof SSIMap.setShowBounds === 'function') {
-        SSIMap.setShowBounds(this.checked);
-      } else if (SSIMap.state) {
-        SSIMap.state.showBounds = this.checked;
-        if (typeof SSIMap.redraw === 'function') SSIMap.redraw();
-      }
-    });
-  }
 </script>
 <script>renderFooter();</script>
 </body>
