@@ -139,7 +139,7 @@
           <td>Slovenian Open Data</td>
           <td class="num">8</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">ARSO + DRSV · SI-CERT · DRSV · DRSV + ARSO</td>
+          <td style="font-size:12px">ARSO seismology · DRSV floods · SI-CERT · URSJV</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:var(--sage)">F</td>
@@ -298,7 +298,7 @@ fetch('ssi-data.json?v=500').then(function(r) { return r.json(); }).then(functio
 
   // Update KPI
   document.getElementById('data-subs').textContent = n.toLocaleString();
-  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + ssi.meta.total_departments + ' NUTS-3 regions · ' + ssi.regions.length + ' NUTS-3 regions';
+  document.getElementById('data-subs-sub').textContent = n.toLocaleString() + ' substations · ' + ssi.regions.length + ' NUTS-3 regions';
   document.getElementById('dl-full-info').textContent = n.toLocaleString() + ' substations · all fields';
 
   // ── Full Dataset PDF (registration-gated) ──
@@ -312,7 +312,7 @@ fetch('ssi-data.json?v=500').then(function(r) { return r.json(); }).then(functio
         styles: { fontSize: 5.5, cellPadding: 1.5 },
         headStyles: { fillColor: [148, 25, 20], textColor: 255, fontSize: 6 },
         alternateRowStyles: { fillColor: [252, 249, 244] },
-        head: [['ID', 'Name', 'NUTS-3 Region', 'NUTS-3 Region', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6a', 'R6b', 'R7', 'Network', 'Output', 'Tier']],
+        head: [['ID', 'Name', 'NUTS-3 Code', 'NUTS-3 Region', 'kV', 'R_med', 'R_P5', 'R_P95', 'CI', 'Band', 'Pct', 'C', 'V', 'I', 'E', 'S', 'T', 'R3', 'R4', 'R6a', 'R6b', 'R7', 'Network', 'Output', 'Tier']],
         body: ssi.substations.map(function(s) {
           return [
             s.internal_id, s.name, s.region, s.province, s.voltage_kv,
@@ -442,7 +442,7 @@ fetch('ssi-data.json?v=500').then(function(r) { return r.json(); }).then(functio
         styles: { fontSize: 6, cellPadding: 1.5 },
         headStyles: { fillColor: [148, 25, 20], textColor: 255, fontSize: 6.5 },
         alternateRowStyles: { fillColor: [252, 249, 244] },
-        head: [['ID', 'Name', 'NUTS-3 Region', 'NUTS-3 Region', 'Longitude', 'Latitude', 'kV', 'R_median', 'Band', 'C', 'V', 'I', 'E', 'S', 'T']],
+        head: [['ID', 'Name', 'NUTS-3 Code', 'NUTS-3 Region', 'Longitude', 'Latitude', 'kV', 'R_median', 'Band', 'C', 'V', 'I', 'E', 'S', 'T']],
         body: ssi.substations.map(function(s) {
           return [
             s.internal_id, s.name, s.region, s.province,
@@ -474,7 +474,7 @@ fetch('ssi-data.json?v=500').then(function(r) { return r.json(); }).then(functio
         { title: 'Modifier Functions', text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence NUTS-3 regions\nR4 — Graph criticality: betweenness centrality & bridge status from network topology\nR6a — Restoration speed: DSO historical MTTR or Bayesian estimate\nR6b — Network topology: Centrality and ring topology from physical network analysis\nR7 — Digital readiness: DESI digital index & smart meter penetration proxy' },
         { title: 'Monte Carlo Uncertainty', text: '1,000 iterations per NUTS-3 region (browser mode)\nEach metric perturbed ± based on confidence tier:\n  Tier A (measured): σ = 5%\n  Tier B (proxy): σ = 12%\n  Tier C (fuzzy): σ = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
         { title: 'Classification Bands', text: 'LOW risk: R_median < 0.35\nMEDIUM-LOW: 0.35 ≤ R < 0.45\nMEDIUM: 0.45 ≤ R < 0.55\nMEDIUM-HIGH: 0.55 ≤ R < 0.65\nHIGH risk: R_median ≥ 0.65' },
-        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, AGEN-RS monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): floods, landslides, corrosion, wildfire\nE — Slovenian Open Data (8 vars): ARSO + DRSV, SI-CERT, DRSV, DRSV + ARSO public indicators\nF — Network Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): AGEN-RS quality, topology, JRC DSO data\nH — Network & Topology (7 vars): ELES data, ARSO + ZAG-EQS, ring analysis\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities' },
+        { title: 'Data Layers (11 layers, 95 variables)', text: 'A — SSI v4.0 Resilience (17 vars): asset age, condition, load factor, SAIDI/SAIFI\nB.1 — Grid Telemetry Open (3 vars): weather, AGEN-RS monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves\nC — Socio-Economic (9 vars): income, energy poverty, digital readiness\nD — Environmental Hazards (7 vars): floods, landslides, corrosion, wildfire\nE — Slovenian Open Data (8 vars): ARSO seismology + DRSV floods + SI-CERT + URSJV nuclear oversight\nF — Network Transitions (12 vars): state transition probabilities\nG — Modifier Inputs (3 vars): AGEN-RS quality, topology, JRC DSO data\nH — Network & Topology (7 vars): ELES data, ARSO + ZAG-EQS, ring analysis\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities' },
         { title: 'Normalisation', text: 'All metrics normalised to [0, 1] using min-max scaling across the fleet.\nHigher score = higher risk. Inverted metrics (where high raw value = low risk) are flipped: x_norm = 1 - (x - min) / (max - min).' }
       ];
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Slovenia's 158 substations — 21 EHV (400/220 kV), 137 HV (110 kV) — across 96 NUTS-3 regions and 13 NUTS-3 regions. 95 variables, 30+ public data sources. Open data, open methodology.">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Slovenia's 158 substations — 21 EHV (400/220 kV), 137 HV (110 kV) — across 12 NUTS-3 regions. 95 variables, 30+ public data sources. Open data, open methodology.">
 <meta name="theme-color" content="#941914">
 <meta property="og:title" content="SSI Index — Overview">
 <meta property="og:description" content="Composite resilience scoring for Slovenia's electrical grid. 95 variables, 30+ public data sources.">
@@ -23,7 +23,7 @@
   <div class="page-header animate-in">
     <h1>Systemic System Infrastructure Index</h1>
     <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
-    <p>A composite resilience score for Slovenia's electrical grid — 158 substations — 21 EHV (400/220 kV), 137 HV (110 kV) — across 96 NUTS-3 regions and 13 NUTS-3 regions — 95 variables, 30+ public data sources, zero proprietary dependencies.</p>
+    <p>A composite resilience score for Slovenia's electrical grid — 158 substations — 21 EHV (400/220 kV), 137 HV (110 kV) — across 12 NUTS-3 regions — 95 variables, 30+ public data sources, zero proprietary dependencies.</p>
     <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
   </div>
 
@@ -48,7 +48,7 @@
     <div class="kpi-card animate-in delay-1">
       <div class="kpi-label">Substations Scored</div>
       <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
-      <div class="kpi-sub" id="kpi-total-sub">21 EHV · 137 HV · 96 NUTS-3 regions · 13 NUTS-3 regions</div>
+      <div class="kpi-sub" id="kpi-total-sub">21 EHV · 137 HV · 12 NUTS-3 regions</div>
     </div>
     <div class="kpi-card animate-in delay-2">
       <div class="kpi-label">Fleet Median R</div>
@@ -140,7 +140,7 @@
             <div><strong>5</strong> modifiers (R3, R4, R6a, R6b, R7)</div>
             <div><strong>10,000</strong> Monte Carlo iterations</div>
             <div><strong>20×20</strong> correlation matrix</div>
-            <div><strong>13</strong> NUTS-3 regions covered</div>
+            <div><strong>12</strong> NUTS-3 regions covered</div>
             <div><strong>30+</strong> verified data sources</div>
           </div>
           <div style="border-top:1px solid rgba(0,0,0,0.06);margin-top:10px;padding-top:10px">
@@ -173,7 +173,7 @@
         });
       })();
       </script>
-              <div><strong>96</strong> NUTS-3 regions · 13 NUTS-3 regions</div>
+              <div><strong>12</strong> NUTS-3 regions · 212 občine</div>
             </div>
           </div>
         </div>
@@ -257,7 +257,7 @@
       document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
       var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 220; }).length;
       var hvCount = ssi.fleet_summary.total - ehvCount;
-      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + ssi.meta.total_departments + ' NUTS-3 regions · ' + ssi.regions.length + ' NUTS-3 regions';
+      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + ssi.regions.length + ' NUTS-3 regions';
 
       // ── Distribution bar ──
       var bp = ssi.fleet_summary.band_pct;

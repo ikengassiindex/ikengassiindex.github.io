@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Compare Slovenian NUTS-3 regions and NUTS-3 regions by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="description" content="Compare Slovenia's 12 NUTS-3 statistical regions by SSI resilience score, component breakdown, and socio-economic context.">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Regional Analysis</title>
 <link rel="stylesheet" href="../style.css?v=500">
@@ -18,7 +18,7 @@
 <main class="page-shell">
   <div class="page-header animate-in">
     <h1>Regional Analysis</h1>
-    <p>Compare Slovenian NUTS-3 regions and NUTS-3 regions by SSI score, component breakdown, and socio-economic context across 158 substations in Slovenia's 13 NUTS-3 regions.</p>
+    <p>Compare Slovenia's 12 NUTS-3 statistical regions by SSI score, component breakdown, and socio-economic context across 158 substations.</p>
   </div>
 
   <!-- Tabs -->
@@ -33,7 +33,7 @@
     <div class="card animate-in delay-2" style="margin-bottom:24px">
       <div class="card-header">
         <h3>NUTS-3 Regions Ranked by Median R Score</h3>
-        <span class="label-xs" id="ranking-count">13 NUTS-3 Regions · sorted worst → best</span>
+        <span class="label-xs" id="ranking-count">12 NUTS-3 Regions · sorted worst → best</span>
       </div>
       <table class="data-table">
         <thead>
@@ -100,7 +100,7 @@
     <div class="card animate-in">
       <div class="card-header">
         <h3>Average Component Contribution by NUTS-3 Region</h3>
-        <span class="label-xs">Stacked horizontal bars · 13 NUTS-3 Regions</span>
+        <span class="label-xs">Stacked horizontal bars · 12 NUTS-3 Regions</span>
       </div>
       <div id="decomp-bars" style="margin-top:16px">
         <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
@@ -161,7 +161,7 @@ function renderRanking(data) {
     var pCrit = ((r.bands.Critical / total) * 100).toFixed(0);
     return '<tr>' +
       '<td style="color:var(--warm-grey)">' + (i + 1) + '</td>' +
-      '<td style="font-weight:500">' + r.region + '</td>' +
+      '<td style="font-weight:500">' + (r.name && r.name !== r.region ? r.name : r.region) + '</td>' +
       '<td class="num" style="color:' + scoreColor(r.median_R) + ';font-weight:600">' + fmt(r.median_R) + '</td>' +
       '<td class="num">' + r.count + '</td>' +
       '<td class="num">' + pct(r.pct_critical) + '</td>' +
@@ -412,7 +412,7 @@ function renderDecomposition(data) {
 
     return '<div style="margin-bottom:14px">' +
       '<div style="display:flex;align-items:center;margin-bottom:4px">' +
-        '<span style="width:140px;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + r.region + '</span>' +
+        '<span style="width:140px;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (r.name && r.name !== r.region ? r.name : r.region) + '</span>' +
         '<span style="margin-left:auto;font-size:11px;color:var(--warm-grey);font-variant-numeric:tabular-nums">' + r.mean_R.toFixed(3) + '</span>' +
       '</div>' +
       '<div style="display:flex;height:16px;border-radius:4px;overflow:hidden;width:' + barWidth.toFixed(0) + '%">' + segments + '</div>' +

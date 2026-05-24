@@ -1506,9 +1506,9 @@ document.addEventListener("ssi-config-ready", function(e) {
     var aboveAvg = regions.filter(function(r){ return r.avgR > fleetAvgR; }).length;
 
     document.getElementById('eu-ranking-narrative').innerHTML =
-      'The Savinja Valley ranks <strong>#' + rhoneRank + ' of 13 NUTS-3 regions</strong> by mean R_median, placing it among the upper tier of national risk. ' +
+      'The Savinja Valley ranks <strong>#' + rhoneRank + ' of 12 NUTS-3 regions</strong> by mean R_median, placing it among the upper tier of national risk. ' +
       'The three most stressed regions are ' + top3.join(', ') + ', while the three most resilient are ' + bot3.join(', ') + '. ' +
-      aboveAvg + ' of 13 NUTS-3 regions score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
+      aboveAvg + ' of 12 NUTS-3 regions score above the fleet average of ' + fleetAvgR.toFixed(3) + '. ' +
       'This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DSO or national statistics — ' +
       'reveals the true spatial distribution of grid stress across Slovenia. ' +
       'It is precisely this substation-level granularity that positions the SSI as a tool for NEPN / Slovenia Digital 2030 / Slovenia RRP investment prioritisation: ' +
@@ -1700,8 +1700,9 @@ document.addEventListener("ssi-config-ready", function(e) {
       '<span>' + c + '</span></div>';
   }).join('');
 
-  var editionNum = (now.getFullYear() - 2026) * 12 + (now.getMonth() + 1) - 2; // March 2026 = Ed 001
-  var editionStr = String(Math.max(1, editionNum)).padStart(3, '0');
+  // KB §47.14 — Slovenia anchor: July 2026 = Edition 01 (inaugural · FIRST_REFRESH 2026-07-09)
+  var editionNum = (now.getFullYear() - 2026) * 12 + (now.getMonth() + 1) - 6;
+  var editionStr = String(Math.max(1, editionNum)).padStart(2, '0');
 
   document.getElementById('enn-topic').innerHTML =
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
@@ -1820,11 +1821,16 @@ document.addEventListener("ssi-config-ready", function(e) {
   var year = now.getFullYear();
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-  // Next month
-  var nextMonth = month + 1 > 11 ? 0 : month + 1;
-  var nextYear = month + 1 > 11 ? year + 1 : year;
-  var editionNum = (year - 2026) * 12 + (month + 1) - 2; // March 2026 = 1
-  var nextEdition = String(Math.max(1, editionNum)).padStart(3, '0');
+  // KB §47.14 — Slovenia anchor: July 2026 = Edition 01 (inaugural · FIRST_REFRESH 2026-07-09)
+  // Standard padStart(2,'0') · d>=21 cutoff applied via addMonths below
+  var d = now.getDate();
+  var addMonths = d >= 21 ? 2 : 1;          // KB §47.14 second-Thursday cutoff
+  var pubMonth0 = month + addMonths;        // 0-indexed month of next publication
+  var nextYear = year + Math.floor(pubMonth0 / 12);
+  var nextMonth = ((pubMonth0 % 12) + 12) % 12;
+  // Edition number anchored to Slovenia's first refresh (July 2026 = Ed 01)
+  var nextEditionNum = (nextYear - 2026) * 12 + (nextMonth + 1) - 6;
+  var nextEdition = String(Math.max(1, nextEditionNum)).padStart(2, '0');
 
   // Deterministic seed
   function seededIndex(s, len) {
@@ -1986,7 +1992,14 @@ document.addEventListener("ssi-config-ready", function(e) {
     });
 
     // 6. Markov degradation — substations approaching critical state
-    var markovCrit = fleet.filter(function(s){ return s.markov && s.markov.stationary_critical > 0.7; });
+    // (Slovenia schema exposes steady_state[3] = stationary probability of Critical state)
+    var markovCrit = fleet.filter(function(s){
+      if (!s.markov) return false;
+      var pCrit = (s.markov.steady_state && s.markov.steady_state.length > 3)
+        ? s.markov.steady_state[3]
+        : (s.markov.p_critical_20yr || 0);
+      return pCrit > 0.20; // Slovenia fleet is younger than original threshold; recalibrated
+    });
     spotlights.push({
       title: markovCrit.length + ' Substations Approaching Critical Degradation',
       body: 'The SSI\'s 4-state Markov degradation model identifies <strong>' + markovCrit.length +
