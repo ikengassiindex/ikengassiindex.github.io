@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ikengassiindex.github.io/schemas/bounds.schema.json",
+  "title": "SSI Index — bounds.json (admin polygon GeoJSON)",
+  "description": "GeoJSON FeatureCollection of administrative polygons (typically NUTS-3, Cantons, Bundesländer, etc). Used by map.js for region-overlay fitting + on-hover region labeling. Optional file — countries without bounds.json get silent no-op.",
+  "type": "object",
+  "required": ["type", "features"],
+  "additionalProperties": true,
+  "properties": {
+    "type": {"const": "FeatureCollection"},
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/feature"}
+    },
+    "name": {"type": "string"},
+    "crs": {"type": "object"}
+  },
+  "$defs": {
+    "feature": {
+      "type": "object",
+      "required": ["type", "geometry", "properties"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {"const": "Feature"},
+        "geometry": {
+          "type": "object",
+          "required": ["type", "coordinates"],
+          "additionalProperties": true,
+          "properties": {
+            "type": {"enum": ["Polygon", "MultiPolygon"]},
+            "coordinates": {"type": "array", "minItems": 1}
+          }
+        },
+        "properties": {
+          "type": "object",
+          "description": "Region metadata — at minimum should carry a region code/name. Convention: 'code' (NUTS-3/ISO) + 'name' (human-readable).",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

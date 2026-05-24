@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ikengassiindex.github.io/schemas/country-config.schema.json",
+  "title": "SSI Index — per-country config (NEW for Phase 1)",
+  "description": "Per-country configuration carrying everything that was previously hardcoded in {country}/intelligence.html, {country}/index.html, etc. Single source of truth for: edition anchor, admin-level labels + counts, R3/R4/R6 bucket thresholds, DSO panel, deep-dive rotation. Read at runtime by the central renderer (Phase 2). Replaces the per-page hardcoded literals that caused KB §64.3 anti-patterns A2 (template double-render of admin levels), A5 (edition anchor in HTML), A7 (calibration thresholds hardcoded).",
+  "type": "object",
+  "required": ["slug", "country_name", "first_refresh", "admin"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "URL-safe country slug (matches countries.json + nav.js)"
+    },
+    "country_name": {"type": "string", "description": "Display name (e.g. 'Slovenia')"},
+    "country_name_local": {"type": "string", "description": "Endonym (e.g. 'Slovenija')"},
+    "iso2": {"type": "string", "pattern": "^[A-Z]{2}$"},
+    "iso3": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "flag": {"type": "string", "description": "Flag emoji"},
+    "capital": {"type": "string"},
+
+    "first_refresh": {
+      "type": "string",
+      "format": "date",
+      "description": "Inaugural edition publication date (YYYY-MM-DD). Drives Section G edition-anchor formula."
+    },
+    "edition_anchor_month_offset": {
+      "type": "integer",
+      "description": "OPTIONAL: pre-computed offset for legacy compat. If absent, computed at render time from first_refresh as ((year-2026)*12 + month - 6)."
+    },
+
+    "admin": {
+      "type": "object",
+      "description": "Administrative-level labeling. Replaces the {{NUTS-3 regions and {{NUTS-3 regions template double-render bug (KB §64.3 anti-pattern A2).",
+      "required": ["l1"],
+      "additionalProperties": false,
+      "properties": {
+        "l1": {
+          "type": "object",
+          "required": ["label_en", "count"],
+          "additionalProperties": false,
+          "properties": {
+            "label_en": {"type": "string", "description": "e.g. 'NUTS-3 statistical region'"},
+            "label_local": {"type": "string", "description": "e.g. 'statistična regija'"},
+            "label_short": {"type": "string", "description": "e.g. 'NUTS-3' (used in compact UI)"},
+            "count": {"type": "integer", "minimum": 1, "description": "e.g. 12"}
+          }
+        },
+        "l2": {
+          "type": "object",
+          "description": "Optional second admin level (e.g. France départements, Slovenia občine). OMIT for single-level countries to prevent template double-render.",
+          "required": ["label_en", "count"],
+          "additionalProperties": false,
+          "properties": {
+            "label_en": {"type": "string"},
+            "label_local": {"type": "string"},
+            "label_short": {"type": "string"},
+            "count": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+
+    "tso": {"type": "string", "description": "TSO display name (e.g. 'ELES (Elektro-Slovenija)')"},
+    "regulator": {"type": "string"},
+    "statistics_office": {"type": "string"},
+    "nem": {"type": "string", "description": "Nominated electricity market"},
+    "bidding_zone": {"type": "string"},
+
+    "thresholds": {
+      "type": "object",
+      "description": "Calibration thresholds extracted from intelligence.html. Replaces hardcoded JS literals (KB §64.3 anti-pattern A7).",
+      "additionalProperties": false,
+      "properties": {
+        "r3_buckets": {
+          "type": "array",
+          "description": "R3_C_mult tier boundaries, computed per-country from the actual distribution. Ordered top-to-bottom (Capital-Intensive first).",
+          "minItems": 3, "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["label", "lower"],
+            "additionalProperties": false,
+            "properties": {
+              "label": {"type": "string", "description": "e.g. 'Capital-Intensive / High-Consequence'"},
+              "icon": {"type": "string", "description": "Emoji"},
+              "lower": {"type": "number", "description": "Inclusive lower bound"},
+              "upper": {"type": ["number", "null"], "description": "Exclusive upper bound (null = no upper)"},
+              "voll_range": {"type": "string", "description": "e.g. '€15–30/kWh'"},
+              "color": {"type": "string", "description": "CSS color"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "high_consequence_threshold": {
+          "type": "number",
+          "description": "R3_C_mult threshold for the 'High-Consequence Subs' KPI counter."
+        }
+      }
+    },
+
+    "dso_panel": {
+      "type": "array",
+      "description": "DSO list for dno-dashboard.html. Replaces hardcoded HTML cards.",
+      "items": {
+        "type": "object",
+        "required": ["name", "share_pct"],
+        "additionalProperties": true,
+        "properties": {
+          "name": {"type": "string"},
+          "region": {"type": "string"},
+          "customers": {"type": "integer"},
+          "share_pct": {"type": "number", "minimum": 0, "maximum": 100},
+          "color": {"type": "string"}
+        }
+      }
+    },
+
+    "deep_dive_rotation": {
+      "type": "array",
+      "description": "Section G deep-dive topic rotation (intelligence.html). Replaces hardcoded JS array.",
+      "items": {
+        "type": "object",
+        "required": ["region", "theme"],
+        "additionalProperties": true,
+        "properties": {
+          "region": {"type": "string"},
+          "theme": {"type": "string"},
+          "context": {"type": "string"},
+          "context_detail": {"type": "string"}
+        }
+      }
+    },
+
+    "ssi_metadata_extras": {
+      "type": "object",
+      "description": "Country-specific overrides for ssi-metadata.js shape (e.g. R3 tier descriptor, R6 anchors, R7 ceiling).",
+      "additionalProperties": true
+    }
+  }
+}

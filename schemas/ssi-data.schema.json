@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ikengassiindex.github.io/schemas/ssi-data.schema.json",
+  "title": "SSI Index — ssi-data.json (canonical schema)",
+  "description": "Per-country SSI scoring output. Top-level fleet summary + array of substation records. Canonical sub-schema captures the COMMON CORE across all 31 countries; country-specific extensions are permitted via additionalProperties (e.g. Baltic trio's richer R3_tier / R6c_flood modifiers, Mexico/Denmark/Greenland's degradation-model Markov variant). Renderer code must use defensive optional-chaining for fields outside the core (KB §64.3 anti-pattern A1).",
+  "type": "object",
+  "required": ["meta", "fleet_summary", "regions", "substations"],
+  "additionalProperties": true,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Metadata block. country + version were not required by older cohorts (EE/LV/LT/IT/TR) so they are optional here; renderer code uses defensive lookup with fallback to the country slug derived from URL path.",
+      "additionalProperties": true,
+      "properties": {
+        "country": {"type": "string", "description": "Country slug (lowercase, e.g. 'slovenia')"},
+        "code": {"type": "string", "description": "ISO 3166-1 alpha-2 (e.g. 'SI')"},
+        "version": {"type": "string", "description": "SSI engine version, e.g. '4.0.2'"},
+        "substations": {"type": "integer", "minimum": 0, "description": "Sub count (cross-check vs len(substations))"},
+        "regions": {"type": "integer", "minimum": 0},
+        "total_departments": {"type": "integer", "minimum": 0, "description": "Optional admin-l2 count (default = regions count if single-level)"},
+        "mc_iterations": {"type": "integer", "minimum": 0},
+        "variables": {"type": "integer", "minimum": 0}
+      }
+    },
+    "fleet_summary": {
+      "type": "object",
+      "required": ["total", "bands"],
+      "additionalProperties": true,
+      "properties": {
+        "total": {"type": "integer", "minimum": 0},
+        "R_median": {"type": "number"},
+        "R_min": {"type": "number"},
+        "R_max": {"type": "number"},
+        "bands": {
+          "type": "object",
+          "required": ["Low", "Medium", "High", "Critical"],
+          "additionalProperties": true,
+          "properties": {
+            "Low": {"type": "integer", "minimum": 0},
+            "Medium": {"type": "integer", "minimum": 0},
+            "High": {"type": "integer", "minimum": 0},
+            "Critical": {"type": "integer", "minimum": 0}
+          }
+        },
+        "band_pct": {"type": "object"},
+        "confidence_pct": {"type": ["object", "string"]}
+      }
+    },
+    "regions": {
+      "type": ["array", "object"],
+      "description": "Per-region rollup. Most countries use array; some legacy use dict.",
+      "minItems": 0
+    },
+    "substations": {
+      "type": "array",
+      "minItems": 0,
+      "items": {"$ref": "#/$defs/substation"}
+    }
+  },
+  "$defs": {
+    "substation": {
+      "type": "object",
+      "description": "Core fields required across all countries. Renderers MUST optional-chain extension fields. See KB §64.3 anti-pattern A1.",
+      "required": ["R_median", "classification", "components", "modifiers"],
+      "additionalProperties": true,
+      "properties": {
+        "substation_id": {"type": ["string", "integer"]},
+        "internal_id": {"type": ["string", "integer"]},
+        "name": {"type": "string"},
+        "lat": {"type": "number"},
+        "lon": {"type": "number"},
+        "voltage_kv": {"type": ["number", "null"], "description": "May be null when source OSM voltage tag missing (Czechia, Luxembourg)"},
+        "region": {"type": "string", "description": "Admin code (e.g. NUTS-3 'SI041' or canton 'ZH')"},
+        "province": {"type": "string", "description": "Human-readable admin label"},
+        "R_median": {"type": "number", "minimum": 0, "maximum": 1.5},
+        "R_P5": {"type": "number"},
+        "R_P95": {"type": "number"},
+        "CI_width": {"type": "number"},
+        "classification": {
+          "type": "string",
+          "enum": ["Low", "Medium", "High", "Critical"]
+        },
+        "components": {
+          "type": "object",
+          "required": ["C", "V", "I", "E", "S", "T"],
+          "additionalProperties": false,
+          "properties": {
+            "C": {"type": "number"}, "V": {"type": "number"}, "I": {"type": "number"},
+            "E": {"type": "number"}, "S": {"type": "number"}, "T": {"type": "number"}
+          }
+        },
+        "modifiers": {
+          "$ref": "#/$defs/modifiers"
+        },
+        "markov": {"$ref": "#/$defs/markov"},
+        "seismic": {"type": "object"},
+        "socio_economic": {"type": "object"},
+        "graph_topology": {"type": "object"},
+        "transition": {"type": "object"}
+      }
+    },
+    "modifiers": {
+      "type": "object",
+      "description": "Core 5 modifiers. Baltic trio (EE/LV/LT) has 11-key extension — allowed via additionalProperties.",
+      "required": ["R3_C_mult", "R4_F_topo", "R6_restoration", "R6_seismic", "R7_cyber"],
+      "additionalProperties": true,
+      "properties": {
+        "R3_C_mult": {"type": "number", "minimum": 0.5, "maximum": 2.0},
+        "R4_F_topo": {"type": "number", "minimum": 0.5, "maximum": 2.0},
+        "R6_restoration": {"type": "number", "minimum": 0.5, "maximum": 2.0},
+        "R6_seismic": {"type": "number", "minimum": 0.5, "maximum": 2.0},
+        "R7_cyber": {"type": "number", "minimum": 0.5, "maximum": 2.0}
+      }
+    },
+    "markov": {
+      "type": "object",
+      "description": "Markov degradation model output. 10 sub-variants observed across countries (KB §64.3 anti-pattern A1). Schema requires only the CORE 3 keys that the renderer references; everything else is country-specific extension.",
+      "required": ["risk_score"],
+      "additionalProperties": true,
+      "properties": {
+        "risk_score": {"type": "number", "minimum": 0, "maximum": 1},
+        "ettc_years": {"type": "number", "minimum": 0, "description": "Expected time to critical (years)"},
+        "ETTC_years": {"type": "number", "minimum": 0, "description": "Alias for ettc_years (UK/Baltic schema)"},
+        "p_critical_20yr": {"type": "number", "minimum": 0, "maximum": 1},
+        "p_crit_20yr": {"type": "number", "minimum": 0, "maximum": 1, "description": "Alias for p_critical_20yr"},
+        "p_critical_10yr": {"type": "number", "minimum": 0, "maximum": 1},
+        "p_crit_10yr": {"type": "number", "minimum": 0, "maximum": 1},
+        "corrosion_class": {"type": "string", "enum": ["C1", "C2", "C3", "C4", "C5", "CX"]},
+        "steady_state": {
+          "description": "Stationary distribution over [Healthy, Aging, Degraded, Critical]. Two representations observed: array [0.3, 0.3, 0.2, 0.2] (most countries) OR dict {'Good':0.3,'Acceptable':0.3,'Degraded':0.2,'Critical':0.2} (Mexico). Renderers must accept both.",
+          "oneOf": [
+            {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number", "minimum": 0, "maximum": 1}},
+            {"type": "object", "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}}
+          ]
+        },
+        "stationary_critical": {"type": "number", "minimum": 0, "maximum": 1, "description": "Alias for steady_state[3] (Baltic + Mexico schema)"}
+      }
+    }
+  }
+}
