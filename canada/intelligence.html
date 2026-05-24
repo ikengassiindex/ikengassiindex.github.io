@@ -1149,7 +1149,7 @@ if (window.SSI_METADATA) {
 
     // Draw all non-Ontario–Quebec substations as faint grey for context
     fleet.forEach(function(s){
-      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && s.region !== 'Auvergne-Ontario–Quebec-Alpes') {
+      if (s.lon >= minLon && s.lon <= maxLon && s.lat >= minLat && s.lat <= maxLat && s.region !== 'Ontario') {
         var p = proj(s.lon, s.lat);
         ctx.beginPath();
         ctx.arc(p[0], p[1], 2, 0, Math.PI * 2);
@@ -1459,7 +1459,7 @@ if (window.SSI_METADATA) {
 (function(){
   fetch('ssi-data.json?v=402').then(function(r){ return r.json(); }).then(function(data){
     var fleet = data.substations;
-    var puglia = fleet.filter(function(s){ return s.region === 'Auvergne-Ontario–Quebec-Alpes'; });
+    var puglia = fleet.filter(function(s){ return s.region === 'Ontario'; });
 
     // ── Key Insight ──
     // C component > 70% of weight ceiling (0.30) = high continuity deficit ≈ "bassa concentrazione"
@@ -1501,7 +1501,7 @@ if (window.SSI_METADATA) {
     var bandColors = { Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' };
     var html = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div>';
     regions.forEach(function(reg, idx){
-      var isRhone = reg.name === 'Auvergne-Ontario–Quebec-Alpes';
+      var isRhone = reg.name === 'Ontario';
       var barPct = ((1 - reg.avgR) * 100).toFixed(1);
       var col = reg.avgR > 0.50 ? '#941914' : reg.avgR > 0.40 ? '#aa4234' : reg.avgR > 0.35 ? '#b8863a' : '#5d8563';
       var highlight = isRhone ? 'background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;' : '';
@@ -1533,7 +1533,7 @@ if (window.SSI_METADATA) {
     document.getElementById('eu-regional-ranking').innerHTML = html;
 
     // Ranking narrative
-    var rhoneRank = regions.findIndex(function(r){ return r.name === 'Auvergne-Ontario–Quebec-Alpes'; }) + 1;
+    var rhoneRank = regions.findIndex(function(r){ return r.name === 'Ontario'; }) + 1;
     var top3 = regions.slice(0, 3).map(function(r){ return r.name; });
     var bot3 = regions.slice(-3).reverse().map(function(r){ return r.name; });
     var aboveAvg = regions.filter(function(r){ return r.avgR > fleetAvgR; }).length;
@@ -1871,18 +1871,18 @@ if (window.SSI_METADATA) {
 
   // ── Card 1: Next Edition deep-dive topics ──
   var deepDives = [
-    { region: 'Auvergne-Ontario–Quebec-Alpes', theme: 'The Ontario–Quebec Corridor', context: 'SAIDI comparison', contextDetail: 'S/T comparison with Germany and Denmark' },
-    { region: 'Île-de-Canada', theme: 'The Île-de-Canada Metropolitan Load', context: 'Urban saturation dynamics', contextDetail: 'DER + EV penetration stress on the Toronto metropolitan grid' },
-    { region: 'Hauts-de-Canada', theme: 'The Hauts-de-Canada Industrial Belt', context: 'Industrial VoLL exposure', contextDetail: 'Post-industrial corridor where grid ageing meets reindustrialisation' },
-    { region: 'Grand Est', theme: 'The Grand Est Nuclear Corridor', context: 'Nuclear baseload dependency', contextDetail: 'Fessenheim closure impact and cross-border interconnection with Germany' },
-    { region: 'Nouvelle-Aquitaine', theme: 'The Nouvelle-Aquitaine Transition', context: 'Renewable integration stress', contextDetail: 'Solar + wind penetration rates vs grid absorption capacity' },
-    { region: 'Alberta', theme: 'The Alberta Solar Belt', context: 'DER saturation analysis', contextDetail: 'Canada\'s highest PV density — grid absorption limits and curtailment risk' },
-    { region: 'British Columbia', theme: 'The BC Coastal Grid', context: 'CMIP6 climate hazard', contextDetail: 'Mediterranean thermal stress trajectory vs Atlantic peers' },
-    { region: 'Bretagne', theme: 'The Bretagne Peninsula', context: 'Island-like grid topology', contextDetail: 'Peninsular grid dependency and interconnection vulnerability' },
-    { region: 'Normandie', theme: 'The Normandie Energy Nexus', context: 'Nuclear + offshore wind', contextDetail: 'Grid readiness for Flamanville EPR and Channel offshore wind farms' },
-    { region: 'Pays de la Loire', theme: 'The Loire Valley Grid', context: 'SME density analysis', contextDetail: 'How distributed economic fabric amplifies aggregate VoLL exposure' },
-    { region: 'Bourgogne-Franche-Comté', theme: 'The Bourgogne-Franche-Comté Heritage Grid', context: 'Infrastructure age profile', contextDetail: 'Markov degradation analysis on one of Canada\'s oldest networks' },
-    { region: 'Centre-Val de Loire', theme: 'The Centre-Val de Loire Nuclear Hub', context: 'Nuclear concentration risk', contextDetail: 'Four nuclear sites — grid dependency and seismic exposure analysis' }
+    { region: 'Ontario', theme: 'The Ontario–Quebec Power Corridor', context: 'Interconnection capacity & nuclear baseload', contextDetail: 'Bruce Power + Darlington + Pickering — 11.4 GW nuclear meets the Quebec hydro corridor at Beauharnois' },
+    { region: 'Quebec', theme: 'The Hydro-Québec Backbone', context: 'James Bay HVDC + interconnections', contextDetail: '5,200 km of 735 kV plus the Phase II HVDC link to Boston — single-jurisdiction hydro megagrid' },
+    { region: 'Alberta', theme: 'The Alberta Solar Belt', context: 'DER saturation analysis', contextDetail: 'Canada\'s highest PV density — grid absorption limits and curtailment risk on AESO' },
+    { region: 'British Columbia', theme: 'The BC Coastal Grid', context: 'CMIP6 climate hazard', contextDetail: 'Coastal thermal stress trajectory vs Atlantic peers; BC Hydro\'s Site C readiness' },
+    { region: 'Manitoba', theme: 'The Manitoba Hydro Corridor', context: 'DC interconnection capacity', contextDetail: 'Bipole III HVDC and US Midwest export capacity — single-utility hydro fleet' },
+    { region: 'Saskatchewan', theme: 'The Saskatchewan Transition', context: 'Coal phase-out + SMR pilot', contextDetail: 'SaskPower\'s Boundary Dam CCS + planned BWRX-300 SMR — fossil-to-nuclear handoff' },
+    { region: 'Nova Scotia', theme: 'The Maritimes Grid', context: 'Atlantic storm + cable resilience', contextDetail: 'Maritime Link to NL + post-Fiona hardening — R6_storm regional anchor' },
+    { region: 'New Brunswick', theme: 'The New Brunswick Nuclear Hub', context: 'Point Lepreau + cross-border tie', contextDetail: '660 MW CANDU plus the 345 kV ties to Maine and Quebec' },
+    { region: 'Newfoundland and Labrador', theme: 'The Churchill Falls Corridor', context: 'Hydro export geopolitics', contextDetail: '5,428 MW Churchill Falls + the Quebec wheeling agreement expiry in 2041' },
+    { region: 'Yukon', theme: 'The Yukon Isolated Grid', context: 'Off-grid + diesel displacement', contextDetail: 'Whitehorse + Mayo–Dawson loop; isolated from continental grid, diesel-backed' },
+    { region: 'Northwest Territories', theme: 'The NWT Mining Loads', context: 'Industrial isolated load centers', contextDetail: 'Snare-Yellowknife hydro + Norman Wells; remote mining grid criticality' },
+    { region: 'Prince Edward Island', theme: 'The PEI Wind Penetration', context: 'High wind share + cable dependency', contextDetail: 'Highest wind share (~30%) of any Canadian province + NB undersea tie' }
   ];
 
   var nextDiveIdx = seededIndex(nextSeed + 3333, deepDives.length);
