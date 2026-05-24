@@ -659,13 +659,19 @@ let componentChart = null;
 
 function renderAll(data) {
   document.title = `SSI Index — ESG Report · ${displayName(data)} (${data.substation_id || ''})`;
-  renderKPIs(data);
-  renderComponentBar(data);
-  renderMarkov(data);
-  renderRadar(data);
-  renderESGReports(data);
-  renderAuditTrail(data);
-  renderESGFooter(data);
+  // Each section wrapped so a single failure (e.g. Chart.js not loaded yet)
+  // doesn't cascade and leave downstream sections stuck on '—'.
+  function safe(fn, name) {
+    try { fn(data); }
+    catch (e) { console.warn('[esg-report] ' + name + ' failed:', e.message); }
+  }
+  safe(renderKPIs,         'renderKPIs');
+  safe(renderComponentBar, 'renderComponentBar');
+  safe(renderMarkov,       'renderMarkov');
+  safe(renderRadar,        'renderRadar');
+  safe(renderESGReports,   'renderESGReports');
+  safe(renderAuditTrail,   'renderAuditTrail');
+  safe(renderESGFooter,    'renderESGFooter');
 }
 
 function renderKPIs(d) {
