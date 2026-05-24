@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI Index — Slovenia · DNO Dashboard</title>
+<link rel="stylesheet" href="../style.css?v=500">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="../nav.js?v=500"></script>
+<script src="ssi-metadata.js?v=500"></script>
+<script>if(typeof renderNav==='function'){renderNav('dno');}</script>
+<main class="page-shell" style="max-width:1100px">
+
+<div class="page-header animate-in">
+  <h1>DSO + TSO Dashboard <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span></h1>
+  <p>5 regional Elektro DSOs (SODO concession holder) + ELES TSO &middot; SSI v4.0.2 &middot; Edition 01</p>
+</div>
+
+<section style="margin-bottom:24px">
+<h2>TSO &mdash; ELES (Elektro-Slovenija)</h2>
+<div class="card" style="border-left:3px solid var(--terracotta);margin:16px 0">
+  <h3 style="margin-top:0">ELES, d.o.o.</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;font-size:12px;line-height:1.7">
+    <div><strong>Owner:</strong> 100% Republic of Slovenia</div>
+    <div><strong>HQ:</strong> Ljubljana</div>
+    <div><strong>Voltage levels:</strong> 400 / 220 / 110 kV</div>
+    <div><strong>Synchronous area:</strong> ENTSO-E Continental Europe</div>
+    <div><strong>EIC operator:</strong> 10XSI-ELES-----0</div>
+    <div><strong>EIC bidding zone:</strong> 10YSI-ELES-----O</div>
+    <div><strong>NEMO:</strong> Borzen / BSP SouthPool</div>
+    <div><strong>Market coupling:</strong> SDAC + SIDC (AT, IT, HR)</div>
+  </div>
+  <p style="font-size:12px;color:var(--warm-grey);margin-top:12px">Cross-border interconnects: Krško-Tumbri 400 kV (HR), Cirkovce-Žerjavinec 400 kV (HR, 2022 commissioning), Cirkovce-Pince 400 kV (AT), Maribor-Lavamünd 220 kV (AT), Šoštanj-Obersielach 220 kV (AT), Divača-Padriciano 400 kV (IT), Divača-Redipuglia 220 kV (IT).</p>
+</div>
+</section>
+
+<section style="margin-bottom:24px">
+<h2>5 Regional DSOs (SODO Concession Model)</h2>
+<p style="font-size:13px;line-height:1.7">SODO d.o.o. is the national distribution-system-operator legal entity (single DSO concession-holder) that contracts physical operations to 5 regional Elektro companies — a Slovenia-specific hybrid model.</p>
+<div id="dso-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px">Loading…</div>
+</section>
+
+<section style="margin-bottom:24px">
+<h2>Generation Operators</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px">
+  <div class="card"><h3 style="margin-top:0;font-size:14px">HSE Group</h3><p style="font-size:12px;line-height:1.6">Holding Slovenske elektrarne (state-owned). DEM (Drava cascade hydro), SENG (Soča basin hydro), TEŠ-6 (600 MW lignite, phase-out 2033), Premogovnik Velenje (lignite mine).</p></div>
+  <div class="card"><h3 style="margin-top:0;font-size:14px">GEN Energija</h3><p style="font-size:12px;line-height:1.6">State-owned. 50% of NEK Krško (696 MW PWR, life-extended to 2043), TE Brestanica (gas/oil reserve), HESS / SEL (Sava hydro). Lead sponsor of proposed JEK 2.</p></div>
+  <div class="card"><h3 style="margin-top:0;font-size:14px">GEN-I, d.o.o.</h3><p style="font-size:12px;line-height:1.6">Energy trading + retail arm of the GEN Group.</p></div>
+</div>
+</section>
+
+<script>
+var meta = window.SSI_METADATA || {};
+var dsos = meta.DSO_PANEL || [];
+document.getElementById('dso-grid').innerHTML = dsos.map(function(d){
+  return '<div class="card" style="border-top:3px solid var(--sage)">'+
+    '<h3 style="margin-top:0;font-size:15px">'+d.name+'</h3>'+
+    '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Customer share: <strong>~'+d.share_pct+'%</strong></div>'+
+    '<div style="font-size:12px;line-height:1.6"><strong>Coverage:</strong> '+d.region+'</div></div>';
+}).join('');
+</script>
+
+<div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
+  <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Index — Slovenia (Slovenija) <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span></p>
+  <p style="margin-bottom:4px">Edition 01 (Inaugural) · First refresh 2026-07-09 · SSI v4.0.2 · 158 substations · 4,384 grid lines · 12 NUTS-3 regions · CEE-South-2026 cohort</p>
+  <p>TSO: ELES · Regulator: AGEN-RS · Statistics: SURS · 10,000-iteration Gaussian Copula Monte Carlo · CMIP6 SSP2-4.5</p>
+</div>
+</main>
+<footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:16px">
+  &copy; 2026 Altinium Invest &middot; Corso Vittorio Emanuele 110/5, 80121 Napoli &middot; P.IVA 10656441218<br>
+  USCO Registration pending &middot; SIAE Deposito Opere Inedite &middot; Protected under L. 633/1941, Berne Convention, Copyright Act 1976
+</footer>
+</body>
+</html>

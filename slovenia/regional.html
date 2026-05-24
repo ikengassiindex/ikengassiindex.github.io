@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI Index — Slovenia · Regional</title>
+<link rel="stylesheet" href="../style.css?v=500">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="../nav.js?v=500"></script>
+<script src="ssi-metadata.js?v=500"></script>
+<script>if(typeof renderNav==='function'){renderNav('regional');}</script>
+<main class="page-shell" style="max-width:1100px">
+
+<div class="page-header animate-in">
+  <h1>Regional Profiles &mdash; 12 NUTS-3 Statistical Regions <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span></h1>
+  <p>SSI v4.0.2 &middot; Edition 01 &middot; Per-region substation count, median R, R3 consequence multiplier, top hazard</p>
+</div>
+<section style="margin-bottom:24px">
+<p style="font-size:13px;line-height:1.7">Slovenia's 12 NUTS-3 statistical regions are calibrated on a 3-tier R3 consequence multiplier scheme (Capital-Intensive 1.02 / Industrial-Major 1.04 / Light-Rural 1.06) mirroring the Czech archetype. Osrednjeslovenska (Ljubljana metro) sits in the Capital-Intensive tier alone; four industrial-secondary city regions (Podravska/Maribor, Savinjska/Celje, Gorenjska/Kranj, Obalno-kraška/Koper) form the middle tier; seven smaller regions occupy the Light-Rural floor.</p>
+<div id="region-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px">Loading…</div>
+</section>
+<script>
+var hazards = {
+  'SI031':'Drava-Mura floods · ice storm','SI032':'Drava cascade · 2023 flood spillover',
+  'SI033':'Alpine convective storms','SI034':'2023 Savinja floods (€10B anchor)',
+  'SI035':'Legacy coal (Trbovlje) · Sava floods','SI036':'Krško NPP zone · seismic + Sava floods',
+  'SI037':'Krka basin floods · Idrija fault seismic','SI038':'2014 ice storm (žled) · karst hazards',
+  'SI041':'Ljubljana basin floods (1895 EQ baseline)','SI042':'Alpine hydro · Triglav valley access',
+  'SI043':'1976 Friuli spillover · Soča floods','SI044':'Bora wind · Adriatic salt corrosion'
+};
+fetch('ssi-data.json?v=500').then(function(r){return r.json();}).then(function(d){
+  var subs = d.substations || [];
+  var by = {};
+  subs.forEach(function(s){
+    var r = s.region;
+    if(!by[r]) by[r] = {count:0, sumR:0, high:0};
+    by[r].count++;
+    by[r].sumR += s.R_median || 0;
+    if(s.classification==='High'||s.classification==='Critical') by[r].high++;
+  });
+  var meta = window.SSI_METADATA;
+  var html = (meta.REGIONS_NUTS3||[]).map(function(r){
+    var b = by[r.code] || {count:0,sumR:0,high:0};
+    var med = b.count ? (b.sumR/b.count).toFixed(3) : '—';
+    var tierColor = r.tier==='Capital-Intensive'?'var(--crimson)':(r.tier==='Industrial-Major'?'var(--bronze)':'var(--sage)');
+    return '<div class="card" style="border-top:3px solid '+tierColor+'">'+
+      '<div style="font-size:11px;color:var(--warm-grey);letter-spacing:0.06em">'+r.code+'</div>'+
+      '<h3 style="margin:4px 0 6px;font-size:15px">'+r.name+'</h3>'+
+      '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Capital: '+r.capital+' &middot; R3 tier: <strong>'+r.tier+'</strong> ('+r.r3+')</div>'+
+      '<div style="display:flex;gap:14px;font-size:13px;margin:8px 0">'+
+        '<div><strong>'+b.count+'</strong><div style="font-size:10px;color:var(--warm-grey)">substations</div></div>'+
+        '<div><strong>'+med+'</strong><div style="font-size:10px;color:var(--warm-grey)">median R</div></div>'+
+        '<div><strong>'+b.high+'</strong><div style="font-size:10px;color:var(--warm-grey)">High/Crit</div></div>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--warm-grey);border-top:1px solid var(--card-border);padding-top:8px;margin-top:8px"><strong>Top hazard:</strong> '+(hazards[r.code]||'—')+'</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('region-grid').innerHTML = html;
+});
+</script>
+
+<div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
+  <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Index — Slovenia (Slovenija) <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span></p>
+  <p style="margin-bottom:4px">Edition 01 (Inaugural) · First refresh 2026-07-09 · SSI v4.0.2 · 158 substations (LIVE OSM) · 4,384 grid lines · 12 NUTS-3 regions · CEE-South-2026 cohort</p>
+  <p>TSO: ELES · Regulator: AGEN-RS · Statistics: SURS · 10,000-iteration Gaussian Copula Monte Carlo · CMIP6 SSP2-4.5</p>
+</div>
+</main>
+<footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:16px">
+  &copy; 2026 Altinium Invest &middot; Corso Vittorio Emanuele 110/5, 80121 Napoli &middot; P.IVA 10656441218<br>
+  USCO Registration pending &middot; SIAE Deposito Opere Inedite &middot; Protected under L. 633/1941, Berne Convention, Copyright Act 1976
+</footer>
+</body>
+</html>

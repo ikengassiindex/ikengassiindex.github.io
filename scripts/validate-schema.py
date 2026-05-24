@@ -53,7 +53,7 @@ MIN_FLEET = {
     "AT": 1200, "CH": 800,  "DE": 10000,
     "IT": 4000, "ES": 3500, "IE": 990, "JP": 4500,
     "LU": 700,  "BE": 1000, "NL": 1300, "CZ": 800,
-    "LV": 1000, "LT": 400,  "EE": 500,
+    "LV": 1000, "LT": 400,  "EE": 500, "SI": 120,
     "FR": 6500,
     # Other live countries — set conservative floors based on live ssi-data.json counts
     "AU": 5000, "CA": 8000, "CL": 1500, "DK": 1500,
