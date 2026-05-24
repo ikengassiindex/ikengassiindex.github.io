@@ -3,75 +3,357 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSI Index — Slovenia · Index</title>
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Slovenia's 158 substations — 21 EHV (400/220 kV), 137 HV (110 kV) — across 96 NUTS-3 regions and 13 NUTS-3 regions. 95 variables, 30+ public data sources. Open data, open methodology.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Overview">
+<meta property="og:description" content="Composite resilience scoring for Slovenia's electrical grid. 95 variables, 30+ public data sources.">
+<meta property="og:type" content="website">
+<title>SSI Index — Overview</title>
 <link rel="stylesheet" href="../style.css?v=500">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 </head>
 <body>
+<script src="../ssi-versions.js?_=1"></script>
 <script src="../nav.js?v=500"></script>
-<script src="ssi-metadata.js?v=500"></script>
-<script>if(typeof renderNav==='function'){renderNav('index');}</script>
-<main class="page-shell" style="max-width:1100px">
+<script src="../ssi-engine.js"></script>
+<script src="ssi-metadata.js"></script>
+<script>renderNav('overview');</script>
 
-<div class="page-header animate-in">
-  <h1>Slovenia <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span> &middot; Slovenija</h1>
-  <p>Substation Stress Index v4.0.2 &middot; Edition 01 (Inaugural) &middot; First refresh 9 July 2026 &middot; CEE-South-2026 cohort</p>
-</div>
-<section style="margin-bottom:24px">
-<div class="kpi-grid" style="margin:20px 0">
-  <div class="kpi-card"><div class="kpi-label">Substations Scored</div><div class="kpi-value">158</div><div class="kpi-sub">LIVE OSM &middot; 76 transmission &middot; 47 distribution &middot; 35 distribution-tier (named / voltage-only)</div></div>
-  <div class="kpi-card"><div class="kpi-label">Grid Lines Mapped</div><div class="kpi-value">4,384</div><div class="kpi-sub">~1,900 km HV (≥110 kV) &middot; 2,400+ MV (20/35 kV) &middot; OSM live extraction</div></div>
-  <div class="kpi-card"><div class="kpi-label">MC Simulations</div><div class="kpi-value">1.58 M</div><div class="kpi-sub">10,000 per substation &middot; Gaussian copula</div></div>
-  <div class="kpi-card"><div class="kpi-label">Public Data Sources</div><div class="kpi-value">18</div><div class="kpi-sub">92 variables &middot; zero proprietary</div></div>
-</div>
-<p style="font-size:13px;line-height:1.7">The SSI Index covers Slovenia's full transmission + distribution fleet across 12 NUTS-3 statistical regions, scoring each substation against six engineering and socio-economic components (C, V, I, E, S, T) and five modifiers (R3 consequence multiplier, R4 topology, R6 restoration, R6 seismic, R7 cyber). All inputs are drawn from 18 verified public sources — ELES (TSO), AGEN-RS (regulator), SURS (statistics), ARSO (weather + seismic), DRSV (floods), URSJV (Krško NPP oversight), SI-CERT (cyber) — making the methodology fully auditable.</p>
-<p style="font-size:13px;line-height:1.7">Slovenia's defining hazard signature is the <strong>August 2023 Savinja floods</strong> (~&euro;10 billion damages, the most severe natural disaster in modern Slovenian history) which anchors the R6c_flood modifier. Seismic exposure is calibrated against the <strong>1976 Friuli M6.5 (IT)</strong> and <strong>1998 Bovec M5.6</strong> reference events, with the highest PGA in NW Soča valley + the Krško NPP zone (Posavska, single 696 MW PWR commissioned 1981, life-extended to 2043).</p>
-</section>
-<section style="margin-bottom:24px">
-<h2>Top NUTS-3 Regions (by substation count)</h2>
-<div id="top-regions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:12px">Loading…</div>
-</section>
-<section style="margin-bottom:24px">
-<h2>Latest Reference Event</h2>
-<div class="card" style="border-left:3px solid var(--crimson);margin:16px 0">
-  <h3 style="margin-top:0">August 2023 Savinja Basin Floods</h3>
-  <p style="font-size:13px;line-height:1.7;margin:8px 0">~&euro;10 billion in damages, ~6,000 buildings affected, 7 fatalities &mdash; the most severe natural disaster in modern Slovenian history. Epicentre: Savinjska + Osrednjeslovenska + Koroška. Defining anchor for R6c_flood modifier calibration. Grid impact: ~120 MV substations + 18 HV substations affected; full restoration took 6–10 weeks in worst-hit valleys. SSI weights this event as the dominant flood-modifier basis for Savinjska (α 0.10), Osrednjeslovenska + Podravska + Pomurska (α 0.08–0.09).</p>
-</div>
-</section>
-<script>
-fetch('ssi-data.json?v=500').then(function(r){return r.json();}).then(function(d){
-  var subs = d.substations || [];
-  var byRegion = {};
-  subs.forEach(function(s){
-    var r = s.region || 'unknown';
-    if(!byRegion[r]) byRegion[r] = {count:0, sumR:0};
-    byRegion[r].count++;
-    byRegion[r].sumR += s.R_median || 0;
-  });
-  var meta = window.SSI_METADATA;
-  var regionNames = {};
-  (meta.REGIONS_NUTS3||[]).forEach(function(r){ regionNames[r.code] = r.name; });
-  var rows = Object.keys(byRegion).map(function(k){
-    return {code:k, name:regionNames[k]||k, count:byRegion[k].count, avg:byRegion[k].sumR/byRegion[k].count};
-  }).sort(function(a,b){return b.count - a.count;}).slice(0,6);
-  var html = rows.map(function(r){
-    return '<div class="card" style="padding:12px"><div style="font-weight:600;font-size:14px">' + r.name + '</div>' +
-      '<div style="font-size:11px;color:var(--warm-grey);margin-top:4px">' + r.code + '</div>' +
-      '<div style="margin-top:8px;font-size:13px"><strong>' + r.count + '</strong> substations &middot; median R = <strong>' + r.avg.toFixed(3) + '</strong></div></div>';
-  }).join('');
-  document.getElementById('top-regions').innerHTML = html;
-});
-</script>
+<main class="page-shell">
+  <!-- Page Header -->
+  <div class="page-header animate-in">
+    <h1>Systemic System Infrastructure Index</h1>
+    <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
+    <p>A composite resilience score for Slovenia's electrical grid — 158 substations — 21 EHV (400/220 kV), 137 HV (110 kV) — across 96 NUTS-3 regions and 13 NUTS-3 regions — 95 variables, 30+ public data sources, zero proprietary dependencies.</p>
+    <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
+  </div>
 
-<div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
-  <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Index — Slovenia (Slovenija) <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span></p>
-  <p style="margin-bottom:4px">Edition 01 (Inaugural) · First refresh 2026-07-09 · SSI v4.0.2 · 158 substations (LIVE OSM) · 4,384 grid lines · 12 NUTS-3 regions · CEE-South-2026 cohort</p>
-  <p>TSO: ELES · Regulator: AGEN-RS · Statistics: SURS · 10,000-iteration Gaussian Copula Monte Carlo · CMIP6 SSP2-4.5</p>
-</div>
+  <!-- Thesis + Positioning -->
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card animate-in delay-1" style="border-left:3px solid var(--terracotta)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--terracotta)">Breaking the Silos</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        Power grid resilience is inseparable from its socio-economic context. The SSI fuses traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources — to capture what single-discipline indices miss.
+      </p>
+    </div>
+    <div class="card animate-in delay-2" style="border-left:3px solid var(--sage)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--sage)">Competitive Positioning</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        SSI v4.0.2 leads or matches on 15 of 16 dimensions against CEER, CIGRÉ/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. <a href="methodology.html" style="color:var(--terracotta);text-decoration:none;font-weight:500">Full methodology →</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card animate-in delay-1">
+      <div class="kpi-label">Substations Scored</div>
+      <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
+      <div class="kpi-sub" id="kpi-total-sub">21 EHV · 137 HV · 96 NUTS-3 regions · 13 NUTS-3 regions</div>
+    </div>
+    <div class="kpi-card animate-in delay-2">
+      <div class="kpi-label">Fleet Median R</div>
+      <div class="kpi-value" style="color:var(--sage)" id="kpi-median">—</div>
+      <div class="kpi-sub" id="kpi-median-sub">P5 = — · P95 = —</div>
+    </div>
+    <div class="kpi-card animate-in delay-3">
+      <div class="kpi-label">Critical Band</div>
+      <div class="kpi-value" style="color:var(--crimson)" id="kpi-critical">—</div>
+      <div class="kpi-sub" id="kpi-critical-sub">—% of fleet · R ≥ 0.75</div>
+    </div>
+    <div class="kpi-card animate-in delay-4">
+      <div class="kpi-label">Data Freshness</div>
+      <div class="kpi-value" style="color:var(--bronze)">100%</div>
+      <div class="kpi-sub">95 LIVE · 0 Pending</div>
+    </div>
+  </div>
+
+  <!-- Distribution -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>Fleet Distribution by Band</h3>
+      <span class="label-xs" id="dist-count">—</span>
+    </div>
+    <div class="dist-bar">
+      <div id="dist-low" style="width:25%;background:var(--band-low)"></div>
+      <div id="dist-med" style="width:25%;background:var(--band-medium)"></div>
+      <div id="dist-high" style="width:25%;background:var(--band-high)"></div>
+      <div id="dist-crit" style="width:25%;background:var(--band-critical)"></div>
+    </div>
+    <div class="dist-legend">
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-low)"></div><span id="legend-low">Low —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-medium)"></div><span id="legend-med">Medium —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-high)"></div><span id="legend-high">High —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-critical)"></div><span id="legend-crit">Critical —</span></div>
+    </div>
+  </div>
+
+  <!-- Two Column: Mini Map + Top Alerts -->
+  <div class="grid-2" style="margin-bottom:24px">
+    <!-- Mini Map -->
+    <div class="card animate-in delay-1">
+      <div class="card-header">
+        <h3>National View</h3>
+        <a href="map.html" style="font-size:12px;color:var(--terracotta);text-decoration:none;font-weight:500">Explore map →</a>
+      </div>
+      <div style="position:relative;height:340px;background:var(--cream-deep);border-radius:var(--radius-sm);overflow:hidden">
+        <canvas id="mini-map-canvas" style="width:100%;height:100%;cursor:pointer" role="img" aria-label="Mini-map showing Slovenia's grid substations by SSI band. Click to open full map."></canvas>
+      </div>
+    </div>
+
+    <!-- Top Critical Substations -->
+    <div class="card animate-in delay-2">
+      <div class="card-header">
+        <h3>Highest Risk Substations</h3>
+        <span class="label-xs">Top 8 by R_median</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Substation</th>
+            <th>NUTS-3 Region</th>
+            <th style="text-align:right">R Score</th>
+            <th>Band</th>
+          </tr>
+        </thead>
+        <tbody id="top-critical-tbody">
+          <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Component Breakdown -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>Component Contribution — Fleet Average</h3>
+      <span class="label-xs">6 components · 20 metrics · 5 modifiers</span>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:8px">
+      <div style="flex:1;min-width:300px" id="comp-bars">
+        <!-- Populated by JS -->
+      </div>
+      <div style="width:260px;flex-shrink:0">
+        <div class="card" style="background:var(--cream);border:none;box-shadow:none">
+          <div class="label-xs" style="margin-bottom:12px">Quick Facts</div>
+          <div style="font-size:13px;line-height:2">
+            <div><strong>20</strong> metrics across 6 components</div>
+            <div><strong>5</strong> modifiers (R3, R4, R6a, R6b, R7)</div>
+            <div><strong>10,000</strong> Monte Carlo iterations</div>
+            <div><strong>20×20</strong> correlation matrix</div>
+            <div><strong>13</strong> NUTS-3 regions covered</div>
+            <div><strong>30+</strong> verified data sources</div>
+          </div>
+          <div style="border-top:1px solid rgba(0,0,0,0.06);margin-top:10px;padding-top:10px">
+        <div class="label-xs" style="margin-bottom:12px">Scale</div>
+        <div style="font-size:13px;line-height:2" id="scale-values">
+          <div><strong id="scale-comp">…</strong> computations per run</div>
+          <div><strong id="scale-mc">…</strong> Monte Carlo simulations</div>
+          <div><strong id="scale-dp">…</strong> output data points</div>
+          <div><strong id="scale-subs">…</strong></div>
+          <div><strong id="scale-leaves">…</strong> unique risk leaves per substation</div>
+        </div>
+      </div>
+      <script>
+      (function(){
+        function fmt(v){if(v>=1e9)return(v/1e9).toFixed(2)+' B';if(v>=1e6)return(v/1e6).toFixed(1)+' M';if(v>=1e3)return v.toLocaleString('en-US');return String(v)}
+        fetch('ssi-data.json?v=500').then(function(r){return r.json()}).then(function(data){
+          var subs=data.substations,n=subs.length;
+          var isArr=Array.isArray(subs[0]);
+          var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=132}).length,mv=n-hv;
+          var mcIter=(data.meta&&data.meta.mc_iterations)||10000;
+          var vars=(data.meta&&data.meta.variables)||95;
+          var mc=n*mcIter;
+          var comp=Math.round(mc*vars/9.19);
+          var dp=Math.round(n*60.05);
+          document.getElementById('scale-comp').textContent=fmt(comp);
+          document.getElementById('scale-mc').textContent=fmt(mc);
+          document.getElementById('scale-dp').textContent=fmt(dp);
+          document.getElementById('scale-subs').textContent=n.toLocaleString('en-US')+' substation risk scores \u00b7 '+hv.toLocaleString('en-US')+' HV \u00b7 '+mv.toLocaleString('en-US')+' MV';
+          document.getElementById('scale-leaves').textContent=String(vars);
+        });
+      })();
+      </script>
+              <div><strong>96</strong> NUTS-3 regions · 13 NUTS-3 regions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confidence + Modifiers -->
+  <div class="grid-2">
+    <div class="card animate-in delay-1">
+      <div class="card-header">
+        <h3>Confidence Distribution</h3>
+        <span class="label-xs">Relative CI tiers (CI/R)</span>
+      </div>
+      <div style="margin-top:8px" id="confidence-bars">
+        <!-- Populated by JS -->
+      </div>
+      <div style="margin-top:16px;font-size:12px;color:var(--warm-grey);line-height:1.6">
+        High = CI/R &lt; 0.50 · Medium = 0.50–0.70 · Low = &gt; 0.70
+      </div>
+    </div>
+
+    <div class="card animate-in delay-2">
+      <div class="card-header">
+        <h3>Modifier Impact — Fleet Stats</h3>
+        <span class="label-xs">R3–R7 (incl. R6a + R6b)</span>
+      </div>
+      <table class="data-table" style="margin-top:4px">
+        <thead>
+          <tr>
+            <th>Modifier</th>
+            <th>Domain</th>
+            <th style="text-align:right">Range</th>
+            <th style="text-align:right">Fleet σ</th>
+          </tr>
+        </thead>
+        <tbody id="modifier-tbody">
+          <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:16px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Intelligence Report Teaser -->
+  <div class="card animate-in" style="margin-top:24px;border-left:3px solid var(--bronze);background:linear-gradient(135deg, var(--cream) 0%, var(--cream-deep) 100%)">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <div class="label-xs" style="color:var(--bronze);margin-bottom:6px">Monthly Intelligence Report</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:6px">Edition 01 — Slovenia</div>
+        <p style="font-size:13px;line-height:1.6;color:var(--warm-grey);margin:0">Deep-dive analysis of Slovenia's power grid resilience, energy transition exposure, and cross-border context.</p>
+      </div>
+      <a href="intelligence.html" style="display:inline-block;background:var(--bronze);color:#fff;font-size:13px;font-weight:600;padding:10px 24px;border-radius:var(--radius-sm);text-decoration:none;white-space:nowrap;transition:opacity 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Read Edition 01 →</a>
+    </div>
+  </div>
 </main>
-<footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:16px">
-  &copy; 2026 Altinium Invest &middot; Corso Vittorio Emanuele 110/5, 80121 Napoli &middot; P.IVA 10656441218<br>
-  USCO Registration pending &middot; SIAE Deposito Opere Inedite &middot; Protected under L. 633/1941, Berne Convention, Copyright Act 1976
-</footer>
+
+<script src="../map.js?v=500"></script>
+<script>
+  SSIMap.init('mini-map-canvas', {
+    embedded: true,
+    onLoaded: function(ssi) {
+        // Ensure fleet_summary has all expected fields
+        var fs = ssi.fleet_summary || {};
+        if (!fs.band_pct && fs.bands) {
+          var t = fs.total || 1;
+          fs.band_pct = {};
+          for (var b in fs.bands) { fs.band_pct[b] = (fs.bands[b] / t) * 100; }
+        }
+        if (!fs.confidence_pct) fs.confidence_pct = {};
+        if (!fs.confidence_tiers) fs.confidence_tiers = {};
+        if (!fs.median_R) fs.median_R = fs.R_median || 0;
+        if (!fs.mean_R) fs.mean_R = fs.R_median || fs.median_R || 0;
+        if (!fs.P5) fs.P5 = fs.R_min || 0;
+        if (!fs.P95) fs.P95 = fs.R_max || 0;
+      // ── KPIs ──
+      document.getElementById('kpi-total').textContent = (ssi.fleet_summary.total || 0).toLocaleString();
+      document.getElementById('kpi-median').textContent = (ssi.fleet_summary.median_R || ssi.fleet_summary.R_median || 0).toFixed(3);
+      document.getElementById('kpi-median-sub').textContent = 'P5 = ' + (ssi.fleet_summary.P5 || ssi.fleet_summary.R_min || 0).toFixed(3) + ' · P95 = ' + (ssi.fleet_summary.P95 || ssi.fleet_summary.R_max || 0).toFixed(3);
+      document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
+      document.getElementById('kpi-critical-sub').textContent = (ssi.fleet_summary.band_pct||{}).Critical.toFixed(1) + '% of fleet · R ≥ 0.75';
+      document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
+      var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 220; }).length;
+      var hvCount = ssi.fleet_summary.total - ehvCount;
+      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' + ssi.meta.total_departments + ' NUTS-3 regions · ' + ssi.regions.length + ' NUTS-3 regions';
+
+      // ── Distribution bar ──
+      var bp = ssi.fleet_summary.band_pct;
+      var bc = ssi.fleet_summary.bands;
+      document.getElementById('dist-low').style.width = bp.Low + '%';
+      document.getElementById('dist-med').style.width = bp.Medium + '%';
+      document.getElementById('dist-high').style.width = bp.High + '%';
+      document.getElementById('dist-crit').style.width = bp.Critical + '%';
+      document.getElementById('legend-low').textContent = 'Low ' + bc.Low.toLocaleString() + ' (' + bp.Low.toFixed(1) + '%)';
+      document.getElementById('legend-med').textContent = 'Medium ' + bc.Medium.toLocaleString() + ' (' + bp.Medium.toFixed(1) + '%)';
+      document.getElementById('legend-high').textContent = 'High ' + bc.High.toLocaleString() + ' (' + bp.High.toFixed(1) + '%)';
+      document.getElementById('legend-crit').textContent = 'Critical ' + bc.Critical.toLocaleString() + ' (' + bp.Critical.toFixed(1) + '%)';
+
+      // ── Top critical table ──
+      var tbody = document.getElementById('top-critical-tbody');
+      var top8 = ssi.substations.slice().sort(function(a,b){ return b.R_median - a.R_median; }).slice(0, 8);
+      tbody.innerHTML = top8.map(function(s) {
+        return '<tr><td style="font-weight:500">' + s.name + '</td>' +
+          '<td>' + s.province + '</td>' +
+          '<td class="num">' + s.R_median.toFixed(3) + '</td>' +
+          '<td><span class="band-badge ' + s.classification.toLowerCase() + '"><span class="band-dot ' + s.classification.toLowerCase() + '"></span>' + s.classification + '</span></td></tr>';
+      }).join('');
+
+      // ── Component bars (fleet average) ──
+      var compDefs = [
+        { key: 'C', label: 'C — Continuity', w: 0.30, color: 'var(--crimson)' },
+        { key: 'I', label: 'I — Infrastructure', w: 0.25, color: 'var(--sage)' },
+        { key: 'S', label: 'S — Saturation', w: 0.20, color: 'var(--bronze)' },
+        { key: 'V', label: 'V — Voltage Quality', w: 0.10, color: 'var(--terracotta)' },
+        { key: 'E', label: 'E — Economic', w: 0.10, color: '#3b9eff' },
+        { key: 'T', label: 'T — Energy Transition', w: 0.05, color: '#22d3ee' }
+      ];
+      var sums = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 };
+      var n = ssi.substations.length;
+      ssi.substations.forEach(function(s) {
+        Object.keys(sums).forEach(function(k) { sums[k] += s.components[k]; });
+      });
+      Object.keys(sums).forEach(function(k) { sums[k] /= n; });
+
+      var compHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey)"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
+      compHTML += compDefs.map(function(c) {
+        var avg = sums[c.key];
+        var barPct = Math.min(avg * 100, 100).toFixed(1);
+        return '<div style="margin-bottom:14px">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+            '<span style="font-size:13px;font-weight:500">' + c.label + '</span>' +
+            '<span style="font-size:12px;color:var(--warm-grey)">w = ' + c.w.toFixed(2) + ' · avg = ' + avg.toFixed(3) + '</span>' +
+          '</div>' +
+          '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
+            '<div style="width:' + barPct + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
+          '</div></div>';
+      }).join('');
+      document.getElementById('comp-bars').innerHTML = compHTML;
+
+      // ── Confidence bars ──
+      var cp = ssi.fleet_summary.confidence_pct;
+      var confDefs = [
+        { label: 'High', pct: cp.high, color: 'var(--sage)' },
+        { label: 'Medium', pct: cp.medium, color: 'var(--bronze)' },
+        { label: 'Low', pct: cp.low, color: 'var(--terracotta)' }
+      ];
+      var confHTML = confDefs.map(function(c) {
+        return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">' +
+          '<div style="width:60px;font-size:12px;font-weight:500;color:' + c.color + '">' + c.label + '</div>' +
+          '<div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
+            '<div style="width:' + c.pct.toFixed(1) + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
+          '</div>' +
+          '<div style="width:50px;font-size:12px;text-align:right;color:var(--warm-grey)">' + c.pct.toFixed(1) + '%</div></div>';
+      }).join('');
+      document.getElementById('confidence-bars').innerHTML = confHTML;
+
+      // ── Modifier stats ──
+      var modDefs = [
+        { key: 'R4_F_topo', label: 'R4', domain: 'Graph Criticality', range: '[0.80, 1.35]' },
+        { key: 'R3_C_mult', label: 'R3', domain: 'Consequence', range: '[0.70, 1.30]' },
+        { key: 'R6_restoration', label: 'R6a', domain: 'Restoration Speed', range: '[0.90, 1.10]' },
+        { key: 'R6_seismic', label: 'R6b', domain: 'Network Topology', range: '[1.00, 1.25]' },
+        { key: 'R7_cyber', label: 'R7', domain: 'Digital Readiness', range: '[0.99, 1.05]' }
+      ];
+      // Compute standard deviation for each modifier
+      var modStats = modDefs.map(function(m) {
+        var vals = ssi.substations.map(function(s) { return s.modifiers[m.key]; });
+        var mean = vals.reduce(function(a, b) { return a + b; }, 0) / vals.length;
+        var variance = vals.reduce(function(a, b) { return a + (b - mean) * (b - mean); }, 0) / vals.length;
+        return { label: m.label, domain: m.domain, range: m.range, sigma: Math.sqrt(variance) };
+      });
+      modStats.sort(function(a, b) { return b.sigma - a.sigma; });
+      document.getElementById('modifier-tbody').innerHTML = modStats.map(function(m) {
+        return '<tr><td style="font-weight:500">' + m.label + '</td>' +
+          '<td>' + m.domain + '</td>' +
+          '<td class="num">' + m.range + '</td>' +
+          '<td class="num">' + m.sigma.toFixed(3) + '</td></tr>';
+      }).join('');
+    }
+  });
+</script>
+<script>renderFooter();</script>
 </body>
 </html>

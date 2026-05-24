@@ -3,74 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSI Index — Slovenia · DNO Dashboard</title>
+<meta name="description" content="SSI Index — Slovenia DSO segmented view. Elektro Ljubljana, Elektro Maribor, and PREdistribuce side-by-side: SAIDI, customers, kraje served. Slovenian-specific page reflecting the 3-DSO market structure.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Slovenia · DSO Dashboard">
+<meta property="og:description" content="3-DSO segmented view: Elektro Ljubljana / Elektro Maribor / PREdistribuce.">
+<meta property="og:type" content="website">
+<title>SSI Index — Slovenia · DSO Dashboard</title>
 <link rel="stylesheet" href="../style.css?v=500">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  .dso-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .dso-grid { grid-template-columns: 1fr; } }
+  .dso-card { padding: 20px; background: var(--card-bg); border: 1px solid var(--card-border);
+              border-radius: var(--radius); box-shadow: var(--card-shadow); position: relative; }
+  .dso-card h3 { margin: 0 0 6px 0; font-size: 17px; }
+  .dso-card .pct { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; }
+  .dso-card .saidi { font-size: 22px; font-weight: 600; color: var(--terracotta); margin-top: 6px; }
+  .dso-card .meta { font-size: 12px; color: var(--warm-grey); line-height: 1.6; margin-top: 8px; }
+  .dso-card .border-cez { border-left: 4px solid #941914; }
+  .dso-card .border-egd { border-left: 4px solid #b8863a; }
+  .dso-card .border-pre { border-left: 4px solid #5d8563; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th, .compare-table td { padding: 10px 12px; text-align: left;
+                                          border-bottom: 1px solid var(--card-border); }
+  .compare-table th { background: var(--cream-deep); font-weight: 600; }
+  .compare-table tr:hover { background: var(--cream-deep); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+            font-weight: 500; }
+  .badge-cez { background: #fbe9e7; color: #941914; }
+  .badge-egd { background: #fdf3df; color: #b8863a; }
+  .badge-pre { background: #e6efe7; color: #5d8563; }
+</style>
 </head>
 <body>
 <script src="../nav.js?v=500"></script>
-<script src="ssi-metadata.js?v=500"></script>
-<script>if(typeof renderNav==='function'){renderNav('dno');}</script>
-<main class="page-shell" style="max-width:1100px">
+<script src="ssi-metadata.js"></script>
+<script>renderNav('dno');</script>
+
+<main class="page-shell">
 
 <div class="page-header animate-in">
-  <h1>DSO + TSO Dashboard <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span></h1>
-  <p>5 regional Elektro DSOs (SODO concession holder) + ELES TSO &middot; SSI v4.0.2 &middot; Edition 01</p>
+  <h1>DSO Segmented Dashboard — Slovenia</h1>
+  <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">5 Elektro DSOs · ~1.0 M LV customers · 12 NUTS-3 regions · 212 občine</div>
+
+<!-- Overview: TSO + Regulator + 5 DSOs + Krško -->
+<section id="overview" style="margin-bottom:32px">
+<h2>Governance Stack — ELES TSO · AGEN-RS · SODO · 5 Elektros · URSJV</h2>
+<div class="kpi-grid" style="margin-bottom:16px">
+  <div class="kpi-card"><div class="kpi-label">TSO</div><div class="kpi-value" style="font-size:22px">ELES</div><div class="kpi-sub">Elektro-Slovenija — 100% state-owned via SOD</div></div>
+  <div class="kpi-card"><div class="kpi-label">Regulator</div><div class="kpi-value" style="font-size:22px">AGEN-RS</div><div class="kpi-sub">Independent · reports to National Assembly</div></div>
+  <div class="kpi-card"><div class="kpi-label">DSO Holding</div><div class="kpi-value" style="font-size:22px">SODO</div><div class="kpi-sub">Coordinates 5 Elektro DSOs · tariff approval</div></div>
+  <div class="kpi-card"><div class="kpi-label">Nuclear Safety</div><div class="kpi-value" style="font-size:22px">URSJV</div><div class="kpi-sub">Krško NPP oversight · PSR to 2043</div></div>
+</div>
+</section>
+
+  <p>Slovenia's distribution is split across five regional Elektro DSOs coordinated by SODO holding, with very different operating profiles. Elektro Ljubljana (33% share) covers the Osrednjeslovenska capital region plus parts of Gorenjska/Posavska/JV Slovenija; Elektro Maribor (25%) covers Podravska/Pomurska/Koroška including the Drava cascade; Elektro Celje (20%) is the Savinja Valley operator most exposed to the 2023 floods; Elektro Primorska (14%) operates the Adriatic coast and karst plateau; Elektro Gorenjska (8%) covers the Alpine valleys.</p>
 </div>
 
-<section style="margin-bottom:24px">
-<h2>TSO &mdash; ELES (Elektro-Slovenija)</h2>
-<div class="card" style="border-left:3px solid var(--terracotta);margin:16px 0">
-  <h3 style="margin-top:0">ELES, d.o.o.</h3>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;font-size:12px;line-height:1.7">
-    <div><strong>Owner:</strong> 100% Republic of Slovenia</div>
-    <div><strong>HQ:</strong> Ljubljana</div>
-    <div><strong>Voltage levels:</strong> 400 / 220 / 110 kV</div>
-    <div><strong>Synchronous area:</strong> ENTSO-E Continental Europe</div>
-    <div><strong>EIC operator:</strong> 10XSI-ELES-----0</div>
-    <div><strong>EIC bidding zone:</strong> 10YSI-ELES-----O</div>
-    <div><strong>NEMO:</strong> Borzen / BSP SouthPool</div>
-    <div><strong>Market coupling:</strong> SDAC + SIDC (AT, IT, HR)</div>
+<section id="dsos" style="margin-bottom:32px">
+<h2>5 Regional Elektro Distribution System Operators</h2>
+<div class="dso-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:16px 0">
+  <div class="dso-card animate-in delay-1" style="border-left:4px solid #941914;padding:16px;background:var(--cream);border-radius:var(--radius)">
+    <span class="badge" style="background:rgba(148,25,20,0.1);color:#941914;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600">33%</span>
+    <h3 style="margin-top:8px">Elektro Ljubljana</h3>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#941914">~330,000</div>
+    <div style="font-size:11px;color:var(--warm-grey)">LV customers</div>
+    <p style="font-size:12px;line-height:1.6;margin-top:8px">Capital region — Osrednjeslovenska + parts of Gorenjska/Posavska/JV Slovenija. Sava + Ljubljanica flood overlay (R6c HIGH).</p>
   </div>
-  <p style="font-size:12px;color:var(--warm-grey);margin-top:12px">Cross-border interconnects: Krško-Tumbri 400 kV (HR), Cirkovce-Žerjavinec 400 kV (HR, 2022 commissioning), Cirkovce-Pince 400 kV (AT), Maribor-Lavamünd 220 kV (AT), Šoštanj-Obersielach 220 kV (AT), Divača-Padriciano 400 kV (IT), Divača-Redipuglia 220 kV (IT).</p>
+  <div class="dso-card animate-in delay-2" style="border-left:4px solid #aa4234;padding:16px;background:var(--cream);border-radius:var(--radius)">
+    <span class="badge" style="background:rgba(170,66,52,0.1);color:#aa4234;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600">25%</span>
+    <h3 style="margin-top:8px">Elektro Maribor</h3>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#aa4234">~250,000</div>
+    <div style="font-size:11px;color:var(--warm-grey)">LV customers</div>
+    <p style="font-size:12px;line-height:1.6;margin-top:8px">Podravska + Pomurska + Koroška. Drava cascade + Mura basin (R6c HIGH).</p>
+  </div>
+  <div class="dso-card animate-in delay-3" style="border-left:4px solid #b8863a;padding:16px;background:var(--cream);border-radius:var(--radius)">
+    <span class="badge" style="background:rgba(184,134,58,0.1);color:#b8863a;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600">20%</span>
+    <h3 style="margin-top:8px">Elektro Celje</h3>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#b8863a">~200,000</div>
+    <div style="font-size:11px;color:var(--warm-grey)">LV customers</div>
+    <p style="font-size:12px;line-height:1.6;margin-top:8px">Savinjska + Zasavska + Posavska — 2023 Savinja floods primary anchor (€10B, 7 dead, 6,000+ buildings).</p>
+  </div>
+  <div class="dso-card animate-in delay-4" style="border-left:4px solid #5d8563;padding:16px;background:var(--cream);border-radius:var(--radius)">
+    <span class="badge" style="background:rgba(93,133,99,0.1);color:#5d8563;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600">14%</span>
+    <h3 style="margin-top:8px">Elektro Primorska</h3>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#5d8563">~140,000</div>
+    <div style="font-size:11px;color:var(--warm-grey)">LV customers</div>
+    <p style="font-size:12px;line-height:1.6;margin-top:8px">Goriška + Obalno-kraška + Primorsko-notranjska. Bora wind + Idrija fault seismic spillover.</p>
+  </div>
+  <div class="dso-card animate-in delay-4" style="border-left:4px solid #3b9eff;padding:16px;background:var(--cream);border-radius:var(--radius)">
+    <span class="badge" style="background:rgba(59,158,255,0.1);color:#3b9eff;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600">8%</span>
+    <h3 style="margin-top:8px">Elektro Gorenjska</h3>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#3b9eff">~80,000</div>
+    <div style="font-size:11px;color:var(--warm-grey)">LV customers</div>
+    <p style="font-size:12px;line-height:1.6;margin-top:8px">Gorenjska (Kranj–Triglav). Alpine valleys — narrow-valley restoration speed challenges.</p>
+  </div>
 </div>
+
 </section>
 
-<section style="margin-bottom:24px">
-<h2>5 Regional DSOs (SODO Concession Model)</h2>
-<p style="font-size:13px;line-height:1.7">SODO d.o.o. is the national distribution-system-operator legal entity (single DSO concession-holder) that contracts physical operations to 5 regional Elektro companies — a Slovenia-specific hybrid model.</p>
-<div id="dso-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px">Loading…</div>
+<section id="saidi" style="margin-bottom:32px">
+<h2>National SAIDI Context — CEE-South Cohort Comparison</h2>
+<div class="card animate-in" style="margin-top:24px">
+  <h3>SAIDI peer table</h3>
+  <p style="font-size:13px;line-height:1.7">Slovenia's national SAIDI (~38 min/customer/year, AGEN-RS 2024) sits in the middle of the European range — better than Hungary (~57) and Poland (~95), worse than Germany (~12) and the Netherlands (~24). Urban Ljubljana achieves ~18 min (Elektro Ljubljana underground sections), while rural NE/SE territories average ~55 min (Elektro Maribor / Elektro Celje exposed to 2023-style flood events).</p>
+  <table class="data-table" style="margin-top:12px">
+    <thead><tr><th>Peer Country</th><th>SAIDI 2024 (min)</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Germany</td><td>~12</td><td>Best-in-class — N-1, dense underground</td></tr>
+      <tr><td>Austria</td><td>~35</td><td>Closest grid-architecture peer to SI</td></tr>
+      <tr style="background:#fff8db"><td><strong>Slovenia</strong></td><td><strong>~38</strong></td><td>5-DSO weighted; Elektro Ljubljana urban 18, Elektro Maribor rural 55</td></tr>
+      <tr><td>Italy</td><td>~43</td><td>North/South gradient — Slovenian Obalno-kraška shares Friuli coastal profile</td></tr>
+      <tr><td>Croatia</td><td>~55</td><td>HEP single DSO — shared Krško NPP context</td></tr>
+      <tr><td>Hungary</td><td>~57</td><td>Closest CE-zone neighbour (Pomurska border)</td></tr>
+    </tbody>
+  </table>
+</div>
+
 </section>
 
-<section style="margin-bottom:24px">
-<h2>Generation Operators</h2>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px">
-  <div class="card"><h3 style="margin-top:0;font-size:14px">HSE Group</h3><p style="font-size:12px;line-height:1.6">Holding Slovenske elektrarne (state-owned). DEM (Drava cascade hydro), SENG (Soča basin hydro), TEŠ-6 (600 MW lignite, phase-out 2033), Premogovnik Velenje (lignite mine).</p></div>
-  <div class="card"><h3 style="margin-top:0;font-size:14px">GEN Energija</h3><p style="font-size:12px;line-height:1.6">State-owned. 50% of NEK Krško (696 MW PWR, life-extended to 2043), TE Brestanica (gas/oil reserve), HESS / SEL (Sava hydro). Lead sponsor of proposed JEK 2.</p></div>
-  <div class="card"><h3 style="margin-top:0;font-size:14px">GEN-I, d.o.o.</h3><p style="font-size:12px;line-height:1.6">Energy trading + retail arm of the GEN Group.</p></div>
+<section id="nuclear" style="margin-bottom:32px">
+<h2>Krško NPP — Distribution-Side Impact on 5 DSOs</h2>
+<div class="card animate-in" style="margin-top:24px">
+  <h3>Single-unit cascade risk</h3>
+  <p style="font-size:13px;line-height:1.7">Although Krško NPP is a transmission-level asset (operated by NEK / GEN Energija, dispatched by ELES), its single-unit nature affects DSO-level reliability via balancing reserve obligations. A Krško forced outage cascades to all 5 Elektro DSOs simultaneously. URSJV oversees nuclear safety; AGEN-RS handles the grid-side compensation arrangements.</p>
 </div>
+
 </section>
-
-<script>
-var meta = window.SSI_METADATA || {};
-var dsos = meta.DSO_PANEL || [];
-document.getElementById('dso-grid').innerHTML = dsos.map(function(d){
-  return '<div class="card" style="border-top:3px solid var(--sage)">'+
-    '<h3 style="margin-top:0;font-size:15px">'+d.name+'</h3>'+
-    '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Customer share: <strong>~'+d.share_pct+'%</strong></div>'+
-    '<div style="font-size:12px;line-height:1.6"><strong>Coverage:</strong> '+d.region+'</div></div>';
-}).join('');
-</script>
-
-<div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
-  <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Index — Slovenia (Slovenija) <span style="font-family:'Segoe UI Emoji','Apple Color Emoji',sans-serif">&#x1F1F8;&#x1F1EE;</span></p>
-  <p style="margin-bottom:4px">Edition 01 (Inaugural) · First refresh 2026-07-09 · SSI v4.0.2 · 158 substations · 4,384 grid lines · 12 NUTS-3 regions · CEE-South-2026 cohort</p>
-  <p>TSO: ELES · Regulator: AGEN-RS · Statistics: SURS · 10,000-iteration Gaussian Copula Monte Carlo · CMIP6 SSP2-4.5</p>
-</div>
 </main>
-<footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:16px">
-  &copy; 2026 Altinium Invest &middot; Corso Vittorio Emanuele 110/5, 80121 Napoli &middot; P.IVA 10656441218<br>
-  USCO Registration pending &middot; SIAE Deposito Opere Inedite &middot; Protected under L. 633/1941, Berne Convention, Copyright Act 1976
-</footer>
 </body>
 </html>

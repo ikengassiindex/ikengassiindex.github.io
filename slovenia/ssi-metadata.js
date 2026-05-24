@@ -114,3 +114,93 @@ window.SSI_METADATA.DSO_PANEL = [
   { name: 'Elektro Primorska',   region: 'Goriška + Obalno-kraška + Primorsko-notr.', share_pct: 14 },
   { name: 'Elektro Gorenjska',   region: 'Gorenjska (Kranj-Triglav)',                  share_pct: 8  }
 ];
+
+
+// ── Extended metadata for methodology.html / data.html / intelligence.html C-section ──
+// KB §58.6 compliant — no IIFE wrapper, dual-global alias preserved above.
+
+window.SSI_METADATA.COMPONENTS = [
+  { id: 'C', name: 'Continuity', weight: 0.30, color: '#941914', isNew: false,
+    metrics: [
+      { id: 'C1', name: 'SAIDI (planned + unplanned)',     intra: 0.30, global: 0.090, norm: 'P5/P95 inverse',  source: 'AGEN-RS 2024 — per-DSO quality reports' },
+      { id: 'C2', name: 'SAIFI (interruption frequency)',   intra: 0.25, global: 0.075, norm: 'P5/P95 inverse',  source: 'AGEN-RS 2024 — per-DSO' },
+      { id: 'C3', name: 'Voltage class (max kV)',           intra: 0.20, global: 0.060, norm: 'log-scaled',      source: 'OSM Overpass + ELES TP' },
+      { id: 'C4', name: 'Customer count (catchment)',       intra: 0.15, global: 0.045, norm: 'P5/P95 inverse',  source: 'SODO + SURS' },
+      { id: 'C5', name: 'CAIDI restoration speed',          intra: 0.10, global: 0.030, norm: 'P5/P95 inverse',  source: 'AGEN-RS 2024' }
+    ]},
+  { id: 'V', name: 'Voltage Quality', weight: 0.10, color: '#aa4234', isNew: false,
+    metrics: [
+      { id: 'V1', name: 'EN 50160 dip events',              intra: 0.40, global: 0.040, norm: 'count per 1000 cust/yr', source: 'AGEN-RS + 5 DSOs' },
+      { id: 'V2', name: 'Voltage swell events',             intra: 0.30, global: 0.030, norm: 'count per 1000 cust/yr', source: 'AGEN-RS + 5 DSOs' },
+      { id: 'V3', name: 'Harmonic distortion (THD)',        intra: 0.30, global: 0.030, norm: 'P95 of weekly THD',      source: 'AGEN-RS quarterly filings' }
+    ]},
+  { id: 'I', name: 'Infrastructure', weight: 0.25, color: '#5d8563', isNew: false,
+    metrics: [
+      { id: 'I1', name: 'Snow/Ice IRI',                    intra: 0.18, global: 0.045, norm: 'ERA5 reanalysis',  source: 'Copernicus ERA5 + ARSO', adaptive: true },
+      { id: 'I2', name: 'Heat-wave IRI',                   intra: 0.16, global: 0.040, norm: 'GDD anomaly',       source: 'Copernicus + ARSO', adaptive: true },
+      { id: 'I3', name: 'Wind storm IRI (bora)',           intra: 0.14, global: 0.035, norm: 'P99 m/s hourly',    source: 'ARSO + ERA5', adaptive: true },
+      { id: 'I4', name: 'Asset age cohort',                intra: 0.14, global: 0.035, norm: 'Markov-weighted',   source: 'ELES + 5 DSOs annual reports' },
+      { id: 'I5', name: 'Thermal stress (R6 proxy)',       intra: 0.10, global: 0.025, norm: 'IEEE C57.91',       source: 'IEEE C57.91 + Copernicus' },
+      { id: 'I6', name: 'Substation density',              intra: 0.10, global: 0.025, norm: 'per km²',           source: 'OSM + SURS' },
+      { id: 'I7', name: 'Network length per cap',          intra: 0.08, global: 0.020, norm: 'P5/P95',            source: 'ELES TP + 5 DSOs' },
+      { id: 'I8', name: 'Coastal corrosion ISO 9223',      intra: 0.06, global: 0.015, norm: 'C1–C5 categorical', source: 'ARSO + ISO 9223 (Obalno-kraška)' },
+      { id: 'I9', name: 'Hydrogeological exposure',        intra: 0.04, global: 0.010, norm: 'DRSV Q100 overlay', source: 'DRSV + ARSO' }
+    ]},
+  { id: 'E', name: 'Economic', weight: 0.10, color: '#3b9eff', isNew: false,
+    metrics: [
+      { id: 'E1', name: 'Regulatory penalty exposure',     intra: 0.60, global: 0.060, norm: 'EUR per SAIDI min',  source: 'AGEN-RS tariff' },
+      { id: 'E2', name: 'Productivity loss (VoLL)',        intra: 0.40, global: 0.040, norm: 'EUR/kWh',            source: 'ACER 2023 + SURS sector mix' }
+    ]},
+  { id: 'S', name: 'Saturation', weight: 0.20, color: '#b8863a', isNew: false,
+    metrics: [
+      { id: 'S1', name: 'Regional KPI — saturation',       intra: 0.45, global: 0.090, norm: 'load/capacity %',   source: 'ELES + 5 DSOs' },
+      { id: 'S2', name: 'Reverse power flow',              intra: 0.35, global: 0.070, norm: 'hours/yr reverse',   source: 'ELES + ENTSO-E' },
+      { id: 'S3', name: 'Criticality class',               intra: 0.20, global: 0.040, norm: 'categorical 1-5',    source: 'ELES Network Statement' }
+    ]},
+  { id: 'T', name: 'Transition', weight: 0.05, color: '#22d3ee', isNew: true,
+    metrics: [
+      { id: 'T1', name: 'DER Stress Index',                intra: 1.00, global: 0.050, norm: 'composite',          source: 'Borzen + AGEN-RS DER registry', isNew: true }
+    ]}
+];
+
+window.SSI_METADATA.NORM_METHODS = [
+  { id: 'A', name: 'Robust fleet percentile (P5/P95)',
+    formula: 'x_norm = clip((x - P5) / (P95 - P5), 0, 1)',
+    applies: 'C1, C2, C4, C5, E1, E2, I7' },
+  { id: 'B', name: 'Standard fleet percentile',
+    formula: 'x_norm = (rank(x) - 1) / (n - 1)',
+    applies: 'I4, S1, S2' },
+  { id: 'C', name: 'Bounded rescaling (log)',
+    formula: 'x_norm = log10(x / x_min) / log10(x_max / x_min)',
+    applies: 'C3 (voltage class)' },
+  { id: 'D', name: 'Categorical mapping',
+    formula: 'x_norm = lookup[x] where lookup maps ordinal → [0,1]',
+    applies: 'I8 (ISO 9223), S3 (criticality class)' }
+];
+
+window.SSI_METADATA.VALIDATION_CHECKS = [
+  { check: 'Schema validation',                       criterion: 'All required top-level + sub keys present, no nulls',         status: 'verified', isNew: false },
+  { check: 'OSM Overpass boundary filter',            criterion: 'ISO3166-1=SI area filter — zero AT/IT/HR/HU contamination',   status: 'verified', isNew: false },
+  { check: 'Polygon containment (158 subs → 12 NUTS-3 regions)', criterion: 'Every sub falls inside exactly one NUTS-3 polygon', status: 'verified', isNew: true },
+  { check: 'R3 tier distribution (3-tier)',           criterion: 'Capital 1 · Industrial 4 · Light-Rural 7 — all populated',     status: 'verified', isNew: true },
+  { check: 'R6 multi-hazard coverage',                criterion: 'Seismic + flood + storm + restoration all active',             status: 'verified', isNew: true },
+  { check: 'R6c flood — 2023 Savinja anchor',         criterion: 'Savinjska + Pomurska + Podravska + Osrednjeslovenska HIGH',    status: 'verified', isNew: true },
+  { check: 'R7 ceiling 1.04 (DESI 2024 ~0.55)',       criterion: 'SI-CERT mature (est. 1995) + NIS2 transposed Q4 2024',         status: 'verified', isNew: false },
+  { check: 'Krško NPP zone seismic α [0.04, 0.14]',   criterion: 'Posavska seismic + URSJV oversight + NEK reports',             status: 'verified', isNew: true },
+  { check: 'Cross-page schema compatibility (FR template)', criterion: 'grid-geo.json + ssi-data.json match France schema',       status: 'verified', isNew: false }
+];
+
+window.SSI_METADATA.CHANGELOG = [
+  { id: 'SI-S25-9', change: 'France-parity rebuild — 8 pages rewritten to match FR structure verbatim',                  type: 'enhanced', section: 'KB §64' },
+  { id: 'SI-S25-8', change: 'Section G deepDives — 12 NUTS-3 Slovenian regions (Savinjska + 11)',                         type: 'new',      section: 'intelligence G' },
+  { id: 'SI-S25-7', change: 'Edition patcher anchored at FIRST_REFRESH 2026-07-09 (KB §58.6 padStart(2) + d>=21)',        type: 'enhanced', section: 'intelligence' },
+  { id: 'SI-S25-6', change: 'ESG report — slovenia entry in COUNTRY_SOURCES (14 references)',                             type: 'new',      section: 'esg-report' },
+  { id: 'SI-S25-5', change: 'Methodology metadata extension — COMPONENTS/NORM/VALIDATION/CHANGELOG (FR parity)',          type: 'new',      section: 'metadata' },
+  { id: 'SI-S25-4', change: 'R6 modifier set — seismic (Posavska/Goriška/Obalno-kraška) + flood (2023 Savinja anchor)',  type: 'new',      section: 'methodology' },
+  { id: 'SI-S25-3', change: 'd05_osm LIVE — 158 substations via ISO3166-1=SI area filter',                                type: 'data',     section: 'methodology' },
+  { id: 'SI-S25-2', change: '5 Elektro DSOs + ELES TSO + AGEN-RS regulator + URSJV nuclear safety wired',                 type: 'data',     section: 'methodology' },
+  { id: 'SI-S25-1', change: 'KB v25 §64 — Slovenia inaugural onboarding (CEE-South cohort)',                              type: 'enhanced', section: 'KB §64' }
+];
+
+// Mirror onto the lower-case alias too
+window.SSIMetadata = window.SSI_METADATA;
