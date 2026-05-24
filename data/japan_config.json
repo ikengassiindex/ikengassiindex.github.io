@@ -1,0 +1,370 @@
+{
+  "code": "JP",
+  "iso2": "JP",
+  "iso3": "JPN",
+  "prefix": "JP_",
+  "name": "Japan",
+  "tso_zone": "JEPX-NATIONAL",
+  "tso": "10 G T&D operators (TEPCO/Chubu/Kansai/Kyushu/Tohoku/Chugoku/Hokuriku/Hokkaido/Shikoku/Okinawa)",
+  "regulator": "METI / OCCTO",
+  "regions_label": "Prefectures (todoufuken — 47)",
+  "regions_count": 47,
+  "bidding_zones": ["JP-NATIONAL"],
+  "frequency_split": {"east_hz": 50, "west_hz": 60, "note": "50/60 Hz split — structurally unique among OECD"},
+  "min_fleet": 4500,
+  "bbox": {"lon_min": 122.9, "lon_max": 153.0, "lat_min": 24.0, "lat_max": 45.6},
+  "weights": {"C": 0.30, "V": 0.10, "I": 0.25, "E": 0.10, "S": 0.20, "T": 0.05},
+  "seismic_alpha": 0.80,
+  "R3_tiers": {
+    "Capital-Intensive": 1.02,
+    "Industrial-Major":  1.04,
+    "Commercial":        1.06,
+    "Light-Industrial":  1.08,
+    "Light-Rural":       1.10
+  },
+  "R6_modifiers": {
+    "R6_seismic":     {"range": [0.10, 0.30], "active": true,  "note": "OECD-HIGHEST — all 47 prefectures non-trivial; Tohoku/Tokai/Nankai peaks"},
+    "R6_tsunami":     {"range": [0.00, 0.30], "active": true,  "note": "JP-UNIQUE — Pacific + Sea-of-Japan coast subs <30m elevation; 5 km coast band"},
+    "R6_typhoon":     {"range": [0.05, 0.20], "active": true,  "note": "JP-UNIQUE — Kyushu/Shikoku/Pacific-Honshu peak; Hokkaido/Sea-of-Japan lower"},
+    "R6_volcanic":    {"range": [0.00, 0.10], "active": true,  "note": "Sakurajima/Aso/Unzen/Asama/Fuji/Tarumae/Izu — 9 prefectures"},
+    "R6_restoration": {"range": [0.00, 0.05], "active": true,  "note": "10-TSO fragmentation; Okinawa + Hokkaido + island TSOs slower"}
+  },
+  "default_region": {
+    "C_base": 0.45, "V_base": 0.34, "I_base": 0.38, "E_base": 0.34,
+    "pga_base": 0.20, "T_base": 0.36,
+    "seismic_zone": "High", "corrosion": "C4",
+    "der_ratio": 0.30, "ev_share": 0.03, "v_socio": 0.26,
+    "ep_rate": 8, "elderly": 29, "pop_density": 335, "gdp_pc": 33000, "unemp": 2.6
+  },
+  "regions": {
+    "Tokyo": {
+      "C_base": 0.58, "V_base": 0.44, "I_base": 0.48, "E_base": 0.38,
+      "pga_base": 0.25, "T_base": 0.42,
+      "seismic_zone": "Very High", "corrosion": "C3",
+      "der_ratio": 0.20, "ev_share": 0.04, "v_socio": 0.18,
+      "ep_rate": 5, "elderly": 23, "pop_density": 6400, "gdp_pc": 58000, "unemp": 2.3
+    },
+    "Kanagawa": {
+      "C_base": 0.54, "V_base": 0.42, "I_base": 0.46, "E_base": 0.36,
+      "pga_base": 0.25, "T_base": 0.40,
+      "seismic_zone": "Very High", "corrosion": "C4",
+      "der_ratio": 0.22, "ev_share": 0.04, "v_socio": 0.20,
+      "ep_rate": 6, "elderly": 25, "pop_density": 3800, "gdp_pc": 45000, "unemp": 2.4
+    },
+    "Osaka": {
+      "C_base": 0.54, "V_base": 0.42, "I_base": 0.46, "E_base": 0.36,
+      "pga_base": 0.22, "T_base": 0.40,
+      "seismic_zone": "High", "corrosion": "C4",
+      "der_ratio": 0.22, "ev_share": 0.04, "v_socio": 0.22,
+      "ep_rate": 6, "elderly": 28, "pop_density": 4630, "gdp_pc": 42000, "unemp": 2.8
+    },
+    "Aichi": {
+      "C_base": 0.52, "V_base": 0.40, "I_base": 0.44, "E_base": 0.36,
+      "pga_base": 0.25, "T_base": 0.40,
+      "seismic_zone": "Very High", "corrosion": "C4",
+      "der_ratio": 0.28, "ev_share": 0.04, "v_socio": 0.20,
+      "ep_rate": 5, "elderly": 25, "pop_density": 1460, "gdp_pc": 48000, "unemp": 2.2
+    },
+    "Saitama": {
+      "C_base": 0.50, "V_base": 0.38, "I_base": 0.42, "E_base": 0.34,
+      "pga_base": 0.22, "T_base": 0.38,
+      "seismic_zone": "High", "corrosion": "C3",
+      "der_ratio": 0.24, "ev_share": 0.04, "v_socio": 0.22,
+      "ep_rate": 6, "elderly": 27, "pop_density": 1930, "gdp_pc": 38000, "unemp": 2.5
+    },
+    "Hyogo": {
+      "C_base": 0.50, "V_base": 0.38, "I_base": 0.42, "E_base": 0.36,
+      "pga_base": 0.22, "T_base": 0.38,
+      "seismic_zone": "High", "corrosion": "C4",
+      "der_ratio": 0.28, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 29, "pop_density": 651, "gdp_pc": 40000, "unemp": 2.8
+    },
+    "Chiba": {
+      "C_base": 0.50, "V_base": 0.38, "I_base": 0.42, "E_base": 0.36,
+      "pga_base": 0.25, "T_base": 0.38,
+      "seismic_zone": "Very High", "corrosion": "C4",
+      "der_ratio": 0.30, "ev_share": 0.04, "v_socio": 0.22,
+      "ep_rate": 6, "elderly": 27, "pop_density": 1220, "gdp_pc": 40000, "unemp": 2.4
+    },
+    "Fukuoka": {
+      "C_base": 0.48, "V_base": 0.37, "I_base": 0.40, "E_base": 0.34,
+      "pga_base": 0.18, "T_base": 0.36,
+      "seismic_zone": "High", "corrosion": "C4",
+      "der_ratio": 0.32, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 27, "pop_density": 1024, "gdp_pc": 33000, "unemp": 3.0
+    },
+    "Hokkaido": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.36, "E_base": 0.34,
+      "pga_base": 0.20, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.45, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 11, "elderly": 32, "pop_density": 64, "gdp_pc": 30000, "unemp": 3.2
+    },
+    "Shizuoka": {
+      "C_base": 0.46, "V_base": 0.36, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.28, "T_base": 0.36,
+      "seismic_zone": "Very High", "corrosion": "C4",
+      "der_ratio": 0.30, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 30, "pop_density": 470, "gdp_pc": 38000, "unemp": 2.6
+    },
+    "Ibaraki": {
+      "C_base": 0.46, "V_base": 0.36, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.25, "T_base": 0.36,
+      "seismic_zone": "Very High", "corrosion": "C4",
+      "der_ratio": 0.34, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 30, "pop_density": 467, "gdp_pc": 35000, "unemp": 2.5
+    },
+    "Hiroshima": {
+      "C_base": 0.46, "V_base": 0.36, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.15, "T_base": 0.36,
+      "seismic_zone": "Moderate", "corrosion": "C4",
+      "der_ratio": 0.32, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 30, "pop_density": 327, "gdp_pc": 35000, "unemp": 2.6
+    },
+    "Kyoto": {
+      "C_base": 0.46, "V_base": 0.36, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.18, "T_base": 0.36,
+      "seismic_zone": "High", "corrosion": "C3",
+      "der_ratio": 0.28, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 29, "pop_density": 555, "gdp_pc": 35000, "unemp": 2.8
+    },
+    "Miyagi": {
+      "C_base": 0.46, "V_base": 0.35, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.30, "T_base": 0.36,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.36, "ev_share": 0.02, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 28, "pop_density": 314, "gdp_pc": 32000, "unemp": 2.8
+    },
+    "Niigata": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.34,
+      "pga_base": 0.22, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.02, "v_socio": 0.28,
+      "ep_rate": 10, "elderly": 33, "pop_density": 170, "gdp_pc": 30000, "unemp": 2.5
+    },
+    "Nagano": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C2",
+      "der_ratio": 0.42, "ev_share": 0.03, "v_socio": 0.28,
+      "ep_rate": 9, "elderly": 32, "pop_density": 150, "gdp_pc": 30000, "unemp": 2.0
+    },
+    "Gifu": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C2",
+      "der_ratio": 0.36, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 30, "pop_density": 187, "gdp_pc": 30000, "unemp": 2.1
+    },
+    "Mie": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.32,
+      "pga_base": 0.25, "T_base": 0.34,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.34, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 29, "pop_density": 307, "gdp_pc": 33000, "unemp": 2.0
+    },
+    "Kumamoto": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.22, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C4",
+      "der_ratio": 0.40, "ev_share": 0.02, "v_socio": 0.28,
+      "ep_rate": 9, "elderly": 30, "pop_density": 233, "gdp_pc": 28000, "unemp": 2.8
+    },
+    "Kagoshima": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.45, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 31, "pop_density": 174, "gdp_pc": 26000, "unemp": 3.2
+    },
+    "Okinawa": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.30,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.20, "ev_share": 0.02, "v_socio": 0.34,
+      "ep_rate": 11, "elderly": 22, "pop_density": 642, "gdp_pc": 22000, "unemp": 3.5
+    },
+    "Tochigi": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.32,
+      "pga_base": 0.22, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C2",
+      "der_ratio": 0.36, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 29, "pop_density": 304, "gdp_pc": 33000, "unemp": 2.3
+    },
+    "Gunma": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C2",
+      "der_ratio": 0.38, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 30, "pop_density": 308, "gdp_pc": 31000, "unemp": 2.3
+    },
+    "Yamanashi": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.25, "T_base": 0.32,
+      "seismic_zone": "Very High", "corrosion": "C2",
+      "der_ratio": 0.40, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 31, "pop_density": 181, "gdp_pc": 30000, "unemp": 2.0
+    },
+    "Fukushima": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.36, "E_base": 0.34,
+      "pga_base": 0.30, "T_base": 0.34,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 32, "pop_density": 132, "gdp_pc": 30000, "unemp": 2.8
+    },
+    "Iwate": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.34, "E_base": 0.34,
+      "pga_base": 0.28, "T_base": 0.32,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 33, "pop_density": 79, "gdp_pc": 28000, "unemp": 2.6
+    },
+    "Aomori": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.34, "E_base": 0.34,
+      "pga_base": 0.22, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 11, "elderly": 34, "pop_density": 131, "gdp_pc": 26000, "unemp": 3.0
+    },
+    "Akita": {
+      "C_base": 0.38, "V_base": 0.30, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.30,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.02, "v_socio": 0.32,
+      "ep_rate": 12, "elderly": 38, "pop_density": 84, "gdp_pc": 26000, "unemp": 2.6
+    },
+    "Yamagata": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C3",
+      "der_ratio": 0.40, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 35, "pop_density": 116, "gdp_pc": 27000, "unemp": 2.2
+    },
+    "Toyama": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 33, "pop_density": 244, "gdp_pc": 32000, "unemp": 2.2
+    },
+    "Ishikawa": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.22, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 31, "pop_density": 271, "gdp_pc": 30000, "unemp": 2.3
+    },
+    "Fukui": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 32, "pop_density": 184, "gdp_pc": 33000, "unemp": 1.9
+    },
+    "Shiga": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C3",
+      "der_ratio": 0.34, "ev_share": 0.03, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 27, "pop_density": 351, "gdp_pc": 36000, "unemp": 2.0
+    },
+    "Nara": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C3",
+      "der_ratio": 0.28, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 32, "pop_density": 360, "gdp_pc": 28000, "unemp": 2.6
+    },
+    "Wakayama": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.25, "T_base": 0.30,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 34, "pop_density": 195, "gdp_pc": 27000, "unemp": 2.6
+    },
+    "Tokushima": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.25, "T_base": 0.30,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 34, "pop_density": 173, "gdp_pc": 28000, "unemp": 2.7
+    },
+    "Kochi": {
+      "C_base": 0.38, "V_base": 0.30, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.28, "T_base": 0.30,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.02, "v_socio": 0.32,
+      "ep_rate": 11, "elderly": 35, "pop_density": 98, "gdp_pc": 26000, "unemp": 3.0
+    },
+    "Ehime": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 33, "pop_density": 236, "gdp_pc": 28000, "unemp": 2.7
+    },
+    "Kagawa": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.34, "ev_share": 0.02, "v_socio": 0.28,
+      "ep_rate": 9, "elderly": 32, "pop_density": 506, "gdp_pc": 30000, "unemp": 2.7
+    },
+    "Okayama": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.15, "T_base": 0.32,
+      "seismic_zone": "Moderate", "corrosion": "C4",
+      "der_ratio": 0.36, "ev_share": 0.03, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 30, "pop_density": 264, "gdp_pc": 31000, "unemp": 2.5
+    },
+    "Tottori": {
+      "C_base": 0.38, "V_base": 0.30, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.30,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.02, "v_socio": 0.32,
+      "ep_rate": 11, "elderly": 32, "pop_density": 156, "gdp_pc": 26000, "unemp": 2.4
+    },
+    "Shimane": {
+      "C_base": 0.38, "V_base": 0.30, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.30,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.02, "v_socio": 0.32,
+      "ep_rate": 11, "elderly": 35, "pop_density": 99, "gdp_pc": 26000, "unemp": 2.3
+    },
+    "Yamaguchi": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.15, "T_base": 0.30,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.36, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 35, "pop_density": 218, "gdp_pc": 32000, "unemp": 2.5
+    },
+    "Oita": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.30,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 33, "pop_density": 178, "gdp_pc": 32000, "unemp": 2.8
+    },
+    "Miyazaki": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.22, "T_base": 0.30,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.02, "v_socio": 0.32,
+      "ep_rate": 11, "elderly": 32, "pop_density": 138, "gdp_pc": 26000, "unemp": 3.0
+    },
+    "Nagasaki": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.15, "T_base": 0.30,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.02, "v_socio": 0.32,
+      "ep_rate": 11, "elderly": 33, "pop_density": 320, "gdp_pc": 27000, "unemp": 3.1
+    },
+    "Saga": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.15, "T_base": 0.30,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.02, "v_socio": 0.30,
+      "ep_rate": 10, "elderly": 31, "pop_density": 333, "gdp_pc": 27000, "unemp": 2.8
+    }
+  }
+}

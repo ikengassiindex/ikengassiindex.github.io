@@ -1,9 +1,30 @@
 {
   "code": "IE",
+  "iso2": "IE",
+  "iso3": "IRL",
   "prefix": "IE_",
   "name": "Ireland",
   "tso_zone": "EirGrid",
+  "tso": "EirGrid (all-island via SEMO)",
+  "regulator": "CRU",
+  "regions_label": "Counties (NUTS-3 grouped)",
+  "regions_count": 26,
+  "bidding_zones": ["I-SEM"],
+  "min_fleet": 1000,
+  "bbox": {"lon_min": -10.7, "lon_max": -5.4, "lat_min": 51.4, "lat_max": 55.5},
+  "weights": {"C": 0.30, "V": 0.10, "I": 0.25, "E": 0.10, "S": 0.20, "T": 0.05},
   "seismic_alpha": 0.20,
+  "R3_tiers": {
+    "Capital-Intensive":     1.02,
+    "Industrial-Commercial": 1.04,
+    "Light-Rural":           1.06
+  },
+  "R6_modifiers": {
+    "R6_seismic":     {"range": [0.00, 0.04], "active": true,  "note": "Essentially aseismic intra-plate craton"},
+    "R6c_flood":      {"range": [0.06, 0.12], "active": true,  "note": "Shannon basin + Atlantic-storm coupling — HIGHER than DACH"},
+    "R6_storm":       {"range": [0.04, 0.10], "active": true,  "note": "IE-UNIQUE ACTIVE — Storm Isha Jan 2024 (300k customers, 72h restoration) + Ophelia/Ciara/Desmond"},
+    "R6_restoration": {"range": [0.00, 0.04], "active": true,  "note": "ESB Networks uniform ramp (~99% DSO market share)"}
+  },
   "default_region": {
     "C_base": 0.40, "V_base": 0.30, "I_base": 0.30, "E_base": 0.30,
     "pga_base": 0.02, "T_base": 0.35,

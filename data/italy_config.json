@@ -1,0 +1,179 @@
+{
+  "code": "IT",
+  "iso2": "IT",
+  "iso3": "ITA",
+  "prefix": "IT_",
+  "name": "Italy",
+  "tso_zone": "Terna",
+  "tso": "Terna SpA",
+  "regulator": "ARERA",
+  "regions_label": "Regioni (NUTS-2)",
+  "regions_count": 20,
+  "bidding_zones": ["Nord", "CNord", "CSud", "Sud", "Calabria", "Sicilia", "Sardegna"],
+  "min_fleet": 4000,
+  "bbox": {"lon_min": 6.6, "lon_max": 18.55, "lat_min": 35.4, "lat_max": 47.1},
+  "weights": {"C": 0.30, "V": 0.10, "I": 0.25, "E": 0.10, "S": 0.20, "T": 0.05},
+  "seismic_alpha": 0.65,
+  "R3_tiers": {
+    "Capital-Intensive": 1.02,
+    "Industrial-Major":  1.04,
+    "Commercial":        1.06,
+    "Light-Industrial":  1.08,
+    "Light-Rural":       1.10
+  },
+  "R6_modifiers": {
+    "R6_seismic":     {"range": [0.05, 0.25], "active": true,  "note": "INGV MPS19 — Calabria/Sicilia/Friuli/Marche/Abruzzo/Campania 0.20-0.25g"},
+    "R6_volcanic":    {"range": [0.00, 0.15], "active": true,  "note": "IT-UNIQUE candidate — Vesuvio/Campi Flegrei/Etna/Stromboli/Vulcano 10 km buffer"},
+    "R6c_flood":      {"range": [0.04, 0.10], "active": true,  "note": "Po basin + 2023 Romagna ref event + Arno/Tevere/Adige"},
+    "R6_restoration": {"range": [0.00, 0.05], "active": true,  "note": "Mezzogiorno gap — Nord 0.010 -> Calabria 0.045"}
+  },
+  "default_region": {
+    "C_base": 0.45, "V_base": 0.35, "I_base": 0.35, "E_base": 0.35,
+    "pga_base": 0.12, "T_base": 0.35,
+    "seismic_zone": "Moderate", "corrosion": "C3",
+    "der_ratio": 0.40, "ev_share": 0.04, "v_socio": 0.30,
+    "ep_rate": 10, "elderly": 23, "pop_density": 200, "gdp_pc": 30000, "unemp": 7.5
+  },
+  "regions": {
+    "Lombardia": {
+      "C_base": 0.55, "V_base": 0.42, "I_base": 0.45, "E_base": 0.38,
+      "pga_base": 0.06, "T_base": 0.42,
+      "seismic_zone": "Low", "corrosion": "C4",
+      "der_ratio": 0.45, "ev_share": 0.06, "v_socio": 0.18,
+      "ep_rate": 5, "elderly": 22, "pop_density": 420, "gdp_pc": 50000, "unemp": 4.5
+    },
+    "Lazio": {
+      "C_base": 0.52, "V_base": 0.40, "I_base": 0.42, "E_base": 0.36,
+      "pga_base": 0.13, "T_base": 0.40,
+      "seismic_zone": "Moderate", "corrosion": "C4",
+      "der_ratio": 0.32, "ev_share": 0.05, "v_socio": 0.22,
+      "ep_rate": 6, "elderly": 22, "pop_density": 340, "gdp_pc": 40000, "unemp": 7.0
+    },
+    "Piemonte": {
+      "C_base": 0.50, "V_base": 0.38, "I_base": 0.40, "E_base": 0.36,
+      "pga_base": 0.08, "T_base": 0.40,
+      "seismic_zone": "Low", "corrosion": "C3",
+      "der_ratio": 0.42, "ev_share": 0.05, "v_socio": 0.20,
+      "ep_rate": 6, "elderly": 25, "pop_density": 170, "gdp_pc": 36000, "unemp": 5.5
+    },
+    "Emilia-Romagna": {
+      "C_base": 0.50, "V_base": 0.38, "I_base": 0.40, "E_base": 0.36,
+      "pga_base": 0.10, "T_base": 0.40,
+      "seismic_zone": "Moderate", "corrosion": "C3",
+      "der_ratio": 0.50, "ev_share": 0.05, "v_socio": 0.20,
+      "ep_rate": 5, "elderly": 24, "pop_density": 200, "gdp_pc": 38000, "unemp": 5.0
+    },
+    "Liguria": {
+      "C_base": 0.48, "V_base": 0.36, "I_base": 0.38, "E_base": 0.35,
+      "pga_base": 0.10, "T_base": 0.38,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.36, "ev_share": 0.05, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 28, "pop_density": 280, "gdp_pc": 35000, "unemp": 7.0
+    },
+    "Veneto": {
+      "C_base": 0.48, "V_base": 0.36, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.10, "T_base": 0.38,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.45, "ev_share": 0.05, "v_socio": 0.22,
+      "ep_rate": 6, "elderly": 23, "pop_density": 270, "gdp_pc": 36000, "unemp": 5.5
+    },
+    "Toscana": {
+      "C_base": 0.46, "V_base": 0.35, "I_base": 0.36, "E_base": 0.34,
+      "pga_base": 0.10, "T_base": 0.36,
+      "seismic_zone": "Moderate", "corrosion": "C4",
+      "der_ratio": 0.42, "ev_share": 0.05, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 26, "pop_density": 160, "gdp_pc": 34000, "unemp": 6.0
+    },
+    "Friuli-Venezia Giulia": {
+      "C_base": 0.46, "V_base": 0.35, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.22, "T_base": 0.36,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.04, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 25, "pop_density": 154, "gdp_pc": 33000, "unemp": 5.5
+    },
+    "Trentino-Alto Adige": {
+      "C_base": 0.46, "V_base": 0.34, "I_base": 0.36, "E_base": 0.32,
+      "pga_base": 0.10, "T_base": 0.36,
+      "seismic_zone": "Moderate", "corrosion": "C2",
+      "der_ratio": 0.55, "ev_share": 0.06, "v_socio": 0.18,
+      "ep_rate": 4, "elderly": 21, "pop_density": 78, "gdp_pc": 42000, "unemp": 4.0
+    },
+    "Valle d'Aosta": {
+      "C_base": 0.44, "V_base": 0.33, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.06, "T_base": 0.34,
+      "seismic_zone": "Low", "corrosion": "C2",
+      "der_ratio": 0.55, "ev_share": 0.05, "v_socio": 0.20,
+      "ep_rate": 5, "elderly": 23, "pop_density": 39, "gdp_pc": 38000, "unemp": 5.0
+    },
+    "Umbria": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.32,
+      "pga_base": 0.18, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C2",
+      "der_ratio": 0.40, "ev_share": 0.04, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 26, "pop_density": 104, "gdp_pc": 28000, "unemp": 7.0
+    },
+    "Marche": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.33,
+      "pga_base": 0.20, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.04, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 25, "pop_density": 161, "gdp_pc": 28000, "unemp": 7.0
+    },
+    "Abruzzo": {
+      "C_base": 0.42, "V_base": 0.33, "I_base": 0.36, "E_base": 0.32,
+      "pga_base": 0.20, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.04, "v_socio": 0.28,
+      "ep_rate": 9, "elderly": 24, "pop_density": 122, "gdp_pc": 26000, "unemp": 9.0
+    },
+    "Molise": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.30,
+      "pga_base": 0.15, "T_base": 0.30,
+      "seismic_zone": "Moderate", "corrosion": "C2",
+      "der_ratio": 0.42, "ev_share": 0.03, "v_socio": 0.32,
+      "ep_rate": 11, "elderly": 25, "pop_density": 67, "gdp_pc": 22000, "unemp": 11.0
+    },
+    "Campania": {
+      "C_base": 0.46, "V_base": 0.36, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.20, "T_base": 0.34,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.32, "ev_share": 0.04, "v_socio": 0.34,
+      "ep_rate": 12, "elderly": 19, "pop_density": 420, "gdp_pc": 22000, "unemp": 17.0
+    },
+    "Puglia": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.33,
+      "pga_base": 0.10, "T_base": 0.34,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.45, "ev_share": 0.04, "v_socio": 0.30,
+      "ep_rate": 11, "elderly": 23, "pop_density": 205, "gdp_pc": 22000, "unemp": 13.5
+    },
+    "Basilicata": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.30,
+      "pga_base": 0.15, "T_base": 0.30,
+      "seismic_zone": "Moderate", "corrosion": "C2",
+      "der_ratio": 0.42, "ev_share": 0.03, "v_socio": 0.33,
+      "ep_rate": 12, "elderly": 24, "pop_density": 54, "gdp_pc": 22000, "unemp": 10.5
+    },
+    "Calabria": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.25, "T_base": 0.30,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.38, "ev_share": 0.03, "v_socio": 0.36,
+      "ep_rate": 14, "elderly": 23, "pop_density": 124, "gdp_pc": 18000, "unemp": 18.0
+    },
+    "Sicilia": {
+      "C_base": 0.42, "V_base": 0.34, "I_base": 0.36, "E_base": 0.33,
+      "pga_base": 0.22, "T_base": 0.32,
+      "seismic_zone": "Very High", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.03, "v_socio": 0.34,
+      "ep_rate": 13, "elderly": 22, "pop_density": 194, "gdp_pc": 19000, "unemp": 17.0
+    },
+    "Sardegna": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.32,
+      "pga_base": 0.04, "T_base": 0.30,
+      "seismic_zone": "Very Low", "corrosion": "C5",
+      "der_ratio": 0.48, "ev_share": 0.03, "v_socio": 0.32,
+      "ep_rate": 12, "elderly": 24, "pop_density": 68, "gdp_pc": 22000, "unemp": 12.5
+    }
+  }
+}

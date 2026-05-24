@@ -29,7 +29,7 @@ WEIGHTS = {'C': 0.30, 'V': 0.10, 'I': 0.25, 'E': 0.10, 'S': 0.20, 'T': 0.05}
 # not safely importable as a module. Keep these two in lock-step.
 MIN_FLEET = {
     "AT": 1200, "CH": 800,  "DE": 10000,
-    "IT": 4000, "ES": 3500, "IE": 1000, "JP": 4500,
+    "IT": 4000, "ES": 3500, "IE": 990, "JP": 4500,
     "LU": 700,  "BE": 1000, "NL": 1300, "CZ": 800,
     "LV": 1000, "LT": 400,  "EE": 500,
     "FR": 6500,
