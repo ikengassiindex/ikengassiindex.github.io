@@ -1,9 +1,13 @@
 // SSI v4.0.2 — Canada Metadata
 // Generated 2026-03-13 by Ikenga Project
 
-window.SSIMetadata = (function () {
-  'use strict';
-  return {
+// Build the metadata object as a plain assignment (no IIFE wrapper).
+// The previous IIFE returned at the inner closing brace, making every
+// `window.SSI_METADATA.X = ...` block below DEAD CODE — which is why
+// SSIMetadata.DATA_SOURCES / FREQ_DISTRIBUTION were always undefined
+// and intelligence.html Section G stuck on "Loading…". Stripping the
+// IIFE wrapper makes the trailing property assignments execute.
+window.SSIMetadata = {
 
   country: "Canada",
   country_code: "CA",
@@ -122,6 +126,11 @@ window.SSIMetadata = (function () {
 };
 
 /* ── Methodology page data arrays (v4.0.2) ── */
+// Dual-global bridge (KB §45.6): make window.SSI_METADATA the SAME object
+// as window.SSIMetadata so the property assignments below land on the
+// object the IIFE returned. Without this, the assignments either throw
+// (strict) or silently attach to a phantom object that gets discarded.
+window.SSI_METADATA = window.SSIMetadata;
 
 window.SSI_METADATA.COMPONENTS = [
   {
@@ -787,7 +796,9 @@ window.SSI_METADATA.FREQ_DISTRIBUTION = {
     Annual: { count: 9, sources: ['DS02', 'DS03', 'DS09', 'DS10', 'DS11', 'DS12', 'DS13', 'DS14', 'DS18'] },
     Static: { count: 1, sources: ['DS19'] }
     };
-})();
-// Compatibility alias
-window.SSI_METADATA = window.SSIMetadata;
+// Dual-global alias confirmed (KB §45.6): window.SSI_METADATA was set equal
+// to window.SSIMetadata above (line ~127), so all DATA_SOURCES / COMPONENTS /
+// FREQ_DISTRIBUTION assignments above this point landed on the SAME object both
+// globals reference. Both window.SSIMetadata and window.SSI_METADATA now point
+// to the fully-populated object.
 
