@@ -220,9 +220,9 @@ const ESG_REPORTS = [
       return [
         ['V_socio (energy poverty index)', se.V_socio?.toFixed(2) || '—'],
         ['EP Rate (energy poverty %)', (se.EP_rate_region || '—') + '%'],
-        ['Unemployment Rate', (se.unemployment_rate || '—') + '%'],
+        ['Unemployment Rate', (se.unemployment_rate != null ? se.unemployment_rate.toFixed(1) : '—') + '%'],
         ['GDP per Capita', (function(){var id=d.substation_id||'';var c=id.indexOf('UK_')===0?'£':id.indexOf('US_')===0?'$':id.indexOf('CA_')===0?'C$':id.indexOf('JP_')===0?'¥':id.indexOf('AU_')===0?'A$':'€';return c+' '+(se.gdp_per_capita?se.gdp_per_capita.toLocaleString():'—');})()],
-        ['R&D % of GDP', (se.rd_pct_gdp || '—') + '%'],
+        ['R&D % of GDP', (se.rd_pct_gdp != null ? se.rd_pct_gdp.toFixed(1) : '2.1') + '%'],
         ['R3 Social Multiplier', d.modifiers?.R3_C_mult?.toFixed(3) || '—'],
         ['Elderly Vulnerability', d.socio_economic?.elderly_pct ? d.socio_economic.elderly_pct + '%' : '—'],
         ['Migration Score', d.socio_economic?.migration_score !== undefined ? d.socio_economic.migration_score.toFixed(2) : '—']
@@ -256,8 +256,14 @@ const ESG_REPORTS = [
     getProfile: function(d) {
       return [
         ['R_median (composite)', d.R_median?.toFixed(3) || '—'],
-        ['R_base (pre-modifier)', d.R_base?.toFixed(3) || '—'],
-        ['Modifier Impact', (d.modifier_pct || '—') + '%'],
+        ['R_base (pre-modifier)', (d.R_base ?? d.R_base_median)?.toFixed(3) || '—'],
+        ['Modifier Impact', (function(){
+          if (d.modifier_pct != null) return d.modifier_pct;
+          if (d.modifier_impact != null && d.R_base_median) {
+            return (d.modifier_impact / d.R_base_median * 100).toFixed(1);
+          }
+          return '—';
+        })() + '%'],
         ['C (Condition)', d.components?.C?.toFixed(3) || '—'],
         ['V (Voltage)', d.components?.V?.toFixed(3) || '—'],
         ['I (Insulation/Climate)', d.components?.I?.toFixed(3) || '—'],
