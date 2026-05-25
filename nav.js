@@ -3,52 +3,122 @@
    v4.1 — Multi-country support (landing page + country subfolders)
    ═══════════════════════════════════════════════════════════ */
 
-// ── Single source of truth for supported country slugs ──
+// >>> BEGIN AUTO-GENERATED FROM countries.json (do not edit by hand)
+// Single source of truth: intelligence/countries.json (regenerate via
+// scripts/generate_nav_data.py — pre-commit hook does this automatically).
+// 32 countries as of last regeneration.
+
 var SSI_COUNTRY_SLUGS = [
-  'australia','austria','belgium','canada','chile','czechia','denmark','finland','france','germany','greece','greenland','ireland','italy','japan','luxembourg','mexico','netherlands','new-zealand','norway','poland','portugal','slovenia','spain','sweden','switzerland','turkey','uk','us','estonia','latvia','lithuania'
+  'australia',
+  'austria',
+  'belgium',
+  'canada',
+  'chile',
+  'czechia',
+  'denmark',
+  'estonia',
+  'finland',
+  'france',
+  'germany',
+  'greece',
+  'greenland',
+  'ireland',
+  'italy',
+  'japan',
+  'latvia',
+  'lithuania',
+  'luxembourg',
+  'mexico',
+  'netherlands',
+  'new-zealand',
+  'norway',
+  'poland',
+  'portugal',
+  'slovenia',
+  'spain',
+  'sweden',
+  'switzerland',
+  'turkey',
+  'uk',
+  'us'
 ];
 var SSI_COUNTRY_PATH_RE = new RegExp('/(' + SSI_COUNTRY_SLUGS.join('|') + ')/');
 
-// Detect base path + active country from URL
+var SSI_COUNTRY_LABELS = {
+  'australia': '\uD83C\uDDE6\uD83C\uDDFA Australia',
+  'austria': '\uD83C\uDDE6\uD83C\uDDF9 Austria',
+  'belgium': '\uD83C\uDDE7\uD83C\uDDEA Belgium',
+  'canada': '\uD83C\uDDE8\uD83C\uDDE6 Canada',
+  'chile': '\uD83C\uDDE8\uD83C\uDDF1 Chile',
+  'czechia': '\uD83C\uDDE8\uD83C\uDDFF Czechia',
+  'denmark': '\uD83C\uDDE9\uD83C\uDDF0 Denmark',
+  'estonia': '\uD83C\uDDEA\uD83C\uDDEA Estonia',
+  'finland': '\uD83C\uDDEB\uD83C\uDDEE Finland',
+  'france': '\uD83C\uDDEB\uD83C\uDDF7 France',
+  'germany': '\uD83C\uDDE9\uD83C\uDDEA Germany',
+  'greece': '\uD83C\uDDEC\uD83C\uDDF7 Greece',
+  'greenland': '\uD83C\uDDEC\uD83C\uDDF1 Greenland',
+  'ireland': '\uD83C\uDDEE\uD83C\uDDEA Ireland',
+  'italy': '\uD83C\uDDEE\uD83C\uDDF9 Italy',
+  'japan': '\uD83C\uDDEF\uD83C\uDDF5 Japan',
+  'latvia': '\uD83C\uDDF1\uD83C\uDDFB Latvia',
+  'lithuania': '\uD83C\uDDF1\uD83C\uDDF9 Lithuania',
+  'luxembourg': '\uD83C\uDDF1\uD83C\uDDFA Luxembourg',
+  'mexico': '\uD83C\uDDF2\uD83C\uDDFD Mexico',
+  'netherlands': '\uD83C\uDDF3\uD83C\uDDF1 Netherlands',
+  'new-zealand': '\uD83C\uDDF3\uD83C\uDDFF New Zealand',
+  'norway': '\uD83C\uDDF3\uD83C\uDDF4 Norway',
+  'poland': '\uD83C\uDDF5\uD83C\uDDF1 Poland',
+  'portugal': '\uD83C\uDDF5\uD83C\uDDF9 Portugal',
+  'slovenia': '\uD83C\uDDF8\uD83C\uDDEE Slovenia',
+  'spain': '\uD83C\uDDEA\uD83C\uDDF8 Spain',
+  'sweden': '\uD83C\uDDF8\uD83C\uDDEA Sweden',
+  'switzerland': '\uD83C\uDDE8\uD83C\uDDED Switzerland',
+  'turkey': '\uD83C\uDDF9\uD83C\uDDF7 Turkey',
+  'uk': '\uD83C\uDDEC\uD83C\uDDE7 United Kingdom',
+  'us': '\uD83C\uDDFA\uD83C\uDDF8 United States'
+};
+
+var SSI_COUNTRY_STATS_DEFAULT = {
+  'australia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'austria': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'belgium': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'canada': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'chile': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'czechia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'denmark': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'estonia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'finland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'france': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'germany': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'greece': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'greenland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'ireland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'italy': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'japan': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'latvia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'lithuania': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'luxembourg': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'mexico': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'netherlands': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'new-zealand': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'norway': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'poland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'portugal': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'slovenia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'spain': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'sweden': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'switzerland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'turkey': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'uk': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'us': '95 variables \u00b7 substations: ? \u00b7 ? regions'
+};
+// <<< END AUTO-GENERATED
+
+// Detect base path + active country from URL (uses SLUGS + REGEX from auto-section above)
 var _ssiPathMatch = window.location.pathname.match(SSI_COUNTRY_PATH_RE);
 var SSI_BASE = _ssiPathMatch ? '../' : '';
 var SSI_COUNTRY = _ssiPathMatch ? _ssiPathMatch[1] : null;
-
-var SSI_COUNTRY_LABELS = {
-  italy: '🇮🇹 Italy',
-  germany: '🇩🇪 Germany',
-  switzerland: '🇨🇭 Switzerland',
-  austria: '🇦🇹 Austria',
-  france: '🇫🇷 France',
-    japan: '🇯🇵 Japan',
-  spain: '🇪🇸 Spain',
-  uk: '🇬🇧 United Kingdom',
-  us: '🇺🇸 United States',
-  canada: '🇨🇦 Canada',
-    australia: '🇦🇺 Australia'
-,
-    chile: '🇨🇱 Chile',
-    poland: '🇵🇱 Poland',
-    finland: '🇫🇮 Finland',
-    sweden: '🇸🇪 Sweden',
-    norway: '🇳🇴 Norway',
-    denmark: '🇩🇰 Denmark',
-    mexico: '🇲🇽 Mexico',
-    greece: '🇬🇷 Greece',
-    turkey: '🇹🇷 Turkey',
-    ireland: '🇮🇪 Ireland',
-    portugal: '🇵🇹 Portugal',
-    'new-zealand': '🇳🇿 New Zealand',
-    greenland: '🇬🇱 Greenland',
-    czechia: '🇨🇿 Czechia',
-    luxembourg: '🇱🇺 Luxembourg',
-    belgium: '🇧🇪 Belgium',
-    netherlands: '🇳🇱 Netherlands',
-  estonia: '\uD83C\uDDEA\uD83C\uDDEA Estonia',
-  latvia: '\uD83C\uDDF1\uD83C\uDDFB Latvia',
-  lithuania: '\uD83C\uDDF1\uD83C\uDDF9 Lithuania',
-  slovenia: '\uD83C\uDDF8\uD83C\uDDEE Slovenia'
-};
 
 // Ikenga logo
 var SSI_LOGO = '<img src="' + SSI_BASE + 'ikenga-logo.png" alt="Ikenga" style="height:187px;width:auto;display:block" />';

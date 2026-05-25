@@ -1,0 +1,50 @@
+name: Phase 1 — Data contract validation
+
+# Runs on every push to main + every PR. Fails the build if:
+#   1. Any country's data file violates schemas/*.schema.json
+#   2. nav.js auto-section is out of sync with countries.json
+# Reference: KB §65.4.3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*/grid-geo.json'
+      - '*/ssi-data.json'
+      - '*/bounds.json'
+      - 'intelligence/countries.json'
+      - 'schemas/**'
+      - 'scripts/run_schema_validation.py'
+      - 'scripts/generate_nav_data.py'
+      - 'nav.js'
+      - '.github/workflows/validate-schemas.yml'
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          # countries.json + data files only — no need for large LFS objects
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema==4.26.0
+
+      - name: Run schema validation (strict — fails build on any error)
+        run: python3 scripts/run_schema_validation.py --strict
+
+      - name: Verify nav.js auto-section in sync with countries.json
+        run: python3 scripts/generate_nav_data.py --check

@@ -1,0 +1,26 @@
+# Pre-commit hooks for SSI Index repo (KB §65.4.3).
+# Install:  pip install pre-commit && pre-commit install
+# Runs:     automatically on every `git commit`; can also be invoked
+#           manually with `pre-commit run --all-files`.
+#
+# Two checks (both also run in CI via .github/workflows/validate-schemas.yml):
+#   1. Schema validation of country data files (--strict)
+#   2. nav.js auto-section in sync with intelligence/countries.json
+
+repos:
+  - repo: local
+    hooks:
+      - id: validate-schemas
+        name: Validate country data files against schemas/*.schema.json
+        entry: python3 scripts/run_schema_validation.py --strict
+        language: python
+        additional_dependencies: [jsonschema==4.26.0]
+        files: '^(.*/grid-geo\.json|.*/ssi-data\.json|.*/bounds\.json|intelligence/countries\.json|schemas/.*\.json|scripts/run_schema_validation\.py)$'
+        pass_filenames: false
+
+      - id: nav-js-in-sync
+        name: nav.js auto-section in sync with countries.json
+        entry: python3 scripts/generate_nav_data.py --check
+        language: system
+        files: '^(intelligence/countries\.json|nav\.js|scripts/generate_nav_data\.py)$'
+        pass_filenames: false
