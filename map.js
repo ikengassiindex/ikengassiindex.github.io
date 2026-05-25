@@ -1435,10 +1435,38 @@ if (!hasNested) {
       var _classif = {};
       (SSI.substations || []).forEach(function(s) { _classif[s.classification] = (_classif[s.classification]||0)+1; });
       window._ssiHasSpread = Object.keys(_classif).length >= 1;  // (was >=3 — uniformly-classified fleets like LU were falling through to percentile fallback)
+
+      // ── fleet_summary canonicalization (KB §65 — schema drift normalization) ──
+      // Countries vary on key names: France/Italy use {median_R, P5, P95, band_pct, confidence_pct};
+      // Slovenia/Czechia/Baltics use {R_median, R_min, R_max, bands}. Both must work in onLoaded callbacks.
+      // We populate canonical aliases here so downstream code (per-country map.html callbacks,
+      // SSIMap consumers) can use either key set without crashing.
+      var fs = SSI.fleet_summary = SSI.fleet_summary || {};
+      if (fs.median_R == null && fs.R_median != null) fs.median_R = fs.R_median;
+      if (fs.R_median == null && fs.median_R != null) fs.R_median = fs.median_R;
+      if (fs.mean_R == null) fs.mean_R = fs.median_R || fs.R_median || 0;
+      if (fs.P5 == null && fs.R_min != null) fs.P5 = fs.R_min;
+      if (fs.P95 == null && fs.R_max != null) fs.P95 = fs.R_max;
+      if (fs.R_min == null && fs.P5 != null) fs.R_min = fs.P5;
+      if (fs.R_max == null && fs.P95 != null) fs.R_max = fs.P95;
+      // Synthesize band_pct from bands if missing (Slovenia/etc don't emit it)
+      if (!fs.band_pct && fs.bands) {
+        var totalForPct = fs.total || Object.values(fs.bands).reduce(function(a,b){return a + (b||0);}, 0) || 1;
+        fs.band_pct = {};
+        for (var b in fs.bands) { fs.band_pct[b] = (fs.bands[b] / totalForPct) * 100; }
+      }
+      if (!fs.confidence_pct) fs.confidence_pct = { high: 0, medium: 0, low: 0 };
+      if (!fs.confidence_tiers) fs.confidence_tiers = {};
+
       wireFilters();
       clearDetailPanel();
 
-      if (loadedCallback) loadedCallback(SSI);
+      // Wrap callback in try/catch so a per-country callback bug doesn't trigger
+      // the generic 'Failed to load map data' error (anti-pattern A8 — render-chain cascade)
+      if (loadedCallback) {
+        try { loadedCallback(SSI); }
+        catch (e) { console.error('Map onLoaded callback error (data IS loaded):', e); }
+      }
 
       console.log(`SSI Map loaded: ${Object.keys(GEO.s).length} subs, ${GEO.l.length} lines, ${SSI.substations.length} SSI records`);
     }).catch(err => {
