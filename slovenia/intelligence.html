@@ -1043,7 +1043,11 @@ document.addEventListener("ssi-config-ready", function(e) {
 (function(){
   fetch('ssi-data.json?v=700').then(function(r){ return r.json(); }).then(function(data){
     // ── Filter Savinja Valley ──
-    var puglia = data.substations.filter(function(s){ return s.region === 'Savinjska'; });
+    // Slovenia: NUTS-3 code 'SI034' = Savinjska region (human-readable name in s.province).
+    // Accept either field so this works regardless of which key the data file uses.
+    var puglia = data.substations.filter(function(s){
+      return s.province === 'Savinjska' || s.region === 'Savinjska' || s.region === 'SI034';
+    });
     var fleet = data.substations;
     puglia.sort(function(a,b){ return b.R_median - a.R_median; });
 
