@@ -1,9 +1,12 @@
-name: Phase 1 — Data contract validation
+name: Phase 1 — Data contract + JS parse validation
 
 # Runs on every push to main + every PR. Fails the build if:
 #   1. Any country's data file violates schemas/*.schema.json
 #   2. nav.js auto-section is out of sync with countries.json
-# Reference: KB §65.4.3
+#   3. Any inline <script> block in country HTML fails node --check
+#      (Phase 1.7 — catches the apostrophe/typo class that took down
+#       Slovenia's Section D today)
+# Reference: KB §65.4.3 + §65.4.7
 
 on:
   push:
@@ -12,10 +15,12 @@ on:
       - '*/grid-geo.json'
       - '*/ssi-data.json'
       - '*/bounds.json'
+      - '*/*.html'
       - 'intelligence/countries.json'
       - 'schemas/**'
       - 'scripts/run_schema_validation.py'
       - 'scripts/generate_nav_data.py'
+      - 'scripts/check_inline_js_parse.py'
       - 'nav.js'
       - '.github/workflows/validate-schemas.yml'
   pull_request:
@@ -48,3 +53,11 @@ jobs:
 
       - name: Verify nav.js auto-section in sync with countries.json
         run: python3 scripts/generate_nav_data.py --check
+
+      - name: Set up Node.js (for inline JS parse-check)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Parse-check every inline <script> in country HTML pages (Phase 1.7)
+        run: python3 scripts/check_inline_js_parse.py --strict
