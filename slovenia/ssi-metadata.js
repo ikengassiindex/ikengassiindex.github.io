@@ -202,5 +202,27 @@ window.SSI_METADATA.CHANGELOG = [
   { id: 'SI-S25-1', change: 'KB v25 §64 — Slovenia inaugural onboarding (CEE-South cohort)',                              type: 'enhanced', section: 'KB §64' }
 ];
 
+// ── ESG-report data-source registry (Phase 2b — KB §65) ──
+// Row form: [name, source, vintage, frequency, license, reports_tag, blocked_flag?]
+// Consumed by esg-sections.js → getReportSources() to render the
+// "Data Sources & Vintage" card on each of the 6 ESG reports. Kept separate
+// from DATA_SOURCES above (which is object-form, consumed by data.html).
+window.SSI_METADATA.ESG_SOURCES = [
+  ['ERA5 Climate Reanalysis','Copernicus CDS','2024','Weekly','CC-BY-4.0','R1, R3'],
+  ['Slovenian Seismic Hazard Map','ARSO Seismology + ZAG-EQS (PGA 475-yr)','2023','Multi-year','CC0','R1, R3'],
+  ['Population & Economics','SURS (Statistični urad RS)','2023','Annual','OGD','R2, R3'],
+  ['Energy Market Data','ELES + Borzen','2023','Annual','Regulated','R2, R4'],
+  ['Renewable Installations','Borzen + AGEN-RS DER registry','2024','Monthly','Open','R4'],
+  ['Weather Data','ARSO (Agencija RS za okolje)','2024','Daily','CC-BY-4.0','R1'],
+  ['Flood Mapping','DRSV (Direkcija za vode) Q100 + 2023 floods overlay','2024','Monthly','CC-BY-4.0','R1'],
+  ['Nuclear Safety','URSJV — Krško NPP oversight','2024','Quarterly','Regulated','R1, R3'],
+  ['Cybersecurity Index','SI-CERT + ENISA','2024','Annual','Open','R6'],
+  ['DESI Connectivity','European Commission','2024','Annual','Open','R6'],
+  ['IEEE C57.91 Thermal Model','IEEE','Standard','N/A','Published','R1'],
+  ['CIGRE TB 761 Markov','CIGRE','2019','N/A','Published','R1, R3'],
+  ['ISO 9223 Corrosion','ISO','2012','N/A','Published','R5'],
+  ['CMIP6 SSP2-4.5 Projections','Copernicus CDS','2024','Multi-year','CC-BY-4.0','R1']
+];
+
 // Mirror onto the lower-case alias too
 window.SSIMetadata = window.SSI_METADATA;
