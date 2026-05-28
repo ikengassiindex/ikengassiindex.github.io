@@ -131,10 +131,42 @@
       }
     },
 
+    "deep_dive": {
+      "type": "object",
+      "description": "The current edition's featured deep-dive corridor for Section D of intelligence.html. Replaces hardcoded region literal + narrative text in slovenia/intelligence.html (KB §65.5 Phase 2c).",
+      "required": ["region"],
+      "additionalProperties": false,
+      "properties": {
+        "region": {"type": "string", "description": "Region name as it appears in ssi-data.json substations[*].region (e.g. 'Savinjska')."},
+        "label": {"type": "string", "description": "Human-readable corridor label (e.g. 'Savinja Valley'). Defaults to `region` if absent."},
+        "narrative": {"type": "string", "description": "Country-specific contextual paragraph appended to D.1 narrative."}
+      }
+    },
+
     "ssi_metadata_extras": {
       "type": "object",
       "description": "Country-specific overrides for ssi-metadata.js shape (e.g. R3 tier descriptor, R6 anchors, R7 ceiling).",
       "additionalProperties": true
+    },
+
+    "regional_page": {
+      "type": "object",
+      "description": "Per-country overrides for regional.html (Phase 2d.2 thin-shell). Replaces hardcoded JS literals such as the substation→region field name and the ranking-header suffix.",
+      "additionalProperties": false,
+      "properties": {
+        "region_field": {
+          "type": "string",
+          "description": "Substation-record field carrying the L1 region label (defaults to 'province')."
+        },
+        "fallback_region_field": {
+          "type": "string",
+          "description": "Secondary substation-record field used when the primary field is empty (defaults to 'region')."
+        },
+        "ranking_label": {
+          "type": "string",
+          "description": "Suffix used after the region count in the ranking header (e.g. 'NUTS-3 Regions · sorted worst → best')."
+        }
+      }
     }
   }
 }

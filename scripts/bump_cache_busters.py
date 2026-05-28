@@ -29,6 +29,8 @@ Targets in HTML:
 CI / pre-commit: --check exits 1 if any cache-buster is out of sync with its
 target file's current hash. Wired into validate-schemas.yml.
 """
+from __future__ import annotations  # str | None unions work on Python 3.7+
+
 import json
 import os
 import re
@@ -48,9 +50,16 @@ TARGETS = [
     ('map.js',            lambda c: REPO / 'map.js'),
     ('ssi-engine.js',     lambda c: REPO / 'ssi-engine.js'),
     ('ssi-versions.js',   lambda c: REPO / 'ssi-versions.js'),
-    # Phase 2b thin-shell modules (KB §65) — central renderer + section registry
-    ('country-renderer.js', lambda c: REPO / 'country-renderer.js'),
-    ('esg-sections.js',     lambda c: REPO / 'esg-sections.js'),
+    # Phase 2b/2c/2d thin-shell modules (KB §65) — central renderer + section registries
+    ('country-renderer.js',          lambda c: REPO / 'country-renderer.js'),
+    ('esg-sections.js',              lambda c: REPO / 'esg-sections.js'),
+    ('intelligence-sections.js',     lambda c: REPO / 'intelligence-sections.js'),
+    ('index-sections.js',            lambda c: REPO / 'index-sections.js'),
+    ('regional-sections.js',         lambda c: REPO / 'regional-sections.js'),
+    ('map-sections.js',              lambda c: REPO / 'map-sections.js'),
+    ('methodology-sections.js',      lambda c: REPO / 'methodology-sections.js'),
+    ('data-sections.js',             lambda c: REPO / 'data-sections.js'),
+    ('dno-dashboard-sections.js',    lambda c: REPO / 'dno-dashboard-sections.js'),
     # Per-country assets
     ('ssi-metadata.js',   lambda c: REPO / c / 'ssi-metadata.js'),
     ('ssi-data.json',     lambda c: REPO / c / 'ssi-data.json'),
