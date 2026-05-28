@@ -6,7 +6,7 @@
 // >>> BEGIN AUTO-GENERATED FROM countries.json (do not edit by hand)
 // Single source of truth: intelligence/countries.json (regenerate via
 // scripts/generate_nav_data.py — pre-commit hook does this automatically).
-// 32 countries as of last regeneration.
+// 33 countries as of last regeneration.
 
 var SSI_COUNTRY_SLUGS = [
   'australia',
@@ -34,6 +34,7 @@ var SSI_COUNTRY_SLUGS = [
   'norway',
   'poland',
   'portugal',
+  'slovakia',
   'slovenia',
   'spain',
   'sweden',
@@ -70,6 +71,7 @@ var SSI_COUNTRY_LABELS = {
   'norway': '\uD83C\uDDF3\uD83C\uDDF4 Norway',
   'poland': '\uD83C\uDDF5\uD83C\uDDF1 Poland',
   'portugal': '\uD83C\uDDF5\uD83C\uDDF9 Portugal',
+  'slovakia': '\uD83C\uDDF8\uD83C\uDDF0 Slovakia',
   'slovenia': '\uD83C\uDDF8\uD83C\uDDEE Slovenia',
   'spain': '\uD83C\uDDEA\uD83C\uDDF8 Spain',
   'sweden': '\uD83C\uDDF8\uD83C\uDDEA Sweden',
@@ -105,6 +107,7 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'norway': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'poland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'portugal': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'slovakia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'slovenia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'spain': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'sweden': '95 variables \u00b7 substations: ? \u00b7 ? regions',
