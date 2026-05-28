@@ -6,13 +6,13 @@
 <meta name="description" content="Compare Greenland's Kommuner by SSI resilience score, component breakdown, and socio-economic context — 37 substations across 5 Kommuner, scored at Session 1 (2026-04-16).">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Regional Analysis</title>
-<link rel="stylesheet" href="../style.css?v=418">
+<link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
 <script src="../ssi-versions.js?_=1"></script>
-<script src="../nav.js?v=418"></script>
+<script src="../nav.js?v=91a21e302e"></script>
 <script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js?v=418"></script>
+<script src="ssi-metadata.js?v=b3aacf7b1b"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
@@ -190,7 +190,7 @@ function renderRanking(data) {
 
   // Enrich with plant/line counts from grid-geo.json (async, re-paint when ready)
   if (isProvisional) {
-    fetch('grid-geo.json?v=402').then(function(r){ return r.json(); }).then(function(geo){
+    fetch('grid-geo.json?v=9285cdaf79').then(function(r){ return r.json(); }).then(function(geo){
       (geo.plants || []).forEach(function(p){
         var km = p.kommune || p.k; if (km && auxByKommune[km]) auxByKommune[km].plants++;
         else if (km && !auxByKommune[km]) auxByKommune[km] = { plants: 1, lines: 0 };
@@ -411,7 +411,7 @@ function renderDecomposition(data) {
   document.getElementById('decomp-bars').innerHTML = html;
 }
 
-fetch('ssi-data.json?v=402').then(function(r) { return r.json(); }).then(function(data) {
+fetch('ssi-data.json?v=02209447af').then(function(r) { return r.json(); }).then(function(data) {
   SSI = data;
   provinceData = buildProvinceData(data);
   renderRanking(data);
