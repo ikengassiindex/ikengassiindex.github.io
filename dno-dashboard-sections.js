@@ -64,6 +64,8 @@
     return;
   }
   var CR = window.CountryRenderer;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9 (currently unused; reserved
+                       // for future dno_dashboard fields that need null-safety)
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */
   function getCfg(ctx) {

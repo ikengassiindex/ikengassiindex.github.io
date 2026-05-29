@@ -38,6 +38,7 @@
   }
   var CR = window.CountryRenderer;
   var H = CR.H;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Universal palette ──────────────────────────────────────────────── */
   var BAND_COLORS_HEX = {
@@ -205,13 +206,14 @@
 
     var doc = ctx.doc;
     var nameEl = doc.getElementById('focus-name');
-    if (nameEl) nameEl.textContent = s.name;
+    if (nameEl) nameEl.textContent = Safe.displayName(s);
     var locEl = doc.getElementById('focus-location');
-    if (locEl) locEl.textContent = (s.province || '') + ', ' + (s.region || '') + ' · ' + (s.voltage_kv || '—') + ' kV';
-    H.setText('focus-r', (s.R_median != null) ? s.R_median.toFixed(3) : '—');
+    var voltLabel = s.voltage_kv != null ? (s.voltage_kv + ' kV') : 'distribution-tier';
+    if (locEl) locEl.textContent = (s.province || '') + ', ' + (s.region || '') + ' · ' + voltLabel;
+    H.setText('focus-r', Safe.fmt(s.R_median, 3));
     H.setText('focus-band', s.classification || '—');
-    H.setText('focus-ci', (s.CI_width != null) ? s.CI_width.toFixed(3) : '—');
-    H.setText('focus-pctile', (s.fleet_percentile != null) ? (s.fleet_percentile * 100).toFixed(0) + 'th' : '—');
+    H.setText('focus-ci', Safe.fmt(s.CI_width, 3));
+    H.setText('focus-pctile', s.fleet_percentile != null ? Safe.fmt(s.fleet_percentile * 100, 0) + 'th' : '—');
 
     var fb = doc.getElementById('focus-band'), fr = doc.getElementById('focus-r');
     if (fb) fb.style.color = BAND_VAR[s.classification] || 'var(--ink)';
@@ -230,10 +232,10 @@
     var compHTML = compDefs.map(function (c) {
       var val = comps[c.key];
       if (val == null) return '';
-      var pct = (val / c.w * 100).toFixed(0);
+      var pct = Safe.fmt(val / c.w * 100, 0);
       var isAlert = s.alert_components && s.alert_components.indexOf(c.key) >= 0;
       return '<div><strong style="color:' + c.color + '">' + c.key + '</strong> ' + c.label + ': ' +
-        val.toFixed(3) + ' / ' + c.w.toFixed(2) + ' (' + pct + '%)' +
+        Safe.fmt(val, 3) + ' / ' + c.w.toFixed(2) + ' (' + pct + '%)' +
         (isAlert ? ' <span style="color:var(--crimson);font-weight:600">⚠</span>' : '') + '</div>';
     }).join('');
     H.setHTML('focus-components', compHTML);
@@ -252,7 +254,7 @@
       if (val == null) return '';
       var dir = val > 1.01 ? '↑ amplifies' : val < 0.99 ? '↓ dampens' : '→ neutral';
       var col = val > 1.05 ? 'var(--crimson)' : val < 0.95 ? 'var(--sage)' : 'var(--warm-grey)';
-      return '<div><strong>' + m.label + ':</strong> <span style="color:' + col + '">' + val.toFixed(3) + '</span> ' + dir + '</div>';
+      return '<div><strong>' + m.label + ':</strong> <span style="color:' + col + '">' + Safe.fmt(val, 3) + '</span> ' + dir + '</div>';
     }).join('');
     H.setHTML('focus-modifiers', modHTML);
 
@@ -329,11 +331,11 @@
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var d = new Date();
     var narrative = 'This month\'s spotlight — automatically selected for ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
-      ' — is <strong>' + (s.name || '—') + '</strong> in ' + (s.province || '') + ', ' + (s.region || '') +
-      '. With an R_final of ' + ((s.R_median != null) ? s.R_median.toFixed(3) : '—') + ' (' + (s.classification || '—') + ' band, ' +
-      ((s.fleet_percentile != null) ? (s.fleet_percentile * 100).toFixed(0) : '—') + 'th fleet percentile), its risk profile is dominated by the ' +
-      (top1 ? top1.key + ' (' + top1.label + ') component at ' + (comps[top1.key] / top1.w * 100).toFixed(0) + '% of its weight ceiling' : '—') +
-      (top2 ? ', followed by ' + top2.key + ' (' + top2.label + ') at ' + (comps[top2.key] / top2.w * 100).toFixed(0) + '%' : '') +
+      ' — is <strong>' + Safe.displayName(s) + '</strong> in ' + (s.province || '') + ', ' + (s.region || '') +
+      '. With an R_final of ' + Safe.fmt(s.R_median, 3) + ' (' + (s.classification || '—') + ' band, ' +
+      (s.fleet_percentile != null ? Safe.fmt(s.fleet_percentile * 100, 0) : '—') + 'th fleet percentile), its risk profile is dominated by the ' +
+      (top1 ? top1.key + ' (' + top1.label + ') component at ' + Safe.fmt(comps[top1.key] / top1.w * 100, 0) + '% of its weight ceiling' : '—') +
+      (top2 ? ', followed by ' + top2.key + ' (' + top2.label + ') at ' + Safe.fmt(comps[top2.key] / top2.w * 100, 0) + '%' : '') +
       '. Modifiers collectively shift R_base by ' + modImpact +
       ', reflecting the substation\'s specific geographic, socio-economic, and network context.';
     H.setHTML('focus-narrative', narrative);
@@ -348,10 +350,16 @@
     if (!n) return;
     var doc = ctx.doc;
 
-    var r7vals = fleet.map(function (s) { return (s.modifiers && s.modifiers.R7_cyber) || 0; });
-    var avgR7 = r7vals.reduce(function (a, b) { return a + b; }, 0) / n;
-    var medianR7 = median(r7vals);
-    var medianR = median(fleet.map(function (s) { return s.R_median || 0; }));
+    // KB §68.9 A12.3 — filter out null R7 BEFORE computing fleet median.
+    // Slovakia has substations with no modifiers — coercing them to 0 drags
+    // the median below every real value, making the "blind spot" threshold
+    // meaningless. Use only the populated subset for the median.
+    var r7vals = fleet.map(function (s) { return Safe.get(s, 'modifiers.R7_cyber'); })
+                      .filter(function (v) { return v != null && !isNaN(v); });
+    var r7valsAll = fleet.map(function (s) { return Safe.num(Safe.get(s, 'modifiers.R7_cyber'), 0); });
+    var avgR7 = r7vals.length ? r7vals.reduce(function (a, b) { return a + b; }, 0) / r7vals.length : 0;
+    var medianR7 = r7vals.length ? median(r7vals) : 0;
+    var medianR = median(fleet.map(function (s) { return Safe.num(s.R_median, 0); }));
 
     // Cyber classification counts
     var cyberCounts = { LOW: 0, MEDIUM: 0, HIGH: 0 };
@@ -360,26 +368,33 @@
       if (cyberCounts[cls] !== undefined) cyberCounts[cls]++;
     });
 
-    // Blind spots: High/Critical + R7 < median
+    // Blind spots: High/Critical + R7 < median.
+    // A12.3 fix: require R7 to be present — substations without R7 data
+    // shouldn't count as blind spots (we don't know their digital readiness).
     var blindSpots = fleet.filter(function (s) {
-      return (s.classification === 'High' || s.classification === 'Critical') &&
-             (s.modifiers && s.modifiers.R7_cyber < medianR7);
+      if (s.classification !== 'High' && s.classification !== 'Critical') return false;
+      var r7 = Safe.get(s, 'modifiers.R7_cyber');
+      return r7 != null && r7 < medianR7;
     });
 
-    // High-consequence threshold from config
+    // High-consequence threshold from config.
+    // A12.3 fix: R3_C_mult null → coerced to 0 → 0 >= 1.04 false (correct
+    // behaviour here), but we make the intent explicit and avoid `null >= n`
+    // which is implementation-defined.
     var hcThr = highConseqThreshold(ctx.config);
     var highConseq = fleet.filter(function (s) {
-      return s.modifiers && s.modifiers.R3_C_mult >= hcThr;
+      var r3 = Safe.get(s, 'modifiers.R3_C_mult');
+      return r3 != null && r3 >= hcThr;
     });
 
     // B.1 KPIs
     H.setText('b1-cyber-high', cyberCounts.HIGH);
-    H.setText('b1-cyber-high-sub', (cyberCounts.HIGH / n * 100).toFixed(1) + '% of fleet');
+    H.setText('b1-cyber-high-sub', Safe.pct(cyberCounts.HIGH / n * 100, 1) + ' of fleet');
     H.setText('b1-blindspots', blindSpots.length);
     H.setText('b1-blindspots-sub', 'High/Critical + R7 < median');
-    H.setText('b1-avg-r7', avgR7.toFixed(4));
+    H.setText('b1-avg-r7', Safe.fmt(avgR7, 4));
     H.setText('b1-high-conseq', highConseq.length.toLocaleString());
-    H.setText('b1-high-conseq-sub', (highConseq.length / n * 100).toFixed(1) + '% · R3 ≥ ' + hcThr.toFixed(2));
+    H.setText('b1-high-conseq-sub', Safe.pct(highConseq.length / n * 100, 1) + ' · R3 ≥ ' + Safe.fmt(hcThr, 2));
 
     // B.1 Scatter matrix canvas
     drawCyberMatrix(doc, fleet, medianR7, medianR);
@@ -393,12 +408,12 @@
 
     H.setHTML('b1-narrative',
       'The cyber-physical matrix identifies <strong>' + blindSpots.length + ' blind-spot substations</strong> — ' +
-      'scoring High or Critical on overall risk while sitting below the fleet median for digital readiness (R7 &lt; ' + medianR7.toFixed(4) + '). ' +
+      'scoring High or Critical on overall risk while sitting below the fleet median for digital readiness (R7 &lt; ' + Safe.fmt(medianR7, 4) + '). ' +
       'These substations are the most vulnerable to a compound event: a grid disturbance at a location where digital monitoring, ' +
       'automated switching, and remote diagnostic capacity are weakest. ' +
       'The blind spots concentrate in <strong>' + blindStr + '</strong>. ' +
-      'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + (cyberCounts.HIGH / n * 100).toFixed(1) + '%) carry a HIGH cyber-exposure classification, ' +
-      'while ' + cyberCounts.LOW + ' (' + (cyberCounts.LOW / n * 100).toFixed(1) + '%) are in the LOW tier.');
+      'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + Safe.pct(cyberCounts.HIGH / n * 100, 1) + ') carry a HIGH cyber-exposure classification, ' +
+      'while ' + cyberCounts.LOW + ' (' + Safe.pct(cyberCounts.LOW / n * 100, 1) + ') are in the LOW tier.');
 
     // B.2 Economic Impact by Business Fabric — config-driven tier ladder
     var tiers = r3BucketsFromConfig(ctx.config);
@@ -407,21 +422,21 @@
       var lower = (typeof tier.lower === 'number') ? tier.lower : 0;
       var upper = (tier.upper == null) ? Infinity : tier.upper;
       var subs = fleet.filter(function (s) {
-        var v = s.modifiers && s.modifiers.R3_C_mult;
+        var v = Safe.get(s, 'modifiers.R3_C_mult');
         return typeof v === 'number' && v >= lower && v < upper;
       });
       var nTier = subs.length;
       var highCrit = subs.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical'; }).length;
-      var avgR = nTier ? subs.reduce(function (a, s) { return a + (s.R_median || 0); }, 0) / nTier : 0;
-      var avgE = nTier ? subs.reduce(function (a, s) { return a + ((s.components && s.components.E) || 0); }, 0) / nTier : 0;
-      var pctFleet = (nTier / n * 100).toFixed(1);
+      var avgR = nTier ? subs.reduce(function (a, s) { return a + Safe.num(s.R_median, 0); }, 0) / nTier : 0;
+      var avgE = nTier ? subs.reduce(function (a, s) { return a + Safe.num(Safe.get(s, 'components.E'), 0); }, 0) / nTier : 0;
+      var pctFleet = Safe.fmt(nTier / n * 100, 1);
 
       var tierBands = { Low: 0, Medium: 0, High: 0, Critical: 0 };
       subs.forEach(function (s) { if (tierBands[s.classification] !== undefined) tierBands[s.classification]++; });
       var bandBar = '';
       ['Low', 'Medium', 'High', 'Critical'].forEach(function (b) {
         if (tierBands[b] > 0 && nTier > 0) {
-          var w = (tierBands[b] / nTier * 100).toFixed(1);
+          var w = Safe.fmt(tierBands[b] / nTier * 100, 1);
           bandBar += '<div style="width:' + w + '%;height:100%;background:' + BAND_COLORS_HEX[b] + '" title="' + b + ': ' + tierBands[b] + '"></div>';
         }
       });
@@ -433,9 +448,9 @@
         (tier.desc ? '<p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">' + tier.desc + '</p>' : '') +
         '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">' +
           '<span><strong>' + nTier.toLocaleString() + '</strong> substations (' + pctFleet + '%)</span>' +
-          '<span>High/Critical: <strong style="color:var(--crimson)">' + highCrit + '</strong> (' + (nTier ? (highCrit / nTier * 100).toFixed(1) : 0) + '%)</span>' +
-          '<span>Avg R: <strong>' + avgR.toFixed(3) + '</strong></span>' +
-          '<span>Avg E: <strong>' + avgE.toFixed(3) + '</strong> / 0.10</span></div>' +
+          '<span>High/Critical: <strong style="color:var(--crimson)">' + highCrit + '</strong> (' + (nTier ? Safe.fmt(highCrit / nTier * 100, 1) : '0') + '%)</span>' +
+          '<span>Avg R: <strong>' + Safe.fmt(avgR, 3) + '</strong></span>' +
+          '<span>Avg E: <strong>' + Safe.fmt(avgE, 3) + '</strong> / 0.10</span></div>' +
         '<div style="height:8px;border-radius:4px;overflow:hidden;display:flex">' + bandBar + '</div>' +
         '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px">' +
           '<span>Low ' + tierBands.Low + '</span><span>Med ' + tierBands.Medium + '</span>' +
@@ -870,11 +885,14 @@
       puglia = fleet.filter(function (s) { return (s.region || '').toLowerCase() === corridor.toLowerCase(); });
     }
     if (!puglia.length) return;
-    puglia.sort(function (a, b) { return b.R_median - a.R_median; });
+    puglia.sort(function (a, b) { return Safe.num(b.R_median, 0) - Safe.num(a.R_median, 0); });
 
     // D.1 KPIs
+    // KB §68.9 A12.3 — `s.voltage_kv >= 132` returns false for null but the
+    // comparison emits a deprecation warning in some engines. Explicit
+    // null-check honours "we don't know" vs "we know it's <132".
     var nTotal = puglia.length;
-    var nHV = puglia.filter(function (s) { return s.voltage_kv >= 132; }).length;
+    var nHV = puglia.filter(function (s) { return s.voltage_kv != null && s.voltage_kv >= 132; }).length;
     var nMV = nTotal - nHV;
     H.setText('pug-total', nTotal);
     H.setText('pug-total-sub', nHV + ' EHV · ' + nMV + ' HV');
@@ -937,16 +955,16 @@
         var alertStr = s.alert_components ? s.alert_components.join(', ') : '—';
         var c = s.components || {};
         return '<tr>' +
-          '<td style="' + thStyle + 'font-weight:500">' + (s.name || '') + '</td>' +
+          '<td style="' + thStyle + 'font-weight:500">' + Safe.displayName(s) + '</td>' +
           '<td style="' + thStyle + '">' + (s.province || '') + '</td>' +
-          '<td style="' + numStyle + 'color:' + bCol + ';font-weight:600">' + ((s.R_median != null) ? s.R_median.toFixed(3) : '—') + '</td>' +
+          '<td style="' + numStyle + 'color:' + bCol + ';font-weight:600">' + Safe.fmt(s.R_median, 3) + '</td>' +
           '<td style="' + thStyle + 'color:' + bCol + ';font-weight:600">' + (s.classification || '') + '</td>' +
-          '<td style="' + numStyle + '">' + ((c.C != null) ? c.C.toFixed(3) : '—') + '</td>' +
-          '<td style="' + numStyle + '">' + ((c.V != null) ? c.V.toFixed(3) : '—') + '</td>' +
-          '<td style="' + numStyle + '">' + ((c.I != null) ? c.I.toFixed(3) : '—') + '</td>' +
-          '<td style="' + numStyle + '">' + ((c.E != null) ? c.E.toFixed(3) : '—') + '</td>' +
-          '<td style="' + numStyle + '">' + ((c.S != null) ? c.S.toFixed(3) : '—') + '</td>' +
-          '<td style="' + numStyle + '">' + ((c.T != null) ? c.T.toFixed(3) : '—') + '</td>' +
+          '<td style="' + numStyle + '">' + Safe.fmt(c.C, 3) + '</td>' +
+          '<td style="' + numStyle + '">' + Safe.fmt(c.V, 3) + '</td>' +
+          '<td style="' + numStyle + '">' + Safe.fmt(c.I, 3) + '</td>' +
+          '<td style="' + numStyle + '">' + Safe.fmt(c.E, 3) + '</td>' +
+          '<td style="' + numStyle + '">' + Safe.fmt(c.S, 3) + '</td>' +
+          '<td style="' + numStyle + '">' + Safe.fmt(c.T, 3) + '</td>' +
           '<td style="' + thStyle + 'color:var(--crimson);font-weight:600">' + alertStr + '</td></tr>';
       }).join('') +
         '<tr><td colspan="11" style="text-align:center;color:var(--warm-grey);font-style:italic;font-size:12px;padding:8px 10px">… ' +

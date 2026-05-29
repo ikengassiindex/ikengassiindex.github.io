@@ -38,6 +38,7 @@
     return;
   }
   var CR = window.CountryRenderer;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Universal SSI v4.0.2 defaults (used only when ssi-metadata.js is
        missing arrays — every country should override). ─────────────────── */
@@ -100,10 +101,7 @@
   }
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */
-  function fmtNum(v, dp) {
-    if (v == null || isNaN(v)) return '—';
-    return Number(v).toFixed(dp);
-  }
+  function fmtNum(v, dp) { return Safe.fmt(v, dp); }
 
   /* ══════════════════════════════════════════════════════════════════════
      SECTION REGISTRATIONS — each receives ctx = {data, config, country, page, doc}

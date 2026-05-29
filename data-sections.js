@@ -49,6 +49,7 @@
     return;
   }
   var CR = window.CountryRenderer;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Source-registry icon + colour palette (keyed by `category`). ──────
        DATA_SOURCES entries lacking a `category` field fall back to the
@@ -285,10 +286,11 @@
               var comp = s.components || {};
               var mods = s.modifiers || {};
               return [
-                s.internal_id, s.name, rc.code, rc.name, s.voltage_kv,
-                num(s.R_median).toFixed(3), num(s.R_P5).toFixed(3),
-                num(s.R_P95).toFixed(3), num(s.CI_width).toFixed(3),
-                s.classification, (num(s.fleet_percentile) * 100).toFixed(0) + '%',
+                s.internal_id || '', Safe.displayName(s), rc.code, rc.name,
+                s.voltage_kv != null ? s.voltage_kv : '',
+                Safe.fmt(s.R_median, 3), Safe.fmt(s.R_P5, 3),
+                Safe.fmt(s.R_P95, 3), Safe.fmt(s.CI_width, 3),
+                s.classification || '', Safe.fmt(num(s.fleet_percentile) * 100, 0) + '%',
                 num(comp.C).toFixed(2), num(comp.V).toFixed(2), num(comp.I).toFixed(2),
                 num(comp.E).toFixed(2), num(comp.S).toFixed(2), num(comp.T).toFixed(2),
                 num(mods.R3_C_mult).toFixed(2), num(mods.R4_F_topo).toFixed(2),
@@ -382,7 +384,9 @@
             head: [['#', 'Name', regionLabelShort, 'kV', 'R_median', 'Band']],
             body: sorted.slice(0, 20).map(function (s, i) {
               var rc = regionCellsFor(s, cfg);
-              return [i + 1, s.name, rc.code, s.voltage_kv, num(s.R_median).toFixed(4), s.classification];
+              return [i + 1, Safe.displayName(s), rc.code,
+                s.voltage_kv != null ? s.voltage_kv : '',
+                Safe.fmt(s.R_median, 4), s.classification || ''];
             }),
             margin: { left: 14, right: 14 }
           });
@@ -399,7 +403,9 @@
             head: [['#', 'Name', regionLabelShort, 'kV', 'R_median', 'Band']],
             body: sorted.slice(-20).reverse().map(function (s, i) {
               var rc = regionCellsFor(s, cfg);
-              return [i + 1, s.name, rc.code, s.voltage_kv, num(s.R_median).toFixed(4), s.classification];
+              return [i + 1, Safe.displayName(s), rc.code,
+                s.voltage_kv != null ? s.voltage_kv : '',
+                Safe.fmt(s.R_median, 4), s.classification || ''];
             }),
             margin: { left: 14, right: 14 }
           });
@@ -431,11 +437,12 @@
               var rc = regionCellsFor(s, cfg);
               var comp = s.components || {};
               return [
-                s.internal_id, s.name, rc.code, rc.name,
-                num(s.lon).toFixed(5), num(s.lat).toFixed(5), s.voltage_kv,
-                num(s.R_median).toFixed(3), s.classification,
-                num(comp.C).toFixed(2), num(comp.V).toFixed(2), num(comp.I).toFixed(2),
-                num(comp.E).toFixed(2), num(comp.S).toFixed(2), num(comp.T).toFixed(2)
+                s.internal_id || '', Safe.displayName(s), rc.code, rc.name,
+                Safe.fmt(s.lon, 5), Safe.fmt(s.lat, 5),
+                s.voltage_kv != null ? s.voltage_kv : '',
+                Safe.fmt(s.R_median, 3), s.classification || '',
+                Safe.fmt(comp.C, 2), Safe.fmt(comp.V, 2), Safe.fmt(comp.I, 2),
+                Safe.fmt(comp.E, 2), Safe.fmt(comp.S, 2), Safe.fmt(comp.T, 2)
               ];
             }),
             margin: { left: 8, right: 8 }

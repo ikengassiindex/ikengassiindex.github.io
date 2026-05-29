@@ -187,6 +187,204 @@
     setHTML: function (id, html) { var e = document.getElementById(id); if (e) e.innerHTML = html; },
   };
 
+  /* ─────────────────────────────────────────────────────────────────────────
+     Safe — defensive helpers (KB §68.9 / anti-pattern A12)
+     ─────────────────────────────────────────────────────────────────────────
+     SK hotfix #2 shipped these to centralize the null/undefined defenses
+     that were previously scattered across every section file. Slovakia's
+     OSM extract surfaced 5 distinct bug classes that Slovenia's voltage-
+     complete data masked:
+
+       1. ${obj.field} where field doesn't exist → renders literal 'undefined'
+       2. ${val.toFixed(n)} where val is null → TypeError, section dies
+       3. (x || 0) >= N where N > 0 → null silently mis-counted (false negatives)
+       4. s.name || '' → empty cell where data should be
+       5. data.x.y.z accessor through optional sub-objects → TypeError
+
+     Every helper here is documented with the bug class it prevents and the
+     idiom it replaces. When a new section is added, prefer these to bare
+     property access + .toFixed().
+     ───────────────────────────────────────────────────────────────────── */
+  var Safe = {
+    /* ── num(v, dflt) ────────────────────────────────────────────────────
+       Coerce v to a finite Number, else return dflt. Never returns NaN.
+
+       Bug class: A12.3 — `(x || 0) >= M` for M > 0 returns false when x is
+       null/undefined, silently mis-counting. Use Safe.num(x, -Infinity)
+       when the comparison should EXCLUDE missing data, or Safe.num(x, 0)
+       when 0 is genuinely the right neutral element (e.g. summing).
+
+         var hv = subs.filter(function (s) {
+           return Safe.num(s.voltage_kv, -Infinity) >= 132;
+         }).length;
+       ──────────────────────────────────────────────────────────────── */
+    num: function (v, dflt) {
+      if (v == null) return dflt;
+      var n = Number(v);
+      return isNaN(n) ? dflt : n;
+    },
+
+    /* ── fmt(v, dp, fallback) ────────────────────────────────────────────
+       Like Number(v).toFixed(dp) but never throws on null/undefined/NaN.
+       Default dp=3, default fallback='—'. Replace EVERY bare .toFixed()
+       call site in renderers.
+
+       Bug class: A12.2 — `${val.toFixed(3)}` blows up when val is null,
+       killing the section AND any later code in the same render block.
+
+         Safe.fmt(s.R_median, 3)          → '0.481' or '—'
+         Safe.fmt(s.R_median, 3, 'N/A')   → '0.481' or 'N/A'
+       ──────────────────────────────────────────────────────────────── */
+    fmt: function (v, dp, fallback) {
+      if (v == null) return fallback == null ? '—' : fallback;
+      var n = Number(v);
+      if (isNaN(n)) return fallback == null ? '—' : fallback;
+      return n.toFixed(dp == null ? 3 : dp);
+    },
+
+    /* ── pct(v, dp, fallback) ────────────────────────────────────────────
+       Like Safe.fmt but appends ' %'. Use for any value already on the
+       0-100 scale; for 0-1 ratios multiply first. Default dp=1.
+
+         Safe.pct(blindSpots.length / n * 100, 1)   → '12.3 %'
+       ──────────────────────────────────────────────────────────────── */
+    pct: function (v, dp, fallback) {
+      if (v == null) return fallback == null ? '—' : fallback;
+      var n = Number(v);
+      if (isNaN(n)) return fallback == null ? '—' : fallback;
+      return n.toFixed(dp == null ? 1 : dp) + '%';
+    },
+
+    /* ── locale(v, fallback) ─────────────────────────────────────────────
+       Number(v).toLocaleString() but guards against null/NaN.
+
+         Safe.locale(fleet.length)   → '1,516'
+         Safe.locale(null)           → '—'
+       ──────────────────────────────────────────────────────────────── */
+    locale: function (v, fallback) {
+      if (v == null) return fallback == null ? '—' : fallback;
+      var n = Number(v);
+      if (isNaN(n)) return fallback == null ? '—' : fallback;
+      return n.toLocaleString();
+    },
+
+    /* ── displayName(s) ──────────────────────────────────────────────────
+       Canonical substation display name resolution. Slovakia has 544
+       substations with name='' — falling back to substation_id keeps the
+       highest-R row from showing a blank cell. Single source of truth so
+       every section agrees on what to render.
+
+       Bug class: A12.4 — `s.name || ''` returns '' for missing data,
+       producing blank table cells where an ID would do.
+
+       Order: trimmed name → substation_id → internal_id → '(unnamed)'.
+       ──────────────────────────────────────────────────────────────── */
+    displayName: function (s) {
+      if (!s || typeof s !== 'object') return '(unnamed)';
+      if (s.name != null) {
+        var trimmed = String(s.name).trim();
+        if (trimmed) return trimmed;
+      }
+      if (s.substation_id) return String(s.substation_id);
+      if (s.internal_id) return String(s.internal_id);
+      return '(unnamed)';
+    },
+
+    /* ── voltageClass(v) ─────────────────────────────────────────────────
+       Voltage trichotomy that respects null. Returns one of:
+         'EHV'                ≥220 kV
+         'HV'                 110-220 kV
+         'distribution-tier'  <110 kV OR null/missing
+
+       Bug class: A12.3 — `(v || 0) >= 220` mis-counts null as 0 → false,
+       silently throwing all untagged substations into the lowest tier
+       even when we have no idea what voltage they are. The
+       'distribution-tier' label is the honest answer: "MV or unknown".
+       ──────────────────────────────────────────────────────────────── */
+    voltageClass: function (v) {
+      if (v == null) return 'distribution-tier';
+      var n = Number(v);
+      if (isNaN(n)) return 'distribution-tier';
+      if (n >= 220) return 'EHV';
+      if (n >= 110) return 'HV';
+      return 'distribution-tier';
+    },
+
+    /* ── regionOptions(regions) ──────────────────────────────────────────
+       Build {value,label} option list for filter <select> elements. Drops
+       null/empty region names. Use when you wire up the regional.html
+       comparator dropdowns so they don't show a stray "undefined" option.
+
+         var opts = Safe.regionOptions(data.regions);
+         // [{ value: 'SI034', label: 'Savinjska (123)' }, ...]
+       ──────────────────────────────────────────────────────────────── */
+    regionOptions: function (regions) {
+      if (!Array.isArray(regions)) return [];
+      var out = [];
+      for (var i = 0; i < regions.length; i++) {
+        var r = regions[i];
+        if (!r) continue;
+        var v = r.region != null ? r.region : (r.name != null ? r.name : null);
+        if (v == null) continue;
+        var lbl = (r.name && r.name !== v) ? r.name : String(v);
+        if (r.count != null) lbl += ' (' + r.count + ')';
+        out.push({ value: String(v), label: lbl });
+      }
+      return out;
+    },
+
+    /* ── get(obj, path, dflt) ────────────────────────────────────────────
+       Safe deep-property accessor — get(obj, 'a.b.c', 0) returns obj.a.b.c
+       if every intermediate link exists, else dflt.
+
+       Bug class: A12.5 — `data.fleet_summary.bands.Critical` throws if
+       fleet_summary or bands is missing. Use this for any access path
+       3+ levels deep, or 2 levels deep when the middle key is optional.
+
+         Safe.get(data, 'fleet_summary.confidence_pct.high', 0)
+         Safe.get(s, 'modifiers.R7_cyber')   // dflt = undefined
+       ──────────────────────────────────────────────────────────────── */
+    get: function (obj, path, dflt) {
+      if (obj == null) return dflt;
+      var parts = String(path).split('.');
+      var cur = obj;
+      for (var i = 0; i < parts.length; i++) {
+        if (cur == null || typeof cur !== 'object') return dflt;
+        cur = cur[parts[i]];
+      }
+      return cur == null ? dflt : cur;
+    },
+
+    /* ── filterFinite(subs, accessor, predicate) ─────────────────────────
+       Filter an array by a predicate that only fires for finite numbers.
+       Records with null/NaN at the accessor path are excluded from BOTH
+       the numerator AND the denominator — the correct behaviour when the
+       comparison is "of substations where we know X, how many have X≥M".
+
+       Bug class: A12.3 — `(s.modifiers.R7_cyber || 0) < median` treats
+       missing as 0 which is far below any reasonable median, mis-flagging
+       every untagged substation as a "blind spot".
+
+         var blind = Safe.filterFinite(fleet,
+           function (s) { return s.modifiers && s.modifiers.R7_cyber; },
+           function (v, s) { return v < medianR7 &&
+             (s.classification === 'High' || s.classification === 'Critical'); });
+       ──────────────────────────────────────────────────────────────── */
+    filterFinite: function (subs, accessor, predicate) {
+      if (!Array.isArray(subs)) return [];
+      var out = [];
+      for (var i = 0; i < subs.length; i++) {
+        var s = subs[i];
+        var v = accessor ? accessor(s) : s;
+        if (v == null) continue;
+        var n = Number(v);
+        if (isNaN(n)) continue;
+        if (predicate(n, s)) out.push(s);
+      }
+      return out;
+    }
+  };
+
   /* ── 6. Public API ────────────────────────────────────────────────────── */
   window.CountryRenderer = {
     init: init,
@@ -194,6 +392,7 @@
     pickMonthlySubstation: pickMonthlySubstation,
     normalize: normalize,
     H: H,
+    Safe: Safe,
     _registry: registry,  // exposed for debugging only
   };
 })();

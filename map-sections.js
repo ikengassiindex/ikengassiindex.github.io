@@ -55,6 +55,7 @@
     return;
   }
   var CR = window.CountryRenderer;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Defaults exposed for non-migrated countries ─────────────────────── */
   function getMapCenter(cfg) {
@@ -92,10 +93,7 @@
     return n ? n + ' ' + label : label;
   }
 
-  function fmt3(v) {
-    if (v == null || isNaN(v)) return '—';
-    return Number(v).toFixed(3);
-  }
+  function fmt3(v) { return Safe.fmt(v, 3); }
 
   /* ══════════════════════════════════════════════════════════════════════
      SECTION REGISTRATION — receives ctx = { data, config, country, page, doc }

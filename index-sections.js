@@ -43,6 +43,7 @@
   }
   var CR = window.CountryRenderer;
   var H = CR.H;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Universal palette ──────────────────────────────────────────────── */
   var BAND_VAR = {
@@ -142,10 +143,12 @@
     // coerces null to 0, then 0 >= 132 is false, silently mis-counting
     // every untagged substation as MV. Fix: explicit null check before
     // comparison. Counts shift to "known HV (≥132 kV) + everything else".
+    // Safe.num with -Infinity sentinel: any null v is excluded from the
+    // >=132 count, so 'mv = n - hv' captures both "known MV" and "unknown".
     var isArr = Array.isArray(subs[0]);
     var hv = subs.filter(function (s) {
       var v = isArr ? s[3] : s.voltage_kv;
-      return v != null && Number(v) >= 132;
+      return Safe.num(v, -Infinity) >= 132;
     }).length;
     var mv = n - hv;
 
@@ -180,13 +183,13 @@
     var critCount = bands.Critical || 0;
     var critPct = bandPct.Critical != null ? bandPct.Critical : 0;
 
-    H.setText('kpi-total', total.toLocaleString());
-    H.setText('kpi-median', Number(medianR).toFixed(3));
+    H.setText('kpi-total', Safe.locale(total));
+    H.setText('kpi-median', Safe.fmt(medianR, 3));
     H.setText('kpi-median-sub',
-      'P5 = ' + Number(p5).toFixed(3) + ' · P95 = ' + Number(p95).toFixed(3));
+      'P5 = ' + Safe.fmt(p5, 3) + ' · P95 = ' + Safe.fmt(p95, 3));
     H.setText('kpi-critical', String(critCount));
     H.setText('kpi-critical-sub',
-      Number(critPct).toFixed(1) + '% of fleet · R ≥ ' + critThr.toFixed(2));
+      Safe.pct(critPct, 1) + ' of fleet · R ≥ ' + Safe.fmt(critThr, 2));
 
     // Voltage-class split for the total-sub line (deferring to data when
     // available, falling back to the existing static markup if absent).
@@ -195,12 +198,14 @@
     // "EHV / HV / distribution-tier" trichotomy is honest about what we know.
     var subs = data.substations || [];
     if (subs.length) {
-      var ehvCount = subs.filter(function (s) {
-        return s.voltage_kv != null && s.voltage_kv >= 220;
-      }).length;
-      var hvCount = subs.filter(function (s) {
-        return s.voltage_kv != null && s.voltage_kv >= 110 && s.voltage_kv < 220;
-      }).length;
+      // Three-way voltage trichotomy via Safe.voltageClass — single source
+      // of truth for the EHV/HV/distribution-tier split (KB §68.9).
+      var ehvCount = 0, hvCount = 0;
+      subs.forEach(function (s) {
+        var cls = Safe.voltageClass(s.voltage_kv);
+        if (cls === 'EHV') ehvCount++;
+        else if (cls === 'HV') hvCount++;
+      });
       var distCount = total - ehvCount - hvCount;  // distribution-tier + untagged
       var nRegions = (data.regions && data.regions.length) ||
         (cfg.admin && cfg.admin.l1 && cfg.admin.l1.count) || 0;
@@ -247,21 +252,18 @@
     var subs = (data.substations || []).slice();
     if (!subs.length) return;
 
-    var top8 = subs.sort(function (a, b) { return (b.R_median || 0) - (a.R_median || 0); }).slice(0, 8);
+    var top8 = subs.sort(function (a, b) { return Safe.num(b.R_median, 0) - Safe.num(a.R_median, 0); }).slice(0, 8);
     var tbody = document.getElementById('top-critical-tbody');
     if (!tbody) return;
 
-    // KB §64.3 A12 — empty-string-as-data: OSM extracts sometimes ship empty
-    // substation names. Fall through to substation_id, then to a placeholder
-    // so the highest-R row never shows as a blank cell.
+    // Safe.displayName + Safe.fmt — single source of truth for null-safe
+    // rendering (KB §68.9 A12.4 / A12.2).
     tbody.innerHTML = top8.map(function (s) {
       var band = s.classification || 'Low';
       var bandLow = bandLower(band);
-      var displayName = (s.name && String(s.name).trim()) ||
-        s.substation_id || s.internal_id || '(unnamed)';
-      return '<tr><td style="font-weight:500">' + displayName + '</td>' +
+      return '<tr><td style="font-weight:500">' + Safe.displayName(s) + '</td>' +
         '<td>' + (s.province || '') + '</td>' +
-        '<td class="num">' + (s.R_median != null ? Number(s.R_median).toFixed(3) : '—') + '</td>' +
+        '<td class="num">' + Safe.fmt(s.R_median, 3) + '</td>' +
         '<td><span class="band-badge ' + bandLow + '"><span class="band-dot ' + bandLow + '"></span>' + band + '</span></td></tr>';
     }).join('');
   });
@@ -278,7 +280,7 @@
     subs.forEach(function (s) {
       var c = s.components || {};
       defs.forEach(function (d) {
-        sums[d.key] += Number(c[d.key] || 0);
+        sums[d.key] += Safe.num(c[d.key], 0);
       });
     });
     var n = subs.length;
@@ -288,11 +290,11 @@
       '<span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
     html += defs.map(function (c) {
       var avg = sums[c.key];
-      var barPct = Math.min(avg * 100, 100).toFixed(1);
+      var barPct = Safe.fmt(Math.min(avg * 100, 100), 1);
       return '<div style="margin-bottom:14px">' +
         '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
           '<span style="font-size:13px;font-weight:500">' + c.label + '</span>' +
-          '<span style="font-size:12px;color:var(--warm-grey)">w = ' + Number(c.w).toFixed(2) + ' · avg = ' + avg.toFixed(3) + '</span>' +
+          '<span style="font-size:12px;color:var(--warm-grey)">w = ' + Safe.fmt(c.w, 2) + ' · avg = ' + Safe.fmt(avg, 3) + '</span>' +
         '</div>' +
         '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
           '<div style="width:' + barPct + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +

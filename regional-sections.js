@@ -45,6 +45,7 @@
   }
   var CR = window.CountryRenderer;
   var H = CR.H;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Universal component palette (matches index-sections.js) ─────────── */
   var COMPONENT_DEFS = [
@@ -104,15 +105,10 @@
     return 'var(--warm-grey)';
   }
 
-  function fmt(v, dp) {
-    if (v == null || isNaN(v)) return '—';
-    return Number(v).toFixed(dp == null ? 3 : dp);
-  }
-
-  function pct(v) {
-    if (v == null || isNaN(v)) return '—';
-    return Number(v).toFixed(1) + '%';
-  }
+  // Thin pass-throughs to centralised Safe.* helpers (KB §68.9). Kept as
+  // free functions so existing call sites stay one-liners.
+  function fmt(v, dp) { return Safe.fmt(v, dp); }
+  function pct(v)     { return Safe.pct(v, 1); }
 
   /* ── Province aggregate builder (shared by tabs 2 and 3) ─────────────── */
   function buildRegionAggregates(data, cfg) {
@@ -122,7 +118,9 @@
     var map = {};
 
     subs.forEach(function (s) {
-      var name = s[primaryField] || s[fallbackField] || '—';
+      var pf = s[primaryField];
+      var ff = s[fallbackField];
+      var name = (pf != null && pf !== '') ? pf : ((ff != null && ff !== '') ? ff : '—');
       if (!map[name]) {
         map[name] = {
           province: name,

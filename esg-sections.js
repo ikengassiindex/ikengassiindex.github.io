@@ -34,6 +34,7 @@
   }
   var CR = window.CountryRenderer;
   var H = CR.H;
+  var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Constants — ESG report catalogue (6 reports × 7 attributes each) ─── */
   var ESG_REPORTS = [
@@ -450,8 +451,8 @@
       '</div>' +
       '<div class="kpi-card">' +
         '<div class="kpi-label">Voltage Class</div>' +
-        '<div class="kpi-value">' + (s.voltage_kv || '—') + ' <span style="font-size:16px;font-weight:400;">kV</span></div>' +
-        '<div class="kpi-sub">' + (s.voltage_kv >= 100 ? 'High-voltage transmission' : 'Distribution') + '</div>' +
+        '<div class="kpi-value">' + (s.voltage_kv != null ? s.voltage_kv : '—') + ' <span style="font-size:16px;font-weight:400;">kV</span></div>' +
+        '<div class="kpi-sub">' + (Safe.voltageClass(s.voltage_kv) === 'distribution-tier' ? 'distribution-tier' : 'High-voltage transmission') + '</div>' +
       '</div>' +
       '<div class="kpi-card">' +
         '<div class="kpi-label">Confidence Interval</div>' +
