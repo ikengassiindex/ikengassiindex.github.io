@@ -466,11 +466,21 @@
       var v = s.modifiers && s.modifiers.R3_C_mult;
       return v >= topLower && (s.classification === 'High' || s.classification === 'Critical');
     }).length;
-    H.setHTML('b2-voll-note',
-      '<strong>Value of Lost Load (VoLL) context:</strong> ACER\'s 2023 estimate places average VoLL at €13.1/kWh for industrial customers ' +
-      'and €3.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
-      'exposed territories. <strong>' + totalHCHR + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ ' + topLower.toFixed(2) + ') with ' +
-      'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.');
+    // KR S31 hotfix #6: country-config override for B.2 VoLL note (currency localization)
+    // Placeholders supported: {totalHCHR}, {topLower}
+    var vollNoteOverride = (ctx.config && ctx.config.b2_voll_note) ? ctx.config.b2_voll_note : null;
+    if (vollNoteOverride) {
+      vollNoteOverride = vollNoteOverride
+        .replace(/\{totalHCHR\}/g, totalHCHR)
+        .replace(/\{topLower\}/g, topLower.toFixed(2));
+      H.setHTML('b2-voll-note', vollNoteOverride);
+    } else {
+      H.setHTML('b2-voll-note',
+        '<strong>Value of Lost Load (VoLL) context:</strong> ACER\'s 2023 estimate places average VoLL at €13.1/kWh for industrial customers ' +
+        'and €3.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
+        'exposed territories. <strong>' + totalHCHR + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ ' + topLower.toFixed(2) + ') with ' +
+        'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.');
+    }
 
     // B.2 Narrative
     var topTierSubs = fleet.filter(function (s) {
@@ -485,14 +495,24 @@
     var avgEP = fleet.reduce(function (a, s) {
       return a + (((s.socio_economic && s.socio_economic.EP_rate_region) || 0));
     }, 0) / n;
-    H.setHTML('b2-narrative',
-      'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
-      'depend on uninterrupted power for continuous processes. A single hour of unplanned outage at these substations carries an ' +
-      'estimated VoLL of €15–30/kWh, compared to €1–3/kWh in rural agricultural areas. ' +
-      'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
-      'Southern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
-      'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
-      'to substation-level risk scores.');
+    // KR S31 hotfix #6: country-config override for B.2 narrative (currency localization)
+    // Placeholders supported: {econRegionStr}, {avgEP}
+    var narrativeOverride = (ctx.config && ctx.config.b2_narrative) ? ctx.config.b2_narrative : null;
+    if (narrativeOverride) {
+      narrativeOverride = narrativeOverride
+        .replace(/\{econRegionStr\}/g, econRegionStr)
+        .replace(/\{avgEP\}/g, avgEP.toFixed(1));
+      H.setHTML('b2-narrative', narrativeOverride);
+    } else {
+      H.setHTML('b2-narrative',
+        'The capital-intensive tier concentrates in <strong>' + econRegionStr + '</strong> — regions where industrial corridors ' +
+        'depend on uninterrupted power for continuous processes. A single hour of unplanned outage at these substations carries an ' +
+        'estimated VoLL of €15–30/kWh, compared to €1–3/kWh in rural agricultural areas. ' +
+        'The fleet-wide average energy poverty rate is ' + avgEP.toFixed(1) + '%, but this masks sharp regional variation: ' +
+        'Southern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. ' +
+        'This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure ' +
+        'to substation-level risk scores.');
+    }
 
     // B.3 Province Digital Readiness
     var provData = {};
