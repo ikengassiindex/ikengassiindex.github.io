@@ -884,6 +884,20 @@
       // Try common code-vs-name conversion (e.g. SI034 vs Savinjska)
       puglia = fleet.filter(function (s) { return (s.region || '').toLowerCase() === corridor.toLowerCase(); });
     }
+    if (!puglia.length) {
+      // KB §69 HU hotfix #1 — admin-unit-suffix tolerance. Slovakia stores
+      // provinces with the kraj suffix ("Nitriansky kraj"); Hungary stores
+      // bare names ("Tolna"). Configs may use either form. Strip common
+      // admin-unit suffixes from both sides before comparing.
+      // Suffixes covered: " megye" (HU), " kraj" (SK/CZ), " megye-város"
+      // (HU urban), " (autonomous territory)", " county", " region".
+      var SUFFIX_RE = /\s+(megye(-város)?|kraj|county|region|région|département|prefecture|provincia|provinsi)$/i;
+      var strip = function (v) { return (v || '').replace(SUFFIX_RE, '').toLowerCase(); };
+      var corridorStripped = strip(corridor);
+      puglia = fleet.filter(function (s) {
+        return strip(s.province) === corridorStripped || strip(s.region) === corridorStripped;
+      });
+    }
     if (!puglia.length) return;
     puglia.sort(function (a, b) { return Safe.num(b.R_median, 0) - Safe.num(a.R_median, 0); });
 
