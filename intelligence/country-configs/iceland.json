@@ -1,0 +1,106 @@
+{
+  "slug": "iceland",
+  "country_name": "Iceland",
+  "country_name_local": "Ísland",
+  "iso2": "IS",
+  "iso3": "ISL",
+  "flag": "🇮🇸",
+  "capital": "Reykjavík",
+  "first_refresh": "2026-08-13",
+  "tso": "Landsnet hf. (Icelandic Transmission System Operator; State 93.22% + OR 6.78%)",
+  "regulator": "Orkustofnun (OS) — Icelandic National Energy Authority",
+  "currency": "ISK",
+  "currency_symbol": "kr.",
+  "currency_position": "after",
+  "admin": {
+    "l1": {
+      "label_en": "Landshluti (8 traditional regions)",
+      "label_short": "Landshluti",
+      "count": 8
+    }
+  },
+  "regional_page": {
+    "region_field": "province",
+    "fallback_region_field": "region",
+    "ranking_label": "Landshluti · sorted worst → best"
+  },
+  "map_page": {
+    "center": { "lat": 64.96, "lon": -18.5 },
+    "zoom": 6,
+    "region_unit_label": "Landshluti"
+  },
+  "data_page": {
+    "file_slug": "iceland",
+    "region_field": "region",
+    "region_label_short": "Landshluti",
+    "region_label_code": "Slug",
+    "formula_pdf_layers": "A — SSI v4.0 Resilience (20 vars): asset age, condition, load factor, SAIDI/SAIFI from Landsnet network statement + Orkustofnun quality reports\nB.1 — Grid Telemetry Open (3 vars): Veðurstofa Íslands (IMO) meteorological feeds + Orkustofnun continuity monitoring\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading, IEEE C57.91 ageing\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves under sub-Arctic + Atlantic-marine climate\nC — Socio-Economic (9 vars): Hagstofa Íslands landshluti GDP + Seðlabanki Íslands regional accounts + DESI digital readiness\nD — Environmental Hazards (7 vars): Mid-Atlantic Ridge seismic (SISZ + Tjörnes Fracture Zone), volcanic exposure (Reykjanes Sundhnúkur cycle since 2021), jökulhlaup risk (Skeiðará 1996 + Eyjafjallajökull 2010), ISO 9223 corrosion C2-C5 (C5 restored — marine + volcanic H₂S)\nE — Icelandic Open Data (8 vars): OVF + Veðurstofa hydrology + CERT-IS cyber + OAH nuclear (N/A — Iceland has no nuclear)\nF — Network Transitions (12 vars): state transition probabilities calibrated against 3-DSO heritage portfolio (Veitur + RARIK + HS Veitur)\nG — Modifier Inputs (3 vars): Orkustofnun quality reports, OSM grid topology, JRC DSO Observatory benchmarks. NEW: R6_volcanic + R6c_jokulhlaup sub-pattern modifiers\nH — Network & Topology (7 vars): Landsnet Network Statement, MBFSZ-equivalent seismic, OSM Overpass ring analysis (ZERO cross-border interconnects — isolated grid)\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities, R3 4-tier band, Markov 5-state"
+  },
+  "dno_dashboard": {
+    "subtitle": "3 regional DSOs · ~190,000 LV customers · 8 landshluti · 62 sveitarfélög (LAU)",
+    "intro": "Iceland's distribution sector is split three ways geographically + by density tier. Veitur ohf. (Greater Reykjavík + 6 Faxaflói municipalities, ~55-60% of customers, OR-owned via Reykjavík + 2 other municipalities) is the highest-density DSO covering the Capital metropolitan area. RARIK ohf. (rural Iceland outside Greater Reykjavík and Suðurnes, ~30-35% of customers, 100% state-owned) covers ~85% of the country by area. HS Veitur hf. (Suðurnes/Reykjanes peninsula including Grindavík + Keflavík airport corridor + Vestmannaeyjar, ~10-15% of customers, HS Orka majority + state minority) covers the volcanically active Reykjanes peninsula — operationally critical to the 2023-2025 Sundhnúkur eruption response. The 8 Feb 2024 Sundhnúkur eruption damaged the regional hot-water pipeline (district heating from Svartsengi geothermal plant); ~26,000 residents in HS Veitur's territory lost heating for ~4 days. Grindavík remains evacuated as of 2026-05-29.",
+    "governance": [
+      { "label": "TSO", "value": "Landsnet hf. (State 93.22% + Orkuveita Reykjavíkur 6.78%)" },
+      { "label": "Regulator", "value": "Orkustofnun (OS)" },
+      { "label": "DSO 1 (largest)", "value": "Veitur ohf. — Reykjavík metro (~55-60%, OR-owned)" },
+      { "label": "DSO 2 (rural)", "value": "RARIK ohf. — rural Iceland (~30-35%, state-owned)" },
+      { "label": "DSO 3 (Suðurnes)", "value": "HS Veitur hf. — Reykjanes peninsula (~10-15%, HS Orka)" },
+      { "label": "NEM/NEMO", "value": "Not applicable — isolated grid, no SDAC/SIDC/CORE FB-MC" },
+      { "label": "Synchronous area", "value": "ISOLATED — Iceland is not in ENTSO-E; zero cross-border interconnects" }
+    ]
+  },
+  "thresholds": {
+    "r3_buckets": [
+      {
+        "label": "Industrial-Aluminum / Geothermal",
+        "icon": "🏭",
+        "lower": 1.045,
+        "upper": null,
+        "voll_range": "€15–30/kWh",
+        "color": "#941914",
+        "desc": "3 aluminum smelter corridors + Reykjanes geothermal — highest economic loss per interruption (Iceland's industrial spine consumes ~70-80% of national electricity)"
+      },
+      {
+        "label": "Capital-Reykjavík / Service Economy",
+        "icon": "🏛️",
+        "lower": 1.035,
+        "upper": 1.045,
+        "voll_range": "€8–15/kWh",
+        "color": "#aa4234",
+        "desc": "Höfuðborgarsvæðið — Reykjavík metropolitan + Hellisheiði geothermal + data-center cluster (Verne, atNorth, Borealis)"
+      },
+      {
+        "label": "Commercial / SME-Dense",
+        "icon": "🏪",
+        "lower": 1.025,
+        "upper": 1.035,
+        "voll_range": "€3–8/kWh",
+        "color": "#b8863a",
+        "desc": "Akureyri (2nd city, SME + tourism + Krafla geothermal) + Selfoss + Þjórsá-Tungnaá hydro corridor + Hekla zone tourism"
+      },
+      {
+        "label": "Light / Rural / Peripheral",
+        "icon": "🌾",
+        "lower": 0.0,
+        "upper": 1.025,
+        "voll_range": "€1–3/kWh",
+        "color": "#5d8563",
+        "desc": "Vestfirðir (Westfjords — fishing + aquaculture; Vestfjarðalína topology dependent) + Norðurland vestra (Blönduvirkjun + agriculture)"
+      }
+    ],
+    "high_consequence_threshold": 1.045
+  },
+  "edition_anchor_month_offset": 0,
+  "deep_dive": {
+    "region": "Suðurnes",
+    "region_slug": "sudurnes",
+    "label": "Reykjanes Sundhnúkur Volcanic Corridor"
+  },
+  "deep_dive_rotation": [
+    { "month": "2026-08", "region": "Suðurnes", "label": "Reykjanes Sundhnúkur Volcanic Corridor (Edition 01 inaugural — 8 Feb 2024 Svartsengi anchor)" },
+    { "month": "2026-09", "region": "Suðurland", "label": "Þjórsá-Tungnaá Hydro Cascade + SISZ 2008 Mw 6.3 Selfoss-Hveragerði anchor" },
+    { "month": "2026-10", "region": "Austurland", "label": "Alcoa Fjarðaál + Kárahnjúkar 690 MW + Vatnajökull jökulhlaup zone" },
+    { "month": "2026-11", "region": "Höfuðborgarsvæðið", "label": "Reykjavík metropolitan + Hellisheiði/Nesjavellir geothermal + data-center cluster" },
+    { "month": "2026-12", "region": "Vestfirðir", "label": "Vestfjarðalína peripheral resilience corridor (Westfjords)" }
+  ]
+}
