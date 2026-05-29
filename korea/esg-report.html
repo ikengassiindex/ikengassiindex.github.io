@@ -3,116 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index Korea — ESG report covering climate, seismic ethics (Pohang 2017 induced), chaebol concentration, 24 NPPs nuclear oversight, cyber-leadership maturity.">
-<meta name="theme-color" content="#02529c">
-<title>SSI Index — Korea ESG Report 🇰🇷</title>
+<title>SSI Index — Republic of Korea ESG Report</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<link rel="stylesheet" href="../esg-report.css?v=700">
 </head>
 <body>
-<script src="../ssi-versions.js?v=dffbd5ace6"></script>
-<script src="../nav.js?v=167bb6caef"></script>
-<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="../nav.js?v=092afb510f"></script>
+<script src="../esg-helpers.js?v=700"></script>
 <script src="ssi-metadata.js?v=ce5bb32a90"></script>
-<script>renderNav('esg');</script>
+<script src="../intelligence/intelligence-loader.js?v=700" data-country="korea" id="ssi-esg-page"></script>
+<script>renderNav('esg-report');</script>
 
-<main class="page-shell">
-  <div class="page-header animate-in">
-    <h1>ESG Report — Republic of Korea 🇰🇷</h1>
-    <p>Environmental, Social, and Governance assessment of Korea's electrical grid resilience — 8 sections covering climate, multi-hazard (typhoon + induced seismic), nuclear (24 reactors), cyber-leadership (cohort-best 25-yr KISA), social-economic chaebol concentration, and governance (single-DSO monopoly architectural test).</p>
+<!-- ═══ Page Shell ═══ -->
+<div class="page-shell">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="label-xs" style="margin-bottom:6px;">ANNUAL ESG DISCLOSURE — REPORTING PERIOD 2025 · ICELAND EDITION 01</div>
+    <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇮🇸</span>Substation ESG Report</h1>
+    <p>Substation-level Environmental, Social, and Governance assessment aligned to CSRD/ESRS, EU Taxonomy, TCFD, SFDR, and UN PRI frameworks. Updated annually via the SSI Index scoring engine.</p>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #5d8563">
-    <h3>🌍 R1 — Environmental: Climate & Multi-Hazard</h3>
-    <p>Korean Peninsula temperate-monsoon + typhoon-cyclone climate. CMIP6 SSP2-4.5 projects intensifying summer heat (2018 record summer anchor) + intensifying typhoon (Hinnamnor 2022 + Khanun 2023). C5 corrosion class RESTORED for peninsula-full marine coast (parallel to Iceland post-CEE-South-2026). Sub-Arctic transformer headroom benefit (×1.10 factor) does NOT apply — Korean Peninsula is temperate.</p>
-    <p style="margin-top:8px"><strong>R6_typhoon NEW modifier</strong> (α ∈ [0.03, 0.15]) — UNIQUE in cohort with Iceland's R6_volcanic. Anchors: Hinnamnor 2022 (66,000 lost power · Geoje landfall), Khanun 2023 (40,350 lost), Bolaven 2012 (Jeju historical).</p>
+  <!-- ── Substation Identity KPIs ── -->
+  <div class="kpi-grid" id="kpiGrid" style="margin-bottom:32px;"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MOD 1: COMPONENT BAR CHART (C/V/I/E/S/T fingerprint)
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block component-bar-wrap">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Component Fingerprint</h2>
+        <div class="section-sub">Six-component weighted decomposition of the SSI composite score — the substation's structural risk profile</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="grid-2">
+        <div>
+          <div class="label-sm" style="margin-bottom:8px;">Weighted Contribution to R<sub>base</sub></div>
+          <div class="component-bar" id="componentBar"></div>
+          <div class="component-legend" id="componentLegend"></div>
+        </div>
+        <div>
+          <canvas id="componentChart" height="180"></canvas>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #5d8563">
-    <h3>🌋 R1.5 — Environmental: Pohang 2017 Induced Earthquake Ethics</h3>
-    <p>Pohang Mw 5.5 earthquake (15 November 2017) was the largest + most damaging modern Korean seismic event. <strong>Anthropogenically induced</strong> — EGS (Enhanced Geothermal System) hydraulic injection triggered fault rupture (Grigoli et al., <em>Science</em>, 2018). Mainshock within 2 km of EGS site. Korean court 2019 ruled the geothermal project responsible. ~135 injured, ~1,800 buildings damaged.</p>
-    <p style="margin-top:8px"><strong>ESG significance:</strong> Korea's grid resilience model must account for anthropogenic seismic risk from energy infrastructure (geothermal injection sites, CO2 sequestration). R6b α=0.10 for N. Gyeongsang reflects this. Sets precedent for next-cohort R6_induced sub-pattern.</p>
+  <!-- ══════════════════════════════════════════════════════════
+       MOD 2: MARKOV STEADY-STATE DIAGRAM
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2>Markov Degradation Profile</h2>
+        <div class="section-sub">CIGRE TB 761 five-state condition model — steady-state probability distribution and expected time to criticality</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="grid-2">
+        <div>
+          <div class="label-sm" style="margin-bottom:8px;">Steady-State Distribution</div>
+          <div class="markov-diagram" id="markovDiagram"></div>
+          <div style="margin-top:12px; font-size:12px; color:var(--warm-grey);">
+            Markov 5-state model calibrated from CIGRE Technical Brochure 761 (2019). States represent asset condition from new/good through critical. Steady-state probabilities indicate the long-run proportion of time the asset spends in each condition state given current operating environment.
+          </div>
+        </div>
+        <div>
+          <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
+            <div class="kpi-card">
+              <div class="kpi-label">Risk Score</div>
+              <div class="kpi-value" id="markovRiskScore" style="font-size:28px;">—</div>
+              <div class="kpi-sub">Composite Markov risk</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">ETTC</div>
+              <div class="kpi-value" id="markovETTC" style="font-size:28px;">—</div>
+              <div class="kpi-sub">Expected time to critical</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">P(Critical) 20yr</div>
+              <div class="kpi-value" id="markovPCrit" style="font-size:28px;">—</div>
+              <div class="kpi-sub">Probability of reaching critical</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Corrosion</div>
+              <div class="kpi-value" id="markovCorrosion" style="font-size:28px;">—</div>
+              <div class="kpi-sub">ISO 9223 (C2-C4 — landlocked)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #aa4234">
-    <h3>👥 R2 — Social: Aging Demographic + Chaebol Concentration</h3>
-    <p>Korea has cohort-elevated elderly demographic — 22-26% over-65 in agricultural Jeolla/Gyeongsang provinces vs 11.5% in Sejong (youngest in cohort). Energy-poverty risk concentrated in mountainous Gangwon (interior C2) + rural Jeolla/Gyeongsang.</p>
-    <p style="margin-top:8px"><strong>R6_chaebol NEW modifier</strong> (α ∈ [0.00, 0.10]) — Samsung Pyeongtaek + SK Hynix Icheon + LG Paju + POSCO Gwangyang/Pohang + Hyundai Ulsan represent ~50% national GDP + ~40% national electricity. Single-site catastrophic loss potential exceeds Iceland aluminum corridor (3 sites). Ethical question: does R3 alone (1.05 max for Industrial) capture chaebol-driven concentration risk? Korea's answer: NO — R6_chaebol added as separate magnitude-of-impact modifier.</p>
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION A: ESG RADAR CHART
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block">
+    <div class="section-header">
+      <span class="section-number">A</span>
+      <div class="section-title-group">
+        <h2>ESG Radar — Six-Report Overview</h2>
+        <div class="section-sub">Composite readiness across 6 ESG dimensions, each linked to UN Sustainable Development Goals</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:24px; overflow:visible;">
+      <div class="radar-wrap">
+        <div class="radar-chart-box">
+          <canvas id="esgRadar" width="500" height="420"></canvas>
+        </div>
+        <div class="radar-legend" id="radarLegend"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #b8863a">
-    <h3>💰 R3 — Economic: Consequence + VoLL</h3>
-    <p>4-tier R3 calibration (post-BPG Discipline #15 / Iceland Hotfix #2 lesson). Spans renderer's <code>DEFAULT_R3_BUCKETS [0.97, 1.05+]</code>:</p>
-    <ul style="margin-left:24px;font-size:13px;line-height:1.7">
-      <li><strong>1.05 Industrial-Chaebol</strong> — 557 substations · VoLL €18-32/kWh · cohort-highest</li>
-      <li><strong>1.04 Capital-Seoul</strong> — 123 substations · VoLL €10-18/kWh</li>
-      <li><strong>1.03 SME</strong> — 424 substations · VoLL €4-10/kWh</li>
-      <li><strong>1.02 Rural</strong> — 80 substations · VoLL €1-4/kWh</li>
-    </ul>
-    <p style="margin-top:8px">Korea is non-eurozone (KRW ₩) — like Iceland (ISK kr.) and Hungary (HUF Ft). KRW pre-symbol convention (₩1,000 not 1,000 ₩).</p>
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION B: INDIVIDUAL ESG REPORTS (dynamically rendered)
+       ══════════════════════════════════════════════════════════ -->
+  <div id="esgReportsContainer"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SECTION C: AUDIT TRAIL
+       ══════════════════════════════════════════════════════════ -->
+  <div class="section-block" id="audit">
+    <div class="section-header">
+      <span class="section-number">C</span>
+      <div class="section-title-group">
+        <h2>Audit Trail & Methodology Note</h2>
+        <div class="section-sub">Traceability for CSRD Article 29a limited assurance</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px;">
+      <table class="data-table">
+        <thead><tr><th>Item</th><th>Value</th></tr></thead>
+        <tbody id="auditTrailBody"></tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #02529c">
-    <h3>🏭 R4 — Industrial Transition: 11th Basic Plan 2025</h3>
-    <p>Korea's 2024 generation mix: 32% nuclear · 30% coal · 28% LNG · &lt;6.5% renewables · 1.5% hydro. <strong>Nuclear surpassed coal in 2024 for first time.</strong> MOTIE 11th Basic Plan (Feb 2025) target: 35.2% nuclear + 29.7% RES + 10.1% coal + 10.6% LNG by 2038. Kori 2 restarted April 2026 — first Korean reactor with 40-yr operating-lifetime extension granted. 9 reactors pending NSSC review (Kori 3-4, Hanbit 1-2, Hanul 1-2, Wolsong 2-4).</p>
-  </div>
+  <!-- ── Footer ── -->
+  <div class="page-footer" id="footerContainer"></div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #5d8563">
-    <h3>🌊 R5 — Corrosion: ISO 9223 C5 RESTORED</h3>
-    <p>Korean Peninsula is fully marine (peninsular geography). C5 corrosion class applies to all coastal do/si: Jeju + S. Jeolla coast + S. Gyeongsang coast + Busan + Pohang coast + Incheon + Gangwon east coast. Follows Iceland post-CEE-South-2026 pattern (C5 returned after HU/SK landlocked C2-C4 only). Interior Gangwon highlands + interior Chungbuk remain C2.</p>
-  </div>
+</div><!-- /page-shell -->
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #6c3483">
-    <h3>🔐 R6 — Cyber: Cohort-Best 25-Yr KISA + KrCERT</h3>
-    <p>Korea has cohort-LEADING cyber maturity. <strong>KISA (Korea Internet & Security Agency)</strong> + <strong>KrCERT/CC</strong> founded 2001 — 25-year incident catalogue (vs HU GovCERT 2008, IS CERT-IS 2013). <strong>Act on the Protection of Information and Communications Infrastructure</strong> (정보통신기반보호법) since 2001-12-26 — pre-dates EU NIS2 by 22 years. NIS coordination via NIS (National Intelligence Service).</p>
-    <p style="margin-top:8px"><strong>R7 ceiling 1.015</strong> — cohort-LOWEST. Reflects mature cyber regime. C-TAS (Cyber Threat Analysis and Sharing) platform operational since 2014.</p>
-  </div>
-
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #c0392b">
-    <h3>⚖️ R7 — Governance: Single-DSO Monopoly Architectural Test</h3>
-    <p>Korea is the first OECD country in cohort with <strong>single-DSO monopoly</strong> — KEPCO holds ALL transmission + distribution + retail across the entire peninsula. TSO function splits: KPX (non-profit market+system operator) + KEPCO (asset owner). Governance flag <code>is_kepco_monopoly: true</code> triggers single-DSO panel rendering on dno-dashboard.html. NEW architectural test surfaces for the cohort.</p>
-    <p style="margin-top:8px"><strong>Cohort governance comparison:</strong></p>
-    <ul style="margin-left:24px;font-size:13px;line-height:1.7">
-      <li>Korea — 1 DSO (KEPCO) — cohort-UNIQUE single-monopoly</li>
-      <li>Iceland — 3 DSOs (Veitur + RARIK + HS Veitur)</li>
-      <li>Hungary — 6 DSOs (E.ON 3 + MVM 3)</li>
-      <li>Slovakia — 3 DSOs (ZSD + SSD + VSD)</li>
-    </ul>
-  </div>
-
-  <div class="card animate-in" style="margin-bottom:24px;background:#fef8e0;border-left:4px solid #02529c">
-    <h3>📋 Data Sources & Vintage</h3>
-    <table class="data-table">
-      <thead><tr><th>Source</th><th>Provider</th><th>Vintage</th><th>License</th></tr></thead>
-      <tbody>
-        <tr><td>ERA5 Climate Reanalysis</td><td>Copernicus CDS</td><td>2024</td><td>CC-BY-4.0</td></tr>
-        <tr><td>Korean Seismic Hazard Map</td><td>KIGAM</td><td>2023</td><td>Open</td></tr>
-        <tr><td>Pohang 2017 Mw 5.5 induced earthquake</td><td>Science (Grigoli et al. 2018)</td><td>2018</td><td>Peer-reviewed</td></tr>
-        <tr><td>Population & Economics</td><td>KOSTAT — Statistics Korea</td><td>2024</td><td>Open</td></tr>
-        <tr><td>Energy Market Data</td><td>KPX + KEPCO</td><td>2024</td><td>Regulated</td></tr>
-        <tr><td>Generation Mix 2024</td><td>Ember + MOTIE 11th Basic Plan</td><td>2024</td><td>Open</td></tr>
-        <tr><td>Typhoon Tracks & Damage</td><td>KMA</td><td>2024</td><td>Open</td></tr>
-        <tr><td>Hinnamnor 2022 + Khanun 2023 anchors</td><td>KMA + NEMA</td><td>2024</td><td>Open</td></tr>
-        <tr><td>Nuclear Safety (24 reactors)</td><td>NSSC + KHNP</td><td>2024</td><td>Regulated</td></tr>
-        <tr><td>Cybersecurity Posture (25-yr backlog)</td><td>KISA + KrCERT/CC</td><td>2024</td><td>Open</td></tr>
-        <tr><td>Act on Information Infrastructure Protection</td><td>MSIT</td><td>2001-2024</td><td>Open</td></tr>
-        <tr><td>IEEE C57.91 (60Hz adjustment)</td><td>IEEE</td><td>Standard</td><td>Published</td></tr>
-        <tr><td>CIGRÉ TB 761 Markov</td><td>CIGRÉ</td><td>2019</td><td>Published</td></tr>
-        <tr><td>ISO 9223 Corrosion (C2-C5)</td><td>ISO</td><td>2012</td><td>Published</td></tr>
-        <tr><td>CMIP6 SSP2-4.5</td><td>Copernicus CDS</td><td>2024</td><td>CC-BY-4.0</td></tr>
-      </tbody>
-    </table>
-  </div>
-</main>
-
-<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
-  SSI v4.0.2 · 🇰🇷 Korea ESG · Edition 01 · 8 sections · KB §71 (planned)
-</footer>
-
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2b · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../esg-sections.js?v=fab0364a4f"></script>
 <script>
-  window.PAGE_CONFIG = { page: 'esg', country: 'korea' };
-  if (window.CountryRenderer && window.CountryRenderer.init) {
-    window.CountryRenderer.init(window.PAGE_CONFIG);
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('korea', 'esg-report');
+  });
 </script>
 </body>
 </html>

@@ -3,98 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index Korea — regional view of 17 do/si (provinces and metropolitan cities), sorted by composite resilience score.">
-<meta name="theme-color" content="#02529c">
-<title>SSI Index — Korea Regional View 🇰🇷</title>
+<meta name="description" content="Compare Korea's 17 do/si by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Republic of Korea Regional Analysis</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
 <script src="../ssi-versions.js?v=dffbd5ace6"></script>
-<script src="../nav.js?v=167bb6caef"></script>
+<script src="../nav.js?v=092afb510f"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=ce5bb32a90"></script>
 <script>renderNav('regional');</script>
 
 <main class="page-shell">
   <div class="page-header animate-in">
-    <h1>Regional Ranking — 17 do/si</h1>
-    <p>Korea's electrical grid resilience by first-tier administrative division (도/시 · 9 provinces + Seoul + 6 metropolitan cities + Sejong). Sorted worst → best by median R score. Heavy-industry + nuclear + typhoon-corridor regions cluster at the top.</p>
+    <h1>Regional Analysis</h1>
+    <p>Compare Korea's 17 do/si by SSI score, component breakdown, and socio-economic context across 1,184 substations.</p>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px">
-    <div class="card-header">
-      <h3>🇰🇷 do/si Resilience Ranking</h3>
-      <span class="label-xs">Worst → Best by R_median · 1,184 substations</span>
-    </div>
-    <table class="data-table">
-      <thead><tr><th>#</th><th>do/si</th><th>EN</th><th>Tier Label</th><th style="text-align:right">N</th><th style="text-align:right">R_median</th><th style="text-align:right">High %</th><th>R3</th></tr></thead>
-      <tbody id="regions-tbody">
-        <tr><td>1</td><td>제주특별자치도 🌋</td><td>Jeju</td><td>Island-Tourism</td><td style="text-align:right">13</td><td style="text-align:right">0.554</td><td style="text-align:right">100%</td><td>1.02</td></tr>
-        <tr><td>2</td><td>경상북도 ⚛️</td><td>North Gyeongsang</td><td>Industrial-Nuclear-Steel</td><td style="text-align:right">124</td><td style="text-align:right">0.532</td><td style="text-align:right">78%</td><td>1.05</td></tr>
-        <tr><td>3</td><td>전라남도 ⚛️</td><td>South Jeolla</td><td>Industrial-Nuclear-Steel</td><td style="text-align:right">81</td><td style="text-align:right">0.530</td><td style="text-align:right">75%</td><td>1.05</td></tr>
-        <tr><td>4</td><td>경상남도 🚢</td><td>South Gyeongsang</td><td>Industrial-Shipbuilding</td><td style="text-align:right">89</td><td style="text-align:right">0.488</td><td style="text-align:right">39%</td><td>1.03</td></tr>
-        <tr><td>5</td><td>전북특별자치도 🌾</td><td>Jeonbuk</td><td>Industrial-Tidal</td><td style="text-align:right">62</td><td style="text-align:right">0.477</td><td style="text-align:right">24%</td><td>1.03</td></tr>
-        <tr><td>6</td><td>충청남도 ⚫</td><td>South Chungcheong</td><td>Coal-Industrial</td><td style="text-align:right">75</td><td style="text-align:right">0.473</td><td style="text-align:right">31%</td><td>1.05</td></tr>
-        <tr><td>7</td><td>강원특별자치도 ⛰️</td><td>Gangwon</td><td>Mountain-Rural</td><td style="text-align:right">67</td><td style="text-align:right">0.466</td><td style="text-align:right">13%</td><td>1.02</td></tr>
-        <tr><td>8</td><td>광주광역시 🏙️</td><td>Gwangju</td><td>Southwest-Metro</td><td style="text-align:right">23</td><td style="text-align:right">0.464</td><td style="text-align:right">9%</td><td>1.03</td></tr>
-        <tr><td>9</td><td>울산광역시 🛢️</td><td>Ulsan</td><td>Industrial-Petrochemical</td><td style="text-align:right">29</td><td style="text-align:right">0.460</td><td style="text-align:right">21%</td><td>1.05</td></tr>
-        <tr><td>10</td><td>대구광역시 🏙️</td><td>Daegu</td><td>Interior-Metro</td><td style="text-align:right">48</td><td style="text-align:right">0.449</td><td style="text-align:right">6%</td><td>1.03</td></tr>
-        <tr><td>11</td><td>충청북도 🏭</td><td>North Chungcheong</td><td>Central-Industrial</td><td style="text-align:right">81</td><td style="text-align:right">0.447</td><td style="text-align:right">4%</td><td>1.03</td></tr>
-        <tr><td>12</td><td>인천광역시 ⚓</td><td>Incheon</td><td>Port-Logistics</td><td style="text-align:right">46</td><td style="text-align:right">0.443</td><td style="text-align:right">7%</td><td>1.03</td></tr>
-        <tr><td>13</td><td>부산광역시 ⚓</td><td>Busan</td><td>Coastal-Industrial</td><td style="text-align:right">52</td><td style="text-align:right">0.440</td><td style="text-align:right">6%</td><td>1.03</td></tr>
-        <tr><td>14</td><td>대전광역시 🔬</td><td>Daejeon</td><td>R&D-Government</td><td style="text-align:right">23</td><td style="text-align:right">0.416</td><td style="text-align:right">0%</td><td>1.03</td></tr>
-        <tr><td>15</td><td>경기도 💎</td><td>Gyeonggi</td><td>Industrial-Chaebol</td><td style="text-align:right">248</td><td style="text-align:right">0.414</td><td style="text-align:right">4%</td><td>1.05</td></tr>
-        <tr><td>16</td><td>세종특별자치시 🏛️</td><td>Sejong</td><td>Administrative-Capital</td><td style="text-align:right">17</td><td style="text-align:right">0.389</td><td style="text-align:right">0%</td><td>1.04</td></tr>
-        <tr><td>17</td><td>서울특별시 🏛️</td><td>Seoul</td><td>Capital-Seoul-Metro</td><td style="text-align:right">106</td><td style="text-align:right">0.376</td><td style="text-align:right">0%</td><td>1.04</td></tr>
-      </tbody>
-    </table>
+  <!-- Tabs -->
+  <div class="tabs animate-in delay-1">
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regional Ranking</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">NUTS-3 Megye Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
   </div>
 
-  <div class="grid-2" style="margin-bottom:24px">
-    <div class="card animate-in delay-1" style="border-left:3px solid #c0392b">
-      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:#c0392b">⚛️ Worst Band — Top 3 Drivers</div>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
-        <strong>Jeju 0.554</strong> — volcanic island (Hallasan) + isolated HVDC sub-grid + Bolaven 2012 typhoon historical anchor + C5 marine corrosion.<br>
-        <strong>N. Gyeongsang 0.532</strong> — Pohang 2017 Mw 5.5 anthropogenically induced earthquake (EGS geothermal hydraulic injection) + Hanul 765 kV 6-NPP cluster + Wolsong 4-NPP CANDU cluster + POSCO Pohang steel.<br>
-        <strong>S. Jeolla 0.530</strong> — Hanbit 6-NPP cluster (Yeonggwang) + Gwangyang POSCO steel (world's largest single-site) + Khanun 2023 west-coast typhoon (40,350 lost power) + C5 coast.
-      </p>
-    </div>
-    <div class="card animate-in delay-2" style="border-left:3px solid #5d8563">
-      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:#5d8563">🏛️ Best Band — Top 3 Resilience Drivers</div>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
-        <strong>Seoul 0.376</strong> — lowest PGA (0.06), youngest fleet (elderly 18%), C3 corrosion only, R6_typhoon minimal (inland), R6_chaebol modest (HQ presence not fab-floor).<br>
-        <strong>Sejong 0.389</strong> — newest administrative-capital fleet (post-2007 relocation city), elderly only 11.5% (youngest in cohort), R3 1.04 Capital.<br>
-        <strong>Gyeonggi 0.414</strong> — densely instrumented, healthy fleet despite Samsung Pyeongtaek + SK Hynix Icheon chaebol concentration. R3 1.05 + R6_chaebol 0.08 stack partly offset by modern asset base.
-      </p>
+  <!-- Tab: Regional Ranking -->
+  <div id="tab-ranking">
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">
+        <h3>NUTS-3 Megyék Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">17 do/si · sorted worst → best</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>NUTS-3 Megye</th>
+            <th style="text-align:right">Median R</th>
+            <th style="text-align:right">Substations</th>
+            <th style="text-align:right">% Critical</th>
+            <th style="text-align:right">% High</th>
+            <th>Distribution</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid var(--bronze)">
-    <div class="card-header">
-      <h3>📊 Deep Dive: Edition Rotation 01-05</h3>
+  <!-- Tab: NUTS-3 Megye Comparison -->
+  <div id="tab-compare" style="display:none">
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header"><h3>Select NUTS-3 Megyék to Compare</h3></div>
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">NUTS-3 Megye A</div>
+            <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">NUTS-3 Megye B</div>
+            <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+        </div>
+        <!-- Comparison Table -->
+        <table class="data-table" id="compare-table">
+          <thead>
+            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">—</th><th style="text-align:right" id="th-prov-b">—</th><th style="text-align:right">Delta</th></tr>
+          </thead>
+          <tbody id="compare-tbody">
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select do/si above</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-header"><h3>Component Radar</h3></div>
+        <div id="radar-container" style="display:flex;flex-direction:column;align-items:center;color:var(--warm-grey);flex:1;min-height:0">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+            <svg id="radar-svg" width="320" height="300" viewBox="0 0 280 260"></svg>
+          </div>
+          <div id="radar-legend" style="display:flex;flex-direction:column;align-items:center;font-size:11px;padding-bottom:0px;margin-top:0px"></div>
+        </div>
+      </div>
     </div>
-    <table class="data-table">
-      <thead><tr><th>Edition</th><th>Month</th><th>do/si Anchor</th><th>Theme</th></tr></thead>
-      <tbody>
-        <tr><td>01</td><td>2026-08 (inaugural)</td><td>Gyeonggi 💎</td><td>Samsung Pyeongtaek + SK Hynix Icheon fab corridor — R6_chaebol α=0.08 inaugural anchor</td></tr>
-        <tr><td>02</td><td>2026-09</td><td>S. Gyeongsang 🚢</td><td>Busan + Ulsan industrial + Hinnamnor 2022 typhoon landfall (Geoje · 66,000 lost power)</td></tr>
-        <tr><td>03</td><td>2026-10</td><td>N. Gyeongsang ⚛️</td><td>Pohang 2017 Mw 5.5 induced seismic anchor + Hanul 765 kV + Wolsong CANDU cluster</td></tr>
-        <tr><td>04</td><td>2026-11</td><td>S. Jeolla ⚛️</td><td>Hanbit nuclear cluster + Gwangyang POSCO steel + Khanun 2023 west-coast typhoon</td></tr>
-        <tr><td>05</td><td>2026-12</td><td>Jeju 🌋</td><td>Volcanic island isolated HVDC sub-grid + R6_typhoon Bolaven 2012 + tourism</td></tr>
-      </tbody>
-    </table>
+  </div>
+
+  <!-- Tab: Component Decomposition -->
+  <div id="tab-decomp" style="display:none">
+    <div class="card animate-in">
+      <div class="card-header">
+        <h3>Average Component Contribution by NUTS-3 Megye</h3>
+        <span class="label-xs">Stacked horizontal bars · 17 do/si Megyék</span>
+      </div>
+      <div id="decomp-bars" style="margin-top:16px">
+        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:11px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--crimson);border-radius:2px"></div>C Continuity</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--terracotta);border-radius:2px"></div>V Voltage</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--sage);border-radius:2px"></div>I Infrastructure</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#3b9eff;border-radius:2px"></div>E Economic</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--bronze);border-radius:2px"></div>S Saturation</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#22d3ee;border-radius:2px"></div>T Transition</div>
+      </div>
+    </div>
   </div>
 </main>
 
-<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
-  SSI v4.0.2 · 🇰🇷 Korea regional · 17 do/si · KB §71 (planned)
-</footer>
-
+<!-- ═══════════════════════════════════════════════════════════
+     TAB SWITCHING — light inline helper (no data dependency)
+     ═══════════════════════════════════════════════════════════ -->
 <script>
-  window.PAGE_CONFIG = { page: 'regional', country: 'korea' };
-  if (window.CountryRenderer && window.CountryRenderer.init) {
-    window.CountryRenderer.init(window.PAGE_CONFIG);
-  }
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(function(t) { t.style.display = 'none'; });
+  document.getElementById(tabId).style.display = 'block';
+}
+renderFooter();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.2 · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../regional-sections.js?v=8b69458499"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('korea', 'regional');
+  });
 </script>
 </body>
 </html>

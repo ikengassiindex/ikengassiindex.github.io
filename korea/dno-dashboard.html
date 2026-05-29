@@ -3,140 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index Korea — KEPCO single-DSO monopoly dashboard. Cohort-UNIQUE first architectural test.">
-<meta name="theme-color" content="#02529c">
-<title>SSI Index — Korea DSO Dashboard 🇰🇷</title>
+<meta name="description" content="SSI Index — Republic of Korea DSO segmented view. 3 regional DSOs side-by-side: KEPCO (OR), KEPCO (state), HS KEPCO (HS Orka/Alterra), —. SAIDI, customers, do/si served. Korea-specific page reflecting the 3-DSO geographic split (KEPCO (~55-60% / OR-owned) + KEPCO (~30-35% / state) + HS KEPCO (~10-15% / HS Orka)) with state + municipal + private mixed ownership.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Republic of Korea · DSO Dashboard">
+<meta property="og:description" content="6-DSO segmented view across 2 parent groups: KEPCO (state) + KEPCO (Germany). KOREC + GVH review pending on full consolidation.">
+<meta property="og:type" content="website">
+<title>SSI Index — Republic of Korea · DSO Dashboard</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
+<style>
+  .dso-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 16px; margin: 16px 0; }
+  @media (max-width: 900px) { .dso-grid { grid-template-columns: 1fr; } }
+  .dso-card { padding: 16px; background: var(--cream); border-radius: var(--radius);
+              position: relative; }
+  .dso-card h3 { margin: 0 0 6px 0; font-size: 17px; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th, .compare-table td { padding: 10px 12px; text-align: left;
+                                          border-bottom: 1px solid var(--card-border); }
+  .compare-table th { background: var(--cream-deep); font-weight: 600; }
+  .compare-table tr:hover { background: var(--cream-deep); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+            font-weight: 500; }
+</style>
 </head>
 <body>
-<script src="../ssi-versions.js?v=dffbd5ace6"></script>
-<script src="../nav.js?v=167bb6caef"></script>
-<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="../nav.js?v=092afb510f"></script>
 <script src="ssi-metadata.js?v=ce5bb32a90"></script>
 <script>renderNav('dno');</script>
 
 <main class="page-shell">
-  <div class="page-header animate-in">
-    <h1>DSO Dashboard — KEPCO Single-DSO Monopoly 🇰🇷</h1>
-    <p>Korea is the <strong>cohort-FIRST single-DSO monopoly</strong> country in OECD coverage. KEPCO (Korea Electric Power Corporation, 한국전력공사) holds 100% of transmission + distribution + retail electricity sales across the entire peninsula. Architectural flag <code>is_kepco_monopoly: true</code> triggers this single-DSO panel layout (vs typical 3-6 DSO panel).</p>
-    <div style="margin-top:8px;padding:8px 12px;background:#fef2ee;border-left:3px solid #c0392b;font-size:13px;border-radius:4px">
-      🔬 <strong>NEW architectural test (Korea Session 31):</strong> First single-DSO rendering in cohort. Validates renderer's <code>is_kepco_monopoly</code> branch logic. Generalisable to next-cohort countries with vertically-integrated utilities (Israel IEC, Costa Rica ICE, etc.).
-    </div>
-  </div>
 
-  <!-- Single-DSO Panel — cohort-UNIQUE layout -->
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #c0392b;background:#fef8e0">
-    <div class="card-header">
-      <h3 style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:24px">🏢</span>
-        KEPCO — Korea Electric Power Corporation (한국전력공사)
-      </h3>
-      <span class="label-xs" style="background:#c0392b;color:#fff;padding:4px 12px;border-radius:20px;font-weight:600">100% MONOPOLY · Cohort-UNIQUE</span>
-    </div>
-    <table class="data-table">
-      <thead><tr><th colspan="2">KEPCO Profile</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Role</strong></td><td>Transmission asset owner + single-DSO monopoly + retail sales (vertically integrated)</td></tr>
-        <tr><td><strong>HQ</strong></td><td>Naju-si, Jeollanam-do (전라남도 나주시) — relocated from Seoul 2014</td></tr>
-        <tr><td><strong>Ownership</strong></td><td>Korea Development Bank (majority) + Korean state — government majority</td></tr>
-        <tr><td><strong>Coverage</strong></td><td>ALL 17 do/si — entire Korean Peninsula (excluding DPRK)</td></tr>
-        <tr><td><strong>LV customers</strong></td><td>~25 million connection points (≈ Korean population) — cohort-LARGEST single-operator LV portfolio</td></tr>
-        <tr><td><strong>Transmission</strong></td><td>765 kV ultra-high voltage backbone (Hanul → Sinjincheon — UNIQUE) + 345/154 kV sub-transmission</td></tr>
-        <tr><td><strong>Distribution</strong></td><td>22.9 kV standard MV-low + 0.38 kV LV</td></tr>
-        <tr><td><strong>Generation</strong></td><td>via 6 subsidiaries (KOSEPCO + KOSPO + KOMIPO + KOWEPO + KEWESPO + KHNP nuclear) spun out 2001 but remain under KEPCO holding</td></tr>
-        <tr><td><strong>Listed</strong></td><td>KRX 015760 + NYSE KEP (since 1994)</td></tr>
-      </tbody>
-    </table>
-  </div>
+<div class="page-header animate-in">
+  <h1>DSO Segmented Dashboard — Korea</h1>
+  <div id="dno-subtitle" style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">—</div>
 
-  <div class="grid-2" style="margin-bottom:24px">
-    <div class="card animate-in delay-1" style="border-left:3px solid #5d8563">
-      <div class="card-header">
-        <h3>📊 KPX — TSO + Market Operator (separate from KEPCO)</h3>
-      </div>
-      <table class="data-table">
-        <tbody>
-          <tr><td><strong>Role</strong></td><td>Non-profit market + system operator (TSO function)</td></tr>
-          <tr><td><strong>Founded</strong></td><td>April 2001 — Electricity Industry Restructuring</td></tr>
-          <tr><td><strong>Parent</strong></td><td>MOTIE (Ministry of Trade, Industry and Energy)</td></tr>
-          <tr><td><strong>Function</strong></td><td>Electricity market operation + system control + price determination + grid stability</td></tr>
-          <tr><td><strong>Note</strong></td><td>KPX does NOT own transmission assets — KEPCO owns them. Functional split (MO-TO) is cohort-UNIQUE.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="card animate-in delay-2" style="border-left:3px solid #02529c">
-      <div class="card-header">
-        <h3>🏛️ KOREC — Regulator</h3>
-      </div>
-      <table class="data-table">
-        <tbody>
-          <tr><td><strong>Role</strong></td><td>Korea Electricity Regulation Commission — tariff + quality regulator</td></tr>
-          <tr><td><strong>Parent</strong></td><td>MOTIE</td></tr>
-          <tr><td><strong>Function</strong></td><td>Tariff setting · Quality-of-supply monitoring · Distribution + retail oversight</td></tr>
-          <tr><td><strong>Adjacent</strong></td><td>NSSC (Nuclear Safety and Security Commission) for 24 reactors · MSIT for cyber · NIS coordination</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<!-- Overview: Governance Stack (TSO + Regulator + Generation + Nuclear Safety) -->
+<section id="dno-governance-section" style="margin-bottom:32px">
+<h2>Governance Stack — KPX/KEPCO TSO · KOREC · KEPCO Group · —</h2>
+<div id="dno-governance-grid" class="kpi-grid" style="margin-bottom:16px"></div>
+</section>
 
-  <div class="card animate-in" style="margin-bottom:24px">
-    <div class="card-header">
-      <h3>📈 KEPCO Service Coverage by do/si (17 first-tier divisions)</h3>
-      <span class="label-xs">All under single operator · 100% coverage</span>
-    </div>
-    <table class="data-table">
-      <thead><tr><th>do/si</th><th>EN</th><th style="text-align:right">Substations</th><th style="text-align:right">Fleet %</th><th>Notes</th></tr></thead>
-      <tbody>
-        <tr><td>경기도</td><td>Gyeonggi</td><td style="text-align:right">248</td><td style="text-align:right">20.9%</td><td>Largest fleet · Samsung Pyeongtaek + SK Hynix Icheon corridor</td></tr>
-        <tr><td>경상북도</td><td>North Gyeongsang</td><td style="text-align:right">124</td><td style="text-align:right">10.5%</td><td>Hanul 765 kV egress + Wolsong CANDU</td></tr>
-        <tr><td>서울특별시</td><td>Seoul</td><td style="text-align:right">106</td><td style="text-align:right">9.0%</td><td>Capital · highest density 16,000/km²</td></tr>
-        <tr><td>경상남도</td><td>South Gyeongsang</td><td style="text-align:right">89</td><td style="text-align:right">7.5%</td><td>Busan adjacent · Hinnamnor anchor</td></tr>
-        <tr><td>전라남도</td><td>South Jeolla</td><td style="text-align:right">81</td><td style="text-align:right">6.8%</td><td>Hanbit nuclear + Gwangyang steel</td></tr>
-        <tr><td>충청북도</td><td>North Chungcheong</td><td style="text-align:right">81</td><td style="text-align:right">6.8%</td><td>Central corridor</td></tr>
-        <tr><td>충청남도</td><td>South Chungcheong</td><td style="text-align:right">75</td><td style="text-align:right">6.3%</td><td>Coal cluster</td></tr>
-        <tr><td>강원특별자치도</td><td>Gangwon</td><td style="text-align:right">67</td><td style="text-align:right">5.7%</td><td>Mountainous interior</td></tr>
-        <tr><td>전북특별자치도</td><td>Jeonbuk</td><td style="text-align:right">62</td><td style="text-align:right">5.2%</td><td>Saemangeum future NPP</td></tr>
-        <tr><td>부산광역시</td><td>Busan</td><td style="text-align:right">52</td><td style="text-align:right">4.4%</td><td>Port + Kori NPP cluster</td></tr>
-        <tr><td>대구광역시</td><td>Daegu</td><td style="text-align:right">48</td><td style="text-align:right">4.1%</td><td>Interior metro</td></tr>
-        <tr><td>인천광역시</td><td>Incheon</td><td style="text-align:right">46</td><td style="text-align:right">3.9%</td><td>ICN airport + port</td></tr>
-        <tr><td>울산광역시</td><td>Ulsan</td><td style="text-align:right">29</td><td style="text-align:right">2.5%</td><td>Cohort-highest GDP/cap ($60k)</td></tr>
-        <tr><td>대전광역시</td><td>Daejeon</td><td style="text-align:right">23</td><td style="text-align:right">1.9%</td><td>R&D + KAERI</td></tr>
-        <tr><td>광주광역시</td><td>Gwangju</td><td style="text-align:right">23</td><td style="text-align:right">1.9%</td><td>Southwest metro · Kia Motors</td></tr>
-        <tr><td>세종특별자치시</td><td>Sejong</td><td style="text-align:right">17</td><td style="text-align:right">1.4%</td><td>Administrative-capital · youngest fleet</td></tr>
-        <tr><td>제주특별자치도</td><td>Jeju</td><td style="text-align:right">13</td><td style="text-align:right">1.1%</td><td>Volcanic island · isolated HVDC sub-grid</td></tr>
-        <tr style="font-weight:600;background:rgba(192,57,43,0.06)"><td colspan="2">TOTAL — single-DSO portfolio</td><td style="text-align:right">1,184</td><td style="text-align:right">100.0%</td><td>KEPCO 100% LV market</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <p id="dno-intro">—</p>
+</div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #6c3483">
-    <div class="card-header">
-      <h3>🌐 Cohort Comparison — Single-DSO Rarity</h3>
-    </div>
-    <table class="data-table">
-      <thead><tr><th>Country</th><th>DSO Count</th><th>Pattern</th><th>Cohort Role</th></tr></thead>
-      <tbody>
-        <tr style="background:rgba(192,57,43,0.06);font-weight:600"><td>🇰🇷 Korea</td><td>1 (KEPCO)</td><td>Single-DSO monopoly · vertically integrated</td><td>Cohort-FIRST · NEW architectural test</td></tr>
-        <tr><td>🇮🇸 Iceland</td><td>3 (Veitur + RARIK + HS Veitur)</td><td>Mixed ownership · OR/state/HS Orka</td><td>Multi-DSO mixed</td></tr>
-        <tr><td>🇸🇰 Slovakia</td><td>3 (ZSD + SSD + VSD)</td><td>State-owned regional split</td><td>Multi-DSO state</td></tr>
-        <tr><td>🇸🇮 Slovenia</td><td>5 (Elektro Ljubljana + 4 others)</td><td>Regional unbundled</td><td>Multi-DSO regional</td></tr>
-        <tr><td>🇭🇺 Hungary</td><td>6 (E.ON 3 + MVM 3)</td><td>Foreign + state mixed</td><td>Multi-DSO mixed</td></tr>
-        <tr><td>🇯🇵 Japan</td><td>10 (post-2016 unbundling)</td><td>Regional fully-unbundled</td><td>Multi-TSO+DSO unbundled</td></tr>
-      </tbody>
-    </table>
-    <p style="margin-top:8px;font-size:12px;color:var(--warm-grey)">Generalisability: KEPCO's single-DSO monopoly pattern is reusable for next-cohort vertically-integrated utilities (Israel IEC, Costa Rica ICE) when those countries are onboarded.</p>
-  </div>
+<section id="dsos" style="margin-bottom:32px">
+<h2>Regional Distribution System Operators</h2>
+<div id="dno-dso-grid" class="dso-grid"></div>
+</section>
+
+<section id="dno-saidi-section" style="margin-bottom:32px">
+<h2>National SAIDI Context — Visegrád + CEE-South Cohort Comparison</h2>
+<div class="card animate-in" style="margin-top:24px">
+  <h3>SAIDI peer table</h3>
+  <p id="dno-saidi-headline" style="font-size:13px;line-height:1.7">—</p>
+  <table id="dno-saidi-table" class="data-table" style="margin-top:12px">
+    <thead><tr><th>Peer Country</th><th>SAIDI 2024 (min)</th><th>Notes</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+</section>
+
+<div id="dno-notes"></div>
+
 </main>
 
-<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
-  SSI v4.0.2 · 🇰🇷 Korea DSO dashboard · NEW single-DSO architectural test (cohort-FIRST) · KB §71 (planned)
-</footer>
-
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.6 · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../dno-dashboard-sections.js?v=8eb03d024c"></script>
 <script>
-  window.PAGE_CONFIG = { page: 'dno', country: 'korea', single_dso: true };
-  if (window.CountryRenderer && window.CountryRenderer.initDno) {
-    window.CountryRenderer.initDno(window.PAGE_CONFIG);
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('korea', 'dno-dashboard');
+  });
 </script>
+<script>renderFooter();</script>
 </body>
 </html>

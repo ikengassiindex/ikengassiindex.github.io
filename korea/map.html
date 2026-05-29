@@ -3,80 +3,237 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index Korea — interactive map of 1,184 substations + 4,004 power lines + 17 do/si polygons.">
-<meta name="theme-color" content="#02529c">
-<title>SSI Index — Korea Map 🇰🇷</title>
+<meta name="description" content="Interactive map of Korea's electrical grid with SSI v4.0.2 resilience scores for 1,184 substations across 17 do/si. 95 variables, KPX/KEPCO + KEPCO/KEPCO heritage + Samsung-SK Hynix geothermal oversight.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Republic of Korea Map Explorer</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  .map-container {
+    position: relative;
+    width: 100%;
+    height: 620px;
+    background: var(--cream-deep);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .map-container canvas {
+    display: block;
+    cursor: grab;
+    width: 100%;
+    height: 100%;
+  }
+  .map-container canvas.grabbing { cursor: grabbing; }
+
+  #map-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(250,246,245,0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(44,36,32,0.12);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--ink);
+    z-index: 200;
+    display: none;
+    max-width: 260px;
+    box-shadow: 0 4px 16px rgba(44,36,32,0.1);
+    line-height: 1.5;
+  }
+
+  .map-legend {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    z-index: 10;
+    box-shadow: 0 2px 12px rgba(44,36,32,0.06);
+  }
+  .map-legend h4 {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--warm-grey);
+    margin-bottom: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+  }
+  .map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 3px;
+    font-size: 11px;
+  }
+
+  .map-zoom {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 3px;
+    z-index: 10;
+  }
+  .map-zoom button {
+    width: 34px;
+    height: 34px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 7px;
+    color: var(--ink);
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(44,36,32,0.06);
+  }
+  .map-zoom button:hover { background: var(--cream); }
+
+  .map-stats {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    z-index: 10;
+    font-size: 11px;
+    color: var(--warm-grey);
+    letter-spacing: 0.02em;
+  }
+  .map-stats b { color: var(--ink); font-weight: 500; }
+
+  .detail-scroll {
+    max-height: 620px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(44,36,32,0.15) transparent;
+  }
+  .detail-scroll::-webkit-scrollbar { width: 5px; }
+  .detail-scroll::-webkit-scrollbar-thumb { background: rgba(44,36,32,0.15); border-radius: 3px; }
+
+  #btn-breakdown:hover {
+    background: rgba(170,66,52,0.10) !important;
+    border-color: rgba(170,66,52,0.25) !important;
+  }
+
+  @media (max-width: 1100px) {
+    .map-layout { grid-template-columns: 1fr !important; }
+    .map-container { height: 450px; }
+    .detail-scroll { max-height: none; }
+  }
+</style>
 </head>
 <body>
 <script src="../ssi-versions.js?v=dffbd5ace6"></script>
-<script src="../nav.js?v=167bb6caef"></script>
+<script src="../nav.js?v=092afb510f"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=ce5bb32a90"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>renderNav('map');</script>
 
-<main class="page-shell">
+<main class="page-shell" style="max-width:1440px">
   <div class="page-header animate-in">
-    <h1>National Grid Map — Republic of Korea 🇰🇷</h1>
-    <p>1,184 substations + 4,004 power lines extracted from OSM (ISO3166-1=KR · admin_level=2 · area filter). 17 do/si polygons (admin_level=4). 765 kV ultra-high voltage backbone highlighted (Hanul → Sinjincheon — cohort-UNIQUE).</p>
+    <h1>Map Explorer</h1>
+    <p>Explore 1,184 substations across Korea's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;padding:0;overflow:hidden">
-    <div id="map-canvas" style="width:100%;height:680px;background:var(--cream-deep)"></div>
+  <!-- Filter Bar -->
+  <div class="filter-bar animate-in delay-1">
+    <label>Band</label>
+    <select id="filter-band">
+      <option value="all">All Bands</option>
+      <option value="Low">Low (0.00–0.25)</option>
+      <option value="Medium">Medium (0.25–0.50)</option>
+      <option value="High">High (0.50–0.75)</option>
+      <option value="Critical">Critical (0.75–1.00)</option>
+    </select>
+    <label>NUTS-3 Megye</label>
+    <select id="filter-region">
+      <option value="all">All NUTS-3 Megyék</option>
+    </select>
+    <label>Power Voltage</label>
+    <select id="filter-voltage">
+      <option value="all">All Voltages</option>
+      <option value="400">400 kV</option>
+      <option value="220">220 kV</option>
+      <option value="120">120 kV</option>
+      <option value="other">&lt; 120 kV</option>
+    </select>
+    <label>Component Focus</label>
+    <select id="filter-component">
+      <option value="overall">Overall R Score</option>
+      <option value="C">C — Continuity</option>
+      <option value="V">V — Voltage Quality</option>
+      <option value="I">I — Infrastructure</option>
+      <option value="E">E — Economic</option>
+      <option value="S">S — Saturation</option>
+      <option value="T">T — Energy Transition</option>
+    </select>
+    <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
   </div>
 
-  <div class="grid-2" style="margin-bottom:24px">
-    <div class="card animate-in delay-1">
-      <div class="card-header">
-        <h3>Voltage Class Legend</h3>
+  <!-- Map + Detail Panel -->
+  <div class="map-layout animate-in delay-2" style="display:grid;grid-template-columns:1fr 360px;gap:20px">
+    <!-- Map -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="map-container">
+        <canvas id="ssi-map-canvas" role="img" aria-label="Interactive map of Korea's electrical grid showing substations colored by SSI resilience score. Use mouse to pan and zoom, click substations for details."></canvas>
+        <div id="map-tooltip"></div>
+
+        <div class="map-legend">
+          <h4>SSI Band</h4>
+          <div class="map-legend-item"><div class="band-dot low"></div> Low (0.00–0.25)</div>
+          <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25–0.50)</div>
+          <div class="map-legend-item"><div class="band-dot high"></div> High (0.50–0.75)</div>
+          <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75–1.00)</div>
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(44,36,32,0.08);font-size:10px;color:var(--warm-grey);line-height:1.5">
+            Scroll to zoom · Drag to pan<br>Click substation to inspect
+          </div>
+        </div>
+
+        <div class="map-zoom">
+          <button id="zoomIn" title="Zoom in">+</button>
+          <button id="zoomOut" title="Zoom out">−</button>
+          <button id="zoomFit" title="Fit Korea" style="font-size:13px">⟐</button>
+        </div>
+
+        <div class="map-stats" id="map-stats">
+          Loading data…
+        </div>
       </div>
-      <table class="data-table">
-        <thead><tr><th>Voltage</th><th>Class</th><th style="text-align:right">N</th><th>%</th></tr></thead>
-        <tbody>
-          <tr><td>765 kV 🇰🇷</td><td>EHV (UNIQUE)</td><td style="text-align:right">10</td><td>0.8%</td></tr>
-          <tr><td>345 kV</td><td>HV</td><td style="text-align:right">109</td><td>9.2%</td></tr>
-          <tr><td>154 kV</td><td>sub-HV (dominant)</td><td style="text-align:right">727</td><td>61.4%</td></tr>
-          <tr><td>22.9 kV</td><td>MV-low (KEPCO DSO standard)</td><td style="text-align:right">11</td><td>0.9%</td></tr>
-          <tr><td>55-66 kV</td><td>MV-high (rail traction)</td><td style="text-align:right">183</td><td>15.5%</td></tr>
-          <tr><td>untagged</td><td>distribution-tier</td><td style="text-align:right">144</td><td>12.2%</td></tr>
-        </tbody>
-      </table>
     </div>
-    <div class="card animate-in delay-2">
-      <div class="card-header">
-        <h3>Band Distribution</h3>
-      </div>
-      <table class="data-table">
-        <thead><tr><th>Band</th><th>R Range</th><th style="text-align:right">N</th><th>%</th></tr></thead>
-        <tbody>
-          <tr><td><span style="display:inline-block;width:12px;height:12px;background:var(--band-critical);border-radius:50%;margin-right:6px"></span>Critical</td><td>≥ 0.75</td><td style="text-align:right">0</td><td>0.0%</td></tr>
-          <tr><td><span style="display:inline-block;width:12px;height:12px;background:var(--band-high);border-radius:50%;margin-right:6px"></span>High</td><td>0.50 — 0.75</td><td style="text-align:right">257</td><td>21.7%</td></tr>
-          <tr><td><span style="display:inline-block;width:12px;height:12px;background:var(--band-medium);border-radius:50%;margin-right:6px"></span>Medium</td><td>0.35 — 0.50</td><td style="text-align:right">909</td><td>76.8%</td></tr>
-          <tr><td><span style="display:inline-block;width:12px;height:12px;background:var(--band-low);border-radius:50%;margin-right:6px"></span>Low</td><td>0.25 — 0.35</td><td style="text-align:right">18</td><td>1.5%</td></tr>
-        </tbody>
-      </table>
+
+    <!-- Detail Panel -->
+    <div class="detail-scroll" id="detail-panel">
+      <!-- Populated by map.js on click -->
     </div>
   </div>
 </main>
 
-<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
-  SSI v4.0.2 · 🇰🇷 Korea map · OSM Overpass 2026-05-29 (ODbL) · Canonical {s,l,a} schema (Discipline #14 verified)
-</footer>
+<!-- ═══════════════════════════════════════════════════════════
+     MAP ENGINE — owned by map.js
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../map.js?v=08c2035b1a"></script>
 
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL — thin-shell (Phase 2d.3 · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../map-sections.js?v=063331d06c"></script>
 <script>
-  window.PAGE_CONFIG = { page: 'map', country: 'korea', bounds_url: 'bounds.json', grid_url: 'grid-geo.json', data_url: 'ssi-data.json' };
-  if (window.CountryRenderer && window.CountryRenderer.initMap) {
-    window.CountryRenderer.initMap(window.PAGE_CONFIG);
-  } else if (typeof L !== 'undefined') {
-    // Fallback inline initialization
-    var map = L.map('map-canvas').setView([36.5, 127.8], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '© OpenStreetMap contributors (ODbL) · SSI v4.0.2 Korea Edition 01'
-    }).addTo(map);
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('korea', 'map');
+  });
 </script>
+<script>renderFooter();</script>
 </body>
 </html>

@@ -3,89 +3,240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index Korea — 95-variable inventory + 19-source registry.">
-<meta name="theme-color" content="#02529c">
-<title>SSI Index — Korea Data 🇰🇷</title>
+<meta name="description" content="Download the complete SSI dataset for Korea — JSON, CSV, GeoJSON. 19 verified public data sources, 95 variables, 11 data layers.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Republic of Korea Data &amp; Download</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
 <script src="../ssi-versions.js?v=dffbd5ace6"></script>
-<script src="../nav.js?v=167bb6caef"></script>
+<script src="../nav.js?v=092afb510f"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=ce5bb32a90"></script>
 <script>renderNav('data');</script>
 
 <main class="page-shell">
   <div class="page-header animate-in">
-    <h1>Data Inventory — 95 Variables · 19 Sources 🇰🇷</h1>
-    <p>Korea SSI v4.0.2 data backbone: 19 Korean-specific data sources feeding 95 variables across 6 components + 7 modifiers (2 NEW: R6_typhoon + R6_chaebol).</p>
+    <h1>Data &amp; Download</h1>
+    <p>All 30+ data sources are public, free, and independently verifiable. Download the full SSI dataset or explore source documentation. v4.0.2 — 95 variables, 1,184 substations across 17 do/si.</p>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px">
-    <div class="card-header">
-      <h3>📊 19-Source Registry</h3>
+  <!-- Data Status -->
+  <div class="kpi-grid animate-in delay-1" style="margin-bottom:32px">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Variables</div>
+      <div class="kpi-value" style="color:var(--ink)">95</div>
+      <div class="kpi-sub">Across 11 data layers</div>
     </div>
-    <table class="data-table">
-      <thead><tr><th>ID</th><th>Source</th><th>Frequency</th><th>Vars</th><th>Feeds</th></tr></thead>
-      <tbody id="sources-tbody">
-        <tr><td>d01_kpx</td><td>KPX — Korea Power Exchange (TSO+market)</td><td>Continuous</td><td style="text-align:right">14</td><td>C2, C3, I1, I2, I3, R4</td></tr>
-        <tr><td>d02_kepco</td><td>KEPCO — single-DSO monopoly + transmission asset owner</td><td>Annual</td><td style="text-align:right">18</td><td>C1, V1, V2, I2, I3</td></tr>
-        <tr><td>d02b_korec</td><td>KOREC — Korea Electricity Regulation Commission</td><td>Annual</td><td style="text-align:right">12</td><td>C1, C2, V1, V2, T1</td></tr>
-        <tr><td>d03_kma</td><td>KMA — Korea Meteorological Administration (typhoon tracking)</td><td>Daily</td><td style="text-align:right">8</td><td>I1, I2, I3, R6_typhoon</td></tr>
-        <tr><td>d03b_kigam</td><td>KIGAM — Korea Institute of Geoscience and Mineral Resources</td><td>Multi-year</td><td style="text-align:right">4</td><td>R6_seismic · Pohang 2017 induced anchor</td></tr>
-        <tr><td>d03c_nssc</td><td>NSSC — Nuclear Safety and Security Commission</td><td>Quarterly</td><td style="text-align:right">5</td><td>R6_seismic, I3, I4 · 24 reactors</td></tr>
-        <tr><td>d04_kostat</td><td>KOSTAT — Statistics Korea</td><td>Quarterly</td><td style="text-align:right">16</td><td>E1, E2, S1, S2, S3 · 226 si/gun/gu LAU</td></tr>
-        <tr><td>d04b_bok</td><td>Bank of Korea (central bank · non-€)</td><td>Quarterly</td><td style="text-align:right">4</td><td>E1, E2</td></tr>
-        <tr><td>d05_osm</td><td>OSM Overpass · ISO3166-1=KR (1,184 subs + 4,004 lines)</td><td>Monthly</td><td style="text-align:right">8</td><td>I1, I2, I3, R4</td></tr>
-        <tr><td>d06_iso9223</td><td>ISO 9223 corrosion classes (C2-C5 — C5 RESTORED peninsula)</td><td>Multi-year</td><td style="text-align:right">5</td><td>R5_corrosion, I8</td></tr>
-        <tr><td>d07_copernicus</td><td>Copernicus ERA5 + CMIP6 SSP2-4.5</td><td>Monthly</td><td style="text-align:right">4</td><td>R6_climate</td></tr>
-        <tr><td>d08_khnp</td><td>KHNP — Korea Hydro & Nuclear Power (24 reactors)</td><td>Quarterly</td><td style="text-align:right">5</td><td>R6_seismic, I3, I4 · Kori/Hanul/Hanbit/Wolsong</td></tr>
-        <tr><td>d09_kisa_krcert</td><td>KISA + KrCERT/CC (cohort-leading 25-yr backlog 2001-present)</td><td>Continuous</td><td style="text-align:right">5</td><td>R7_cyber · C-TAS platform</td></tr>
-        <tr><td>d10_msit</td><td>MSIT — Ministry of Science & ICT (NIS2-equiv competent authority)</td><td>Annual</td><td style="text-align:right">3</td><td>R7_cyber · Act on Info Infrastructure Protection 2001</td></tr>
-        <tr><td>d11_iea_oecd</td><td>IEA + OECD — energy benchmarks (KR 29th OECD 1996)</td><td>Annual</td><td style="text-align:right">6</td><td>T1, E1</td></tr>
-        <tr><td>d12_motie</td><td>MOTIE — 11th Basic Plan 2025 (target 35.2% nuclear by 2038)</td><td>Annual</td><td style="text-align:right">6</td><td>T1, E1</td></tr>
-        <tr><td>d13_korail</td><td>KORAIL + Korea Rail Network Authority (25-55 kV traction)</td><td>Annual</td><td style="text-align:right">3</td><td>I3, I4</td></tr>
-        <tr><td>d14_jeju_hvdc</td><td>Jeju HVDC submarine cables (300+400 MW Haenam/Jindo)</td><td>Annual</td><td style="text-align:right">2</td><td>I1, R4 · isolated island sub-grid</td></tr>
-        <tr><td>d15_nema</td><td>NEMA — National Disaster Management Research Institute</td><td>Annual</td><td style="text-align:right">4</td><td>R6_typhoon, R6_seismic, R6_restoration</td></tr>
-      </tbody>
-    </table>
+    <div class="kpi-card">
+      <div class="kpi-label">Data Sources</div>
+      <div class="kpi-value" style="color:var(--bronze)">30+</div>
+      <div class="kpi-sub">All verified &amp; public</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Substations</div>
+      <div class="kpi-value" style="color:var(--sage)" id="data-subs">—</div>
+      <div class="kpi-sub" id="data-subs-sub">Loading…</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Max Frequency</div>
+      <div class="kpi-value" style="color:var(--terracotta)">Daily</div>
+      <div class="kpi-sub">KPX/KEPCO + KMA + — feeds</div>
+    </div>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px">
+  <!-- Download Section -->
+  <div class="card animate-in delay-2" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>📈 95-Variable Distribution by Component</h3>
+      <h3>Download SSI Dataset</h3>
+      <span class="label-xs">Latest fleet run</span>
     </div>
-    <table class="data-table">
-      <thead><tr><th>Layer</th><th>Component</th><th>Weight</th><th>Variables</th><th>Status</th></tr></thead>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px">
+      <div id="dl-full" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📊</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">— substations · all fields</div>
+      </div>
+      <div id="dl-summary" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📋</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Summary Report (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">R_median, band, components, CI</div>
+      </div>
+      <div id="dl-geo" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">🗺️</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Geographic Data (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">NUTS-3 Megye coordinates + SSI scores</div>
+      </div>
+      <div id="dl-formula" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📐</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Formula Construct (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">Complete v4.0.2 technical reference</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Layers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Layers</h3>
+      <span class="label-xs">11 layers · 95 variables</span>
+    </div>
+    <table class="data-table" style="margin-top:4px">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Domain</th>
+          <th style="text-align:right">Variables</th>
+          <th>Status</th>
+          <th>Key Sources</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr><td>A — Resilience</td><td>C Continuity (5) + V Voltage (3) + I Infrastructure (9) + E Economic (2)</td><td>0.65</td><td style="text-align:right">19</td><td>✅ LIVE</td></tr>
-        <tr><td>A.S — Saturation</td><td>S1 + S2 + S3 (Nuclear-Critical + Chaebol-Critical subclasses NEW)</td><td>0.20</td><td style="text-align:right">3</td><td>✅ LIVE</td></tr>
-        <tr><td>A.M — Modifier Inputs</td><td>7 modifiers incl. NEW R6_typhoon + R6_chaebol</td><td>multiplicative</td><td style="text-align:right">7</td><td>✅ LIVE</td></tr>
-        <tr><td>B.1 — Grid Telemetry Open</td><td>KMA + Copernicus + KEPCO SCADA</td><td>—</td><td style="text-align:right">3</td><td>✅ AVAILABLE</td></tr>
-        <tr><td>B.2 — Grid Telemetry Proxy</td><td>IEEE C57.91 + 60Hz adjustment + KPX</td><td>—</td><td style="text-align:right">4</td><td>✅ LIVE (modelled)</td></tr>
-        <tr><td>B.3 — Grid Telemetry Fuzzy</td><td>CIGRÉ TB 761 + Bayesian priors</td><td>—</td><td style="text-align:right">12</td><td>🔄 FUZZY (Bayesian)</td></tr>
-        <tr><td>C — Socio-Economic</td><td>KOSTAT + Bank of Korea + 226 LAU</td><td>—</td><td style="text-align:right">9</td><td>✅ FETCHABLE</td></tr>
-        <tr><td>D — Environmental Hazards</td><td>KIGAM + KMA + ISO 9223 + Pohang/Hinnamnor anchors</td><td>—</td><td style="text-align:right">7</td><td>✅ LIVE</td></tr>
-        <tr><td>E — Korean Open Data</td><td>KOSTAT + BoK + KORAIL + cadastre + MSIT</td><td>—</td><td style="text-align:right">8</td><td>✅ FETCHABLE</td></tr>
-        <tr><td>F — Network Transitions (Markov)</td><td>5-state F-block · CIGRÉ TB 761 + C5 corrosion</td><td>—</td><td style="text-align:right">5</td><td>🔄 FUZZY (Bayesian)</td></tr>
-        <tr><td>G — Modifier Raw Feeds</td><td>DESI + KISA + NIS2-equiv</td><td>—</td><td style="text-align:right">3</td><td>✅ LIVE</td></tr>
-        <tr><td>H — Network & Topology</td><td>OSM Overpass + KPX + isolated peninsula (0 cross-border)</td><td>—</td><td style="text-align:right">7</td><td>✅ LIVE</td></tr>
-        <tr><td>I — Output Scores</td><td>R_median + σ + ETTC + MTBF + RUL + availability</td><td>—</td><td style="text-align:right">7</td><td>✅ LIVE (computed)</td></tr>
-        <tr style="font-weight:600;background:rgba(11,78,162,0.06)"><td colspan="3">TOTAL</td><td style="text-align:right">95</td><td>—</td></tr>
+        <tr>
+          <td style="font-weight:600;color:var(--crimson)">A</td>
+          <td>SSI v4.0.2 Resilience</td>
+          <td class="num">20</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">KOREC · KPX/KEPCO Network Statement · KEPCO single-DSOs · KOSTAT</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.1</td>
+          <td>Grid Telemetry: Open</td>
+          <td class="num">3</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">Open-Meteo / ERA5 · KOREC</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.2</td>
+          <td>Grid Telemetry: Proxy</td>
+          <td class="num">4</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">IEEE C57.91 · KPX/KEPCO · quality-of-supply</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.3</td>
+          <td>Grid Telemetry: Fuzzy</td>
+          <td class="num">12</td>
+          <td><span class="band-badge medium" style="font-size:10px">FUZZY</span></td>
+          <td style="font-size:12px">IEEE/CIGRÉ standards · EEA</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#a67cff">C</td>
+          <td>Socio-Economic</td>
+          <td class="num">9</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">KOSTAT regional data · Eurostat · DESI</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#ff8c42">D</td>
+          <td>Environmental Hazards</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">EEA · KIGAM + KMA · Copernicus · KMA</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#3b9eff">E</td>
+          <td>Icelandic Open Data</td>
+          <td class="num">8</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">NEMA Han River + Nakdong River Q100 · KMA · KrCERT/CC · —</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">F</td>
+          <td>Network Transitions</td>
+          <td class="num">12</td>
+          <td><span class="band-badge medium" style="font-size:10px">BAYESIAN</span></td>
+          <td style="font-size:12px">DSO history OR IEEE/CIGRÉ + priors</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#22d3ee">G</td>
+          <td>Modifier Inputs</td>
+          <td class="num">3</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">KOREC quality reports · OSM Power · JRC DSO</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#e67e22">H</td>
+          <td>Network &amp; Topology</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">KPX/KEPCO Network Statement · KIGAM + KMA · OSM</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#8e44ad">I</td>
+          <td>Output Scores</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">Fleet Markov Chain · IEEE/CIGRÉ analysis</td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Source Registry (all 30+, rendered from metadata) -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Source Registry</h3>
+      <span class="label-xs">18+ verified · all free &amp; public</span>
+    </div>
+    <div class="source-grid" style="margin-top:12px" id="data-source-grid"></div>
+  </div>
+
+  <!-- Engine Info -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>SSI Engine</h3>
+      <span class="label-xs">Client-side formula implementation</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:12px">
+      The SSI v4.0.2 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b network topology, R7 digital readiness — Korea ceiling 1.03), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">—</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Public API functions</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">20</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Global weight entries</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">6</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Modifier functions</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">1,000</div>
+        <div style="font-size:10px;color:var(--warm-grey)">MC iterations (browser)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API / Schema -->
+  <div class="card animate-in">
+    <div class="card-header">
+      <h3>Output Schema</h3>
+      <span class="label-xs">JSON per substation</span>
+    </div>
+    <div class="formula-block" id="schema-block" style="font-size:12px;line-height:1.6">
+      Loading live sample…
+    </div>
   </div>
 </main>
 
-<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
-  SSI v4.0.2 · 🇰🇷 Korea data inventory · 95 vars · 19 sources · KB §71 (planned)
-</footer>
+<!-- jsPDF + autotable for the 4 PDF download buttons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.5 · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../data-sections.js?v=44cf6cb5de"></script>
 <script>
-  window.PAGE_CONFIG = { page: 'data', country: 'korea' };
-  if (window.CountryRenderer && window.CountryRenderer.init) {
-    window.CountryRenderer.init(window.PAGE_CONFIG);
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('korea', 'data');
+  });
 </script>
+<script>renderFooter();</script>
 </body>
 </html>

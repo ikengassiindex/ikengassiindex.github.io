@@ -3,149 +3,345 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI Index Korea — methodology, formulas, R3 4-tier calibration, NEW R6_typhoon + R6_chaebol modifiers.">
-<meta name="theme-color" content="#02529c">
-<title>SSI Index — Korea Methodology 🇰🇷</title>
+<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Republic of Korea Methodology</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
 <script src="../ssi-versions.js?v=dffbd5ace6"></script>
-<script src="../nav.js?v=167bb6caef"></script>
+<script src="../nav.js?v=092afb510f"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=ce5bb32a90"></script>
 <script>renderNav('methodology');</script>
 
-<main class="page-shell">
+<main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
-    <h1>Methodology — Korea Calibration 🇰🇷</h1>
-    <p>SSI v4.0.2 formula construct adapted for Republic of Korea — 6 components, 7 modifiers (incl. NEW R6_typhoon + R6_chaebol), 10,000 MC iterations, 4-tier R3 + KEPCO single-DSO monopoly architectural test. Full formula construct: <a href="../reference-docs/SSI_v4_0_Complete_Formula_Construct_Korea.html" style="color:var(--terracotta)">SSI_v4_0_Complete_Formula_Construct_Korea.html</a> (planned).</p>
+    <h1>Methodology</h1>
+    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;background:#fef8e0;border-left:4px solid #02529c">
-    <h3>📐 Master Equation</h3>
-    <pre style="font-family:'JetBrains Mono',Consolas,monospace;font-size:14px;line-height:1.8;color:#02529c;padding:16px;background:#fff;border-radius:6px;overflow-x:auto">
-R = (w<sub>R</sub> · R<sup>norm</sup> + w<sub>S</sub> · S<sup>norm</sup>) × ∏<sub>k</sub> M<sub>k</sub>
-
-where
-  R<sup>norm</sup> = 0.30 · C + 0.10 · V + 0.25 · I + 0.10 · E      [Resilience: Continuity + Voltage + Infra + Econ]
-  S<sup>norm</sup> = 0.20 · S + 0.05 · S<sub>crit</sub>                              [Saturation + Criticality with NEW Nuclear-Critical + Chaebol-Critical subclasses]
-  M<sub>k</sub> ∈ { R3<sub>4-tier</sub>, R4<sub>topo</sub>, R6<sub>seismic</sub>, <strong>R6<sub>typhoon</sub></strong> NEW, <strong>R6<sub>chaebol</sub></strong> NEW, R7<sub>cyber</sub>, R6<sub>restoration</sub> }
-</pre>
+  <!-- Thesis -->
+  <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
+    <p style="font-size:14px;line-height:1.7;color:var(--ink)">
+      Power grid resilience is inseparable from its socio-economic context. A do/si serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+    </p>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px">
+  <!-- Pipeline -->
+  <div class="animate-in delay-2" style="margin-bottom:40px">
+    <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
+    <div class="method-step">
+      <div class="method-step-num">1</div>
+      <div class="method-step-content">
+        <h3>Ingest</h3>
+        <p>95 variables from 19 verified public data sources — KPX/KEPCO network statement, KOREC quality reports, KEPCO single-DSO filings, KOSTAT regional data, Bank of Korea national accounts, KMA meteorology, NEMA flood disaster mapping, KIGAM seismic + KMA, + NSSC nuclear safety, KrCERT/CC + Cyber Security Authority (KISA-affiliated) cyber, Copernicus, ENTSO-E, Eurostat, OSM Overpass. Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">2</div>
+      <div class="method-step-content">
+        <h3>Normalise</h3>
+        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">3</div>
+      <div class="method-step-content">
+        <h3>Weight</h3>
+        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">4</div>
+      <div class="method-step-content">
+        <h3>Compose R_base</h3>
+        <p>Weighted sum of 6 normalised component scores produces the base resilience score.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">5</div>
+      <div class="method-step-content">
+        <h3>Modify</h3>
+        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty — Korea uses a 4-tier calibration reflecting chaebol-concentration: Industrial-Chaebol 1.05 / Capital-Seoul 1.04 / SME 1.03 / Rural 1.02), R4 (graph-theoretic network criticality), R6a (restoration speed — KEPCO single-DSO CAIDI; Jeju isolated HVDC penalty), R6b (network topology), R7 (digital readiness, ceiling 1.015 — cohort-LOWEST · KISA 2001 25-yr backlog).</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">6</div>
+      <div class="method-step-content">
+        <h3>Monte Carlo</h3>
+        <p>10,000 iterations per do/si using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each do/si.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">7</div>
+      <div class="method-step-content">
+        <h3>Classify</h3>
+        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Equation -->
+  <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>📊 R3 4-Tier Consequence Calibration (post-BPG Discipline #15)</h3>
+      <h3>Master Equation</h3>
+      <span class="label-xs">v4.0.2</span>
+    </div>
+    <div class="formula-block">
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × Cyber_factor )
+
+<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+
+<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30] · 5-tier KR</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10] · NE/SE rural</span>
+<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.03]</span>
+    </div>
+  </div>
+
+  <!-- Components -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>6 Components · 20 Metrics</h3>
     </div>
     <table class="data-table">
-      <thead><tr><th>Tier</th><th>R3 Value</th><th>Bucket Range</th><th>Substations</th><th>VoLL</th><th>Anchor</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Weight</th>
+          <th>Metrics</th>
+          <th>Domain</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr><td>1 🏭</td><td>1.05</td><td>≥ 1.045</td><td>557 (47%)</td><td>€18-32/kWh</td><td>Gyeonggi Samsung Pyeongtaek + SK Hynix Icheon + Ulsan + N. Gyeongsang + Jeonnam + Chungnam</td></tr>
-        <tr><td>2 🏛️</td><td>1.04</td><td>1.035-1.045</td><td>123 (10%)</td><td>€10-18/kWh</td><td>Seoul + Sejong administrative</td></tr>
-        <tr><td>3 🏪</td><td>1.03</td><td>1.025-1.035</td><td>424 (36%)</td><td>€4-10/kWh</td><td>Busan + Daegu + Incheon + Daejeon + Gwangju + Gyeongnam + Chungbuk + Jeonbuk</td></tr>
-        <tr><td>4 🌾</td><td>1.02</td><td>&lt; 1.025</td><td>80 (7%)</td><td>€1-4/kWh</td><td>Gangwon + Jeju</td></tr>
+        <tr>
+          <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
+          <td class="num">0.30</td>
+          <td>4 — Duration, Count, MT exceed, Planned</td>
+          <td>Outage frequency and duration</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
+          <td class="num">0.10</td>
+          <td>1 — Severity-weighted dips</td>
+          <td>Power quality events</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
+          <td class="num">0.25</td>
+          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, industrial corrosion (C2-C4), hydrogeological</td>
+          <td>Physical asset condition &amp; environment</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#3b9eff">E</strong> Economic</td>
+          <td class="num">0.10</td>
+          <td>2 — Regulatory penalties, productivity loss</td>
+          <td>Economic impact of interruptions</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
+          <td class="num">0.20</td>
+          <td>3 — Regional KPI, reverse power flow, criticality class</td>
+          <td>Grid capacity utilisation</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#22d3ee">T</strong> Transition</td>
+          <td class="num">0.05</td>
+          <td>1 — DER Stress Index (11th Basic Plan coal exit (30%→10.1% by 2038) + 11th Basic Plan nuclear ramp-up (32%→35.2% by 2038) + Korean RES ramp (target 29.7% by 2038))</td>
+          <td>Energy transition exposure</td>
+        </tr>
       </tbody>
     </table>
-    <p style="font-size:12px;color:var(--warm-grey);margin-top:8px">Iceland Hotfix #2 lesson: r3_buckets span renderer's <code>DEFAULT_R3_BUCKETS [0.97, 1.05+]</code> — all 4 Economic Impact panels populate on intelligence.html. NO empty buckets.</p>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #c0392b">
+  <!-- Modifiers -->
+  <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>🆕 R6_typhoon — NEW Pacific Corridor Modifier</h3>
-    </div>
-    <pre style="font-family:'JetBrains Mono',Consolas,monospace;font-size:13px;background:#fef2ee;padding:12px;border-radius:6px;overflow-x:auto">
-R6<sub>typhoon</sub> = 1.0 + α<sub>typhoon, do/si</sub> × exposure_factor
-
-α range: [0.03, 0.15]
-  South coast corridor (Gyeongnam + Jeonnam):       α = 0.12
-  West/east coast (Busan + Incheon + Chungnam):     α = 0.07-0.10
-  Jeju offshore:                                     α = 0.10 (Bolaven 2012 base)
-  Inland (Seoul + Gyeonggi + Chungbuk + Daejeon):   α = 0.03-0.05
-
-Anchor events:
-  • 2022-09-06 Typhoon Hinnamnor — Geoje landfall · 66,000+ households lost power
-  • 2023-08-10 Typhoon Khanun — west-coast transit · 40,350 lost power
-  • 2012-08-26 Typhoon Bolaven — Jeju + Honam historical base rate
-  • 2003-09-12 Typhoon Maemi — historic; coastal devastation Sokcho
-  • 2002-08-31 Typhoon Rusa — record rainfall Gangneung
-  • 2012-09-17 Typhoon Sanba — Hinnamnor-precursor pattern
-</pre>
-    <p style="font-size:12px;color:var(--warm-grey);margin-top:8px">UNIQUE for Korea (parallel to Iceland's R6_volcanic + R6c_jokulhlaup). Generalisable to Japan + Taiwan + future Pacific cohort.</p>
-  </div>
-
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #c0392b">
-    <div class="card-header">
-      <h3>🆕 R6_chaebol — NEW Industrial-Concentration Modifier</h3>
-    </div>
-    <pre style="font-family:'JetBrains Mono',Consolas,monospace;font-size:13px;background:#fce4ec;padding:12px;border-radius:6px;overflow-x:auto">
-R6<sub>chaebol</sub> = 1.0 + α<sub>chaebol, do/si</sub> × cluster_concentration_index
-
-α range: [0.00, 0.10]
-  Samsung-SK Hynix-LG fab corridor (Gyeonggi):       α = 0.08
-  Petrochem + steel corridor (Ulsan/Jeonnam/Gyeongbuk): α = 0.07
-  Secondary chaebol (Chungnam Asan + Daegu textile): α = 0.04-0.06
-  Non-chaebol (Gangwon + Jeju + Sejong):             α = 0.00-0.02
-
-Anchors:
-  • Samsung Electronics Pyeongtaek P3+P4 — largest single-site fab campus globally
-  • SK Hynix Icheon M16 — 1m wafer/month capacity
-  • POSCO Gwangyang — world's largest single-site steel works
-  • POSCO Pohang — world's 5th-largest steel mill
-  • Hyundai Ulsan — world's largest auto plant by single-site capacity
-
-Rationale:
-  Single-site catastrophic loss potential exceeds even Iceland aluminum corridor
-  (3 sites total) — Samsung Pyeongtaek alone consumes more electricity than several
-  Korean provinces. R6_chaebol captures magnitude-of-impact differently from
-  R6_volcanic (probability-based) or R3 (consequence-weighted general).
-</pre>
-  </div>
-
-  <div class="card animate-in" style="margin-bottom:24px">
-    <div class="card-header">
-      <h3>📐 Normalisation Methods (Method A/B/C/D)</h3>
+      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
+      <span class="label-xs">Context multipliers</span>
     </div>
     <table class="data-table">
-      <thead><tr><th>Method</th><th>Formula</th><th>Applies to</th></tr></thead>
+      <thead>
+        <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
+      </thead>
       <tbody>
-        <tr><td>A — Robust fleet percentile (P5/P95 winsorise)</td><td><code>x_norm = clip((x − P5) / (P95 − P5), 0, 1)</code></td><td>C1, C2, C4, C5, E1, E2, I7</td></tr>
-        <tr><td>B — Standard fleet percentile (rank)</td><td><code>x_norm = (rank(x) − 1) / (n − 1)</code></td><td>I4, S1, S2</td></tr>
-        <tr><td>C — Bounded rescaling (log)</td><td><code>x_norm = log10(x/x_min) / log10(x_max/x_min)</code></td><td>C3 (voltage class · 765/345/154/22.9 kV — KR UNIQUE 765 kV)</td></tr>
-        <tr><td>D — Categorical mapping</td><td><code>x_norm = lookup[x]</code> · ordinal → [0,1]</td><td>I8 (ISO 9223 C2-C5 — C5 RESTORED), S3 (criticality + NEW Nuclear-Critical + Chaebol-Critical subclasses), R3 4-tier, R6_typhoon, R6_chaebol</td></tr>
+        <tr>
+          <td style="font-weight:500">R2</td>
+          <td>Adaptive IRI + Climate</td>
+          <td class="num">internal</td>
+          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R3</td>
+          <td>Consequence + Poverty</td>
+          <td class="num">[0.70, 1.30]</td>
+          <td>Amplifies risk for do/si serving large/energy-poor populations with high economic dependency. Korea uses a 4-tier calibration (1.02 / 1.03 / 1.04 / 1.05) spanning the renderer's DEFAULT_R3_BUCKETS [0.97, 1.05+]: Industrial-Chaebol 1.05 (Gyeonggi Samsung-SK Hynix + Ulsan chaebol + Gyeongbuk/Jeonnam steel/nuclear) / Capital-Seoul 1.04 (Seoul + Sejong) / Commercial-SME 1.03 / Rural 1.02 (Gangwon + Jeju). BPG Discipline #15 verified — all 4 buckets populate (557 / 123 / 424 / 80).</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R4</td>
+          <td>Graph Criticality</td>
+          <td class="num">[0.80, 1.35]</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph (1,184 nodes · 4,261 edges).</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6a</td>
+          <td>Restoration Speed</td>
+          <td class="num">[0.90, 1.10]</td>
+          <td>KEPCO-CAIDI-based (single-DSO monopoly): rewards fast-restoring metropolitan areas (Seoul + Gyeonggi), penalises slow ones. Jeju isolated sub-grid carries HVDC submarine cable dependency penalty (300+400 MW Haenam/Jindo). Gangwon mountainous interior (Taebaek range — Hallasan 1,950 m highest) has elevated restoration times in winter.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6b</td>
+          <td>Network Topology</td>
+          <td class="num">[1.00, 1.25]</td>
+          <td>Network centrality and ring topology. Penalises do/si in single-source or low-redundancy configurations. Based on physical network analysis of the OSM graph.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R7</td>
+          <td>Digital Readiness</td>
+          <td class="num">[0.99, 1.03]</td>
+          <td>Regional DESI digital readiness, KrCERT/CC (KISA est. 2001) maturity, NIS2 transposition (Cyber Security Act 2023 (NIS2-equivalent transposition), in force 2023 (pre-dates EU NIS2 by 22 years via Act on Information Infrastructure Protection 2001)). Ceiling 1.015 — cohort-LOWEST (KISA 2001 25-yr backlog cohort-leading).</td>
+        </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #5d8563">
+  <!-- Classification -->
+  <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>🇰🇷 Cohort Comparison (Korean Specifics)</h3>
+      <h3>Classification Bands</h3>
     </div>
-    <table class="data-table">
-      <thead><tr><th>Dimension</th><th>Korea</th><th>Iceland</th><th>Hungary</th></tr></thead>
-      <tbody>
-        <tr><td>Synchronous area</td><td>ISOLATED 60Hz</td><td>ISOLATED</td><td>ENTSO-E 50Hz CE</td></tr>
-        <tr><td>DSO count</td><td><strong>1 (KEPCO monopoly) — UNIQUE</strong></td><td>3</td><td>6</td></tr>
-        <tr><td>Nuclear share</td><td><strong>32% (24 reactors) — cohort-HIGHEST</strong></td><td>0%</td><td>~45%</td></tr>
-        <tr><td>R3 tiers</td><td>4-tier</td><td>4-tier (post-hotfix)</td><td>5-tier</td></tr>
-        <tr><td>R6 modifiers (extra)</td><td>R6_typhoon + R6_chaebol NEW</td><td>R6_volcanic + R6c_jokulhlaup NEW</td><td>—</td></tr>
-        <tr><td>R7 ceiling</td><td><strong>1.015 — cohort-LOWEST (KISA 2001 25-yr)</strong></td><td>1.04</td><td>1.02</td></tr>
-        <tr><td>Currency</td><td>KRW ₩ (non-€)</td><td>ISK kr. (non-€)</td><td>HUF Ft (non-€)</td></tr>
-        <tr><td>OECD since</td><td>1996 (29th)</td><td>1961 founding</td><td>1996 (same year)</td></tr>
-        <tr><td>Cohort firsts</td><td>Single-DSO + 60Hz + 765 kV</td><td>R6_volcanic + zero-cross-border + sub-Arctic</td><td>5-tier R3</td></tr>
-      </tbody>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MC & Confidence -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Uncertainty Quantification</h3>
+      <span class="label-xs">Monte Carlo engine</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
+      Every do/si score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per do/si</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~18 min</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime (1,184 subs)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Metrics -->
+  <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
+
+  <!-- Normalisation Methods -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Normalisation Methods</h3>
+    </div>
+    <div id="method-norm"></div>
+  </div>
+
+  <!-- Data Layers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Layers — 95 Variables</h3>
+      <span class="label-xs">11 layers</span>
+    </div>
+    <table class="data-table" id="method-layers">
+      <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
+      <tbody></tbody>
     </table>
+  </div>
+
+  <!-- Data Sources -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>30+ Verified Data Sources for Korea</h3>
+      <span class="label-xs">All open + free registration only</span>
+    </div>
+    <table class="data-table" id="method-sources">
+      <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Validation -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Validation Framework</h3>
+      <span class="label-xs" id="method-val-count"></span>
+    </div>
+    <table class="data-table" id="method-validation">
+      <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Changelog -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>v3.4 → v4.0.2 Changelog</h3>
+    </div>
+    <table class="data-table" id="method-changelog">
+      <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Competitive Positioning Note -->
+  <div class="card animate-in" style="border-left:3px solid var(--sage)">
+    <div class="card-header">
+      <h3>Competitive Positioning</h3>
+      <span class="label-xs">v4.0.2</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7">
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 implementation data per Cyber Security Act 2023) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
+    </p>
   </div>
 </main>
 
-<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
-  SSI v4.0.2 · 🇰🇷 Korea methodology · 4-tier R3 + 2 NEW modifiers · 10k MC · KB §71 (planned)
-</footer>
-
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.4 · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../methodology-sections.js?v=db84d4350d"></script>
 <script>
-  window.PAGE_CONFIG = { page: 'methodology', country: 'korea' };
-  if (window.CountryRenderer && window.CountryRenderer.init) {
-    window.CountryRenderer.init(window.PAGE_CONFIG);
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('korea', 'methodology');
+  });
 </script>
+<script>renderFooter();</script>
 </body>
 </html>
