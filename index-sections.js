@@ -136,10 +136,16 @@
     var n = subs.length;
     if (!n) return;
 
+    // KB §64.3 A12 — null-coerced-to-default in numeric comparisons:
+    // Many countries' OSM extracts have substations with voltage_kv=null
+    // (untagged). The pre-A12 pattern `Number(s.voltage_kv || 0) >= 132`
+    // coerces null to 0, then 0 >= 132 is false, silently mis-counting
+    // every untagged substation as MV. Fix: explicit null check before
+    // comparison. Counts shift to "known HV (≥132 kV) + everything else".
     var isArr = Array.isArray(subs[0]);
     var hv = subs.filter(function (s) {
-      var v = isArr ? Number(s[3]) : Number(s.voltage_kv || 0);
-      return v >= 132;
+      var v = isArr ? s[3] : s.voltage_kv;
+      return v != null && Number(v) >= 132;
     }).length;
     var mv = n - hv;
 
@@ -184,14 +190,24 @@
 
     // Voltage-class split for the total-sub line (deferring to data when
     // available, falling back to the existing static markup if absent).
+    // KB §64.3 A12 — null-coerced-to-default: untagged OSM substations have
+    // voltage_kv=null. Explicit null check before threshold compare so the
+    // "EHV / HV / distribution-tier" trichotomy is honest about what we know.
     var subs = data.substations || [];
     if (subs.length) {
-      var ehvCount = subs.filter(function (s) { return (s.voltage_kv || 0) >= 220; }).length;
-      var hvCount = total - ehvCount;
+      var ehvCount = subs.filter(function (s) {
+        return s.voltage_kv != null && s.voltage_kv >= 220;
+      }).length;
+      var hvCount = subs.filter(function (s) {
+        return s.voltage_kv != null && s.voltage_kv >= 110 && s.voltage_kv < 220;
+      }).length;
+      var distCount = total - ehvCount - hvCount;  // distribution-tier + untagged
       var nRegions = (data.regions && data.regions.length) ||
         (cfg.admin && cfg.admin.l1 && cfg.admin.l1.count) || 0;
       H.setText('kpi-total-sub',
-        ehvCount.toLocaleString() + ' EHV · ' + hvCount.toLocaleString() + ' HV · ' +
+        ehvCount.toLocaleString() + ' EHV · ' +
+        hvCount.toLocaleString() + ' HV · ' +
+        distCount.toLocaleString() + ' distribution-tier · ' +
         nRegions + ' ' + regionLabel);
     }
   });
@@ -235,10 +251,15 @@
     var tbody = document.getElementById('top-critical-tbody');
     if (!tbody) return;
 
+    // KB §64.3 A12 — empty-string-as-data: OSM extracts sometimes ship empty
+    // substation names. Fall through to substation_id, then to a placeholder
+    // so the highest-R row never shows as a blank cell.
     tbody.innerHTML = top8.map(function (s) {
       var band = s.classification || 'Low';
       var bandLow = bandLower(band);
-      return '<tr><td style="font-weight:500">' + (s.name || '') + '</td>' +
+      var displayName = (s.name && String(s.name).trim()) ||
+        s.substation_id || s.internal_id || '(unnamed)';
+      return '<tr><td style="font-weight:500">' + displayName + '</td>' +
         '<td>' + (s.province || '') + '</td>' +
         '<td class="num">' + (s.R_median != null ? Number(s.R_median).toFixed(3) : '—') + '</td>' +
         '<td><span class="band-badge ' + bandLow + '"><span class="band-dot ' + bandLow + '"></span>' + band + '</span></td></tr>';

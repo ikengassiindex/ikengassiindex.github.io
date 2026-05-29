@@ -905,11 +905,24 @@ if (!hasNested) {
       </div>`;
     }).join('');
 
+    // KB §64.3 A12 — null-coerced-to-default + empty-string-as-data: many
+    // OSM-sourced substations carry voltage_kv=null and/or empty name. The
+    // pre-A12 template emitted "null kV (MV)" and a blank <h3>. Use explicit
+    // null/empty checks so the panel either reports the known voltage class
+    // or labels the gap as "voltage untagged".
+    var ssiDisplayName = (ssi.name && String(ssi.name).trim()) ||
+      ssi.substation_id || '(unnamed)';
+    var voltageLabel;
+    if (ssi.voltage_kv != null && !isNaN(ssi.voltage_kv)) {
+      voltageLabel = ssi.voltage_kv + ' kV ' + (ssi.voltage_kv >= 110 ? '(HV)' : '(MV)');
+    } else {
+      voltageLabel = 'voltage untagged';
+    }
     panel.innerHTML = `
       <div class="card" style="margin-bottom:12px">
         <div class="label-xs" style="margin-bottom:6px">Selected Substation</div>
-        <h3 style="margin-bottom:2px;font-size:15px">${ssi.name}</h3>
-        <div style="font-size:11px;color:var(--warm-grey);margin-bottom:14px">${ssi.region} . ${ssi.province} . ${ssi.voltage_kv} kV ${ssi.voltage_kv >= 110 ? '(HV)' : '(MV)'} . ${ssi.substation_id}</div>
+        <h3 style="margin-bottom:2px;font-size:15px">${ssiDisplayName}</h3>
+        <div style="font-size:11px;color:var(--warm-grey);margin-bottom:14px">${ssi.region} . ${ssi.province} . ${voltageLabel} . ${ssi.substation_id}</div>
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px">
           <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:${BAND_COLORS[ssi.classification]}">${ssi.R_median.toFixed(4)}</div>
           <span class="band-badge ${ssi.classification.toLowerCase()}"><span class="band-dot ${ssi.classification.toLowerCase()}"></span>${ssi.classification}</span>
@@ -1184,9 +1197,17 @@ if (!hasNested) {
       };
     }
 
-    // Populate regions dropdown --- detect country from meta or URL
+    // Populate regions dropdown --- detect country from meta or URL.
+    // KB §64.3 A12 — empty-string-as-data: filter dropdowns must show
+    // human-readable labels (region NAME) while keeping the option VALUE
+    // as the stable code used by the filter pipeline. Previous version
+    // emitted raw NUTS-3 codes ("SK010", "SK021", …) as both value and
+    // label — technically correct but illegible to users. Use r.name as
+    // the label with r.region as the value+fallback.
     if (regionSel && SSI) {
-      const regions = (SSI.regions || []).map(r => r.region).sort();
+      var regionObjs = (SSI.regions || []).slice().sort(function (a, b) {
+        return String(a.region || '').localeCompare(String(b.region || ''));
+      });
       var allLabel = 'All Regions';
       var countryCode = (SSI.meta && SSI.meta.country) || '';
       if (countryCode === 'DE' || countryCode === 'AT') allLabel = 'All Bundeslnder';
@@ -1205,7 +1226,11 @@ if (!hasNested) {
         allLabel = existingAll.textContent;
       }
       regionSel.innerHTML = '<option value="all">' + allLabel + '</option>' +
-        regions.map(r => `<option value="${r}">${r}</option>`).join('');
+        regionObjs.map(function (r) {
+          var code = r.region || '';
+          var label = (r.name && String(r.name).trim()) || code;
+          return '<option value="' + code + '">' + label + '</option>';
+        }).join('');
     }
 
     // Zoom buttons --- detect country center from data
