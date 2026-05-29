@@ -649,14 +649,30 @@
     var unemploymentLabel = se.unemployment_rate != null ? 'Unemployment' : se.population != null ? 'Population' : 'Unemployment';
     // 2. GDP per capita
     var currSymbol = (function() {
+      // KR S31 hotfix #7: prefer SSIMetadata.currency_symbol (always present
+      // on country pages via ssi-metadata.js); fall back to old behaviour.
+      if (window.SSIMetadata && window.SSIMetadata.currency_symbol) {
+        return window.SSIMetadata.currency_symbol;
+      }
+      if (window.SSI_METADATA && window.SSI_METADATA.currency_symbol) {
+        return window.SSI_METADATA.currency_symbol;
+      }
       if (!window.SSI_COUNTRIES_CONFIG) return '\u20AC'; // fallback to EUR
       var id = ssi.substation_id || '';
       var prefix = id.substring(0, 2);
-      // Map prefix to ISO code (UK_ -> GB, all others match)
       var isoMap = {UK: 'GB'};
       var iso = isoMap[prefix] || prefix;
+      // Handle both flat-iso-dict and {countries:[...]} shapes
       var cc = window.SSI_COUNTRIES_CONFIG[iso];
-      return cc ? cc.currency : '\u20AC';
+      if (!cc && window.SSI_COUNTRIES_CONFIG.countries) {
+        var slug = (ssi.substation_id || '').match(/^([A-Z]+)_/);
+        var isoLookup = slug ? slug[1] : '';
+        var found = window.SSI_COUNTRIES_CONFIG.countries.filter(function(c) {
+          return c.iso2 === isoLookup;
+        })[0];
+        if (found && found.currency_symbol) return found.currency_symbol;
+      }
+      return cc ? (cc.currency_symbol || cc.currency || '\u20AC') : '\u20AC';
     })();
     var gdp = se.gdp_per_capita != null ? currSymbol + Math.round(se.gdp_per_capita).toLocaleString() : na;
     // 3. Innovation (R&D) / Elderly pct
