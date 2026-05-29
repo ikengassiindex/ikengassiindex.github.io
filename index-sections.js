@@ -98,38 +98,17 @@
     return /s$/i.test(lbl) ? lbl : lbl + 's';
   }
 
-  /* COMPONENTS_INDEX schema normalisation (KB §66 A1 — schema-key drift).
-     Some countries (Slovakia onboarding 2026-05-28) ship the catalogue with
-     keys `{code, name, ceiling, drivers}` — semantically richer (the
-     `drivers` strings document data sources per component) but using
-     different field names than this file's renderer expects
-     (`{key, label, w, color}`). Without aliasing, `c.label` is `undefined`
-     and renders literally as the string "undefined" in the Fleet Average
-     section. Defaults palette covers the case where the metadata file
-     doesn't ship a per-component color.
-     Accepted input shapes (both keep working):
-       Canonical (used by DEFAULT_COMPONENT_BARS):
-         { key, label, w, color }                          ← renderer-native
-       Documentation-rich (used by Slovakia, future cohort):
-         { code, name, ceiling, drivers[, color] }          ← aliased here
-  */
-  var DEFAULT_PALETTE = {
-    C: 'var(--crimson)', V: 'var(--terracotta)', I: 'var(--sage)',
-    E: '#3b9eff',        S: 'var(--bronze)',     T: '#22d3ee'
-  };
-  function normalizeComponentBar(c) {
-    if (!c || typeof c !== 'object') return c;
-    var key   = c.key   != null ? c.key   : c.code;
-    var label = c.label != null ? c.label : (c.name ? (key + ' — ' + c.name) : c.name);
-    var w     = c.w     != null ? c.w     : c.ceiling;
-    var color = c.color != null ? c.color : DEFAULT_PALETTE[key] || '#888';
-    return { key: key, label: label, w: w, color: color,
-             drivers: c.drivers || null };
-  }
+  /* COMPONENTS_INDEX consumers — schema normalisation now lives in
+     CountryRenderer.normalizeMeta() (KB §68.11 / BPG Part XXXV.3), which
+     runs once at load time, before any section handler. The metadata
+     reaching this file is already in canonical {key, label, w, color}
+     shape regardless of what the country ssi-metadata.js shipped. We
+     only need to choose between the country-supplied array and the
+     universal default fallback. */
   function getComponentBars() {
     var meta = window.SSI_METADATA || {};
     if (Array.isArray(meta.COMPONENTS_INDEX) && meta.COMPONENTS_INDEX.length) {
-      return meta.COMPONENTS_INDEX.map(normalizeComponentBar);
+      return meta.COMPONENTS_INDEX;
     }
     return DEFAULT_COMPONENT_BARS;
   }

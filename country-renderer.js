@@ -59,6 +59,112 @@
     return data;
   }
 
+  /* ── 1b. Metadata schema normalization (anti-pattern A1b) ─────────────
+     KB §68.11 / BPG Part XXXV.3 — schema-key drift at the metadata
+     boundary. Each window.SSI_METADATA.* array consumed by section
+     handlers can have a country-specific schema variant. Without
+     per-array aliasing, fields silently render as `undefined` (label),
+     '—' (sigma), or fall back to neutral defaults that mask the issue.
+
+     Applied to window.SSI_METADATA BEFORE sections see it. Same shape as
+     normalize(data) above: idempotent (re-running on already-normalised
+     metadata is a no-op), non-destructive (variant fields preserved
+     alongside canonical fields), defensive (operates on copies).
+
+     Slovakia onboarding (2026-05-28) surfaced two real drift sites:
+       - COMPONENTS_INDEX: ships {code, name, ceiling, drivers} but the
+         Fleet-Average renderer reads {key, label, w, color}. Symptom:
+         bar label rendered literal "undefined". Hotfix #3 spot-patched
+         in index-sections.js; this central pass supersedes that.
+       - MODIFIER_DEFS: ships {id, domain, range, description} but the
+         Modifier-Impact renderer reads {key, label, domain, range}.
+         Symptom: m.key is undefined so subs.modifiers[m.key] is always
+         NaN → sigma column always renders '—'. Latent on live SK page.
+
+     COMPONENTS / DATA_LAYERS / NORM_METHODS / VALIDATION_CHECKS /
+     CHANGELOG audit (see KB §68.11): no drift between SI/SK and what
+     methodology-sections.js reads — no aliasing needed.
+
+     DATA_SOURCES carries a minor cosmetic drift (SI/SK don't ship the
+     `category` field that drives the source-icon palette, so all
+     sources render with the gray Standards icon). Not breaking; we
+     leave the renderer's fallback in place rather than synthesise a
+     `category` derivation here, because the right answer is for the
+     metadata files to ship the field. Tracked for a future pass.
+     ──────────────────────────────────────────────────────────────── */
+  var COMPONENT_DEFAULT_PALETTE = {
+    C: 'var(--crimson)', V: 'var(--terracotta)', I: 'var(--sage)',
+    E: '#3b9eff',        S: 'var(--bronze)',     T: '#22d3ee'
+  };
+
+  function normalizeComponentBar(c) {
+    /* {code, name, ceiling, drivers}  →  {key, label, w, color, drivers}
+       Canonical {key, label, w, color} pass through untouched (idempotent). */
+    if (!c || typeof c !== 'object') return c;
+    var key   = c.key   != null ? c.key   : c.code;
+    var label = c.label != null ? c.label : (c.name ? (key + ' — ' + c.name) : c.name);
+    var w     = c.w     != null ? c.w     : c.ceiling;
+    var color = c.color != null ? c.color : (COMPONENT_DEFAULT_PALETTE[key] || '#888');
+    return {
+      key: key, label: label, w: w, color: color,
+      // preserve variant fields so callers that prefer them still work
+      code: c.code != null ? c.code : key,
+      name: c.name != null ? c.name : (label || ''),
+      ceiling: c.ceiling != null ? c.ceiling : w,
+      drivers: c.drivers || null
+    };
+  }
+
+  function normalizeModifierDef(m) {
+    /* {id, domain, range, description}  →  {key, label, domain, range, description}
+       Slovakia's `id` (e.g. 'R3', 'R6a') maps to the canonical 4-modifier
+       runtime key on substations (R3_C_mult, R6_restoration, …) via a
+       lookup table. `label` defaults to `id`. Canonical input passes
+       through untouched. */
+    if (!m || typeof m !== 'object') return m;
+    var key   = m.key   != null ? m.key   : MODIFIER_ID_TO_KEY[m.id] || m.id;
+    var label = m.label != null ? m.label : (m.id != null ? String(m.id) : '');
+    return {
+      key: key,
+      label: label,
+      domain: m.domain != null ? m.domain : '',
+      range:  m.range  != null ? m.range  : '',
+      description: m.description || '',
+      // preserve original id for downstream consumers
+      id: m.id != null ? m.id : key
+    };
+  }
+
+  /* MODIFIER_ID_TO_KEY: maps short ids (used in MODIFIER_DEFS arrays) to the
+     canonical substation modifier keys. Same convention as
+     DEFAULT_MODIFIER_DEFS in index-sections.js. */
+  var MODIFIER_ID_TO_KEY = {
+    R3: 'R3_C_mult',
+    R4: 'R4_F_topo',
+    R6a: 'R6_restoration',
+    R6b: 'R6_seismic',
+    R7: 'R7_cyber'
+  };
+
+  function normalizeMeta() {
+    var meta = window.SSI_METADATA || window.SSIMetadata;
+    if (!meta || typeof meta !== 'object') return;
+    if (Array.isArray(meta.COMPONENTS_INDEX)) {
+      meta.COMPONENTS_INDEX = meta.COMPONENTS_INDEX.map(normalizeComponentBar);
+    }
+    if (Array.isArray(meta.MODIFIER_DEFS)) {
+      meta.MODIFIER_DEFS = meta.MODIFIER_DEFS.map(normalizeModifierDef);
+    }
+    // Mirror onto the dual-global alias (KB §45.6) so consumers that read
+    // either name see the normalised arrays.
+    if (window.SSIMetadata && window.SSIMetadata !== meta) {
+      window.SSIMetadata = meta;
+    }
+    if (window.SSI_METADATA && window.SSI_METADATA !== meta) {
+      window.SSI_METADATA = meta;
+    }
+  }
+
   function normalizeSubstation(s) {
     if (!s) return;
     // R_base ↔ R_base_median
@@ -124,6 +230,10 @@
       fetch(configUrl).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
     ]).then(function (results) {
       var data = normalize(results[0]);
+      // Normalise window.SSI_METADATA arrays once, here, before any section
+      // handler runs (KB §68.11 / BPG Part XXXV.3). Idempotent — safe even
+      // if a country's ssi-metadata.js already ships canonical schemas.
+      normalizeMeta();
       var config = results[1] || defaultConfig(country, data);
       runSections(country, page, data, config);
     }).catch(function (err) {
@@ -391,6 +501,7 @@
     register: register,
     pickMonthlySubstation: pickMonthlySubstation,
     normalize: normalize,
+    normalizeMeta: normalizeMeta,
     H: H,
     Safe: Safe,
     _registry: registry,  // exposed for debugging only
