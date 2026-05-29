@@ -1,0 +1,108 @@
+{
+  "slug": "korea",
+  "country_name": "Republic of Korea",
+  "country_name_local": "대한민국",
+  "iso2": "KR",
+  "iso3": "KOR",
+  "flag": "🇰🇷",
+  "capital": "Seoul",
+  "first_refresh": "2026-08-13",
+  "tso": "KPX — Korea Power Exchange (market+system operator); KEPCO owns transmission assets",
+  "regulator": "KOREC — Korea Electricity Regulation Commission (under MOTIE)",
+  "currency": "KRW",
+  "currency_symbol": "₩",
+  "currency_position": "before",
+  "admin": {
+    "l1": {
+      "label_en": "do/si (17 provinces and metropolitan cities)",
+      "label_short": "do/si",
+      "label_native": "도/시",
+      "count": 17
+    }
+  },
+  "regional_page": {
+    "region_field": "province",
+    "fallback_region_field": "region",
+    "ranking_label": "do/si · sorted worst → best"
+  },
+  "map_page": {
+    "center": { "lat": 36.5, "lon": 127.8 },
+    "zoom": 7,
+    "region_unit_label": "do/si"
+  },
+  "data_page": {
+    "file_slug": "korea",
+    "region_field": "region",
+    "region_label_short": "do/si",
+    "region_label_code": "Slug",
+    "formula_pdf_layers": "A — SSI v4.0 Resilience (20 vars): asset age, condition, load factor, SAIDI/SAIFI from Orkustofnun-equivalent (KEPCO Quality-of-supply) + KPX system reports\nB.1 — Grid Telemetry Open (3 vars): KMA (Korea Meteorological Administration) meteorological feeds + KPX continuous telemetry\nB.2 — Grid Telemetry Proxy (4 vars): thermal stress, transformer loading, IEEE C57.91 ageing under 60Hz operation\nB.3 — Grid Telemetry Fuzzy (12 vars): IEEE/CIGRÉ degradation curves under temperate-monsoon + typhoon-cyclone climate\nC — Socio-Economic (9 vars): KOSTAT (Statistics Korea) provincial GDP + Bank of Korea regional accounts + DESI-equivalent digital readiness\nD — Environmental Hazards (7 vars): Korean Peninsula intra-plate seismic (Pohang 2017 + Gyeongju 2016 + Yangsan Fault Zone), volcanic N/A (no active volcanism), typhoon corridor (Hinnamnor 2022 + Khanun 2023 + Bolaven 2012), ISO 9223 corrosion C2-C5 (C5 RESTORED — peninsula full marine)\nE — Korean Open Data (8 vars): KEPCO + KOSTAT + Bank of Korea + KORAIL + Korea Highway Corp + cadastre LX\nF — Network Transitions (12 vars): state transition probabilities calibrated against KEPCO single-DSO heritage portfolio\nG — Modifier Inputs (3 vars): KISA cyber + DESI-proxy digital readiness + KOREC quality. NEW: R6_typhoon + R6_chaebol sub-pattern modifiers\nH — Network & Topology (7 vars): KPX Network Statement, KMA-equivalent seismic, OSM Overpass ring analysis (ZERO cross-border interconnects — isolated peninsula)\nI — Output Scores (7 vars): risk score, ETTC, stationary probabilities, R3 4-tier band, Markov 5-state"
+  },
+  "dno_dashboard": {
+    "subtitle": "1 DSO monopoly · KEPCO · ~25M LV customers · 17 do/si · 226 sveitarfélög-equivalent (si/gun/gu) LAU",
+    "intro": "Korea's distribution sector is a SINGLE-DSO MONOPOLY (cohort-UNIQUE first). KEPCO — Korea Electric Power Corporation (한국전력공사) — owns and operates all transmission + distribution + retail sales infrastructure across the entire Korean Peninsula (excluding DPRK). KEPCO is majority government-owned (Korea Development Bank + Korean state). HQ in Naju-si, Jeollanam-do. The TSO function is split: KPX (Korea Power Exchange) is the market + system operator (non-profit under MOTIE); KEPCO holds the physical transmission assets. This MO-TO split is also cohort-UNIQUE. The 6 generation subsidiaries (KOSEPCO + KOSPO + KOMIPO + KOWEPO + KEWESPO + KHNP) were spun out in 2001 restructuring but remain under KEPCO holding. 24 nuclear reactors operational (KHNP-operated, ~32% generation share — cohort-highest).",
+    "governance": [
+      { "label": "TSO + Market Operator", "value": "KPX — Korea Power Exchange (non-profit, under MOTIE)" },
+      { "label": "Transmission Asset Owner", "value": "KEPCO — Korea Electric Power Corporation (gov't majority)" },
+      { "label": "Regulator", "value": "KOREC — Korea Electricity Regulation Commission (under MOTIE)" },
+      { "label": "DSO (single monopoly)", "value": "KEPCO — same entity as transmission asset owner — ALL 17 do/si" },
+      { "label": "NEM/NEMO", "value": "Not applicable — isolated peninsula, no SDAC/SIDC/CORE FB-MC" },
+      { "label": "Synchronous area", "value": "ISOLATED — Korean Peninsula 60Hz unified; NOT in ENTSO-E; zero cross-border interconnects (DPRK link cut since 1953)" },
+      { "label": "Nuclear regulator", "value": "NSSC — Nuclear Safety and Security Commission" },
+      { "label": "Cyber CSIRT", "value": "KrCERT/CC operated by KISA (Korea Internet & Security Agency) since 2001" }
+    ]
+  },
+  "thresholds": {
+    "r3_buckets": [
+      {
+        "label": "Industrial-Chaebol",
+        "icon": "🏭",
+        "lower": 1.045,
+        "upper": null,
+        "voll_range": "€18–32/kWh",
+        "color": "#7a1612",
+        "desc": "Gyeonggi Samsung Pyeongtaek/Icheon SK Hynix fab corridor + Ulsan petrochemicals + Gwangyang/Pohang steel + Chungnam Asan display fabs. Single-site catastrophic loss potential exceeds Iceland aluminum corridor — chaebol-driven concentration UNIQUE."
+      },
+      {
+        "label": "Capital-Seoul-Metro",
+        "icon": "🏛️",
+        "lower": 1.035,
+        "upper": 1.045,
+        "voll_range": "€10–18/kWh",
+        "color": "#aa4234",
+        "desc": "Seoul metropolitan + Sejong administrative — ~50% of national electricity load. Finance + data centres (KT IDC + Equinix Songdo) + R&D. Han River fluvial flood basin."
+      },
+      {
+        "label": "Commercial / SME-Dense",
+        "icon": "🏪",
+        "lower": 1.025,
+        "upper": 1.035,
+        "voll_range": "€4–10/kWh",
+        "color": "#b8863a",
+        "desc": "Busan + Daegu + Daejeon + Gwangju + Incheon metropolitan + Gyeongnam/Gyeongbuk SME. Mixed industrial-commercial. Coastal C5 corrosion for port cities."
+      },
+      {
+        "label": "Light / Rural / Peripheral",
+        "icon": "🌾",
+        "lower": 0.0,
+        "upper": 1.025,
+        "voll_range": "€1–4/kWh",
+        "color": "#5d8563",
+        "desc": "Gangwon (mountainous interior) + Jeju (volcanic island, isolated HVDC sub-grid) + rural Jeolla agriculture + Gyeongbuk highlands. Agriculture + tourism + low industrial concentration."
+      }
+    ],
+    "high_consequence_threshold": 1.045
+  },
+  "edition_anchor_month_offset": 0,
+  "deep_dive": {
+    "region": "Gyeonggi",
+    "region_slug": "gyeonggi",
+    "label": "Gyeonggi-do Samsung-SK Hynix Fab Corridor (R6_chaebol inaugural anchor)"
+  },
+  "deep_dive_rotation": [
+    { "month": "2026-08", "region": "Gyeonggi", "label": "Gyeonggi-do Samsung Pyeongtaek + SK Hynix Icheon fab corridor (Edition 01 inaugural — R6_chaebol α=0.08 anchor + Capital metro)" },
+    { "month": "2026-09", "region": "Gyeongnam", "label": "Busan + Ulsan industrial + Hinnamnor 2022 typhoon landfall anchor (R6_typhoon α=0.12)" },
+    { "month": "2026-10", "region": "Gyeongbuk", "label": "Pohang 2017 Mw 5.5 induced seismic anchor + Hanul 765 kV backbone + Wolsong CANDU cluster" },
+    { "month": "2026-11", "region": "Jeonnam", "label": "Hanbit nuclear cluster + Gwangyang POSCO steel + Khanun 2023 west-coast typhoon" },
+    { "month": "2026-12", "region": "Jeju", "label": "Volcanic island isolated sub-grid (HVDC submarine) + R6_typhoon Bolaven 2012 anchor + tourism" }
+  ]
+}

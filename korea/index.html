@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Korea's 1,184 substations across 17 do/si. 95 variables, 19 public data sources, KPX TSO + KEPCO single-DSO monopoly + KOREC regulator. Open data, open methodology. Final-4 OECD member onboarding.">
+<meta name="theme-color" content="#02529c">
+<meta property="og:title" content="SSI Index — Republic of Korea Overview 🇰🇷">
+<meta property="og:description" content="Composite resilience scoring for Korea's electrical grid. 95 variables, 17 do/si, KEPCO single-DSO monopoly, 24 NPPs, R6_typhoon + R6_chaebol NEW modifiers.">
+<title>SSI Index — Republic of Korea Overview 🇰🇷</title>
+<link rel="stylesheet" href="../style.css?v=00582c6548">
+</head>
+<body>
+<script src="../ssi-versions.js?v=dffbd5ace6"></script>
+<script src="../nav.js?v=167bb6caef"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=ce5bb32a90"></script>
+<script>renderNav('overview');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Systemic System Infrastructure Index</h1>
+    <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
+    <p>A composite resilience score for the Republic of Korea's electrical grid — 1,184 substations across 17 do/si (1 special city + 6 metros + 9 provinces + 1 special self-governing city), scored against the KPX transmission system and KEPCO's single-DSO monopoly distribution heritage — 95 variables, 19 public data sources, zero proprietary dependencies.</p>
+    <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">🇰🇷 Final-4 OECD member onboarding · Post-Iceland (Session 30) · BPG Disciplines #14 + #15 carried forward</div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card animate-in delay-1" style="border-left:3px solid var(--terracotta)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--terracotta)">Cohort-UNIQUE: Single-DSO Monopoly</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        KEPCO holds ALL transmission + distribution + retail across the entire peninsula (cohort-first in OECD coverage). The TSO function splits between KPX (non-profit market+system operator) and KEPCO (asset owner). 24 nuclear reactors operational — highest count in OECD coverage. Isolated 60Hz unified grid.
+      </p>
+    </div>
+    <div class="card animate-in delay-2" style="border-left:3px solid var(--sage)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--sage)">NEW Modifiers: R6_typhoon + R6_chaebol</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        Korea introduces 2 new sub-pattern modifiers (parallel to Iceland's R6_volcanic + R6c_jokulhlaup). Pacific corridor typhoon exposure (Hinnamnor 2022 + Khanun 2023 + Bolaven 2012 anchors) + fab-cluster concentration (Samsung Pyeongtaek + SK Hynix Icheon + POSCO Gwangyang/Pohang). <a href="methodology.html" style="color:var(--terracotta);text-decoration:none;font-weight:500">Full methodology →</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card animate-in delay-1">
+      <div class="kpi-label">Substations Scored</div>
+      <div class="kpi-value" style="color:var(--ink)" id="kpi-total">1,184</div>
+      <div class="kpi-sub" id="kpi-total-sub">KPX transmission + KEPCO single-DSO · 17 do/si · 765/345/154 kV</div>
+    </div>
+    <div class="kpi-card animate-in delay-2">
+      <div class="kpi-label">Fleet Median R</div>
+      <div class="kpi-value" style="color:var(--sage)" id="kpi-median">0.454</div>
+      <div class="kpi-sub" id="kpi-median-sub">P5 = 0.370 · P95 = 0.555 · Cohort-HIGHEST (R6_typhoon + R6_chaebol stacking)</div>
+    </div>
+    <div class="kpi-card animate-in delay-3">
+      <div class="kpi-label">High Band</div>
+      <div class="kpi-value" style="color:var(--crimson)" id="kpi-critical">21.7%</div>
+      <div class="kpi-sub" id="kpi-critical-sub">257 substations · R ≥ 0.50 · Heavy-industry + nuclear corridors</div>
+    </div>
+    <div class="kpi-card animate-in delay-4">
+      <div class="kpi-label">Data Freshness</div>
+      <div class="kpi-value" style="color:var(--bronze)">100%</div>
+      <div class="kpi-sub">95 LIVE · 0 Pending · 88% OSM tag completeness (cohort-leading)</div>
+    </div>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>Fleet Distribution by Band</h3>
+      <span class="label-xs" id="dist-count">1,184 substations</span>
+    </div>
+    <div class="dist-bar">
+      <div id="dist-low" style="width:1.5%;background:var(--band-low)"></div>
+      <div id="dist-med" style="width:76.8%;background:var(--band-medium)"></div>
+      <div id="dist-high" style="width:21.7%;background:var(--band-high)"></div>
+      <div id="dist-crit" style="width:0%;background:var(--band-critical)"></div>
+    </div>
+    <div class="dist-legend">
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-low)"></div><span id="legend-low">Low — 18 (1.5%)</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-medium)"></div><span id="legend-med">Medium — 909 (76.8%)</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-high)"></div><span id="legend-high">High — 257 (21.7%)</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-critical)"></div><span id="legend-crit">Critical — 0 (0.0%)</span></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card animate-in delay-1">
+      <div class="card-header">
+        <h3>National View — 17 do/si</h3>
+        <a href="map.html" style="font-size:12px;color:var(--terracotta);text-decoration:none;font-weight:500">Explore map →</a>
+      </div>
+      <div style="position:relative;height:340px;background:var(--cream-deep);border-radius:var(--radius-sm);overflow:hidden">
+        <canvas id="mini-map-canvas" style="width:100%;height:100%;cursor:pointer" role="img" aria-label="Mini-map showing Korea's 1,184 substations by SSI band across 17 do/si. Click to open full map."></canvas>
+      </div>
+    </div>
+
+    <div class="card animate-in delay-2">
+      <div class="card-header">
+        <h3>Highest Risk do/si</h3>
+        <span class="label-xs">Top 5 by R_median</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>do/si</th>
+            <th>Tier</th>
+            <th style="text-align:right">R_median</th>
+            <th>High%</th>
+          </tr>
+        </thead>
+        <tbody id="top-critical-tbody">
+          <tr><td>Jeju 🌋</td><td>Island-Tourism (volcanic + typhoon)</td><td style="text-align:right">0.554</td><td>100%</td></tr>
+          <tr><td>N. Gyeongsang ⚛️</td><td>Industrial-Nuclear-Steel (Pohang 2017)</td><td style="text-align:right">0.532</td><td>78%</td></tr>
+          <tr><td>S. Jeolla ⚛️</td><td>Industrial-Nuclear-Steel (Hanbit+Khanun)</td><td style="text-align:right">0.530</td><td>75%</td></tr>
+          <tr><td>S. Gyeongsang 🏭</td><td>Industrial-Shipbuilding (Hinnamnor 2022)</td><td style="text-align:right">0.488</td><td>39%</td></tr>
+          <tr><td>Jeonbuk 🌾</td><td>Industrial-Tidal (Saemangeum future NPP)</td><td style="text-align:right">0.477</td><td>24%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>4-Tier R3 Consequence Distribution</h3>
+      <span class="label-xs">All 4 buckets populate (BPG Discipline #15 verified)</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>R3 Tier</th><th>Label</th><th style="text-align:right">Substations</th><th>% Fleet</th><th>VoLL Range</th><th>Anchor</th></tr></thead>
+      <tbody>
+        <tr><td>1.05</td><td>🏭 Industrial-Chaebol</td><td style="text-align:right">557</td><td>47.0%</td><td>€18-32/kWh</td><td>Gyeonggi (Samsung Pyeongtaek + SK Hynix) + Ulsan + N./S. Gyeongsang nuclear/steel + Jeonnam Gwangyang + Chungnam coal</td></tr>
+        <tr><td>1.04</td><td>🏛️ Capital-Seoul-Metro</td><td style="text-align:right">123</td><td>10.4%</td><td>€10-18/kWh</td><td>Seoul + Sejong administrative — ~50% of national electricity load</td></tr>
+        <tr><td>1.03</td><td>🏪 Commercial / SME-Dense</td><td style="text-align:right">424</td><td>35.8%</td><td>€4-10/kWh</td><td>Busan + Daegu + Daejeon + Gwangju + Incheon + Gyeongnam + Chungbuk + Jeonbuk</td></tr>
+        <tr><td>1.02</td><td>🌾 Light / Rural / Peripheral</td><td style="text-align:right">80</td><td>6.8%</td><td>€1-4/kWh</td><td>Gangwon (mountainous) + Jeju (volcanic island isolated sub-grid)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #c0392b">
+    <div class="card-header">
+      <h3>🔬 Cohort-First Architectural Tests</h3>
+      <span class="label-xs">Korea-specific validations</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Test</th><th>Status</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Single-DSO monopoly rendering</td><td>✓ NEW</td><td>is_kepco_monopoly: true · dno-dashboard.html displays single-DSO panel (cohort-UNIQUE)</td></tr>
+        <tr><td>60Hz unified frequency</td><td>✓ NEW</td><td>frequency_hz: 60 · IEEE C57.91 60Hz inertia adjustment in scoring-kr/modifiers/inertia.py</td></tr>
+        <tr><td>765 kV ultra-high voltage</td><td>✓ NEW</td><td>Hanul → Sinjincheon backbone · C3 voltage class log scaling extended top tier</td></tr>
+        <tr><td>BPG Discipline #14 (canonical schema)</td><td>✓ Iceland S30 carry-forward</td><td>grid-geo.json {s,l,a} emitted at Step 2 — NO Iceland Hotfix #1 regression</td></tr>
+        <tr><td>BPG Discipline #15 (country-config)</td><td>✓ Iceland S30 carry-forward</td><td>korea_country-config.json + r3_buckets span [0.0, 1.045+] — NO Iceland Hotfix #2 regression</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
+  SSI v4.0.2 · 🇰🇷 Korea Edition 01 inaugural · 2026-08-13 first refresh · KB §71 (planned) · BPG Part XXXVIII (planned) · Session 31 · Final-4 OECD onboarding
+</footer>
+
+<script>
+  // Page-specific config
+  window.PAGE_CONFIG = { page: 'overview', country: 'korea' };
+  if (window.CountryRenderer && window.CountryRenderer.init) {
+    window.CountryRenderer.init(window.PAGE_CONFIG);
+  }
+</script>
+</body>
+</html>

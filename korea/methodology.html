@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index Korea — methodology, formulas, R3 4-tier calibration, NEW R6_typhoon + R6_chaebol modifiers.">
+<meta name="theme-color" content="#02529c">
+<title>SSI Index — Korea Methodology 🇰🇷</title>
+<link rel="stylesheet" href="../style.css?v=00582c6548">
+</head>
+<body>
+<script src="../ssi-versions.js?v=dffbd5ace6"></script>
+<script src="../nav.js?v=167bb6caef"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=ce5bb32a90"></script>
+<script>renderNav('methodology');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Methodology — Korea Calibration 🇰🇷</h1>
+    <p>SSI v4.0.2 formula construct adapted for Republic of Korea — 6 components, 7 modifiers (incl. NEW R6_typhoon + R6_chaebol), 10,000 MC iterations, 4-tier R3 + KEPCO single-DSO monopoly architectural test. Full formula construct: <a href="../reference-docs/SSI_v4_0_Complete_Formula_Construct_Korea.html" style="color:var(--terracotta)">SSI_v4_0_Complete_Formula_Construct_Korea.html</a> (planned).</p>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px;background:#fef8e0;border-left:4px solid #02529c">
+    <h3>📐 Master Equation</h3>
+    <pre style="font-family:'JetBrains Mono',Consolas,monospace;font-size:14px;line-height:1.8;color:#02529c;padding:16px;background:#fff;border-radius:6px;overflow-x:auto">
+R = (w<sub>R</sub> · R<sup>norm</sup> + w<sub>S</sub> · S<sup>norm</sup>) × ∏<sub>k</sub> M<sub>k</sub>
+
+where
+  R<sup>norm</sup> = 0.30 · C + 0.10 · V + 0.25 · I + 0.10 · E      [Resilience: Continuity + Voltage + Infra + Econ]
+  S<sup>norm</sup> = 0.20 · S + 0.05 · S<sub>crit</sub>                              [Saturation + Criticality with NEW Nuclear-Critical + Chaebol-Critical subclasses]
+  M<sub>k</sub> ∈ { R3<sub>4-tier</sub>, R4<sub>topo</sub>, R6<sub>seismic</sub>, <strong>R6<sub>typhoon</sub></strong> NEW, <strong>R6<sub>chaebol</sub></strong> NEW, R7<sub>cyber</sub>, R6<sub>restoration</sub> }
+</pre>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>📊 R3 4-Tier Consequence Calibration (post-BPG Discipline #15)</h3>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Tier</th><th>R3 Value</th><th>Bucket Range</th><th>Substations</th><th>VoLL</th><th>Anchor</th></tr></thead>
+      <tbody>
+        <tr><td>1 🏭</td><td>1.05</td><td>≥ 1.045</td><td>557 (47%)</td><td>€18-32/kWh</td><td>Gyeonggi Samsung Pyeongtaek + SK Hynix Icheon + Ulsan + N. Gyeongsang + Jeonnam + Chungnam</td></tr>
+        <tr><td>2 🏛️</td><td>1.04</td><td>1.035-1.045</td><td>123 (10%)</td><td>€10-18/kWh</td><td>Seoul + Sejong administrative</td></tr>
+        <tr><td>3 🏪</td><td>1.03</td><td>1.025-1.035</td><td>424 (36%)</td><td>€4-10/kWh</td><td>Busan + Daegu + Incheon + Daejeon + Gwangju + Gyeongnam + Chungbuk + Jeonbuk</td></tr>
+        <tr><td>4 🌾</td><td>1.02</td><td>&lt; 1.025</td><td>80 (7%)</td><td>€1-4/kWh</td><td>Gangwon + Jeju</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--warm-grey);margin-top:8px">Iceland Hotfix #2 lesson: r3_buckets span renderer's <code>DEFAULT_R3_BUCKETS [0.97, 1.05+]</code> — all 4 Economic Impact panels populate on intelligence.html. NO empty buckets.</p>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #c0392b">
+    <div class="card-header">
+      <h3>🆕 R6_typhoon — NEW Pacific Corridor Modifier</h3>
+    </div>
+    <pre style="font-family:'JetBrains Mono',Consolas,monospace;font-size:13px;background:#fef2ee;padding:12px;border-radius:6px;overflow-x:auto">
+R6<sub>typhoon</sub> = 1.0 + α<sub>typhoon, do/si</sub> × exposure_factor
+
+α range: [0.03, 0.15]
+  South coast corridor (Gyeongnam + Jeonnam):       α = 0.12
+  West/east coast (Busan + Incheon + Chungnam):     α = 0.07-0.10
+  Jeju offshore:                                     α = 0.10 (Bolaven 2012 base)
+  Inland (Seoul + Gyeonggi + Chungbuk + Daejeon):   α = 0.03-0.05
+
+Anchor events:
+  • 2022-09-06 Typhoon Hinnamnor — Geoje landfall · 66,000+ households lost power
+  • 2023-08-10 Typhoon Khanun — west-coast transit · 40,350 lost power
+  • 2012-08-26 Typhoon Bolaven — Jeju + Honam historical base rate
+  • 2003-09-12 Typhoon Maemi — historic; coastal devastation Sokcho
+  • 2002-08-31 Typhoon Rusa — record rainfall Gangneung
+  • 2012-09-17 Typhoon Sanba — Hinnamnor-precursor pattern
+</pre>
+    <p style="font-size:12px;color:var(--warm-grey);margin-top:8px">UNIQUE for Korea (parallel to Iceland's R6_volcanic + R6c_jokulhlaup). Generalisable to Japan + Taiwan + future Pacific cohort.</p>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #c0392b">
+    <div class="card-header">
+      <h3>🆕 R6_chaebol — NEW Industrial-Concentration Modifier</h3>
+    </div>
+    <pre style="font-family:'JetBrains Mono',Consolas,monospace;font-size:13px;background:#fce4ec;padding:12px;border-radius:6px;overflow-x:auto">
+R6<sub>chaebol</sub> = 1.0 + α<sub>chaebol, do/si</sub> × cluster_concentration_index
+
+α range: [0.00, 0.10]
+  Samsung-SK Hynix-LG fab corridor (Gyeonggi):       α = 0.08
+  Petrochem + steel corridor (Ulsan/Jeonnam/Gyeongbuk): α = 0.07
+  Secondary chaebol (Chungnam Asan + Daegu textile): α = 0.04-0.06
+  Non-chaebol (Gangwon + Jeju + Sejong):             α = 0.00-0.02
+
+Anchors:
+  • Samsung Electronics Pyeongtaek P3+P4 — largest single-site fab campus globally
+  • SK Hynix Icheon M16 — 1m wafer/month capacity
+  • POSCO Gwangyang — world's largest single-site steel works
+  • POSCO Pohang — world's 5th-largest steel mill
+  • Hyundai Ulsan — world's largest auto plant by single-site capacity
+
+Rationale:
+  Single-site catastrophic loss potential exceeds even Iceland aluminum corridor
+  (3 sites total) — Samsung Pyeongtaek alone consumes more electricity than several
+  Korean provinces. R6_chaebol captures magnitude-of-impact differently from
+  R6_volcanic (probability-based) or R3 (consequence-weighted general).
+</pre>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>📐 Normalisation Methods (Method A/B/C/D)</h3>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>Formula</th><th>Applies to</th></tr></thead>
+      <tbody>
+        <tr><td>A — Robust fleet percentile (P5/P95 winsorise)</td><td><code>x_norm = clip((x − P5) / (P95 − P5), 0, 1)</code></td><td>C1, C2, C4, C5, E1, E2, I7</td></tr>
+        <tr><td>B — Standard fleet percentile (rank)</td><td><code>x_norm = (rank(x) − 1) / (n − 1)</code></td><td>I4, S1, S2</td></tr>
+        <tr><td>C — Bounded rescaling (log)</td><td><code>x_norm = log10(x/x_min) / log10(x_max/x_min)</code></td><td>C3 (voltage class · 765/345/154/22.9 kV — KR UNIQUE 765 kV)</td></tr>
+        <tr><td>D — Categorical mapping</td><td><code>x_norm = lookup[x]</code> · ordinal → [0,1]</td><td>I8 (ISO 9223 C2-C5 — C5 RESTORED), S3 (criticality + NEW Nuclear-Critical + Chaebol-Critical subclasses), R3 4-tier, R6_typhoon, R6_chaebol</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px;border-left:4px solid #5d8563">
+    <div class="card-header">
+      <h3>🇰🇷 Cohort Comparison (Korean Specifics)</h3>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Dimension</th><th>Korea</th><th>Iceland</th><th>Hungary</th></tr></thead>
+      <tbody>
+        <tr><td>Synchronous area</td><td>ISOLATED 60Hz</td><td>ISOLATED</td><td>ENTSO-E 50Hz CE</td></tr>
+        <tr><td>DSO count</td><td><strong>1 (KEPCO monopoly) — UNIQUE</strong></td><td>3</td><td>6</td></tr>
+        <tr><td>Nuclear share</td><td><strong>32% (24 reactors) — cohort-HIGHEST</strong></td><td>0%</td><td>~45%</td></tr>
+        <tr><td>R3 tiers</td><td>4-tier</td><td>4-tier (post-hotfix)</td><td>5-tier</td></tr>
+        <tr><td>R6 modifiers (extra)</td><td>R6_typhoon + R6_chaebol NEW</td><td>R6_volcanic + R6c_jokulhlaup NEW</td><td>—</td></tr>
+        <tr><td>R7 ceiling</td><td><strong>1.015 — cohort-LOWEST (KISA 2001 25-yr)</strong></td><td>1.04</td><td>1.02</td></tr>
+        <tr><td>Currency</td><td>KRW ₩ (non-€)</td><td>ISK kr. (non-€)</td><td>HUF Ft (non-€)</td></tr>
+        <tr><td>OECD since</td><td>1996 (29th)</td><td>1961 founding</td><td>1996 (same year)</td></tr>
+        <tr><td>Cohort firsts</td><td>Single-DSO + 60Hz + 765 kV</td><td>R6_volcanic + zero-cross-border + sub-Arctic</td><td>5-tier R3</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
+  SSI v4.0.2 · 🇰🇷 Korea methodology · 4-tier R3 + 2 NEW modifiers · 10k MC · KB §71 (planned)
+</footer>
+
+<script>
+  window.PAGE_CONFIG = { page: 'methodology', country: 'korea' };
+  if (window.CountryRenderer && window.CountryRenderer.init) {
+    window.CountryRenderer.init(window.PAGE_CONFIG);
+  }
+</script>
+</body>
+</html>

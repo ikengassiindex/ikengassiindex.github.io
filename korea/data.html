@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index Korea — 95-variable inventory + 19-source registry.">
+<meta name="theme-color" content="#02529c">
+<title>SSI Index — Korea Data 🇰🇷</title>
+<link rel="stylesheet" href="../style.css?v=00582c6548">
+</head>
+<body>
+<script src="../ssi-versions.js?v=dffbd5ace6"></script>
+<script src="../nav.js?v=167bb6caef"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=ce5bb32a90"></script>
+<script>renderNav('data');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Data Inventory — 95 Variables · 19 Sources 🇰🇷</h1>
+    <p>Korea SSI v4.0.2 data backbone: 19 Korean-specific data sources feeding 95 variables across 6 components + 7 modifiers (2 NEW: R6_typhoon + R6_chaebol).</p>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>📊 19-Source Registry</h3>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>ID</th><th>Source</th><th>Frequency</th><th>Vars</th><th>Feeds</th></tr></thead>
+      <tbody id="sources-tbody">
+        <tr><td>d01_kpx</td><td>KPX — Korea Power Exchange (TSO+market)</td><td>Continuous</td><td style="text-align:right">14</td><td>C2, C3, I1, I2, I3, R4</td></tr>
+        <tr><td>d02_kepco</td><td>KEPCO — single-DSO monopoly + transmission asset owner</td><td>Annual</td><td style="text-align:right">18</td><td>C1, V1, V2, I2, I3</td></tr>
+        <tr><td>d02b_korec</td><td>KOREC — Korea Electricity Regulation Commission</td><td>Annual</td><td style="text-align:right">12</td><td>C1, C2, V1, V2, T1</td></tr>
+        <tr><td>d03_kma</td><td>KMA — Korea Meteorological Administration (typhoon tracking)</td><td>Daily</td><td style="text-align:right">8</td><td>I1, I2, I3, R6_typhoon</td></tr>
+        <tr><td>d03b_kigam</td><td>KIGAM — Korea Institute of Geoscience and Mineral Resources</td><td>Multi-year</td><td style="text-align:right">4</td><td>R6_seismic · Pohang 2017 induced anchor</td></tr>
+        <tr><td>d03c_nssc</td><td>NSSC — Nuclear Safety and Security Commission</td><td>Quarterly</td><td style="text-align:right">5</td><td>R6_seismic, I3, I4 · 24 reactors</td></tr>
+        <tr><td>d04_kostat</td><td>KOSTAT — Statistics Korea</td><td>Quarterly</td><td style="text-align:right">16</td><td>E1, E2, S1, S2, S3 · 226 si/gun/gu LAU</td></tr>
+        <tr><td>d04b_bok</td><td>Bank of Korea (central bank · non-€)</td><td>Quarterly</td><td style="text-align:right">4</td><td>E1, E2</td></tr>
+        <tr><td>d05_osm</td><td>OSM Overpass · ISO3166-1=KR (1,184 subs + 4,004 lines)</td><td>Monthly</td><td style="text-align:right">8</td><td>I1, I2, I3, R4</td></tr>
+        <tr><td>d06_iso9223</td><td>ISO 9223 corrosion classes (C2-C5 — C5 RESTORED peninsula)</td><td>Multi-year</td><td style="text-align:right">5</td><td>R5_corrosion, I8</td></tr>
+        <tr><td>d07_copernicus</td><td>Copernicus ERA5 + CMIP6 SSP2-4.5</td><td>Monthly</td><td style="text-align:right">4</td><td>R6_climate</td></tr>
+        <tr><td>d08_khnp</td><td>KHNP — Korea Hydro & Nuclear Power (24 reactors)</td><td>Quarterly</td><td style="text-align:right">5</td><td>R6_seismic, I3, I4 · Kori/Hanul/Hanbit/Wolsong</td></tr>
+        <tr><td>d09_kisa_krcert</td><td>KISA + KrCERT/CC (cohort-leading 25-yr backlog 2001-present)</td><td>Continuous</td><td style="text-align:right">5</td><td>R7_cyber · C-TAS platform</td></tr>
+        <tr><td>d10_msit</td><td>MSIT — Ministry of Science & ICT (NIS2-equiv competent authority)</td><td>Annual</td><td style="text-align:right">3</td><td>R7_cyber · Act on Info Infrastructure Protection 2001</td></tr>
+        <tr><td>d11_iea_oecd</td><td>IEA + OECD — energy benchmarks (KR 29th OECD 1996)</td><td>Annual</td><td style="text-align:right">6</td><td>T1, E1</td></tr>
+        <tr><td>d12_motie</td><td>MOTIE — 11th Basic Plan 2025 (target 35.2% nuclear by 2038)</td><td>Annual</td><td style="text-align:right">6</td><td>T1, E1</td></tr>
+        <tr><td>d13_korail</td><td>KORAIL + Korea Rail Network Authority (25-55 kV traction)</td><td>Annual</td><td style="text-align:right">3</td><td>I3, I4</td></tr>
+        <tr><td>d14_jeju_hvdc</td><td>Jeju HVDC submarine cables (300+400 MW Haenam/Jindo)</td><td>Annual</td><td style="text-align:right">2</td><td>I1, R4 · isolated island sub-grid</td></tr>
+        <tr><td>d15_nema</td><td>NEMA — National Disaster Management Research Institute</td><td>Annual</td><td style="text-align:right">4</td><td>R6_typhoon, R6_seismic, R6_restoration</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>📈 95-Variable Distribution by Component</h3>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Layer</th><th>Component</th><th>Weight</th><th>Variables</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>A — Resilience</td><td>C Continuity (5) + V Voltage (3) + I Infrastructure (9) + E Economic (2)</td><td>0.65</td><td style="text-align:right">19</td><td>✅ LIVE</td></tr>
+        <tr><td>A.S — Saturation</td><td>S1 + S2 + S3 (Nuclear-Critical + Chaebol-Critical subclasses NEW)</td><td>0.20</td><td style="text-align:right">3</td><td>✅ LIVE</td></tr>
+        <tr><td>A.M — Modifier Inputs</td><td>7 modifiers incl. NEW R6_typhoon + R6_chaebol</td><td>multiplicative</td><td style="text-align:right">7</td><td>✅ LIVE</td></tr>
+        <tr><td>B.1 — Grid Telemetry Open</td><td>KMA + Copernicus + KEPCO SCADA</td><td>—</td><td style="text-align:right">3</td><td>✅ AVAILABLE</td></tr>
+        <tr><td>B.2 — Grid Telemetry Proxy</td><td>IEEE C57.91 + 60Hz adjustment + KPX</td><td>—</td><td style="text-align:right">4</td><td>✅ LIVE (modelled)</td></tr>
+        <tr><td>B.3 — Grid Telemetry Fuzzy</td><td>CIGRÉ TB 761 + Bayesian priors</td><td>—</td><td style="text-align:right">12</td><td>🔄 FUZZY (Bayesian)</td></tr>
+        <tr><td>C — Socio-Economic</td><td>KOSTAT + Bank of Korea + 226 LAU</td><td>—</td><td style="text-align:right">9</td><td>✅ FETCHABLE</td></tr>
+        <tr><td>D — Environmental Hazards</td><td>KIGAM + KMA + ISO 9223 + Pohang/Hinnamnor anchors</td><td>—</td><td style="text-align:right">7</td><td>✅ LIVE</td></tr>
+        <tr><td>E — Korean Open Data</td><td>KOSTAT + BoK + KORAIL + cadastre + MSIT</td><td>—</td><td style="text-align:right">8</td><td>✅ FETCHABLE</td></tr>
+        <tr><td>F — Network Transitions (Markov)</td><td>5-state F-block · CIGRÉ TB 761 + C5 corrosion</td><td>—</td><td style="text-align:right">5</td><td>🔄 FUZZY (Bayesian)</td></tr>
+        <tr><td>G — Modifier Raw Feeds</td><td>DESI + KISA + NIS2-equiv</td><td>—</td><td style="text-align:right">3</td><td>✅ LIVE</td></tr>
+        <tr><td>H — Network & Topology</td><td>OSM Overpass + KPX + isolated peninsula (0 cross-border)</td><td>—</td><td style="text-align:right">7</td><td>✅ LIVE</td></tr>
+        <tr><td>I — Output Scores</td><td>R_median + σ + ETTC + MTBF + RUL + availability</td><td>—</td><td style="text-align:right">7</td><td>✅ LIVE (computed)</td></tr>
+        <tr style="font-weight:600;background:rgba(11,78,162,0.06)"><td colspan="3">TOTAL</td><td style="text-align:right">95</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer style="text-align:center;color:var(--warm-grey);font-size:11px;padding:24px;border-top:1px solid var(--border)">
+  SSI v4.0.2 · 🇰🇷 Korea data inventory · 95 vars · 19 sources · KB §71 (planned)
+</footer>
+
+<script>
+  window.PAGE_CONFIG = { page: 'data', country: 'korea' };
+  if (window.CountryRenderer && window.CountryRenderer.init) {
+    window.CountryRenderer.init(window.PAGE_CONFIG);
+  }
+</script>
+</body>
+</html>
