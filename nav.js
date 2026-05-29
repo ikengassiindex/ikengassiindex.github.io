@@ -6,7 +6,7 @@
 // >>> BEGIN AUTO-GENERATED FROM countries.json (do not edit by hand)
 // Single source of truth: intelligence/countries.json (regenerate via
 // scripts/generate_nav_data.py — pre-commit hook does this automatically).
-// 34 countries as of last regeneration.
+// 35 countries as of last regeneration.
 
 var SSI_COUNTRY_SLUGS = [
   'australia',
@@ -23,6 +23,7 @@ var SSI_COUNTRY_SLUGS = [
   'greece',
   'greenland',
   'hungary',
+  'iceland',
   'ireland',
   'italy',
   'japan',
@@ -61,6 +62,7 @@ var SSI_COUNTRY_LABELS = {
   'greece': '\uD83C\uDDEC\uD83C\uDDF7 Greece',
   'greenland': '\uD83C\uDDEC\uD83C\uDDF1 Greenland',
   'hungary': '\uD83C\uDDED\uD83C\uDDFA Hungary',
+  'iceland': '\uD83C\uDDEE\uD83C\uDDF8 Iceland',
   'ireland': '\uD83C\uDDEE\uD83C\uDDEA Ireland',
   'italy': '\uD83C\uDDEE\uD83C\uDDF9 Italy',
   'japan': '\uD83C\uDDEF\uD83C\uDDF5 Japan',
@@ -98,6 +100,7 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'greece': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'greenland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'hungary': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'iceland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'ireland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'italy': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'japan': '95 variables \u00b7 substations: ? \u00b7 ? regions',
