@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 25 data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Methodology</title>
+<title>SSI Index — Switzerland Methodology</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
+<script src="../ssi-versions.js?v=dffbd5ace6"></script>
 <script src="../nav.js?v=89a316b023"></script>
-<script src="../ssi-engine.js"></script>
-<script src="../ssi-metadata-ch.js"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=aa405f7b64"></script>
 <script>renderNav('methodology');</script>
 
 <main class="page-shell" style="max-width:860px">
@@ -24,7 +25,7 @@
   <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
     <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
     <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A Bezirk serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+      Power grid resilience is inseparable from its socio-economic context. A NUTS-3 landshluti serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
     </p>
   </div>
 
@@ -35,7 +36,7 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 25 verified public data sources — ElCom Switzerland, BFS, Pronovo registry, ENTSO-E transparency, Swisstopo, SED, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.</p>
+        <p>95 variables from 30+ verified public data sources — Landsnet network statement, Orkustofnun quality reports, Landsvirkjun + E.ON DSO filings, Hagstofa RegDat, MNB national accounts, OMSZ meteorology, OVF hydrology + Þjórsá/Sog Q100, Veðurstofa Íslands (IMO) seismic, — geothermal safety, CERT-IS + Fjarskiptastofa (ECOI) cyber, Copernicus, ENTSO-E, Eurostat, OSM Overpass. Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
       </div>
     </div>
     <div class="method-step">
@@ -63,14 +64,14 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy).</p>
+        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty — Switzerland uses a 5-tier calibration reflecting the steep Reykjavík-vs-Nógrád/Békés GDP gradient), R4 (graph-theoretic network criticality), R6a (restoration speed — Great Plain rural penalty), R6b (network topology), R7 (digital readiness, ceiling 1.03).</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">6</div>
       <div class="method-step-content">
         <h3>Monte Carlo</h3>
-        <p>10,000 iterations per Bezirk using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each Bezirk.</p>
+        <p>10,000 iterations per landshluti using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each NUTS-3 landshluti.</p>
       </div>
     </div>
     <div class="method-step">
@@ -94,10 +95,10 @@
 <span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
 
 <span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30] · 5-tier IS</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10] · NE/SE rural</span>
 <span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.03]</span>
     </div>
   </div>
 
@@ -131,8 +132,8 @@
         <tr>
           <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
           <td class="num">0.25</td>
-          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
-          <td>Physical asset condition & environment</td>
+          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, industrial corrosion (C2-C4), hydrogeological</td>
+          <td>Physical asset condition &amp; environment</td>
         </tr>
         <tr>
           <td><strong style="color:#3b9eff">E</strong> Economic</td>
@@ -149,7 +150,7 @@
         <tr>
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
-          <td>1 — DER Stress Index (DER penetration + variability + EV load)</td>
+          <td>1 — DER Stress Index (post-Mátra coal exit + —+II geothermal ramp-up + 6 GW PV boom)</td>
           <td>Energy transition exposure</td>
         </tr>
       </tbody>
@@ -159,7 +160,7 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7</h3>
+      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
       <span class="label-xs">Context multipliers</span>
     </div>
     <table class="data-table">
@@ -168,51 +169,179 @@
       </thead>
       <tbody>
         <tr>
+          <td style="font-weight:500">R2</td>
+          <td>Adaptive IRI + Climate</td>
+          <td class="num">internal</td>
+          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
+        </tr>
+        <tr>
           <td style="font-weight:500">R3</td>
           <td>Consequence + Poverty</td>
           <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for Bezirke serving large/energy-poor populations with high economic dependency.</td>
+          <td>Amplifies risk for landshluti serving large/energy-poor populations with high economic dependency. Switzerland uses a 5-tier calibration (1.02 / 1.04 / 1.05 / 1.06 / 1.07) reflecting the sharp Reykjavík-vs-Nógrád/Békés GDP gradient and the automotive OEM corridor (Győr–Esztergom–Kecskemét–Debrecen).</td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
           <td>Graph Criticality</td>
           <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree.</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph (687 nodes · 4,261 edges).</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
-          <td>CAIDI-based: rewards fast-restoring areas, penalises slow ones.</td>
+          <td>Orkustofnun-CAIDI-based: rewards fast-restoring urban areas, penalises slow ones. NE/SE rural landshluti (Szabolcs-Szatmár-Bereg, Békés, Nógrád) carry a remote-border access penalty; no Tatra-scale mountain barrier (Kékes 1,014 m is IS's highest point).</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6b</td>
           <td>Network Topology</td>
           <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality and ring topology. Penalises Bezirke in single-source or low-redundancy configurations.</td>
+          <td>Network centrality and ring topology. Penalises landshluti in single-source or low-redundancy configurations. Based on physical network analysis of the OSM graph.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
           <td>Digital Readiness</td>
-          <td class="num">[0.99, 1.05]</td>
-          <td>Regional digital readiness score, smart meter penetration proxy. 556 unique values across Switzerland.</td>
+          <td class="num">[0.99, 1.03]</td>
+          <td>Regional DESI digital readiness, CERT-IS (est. 2008) maturity, NIS2 transposition (Act LXIX/2024 — full transposition, in force 1 Jan 2025, repealed and superseded the partial Act XXIII/2023). Ceiling 1.03 matches SK/LV/LT and sits below SI/CZ/AT (1.04).</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Competitive Positioning -->
+  <!-- Classification -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Classification Bands</h3>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MC & Confidence -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Uncertainty Quantification</h3>
+      <span class="label-xs">Monte Carlo engine</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
+      Every landshluti score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per landshluti</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~18 min</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime (687 subs)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Metrics -->
+  <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
+
+  <!-- Normalisation Methods -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Normalisation Methods</h3>
+    </div>
+    <div id="method-norm"></div>
+  </div>
+
+  <!-- Data Layers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Layers — 95 Variables</h3>
+      <span class="label-xs">11 layers</span>
+    </div>
+    <table class="data-table" id="method-layers">
+      <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Data Sources -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>30+ Verified Data Sources for Switzerland</h3>
+      <span class="label-xs">All open + free registration only</span>
+    </div>
+    <table class="data-table" id="method-sources">
+      <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Validation -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Validation Framework</h3>
+      <span class="label-xs" id="method-val-count"></span>
+    </div>
+    <table class="data-table" id="method-validation">
+      <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Changelog -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>v3.4 → v4.0.2 Changelog</h3>
+    </div>
+    <table class="data-table" id="method-changelog">
+      <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Competitive Positioning Note -->
   <div class="card animate-in" style="border-left:3px solid var(--sage)">
     <div class="card-header">
       <h3>Competitive Positioning</h3>
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 implementation data per Act LXIX/2024) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
 </main>
 
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.4 · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../methodology-sections.js?v=db84d4350d"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('switzerland', 'methodology');
+  });
+</script>
 <script>renderFooter();</script>
 </body>
 </html>
