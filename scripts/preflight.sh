@@ -118,6 +118,16 @@ else
     python3 scripts/check_currency_leakage.py $STRICT_FLAG
 fi
 
+# D#20 — country-config edition_anchor_month_offset range [1, 12] (NEW post-§72.10)
+# Catches the IS+KR misalignment that produced "Edition 07" instead of "02".
+if [ -n "$SLUG" ]; then
+  run_gate "D#20" "edition_anchor_month_offset range" \
+    python3 scripts/check_edition_offset.py "$SLUG" $STRICT_FLAG
+else
+  run_gate "D#20" "edition_anchor_month_offset range (all)" \
+    python3 scripts/check_edition_offset.py $STRICT_FLAG
+fi
+
 # Summary
 echo ""
 echo "════════════════════════════════════════════════════════════════════════"

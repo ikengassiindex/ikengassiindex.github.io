@@ -12,7 +12,7 @@
 <script src="../ssi-versions.js?v=dffbd5ace6"></script>
 <script src="../nav.js?v=89a316b023"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
-<script src="ssi-metadata.js?v=aa405f7b64"></script>
+<script src="ssi-metadata.js?v=1713cbaa4b"></script>
 <script>renderNav('methodology');</script>
 
 <main class="page-shell" style="max-width:860px">
@@ -36,7 +36,7 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 30+ verified public data sources — Landsnet network statement, Orkustofnun quality reports, Landsvirkjun + E.ON DSO filings, Hagstofa RegDat, MNB national accounts, OMSZ meteorology, OVF hydrology + Þjórsá/Sog Q100, Veðurstofa Íslands (IMO) seismic, — geothermal safety, CERT-IS + Fjarskiptastofa (ECOI) cyber, Copernicus, ENTSO-E, Eurostat, OSM Overpass. Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
+        <p>95 variables from 30+ verified public data sources — Landsnet network statement, Orkustofnun raforkutölfræði + quality reports, Veitur + RARIK + HS Veitur DSO quarterly filings, Hagstofa Íslands landshluti regional accounts, Seðlabanki Íslands national accounts, Veðurstofa Íslands (IMO/OVF) consolidated meteorology + hydrology + seismic + volcanic monitoring (Þjórsá Q100 + Skeiðará/Markarfljót jökulhlaup + Mid-Atlantic Ridge SISZ/TFZ catalogue + Reykjanes/Vatnajökull/Hekla networks), Umhverfisstofnun (UST) air quality + ISO 9223 corrosion, CERT-IS + Fjarskiptastofa (ECOI) cyber posture, Copernicus, Eurostat, IEA/OECD, OSM Overpass. Iceland is NOT an ENTSO-E member (insular grid). Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
       </div>
     </div>
     <div class="method-step">
@@ -64,7 +64,7 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty — Iceland uses a 5-tier calibration reflecting the steep Reykjavík-vs-Nógrád/Békés GDP gradient), R4 (graph-theoretic network criticality), R6a (restoration speed — Great Plain rural penalty), R6b (network topology), R7 (digital readiness, ceiling 1.03).</p>
+        <p>Seven multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI — at 64-66°N heat-wave loading is structurally low, winter windstorm + atmospheric icing dominate), R3 (consequence + energy poverty — Iceland uses a 4-tier calibration reflecting the flat Reykjavík-vs-rural GDP gradient and 3-smelter industrial concentration), R4 (graph-theoretic network criticality on an insular grid with zero cross-border interconnects), R6_seismic (Mid-Atlantic Ridge SISZ + TFZ — highest seismic α in cohort outside NZ), R6_volcanic (NEW sub-pattern — Reykjanes/Vatnajökull/Hekla active volcanism), R6c_jokulhlaup (NEW sub-pattern — glacial-outburst floods replace conventional Q100 fluvial), R7 (digital readiness, ceiling 1.04).</p>
       </div>
     </div>
     <div class="method-step">
@@ -150,7 +150,7 @@
         <tr>
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
-          <td>1 — DER Stress Index (post-Mátra coal exit + —+II geothermal ramp-up + 6 GW PV boom)</td>
+          <td>1 — DER Stress Index (T_share saturated near 1.0: hydro 70.5% + geothermal 29.4% + fossil 0.1%; Vaðölduver 120 MW first utility-scale wind, target 2027)</td>
           <td>Energy transition exposure</td>
         </tr>
       </tbody>
@@ -178,7 +178,7 @@
           <td style="font-weight:500">R3</td>
           <td>Consequence + Poverty</td>
           <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for landshluti serving large/energy-poor populations with high economic dependency. Iceland uses a 5-tier calibration (1.02 / 1.04 / 1.05 / 1.06 / 1.07) reflecting the sharp Reykjavík-vs-Nógrád/Békés GDP gradient and the automotive OEM corridor (Győr–Esztergom–Kecskemét–Debrecen).</td>
+          <td>Amplifies risk for landshluti serving large/energy-poor populations with high economic dependency. Iceland uses a 4-tier calibration (Industrial-Aluminum 1.05 / Capital-Reykjavík 1.04 / Commercial-SME 1.03 / Light-Rural 1.02) — the flattest gradient in cohort. Industrial-Aluminum tier reflects the 3-smelter corridors (Alcoa Fjarðaál, Rio Tinto ISAL Straumsvík, Century Aluminum Norðurál Grundartangi) consuming ~70-80% of national electricity; Capital-Reykjavík reflects ~64% of population in Höfuðborgarsvæðið.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
@@ -190,19 +190,31 @@
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
-          <td>Orkustofnun-CAIDI-based: rewards fast-restoring urban areas, penalises slow ones. NE/SE rural landshluti (Szabolcs-Szatmár-Bereg, Békés, Nógrád) carry a remote-border access penalty; no Tatra-scale mountain barrier (Kékes 1,014 m is IS's highest point).</td>
+          <td>Orkustofnun-CAIDI-based: rewards fast-restoring urban areas (Reykjavík metro under Veitur), penalises slow ones. Vestfirðir (Westfjords, &lt;7,000 population in 22,000 km²) and Norðurland vestra carry a remote-rural access penalty via long radial 132 kV feeds.</td>
         </tr>
         <tr>
-          <td style="font-weight:500">R6b</td>
-          <td>Network Topology</td>
+          <td style="font-weight:500">R6_seismic</td>
+          <td>Network Topology + Seismic</td>
           <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality and ring topology. Penalises landshluti in single-source or low-redundancy configurations. Based on physical network analysis of the OSM graph.</td>
+          <td>Network centrality + Mid-Atlantic Ridge seismic hazard. Iceland straddles the ridge with two active source zones — the South Iceland Seismic Zone (SISZ, anchor: 29 May 2008 Mw 6.3 doublet Selfoss-Hveragerði) and the Tjörnes Fracture Zone (TFZ, Norðurland eystra). R6_seismic α band [0.05, 0.20] — HIGHEST in cohort outside New Zealand. Veðurstofa Íslands publishes the 475-yr PGA hazard maps.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6_volcanic</td>
+          <td>Volcanic Activity (NEW)</td>
+          <td class="num">[1.00, 1.20]</td>
+          <td>FIRST IN COHORT — codifies active-volcanism exposure on grid infrastructure. R6_volcanic α band [0.00, 0.20]: Reykjanes/Sundhnúkur peak 0.14 (active eruption cycle since 19 Mar 2021; 8 Feb 2024 eruption damaged Svartsengi hot-water pipeline, ~26,000 residents lost district heating ~4 days, Grindavík evacuated since 10 Nov 2023); Suðurland 0.10 (Hekla / Eyjafjallajökull 2010 / Katla overdue); Austurland 0.07 (Vatnajökull / Grímsvötn / Bárðarbunga Holuhraun 2014-2015); Vestfirðir + Norðurland vestra 0.00-0.02 (no active volcanism).</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6c_jokulhlaup</td>
+          <td>Glacial-Outburst Flood (NEW)</td>
+          <td class="num">[1.00, 1.15]</td>
+          <td>FIRST IN COHORT — Iceland's flood risk is structurally jökulhlaup-dominant, not Q100-fluvial. Sub-glacial volcanic activity melts ice within Vatnajökull / Mýrdalsjökull / Eyjafjallajökull, water accumulates in a sub-glacial lake, then bursts as a flash flood. Anchors: 1996 Skeiðará jökulhlaup (Grímsvötn-triggered, destroyed Ring Road bridges); 14 April 2010 Eyjafjallajökull (Markarfljót valley flooded). α band [0.00, 0.15] concentrated in Suðurland + Austurland 132 kV transmission corridors.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
           <td>Digital Readiness</td>
-          <td class="num">[0.99, 1.03]</td>
-          <td>Regional DESI digital readiness, CERT-IS (est. 2008) maturity, NIS2 transposition (Act LXIX/2024 — full transposition, in force 1 Jan 2025, repealed and superseded the partial Act XXIII/2023). Ceiling 1.03 matches SK/LV/LT and sits below SI/CZ/AT (1.04).</td>
+          <td class="num">[0.99, 1.04]</td>
+          <td>Regional DESI digital readiness score (Iceland EFTA-EEA proxy ~0.65-0.70), CERT-IS maturity (founded 2013, FIRST + Nordic CERT Cooperation member), NIS2 transposition (Act 78/2019 + 2025 amendment via EEA process, in force 1 Jan 2026; Fjarskiptastofa/ECOI is the competent authority). Ceiling 1.04 matches SI; above SK 1.03 — reflects Iceland's OECD top-5 fiber penetration &gt;99% and digital-government ~95% adoption despite later CERT founding date.</td>
         </tr>
       </tbody>
     </table>
