@@ -776,16 +776,22 @@
       Quarterly: 'rgba(184,134,58,0.12)', Annual: 'rgba(184,134,58,0.12)', Continuous: 'rgba(93,133,99,0.12)',
       Static: 'rgba(44,36,32,0.06)', Derived: 'rgba(44,36,32,0.06)'
     };
+    // CSS grid layout (KB §73 fix — handles variable-length entries gracefully)
+    // Auto-derive id-column width from max id length in the source list so 2-char
+    // (FR-style) and 8+char (IS/HU/KR-style) IDs both render cleanly.
+    var maxIdLen = sorted.reduce(function (m, s) { return Math.max(m, (s.id || '').length); }, 0);
+    var idColW = Math.max(48, Math.min(110, maxIdLen * 8 + 8)) + 'px';
     var listHTML = sorted.map(function (s, i) {
       var fCol = freqColors[s.freq] || 'var(--warm-grey)';
       var fBg = freqBgs[s.freq] || 'rgba(44,36,32,0.06)';
       var border = i < sorted.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
-      return '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:8px 0;' + border + '">' +
-        '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:42px;font-family:Consolas,monospace">' + (s.id || '') + '</span>' +
-        '<span style="flex:1;font-weight:500">' + (s.name || '') + '</span>' +
-        '<span style="flex-shrink:0;font-size:10px;color:' + fCol + ';background:' + fBg + ';padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase">' + (s.freq || '') + '</span>' +
-        '<span style="flex-shrink:0;color:var(--warm-grey);font-size:11px;min-width:90px;text-align:right">' + (s.res || s.sources || '') + '</span>' +
-        '<span style="flex-shrink:0;font-weight:600;min-width:30px;text-align:right">' + (s.vars || 0) + ' var' + ((s.vars || 0) > 1 ? 's' : '') + '</span>' +
+      // grid-template-columns: id | name (1fr) | freq | res | vars
+      return '<div style="display:grid;grid-template-columns:' + idColW + ' 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;' + border + '">' +
+        '<span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">' + (s.id || '') + '</span>' +
+        '<span style="font-weight:500;line-height:1.5">' + (s.name || '') + '</span>' +
+        '<span style="font-size:10px;color:' + fCol + ';background:' + fBg + ';padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">' + (s.freq || '') + '</span>' +
+        '<span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5">' + (s.res || s.sources || '') + '</span>' +
+        '<span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">' + (s.vars || 0) + ' var' + ((s.vars || 0) > 1 ? 's' : '') + '</span>' +
       '</div>';
     }).join('');
     H.setHTML('sec-c-source-list', listHTML);
@@ -861,11 +867,17 @@
         'and thermal proxy (I5), which have minimal impact on fleet-level score distribution.');
     }
 
-    // Changelog
+    // Changelog (KB §73 fix — CSS grid with auto-derived id-column width)
+    // Handles both FR-style terse entries (id 2 chars, change 40-80 chars) and
+    // post-cohort verbose entries (id 8+ chars, change 100-200 chars) gracefully.
     var cl = meta.CHANGELOG || [];
     var typeLabels = { 'new': 'New', 'enhanced': 'Enhanced', 'data': 'Data' };
     var typeColors = { 'new': 'var(--sage)', 'enhanced': 'var(--bronze)', 'data': 'var(--terracotta)' };
     var typeBgs = { 'new': 'rgba(93,133,99,0.12)', 'enhanced': 'rgba(184,134,58,0.12)', 'data': 'rgba(170,66,52,0.12)' };
+    var maxClIdLen = cl.reduce(function (m, c) { return Math.max(m, (c.id || '').length); }, 0);
+    var clIdColW = Math.max(48, Math.min(110, maxClIdLen * 8 + 8)) + 'px';
+    var maxClSecLen = cl.reduce(function (m, c) { return Math.max(m, (c.section || '').length); }, 0);
+    var clSecColW = Math.max(80, Math.min(160, maxClSecLen * 7 + 16)) + 'px';
     var clHTML = '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:10px">' + cl.length + ' changes tracked across P0, P1, and P2 releases</div>';
     cl.forEach(function (c, i) {
       var col = typeColors[c.type] || 'var(--warm-grey)';
@@ -873,11 +885,12 @@
       var lbl = typeLabels[c.type] || c.type;
       var border = i < cl.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
       var p2 = c.isP2 ? ' <span style="font-size:9px;color:var(--terracotta);font-weight:600">P2</span>' : '';
-      clHTML += '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;' + border + '">' +
-        '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">' + (c.id || '') + '</span>' +
-        '<span style="flex-shrink:0;font-size:10px;color:' + col + ';background:' + bg + ';padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">' + lbl + '</span>' +
-        '<span style="flex:1">' + (c.change || '') + p2 + '</span>' +
-        '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">' + (c.section || '') + '</span>' +
+      // grid-template-columns: id | type | change (1fr) | section
+      clHTML += '<div style="display:grid;grid-template-columns:' + clIdColW + ' 80px 1fr ' + clSecColW + ';column-gap:12px;align-items:start;font-size:12px;padding:8px 0;' + border + '">' +
+        '<span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">' + (c.id || '') + '</span>' +
+        '<span style="font-size:10px;color:' + col + ';background:' + bg + ';padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">' + lbl + '</span>' +
+        '<span style="line-height:1.55">' + (c.change || '') + p2 + '</span>' +
+        '<span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">' + (c.section || '') + '</span>' +
       '</div>';
     });
     H.setHTML('sec-c-changelog', clHTML);

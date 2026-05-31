@@ -25,6 +25,15 @@
 #   scripts/check_content_leakage.py    — D#21 gate, 30-country vocab dict
 #   scripts/preflight.sh                — wired D#21 between D#20 and D#56
 #
+# Bonus central-renderer fix (Section C visual audit):
+#   intelligence-sections.js            — Section C Data Source Registry + Changelog
+#                                         tables now use CSS grid with auto-derived
+#                                         id-column widths. Handles both FR-style
+#                                         terse entries (2-char IDs, 40-80 char text)
+#                                         and post-cohort verbose entries (8-char IDs,
+#                                         100-200 char text) gracefully. Visual rendering
+#                                         no longer breaks on long entries.
+#
 # Verification: D#21 + all 7 preflight gates PASS on iceland post-cleanup.
 # Before: 63 HU hits across 4 files. After: 0 HU hits.
 #
@@ -98,6 +107,8 @@ git add iceland/ssi-metadata.js \
         iceland/versions.json
 git add scripts/check_content_leakage.py
 git add scripts/preflight.sh 2>/dev/null || true
+# Bonus: central-renderer fix (Section C grid layout — benefits all 36 countries)
+git add intelligence-sections.js 2>/dev/null || true
 git add '*/data.html' '*/dno-dashboard.html' '*/esg-report.html' '*/index.html' \
         '*/intelligence.html' '*/map.html' '*/methodology.html' '*/regional.html' 2>/dev/null || true
 
@@ -177,6 +188,43 @@ single-country onboardings can clone from a clean reference.
   scripts/preflight.sh — extended with D#21 between D#20 and D#56.
     Now 8 enforceable gates: D#3 + D#14/15/56 + D#16 + D#17 + D#18 + D#19
     + D#20 + D#21.
+
+═══ Central-renderer fix (Section C visual audit) ═══
+
+  intelligence-sections.js — Section C 'Data Refresh & Changelog' rewritten
+  to use CSS grid with auto-derived id-column widths. Triggered by user-
+  reported visual audit on Iceland intelligence.html where the section
+  rendered visually ugly compared to the France benchmark.
+
+  ROOT CAUSE: the original flex layout had hardcoded min-widths (30px id,
+  65px type, 90px res) and align-items:center, designed for France's terse
+  style (2-char IDs, 40-80 char change text). Post-cohort countries (SK/HU/
+  IS/KR) author verbose entries (8-char IDs, 100-200 char text) that
+  overflow the fixed columns and wrap with center-aligned baselines,
+  producing cramped misaligned rendering.
+
+  FIX (renderer-side, affects all 36 countries):
+    Data Source Registry: display:grid; grid-template-columns: [auto-id] 1fr
+      90px 110px 60px; column-gap:12px; align-items:start. Auto-derives
+      id-column width from max id length in the source list (range 48-110px).
+    Changelog: display:grid; grid-template-columns: [auto-id] 80px 1fr
+      [auto-section]; column-gap:12px; align-items:start. Auto-derives both
+      id-column AND section-column widths from their max lengths.
+
+  Result: France (id=2, change=58 avg) and Iceland/Hungary (id=8, change=167
+  avg) both render cleanly with the same renderer. Long text wraps within
+  its column without disturbing alignment of sibling columns. The fix is
+  durable: future countries with even-longer entries inherit the same
+  graceful handling.
+
+  Architectural codification (for next-session KB §73):
+    A1g — RENDERER-FRAGILE-TO-CONTENT-LENGTH sub-pattern. Distinct from
+    A1a (schema-key) / A1c (DOM-hooks) / A1d (data-emit) — this is about
+    fixed-width layout assumptions in shared renderers that break when
+    country-specific content scales beyond the original-design baseline.
+    Prevention principle: shared renderers should use CSS grid (or
+    flex-with-wrap) and auto-derive widths from data extremes, not
+    hardcoded min-widths.
 
 ═══ Architectural note ═══
 
