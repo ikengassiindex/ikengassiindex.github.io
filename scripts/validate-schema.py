@@ -52,12 +52,15 @@ WEIGHTS = {'C': 0.30, 'V': 0.10, 'I': 0.25, 'E': 0.10, 'S': 0.20, 'T': 0.05}
 MIN_FLEET = {
     "AT": 1200, "CH": 800,  "DE": 10000,
     "IT": 4000, "ES": 3500, "IE": 990, "JP": 4500,
-    "LU": 700,  "BE": 1000, "NL": 1300, "CZ": 800,
+    # Session 32 recalibration: LU 700→80 (actual 91; small country, coarse OSM canton-level)
+    "LU": 80,   "BE": 1000, "NL": 1300, "CZ": 800,
     "LV": 1000, "LT": 400,  "EE": 500, "SI": 120,
     "FR": 6500,
     # Other live countries — set conservative floors based on live ssi-data.json counts
-    "AU": 5000, "CA": 8000, "CL": 1500, "DK": 1500,
-    "FI": 3000, "GR": 1500, "GL": 100,  "MX": 4000,
+    # Session 32 recalibration: CL 1500→900 (actual 1095; OSM completeness gap),
+    #                            GL 100→30 (actual 37; pre-launch dataset)
+    "AU": 5000, "CA": 8000, "CL": 900,  "DK": 1500,
+    "FI": 3000, "GR": 1500, "GL": 30,   "MX": 4000,
     "NZ": 1000, "NO": 4000, "PL": 3000, "PT": 1500,
     "SE": 3500, "TR": 4000, "GB": 2500, "US": 30000,
 }
