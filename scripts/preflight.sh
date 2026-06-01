@@ -19,6 +19,10 @@
 #   D#17  — Substation 44-field schema + rd_pct_gdp variance          [BPG Part XXXVIII NEW]
 #   D#18  — nav.js slug parity (check_nav_slug.py)                    [BPG Part XXXVIII NEW]
 #   D#19  — Currency-symbol country-native primary                    [BPG Part XXXVIII NEW]
+#   D#20  — Edition anchor month offset range [1,12]                  [BPG Part XXXIX NEW]
+#   D#21  — Content leakage (proper-noun vocab)                       [BPG Part XL]
+#   D#26  — Map aesthetic (two-axis offshore clip + jumps)            [BPG Part XLII NEW v2]
+#   D#27  — Substation sub-dict completeness (stub-class)             [BPG Part XLII NEW]
 #   D#56  — Fleet-size floor (KB §56 stub-deploy regression)          [validate-schema.py]
 # ════════════════════════════════════════════════════════════════════════════
 
@@ -126,6 +130,41 @@ if [ -n "$SLUG" ]; then
 else
   run_gate "D#20" "edition_anchor_month_offset range (all)" \
     python3 scripts/check_edition_offset.py $STRICT_FLAG
+fi
+
+# D#21 — Content leakage (cross-country proper-noun contamination, post-CR S33B)
+if [ -f scripts/check_content_leakage.py ]; then
+  if [ -n "$SLUG" ]; then
+    run_gate "D#21" "content leakage (cross-country)" \
+      python3 scripts/check_content_leakage.py "$SLUG" $STRICT_FLAG
+  else
+    run_gate "D#21" "content leakage (all)" \
+      python3 scripts/check_content_leakage.py $STRICT_FLAG
+  fi
+fi
+
+# D#26 — Map aesthetic (two-axis offshore clip, post-Korea/Israel S36/S37)
+# v2: per-feature centroid (Axis 1) + per-ring vertex envelope (Axis 2, NEW)
+if [ -f scripts/check_map_aesthetics.py ]; then
+  if [ -n "$SLUG" ]; then
+    run_gate "D#26" "map aesthetic (two-axis offshore clip)" \
+      python3 scripts/check_map_aesthetics.py "$SLUG"
+  else
+    run_gate "D#26" "map aesthetic (all with bounds.json)" \
+      python3 scripts/check_map_aesthetics.py --all
+  fi
+fi
+
+# D#27 — Substation sub-dict completeness (stub-class defect, post-IL S35)
+# Catches socio_economic/graph_topology/seismic/markov stubs that render blank.
+if [ -f scripts/check_socio_economic_completeness.py ]; then
+  if [ -n "$SLUG" ]; then
+    run_gate "D#27" "substation sub-dict completeness" \
+      python3 scripts/check_socio_economic_completeness.py "$SLUG"
+  else
+    run_gate "D#27" "substation sub-dict completeness (all)" \
+      python3 scripts/check_socio_economic_completeness.py --all
+  fi
 fi
 
 # Summary
