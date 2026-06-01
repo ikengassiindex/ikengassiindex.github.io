@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, modifiers including R6_armed_conflict + R6_volcanic + R6_drought (reservoir-electricity nexus), 95 variables, Monte Carlo uncertainty. Colombia edition.">
+<meta name="theme-color" content="#FCD116">
+<title>SSI Index — Colombia Methodology</title>
+<link rel="stylesheet" href="../style.css?v={{HASH}}">
+</head>
+<body>
+<script src="../ssi-versions.js?v={{HASH}}"></script>
+<script src="../nav.js?v={{HASH}}"></script>
+<script src="../ssi-engine.js?v={{HASH}}"></script>
+<script src="ssi-metadata.js?v={{HASH}}"></script>
+<script>renderNav('methodology');</script>
+
+<main class="page-shell" style="max-width:860px">
+  <div class="page-header animate-in">
+    <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇨🇴</span>Methodology — Colombia</h1>
+    <p>How the SSI v4.0.2 score is calculated for Colombia — from raw data to final classification. Open methodology, open data, fully reproducible across 33 departamentos.</p>
+  </div>
+
+  <!-- Thesis -->
+  <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
+    <p style="font-size:14px;line-height:1.7;color:var(--ink)">
+      Grid resilience in Colombia is inseparable from its hydro-dependent generation matrix, its active Andean seismic + volcanic regime, its internal armed-conflict legacy, and its socio-economic gradient running from Bogotá D.C. to the Amazon frontier. A substation serving a Chocó or Amazonas department with slow restoration, weak fiscal capacity, and proximity to a historical pylon-attack corridor is structurally more vulnerable than one with identical electrical characteristics in the Bogotá metro. The SSI captures this by fusing grid metrics with DANE socio-economic, IDEAM hydro-meteorological, SGC seismic + volcanic, ColCERT cyber, and Unidad de Víctimas + Migración Colombia displacement data — all from public sources.
+    </p>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="animate-in delay-2" style="margin-bottom:40px">
+    <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
+    <div class="method-step">
+      <div class="method-step-num">1</div>
+      <div class="method-step-content">
+        <h3>Ingest</h3>
+        <p>95 variables from 30+ verified public Colombian sources — DANE (Departamento Administrativo Nacional de Estadística) census + departamento-level GDP per capita + multidimensional poverty (MPI), UPME (Unidad de Planeación Minero-Energética) transmission + generation expansion plans, CREG (Comisión de Regulación de Energía y Gas) tariff + reliability + market structure, XM market dispatch + reservoir-level monitoring + CSIRT-XM cyber posture, IDEAM (Instituto de Hidrología, Meteorología y Estudios Ambientales) ENSO advisories + flood-hazard maps + climate baselines, SGC (Servicio Geológico Colombiano) 475-yr PGA hazard maps + volcanic-observatory alert bulletins (OVSM Manizales for Nevado del Ruiz, OVSP Pasto for Galeras, OVSPop Popayán for Puracé), ColCERT national CERT + CONPES 3854/2016 + 3995/2020 cyber framework, Unidad de Víctimas (IDP cumulative register), Migración Colombia (Venezuelan refugee register), Ministerio de Defensa (pylon-attack incident reporting), OSM Overpass (substation + line geometry via `out geom`). Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">2</div>
+      <div class="method-step-content">
+        <h3>Normalise</h3>
+        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">3</div>
+      <div class="method-step-content">
+        <h3>Weight</h3>
+        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol global sensitivity analysis.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">4</div>
+      <div class="method-step-content">
+        <h3>Compose R_base</h3>
+        <p>Weighted mean of normalised C/V/I/E component scores plus T_base produces the base resilience score, prior to modifiers.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">5</div>
+      <div class="method-step-content">
+        <h3>Modify</h3>
+        <p>Multiplicative modifiers adjust R_base for context: R3 (consequence + energy poverty — Colombia uses a 5-tier calibration reflecting the steep Bogotá-vs-Amazon GDP gradient), R4 (graph-theoretic criticality on the SIN backbone with ~17,000 km of 220+ kV circuits operated by ISA INTERCOLOMBIA), R6_seismic (Andean Nazca subduction zone + Bucaramanga seismic nest + 1999 Armenia Mw 6.2 cohort-anchor), R6_volcanic (SGC alert-level proximity multiplier; Galeras ORANGE +0.40 within 15 km; Nevado del Ruiz YELLOW +0.25 within 25 km — cohort-second highest after Iceland), R6_drought (reservoir-electricity nexus — ENSO-warm-phase reservoir-drawdown factor coupled to hydro_dependence per departamento), R6_armed_conflict (NEW cohort-first — department + 50-km historical-attack-corridor proximity), R6_flood (La Niña anchors + IDEAM flood-hazard map), R7 (cyber — ColCERT + sectoral CSIRT-XM since 2019; CONPES 3854/2016 + 3995/2020 framework; ceiling 1.030).</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">6</div>
+      <div class="method-step-content">
+        <h3>Monte Carlo + Sobol</h3>
+        <p>10,000 iterations per substation using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Sobol first-order + total-order indices identify dominant drivers. Produces median, P5, P95, skewness, and P_critical per substation.</p>
+      </div>
+    </div>
+    <div class="method-step">
+      <div class="method-step-num">7</div>
+      <div class="method-step-content">
+        <h3>Classify</h3>
+        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Equation -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Master Equation</h3>
+      <span class="label-xs">v4.0.2 · Colombia</span>
+    </div>
+    <div class="formula-block">
+<span class="hl-fn">R_modified</span> = ( <span class="hl-fn">mean</span>(C, V, I, E) + T_base ) × R3 × R4 × ( 1 + Σ R6_α ) × R7
+
+<span class="hl-var">C</span>  Continuity        <span class="hl-comment">// SAIDI/SAIFI per Operador de Red</span>
+<span class="hl-var">V</span>  Voltage quality   <span class="hl-comment">// severity-weighted dips</span>
+<span class="hl-var">I</span>  Infrastructure    <span class="hl-comment">// climate IRI + density + corrosion C2-C5</span>
+<span class="hl-var">E</span>  Economic          <span class="hl-comment">// regulatory penalty + productivity loss</span>
+<span class="hl-var">S</span>  Saturation        <span class="hl-comment">// load + reverse flow + criticality</span>
+<span class="hl-var">T</span>  Transition        <span class="hl-comment">// DER stress + hydro-share volatility</span>
+
+<span class="hl-var">R3</span> = consequence multiplier              <span class="hl-comment">// 5-tier · [1.01, 1.05]</span>
+<span class="hl-var">R4</span> = graph criticality (degree, BC, bridge) <span class="hl-comment">// [0.80, 1.35]</span>
+<span class="hl-var">R6_α</span> = Σ ( seismic + volcanic + drought + armed_conflict + flood )
+<span class="hl-var">R7</span> = cyber readiness                      <span class="hl-comment">// ColCERT + CSIRT-XM · ceiling 1.030</span>
+    </div>
+  </div>
+
+  <!-- Components -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>6 Components · 95 Variables (post-S38 canonical)</h3>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Weight</th>
+          <th>Metrics</th>
+          <th>Domain</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
+          <td class="num">0.30</td>
+          <td>4 — SAIDI, SAIFI, MT exceed, Planned</td>
+          <td>Operador de Red quality reports per CREG annual</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
+          <td class="num">0.10</td>
+          <td>1 — Severity-weighted dips</td>
+          <td>Power quality events (XM + DSO filings)</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
+          <td class="num">0.25</td>
+          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, ISO 9223 corrosion (C2 inland → C5 Pacific/Caribbean), hydrogeological</td>
+          <td>Physical asset condition &amp; environment</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#3b9eff">E</strong> Economic</td>
+          <td class="num">0.10</td>
+          <td>2 — Regulatory penalties (CREG), productivity loss</td>
+          <td>Economic impact of interruptions in COP</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
+          <td class="num">0.20</td>
+          <td>3 — Regional KPI, reverse power flow, criticality class</td>
+          <td>Grid capacity utilisation</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#22d3ee">T</strong> Transition</td>
+          <td class="num">0.05</td>
+          <td>1 — DER Stress Index (hydro ~70% normal year / ~50% El Niño; ~2.5 GW solar+wind by mid-2024; 12 GW renewable target 2030 per UPME)</td>
+          <td>Energy transition exposure</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- R3 — 5-tier Colombia -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>R3 Consequence — 5-Tier Colombia Calibration</h3>
+      <span class="label-xs">vs CR 4-tier · KB §77</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Tier</th><th>α</th><th>Departamentos</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>T1</strong> Capital-Metro / Industrial</td>
+          <td class="num">1.045+</td>
+          <td>Bogotá D.C., Antioquia</td>
+          <td>~16% national GDP (Bogotá) + Medellín industrial heartland (Antioquia); GDP/cap ~$8-11k; major financial centre + EPM hydro fleet.</td>
+        </tr>
+        <tr>
+          <td><strong>T2</strong> Regional-Capital</td>
+          <td class="num">1.035 – 1.045</td>
+          <td>Valle del Cauca, Santander, Cundinamarca, Atlántico, Bolívar, Casanare</td>
+          <td>GDP/cap ~$6-8k; regional capitals; petroleum economy (Casanare); Caribbean thermal hubs (Atlántico Tebsa, Bolívar Termocandelaria).</td>
+        </tr>
+        <tr>
+          <td><strong>T3</strong> Andean Intermediate</td>
+          <td class="num">1.025 – 1.035</td>
+          <td>Boyacá, Caldas, Risaralda, Quindío, Tolima, Huila, Nariño, Norte de Santander, Cesar, Magdalena, Córdoba, Meta, San Andrés</td>
+          <td>GDP/cap ~$5-6k; coffee zone, agro-industrial, Caribbean insular, Llanos petroleum.</td>
+        </tr>
+        <tr>
+          <td><strong>T4</strong> Pacific / Frontier</td>
+          <td class="num">1.015 – 1.025</td>
+          <td>Chocó, Cauca, Caquetá, Putumayo, La Guajira, Arauca, Sucre, Guaviare</td>
+          <td>GDP/cap ~$3-5k; Pacific rainforest + Llanos + frontier zones with significant IDP + Venezuelan-refugee populations.</td>
+        </tr>
+        <tr>
+          <td><strong>T5</strong> Amazon-Frontier Sparse</td>
+          <td class="num">&lt; 1.015</td>
+          <td>Vichada, Guainía, Vaupés, Amazonas</td>
+          <td>GDP/cap ~$3-4k; very sparse; substantial ZNI (Zonas No Interconectadas) overlap; limited grid penetration.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- R6 modifiers Colombia -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>R6 Hazard Modifiers — Colombia α Formulas</h3>
+      <span class="label-xs">5 sub-multipliers</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Modifier</th><th>Range α</th><th>Formula / Anchor</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:500">R6_seismic</td>
+          <td class="num">[0.05, 0.20]</td>
+          <td>PGA-based per departamento. Andean subduction (Nazca plate underthrust) drives Pacific-coast + Western-Cordillera PGA 0.30-0.40g (475-yr); Bucaramanga seismic nest adds intermediate-depth source under Santander. Anchors: 1979 Tumaco-Esmeraldas Mw 8.2 (subduction megathrust), 1999 Armenia Mw 6.2 (≈1,200 fatalities, coffee-zone SAIDI/SAIFI anchor), 2008 Quetame Mw 5.9 (capital-proximate). ~45% of fleet at PGA ≥ 0.25g.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6_volcanic</td>
+          <td class="num">[0.00, 0.40]</td>
+          <td>SGC alert-level proximity multiplier. Galeras (current ORANGE) +0.40 for substations within 15 km. Nevado del Ruiz (YELLOW, 1985 Armero lahar ≈23,000 fatalities — cohort-anchor catastrophic event) +0.25 within 25 km. Puracé / Nevado del Tolima / Nevado del Huila YELLOW +0.15. Approximately 41 substations in the volcanic-proximity envelope. Cohort-second after Iceland.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6_drought</td>
+          <td class="num">[0.00, 0.18]</td>
+          <td>Reservoir-electricity nexus — hydro_dependence × ENSO-warm-phase reservoir-drawdown factor. Anchors: 1992-1993 Apagón (90-day nationwide rationing; triggered Law 142+143/1994 unbundling); 2015-2016 strong El Niño; 2023-2024 strong El Niño with emergency CREG-101-009-2024 demand curtailment + reservoir levels &lt;35% by March 2024. +0.10 V_climate for hydro_dependence &gt; 40% (Cundinamarca, Huila, Santander); +0.18 for &gt; 60% (Antioquia EPM portfolio: Guatapé / Ituango / Porce / San Carlos).</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6_armed_conflict</td>
+          <td class="num">[0.00, 0.15]</td>
+          <td><strong>COHORT-FIRST.</strong> Department + 50-km historical-attack-corridor proximity. Pre-2016 FARC-EP era: several thousand pylon attacks 1985-2002 (200-300/year peak mid-1990s). Post-2016 Peace Accord: ≈40-80 pylon attacks/year + 5-10 substation attacks/year (per Ministerio de Defensa). High-risk corridors: Catatumbo (Norte de Santander, ELN), Cauca/Nariño Pacific (dissident FARC), Bajo Cauca/Sur de Córdoba (Clan del Golfo), Arauca + Casanare (ELN historical). ~12% of fleet in elevated zone.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R6_flood</td>
+          <td class="num">[0.00, 0.10]</td>
+          <td>La Niña ENSO-cool-phase anchors (2010-2011 floods, 2017 Mocoa landslide 333 fatalities) + IDEAM flood-hazard map per zone. +0.05 V_climate baseline for Pacific coast (Chocó), Andean foothills (Boyacá, Caldas), Caribbean (Atlántico, Bolívar); up to +0.10 in validated high-risk floodplain zones.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- R3/R4/R7 -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>R3 / R4 / R7 — Structural Multipliers</h3>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:500">R3</td>
+          <td>Consequence + V_socio</td>
+          <td class="num">[1.01, 1.05]</td>
+          <td>5-tier consequence multiplier per departamento (see table above). Amplifies risk for substations serving large/energy-poor populations with high economic dependency.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R4</td>
+          <td>Graph Criticality</td>
+          <td class="num">[0.80, 1.35]</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph of the SIN (Sistema Interconectado Nacional) — ~17,000 km of 220+ kV circuits + ~150 HV substations owned by ISA INTERCOLOMBIA (~70% of STN backbone).</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">R7</td>
+          <td>Cyber Readiness</td>
+          <td class="num">[1.000, 1.030]</td>
+          <td>ColCERT national CERT (operational since 2011, joint MinTIC + Ministerio de Defensa) + sectoral CSIRT-XM (operated by XM since 2019 post-CONPES 3854/2016 mandate). National framework: CONPES 3854/2016 (Cyber Security Strategy) + CONPES 3995/2020 (Cyber Defence Policy Update). Cyber Defence Command (CCOCI) under Ministerio de Defensa. <strong>Ceiling 1.030, baseline 1.020</strong> — reflects pre-crisis maturity (no major sectoral electrical-grid incident as of mid-2024). Active threats per ColCERT 2023 annual: ransomware (Conti, LockBit), state-actor + APT activity.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Classification -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Classification Bands</h3>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
+      </div>
+      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Markov + MC + Sobol -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Uncertainty Quantification</h3>
+      <span class="label-xs">Markov 8-state · Monte Carlo · Sobol</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
+      Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics. Three uncertainty sources are modelled: measurement error, spatial disaggregation noise across 33 departamentos, and data staleness. An 8-state Markov degradation model (extending CIGRE TB 761) tracks asset condition from new to critical with ENSO-modulated transition rates. Sobol first-order + total-order indices identify dominant drivers for each region.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per substation</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">8-state</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Markov degradation chain</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">33</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Departamentos aggregated</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Metrics -->
+  <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
+
+  <!-- Normalisation Methods -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Normalisation Methods</h3>
+    </div>
+    <div id="method-norm"></div>
+  </div>
+
+  <!-- Data Layers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Layers — 95 Variables</h3>
+      <span class="label-xs">11 layers</span>
+    </div>
+    <table class="data-table" id="method-layers">
+      <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Data Sources -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>30+ Verified Data Sources for Colombia</h3>
+      <span class="label-xs">All open + free registration only</span>
+    </div>
+    <table class="data-table" id="method-sources">
+      <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p style="font-size:12px;color:var(--warm-grey);margin-top:12px;line-height:1.6">
+      Core stack: <strong>DANE</strong> (statistics + census + departamento GDP/cap + MPI) · <strong>UPME</strong> (planning + PERT + PERG) · <strong>CREG</strong> (tariff + reliability + market rules) · <strong>XM</strong> (dispatch + reservoir-level + Boletín Estadístico Mensual) · <strong>IDEAM</strong> (ENSO + flood-hazard + climate) · <strong>SGC</strong> (PGA + volcanic-observatory bulletins) · <strong>ColCERT</strong> (cyber posture) · <strong>Unidad de Víctimas</strong> (IDP register) · <strong>Migración Colombia</strong> (refugee data) · <strong>OSM Overpass</strong> (substation + line `out geom`).
+    </p>
+  </div>
+
+  <!-- Validation -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Validation Framework</h3>
+      <span class="label-xs" id="method-val-count"></span>
+    </div>
+    <table class="data-table" id="method-validation">
+      <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Changelog -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>v3.4 → v4.0.2 Changelog</h3>
+    </div>
+    <table class="data-table" id="method-changelog">
+      <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Competitive Positioning Note -->
+  <div class="card animate-in" style="border-left:3px solid var(--sage)">
+    <div class="card-header">
+      <h3>Competitive Positioning</h3>
+      <span class="label-xs">v4.0.2 · Colombia</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7">
+      SSI v4.0.2 introduces with Colombia the cohort-first <strong>R6_armed_conflict</strong> modifier (durable infrastructure-targeting form, distinct from acute national-conflict readings elsewhere in the cohort). Colombia is also the cohort-first country with a predominantly-hydro electricity matrix subject to recurring El Niño drought stress, so the <strong>R6_drought</strong> modifier is recalibrated to a reservoir-electricity-nexus form. Active-volcanism exposure (R6_volcanic) reuses the engine introduced for Iceland with Colombia-specific α-calibration anchored on the 1985 Armero lahar. Acknowledged gaps remain: comprehensive sectoral incident reporting on R6_armed_conflict 2024-2025 attack counts (depends on Ministerio de Defensa release cadence) and the Cyber Security Law enactment status (still draft in Congreso as of mid-2024).
+    </p>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.4 · KB §65 · §77)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v={{HASH}}"></script>
+<script src="../methodology-sections.js?v={{HASH}}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('colombia', 'methodology');
+  });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>

@@ -276,6 +276,46 @@ VOCAB = {
         "Hydro-Québec", "AESO", "IESO Ontario", "Statistics Canada",
         "Alberta Canada", "Quebec Canada",
     ],
+    "colombia": [
+        # TSO + Transmission + Regulator (CO-specific)
+        "XM Colombia", "Compañía de Expertos en Mercados",
+        "ISA INTERCOLOMBIA", "ISA Colombia",
+        "CREG Colombia", "UPME Colombia", "MME Colombia",
+        # Stat + central bank + agencies
+        "DANE Colombia", "Banco de la República", "IDEAM Colombia",
+        "SGC Colombia", "Servicio Geológico Colombiano",
+        "ColCERT", "CSIRT-XM", "CCOCI",
+        "Unidad de Víctimas", "Migración Colombia",
+        # DSO/generator brands
+        "Codensa", "EPM Medellín", "Emgesa", "Isagen Colombia",
+        "Celsia", "EPSA", "Tebsa", "Termocandelaria",
+        "Drummond Colombia", "Cerrejón",
+        # Major cities + departamentos
+        "Bogotá D.C.", "Medellín", "Cali Colombia", "Barranquilla",
+        "Cartagena Colombia", "Bucaramanga", "Cúcuta",
+        "Antioquia", "Cundinamarca", "Casanare",
+        "Chocó", "La Guajira", "Boyacá", "Nariño Colombia",
+        "Catatumbo", "Llanos Orientales",
+        # Volcanoes (CO-specific anchors)
+        "Nevado del Ruiz", "Armero", "Galeras Colombia",
+        "Nevado del Tolima", "Puracé", "Nevado del Huila",
+        # Anchor events
+        "Apagón 1992", "Apagón 1993",
+        "Armenia 1999", "Tumaco 1979", "Mocoa 2017",
+        # Hydro + grid
+        "Ituango", "Guavio", "Sogamoso hydro", "El Quimbo",
+        "Chivor Colombia", "Hagit",
+        # Conflict
+        "FARC-EP", "ELN Colombia", "Clan del Golfo",
+        # System
+        "SIN Colombia", "MEM Colombia", "CND XM",
+        # Currency + cohort
+        "COP Colombia", "peso colombiano",
+        # Geology
+        "Nazca plate", "Bucaramanga seismic nest",
+        # Policy framework
+        "CONPES 3854", "CONPES 3995",
+    ],
     "costa-rica": [
         # TSO/DSO (single-DSO monopoly)
         "ICE Costa Rica", "Instituto Costarricense de Electricidad",

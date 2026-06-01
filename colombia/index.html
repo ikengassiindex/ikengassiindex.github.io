@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index v4.0.2 — Systemic System Infrastructure Index. Composite resilience scoring for Colombia's 381 substations across 32 departamentos + Bogotá D.C. 98 variables, 30+ public data sources, XM + CREG + MME/UPME oversight, hydro-dominant matrix (~70% normal year) with El Niño drought + Nevado del Ruiz/Galeras volcanic + Andean subduction seismic + R6_armed_conflict modifiers. Open data, open methodology.">
+<meta name="theme-color" content="#941914">
+<meta property="og:title" content="SSI Index — Colombia Overview">
+<meta property="og:description" content="Composite resilience scoring for Colombia's electrical grid. 98 variables, 30+ public data sources, 32 departamentos + Bogotá D.C., Ituango / Guavio / San Carlos / Sogamoso / Chivor hydro portfolio + Caribbean thermal backup, 1992-1993 Apagón + 1985 Armero + 1999 Armenia anchors.">
+<meta property="og:type" content="website">
+<title>Colombia (CO) — SSI v4.0.2</title>
+<link rel="stylesheet" href="../style.css?v={{HASH}}">
+</head>
+<body>
+<script src="../ssi-versions.js?v={{HASH}}"></script>
+<script src="../nav.js?v={{HASH}}"></script>
+<script src="../ssi-engine.js?v={{HASH}}"></script>
+<script src="ssi-metadata.js?v={{HASH}}"></script>
+<script>renderNav('overview');</script>
+
+<main class="page-shell">
+  <!-- Page Header -->
+  <div class="page-header animate-in">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+      <span class="flag" style="font-size:32px;line-height:1">🇨🇴</span>
+      <h1 style="margin:0">Colombia</h1>
+    </div>
+    <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">Systemic System Infrastructure Index — The First Open Digital Twin Fusing Grid Risk with Societal Exposure</div>
+    <p>A composite resilience score for Colombia's electrical grid — 381 substations across 32 departamentos plus Bogotá D.C., scored against the XM CND dispatch + ISA INTERCOLOMBIA 500/230/220/138 kV STN backbone and the fragmented ~25-DSO distribution market (Codensa Enel + EPM municipal + EPSA/Celsia + Air-e/Afinia + 20+ regional). 98 variables, 30+ public data sources, zero proprietary dependencies. XM system operation since June 1995 + CREG tariff regulation + MME/UPME planning + ColCERT/CSIRT-XM cyber oversight. Population ~52.2M (DANE 2024); 37th OECD member (accession 28 April 2020 — first Andean OECD member, second South American after Chile 2010).</p>
+    <div style="margin-top:6px;font-size:12px;color:var(--warm-grey);letter-spacing:0.3px">Operated as a non-profit through a dedicated foundation — ensuring the Index serves the public interest.</div>
+  </div>
+
+  <!-- Thesis + Positioning -->
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card animate-in delay-1" style="border-left:3px solid var(--terracotta)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--terracotta)">Breaking the Silos</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        Power grid resilience is inseparable from its socio-economic context — and in Colombia, inseparable from its hydrology. The SSI fuses traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources (XM, CREG, DANE, IDEAM, SGC, Unidad de Víctimas) — to capture what single-discipline indices miss: the 1992-1993 Apagón rationing, the El Niño reservoir-electricity nexus, the Nevado del Ruiz 1985 Armero anchor, and the durable R6_armed_conflict layer that ELN + dissidente FARC + Clan del Golfo still place on pylons and substations.
+      </p>
+    </div>
+    <div class="card animate-in delay-2" style="border-left:3px solid var(--sage)">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--sage)">Cohort-First Modifiers</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+        Colombia introduces two NEW modifiers to the SSI cohort: <strong>R6_drought</strong> in its hydro-reservoir-drawdown form (distinct from Israel's desalination-electricity nexus form — same field, different α-mapping logic), and <strong>R6_armed_conflict</strong>, the first OECD-cohort modifier capturing durable substation-proximate infrastructure-targeting. <a href="methodology.html" style="color:var(--terracotta);text-decoration:none;font-weight:500">Full methodology →</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card animate-in delay-1">
+      <div class="kpi-label">Substations Scored</div>
+      <div class="kpi-value" style="color:var(--ink)" id="kpi-total">—</div>
+      <div class="kpi-sub" id="kpi-total-sub">XM/ISA INTERCOLOMBIA transmission + ~25-DSO fragmented distribution · 32 departamentos + Bogotá D.C.</div>
+    </div>
+    <div class="kpi-card animate-in delay-2">
+      <div class="kpi-label">Fleet Median R</div>
+      <div class="kpi-value" style="color:var(--sage)" id="kpi-median">—</div>
+      <div class="kpi-sub" id="kpi-median-sub">P5 = — · P95 = —</div>
+    </div>
+    <div class="kpi-card animate-in delay-3">
+      <div class="kpi-label">Critical Band</div>
+      <div class="kpi-value" style="color:var(--crimson)" id="kpi-critical">—</div>
+      <div class="kpi-sub" id="kpi-critical-sub">—% of fleet · R ≥ 0.75</div>
+    </div>
+    <div class="kpi-card animate-in delay-4">
+      <div class="kpi-label">Data Freshness</div>
+      <div class="kpi-value" style="color:var(--bronze)">100%</div>
+      <div class="kpi-sub">98 LIVE · 0 Pending</div>
+    </div>
+  </div>
+
+  <!-- Distribution -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>Fleet Distribution by Band</h3>
+      <span class="label-xs" id="dist-count">—</span>
+    </div>
+    <div class="dist-bar">
+      <div id="dist-low" style="width:25%;background:var(--band-low)"></div>
+      <div id="dist-med" style="width:25%;background:var(--band-medium)"></div>
+      <div id="dist-high" style="width:25%;background:var(--band-high)"></div>
+      <div id="dist-crit" style="width:25%;background:var(--band-critical)"></div>
+    </div>
+    <div class="dist-legend">
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-low)"></div><span id="legend-low">Low —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-medium)"></div><span id="legend-med">Medium —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-high)"></div><span id="legend-high">High —</span></div>
+      <div class="dist-legend-item"><div class="dist-legend-dot" style="background:var(--band-critical)"></div><span id="legend-crit">Critical —</span></div>
+    </div>
+  </div>
+
+  <!-- Two Column: Mini Map + Top Alerts -->
+  <div class="grid-2" style="margin-bottom:24px">
+    <!-- Mini Map -->
+    <div class="card animate-in delay-1">
+      <div class="card-header">
+        <h3>National View</h3>
+        <a href="map.html" style="font-size:12px;color:var(--terracotta);text-decoration:none;font-weight:500">Explore map →</a>
+      </div>
+      <div style="position:relative;height:340px;background:var(--cream-deep);border-radius:var(--radius-sm);overflow:hidden">
+        <canvas id="mini-map-canvas" style="width:100%;height:100%;cursor:pointer" role="img" aria-label="Mini-map showing Colombia's grid substations by SSI band. Click to open full map."></canvas>
+      </div>
+    </div>
+
+    <!-- Top Critical Substations -->
+    <div class="card animate-in delay-2">
+      <div class="card-header">
+        <h3>Highest Risk Substations</h3>
+        <span class="label-xs">Top 8 by R_median</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Substation</th>
+            <th>Departamento</th>
+            <th style="text-align:right">R Score</th>
+            <th>Band</th>
+          </tr>
+        </thead>
+        <tbody id="top-critical-tbody">
+          <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Component Breakdown -->
+  <div class="card animate-in" style="margin-bottom:24px">
+    <div class="card-header">
+      <h3>Component Contribution — Fleet Average</h3>
+      <span class="label-xs">6 components · 20 metrics · 8 modifiers (R3, R4, R6a, R6_seismic, R6_volcanic, R6_drought, R6_armed_conflict, R6_flood, R7)</span>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:8px">
+      <div style="flex:1;min-width:300px" id="comp-bars">
+        <!-- Populated by index-sections.js (component-bars) -->
+      </div>
+      <div style="width:260px;flex-shrink:0">
+        <div class="card" style="background:var(--cream);border:none;box-shadow:none">
+          <div class="label-xs" style="margin-bottom:12px">Quick Facts</div>
+          <div style="font-size:13px;line-height:2">
+            <div><strong>20</strong> metrics across 6 components</div>
+            <div><strong>9</strong> modifiers (R3 + R4 + R6a + R6_seismic + R6_volcanic + R6_drought NEW + R6_armed_conflict NEW + R6_flood + R7)</div>
+            <div><strong>10,000</strong> Monte Carlo iterations</div>
+            <div><strong>20×20</strong> correlation matrix</div>
+            <div><strong>33</strong> departamentos (32 + Bogotá D.C.)</div>
+            <div><strong>30+</strong> verified data sources</div>
+          </div>
+          <div style="border-top:1px solid rgba(0,0,0,0.06);margin-top:10px;padding-top:10px">
+            <div class="label-xs" style="margin-bottom:12px">Scale</div>
+            <div style="font-size:13px;line-height:2" id="scale-values">
+              <div><strong id="scale-comp">…</strong> computations per run</div>
+              <div><strong id="scale-mc">…</strong> Monte Carlo simulations</div>
+              <div><strong id="scale-dp">…</strong> output data points</div>
+              <div><strong id="scale-subs">…</strong></div>
+              <div><strong id="scale-leaves">…</strong> unique risk leaves per substation</div>
+              <div><strong>33</strong> departamentos · ~1,123 municipios</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confidence + Modifiers -->
+  <div class="grid-2">
+    <div class="card animate-in delay-1">
+      <div class="card-header">
+        <h3>Confidence Distribution</h3>
+        <span class="label-xs">Relative CI tiers (CI/R)</span>
+      </div>
+      <div style="margin-top:8px" id="confidence-bars">
+        <!-- Populated by index-sections.js (confidence-bars) -->
+      </div>
+      <div style="margin-top:16px;font-size:12px;color:var(--warm-grey);line-height:1.6">
+        High = CI/R &lt; 0.50 · Medium = 0.50–0.70 · Low = &gt; 0.70
+      </div>
+    </div>
+
+    <div class="card animate-in delay-2">
+      <div class="card-header">
+        <h3>Modifier Impact — Fleet Stats</h3>
+        <span class="label-xs">R3–R7 (incl. R6_seismic + R6_volcanic + R6_drought + R6_armed_conflict + R6_flood)</span>
+      </div>
+      <table class="data-table" style="margin-top:4px">
+        <thead>
+          <tr>
+            <th>Modifier</th>
+            <th>Domain</th>
+            <th style="text-align:right">Range</th>
+            <th style="text-align:right">Fleet σ</th>
+          </tr>
+        </thead>
+        <tbody id="modifier-tbody">
+          <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:16px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Intelligence Report Teaser -->
+  <div class="card animate-in" style="margin-top:24px;border-left:3px solid var(--bronze);background:linear-gradient(135deg, var(--cream) 0%, var(--cream-deep) 100%)">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <div class="label-xs" style="color:var(--bronze);margin-bottom:6px">Monthly Intelligence Report</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:6px">Edition 01 — Colombia</div>
+        <p style="font-size:13px;line-height:1.6;color:var(--warm-grey);margin:0">Deep-dive analysis of Colombia's hydro-dominant grid, the Guavio reservoir / Bogotá D.C. supply corridor, Ituango 2,400 MW EPM full commissioning, El Niño 2023-2024 emergency CREG-101-009-2024, and R6_armed_conflict residual exposure.</p>
+      </div>
+      <a href="intelligence.html" style="display:inline-block;background:var(--bronze);color:#fff;font-size:13px;font-weight:600;padding:10px 24px;border-radius:var(--radius-sm);text-decoration:none;white-space:nowrap;transition:opacity 0.15s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Read Edition 01 →</a>
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MINI-MAP — owned by map.js, NOT by the section renderer.
+     SSIMap fetches grid-geo.json + ssi-data.json independently
+     and renders into #mini-map-canvas.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../map.js?v={{HASH}}"></script>
+<script>SSIMap.init('mini-map-canvas', { embedded: true });</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d · KB §65)
+     Country-specific values live in
+     ../intelligence/country-configs/colombia.json under
+     index_page / thresholds / admin.l1.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v={{HASH}}"></script>
+<script src="../index-sections.js?v={{HASH}}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('colombia', 'index');
+  });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>

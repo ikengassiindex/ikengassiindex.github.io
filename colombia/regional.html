@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare Colombia's 32 departamentos plus Bogotá D.C. by SSI resilience score, component breakdown, and socio-economic context. Five-tier R3 calibration (Capital-Metro/Industrial 1.05 / Regional-Capital 1.04 / Andean Intermediate 1.03 / Pacific-Frontier 1.02 / Amazon-Frontier Sparse 1.01).">
+<meta name="theme-color" content="#941914">
+<title>Colombia (CO) — Regional Analysis — SSI v4.0.2</title>
+<link rel="stylesheet" href="../style.css?v={{HASH}}">
+</head>
+<body>
+<script src="../ssi-versions.js?v={{HASH}}"></script>
+<script src="../nav.js?v={{HASH}}"></script>
+<script src="../ssi-engine.js?v={{HASH}}"></script>
+<script src="ssi-metadata.js?v={{HASH}}"></script>
+<script>renderNav('regional');</script>
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+      <span class="flag" style="font-size:32px;line-height:1">🇨🇴</span>
+      <h1 style="margin:0">Regional Analysis — Colombia</h1>
+    </div>
+    <p>Compare Colombia's 32 departamentos plus Bogotá D.C. by SSI score, component breakdown, and socio-economic context across 381 substations. Five-tier R3 calibration spans Capital-Metro/Industrial (Bogotá D.C. + Antioquia, 1.05) through Regional-Capital (Cali / Bucaramanga / Cundinamarca / Atlántico / Bolívar / Casanare, 1.04), Andean Intermediate (coffee zone + Galeras/Ruiz proximity, 1.03), Pacific-Frontier (Chocó cohort-poorest + Cauca + La Guajira + Putumayo, 1.02), down to Amazon-Frontier Sparse (Vichada / Guainía / Vaupés / Amazonas, 1.01).</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs animate-in delay-1">
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Departamento Ranking</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Departamento Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
+  </div>
+
+  <!-- Tab: Departamento Ranking -->
+  <div id="tab-ranking">
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">
+        <h3>Departamentos Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">33 departamentos · sorted worst → best</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>Departamento</th>
+            <th style="text-align:right">Median R</th>
+            <th style="text-align:right">Substations</th>
+            <th style="text-align:right">% Critical</th>
+            <th style="text-align:right">% High</th>
+            <th>Distribution</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Top-3 Deep-Dive Callouts -->
+    <div class="grid-3 animate-in delay-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px">
+
+      <div class="card" style="border-left:3px solid #941914">
+        <div class="label-xs" style="color:#941914;margin-bottom:6px">T1 · Capital-Metro / Industrial</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px">Bogotá D.C.</div>
+        <p style="font-size:12px;line-height:1.6;color:var(--warm-grey);margin:0">Capital district + Distrito Capital special administrative status. Population ~7.9M (DANE 2024); ~16% of national GDP; government + financial services + tertiary core. R3 ceiling 1.05. Codensa S.A. E.S.P. (Enel Colombia) is the regional DSO with ~30% of national MWh. Critical supply: Guavio 1,200 MW (Emgesa, Cundinamarca-Boyacá border) is the reservoir-electricity nexus anchor for Bogotá D.C. supply continuity during dry-season El Niño years.</p>
+      </div>
+
+      <div class="card" style="border-left:3px solid #941914">
+        <div class="label-xs" style="color:#941914;margin-bottom:6px">T1 · Capital-Metro / Industrial</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px">Antioquia (Medellín)</div>
+        <p style="font-size:12px;line-height:1.6;color:var(--warm-grey);margin:0">Medellín industrial heartland + Aburrá Valley manufacturing concentration. Population ~6.9M; GDP/cap ~$8k. EPM (Empresa Pública de Medellín) is the municipally-owned 100%-City-of-Medellín DSO + dominant hydro generator. EPM hydro portfolio includes Guatapé + San Carlos 1,240 MW + Porce I-II-III-IV + Ituango 2,400 MW (cohort-largest hydro project; partial commissioning 2018-2024, full commissioning 2024 added ~1,200 MW). R6_drought α 0.15-0.20 — cohort-highest hydro-dependence exposure.</p>
+      </div>
+
+      <div class="card" style="border-left:3px solid #5d8563">
+        <div class="label-xs" style="color:#5d8563;margin-bottom:6px">T4 · Pacific / Frontier</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px">Chocó (Quibdó)</div>
+        <p style="font-size:12px;line-height:1.6;color:var(--warm-grey);margin:0">Pacific rainforest cohort-poorest departamento. Population ~0.55M; GDP/cap ~$2-3k (cohort-low). Wettest place on earth (~10,000 mm/yr precipitation). V_socio baseline 0.20 — cohort-lowest social-resilience capacity. Significant Afro-Colombian + Embera indigenous population. R6_armed_conflict residual exposure (Clan del Golfo + ELN). R6_flood α 0.18 — cohort-highest flood-landslide exposure. DSO: DISPAC with long radial 34.5 kV feeds and structural quality-of-supply gap vs Andean corridor.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tab: Departamento Comparison -->
+  <div id="tab-compare" style="display:none">
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header"><h3>Select Departamentos to Compare</h3></div>
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">Departamento A</div>
+            <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">Departamento B</div>
+            <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+        </div>
+        <!-- Comparison Table -->
+        <table class="data-table" id="compare-table">
+          <thead>
+            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">—</th><th style="text-align:right" id="th-prov-b">—</th><th style="text-align:right">Delta</th></tr>
+          </thead>
+          <tbody id="compare-tbody">
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select departamentos above</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-header"><h3>Component Radar</h3></div>
+        <div id="radar-container" style="display:flex;flex-direction:column;align-items:center;color:var(--warm-grey);flex:1;min-height:0">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+            <svg id="radar-svg" width="320" height="300" viewBox="0 0 280 260"></svg>
+          </div>
+          <div id="radar-legend" style="display:flex;flex-direction:column;align-items:center;font-size:11px;padding-bottom:0px;margin-top:0px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Component Decomposition -->
+  <div id="tab-decomp" style="display:none">
+    <div class="card animate-in">
+      <div class="card-header">
+        <h3>Average Component Contribution by Departamento</h3>
+        <span class="label-xs">Stacked horizontal bars · 33 departamentos</span>
+      </div>
+      <div id="decomp-bars" style="margin-top:16px">
+        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data…</div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:11px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--crimson);border-radius:2px"></div>C Continuity</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--terracotta);border-radius:2px"></div>V Voltage</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--sage);border-radius:2px"></div>I Infrastructure</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#3b9eff;border-radius:2px"></div>E Economic</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--bronze);border-radius:2px"></div>S Saturation</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#22d3ee;border-radius:2px"></div>T Transition</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TAB SWITCHING — light inline helper (no data dependency)
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(function(t) { t.style.display = 'none'; });
+  document.getElementById(tabId).style.display = 'block';
+}
+renderFooter();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.2 · KB §65)
+     Country-specific bucket thresholds live in
+     ../intelligence/country-configs/colombia.json → thresholds.r3_buckets
+     (5-tier: Capital-Metro 1.045+ / Regional-Capital 1.035-1.045 /
+     Andean Intermediate 1.025-1.035 / Pacific-Frontier 1.015-1.025 /
+     Amazon-Frontier Sparse 0.0-1.015).
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v={{HASH}}"></script>
+<script src="../regional-sections.js?v={{HASH}}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('colombia', 'regional');
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SSI Index — Colombia DSO segmented view. ~25+ Operadores de Red across mixed state/municipal/Enel/cooperative ownership — Codensa (Enel) Bogotá+Cundinamarca, EPM Antioquia, EPSA/Celsia Valle, Air-e + Afinia Caribbean (post-Electricaribe split 2020), and ~20 smaller regional operators. SAIDI, customers, departamentos served. Most fragmented OECD distribution sector after the US.">
+<meta name="theme-color" content="#FCD116">
+<meta property="og:title" content="SSI Index — Colombia · DSO Dashboard">
+<meta property="og:description" content="Governance + operator panel: XM TSO (ISA subsidiary), ISA INTERCOLOMBIA transmission owner (~70% STN), CREG tariff regulator, MME + UPME policy + planning, ~25 DSOs across mixed ownership types.">
+<meta property="og:type" content="website">
+<title>SSI Index — Colombia · DSO Dashboard</title>
+<link rel="stylesheet" href="../style.css?v={{HASH}}">
+<style>
+  .dso-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 16px; margin: 16px 0; }
+  @media (max-width: 900px) { .dso-grid { grid-template-columns: 1fr; } }
+  .dso-card { padding: 16px; background: var(--cream); border-radius: var(--radius);
+              position: relative; }
+  .dso-card h3 { margin: 0 0 6px 0; font-size: 17px; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th, .compare-table td { padding: 10px 12px; text-align: left;
+                                          border-bottom: 1px solid var(--card-border); }
+  .compare-table th { background: var(--cream-deep); font-weight: 600; }
+  .compare-table tr:hover { background: var(--cream-deep); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+            font-weight: 500; }
+</style>
+</head>
+<body>
+<script src="../nav.js?v={{HASH}}"></script>
+<script src="ssi-metadata.js?v={{HASH}}"></script>
+<script>renderNav('dno');</script>
+
+<main class="page-shell">
+
+<div class="page-header animate-in">
+  <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇨🇴</span>DSO Segmented Dashboard — Colombia</h1>
+  <div id="dno-subtitle" style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px">~25 Operadores de Red across mixed state / municipal / Enel-Colombia / cooperative ownership — cohort-most-fragmented OECD distribution sector after the United States.</div>
+
+<!-- Overview: Governance Stack (TSO + Transmission + Regulators + Major Generators) -->
+<section id="dno-governance-section" style="margin-bottom:32px">
+<h2>Governance Stack — XM TSO · ISA INTERCOLOMBIA · CREG · MME + UPME</h2>
+<div id="dno-governance-grid" class="kpi-grid" style="margin-bottom:16px"></div>
+<div class="card animate-in" style="margin-top:8px">
+  <table class="data-table">
+    <thead><tr><th>Function</th><th>Entity</th><th>Status / Notes</th></tr></thead>
+    <tbody>
+      <tr><td>TSO (system operator)</td><td><strong>XM (Compañía de Expertos en Mercados)</strong></td><td>ISA subsidiary since June 1995; CND dispatch + ASIC market clearing for the MEM (Mercado de Energía Mayorista); Medellín HQ with Bogotá operational centres.</td></tr>
+      <tr><td>Transmission asset owner</td><td><strong>ISA INTERCOLOMBIA</strong></td><td>~70% of the STN (Sistema de Transmisión Nacional, ≥220 kV); ~17,000 km of 220 / 500 kV + ~150 HV substations. Listed on BVC (Ministerio de Hacienda majority shareholder).</td></tr>
+      <tr><td>Tariff + reliability regulator</td><td><strong>CREG (Comisión de Regulación de Energía y Gas)</strong></td><td>Statutory independent regulator under Ministerio de Minas y Energía; tariffs + reliability + market rules; ARIAE member.</td></tr>
+      <tr><td>Energy policy</td><td><strong>MME (Ministerio de Minas y Energía)</strong></td><td>National energy policy; oversees CREG + UPME + concessions.</td></tr>
+      <tr><td>Planning + projections</td><td><strong>UPME (Unidad de Planeación Minero-Energética)</strong></td><td>Long-term demand projections + PERT (transmission expansion) + PERG (generation expansion).</td></tr>
+      <tr><td>National CERT</td><td><strong>ColCERT</strong> + sectoral <strong>CSIRT-XM</strong></td><td>ColCERT national CERT since 2011 (joint MinTIC + MinDef); CSIRT-XM sectoral electricity CSIRT since 2019 per CONPES 3854/2016 mandate.</td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+  <p id="dno-intro">Colombia's electricity distribution market is the most fragmented in the OECD after the United States, with ~25+ Operadores de Red across four ownership categories: state-controlled (post-Electricaribe split into Air-e + Afinia/EPM 2020), municipal (EPM Medellín, EMCALI Cali), Enel-controlled (Codensa Bogotá+Cundinamarca), and cooperative/private regional. Post-Law 142+143/1994 unbundling, the sector is competitive in generation + retail with regulated distribution + transmission.</p>
+</div>
+
+<section id="dsos" style="margin-bottom:32px">
+<h2>Regional Distribution System Operators</h2>
+<div id="dno-dso-grid" class="dso-grid"></div>
+<div class="card animate-in" style="margin-top:16px">
+  <h3>DSO Reference Panel</h3>
+  <table class="compare-table">
+    <thead><tr><th>DSO</th><th>Territory</th><th>Ownership</th><th>Share (approx.)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Codensa</strong></td><td>Bogotá D.C. + Cundinamarca</td><td>Enel Colombia majority</td><td>~30% national DSO MWh</td></tr>
+      <tr><td><strong>EPM</strong> (Empresa Pública de Medellín)</td><td>Antioquia</td><td>Municipal (City of Medellín 100%)</td><td>Large; also major generation operator (~3.5 GW)</td></tr>
+      <tr><td><strong>EPSA / Celsia</strong></td><td>Valle del Cauca</td><td>Celsia (Argos Group) subsidiary; EPSA acquired 2009</td><td>Regional dominant</td></tr>
+      <tr><td><strong>Air-e</strong></td><td>Atlántico + La Guajira + Magdalena (north)</td><td>Post-Electricaribe split 2020 (private operator)</td><td>Caribbean north</td></tr>
+      <tr><td><strong>Afinia</strong></td><td>Bolívar + Córdoba + Sucre + Cesar (south Caribbean)</td><td>EPM subsidiary post-2020 split</td><td>Caribbean south</td></tr>
+      <tr><td><strong>EMCALI</strong></td><td>Cali (municipal)</td><td>Municipal</td><td>Cali metro</td></tr>
+      <tr><td><strong>CHEC</strong></td><td>Caldas</td><td>EPM subsidiary</td><td>Coffee zone</td></tr>
+      <tr><td><strong>EBSA</strong></td><td>Boyacá</td><td>Private / regional</td><td>Andean intermediate</td></tr>
+      <tr><td><strong>ESSA</strong></td><td>Santander</td><td>EPM subsidiary</td><td>Bucaramanga region</td></tr>
+      <tr><td><strong>CENS</strong></td><td>Norte de Santander</td><td>EPM subsidiary</td><td>Cúcuta + Venezuelan-border</td></tr>
+      <tr><td><strong>EDEQ</strong></td><td>Quindío</td><td>EPM subsidiary</td><td>Armenia (1999 earthquake epicentre region)</td></tr>
+      <tr><td><strong>CEDENAR</strong></td><td>Nariño</td><td>State / mixed</td><td>Pasto (Galeras volcano proximate)</td></tr>
+      <tr><td><strong>DISPAC</strong></td><td>Chocó</td><td>State / mixed</td><td>Pacific rainforest (cohort-poorest region)</td></tr>
+      <tr><td><strong>ELECTROHUILA</strong></td><td>Huila</td><td>State / mixed</td><td>El Quimbo dam catchment</td></tr>
+      <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);font-size:12px;padding-top:14px"><em>+ ~10 smaller regional Operadores de Red across remaining departamentos</em></td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+<section id="generators-section" style="margin-bottom:32px">
+<h2>Major Generation Operators</h2>
+<div class="card animate-in">
+  <p style="font-size:13px;line-height:1.7">Total installed capacity ≈21 GW (post-Ituango full commissioning 2024); peak demand ~12-13 GW; annual generation ~80 TWh (≈70% hydro normal year, dropping to ~50% during strong El Niño).</p>
+  <table class="compare-table" style="margin-top:8px">
+    <thead><tr><th>Operator</th><th>Capacity</th><th>Type</th><th>Key Plants</th></tr></thead>
+    <tbody>
+      <tr><td><strong>EPM</strong></td><td>~3.5 GW</td><td>Hydro-dominated</td><td>Ituango 2.4 GW (cohort-largest hydro project; full commissioning 2024) + Guatapé + San Carlos + Porce I-IV</td></tr>
+      <tr><td><strong>Emgesa (Enel Colombia)</strong></td><td>~3.5 GW</td><td>Hydro + thermal</td><td>El Quimbo 400 MW + Betania 540 MW + Guavio 1,200 MW (critical Cundinamarca/Bogotá supply reservoir)</td></tr>
+      <tr><td><strong>Isagen</strong></td><td>~3 GW</td><td>Hydro-dominated</td><td>Sogamoso 820 MW + San Carlos 1,240 MW + Calderas + Termocentro (privatised 2016 to Brookfield)</td></tr>
+      <tr><td><strong>Celsia / EPSA</strong></td><td>~1.8 GW</td><td>Hydro + thermal + solar</td><td>Cauca river hydro + Zona Franca Celsia thermal Caribbean</td></tr>
+      <tr><td><strong>AES Chivor</strong></td><td>~1 GW</td><td>Hydro</td><td>Chivor reservoir (Cundinamarca/Boyacá border) — single-plant operator</td></tr>
+      <tr><td><strong>Caribbean thermal cluster</strong></td><td>~3.5 GW</td><td>Gas + dual-fuel</td><td>Tebsa 914 MW (Barranquilla — largest single thermal plant) + Termocandelaria + Termocaribe + Termoflores; dry-season reliability backup</td></tr>
+      <tr><td><strong>Drummond / Cerrejón</strong></td><td>~120 MW</td><td>Coal mine-mouth</td><td>Cesar + La Guajira mine-mouth thermal — minor grid share, export-focused mining; targeted phase-out 2030-2035</td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+<section id="cross-border-section" style="margin-bottom:32px">
+<h2>Cross-Border Interconnects</h2>
+<div class="card animate-in">
+  <table class="compare-table">
+    <thead><tr><th>Partner</th><th>Link</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Ecuador</td><td>230 kV Pasto–Quito</td><td><strong>ACTIVE</strong></td><td>~250 MW commercial capacity; continuous flow under Andean Community (CAN) framework + bilateral CO-EC contracts; critical during 2023-2024 El Niño as Colombia maximized imports.</td></tr>
+      <tr><td>Venezuela</td><td>230 kV Cuestecitas–Cuatricentenario</td><td><strong>SUSPENDED 2008</strong></td><td>Physical link exists; commercial flow suspended since 2008 for political/economic reasons. Functionally isolated boundary.</td></tr>
+      <tr><td>Panama</td><td>500 kV Cerromatoso–Veladero</td><td><strong>PLANNED</strong></td><td>Andean-Pacific link planned under regional integration framework; pending environmental approval as of 2024.</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:var(--warm-grey);margin-top:10px;line-height:1.6">For simulation purposes the SIN is treated as <em>semi-insular</em> — Ecuador-coupled but Venezuela-decoupled — with a lower interconnect-buffer ratio than continental-European grids but non-zero. The ZNI (Zonas No Interconectadas — Amazon, Pacific, La Guajira frontier; ≈0.5% of population, diesel + mini-grid supply) sits outside the SIN scope and is excluded from the SSI substation count.</p>
+</div>
+</section>
+
+<section id="dno-saidi-section" style="margin-bottom:32px">
+<h2>National SAIDI Context — Cohort Comparison</h2>
+<div class="card animate-in" style="margin-top:24px">
+  <h3>SAIDI peer table</h3>
+  <p id="dno-saidi-headline" style="font-size:13px;line-height:1.7">—</p>
+  <table id="dno-saidi-table" class="data-table" style="margin-top:12px">
+    <thead><tr><th>Peer Country</th><th>SAIDI 2024 (min)</th><th>Notes</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+</section>
+
+<div id="dno-notes">
+  <div class="card animate-in" style="margin-top:16px;border-left:3px solid var(--sage)">
+    <h3>Cohort-Context Note — Fragmentation</h3>
+    <p style="font-size:13px;line-height:1.7">Colombia's distribution sector is the <strong>most fragmented OECD distribution market after the United States</strong>, with ~25+ Operadores de Red across mixed state-controlled, municipal (EPM Medellín, EMCALI Cali), Enel-Colombia private (Codensa), and cooperative ownership. This contrasts with single-DSO-dominant cohort entries and complicates per-DSO data ingestion: CREG annual market reports and individual OR quality filings are the primary source channels, with XM Boletín Estadístico Mensual providing market-wide aggregates.</p>
+  </div>
+</div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.6 · KB §65 · §77)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v={{HASH}}"></script>
+<script src="../dno-dashboard-sections.js?v={{HASH}}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('colombia', 'dno-dashboard');
+  });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>

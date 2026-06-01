@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive map of Colombia's electrical grid with SSI v4.0.2 resilience scores for 381 substations across 32 departamentos plus Bogotá D.C. Volcanic-proximity overlay for Caldas + Tolima (Nevado del Ruiz), Nariño (Galeras), Cauca (Puracé), Huila (Nevado del Huila). XM CND dispatch + ISA INTERCOLOMBIA STN backbone + ~25-DSO fragmented distribution.">
+<meta name="theme-color" content="#941914">
+<title>Colombia (CO) — Map Explorer — SSI v4.0.2</title>
+<link rel="stylesheet" href="../style.css?v={{HASH}}">
+<style>
+  .map-container {
+    position: relative;
+    width: 100%;
+    height: 620px;
+    background: var(--cream-deep);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .map-container canvas {
+    display: block;
+    cursor: grab;
+    width: 100%;
+    height: 100%;
+  }
+  .map-container canvas.grabbing { cursor: grabbing; }
+
+  #map-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(250,246,245,0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(44,36,32,0.12);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--ink);
+    z-index: 200;
+    display: none;
+    max-width: 260px;
+    box-shadow: 0 4px 16px rgba(44,36,32,0.1);
+    line-height: 1.5;
+  }
+
+  .map-legend {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    z-index: 10;
+    box-shadow: 0 2px 12px rgba(44,36,32,0.06);
+  }
+  .map-legend h4 {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--warm-grey);
+    margin-bottom: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+  }
+  .map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 3px;
+    font-size: 11px;
+  }
+
+  .map-zoom {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 3px;
+    z-index: 10;
+  }
+  .map-zoom button {
+    width: 34px;
+    height: 34px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 7px;
+    color: var(--ink);
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(44,36,32,0.06);
+  }
+  .map-zoom button:hover { background: var(--cream); }
+
+  .map-stats {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(250,246,245,0.92);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(44,36,32,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    z-index: 10;
+    font-size: 11px;
+    color: var(--warm-grey);
+    letter-spacing: 0.02em;
+  }
+  .map-stats b { color: var(--ink); font-weight: 500; }
+
+  .detail-scroll {
+    max-height: 620px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(44,36,32,0.15) transparent;
+  }
+  .detail-scroll::-webkit-scrollbar { width: 5px; }
+  .detail-scroll::-webkit-scrollbar-thumb { background: rgba(44,36,32,0.15); border-radius: 3px; }
+
+  #btn-breakdown:hover {
+    background: rgba(170,66,52,0.10) !important;
+    border-color: rgba(170,66,52,0.25) !important;
+  }
+
+  @media (max-width: 1100px) {
+    .map-layout { grid-template-columns: 1fr !important; }
+    .map-container { height: 450px; }
+    .detail-scroll { max-height: none; }
+  }
+</style>
+</head>
+<body>
+<script src="../ssi-versions.js?v={{HASH}}"></script>
+<script src="../nav.js?v={{HASH}}"></script>
+<script src="../ssi-engine.js?v={{HASH}}"></script>
+<script src="ssi-metadata.js?v={{HASH}}"></script>
+<script>renderNav('map');</script>
+
+<main class="page-shell" style="max-width:1440px">
+  <div class="page-header animate-in">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+      <span class="flag" style="font-size:32px;line-height:1">🇨🇴</span>
+      <h1 style="margin:0">Map Explorer — Colombia</h1>
+    </div>
+    <p>Explore 381 substations across Colombia's transmission (XM CND dispatch + ISA INTERCOLOMBIA 500/230/220/138 kV STN backbone) and distribution (~25-DSO fragmented market) grid. Substations are coloured by R3 tier (T1 Capital-Metro red/orange → T5 Amazon-Frontier Sparse green). Volcanic-proximity overlay highlights substations within 25 km of YELLOW+ alert vents (Nevado del Ruiz in Caldas/Tolima · Galeras in Nariño · Puracé in Cauca · Nevado del Huila on Huila-Cauca border). Click any substation to inspect scores, components, and modifiers.</p>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar animate-in delay-1">
+    <label>Band</label>
+    <select id="filter-band">
+      <option value="all">All Bands</option>
+      <option value="Low">Low (0.00–0.25)</option>
+      <option value="Medium">Medium (0.25–0.50)</option>
+      <option value="High">High (0.50–0.75)</option>
+      <option value="Critical">Critical (0.75–1.00)</option>
+    </select>
+    <label>Departamento</label>
+    <select id="filter-region">
+      <option value="all">All Departamentos</option>
+    </select>
+    <label>Power Voltage</label>
+    <select id="filter-voltage">
+      <option value="all">All Voltages</option>
+      <option value="500">500 kV</option>
+      <option value="230">230 / 220 kV</option>
+      <option value="138">138 / 115 kV</option>
+      <option value="other">&lt; 115 kV</option>
+    </select>
+    <label>Component Focus</label>
+    <select id="filter-component">
+      <option value="overall">Overall R Score</option>
+      <option value="C">C — Continuity</option>
+      <option value="V">V — Voltage Quality</option>
+      <option value="I">I — Infrastructure</option>
+      <option value="E">E — Economic</option>
+      <option value="S">S — Saturation</option>
+      <option value="T">T — Energy Transition</option>
+    </select>
+    <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
+  </div>
+
+  <!-- Map + Detail Panel -->
+  <div class="map-layout animate-in delay-2" style="display:grid;grid-template-columns:1fr 360px;gap:20px">
+    <!-- Map -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="map-container">
+        <canvas id="ssi-map-canvas" role="img" aria-label="Interactive map of Colombia's electrical grid showing 381 substations across 32 departamentos plus Bogotá D.C., coloured by SSI R3 tier. Volcanic-proximity overlay for Nevado del Ruiz / Galeras / Puracé / Nevado del Huila. Use mouse to pan and zoom, click substations for details."></canvas>
+        <div id="map-tooltip"></div>
+
+        <div class="map-legend">
+          <h4>SSI Band</h4>
+          <div class="map-legend-item"><div class="band-dot low"></div> Low (0.00–0.25)</div>
+          <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25–0.50)</div>
+          <div class="map-legend-item"><div class="band-dot high"></div> High (0.50–0.75)</div>
+          <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75–1.00)</div>
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(44,36,32,0.08);font-size:10px;color:var(--warm-grey);line-height:1.5">
+            Volcanic overlay: Nevado del Ruiz · Galeras · Puracé · Nevado del Huila<br>
+            Scroll to zoom · Drag to pan · Click substation to inspect
+          </div>
+        </div>
+
+        <div class="map-zoom">
+          <button id="zoomIn" title="Zoom in">+</button>
+          <button id="zoomOut" title="Zoom out">−</button>
+          <button id="zoomFit" title="Fit Colombia" style="font-size:13px">⟐</button>
+        </div>
+
+        <div class="map-stats" id="map-stats">
+          Loading data…
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-scroll" id="detail-panel">
+      <!-- Populated by map.js on click -->
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAP ENGINE — owned by map.js
+     Centred on lat 4.57, lon -74.30 (Bogotá D.C. corridor), zoom 5.
+     bounds.json polygon overlay intentionally left optional / null
+     to avoid the D#26 map-aesthetic class issue documented in
+     KB §75 (offshore-clipping + Amazon-frontier sparse-density
+     symptom class). 33 departamento polygons will be enabled in
+     a follow-up patch after D#26 v2 polygon verification.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../map.js?v={{HASH}}"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL — thin-shell (Phase 2d.3 · KB §65)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v={{HASH}}"></script>
+<script src="../map-sections.js?v={{HASH}}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('colombia', 'map');
+  });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>
