@@ -196,18 +196,39 @@
   });
 
   /* ── 4. Data Sources table ───────────────────────────────────────────── */
+  /* Adaptive columns (KB §77 / D#29 facet 8) — France/IT/ES legacy template
+     populates `category` + `res`; CO/IL/CR/IS/KR/SK/HU/SI new template omits
+     both. When an optional field is absent fleet-wide, skip the empty column
+     so headers don't collapse to char-wrapped narrow widths. */
   CR.register('methodology', 'data-sources', function (ctx) {
     var tbody = document.querySelector('#method-sources tbody');
+    var thead = document.querySelector('#method-sources thead');
     if (!tbody) return;
     var sources = getDataSources();
+
+    var hasCategory = sources.some(function (s) { return s.category; });
+    var hasRes      = sources.some(function (s) { return s.res; });
+
+    // Rebuild header if any optional column is empty fleet-wide
+    if (thead && (!hasCategory || !hasRes)) {
+      var head = ['<tr><th>Source</th>'];
+      if (hasCategory) head.push('<th>Category</th>');
+      head.push('<th>Freq.</th>');
+      if (hasRes)      head.push('<th>Resolution</th>');
+      head.push('<th style="text-align:right">Vars</th>');
+      head.push('<th>Feeds</th></tr>');
+      thead.innerHTML = head.join('');
+    }
+
     tbody.innerHTML = sources.map(function (s) {
-      return '<tr><td style="font-size:12px"><strong>' + (s.name || '') + '</strong>' +
-             (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">⚠ registration</span>' : '') +
-             '</td><td style="font-size:11px">' + (s.category || '') + '</td>' +
-             '<td style="font-size:11px">' + (s.freq || '') + '</td>' +
-             '<td style="font-size:11px">' + (s.res || '') + '</td>' +
-             '<td class="num">' + (s.vars != null ? s.vars : '') + '</td>' +
-             '<td style="font-size:11px;color:var(--warm-grey)">' + (s.feeds || '') + '</td></tr>';
+      var cells = ['<td style="font-size:12px"><strong>' + (s.name || '') + '</strong>' +
+                   (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">⚠ registration</span>' : '') + '</td>'];
+      if (hasCategory) cells.push('<td style="font-size:11px">' + (s.category || '') + '</td>');
+      cells.push('<td style="font-size:11px">' + (s.freq || '') + '</td>');
+      if (hasRes)      cells.push('<td style="font-size:11px">' + (s.res || '') + '</td>');
+      cells.push('<td class="num">' + (s.vars != null ? s.vars : '') + '</td>');
+      cells.push('<td style="font-size:11px;color:var(--warm-grey)">' + (s.feeds || '') + '</td>');
+      return '<tr>' + cells.join('') + '</tr>';
     }).join('');
   });
 
