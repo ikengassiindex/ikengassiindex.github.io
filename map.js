@@ -170,9 +170,9 @@
     if (BOUNDS && BOUNDS.features) {
       ctx.save();
       ctx.lineJoin = 'round';
-      ctx.strokeStyle = 'rgba(44, 36, 32, 0.55)';      // warm-grey border, visible at default zoom
-      ctx.fillStyle   = 'rgba(232, 220, 205, 0.78)';   // warm tan fill — distinct from cream-deep background
-      ctx.lineWidth   = 1.4;
+      ctx.strokeStyle = 'rgba(44, 36, 32, 0.32)';      // warm-grey border, subtle — substations dominate visually
+      ctx.fillStyle   = 'rgba(232, 220, 205, 0.45)';   // warm tan fill, lighter — matches FR/IT/ES no-overlay aesthetic
+      ctx.lineWidth   = 0.9;                            // thinner — frames country without blockiness
       for (const f of BOUNDS.features) {
         const g = f.geometry;
         if (!g) continue;
