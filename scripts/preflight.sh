@@ -167,6 +167,21 @@ if [ -f scripts/check_socio_economic_completeness.py ]; then
   fi
 fi
 
+# D#28 — Power-line geometry richness (post-Session 38)
+# Catches the LT/JP/TR/US/IE chord-only rendering class. New onboardings via
+# the proper d05_osm Overpass `out geom` path will always PASS. Legacy JP/TR/US
+# fail until their offline OSM PBF re-ingestion lands — runs non-strict so the
+# legacy fails don't block other countries' deploys.
+if [ -f scripts/check_line_geometry.py ]; then
+  if [ -n "$SLUG" ]; then
+    run_gate "D#28" "power-line geometry richness" \
+      python3 scripts/check_line_geometry.py "$SLUG" $STRICT_FLAG
+  else
+    run_gate "D#28" "power-line geometry richness (all)" \
+      python3 scripts/check_line_geometry.py --all
+  fi
+fi
+
 # Summary
 echo ""
 echo "════════════════════════════════════════════════════════════════════════"
