@@ -221,13 +221,17 @@
     }
 
     tbody.innerHTML = sources.map(function (s) {
+      // KB §77 D#29 facet 10: short categorical/numeric cells need white-space:nowrap
+      // to prevent the table's `word-break:break-word` (added in hf #6 to handle long
+      // sources strings) from squeezing them to 1-2 character width when the auto
+      // layout sees them as breakable. Affects FREQ, RES, VARS — all short content.
       var cells = ['<td style="font-size:12px"><strong>' + (s.name || '') + '</strong>' +
                    (s.registration ? ' <span style="font-size:9px;color:var(--terracotta)">⚠ registration</span>' : '') + '</td>'];
-      if (hasCategory) cells.push('<td style="font-size:11px">' + (s.category || '') + '</td>');
-      cells.push('<td style="font-size:11px">' + (s.freq || '') + '</td>');
-      if (hasRes)      cells.push('<td style="font-size:11px">' + (s.res || '') + '</td>');
-      cells.push('<td class="num">' + (s.vars != null ? s.vars : '') + '</td>');
-      cells.push('<td style="font-size:11px;color:var(--warm-grey)">' + (s.feeds || '') + '</td>');
+      if (hasCategory) cells.push('<td style="font-size:11px;white-space:nowrap">' + (s.category || '') + '</td>');
+      cells.push('<td style="font-size:11px;white-space:nowrap">' + (s.freq || '') + '</td>');
+      if (hasRes)      cells.push('<td style="font-size:11px;white-space:nowrap">' + (s.res || '') + '</td>');
+      cells.push('<td class="num" style="white-space:nowrap">' + (s.vars != null ? s.vars : '') + '</td>');
+      cells.push('<td style="font-size:11px;color:var(--warm-grey);white-space:nowrap">' + (s.feeds || '') + '</td>');
       return '<tr>' + cells.join('') + '</tr>';
     }).join('');
   });
