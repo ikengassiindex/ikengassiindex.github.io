@@ -790,7 +790,7 @@
         '<span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">' + (s.id || '') + '</span>' +
         '<span style="font-weight:500;line-height:1.5">' + (s.name || '') + '</span>' +
         '<span style="font-size:10px;color:' + fCol + ';background:' + fBg + ';padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">' + (s.freq || '') + '</span>' +
-        '<span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5">' + (s.res || s.sources || '') + '</span>' +
+        '<span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (s.res || s.sources || '').replace(/"/g, '&quot;') + '">' + (s.res || s.feeds || '') + '</span>' +
         '<span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">' + (s.vars || 0) + ' var' + ((s.vars || 0) > 1 ? 's' : '') + '</span>' +
       '</div>';
     }).join('');

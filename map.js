@@ -1296,9 +1296,9 @@ if (!hasNested) {
     const basePath = options.basePath || '';
     // bounds.json is optional — countries without an admin-polygon file get a 404 and a silent no-op
     Promise.all([
-      fetch(basePath + 'grid-geo.json?v=601').then(r => r.json()),
-      fetch(basePath + 'ssi-data.json?v=601').then(r => r.json()),
-      fetch(basePath + 'bounds.json?v=601').then(r => r.ok ? r.json() : null).catch(() => null)
+      fetch(basePath + 'grid-geo.json?v=602').then(r => r.json()),
+      fetch(basePath + 'ssi-data.json?v=602').then(r => r.json()),
+      fetch(basePath + 'bounds.json?v=602').then(r => r.ok ? r.json() : null).catch(() => null)
     ]).then(([geo, ssi, bounds]) => {
       GEO = geo;
       SSI = ssi;
