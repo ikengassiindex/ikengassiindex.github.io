@@ -115,8 +115,15 @@ def rewrite_html(html_path: Path, country: str, dry: bool, check: bool) -> tuple
         # semicolons of template literals like `path?v=700`;` (KB §65.4.8 bug,
         # patched 2026-05-25 after slovenia/esg-report.html was broken locally
         # by the eat-too-much regex).
+        # KB §77 / D#29 facet 9: also match the literal `{{HASH}}` placeholder
+        # left by un-bumped Step 5 page scaffolds. Countries onboarded post-
+        # Phase 2 (CO S39 — surfaced 2026-06-01) shipped with `?v={{HASH}}` in
+        # script tags. The character class `[A-Za-z0-9._-]+` did NOT include
+        # `{`/`}` so the regex silently skipped every CO HTML for 7 hotfixes.
+        # Browsers cached the placeholder URL indefinitely → no JS-side fix
+        # ever reached the user. Added explicit `\{\{HASH\}\}` alternation.
         pattern = re.compile(
-            r'(' + re.escape(basename) + r'\?v=)([A-Za-z0-9._-]+)'
+            r'(' + re.escape(basename) + r'\?v=)(\{\{HASH\}\}|[A-Za-z0-9._-]+)'
         )
         for m in pattern.finditer(new_src):
             old_val = m.group(2)
