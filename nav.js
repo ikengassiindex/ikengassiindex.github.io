@@ -6,7 +6,7 @@
 // >>> BEGIN AUTO-GENERATED FROM countries.json (do not edit by hand)
 // Single source of truth: intelligence/countries.json (regenerate via
 // scripts/generate_nav_data.py — pre-commit hook does this automatically).
-// 35 countries as of last regeneration.
+// 38 countries as of last regeneration.
 
 var SSI_COUNTRY_SLUGS = [
   'australia',
@@ -26,6 +26,7 @@ var SSI_COUNTRY_SLUGS = [
   'hungary',
   'iceland',
   'ireland',
+  'israel',
   'italy',
   'japan',
   'korea',
@@ -67,6 +68,7 @@ var SSI_COUNTRY_LABELS = {
   'hungary': '\uD83C\uDDED\uD83C\uDDFA Hungary',
   'iceland': '\uD83C\uDDEE\uD83C\uDDF8 Iceland',
   'ireland': '\uD83C\uDDEE\uD83C\uDDEA Ireland',
+  'israel': '\uD83C\uDDEE\uD83C\uDDF1 Israel',
   'italy': '\uD83C\uDDEE\uD83C\uDDF9 Italy',
   'japan': '\uD83C\uDDEF\uD83C\uDDF5 Japan',
   'korea': '\uD83C\uDDF0\uD83C\uDDF7 Republic of Korea',
@@ -95,7 +97,7 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'belgium': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'canada': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'chile': '95 variables \u00b7 substations: ? \u00b7 ? regions',
-  'costa-rica': '95 variables \u00b7 170 substations \u00b7 7 provincias',
+  'costa-rica': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'czechia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'denmark': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'estonia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
@@ -107,9 +109,10 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'hungary': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'iceland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'ireland': '95 variables \u00b7 substations: ? \u00b7 ? regions',
+  'israel': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'italy': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'japan': '95 variables \u00b7 substations: ? \u00b7 ? regions',
-  'korea': '95 variables \u00b7 1,184 substations \u00b7 17 do/si',
+  'korea': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'latvia': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'lithuania': '95 variables \u00b7 substations: ? \u00b7 ? regions',
   'luxembourg': '95 variables \u00b7 substations: ? \u00b7 ? regions',

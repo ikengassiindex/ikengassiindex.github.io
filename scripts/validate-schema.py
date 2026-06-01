@@ -63,6 +63,8 @@ MIN_FLEET = {
     "FI": 3000, "GR": 1500, "GL": 30,   "MX": 4000,
     "NZ": 1000, "NO": 4000, "PL": 3000, "PT": 1500,
     "SE": 3500, "TR": 4000, "GB": 2500, "US": 30000,
+    # Session 34 (Israel onboarding): IL 200 (actual 257; small dense country)
+    "IL": 200,
 }
 
 # Country slug → ISO2 (used to derive iso2 from filepath when data lacks an iso2 key)
