@@ -78,7 +78,6 @@
   </div>
 </div>
 
-
 <!-- ═══════════════════ A. FLEET SUMMARY — SESSION 1 ═══════════════════ -->
 <section id="exec" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section A</span>
@@ -116,7 +115,6 @@
 </section>
 
 <div style="margin:32px 0"></div>
-
 
 <!-- ═══════════════════ B. ASSET IN FOCUS ═══════════════════ -->
 <section id="focus" style="margin-bottom:32px">
@@ -174,197 +172,9 @@
 
 <p style="font-size:13px;line-height:1.7" id="focus-narrative">Loading substation metadata…</p>
 
-<script>
-(function(){
-  function monthSeed() {
-    var d = new Date();
-    return d.getFullYear() * 100 + (d.getMonth() + 1);
-  }
-  function seededIndex(seed, len) {
-    var h = seed;
-    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
-    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
-    h = (h >>> 16) ^ h;
-    return Math.abs(h) % Math.max(1, len);
-  }
-  function bandFromR(r){
-    if (r == null) return '—';
-    if (r < 0.25) return 'Low';
-    if (r < 0.50) return 'Medium';
-    if (r < 0.75) return 'High';
-    return 'Critical';
-  }
-  function bandColor(b){
-    if (b === 'Low') return 'var(--sage)';
-    if (b === 'Medium') return 'var(--bronze)';
-    if (b === 'High') return 'var(--terracotta)';
-    if (b === 'Critical') return 'var(--crimson)';
-    return 'var(--warm-grey)';
-  }
-  function fmt(v, digits){ return (v == null ? '—' : Number(v).toFixed(digits == null ? 3 : digits)); }
-
-  fetch('ssi-data.json?v=ee5c1d351b').then(function(r){ return r.json(); }).then(function(data){
-    var subs = (data && data.substations) || [];
-    if (!subs.length) {
-      document.getElementById('focus-name').textContent = 'No substations loaded';
-      return;
-    }
-    var idx = seededIndex(monthSeed(), subs.length);
-    var s = subs[idx] || subs[0];
-
-    document.getElementById('focus-name').textContent = s.name || s.substation_id || '—';
-    var region = s.region || s.kommune || '—';
-    var volt = (s.voltage_kv == null) ? 'unmapped' : (s.voltage_kv + ' kV');
-    document.getElementById('focus-location').textContent = region + ' · ' + volt;
-
-    // Scored fields
-    var rMed = (s.R_median != null) ? s.R_median : null;
-    var rP5 = (s.R_P5 != null) ? s.R_P5 : null;
-    var rP95 = (s.R_P95 != null) ? s.R_P95 : null;
-    var ci = (rP5 != null && rP95 != null) ? (rP95 - rP5) : (s.CI_width != null ? s.CI_width : null);
-    var band = s.classification || bandFromR(rMed);
-
-    // Fleet percentile
-    var sorted = subs.slice().map(function(x){ return x.R_median; }).filter(function(x){ return x != null; }).sort(function(a,b){ return a-b; });
-    var rank = (rMed != null) ? sorted.filter(function(x){ return x <= rMed; }).length : 0;
-    var pctile = (rMed != null && sorted.length) ? Math.round(100 * rank / sorted.length) : null;
-
-    var rEl = document.getElementById('focus-r');
-    rEl.textContent = fmt(rMed, 3);
-    rEl.style.color = bandColor(band);
-
-    var bEl = document.getElementById('focus-band');
-    bEl.textContent = band;
-    bEl.style.color = bandColor(band);
-
-    document.getElementById('focus-ci').textContent = ci != null ? ('±' + fmt(ci/2, 3)) : '—';
-    document.getElementById('focus-pctile').textContent = pctile != null ? ('P' + pctile) : '—';
-
-    // Components (C V I E S T)
-    var comp = s.components || {};
-    var compHTML = ['C','V','I','E','S','T'].map(function(k){
-      var v = comp[k];
-      return '<div><strong>' + k + ':</strong> ' + fmt(v, 3) + '</div>';
-    }).join('');
-    document.getElementById('focus-components').innerHTML = compHTML;
-
-    // Modifiers (R3 R4 R6a R6b R7)
-    var mods = s.modifiers || {};
-    var modKeys = [['R3','R3'],['R4','R4'],['R6a','R6a'],['R6b','R6b'],['R7','R7']];
-    var modHTML = modKeys.map(function(pair){
-      var v = mods[pair[0]];
-      return '<div><strong>' + pair[1] + ':</strong> ' + fmt(v, 3) + '</div>';
-    }).join('');
-    document.getElementById('focus-modifiers').innerHTML = modHTML;
-
-    // Geometry + MC
-    var deg = (s.graph_topology && s.graph_topology.degree != null) ? s.graph_topology.degree : '—';
-    var pga = (s.seismic && s.seismic.PGA_g != null) ? s.seismic.PGA_g : '—';
-    var opr = s.operator || 'Nukissiorfiit';
-    var latStr = (s.lat != null) ? Number(s.lat).toFixed(4) : '—';
-    var lonStr = (s.lon != null) ? Number(s.lon).toFixed(4) : '—';
-    document.getElementById('focus-geo').innerHTML =
-      '<div><strong>id:</strong> ' + (s.substation_id || '—') + '</div>' +
-      '<div><strong>operator:</strong> ' + opr + '</div>' +
-      '<div><strong>coord:</strong> ' + latStr + ', ' + lonStr + '</div>' +
-      '<div><strong>degree:</strong> ' + deg + ' · <strong>PGA:</strong> ' + pga + '</div>' +
-      '<div><strong>MC:</strong> 1,000 iter · R∈[' + fmt(rP5,3) + ', ' + fmt(rP95,3) + ']</div>';
-
-    // Radar chart on canvas (C/V/I/E/S/T) — normalised against component weight ceilings
-    (function drawRadar(){
-      var canvas = document.getElementById('focus-radar');
-      if (!canvas) return;
-      var ctx = canvas.getContext('2d');
-      var W = canvas.width, H = canvas.height;
-      var cx = W / 2, cy = H / 2 + 6;
-      var R = 68;
-      var labels = ['C', 'V', 'I', 'E', 'S', 'T'];
-      var weights = [0.30, 0.10, 0.25, 0.10, 0.20, 0.05];
-      var compSum = labels.reduce(function(sum, k){ return sum + (comp[k] || 0); }, 0);
-      var isWeighted = compSum <= 1.0;
-      var vals = labels.map(function(k, i){
-        var v = comp[k];
-        if (v == null) return 0;
-        return isWeighted ? v / weights[i] : v;
-      });
-      var n = labels.length;
-
-      // Concentric rings
-      ctx.strokeStyle = 'rgba(44,36,32,0.08)';
-      ctx.lineWidth = 1;
-      [0.25, 0.5, 0.75, 1.0].forEach(function(ring){
-        ctx.beginPath();
-        for (var i = 0; i <= n; i++) {
-          var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
-          var x = cx + R * ring * Math.cos(angle);
-          var y = cy + R * ring * Math.sin(angle);
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      });
-
-      // Axes
-      for (var i = 0; i < n; i++) {
-        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
-        ctx.stroke();
-      }
-
-      // Data polygon
-      ctx.fillStyle = 'rgba(148,25,20,0.15)';
-      ctx.strokeStyle = 'rgba(148,25,20,0.7)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (var i = 0; i <= n; i++) {
-        var angle = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
-        var v = Math.min(vals[i % n], 1);
-        var x = cx + R * v * Math.cos(angle);
-        var y = cy + R * v * Math.sin(angle);
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.fill();
-      ctx.stroke();
-
-      // Labels
-      ctx.fillStyle = '#2c2420';
-      ctx.font = '600 11px DM Sans, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      for (var i = 0; i < n; i++) {
-        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-        var lx = cx + (R + 16) * Math.cos(angle);
-        var ly = cy + (R + 16) * Math.sin(angle);
-        ctx.fillText(labels[i], lx, ly);
-      }
-    })();
-
-    // Dominant component + modifier
-    var domComp = null, domVal = -1;
-    Object.keys(comp).forEach(function(k){ if (comp[k] != null && comp[k] > domVal){ domVal = comp[k]; domComp = k; } });
-    var domMod = null, domModVal = -1;
-    Object.keys(mods).forEach(function(k){ var m = mods[k]; if (m != null && m > domModVal){ domModVal = m; domMod = k; } });
-
-    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    var d = new Date();
-    document.getElementById('focus-narrative').innerHTML =
-      'This edition\'s spotlight — automatically selected for <strong>' + monthNames[d.getMonth()] + ' ' + d.getFullYear() +
-      '</strong> — is <strong>' + (s.name || s.substation_id) + '</strong> in ' + region +
-      ', operated by ' + opr + '. R_median = <strong>' + fmt(rMed, 3) + '</strong> places it in the <strong style="color:' + bandColor(band) + '">' + band + '</strong> band' +
-      (pctile != null ? ' (fleet P' + pctile + ')' : '') + '. ' +
-      (domComp ? 'The dominant component is <strong>' + domComp + '</strong> (' + fmt(domVal, 3) + '), and ' : '') +
-      (domMod ? 'the heaviest modifier is <strong>' + domMod + '</strong> (×' + fmt(domModVal, 3) + '). ' : '') +
-      'Monte Carlo ran 1,000 iterations at the §8 Small-N setting, yielding a CI width of ' + (ci != null ? fmt(ci, 3) : '—') + '.';
-  }).catch(function(){
-    document.getElementById('focus-name').textContent = 'ssi-data.json unavailable';
-  });
-})();
-</script>
 </section>
 
 <div style="margin:32px 0"></div>
-
 
 <!-- ═══════════════════ C. CYBER & ECONOMIC EXPOSURE MONITOR ═══════════════════ -->
 <section id="cyber-econ" style="margin-bottom:32px">
@@ -401,7 +211,6 @@
 </section>
 
 <div style="margin:32px 0"></div>
-
 
 <!-- ═══════════════════ D. DATA REFRESH & CHANGELOG ═══════════════════ -->
 <section id="data" style="margin-bottom:32px">
@@ -447,175 +256,9 @@
 <h3>D.2 &ensp; Changelog — v3.4 → v4.0.2 (Greenland Edition 001)</h3>
 <div id="sec-d-changelog" style="margin:16px 0">Loading…</div>
 
-<script>
-(function(){
-  var meta = window.SSIMetadata || {};
-  var monthYear = (function(){ var _mn=['January','February','March','April','May','June','July','August','September','October','November','December']; var _d=new Date(); return _mn[_d.getMonth()]+' '+_d.getFullYear(); })();
-
-  var nSources = (meta.stats && meta.stats.sources) ? meta.stats.sources : 25;
-  var nVars = (meta.stats && meta.stats.variables) ? meta.stats.variables : 95;
-  var nComp = (meta.stats && meta.stats.components) ? meta.stats.components : 6;
-  var nMod = (meta.stats && meta.stats.modifiers) ? meta.stats.modifiers : 5;
-
-  document.getElementById('sec-d-intro').innerHTML =
-    'The SSI v4.0.2 Greenland build draws on <strong>' + nSources + '+ verified public data sources</strong> feeding ' +
-    nVars + ' variables across ' + nComp + ' components and ' + nMod +
-    ' modifiers. Edition 001 scores all 95 fields across the 37-substation fleet at 1,000 Monte Carlo iterations per node. This section provides a live registry of sources and the current state of the scored fleet.';
-
-  document.getElementById('d-total-src').textContent = nSources;
-  document.getElementById('d-total-vars').textContent = nVars + ' variables';
-  document.getElementById('d-table-header').innerHTML = '<h3 style="margin:0">Data Source Registry — ' + monthYear + '</h3>';
-
-  // ── Source Registry Table ──
-  var sources = meta.DATA_SOURCES;
-  if (sources && sources.length) {
-    var freqOrder = { Daily: 0, Continuous: 1, Weekly: 2, Monthly: 3, Quarterly: 4, Seasonal: 5, Annual: 6, Biennial: 7, Static: 8, Derived: 9 };
-    var sorted = sources.slice().sort(function(a,b){
-      return (freqOrder[a.freq] || 9) - (freqOrder[b.freq] || 9);
-    });
-    var freqColors = {
-      Daily: 'var(--sage)', Continuous: 'var(--sage)', Weekly: 'var(--sage)', Monthly: 'var(--sage)',
-      Quarterly: 'var(--bronze)', Seasonal: 'var(--bronze)', Annual: 'var(--bronze)', Biennial: 'var(--bronze)',
-      Static: 'var(--warm-grey)', Derived: 'var(--warm-grey)'
-    };
-    var freqBgs = {
-      Daily: 'rgba(93,133,99,0.12)', Continuous: 'rgba(93,133,99,0.12)', Weekly: 'rgba(93,133,99,0.12)', Monthly: 'rgba(93,133,99,0.12)',
-      Quarterly: 'rgba(184,134,58,0.12)', Seasonal: 'rgba(184,134,58,0.12)', Annual: 'rgba(184,134,58,0.12)', Biennial: 'rgba(184,134,58,0.12)',
-      Static: 'rgba(44,36,32,0.06)', Derived: 'rgba(44,36,32,0.06)'
-    };
-    var listHTML = sorted.map(function(src, i){
-      var fCol = freqColors[src.freq] || 'var(--warm-grey)';
-      var fBg = freqBgs[src.freq] || 'rgba(44,36,32,0.06)';
-      var border = i < sorted.length - 1 ? 'border-bottom:1px solid var(--card-border);' : '';
-      return '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:8px 0;' + border + '">' +
-        '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:42px;font-family:Consolas,monospace">' + (src.id || '—') + '</span>' +
-        '<span style="flex:1;font-weight:500">' + (src.name || '—') + '</span>' +
-        '<span style="flex-shrink:0;font-size:10px;color:' + fCol + ';background:' + fBg + ';padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase">' + (src.freq || '—') + '</span>' +
-        '<span style="flex-shrink:0;color:var(--warm-grey);font-size:11px;min-width:90px;text-align:right">' + (src.res || '—') + '</span>' +
-        '<span style="flex-shrink:0;font-weight:600;min-width:30px;text-align:right">' + (src.vars || '—') + ' var' + ((src.vars || 0) > 1 ? 's' : '') + '</span>' +
-      '</div>';
-    }).join('');
-    document.getElementById('sec-d-source-list').innerHTML = listHTML;
-  } else {
-    document.getElementById('sec-d-source-list').innerHTML =
-      '<div style="text-align:center;color:var(--warm-grey);padding:16px;font-size:12px">Source registry metadata not yet attached. See the Data page for the canonical table.</div>';
-  }
-
-  // ── Session 1 Fleet Inventory ──
-  fetch('ssi-data.json?v=ee5c1d351b').then(function(r){ return r.json(); }).then(function(data){
-    var subs = (data && data.substations) || [];
-    var regions = {};
-    subs.forEach(function(s){
-      var r = s.region || s.kommune || 'Unknown';
-      regions[r] = (regions[r] || 0) + 1;
-    });
-    var regList = Object.keys(regions).sort(function(a,b){ return regions[b] - regions[a]; });
-
-    var voltBuckets = { '63': 0, '10-15': 0, 'other': 0 };
-    subs.forEach(function(s){
-      var v = s.voltage_kv;
-      if (v === 63 || v === 60) voltBuckets['63']++;
-      else if (v && v >= 10 && v <= 15) voltBuckets['10-15']++;
-      else voltBuckets.other++;
-    });
-
-    var plants = (data && data.plants) ? data.plants.length : 74;
-    var lines = (data && data.lines) ? data.lines.length : 125;
-
-    var regRowsHTML = regList.map(function(r){
-      var pct = (regions[r] / subs.length * 100).toFixed(1);
-      return '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(44,36,32,0.04)">' +
-        '<span style="flex:1;font-weight:500">' + r + '</span>' +
-        '<span style="flex-shrink:0"><strong>' + regions[r] + '</strong> subs</span>' +
-        '<span style="flex-shrink:0;color:var(--warm-grey);min-width:44px;text-align:right">' + pct + '%</span>' +
-      '</div>';
-    }).join('');
-
-    var fleetHTML =
-      '<div class="card" style="margin-bottom:12px">' +
-        '<div class="label-xs" style="margin-bottom:8px">Substations by Kommune (N = ' + subs.length + ')</div>' +
-        regRowsHTML +
-      '</div>' +
-      '<div class="card" style="margin-bottom:12px">' +
-        '<div class="label-xs" style="margin-bottom:8px">Voltage classes</div>' +
-        '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(44,36,32,0.04)">' +
-          '<span style="flex:1">63 kV (HV transmission)</span><strong>' + voltBuckets['63'] + '</strong></div>' +
-        '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(44,36,32,0.04)">' +
-          '<span style="flex:1">10–15 kV (MV distribution)</span><strong>' + voltBuckets['10-15'] + '</strong></div>' +
-        '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:5px 0">' +
-          '<span style="flex:1">&lt; 10 kV / unmapped</span><strong>' + voltBuckets.other + '</strong></div>' +
-      '</div>' +
-      '<div style="display:flex;gap:12px;flex-wrap:wrap">' +
-        '<div class="card" style="flex:1;min-width:140px;text-align:center">' +
-          '<div class="label-xs">Plants / Generators</div>' +
-          '<div style="font-size:24px;font-weight:700;margin-top:4px">' + plants + '</div>' +
-          '<div style="font-size:11px;color:var(--warm-grey);margin-top:2px">OSM 2026-04-16</div>' +
-        '</div>' +
-        '<div class="card" style="flex:1;min-width:140px;text-align:center">' +
-          '<div class="label-xs">Power-Line Segments</div>' +
-          '<div style="font-size:24px;font-weight:700;margin-top:4px">' + lines + '</div>' +
-          '<div style="font-size:11px;color:var(--warm-grey);margin-top:2px">within-island only</div>' +
-        '</div>' +
-      '</div>';
-
-    document.getElementById('sec-d-fleet').innerHTML = fleetHTML;
-  }).catch(function(){
-    document.getElementById('sec-d-fleet').innerHTML =
-      '<div style="color:var(--warm-grey);font-size:12px">ssi-data.json could not be loaded.</div>';
-  });
-
-  // Changelog — Greenland Edition 001 entries
-  document.getElementById('sec-d-changelog').innerHTML =
-    '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:10px">8 changes tracked for Greenland v4.0.2 Edition 001</div>' +
-    '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
-      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">GL1</span>' +
-      '<span style="flex-shrink:0;font-size:10px;color:#5d8563;background:rgba(93,133,99,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">NEW</span>' +
-      '<span style="flex:1">37 substations scored (36 OSM + 1 Avannaata transformer, Ilulissat node/11958572184), 74 plants, 125 line segments across all 5 Kommuner</span>' +
-      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Section A</span>' +
-    '</div>' +
-    '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
-      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">GL7</span>' +
-      '<span style="flex-shrink:0;font-size:10px;color:#b8863a;background:rgba(184,134,58,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">ENH</span>' +
-      '<span style="flex:1">R6a Arctic restoration modifier recalibrated: α ∈ [0.55, 0.90] (was [0.40, 0.70]) to reflect Arctic Ocean logistics and winter darkness</span>' +
-      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Methodology §R6a</span>' +
-    '</div>' +
-    '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
-      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">GL8</span>' +
-      '<span style="flex-shrink:0;font-size:10px;color:#b8863a;background:rgba(184,134,58,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">ENH</span>' +
-      '<span style="flex:1">R6b seismic floor: α ∈ [0.05, 0.15] from GEUS — stable craton, minimal seismic amplification</span>' +
-      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Methodology §R6b</span>' +
-    '</div>' +
-    '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
-      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">GL10</span>' +
-      '<span style="flex-shrink:0;font-size:10px;color:#5d8563;background:rgba(93,133,99,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">NEW</span>' +
-      '<span style="flex:1">§7 Pituffik Space Base exclusion: bbox + operator filter, logged in meta.pituffik_excluded</span>' +
-      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Methodology §7</span>' +
-    '</div>' +
-    '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
-      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">GL13</span>' +
-      '<span style="flex-shrink:0;font-size:10px;color:#5d8563;background:rgba(93,133,99,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">NEW</span>' +
-      '<span style="flex:1">§8 Small-N Guardrail active: R3 tier-balance 2–50% per tier, MC 1,000 iter/substation, Gaussian copula held off at N=37</span>' +
-      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Methodology §8</span>' +
-    '</div>' +
-    '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border)">' +
-      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">GL19</span>' +
-      '<span style="flex-shrink:0;font-size:10px;color:#5d8563;background:rgba(93,133,99,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">NEW</span>' +
-      '<span style="flex:1">Avannaata substation added: GL_0037 — Ilulissat transformer (Gamle elværk) OSM node/11958572184, 10.5 kV, 69.22°N/−51.10°E</span>' +
-      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Section A</span>' +
-    '</div>' +
-    '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:6px 0">' +
-      '<span style="flex-shrink:0;font-weight:700;font-size:10px;color:var(--warm-grey);min-width:30px;font-family:Consolas,monospace">GL20</span>' +
-      '<span style="flex-shrink:0;font-size:10px;color:#5d8563;background:rgba(93,133,99,0.12);padding:2px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;min-width:65px;text-align:center">NEW</span>' +
-      '<span style="flex:1">Edition 001 scored (FIRST_REFRESH brought forward 2026-07 → 2026-04): fleet R_median = 0.779, 29 Critical, 7 High, 1 Medium, 0 Low</span>' +
-      '<span style="flex-shrink:0;color:var(--warm-grey);font-size:10px">Engine</span>' +
-    '</div>';
-})();
-</script>
-
 </section>
 
 <div style="margin:32px 0"></div>
-
 
 <!-- ═══════════════════ E. DEEP-DIVE ═══════════════════ -->
 <section id="deep" style="margin-bottom:32px">
@@ -633,7 +276,6 @@ Because Sermersooq only contains <strong>1 OSM-tagged substation</strong> in the
 </section>
 
 <div style="margin:32px 0"></div>
-
 
 <!-- ═══════════════════ F. EUROPEAN CONTEXT CARD ═══════════════════ -->
 <section id="eu" style="margin-bottom:32px">
@@ -745,7 +387,6 @@ Because Sermersooq only contains <strong>1 OSM-tagged substation</strong> in the
 
 <div style="margin:32px 0"></div>
 
-
 <!-- ═══════════════════ G. SSI ENHANCED NEURAL NETWORK ═══════════════════ -->
 <section id="enn" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section G — Recurring Module</span>
@@ -793,7 +434,6 @@ Because Sermersooq only contains <strong>1 OSM-tagged substation</strong> in the
 
 <div style="margin:32px 0"></div>
 
-
 <!-- ═══════════════════ H. LOOKING AHEAD ═══════════════════ -->
 <section id="ahead" style="margin-bottom:32px">
 <span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section H</span>
@@ -822,210 +462,6 @@ Because Sermersooq only contains <strong>1 OSM-tagged substation</strong> in the
 
 <p style="font-size:13px;line-height:1.7" id="h-closing">Loading…</p>
 
-<script>
-(function(){
-  var now = new Date();
-  var month = now.getMonth(); // 0-indexed
-  var year = now.getFullYear();
-  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-  // Next edition = two months ahead (bimonthly cadence, Edition 001 = April 2026, Edition 002 = June 2026)
-  var nextMonth = (month + 2) % 12;
-  var nextYear = (month + 2) > 11 ? year + 1 : year;
-  // Edition number: April 2026 = 1, May 2026 = 2, ...
-  var editionNum = (year - 2026) * 12 + (month + 1) - 3;
-  var nextEditionNum = editionNum + 1;
-  var nextEdition = String(Math.max(1, nextEditionNum)).padStart(3, '0');
-
-  // Deterministic seed
-  function seededIndex(s, len) {
-    var h = s;
-    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
-    h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
-    h = (h >>> 16) ^ h;
-    return Math.abs(h) % len;
-  }
-  var nextSeed = nextYear * 100 + (nextMonth + 1);
-
-  // ── Card 1: Next Edition deep-dive topics ──
-  var deepDives = [
-    { region: 'Sermersooq', theme: 'The Buksefjord Hydro Corridor', context: 'Hydro + Nuuk metro load', contextDetail: 'Buksefjord 45 MW, Nuuk metro concentration — SSI-ENN Layer 2 valuation anchor and R3 consequence profile' },
-    { region: 'Avannaata', theme: 'Ilulissat & the Arctic Frontier', context: 'High-Arctic isolation', contextDetail: 'Single transformer at 69.22°N, longest restoration timeline, R6a α → 0.90 envelope and polar-low exposure' },
-    { region: 'Qeqqata', theme: 'Sisimiut & the Hydro Uprate', context: 'West-coast hydro capacity', contextDetail: 'Sisimiut hydro uprate scenario, second-best fleet R_median, R6a α ≈ 0.70 — where Edition 002 movement is most likely' },
-    { region: 'Kujalleq', theme: 'South Greenland Micro-Grids', context: 'Settlement-cluster grid topology', contextDetail: 'Qaqortoq–Narsaq–Nanortalik micro-grids: 20 substations, highest N in fleet, R3 settlement tier dominant' },
-    { region: 'Qeqertalik', theme: 'The Disko Bay Nodes', context: 'Coastal Bay cluster', contextDetail: 'Aasiaat–Qasigiannguit–Qeqertarsuaq: 12 substations, tidewater glacier proximity, sea-ice logistics for spares' },
-    { region: 'Pan-Fleet', theme: 'Permafrost Degradation & R6b', context: 'Asiaq + GEUS ground ice signals', contextDetail: 'Asiaq continuous-permafrost retreat and GEUS bedrock data feeding R6b ice-accretion and foundation-stability penalties' },
-    { region: 'Pan-Fleet', theme: 'R7 Digital Readiness Uplift', context: 'Greenland Connect + Nukissiorfiit OT', contextDetail: 'Tele Greenland backhaul and smart-meter pilot rollout — the levers that could compress the 1.04–1.08 R7 band in Edition 002+' }
-  ];
-
-  var nextDiveIdx = seededIndex(nextSeed + 3333, deepDives.length);
-  var nextDive = deepDives[nextDiveIdx];
-
-  var card1 = document.getElementById('h-next-edition');
-  card1.innerHTML =
-    '<span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition ' + nextEdition + '</span>' +
-    '<h3 style="margin-top:0;font-size:15px">' + nextDive.theme + '</h3>' +
-    '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-    'Deep-dive into ' + nextDive.region + '\'s grid risk profile — substation map, component analysis, kommune breakdown. ' +
-    'European Context Card: ' + nextDive.contextDetail + '.</p>';
-
-  // ── Card 2: Next Data Refresh — from SSIMetadata ──
-  var meta = window.SSIMetadata;
-  if (meta && meta.FREQ_DISTRIBUTION) {
-    var currentQ = Math.floor(month / 3) + 1;
-    var nextQ = currentQ >= 4 ? 1 : currentQ + 1;
-    var nextQYear = currentQ >= 4 ? year + 1 : year;
-    var qLabels = { 1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4' };
-
-    // Find highest-impact annual source by variables covered
-    var annualHighImpact = (meta.DATA_SOURCES || []).filter(function(s){ return s.freq === 'Annual'; })
-      .sort(function(a,b){ return (b.vars||0) - (a.vars||0); })[0];
-
-    var qtrFD = meta.FREQ_DISTRIBUTION.Quarterly;
-    var qtrSources = qtrFD ? qtrFD.sources.join(', ') : 'none';
-    var qtrCount = qtrFD ? qtrFD.count : 0;
-
-    var card2 = document.getElementById('h-data-refresh');
-    card2.innerHTML =
-      '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
-      '<h3 style="margin-top:0;font-size:15px">' + qLabels[nextQ] + ' ' + nextQYear + ' — ' + qtrCount + ' Quarterly Sources</h3>' +
-      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-      '<strong>' + qtrSources + '</strong> due for refresh in ' + qLabels[nextQ] + '. ' +
-      'Impact: Nukissiorfiit reliability counters, Asiaq/DMI climate trajectories, CMIP6 Arctic downscaling refresh (R6b polar-low, freezing-spray, surge). ' +
-      'Highest-impact annual source pending: <strong>' + (annualHighImpact ? annualHighImpact.name : 'TBD') + '</strong>' +
-      (annualHighImpact ? ' (' + (annualHighImpact.vars||'?') + ' variables → ' + (annualHighImpact.feeds||'') + ')' : '') + '.</p>';
-  } else {
-    document.getElementById('h-data-refresh').innerHTML =
-      '<span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span>' +
-      '<h3 style="margin-top:0;font-size:15px">Monthly Cadence — Edition ' + nextEdition + '</h3>' +
-      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' +
-      'Nukissiorfiit reliability counters, Asiaq/DMI climate trajectories and CMIP6 Arctic downscaling re-ingest on the monthly refresh. ' +
-      'First pulse reading: Edition 002 vs Edition 001 R_median delta per substation, surfacing any movement outside the ±0.04–0.06 MC CI width.</p>';
-  }
-
-  // ── Card 3: Fleet Spotlight — rotating stat ──
-  fetch('ssi-data.json?v=ee5c1d351b').then(function(r){ return r.json(); }).then(function(data){
-    var fleet = (data && data.substations) || [];
-    var seed = year * 100 + (month + 1);
-
-    var spotlights = [];
-
-    // 1. Kommune with the highest risk concentration
-    var kData = {};
-    fleet.forEach(function(s){
-      var k = s.region || s.kommune || 'Unknown';
-      if (!kData[k]) kData[k] = { subs: [], sumR: 0, highCrit: 0 };
-      kData[k].subs.push(s);
-      kData[k].sumR += (s.R_median || 0);
-      if (s.classification === 'High' || s.classification === 'Critical') kData[k].highCrit++;
-    });
-    var kList = Object.keys(kData).map(function(k){
-      var d = kData[k];
-      return { name: k, n: d.subs.length, avg: d.subs.length ? d.sumR / d.subs.length : 0, highCrit: d.highCrit, pctHC: d.subs.length ? d.highCrit / d.subs.length : 0 };
-    });
-    kList.sort(function(a,b){ return b.pctHC - a.pctHC || b.avg - a.avg; });
-    var riskiest = kList[0];
-    if (riskiest) {
-      spotlights.push({
-        title: riskiest.name + ': Highest Risk Concentration',
-        body: '<strong>' + riskiest.name + '</strong> has the highest concentration of High/Critical substations: <strong>' +
-          riskiest.highCrit + ' of ' + riskiest.n + ' (' + (riskiest.pctHC * 100).toFixed(0) + '%)</strong> in the upper risk bands — ' +
-          'avg R_median = ' + riskiest.avg.toFixed(3) + '. This is the most acute kommune in the Session 1 fleet.'
-      });
-    }
-
-    // 2. Widest uncertainty — highest optionality
-    var byCIDesc = fleet.slice().filter(function(s){ return s.CI_width != null; }).sort(function(a,b){ return b.CI_width - a.CI_width; });
-    var topUncertain = byCIDesc.slice(0, 10);
-    if (topUncertain.length) {
-      var avgCItop = topUncertain.reduce(function(a,s){ return a + (s.CI_width||0); }, 0) / topUncertain.length;
-      var topRegions = {};
-      topUncertain.forEach(function(s){ var k = s.region || s.kommune || '—'; topRegions[k] = (topRegions[k] || 0) + 1; });
-      var topRegionStr = Object.keys(topRegions).sort(function(a,b){ return topRegions[b] - topRegions[a]; }).slice(0, 3).join(', ');
-      spotlights.push({
-        title: 'Highest Uncertainty = Highest Optionality',
-        body: 'The ' + topUncertain.length + ' substations with the widest confidence intervals (avg CI = ' + avgCItop.toFixed(3) +
-          ') represent the highest <em>option value</em> for BESS and hydro uprate investment — uncertainty creates optionality. ' +
-          'They concentrate in <strong>' + topRegionStr + '</strong>. In the SSI-ENN framework, these substations ' +
-          'would generate the largest real-options premium above base DCF valuation.'
-      });
-    }
-
-    // 3. Isolated within-island topology — every substation a "bridge"
-    var bridges = fleet.filter(function(s){ return s.graph_topology && s.graph_topology.is_bridge; });
-    var isolated = fleet.filter(function(s){ return s.graph_topology && (s.graph_topology.degree === 0); });
-    spotlights.push({
-      title: isolated.length + ' Isolated Nodes — Every Substation a Single Point of Failure',
-      body: 'Greenland\'s grid is a set of <strong>isolated within-island networks</strong>: ' +
-        '<strong>' + isolated.length + ' of ' + fleet.length + '</strong> substations have graph degree 0 — no inter-settlement edges — ' +
-        'and <strong>' + bridges.length + '</strong> are flagged as topological bridges. ' +
-        'In the SSI-ENN framework this collapses the R4 graph-criticality modifier into a binary: every node is a single point of failure for its settlement. ' +
-        'R6a Arctic restoration (α ∈ [0.55, 0.90]) therefore dominates — faster mutual aid cannot substitute for in-place redundancy.'
-    });
-
-    // 4. Arctic storm + permafrost — replaces the seismic spotlight
-    var arcticHigh = fleet.filter(function(s){ return (s.region === 'Avannaata' || s.region === 'Qeqertalik') && (s.classification === 'High' || s.classification === 'Critical'); });
-    spotlights.push({
-      title: 'Arctic Storm + Permafrost: The R6b Compound',
-      body: 'All 37 substations sit on the <strong>GEUS stable craton</strong> — seismic R6b is uniformly α ∈ [0.05, 0.15], effectively neutral. ' +
-        'The dominant physical-hazard modifier is instead <strong>Arctic storm + freezing-spray + permafrost foundation creep</strong>. ' +
-        '<strong>' + arcticHigh.length + ' High/Critical substations</strong> sit in Avannaata and Qeqertalik — the highest-latitude kommuner — ' +
-        'where polar-low storm frequency and continuous-permafrost retreat compound into the heaviest R6b penalty. ' +
-        'CMIP6 Arctic downscaling ingests will tighten this envelope at Edition 002.'
-    });
-
-    // 5. Economic fragility — Kujalleq + Qeqertalik settlement tier
-    var settlementHigh = fleet.filter(function(s){ return (s.region === 'Kujalleq' || s.region === 'Qeqertalik') && (s.classification === 'High' || s.classification === 'Critical'); });
-    spotlights.push({
-      title: 'Settlement Tier: ' + settlementHigh.length + ' High/Critical Nodes in Kujalleq + Qeqertalik',
-      body: 'South and central-west Greenland\'s settlement clusters carry the compressed-high R3 consequence multiplier: ' +
-        'elderly share 13–16%, unemployment 11–13%, GDP/cap DKK 205–235k — all below the pan-OECD median. ' +
-        '<strong>' + settlementHigh.length + '</strong> Kujalleq + Qeqertalik substations score High or Critical, meaning grid fragility ' +
-        'intersects with limited socio-economic capacity to absorb outage cost. The SSI\'s E component + R3 modifier make this invisible correlation visible.'
-    });
-
-    // 6. Markov degradation — 1-year degrade probability
-    var markovRisky = fleet.filter(function(s){ return s.markov && s.markov.P_degrade_1yr != null && s.markov.P_degrade_1yr > 0.25; });
-    if (markovRisky.length) {
-      var avgP = markovRisky.reduce(function(a,s){ return a + (s.markov.P_degrade_1yr||0); }, 0) / markovRisky.length;
-      spotlights.push({
-        title: markovRisky.length + ' Substations With Elevated 1-Year Degrade Probability',
-        body: 'The SSI\'s 4-state Markov degradation model identifies <strong>' + markovRisky.length +
-          ' substations</strong> with a 1-year transition-to-worse probability above 25% — ' +
-          'average P_degrade_1yr = <strong>' + avgP.toFixed(3) + '</strong>. ' +
-          'Without intervention, these substations will trend toward degraded or critical state on the next cycle. ' +
-          'Edition 002 will surface the per-node 3-year expected-state trajectory and compare against the Arctic R6a restoration envelope.'
-      });
-    }
-
-    // Pick this month's spotlight
-    var spotIdx = seededIndex(seed + 5555, spotlights.length);
-    var spot = spotlights[spotIdx] || spotlights[0] || { title: 'Fleet Spotlight', body: 'Loading fleet statistics…' };
-
-    var card3 = document.getElementById('h-spotlight');
-    card3.innerHTML =
-      '<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span>' +
-      '<h3 style="margin-top:0;font-size:15px">' + spot.title + '</h3>' +
-      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">' + spot.body + '</p>';
-
-    // Closing line
-    document.getElementById('h-closing').innerHTML =
-      'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
-      '. Deep-dive: <strong>' + nextDive.theme + '</strong> (' + nextDive.region + '). ' +
-      'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
-  }).catch(function(){
-    document.getElementById('h-spotlight').innerHTML =
-      '<span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span>' +
-      '<h3 style="margin-top:0;font-size:15px">ssi-data.json unavailable</h3>' +
-      '<p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Fleet statistics could not be loaded for this spotlight.</p>';
-    document.getElementById('h-closing').innerHTML =
-      'Edition ' + nextEdition + ' will be published on the second Thursday of ' + monthNames[nextMonth] + ' ' + nextYear +
-      '. Deep-dive: <strong>' + nextDive.theme + '</strong> (' + nextDive.region + '). ' +
-      'To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.';
-  });
-})();
-</script>
-
 <div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey)">
   <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent Nukissiorfiit, Departementet for Boliger og Infrastruktur, a Kommune, GEUS, Asiaq, Grønlands Statistik or an academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
 </div>
@@ -1033,6 +469,16 @@ Because Sermersooq only contains <strong>1 OSM-tagged substation</strong> in the
 
 </main>
 
-<script>renderFooter();</script>
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2c · KB §65 · Wave A 2026-06-03)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../intelligence-sections.js?v=3e8ade51fe"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('greenland', 'intelligence');
+  });
+</script>
+
 </body>
 </html>
