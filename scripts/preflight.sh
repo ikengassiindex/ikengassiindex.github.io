@@ -23,6 +23,8 @@
 #   D#21  — Content leakage (proper-noun vocab)                       [BPG Part XL]
 #   D#26  — Map aesthetic (two-axis offshore clip + jumps)            [BPG Part XLII NEW v2]
 #   D#27  — Substation sub-dict completeness (stub-class)             [BPG Part XLII NEW]
+#   D#28  — Power-line geometry richness (chord-only defect)          [BPG Part XLIII]
+#   D#29  — R3_C_mult per-substation variance (non-strict health)     [BPG Part XLV NEW]
 #   D#56  — Fleet-size floor (KB §56 stub-deploy regression)          [validate-schema.py]
 # ════════════════════════════════════════════════════════════════════════════
 
@@ -179,6 +181,26 @@ if [ -f scripts/check_line_geometry.py ]; then
   else
     run_gate "D#28" "power-line geometry richness (all)" \
       python3 scripts/check_line_geometry.py --all
+  fi
+fi
+
+# D#29 — R3_C_mult per-substation variance (post-Session 100 / KB §78)
+# Catches the DK/EE/GL/LV/LT discrete-clustering defect where regional socio-
+# economic data is applied uniformly to all substations in a region, producing
+# 4-5 discrete R3 values that break Section B.2 tier display.
+# Runs NON-STRICT — currently 19 of 39 countries fail (legacy digital-twin
+# pipelines have systemic discrete-R3 weakness; B.2 still renders correctly
+# thanks to country-config quartile-bucket calibration from hotfix #1).
+# Future country onboardings via score-country.py det_var pattern will PASS
+# by construction. Discipline #29 serves as a health metric pre-flight, not
+# a deploy blocker, until pipeline-layer cleanup completes.
+if [ -f scripts/check_r3_variance.py ]; then
+  if [ -n "$SLUG" ]; then
+    run_gate "D#29" "R3_C_mult variance (non-strict)" \
+      python3 scripts/check_r3_variance.py "$SLUG"
+  else
+    run_gate "D#29" "R3_C_mult variance (all, non-strict)" \
+      python3 scripts/check_r3_variance.py --all
   fi
 fi
 
