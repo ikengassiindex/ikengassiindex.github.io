@@ -143,26 +143,6 @@
           <div><strong id="scale-leaves">…</strong> unique risk leaves per substation</div>
         </div>
       </div>
-      <script>
-      (function(){
-        function fmt(v){if(v>=1e9)return(v/1e9).toFixed(2)+' B';if(v>=1e6)return(v/1e6).toFixed(1)+' M';if(v>=1e3)return v.toLocaleString('en-US');return String(v)}
-        fetch('ssi-data.json?v=719b498e64').then(function(r){return r.json()}).then(function(data){
-          var subs=data.substations,n=subs.length;
-          var isArr=Array.isArray(subs[0]);
-          var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=220}).length,mv=n-hv;
-          var mcIter=(data.meta&&data.meta.mc_iterations)||10000;
-          var vars=(data.meta&&data.meta.variables)||95;
-          var mc=n*mcIter;
-          var comp=Math.round(mc*vars/9.19);
-          var dp=Math.round(n*60.05);
-          document.getElementById('scale-comp').textContent=fmt(comp);
-          document.getElementById('scale-mc').textContent=fmt(mc);
-          document.getElementById('scale-dp').textContent=fmt(dp);
-          document.getElementById('scale-subs').textContent=n.toLocaleString('en-US')+' substation risk scores · '+hv.toLocaleString('en-US')+' HV · '+mv.toLocaleString('en-US')+' MV';
-          document.getElementById('scale-leaves').textContent=String(vars);
-        });
-      })();
-      </script>
             </div>
           </div>
         </div>
@@ -215,123 +195,23 @@
   </div>
 </main>
 
+<!-- ═══════════════════════════════════════════════════════════
+     MINI-MAP — owned by map.js, decoupled from data-driven section pipeline.
+     ═══════════════════════════════════════════════════════════ -->
 <script src="../map.js?v=2f4ed44dc1"></script>
+<script>SSIMap.init('mini-map-canvas', { embedded: true });</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d · KB §65, Wave E1 § 85)
+     The 2 inline JS blocks previously here (in-<main> KPI fetch + post-<main>
+     SSIMap.init with Object.defineProperty shim + heavy onLoaded callback)
+     are now factored into ../index-sections.js.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../index-sections.js?v=de4447c519"></script>
 <script>
-  Object.defineProperty(window, '_ssiHasSpread', { get: function(){ return true; }, set: function(){}, configurable: true });
-  SSIMap.init('mini-map-canvas', {
-    embedded: true,
-    onLoaded: function(ssi) {
-        // Ensure fleet_summary has all expected fields
-        var fs = ssi.fleet_summary || {};
-        if (!fs.band_pct && fs.bands) {
-          var t = fs.total || 1;
-          fs.band_pct = {};
-          for (var b in fs.bands) { fs.band_pct[b] = (fs.bands[b] / t) * 100; }
-        }
-        if (!fs.confidence_pct) fs.confidence_pct = {};
-        if (!fs.confidence_tiers) fs.confidence_tiers = {};
-        if (!fs.median_R) fs.median_R = fs.R_median || 0;
-        if (!fs.mean_R) fs.mean_R = fs.R_median || fs.median_R || 0;
-        if (!fs.P5) fs.P5 = fs.R_min || 0;
-        if (!fs.P95) fs.P95 = fs.R_max || 0;
-      document.getElementById('kpi-total').textContent = (ssi.fleet_summary.total || 0).toLocaleString();
-      document.getElementById('kpi-median').textContent = (ssi.fleet_summary.median_R || ssi.fleet_summary.R_median || 0).toFixed(3);
-      document.getElementById('kpi-median-sub').textContent = 'P5 = ' + (ssi.fleet_summary.P5 || ssi.fleet_summary.R_min || 0).toFixed(3) + ' · P95 = ' + (ssi.fleet_summary.P95 || ssi.fleet_summary.R_max || 0).toFixed(3);
-      document.getElementById('kpi-critical').textContent = ssi.fleet_summary.bands.Critical;
-      document.getElementById('kpi-critical-sub').textContent = ((ssi.fleet_summary.band_pct||{}).Critical||0).toFixed(1) + '% of fleet · R ≥ 0.75';
-      document.getElementById('dist-count').textContent = (ssi.fleet_summary.total || 0).toLocaleString() + ' substations';
-      var ehvCount = ssi.substations.filter(function(s) { return s.voltage_kv >= 220; }).length;
-      var hvCount = ssi.fleet_summary.total - ehvCount;
-      document.getElementById('kpi-total-sub').textContent = ehvCount.toLocaleString() + ' HV · ' + hvCount.toLocaleString() + ' MV · ' + (Array.isArray(ssi.regions)?ssi.regions:Object.values(ssi.regions)).length + ' Estados · CENACE + ~250 DSOs';
-
-      var bp = ssi.fleet_summary.band_pct;
-      var bc = ssi.fleet_summary.bands;
-      document.getElementById('dist-low').style.width = bp.Low + '%';
-      document.getElementById('dist-med').style.width = bp.Medium + '%';
-      document.getElementById('dist-high').style.width = bp.High + '%';
-      document.getElementById('dist-crit').style.width = bp.Critical + '%';
-      document.getElementById('legend-low').textContent = 'Low ' + bc.Low.toLocaleString() + ' (' + bp.Low.toFixed(1) + '%)';
-      document.getElementById('legend-med').textContent = 'Medium ' + bc.Medium.toLocaleString() + ' (' + bp.Medium.toFixed(1) + '%)';
-      document.getElementById('legend-high').textContent = 'High ' + bc.High.toLocaleString() + ' (' + bp.High.toFixed(1) + '%)';
-      document.getElementById('legend-crit').textContent = 'Critical ' + bc.Critical.toLocaleString() + ' (' + bp.Critical.toFixed(1) + '%)';
-
-      var tbody = document.getElementById('top-critical-tbody');
-      var top8 = ssi.substations.slice().sort(function(a,b){ return b.R_median - a.R_median; }).slice(0, 8);
-      tbody.innerHTML = top8.map(function(s) {
-        return '<tr><td style="font-weight:500">' + (s.name || s.id || 'Unnamed') + '</td>' +
-          '<td>' + s.region + '</td>' +
-          '<td class="num">' + s.R_median.toFixed(3) + '</td>' +
-          '<td><span class="band-badge ' + s.classification.toLowerCase() + '"><span class="band-dot ' + s.classification.toLowerCase() + '"></span>' + s.classification + '</span></td></tr>';
-      }).join('');
-
-      var compDefs = [
-        { key: 'C', label: 'C — Continuity', w: 0.30, color: 'var(--crimson)' },
-        { key: 'I', label: 'I — Infrastructure', w: 0.25, color: 'var(--sage)' },
-        { key: 'S', label: 'S — Saturation', w: 0.20, color: 'var(--bronze)' },
-        { key: 'V', label: 'V — Voltage Quality', w: 0.10, color: 'var(--terracotta)' },
-        { key: 'E', label: 'E — Economic', w: 0.10, color: '#3b9eff' },
-        { key: 'T', label: 'T — Energy Transition', w: 0.05, color: '#22d3ee' }
-      ];
-      var sums = { C: 0, V: 0, I: 0, E: 0, S: 0, T: 0 };
-      var n = ssi.substations.length;
-      ssi.substations.forEach(function(s) {
-        Object.keys(sums).forEach(function(k) { sums[k] += s.components[k]; });
-      });
-      Object.keys(sums).forEach(function(k) { sums[k] /= n; });
-
-      var compHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey)"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
-      compHTML += compDefs.map(function(c) {
-        var avg = sums[c.key];
-        var barPct = Math.min(avg * 100, 100).toFixed(1);
-        return '<div style="margin-bottom:14px">' +
-          '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
-            '<span style="font-size:13px;font-weight:500">' + c.label + '</span>' +
-            '<span style="font-size:12px;color:var(--warm-grey)">w = ' + c.w.toFixed(2) + ' · avg = ' + avg.toFixed(3) + '</span>' +
-          '</div>' +
-          '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
-            '<div style="width:' + barPct + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
-          '</div></div>';
-      }).join('');
-      document.getElementById('comp-bars').innerHTML = compHTML;
-
-      var cp = ssi.fleet_summary.confidence_pct || {};
-      var confDefs = [
-        { label: 'High', pct: cp.high || 0, color: 'var(--sage)' },
-        { label: 'Medium', pct: cp.medium || 0, color: 'var(--bronze)' },
-        { label: 'Low', pct: cp.low || 0, color: 'var(--terracotta)' }
-      ];
-      var confHTML = confDefs.map(function(c) {
-        var pv = typeof c.pct === 'number' ? c.pct : 0;
-        return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">' +
-          '<div style="width:60px;font-size:12px;font-weight:500;color:' + c.color + '">' + c.label + '</div>' +
-          '<div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
-            '<div style="width:' + pv.toFixed(1) + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
-          '</div>' +
-          '<div style="width:50px;font-size:12px;text-align:right;color:var(--warm-grey)">' + pv.toFixed(1) + '%</div></div>';
-      }).join('');
-      document.getElementById('confidence-bars').innerHTML = confHTML;
-
-      var modDefs = [
-        { key: 'R4_F_topo', label: 'R4', domain: 'Graph Criticality', range: '[0.80, 1.35]' },
-        { key: 'R3_C_mult', label: 'R3', domain: 'Consequence', range: '[0.70, 1.30]' },
-        { key: 'R6_restoration', label: 'R6a', domain: 'Restoration Speed', range: '[0.90, 1.10]' },
-        { key: 'R6_seismic', label: 'R6b', domain: 'Hurricane + Seismic + Geothermal Overlay', range: '[1.00, 1.25]' },
-        { key: 'R7_cyber', label: 'R7', domain: 'Digital Readiness', range: '[0.99, 1.05]' }
-      ];
-      var modStats = modDefs.map(function(m) {
-        var vals = ssi.substations.map(function(s) { return s.modifiers[m.key]; });
-        var mean = vals.reduce(function(a, b) { return a + b; }, 0) / vals.length;
-        var variance = vals.reduce(function(a, b) { return a + (b - mean) * (b - mean); }, 0) / vals.length;
-        return { label: m.label, domain: m.domain, range: m.range, sigma: Math.sqrt(variance) };
-      });
-      modStats.sort(function(a, b) { return b.sigma - a.sigma; });
-      document.getElementById('modifier-tbody').innerHTML = modStats.map(function(m) {
-        return '<tr><td style="font-weight:500">' + m.label + '</td>' +
-          '<td>' + m.domain + '</td>' +
-          '<td class="num">' + m.range + '</td>' +
-          '<td class="num">' + m.sigma.toFixed(3) + '</td></tr>';
-      }).join('');
-    }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('mexico', 'index');
   });
 </script>
 <script>renderFooter();</script>

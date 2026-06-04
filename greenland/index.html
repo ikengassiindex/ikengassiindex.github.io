@@ -143,26 +143,6 @@
           <div><strong id="scale-leaves">…</strong> unique risk leaves per substation</div>
         </div>
       </div>
-      <script>
-      (function(){
-        function fmt(v){if(v>=1e9)return(v/1e9).toFixed(2)+' B';if(v>=1e6)return(v/1e6).toFixed(1)+' M';if(v>=1e3)return v.toLocaleString('en-US');return String(v)}
-        fetch('ssi-data.json?v=ee5c1d351b').then(function(r){return r.json()}).then(function(data){
-          var subs=data.substations,n=subs.length;
-          var isArr=Array.isArray(subs[0]);
-          var hv=subs.filter(function(s){var v=isArr?Number(s[3]):Number(s.voltage_kv||0);return v>=220}).length,mv=n-hv;
-          var mcIter=(data.meta&&data.meta.mc_iterations)||10000;
-          var vars=(data.meta&&data.meta.variables)||95;
-          var mc=n*mcIter;
-          var comp=Math.round(mc*vars/9.19);
-          var dp=Math.round(n*60.05);
-          document.getElementById('scale-comp').textContent=fmt(comp);
-          document.getElementById('scale-mc').textContent=fmt(mc);
-          document.getElementById('scale-dp').textContent=fmt(dp);
-          document.getElementById('scale-subs').textContent=n.toLocaleString('en-US')+' substation risk scores · '+hv.toLocaleString('en-US')+' HV · '+mv.toLocaleString('en-US')+' MV';
-          document.getElementById('scale-leaves').textContent=String(vars);
-        });
-      })();
-      </script>
             </div>
           </div>
         </div>
@@ -215,175 +195,23 @@
   </div>
 </main>
 
+<!-- ═══════════════════════════════════════════════════════════
+     MINI-MAP — owned by map.js, decoupled from data-driven section pipeline.
+     ═══════════════════════════════════════════════════════════ -->
 <script src="../map.js?v=2f4ed44dc1"></script>
+<script>SSIMap.init('mini-map-canvas', { embedded: true });</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d · KB §65, Wave E1 § 85)
+     The 2 inline JS blocks previously here (in-<main> KPI fetch + post-<main>
+     SSIMap.init with Object.defineProperty shim + heavy onLoaded callback)
+     are now factored into ../index-sections.js.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../index-sections.js?v=de4447c519"></script>
 <script>
-  Object.defineProperty(window, '_ssiHasSpread', { get: function(){ return true; }, set: function(){}, configurable: true });
-  function _fmt(v, d){ return (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toFixed(d || 3); }
-
-  SSIMap.init('mini-map-canvas', {
-    embedded: true,
-    onLoaded: function(ssi) {
-        var isProvisional = (ssi.meta && ssi.meta.data_status === 'PROVISIONAL');
-        var fs = ssi.fleet_summary || {};
-        if (!fs.band_pct && fs.bands) {
-          var t = fs.total || 1;
-          fs.band_pct = {};
-          for (var b in fs.bands) { fs.band_pct[b] = (fs.bands[b] / t) * 100; }
-        }
-        if (!fs.confidence_pct) fs.confidence_pct = {};
-        if (!fs.confidence_tiers) fs.confidence_tiers = {};
-
-      document.getElementById('kpi-total').textContent = (fs.total || 0).toLocaleString();
-      document.getElementById('kpi-median').textContent = isProvisional ? 'Pending' : _fmt(fs.median_R || fs.R_median, 3);
-      document.getElementById('kpi-median').style.fontSize = isProvisional ? '18px' : '';
-      document.getElementById('kpi-median-sub').textContent = isProvisional ? 'Session 1 · 2026-07' : ('P5 = ' + _fmt(fs.P5 || fs.R_min, 3) + ' · P95 = ' + _fmt(fs.P95 || fs.R_max, 3));
-      document.getElementById('kpi-critical').textContent = isProvisional ? 'Pending' : (fs.bands ? fs.bands.Critical : '—');
-      document.getElementById('kpi-critical').style.fontSize = isProvisional ? '18px' : '';
-      document.getElementById('kpi-critical-sub').textContent = isProvisional ? 'Band assignment awaits scoring' : (((fs.band_pct||{}).Critical||0).toFixed(1) + '% of fleet · R ≥ 0.75');
-      document.getElementById('dist-count').textContent = (fs.total || 0).toLocaleString() + ' substations · ' + (isProvisional ? 'scoring pending' : 'scored');
-
-      var hvCount = ssi.substations.filter(function(s){ return (s.voltage_kv||0) >= 36; }).length;
-      var mvCount = (fs.total || ssi.substations.length) - hvCount;
-      var regionCount = (Array.isArray(ssi.regions) ? ssi.regions.length : Object.keys(ssi.regions||{}).length);
-      document.getElementById('kpi-total-sub').textContent = hvCount.toLocaleString() + ' HV (≥36 kV) · ' + mvCount.toLocaleString() + ' MV/unmapped · ' + regionCount + ' active Kommuner · Nukissiorfiit';
-
-      // Distribution bar
-      if (isProvisional) {
-        document.getElementById('dist-low').style.width  = '0%';
-        document.getElementById('dist-med').style.width  = '0%';
-        document.getElementById('dist-high').style.width = '0%';
-        document.getElementById('dist-crit').style.width = '0%';
-        document.querySelector('.dist-bar').style.background = 'repeating-linear-gradient(45deg, var(--cream-deep), var(--cream-deep) 10px, #f0ead6 10px, #f0ead6 20px)';
-        document.getElementById('legend-low').textContent  = 'Low — pending';
-        document.getElementById('legend-med').textContent  = 'Medium — pending';
-        document.getElementById('legend-high').textContent = 'High — pending';
-        document.getElementById('legend-crit').textContent = 'Critical — pending';
-      } else {
-        var bp = fs.band_pct, bc = fs.bands;
-        document.getElementById('dist-low').style.width  = (bp.Low||0) + '%';
-        document.getElementById('dist-med').style.width  = (bp.Medium||0) + '%';
-        document.getElementById('dist-high').style.width = (bp.High||0) + '%';
-        document.getElementById('dist-crit').style.width = (bp.Critical||0) + '%';
-        document.getElementById('legend-low').textContent  = 'Low '      + bc.Low.toLocaleString()      + ' (' + bp.Low.toFixed(1)      + '%)';
-        document.getElementById('legend-med').textContent  = 'Medium '   + bc.Medium.toLocaleString()   + ' (' + bp.Medium.toFixed(1)   + '%)';
-        document.getElementById('legend-high').textContent = 'High '     + bc.High.toLocaleString()     + ' (' + bp.High.toFixed(1)     + '%)';
-        document.getElementById('legend-crit').textContent = 'Critical ' + bc.Critical.toLocaleString() + ' (' + bp.Critical.toFixed(1) + '%)';
-      }
-
-      // Top-8 table — show location rows even when scoring pending
-      var tbody = document.getElementById('top-critical-tbody');
-      if (isProvisional) {
-        // Show 8 sample stations with Pending R scores (by internal_id for stable order)
-        var sample = ssi.substations.slice().sort(function(a,b){ return (a.internal_id||0) - (b.internal_id||0); }).slice(0, 8);
-        tbody.innerHTML = sample.map(function(s) {
-          var nm = (s.name || s.substation_id || 'Unnamed').replace(/^substation /,'Sub ');
-          return '<tr><td style="font-weight:500">' + nm + '</td>' +
-            '<td>' + (s.region || s.kommune || '—') + '</td>' +
-            '<td class="num" style="color:var(--warm-grey)">Pending</td>' +
-            '<td><span class="band-badge" style="background:#f0ead6;color:var(--warm-grey)">Pending</span></td></tr>';
-        }).join('') +
-          '<tr><td colspan="4" style="text-align:center;color:var(--warm-grey);font-size:11px;padding:8px;font-style:italic">R scores await Session 1 · 2026-07</td></tr>';
-      } else {
-        var top8 = ssi.substations.slice().sort(function(a,b){ return b.R_median - a.R_median; }).slice(0, 8);
-        tbody.innerHTML = top8.map(function(s) {
-          return '<tr><td style="font-weight:500">' + (s.name || s.id || 'Unnamed') + '</td>' +
-            '<td>' + (s.region || s.kommune || '—') + '</td>' +
-            '<td class="num">' + _fmt(s.R_median, 3) + '</td>' +
-            '<td><span class="band-badge ' + s.classification.toLowerCase() + '"><span class="band-dot ' + s.classification.toLowerCase() + '"></span>' + s.classification + '</span></td></tr>';
-        }).join('');
-      }
-
-      // Component bars — placeholder in provisional state
-      var compDefs = [
-        { key: 'C', label: 'C — Continuity',       w: 0.30, color: 'var(--crimson)' },
-        { key: 'I', label: 'I — Infrastructure',   w: 0.25, color: 'var(--sage)' },
-        { key: 'S', label: 'S — Saturation',       w: 0.20, color: 'var(--bronze)' },
-        { key: 'V', label: 'V — Voltage Quality',  w: 0.10, color: 'var(--terracotta)' },
-        { key: 'E', label: 'E — Economic',         w: 0.10, color: '#3b9eff' },
-        { key: 'T', label: 'T — Energy Transition',w: 0.05, color: '#22d3ee' }
-      ];
-      var compHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--warm-grey)"><span>◀ Higher risk</span><span>Lower risk ▶</span></div>';
-      if (isProvisional) {
-        compHTML += compDefs.map(function(c){
-          return '<div style="margin-bottom:14px">' +
-            '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
-              '<span style="font-size:13px;font-weight:500">' + c.label + '</span>' +
-              '<span style="font-size:12px;color:var(--warm-grey)">w = ' + c.w.toFixed(2) + ' · avg = pending</span>' +
-            '</div>' +
-            '<div style="height:8px;background:repeating-linear-gradient(45deg, var(--cream-deep), var(--cream-deep) 6px, #f0ead6 6px, #f0ead6 12px);border-radius:4px"></div>' +
-            '</div>';
-        }).join('');
-      } else {
-        var sums = { C:0, V:0, I:0, E:0, S:0, T:0 };
-        var n = ssi.substations.length;
-        ssi.substations.forEach(function(s){ Object.keys(sums).forEach(function(k){ sums[k] += (s.components||{})[k] || 0; }); });
-        Object.keys(sums).forEach(function(k){ sums[k] /= n; });
-        compHTML += compDefs.map(function(c){
-          var avg = sums[c.key];
-          var barPct = Math.min(avg * 100, 100).toFixed(1);
-          return '<div style="margin-bottom:14px">' +
-            '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
-              '<span style="font-size:13px;font-weight:500">' + c.label + '</span>' +
-              '<span style="font-size:12px;color:var(--warm-grey)">w = ' + c.w.toFixed(2) + ' · avg = ' + avg.toFixed(3) + '</span>' +
-            '</div>' +
-            '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
-              '<div style="width:' + barPct + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
-            '</div></div>';
-        }).join('');
-      }
-      document.getElementById('comp-bars').innerHTML = compHTML;
-
-      // Confidence bars
-      var cp = fs.confidence_pct || {};
-      var confDefs = isProvisional
-        ? [{ label: 'Pending', pct: (cp.pending||100), color: 'var(--warm-grey)' }]
-        : [
-            { label: 'High',   pct: cp.high   || 0, color: 'var(--sage)' },
-            { label: 'Medium', pct: cp.medium || 0, color: 'var(--bronze)' },
-            { label: 'Low',    pct: cp.low    || 0, color: 'var(--terracotta)' }
-          ];
-      document.getElementById('confidence-bars').innerHTML = confDefs.map(function(c){
-        var pv = typeof c.pct === 'number' ? c.pct : 0;
-        return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">' +
-          '<div style="width:60px;font-size:12px;font-weight:500;color:' + c.color + '">' + c.label + '</div>' +
-          '<div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden">' +
-            '<div style="width:' + pv.toFixed(1) + '%;height:100%;background:' + c.color + ';border-radius:4px"></div>' +
-          '</div>' +
-          '<div style="width:50px;font-size:12px;text-align:right;color:var(--warm-grey)">' + pv.toFixed(1) + '%</div></div>';
-      }).join('');
-
-      // Modifier impact
-      var modDefs = [
-        { key: 'R4_F_topo',      label: 'R4',  domain: 'Graph Criticality (within-island)',                             range: '[0.80, 1.35]' },
-        { key: 'R3_C_mult',      label: 'R3',  domain: 'Consequence + Settlement Isolation (small-N 2–50%)',            range: '[0.70, 1.35]' },
-        { key: 'R6_restoration', label: 'R6a', domain: 'Arctic Restoration (sea-ice window + air-only logistics)',      range: '[0.55, 0.90]' },
-        { key: 'R6_seismic',     label: 'R6b', domain: 'Stable-craton seismic floor (GEUS; intraplate)',                range: '[0.05, 0.15]' },
-        { key: 'R7_cyber',       label: 'R7',  domain: 'Digital Readiness + Greenland Connect cable exposure',          range: '[0.99, 1.05]' }
-      ];
-      if (isProvisional) {
-        document.getElementById('modifier-tbody').innerHTML = modDefs.map(function(m){
-          return '<tr><td style="font-weight:500">' + m.label + '</td>' +
-            '<td>' + m.domain + '</td>' +
-            '<td class="num">' + m.range + '</td>' +
-            '<td class="num" style="color:var(--warm-grey)">pending</td></tr>';
-        }).join('');
-      } else {
-        var modStats = modDefs.map(function(m){
-          var vals = ssi.substations.map(function(s){ return (s.modifiers||{})[m.key]; }).filter(function(v){ return v !== null && v !== undefined; });
-          if (!vals.length) return { label: m.label, domain: m.domain, range: m.range, sigma: null };
-          var mean = vals.reduce(function(a,b){ return a + b; }, 0) / vals.length;
-          var variance = vals.reduce(function(a,b){ return a + (b - mean) * (b - mean); }, 0) / vals.length;
-          return { label: m.label, domain: m.domain, range: m.range, sigma: Math.sqrt(variance) };
-        });
-        modStats.sort(function(a,b){ return (b.sigma||0) - (a.sigma||0); });
-        document.getElementById('modifier-tbody').innerHTML = modStats.map(function(m){
-          return '<tr><td style="font-weight:500">' + m.label + '</td>' +
-            '<td>' + m.domain + '</td>' +
-            '<td class="num">' + m.range + '</td>' +
-            '<td class="num">' + _fmt(m.sigma, 3) + '</td></tr>';
-        }).join('');
-      }
-    }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('greenland', 'index');
   });
 </script>
 <script>renderFooter();</script>
