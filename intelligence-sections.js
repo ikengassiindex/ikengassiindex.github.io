@@ -906,16 +906,40 @@
 
     // Determine the corridor: read from country-config.deep_dive.region
     // Fall back: pick the region with highest mean R, or Savinjska if present.
-    var corridor = (ctx.config && ctx.config.deep_dive && ctx.config.deep_dive.region) ||
-                   defaultDeepDiveRegion(fleet);
-    var corridorLabel = (ctx.config && ctx.config.deep_dive && ctx.config.deep_dive.label) || corridor;
+    // KB §94 (Session 110.audit) — also try region_slug if config provides it;
+    // covers IS/HU/SK/SI where substation data uses NUTS-3 codes or ASCII slugs
+    // while config provides display names with diacritics or admin suffixes.
+    var ddCfg = (ctx.config && ctx.config.deep_dive) || {};
+    var corridor = ddCfg.region || defaultDeepDiveRegion(fleet);
+    var corridorSlug = ddCfg.region_slug || null;
+    var corridorLabel = ddCfg.label || corridor;
 
     var puglia = fleet.filter(function (s) {
       return s.province === corridor || s.region === corridor;
     });
+    if (!puglia.length && corridorSlug) {
+      // KB §94 — try region_slug (ASCII/NUTS-3 code) when display-name failed.
+      // Iceland: region="Suðurnes" vs s.region="sudurnes"; Hungary:
+      // region="Tolna megye" vs s.region="HU110" (configs map via region_slug).
+      puglia = fleet.filter(function (s) {
+        return s.province === corridorSlug || s.region === corridorSlug;
+      });
+    }
     if (!puglia.length) {
       // Try common code-vs-name conversion (e.g. SI034 vs Savinjska)
       puglia = fleet.filter(function (s) { return (s.region || '').toLowerCase() === corridor.toLowerCase(); });
+    }
+    if (!puglia.length) {
+      // KB §94 — Unicode diacritic folding fallback. NFD-decompose both
+      // sides and strip combining marks so "Suðurnes" folds to "sudurnes",
+      // "Zürich" to "zurich", "Andalucía" to "andalucia", etc.
+      var fold = function (v) {
+        return (v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+      };
+      var corridorFolded = fold(corridor);
+      puglia = fleet.filter(function (s) {
+        return fold(s.province) === corridorFolded || fold(s.region) === corridorFolded;
+      });
     }
     if (!puglia.length) {
       // KB §69 HU hotfix #1 — admin-unit-suffix tolerance. Slovakia stores
@@ -930,6 +954,20 @@
       puglia = fleet.filter(function (s) {
         return strip(s.province) === corridorStripped || strip(s.region) === corridorStripped;
       });
+    }
+    if (!puglia.length) {
+      // KB §94 — final fallback: defaultDeepDiveRegion(fleet) picks the
+      // highest-R region from the actual data. If the configured corridor
+      // simply doesn't exist in this country's data (e.g. typo'd config),
+      // render against the best-available region rather than silent bail.
+      var dataDerivedCorridor = defaultDeepDiveRegion(fleet);
+      if (dataDerivedCorridor && dataDerivedCorridor !== corridor) {
+        corridor = dataDerivedCorridor;
+        corridorLabel = ddCfg.label || corridor;
+        puglia = fleet.filter(function (s) {
+          return s.province === corridor || s.region === corridor;
+        });
+      }
     }
     if (!puglia.length) return;
     puglia.sort(function (a, b) { return Safe.num(b.R_median, 0) - Safe.num(a.R_median, 0); });
