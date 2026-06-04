@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Interactive map of Belgium's electrical grid with SSI v4.0.2 resilience scores for 1,220 substations across 11 Provinces. 95 variables, topology network + EPEX registry risk.">
+<meta name="description" content="Interactive map of Belgium&#39;s electrical grid with SSI v4.0.2 resilience scores for 1,220 substations across 11 Provinces. 95 variables, topology network + EPEX registry risk.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Belgium · Map Explorer</title>
+<title>SSI Index — Map Explorer</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 <style>
   .map-container {
@@ -131,19 +131,20 @@
     .map-container { height: 450px; }
     .detail-scroll { max-height: none; }
   }
+
 </style>
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
+<script src="../ssi-versions.js?_=3"></script>
 <script src="../nav.js?v=00e36e5935"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=6a8330f303"></script>
 <script>renderNav('map');</script>
 
 <main class="page-shell" style="max-width:1440px">
-<div class="page-header animate-in">
+  <div class="page-header animate-in">
     <h1>Map Explorer</h1>
-    <p>Explore 1,220 substations (LIVE — OSM Overpass) across Belgium's transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
+    <p>Explore 1,220 substations across Belgium&#39;s transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
   </div>
 
   <!-- Filter Bar -->
@@ -151,10 +152,10 @@
     <label>Band</label>
     <select id="filter-band">
       <option value="all">All Bands</option>
-      <option value="Low">Low (0.00–0.25)</option>
-      <option value="Medium">Medium (0.25–0.50)</option>
-      <option value="High">High (0.50–0.75)</option>
-      <option value="Critical">Critical (0.75–1.00)</option>
+      <option value="Low">Low (0.00&ndash;0.25)</option>
+      <option value="Medium">Medium (0.25&ndash;0.50)</option>
+      <option value="High">High (0.50&ndash;0.75)</option>
+      <option value="Critical">Critical (0.75&ndash;1.00)</option>
     </select>
     <label>Province</label>
     <select id="filter-region">
@@ -171,14 +172,14 @@
     <label>Component Focus</label>
     <select id="filter-component">
       <option value="overall">Overall R Score</option>
-      <option value="C">C — Continuity</option>
-      <option value="V">V — Voltage Quality</option>
-      <option value="I">I — Infrastructure</option>
-      <option value="E">E — Economic</option>
-      <option value="S">S — Saturation</option>
-      <option value="T">T — Energy Transition</option>
+      <option value="C">C &mdash; Continuity</option>
+      <option value="V">V &mdash; Voltage Quality</option>
+      <option value="I">I &mdash; Infrastructure</option>
+      <option value="E">E &mdash; Economic</option>
+      <option value="S">S &mdash; Saturation</option>
+      <option value="T">T &mdash; Energy Transition</option>
     </select>
-    <input type="search" id="filter-search" placeholder="Search substation…" style="margin-left:auto;width:180px">
+    <input type="search" id="filter-search" placeholder="Search substation&hellip;" style="margin-left:auto;width:180px">
   </div>
 
   <!-- Map + Detail Panel -->
@@ -186,28 +187,28 @@
     <!-- Map -->
     <div class="card" style="padding:0;overflow:hidden">
       <div class="map-container">
-        <canvas id="ssi-map-canvas" role="img" aria-label="Interactive map of Belgium's electrical grid showing substations colored by SSI resilience score. Use mouse to pan and zoom, click substations for details."></canvas>
+        <canvas id="ssi-map-canvas" role="img" aria-label="Interactive map of Belgium&#39;s electrical grid showing substations colored by SSI resilience score. Use mouse to pan and zoom, click substations for details."></canvas>
         <div id="map-tooltip"></div>
 
         <div class="map-legend">
           <h4>SSI Band</h4>
-          <div class="map-legend-item"><div class="band-dot low"></div> Low (0.00–0.25)</div>
-          <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25–0.50)</div>
-          <div class="map-legend-item"><div class="band-dot high"></div> High (0.50–0.75)</div>
-          <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75–1.00)</div>
+          <div class="map-legend-item"><div class="band-dot low"></div> Low (0.00&ndash;0.25)</div>
+          <div class="map-legend-item"><div class="band-dot medium"></div> Medium (0.25&ndash;0.50)</div>
+          <div class="map-legend-item"><div class="band-dot high"></div> High (0.50&ndash;0.75)</div>
+          <div class="map-legend-item"><div class="band-dot critical"></div> Critical (0.75&ndash;1.00)</div>
           <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(44,36,32,0.08);font-size:10px;color:var(--warm-grey);line-height:1.5">
-            Scroll to zoom · Drag to pan<br>Click substation to inspect
+            Scroll to zoom &middot; Drag to pan<br>Click substation to inspect
           </div>
         </div>
 
         <div class="map-zoom">
           <button id="zoomIn" title="Zoom in">+</button>
-          <button id="zoomOut" title="Zoom out">−</button>
-          <button id="zoomFit" title="Fit Belgium" style="font-size:13px">⟐</button>
+          <button id="zoomOut" title="Zoom out">&minus;</button>
+          <button id="zoomFit" title="Fit Belgium" style="font-size:13px">&#10256;</button>
         </div>
 
         <div class="map-stats" id="map-stats">
-          Loading data…
+          Loading data&hellip;
         </div>
       </div>
     </div>
@@ -220,18 +221,20 @@
 </main>
 
 <!-- ═══════════════════════════════════════════════════════════
-     MAP — owned by map.js. SSIMap.init is invoked from inside
-     map-sections.js once data + config are loaded by the central
-     renderer. Country-specific center/zoom/stats overlay logic
-     lives in ../map-sections.js and reads from ssi-data.json +
-     intelligence/country-configs/<slug>.json.
+     MAP ENGINE — owned by map.js (canvas renderer · auto-fit ·
+     fleet_summary canonicalisation · filter wiring · detail panel).
+     SSIMap.init is invoked from inside map-sections.js once
+     CountryRenderer has loaded + normalised ssi-data.json + the
+     per-country config — keeping the map subsystem decoupled from
+     the data pipeline and centralising init options in one place.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../map.js?v=2f4ed44dc1"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.3 · KB §65, Wave E3 §85)
-     The previous inline SSIMap.init block (center / zoom / onLoaded
-     stats overlay) is now factored into ../map-sections.js.
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/map.html.j2 + templates/configs/belgium.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../map-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../map-sections.js?v=063331d06c"></script>
