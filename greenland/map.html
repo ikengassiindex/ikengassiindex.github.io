@@ -218,29 +218,25 @@
   </div>
 </main>
 
+<!-- ═══════════════════════════════════════════════════════════
+     MAP — owned by map.js. SSIMap.init is invoked from inside
+     map-sections.js once data + config are loaded by the central
+     renderer. Country-specific center/zoom/stats overlay logic
+     lives in ../map-sections.js and reads from ssi-data.json +
+     intelligence/country-configs/<slug>.json.
+     ═══════════════════════════════════════════════════════════ -->
 <script src="../map.js?v=2f4ed44dc1"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.3 · KB §65, Wave E3 §85)
+     The previous inline SSIMap.init block (center / zoom / onLoaded
+     stats overlay) is now factored into ../map-sections.js.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../map-sections.js?v=063331d06c"></script>
 <script>
-  Object.defineProperty(window, '_ssiHasSpread', { get: function(){ return true; }, set: function(){}, configurable: true });
-  SSIMap.init('ssi-map-canvas', {
-    center: { lat: 71.0, lon: -42.0 },
-    zoom: 4,
-    onLoaded: function(ssi) {
-      var stats = document.getElementById('map-stats');
-      if (!stats) return;
-      var fs = ssi.fleet_summary || {};
-      var isProvisional = (ssi.meta && ssi.meta.data_status === 'PROVISIONAL');
-      var regionCount = (Array.isArray(ssi.regions) ? ssi.regions.length : Object.keys(ssi.regions||{}).length);
-      if (isProvisional) {
-        stats.innerHTML = '<b>' + (fs.total||0).toLocaleString() + '</b> substations · ' +
-          '<b>' + regionCount + '</b> active Kommuner · Nukissiorfiit · ' +
-          '<span style="color:var(--bronze);font-weight:500">PROVISIONAL — Session 1 · 2026-07</span>';
-      } else {
-        stats.innerHTML = '<b>' + (fs.total||0).toLocaleString() + '</b> substations · ' +
-          '<b>' + regionCount + '</b> active Kommuner · Nukissiorfiit · ' +
-          '<b>' + (fs.bands ? fs.bands.Critical : 0) + '</b> critical · ' +
-          'median R = <b>' + (fs.median_R != null ? fs.median_R.toFixed(3) : '—') + '</b>';
-      }
-    }
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('greenland', 'map');
   });
 </script>
 <script>renderFooter();</script>
