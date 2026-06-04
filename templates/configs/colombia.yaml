@@ -18,6 +18,10 @@ descriptions:
     score, component breakdown, and socio-economic context. Five-tier R3 calibration
     (Capital-Metro/Industrial 1.05 / Regional-Capital 1.04 / Andean Intermediate 1.03
     / Pacific-Frontier 1.02 / Amazon-Frontier Sparse 1.01).
+  data: Download the complete SSI dataset for Colombia — JSON, CSV, GeoJSON. 30+ verified
+    public data sources, 95 variables, 10 data layers. XM + ISA INTERCOLOMBIA + CREG
+    + UPME + DANE + Banco de la República + IDEAM + SGC + ColCERT/CSIRT-XM + Unidad
+    de Víctimas + Migración Colombia.
 regional:
   subheader: Compare Colombia's 32 departamentos plus Bogotá D.C. by SSI score, component
     breakdown, and socio-economic context across 381 substations. Five-tier R3 calibration
@@ -92,3 +96,71 @@ map:
     label: 138 / 115 kV
   - value: other
     label: < 115 kV
+data:
+  country_adjective: Colombia
+  layer_e_extended: false
+  source_registry_count: 30+
+  data_layers:
+  - code: A
+    vars: 20
+    sources: UPME PERT 2024-2034 transmission plan · CREG annual reliability + 2024
+      emergency CREG-101-009-2024 demand-curtailment resolution · per-DSO continuity
+      filings (Codensa + EPM + EPSA-Celsia + Air-e + Afinia + 20 smaller OR)
+  - code: B.1
+    vars: 3
+    sources: IDEAM ENSO advisories (El Niño / La Niña phase) · reservoir-level monitoring
+      (Guavio + Chivor + Ituango + Sogamoso) · Open-Meteo / ERA5 · XM ASIC settlement
+      data (open since 1995 MEM market design)
+  - code: B.2
+    vars: 4
+    sources: IEEE C57.91 thermal stress under tropical / Andean-elevation / Caribbean
+      marine regimes · peak demand ~12-13 GW summer + dry-season backup · 500 kV +
+      230 kV + 220 kV backbone loading
+  - code: B.3
+    vars: 12
+    sources: IEEE/CIGRÉ degradation curves under volcanic SO₂/H₂S exposure + Caribbean
+      salt-aerosol + Andean elevation thermal cycling + active armed-conflict pylon-attack
+      stress
+  - code: C
+    vars: 9
+    sources: DANE Cuentas Departamentales (per-departamento GDP + population) · Banco
+      de la República national accounts + COP/USD FX · Unidad de Víctimas IDP register
+      (~9,4M cumulative) · Migración Colombia (~3M Venezuelan refugees) · DANE energy-poverty
+      supplement
+  - code: D
+    vars: 7
+    sources: 'SGC seismic + 475-yr PGA hazard maps (anchors: Armenia 1999 Mw 6,2 +
+      Tumaco 1979 Mw 8,2 + Quetame 2008 Mw 5,9 + Bucaramanga seismic nest) · SGC volcanic
+      alert bulletins (Ruiz/Galeras/Tolima/Puracé/Huila/Doña Juana/Cumbal/Sotará/Cerro
+      Bravo) · IDEAM ENSO + reservoir-drawdown advisories (R6_drought NEW reservoir-electricity-nexus
+      form) · IDEAM flood-hazard + 2017 Mocoa landslide reference · ISO 9223 C5 Pacific
+      Chocó + Caribbean coast + C3 Andean inland'
+  - code: E
+    vars: 8
+    sources: SGC seismic + volcanic observatories (OVSM Manizales / OVSP Pasto / OVSPop
+      Popayán) · IDEAM hydro / meteo · ColCERT national CERT + CSIRT-XM sectoral electricity
+      · Unidad de Víctimas + Migración Colombia · Defensoría del Pueblo · ANLA environmental
+      licensing
+  - code: F
+    vars: 12
+    sources: 'State-transition probabilities calibrated against fragmented ~25-DSO
+      market: Codensa 30% (Enel) + EPM (Antioquia municipal) + EPSA-Celsia (Valle)
+      + Air-e + Afinia (Caribbean post-Electricaribe split 2020) + ~20 smaller regional
+      + cooperative operators'
+  - code: G
+    vars: 3
+    sources: CREG quality reports · UPME PERT / PERG benchmarks · JRC DSO Observatory
+      · NEW R6_armed_conflict (cohort-FIRST durable internal-conflict α) + R6_drought
+      reservoir-electricity-nexus α + R6_volcanic active reading · R7 ceiling 1,030
+      mid-cohort
+  - code: H
+    vars: 7
+    sources: UPME PERT 2024-2034 transmission expansion · SGC seismic + volcanic observatory
+      · OSM Overpass ISO3166-1='CO' ring analysis (Ecuador 230 kV Pasto-Quito ACTIVE;
+      Venezuela 230 kV Cuestecitas-Cuatricentenario SUSPENDED commercial flow since
+      2008; Panama Andean-CA interconnect extension planned 500 kV Cerromatoso-Veladero
+      pending environmental approval)
+  - code: I
+    vars: 7
+    sources: Risk score, ETTC, stationary probabilities, R3 5-tier band (1,05 / 1,04
+      / 1,03 / 1,02 / 1,01 across 33 departamentos), Markov 5-state
