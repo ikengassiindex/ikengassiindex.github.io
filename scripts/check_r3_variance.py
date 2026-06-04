@@ -78,13 +78,13 @@ def check_country(slug, repo_root="."):
             if mod_idx < len(arr) and isinstance(arr[mod_idx], dict):
                 v = arr[mod_idx].get("R3_C_mult")
                 if isinstance(v, (int, float)):
-                    vals.append(round(v, 4))
+                    vals.append(round(v, 6))
     else:
         vals = []
         for s in raw_subs:
             v = s.get("modifiers", {}).get("R3_C_mult")
             if isinstance(v, (int, float)):
-                vals.append(round(v, 4))
+                vals.append(round(v, 6))
 
     n = len(vals)
     if n == 0:
