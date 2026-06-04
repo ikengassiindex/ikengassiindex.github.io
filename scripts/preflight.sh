@@ -25,6 +25,7 @@
 #   D#27  — Substation sub-dict completeness (stub-class)             [BPG Part XLII NEW]
 #   D#28  — Power-line geometry richness (chord-only defect)          [BPG Part XLIII]
 #   D#29  — R3_C_mult per-substation variance (non-strict health)     [BPG Part XLV NEW]
+#   D#30  — Required-files presence (intelligence/ssi-metadata/data/geo) [BPG Part LX NEW]
 #   D#56  — Fleet-size floor (KB §56 stub-deploy regression)          [validate-schema.py]
 # ════════════════════════════════════════════════════════════════════════════
 
@@ -67,6 +68,20 @@ run_gate() {
     FAILED_GATES+=("$name")
   fi
 }
+
+# D#30 — Required-files presence (NEW, KB §93 / BPG Part LX)
+# Runs first because if any country is missing required files, all subsequent
+# gates that try to load those files will produce noise (file-not-found errors
+# masquerading as content/schema failures).
+if [ -f scripts/check_required_files.py ]; then
+  if [ -n "$SLUG" ]; then
+    run_gate "D#30" "required-files presence" \
+      python3 scripts/check_required_files.py "$SLUG" $STRICT_FLAG
+  else
+    run_gate "D#30" "required-files presence (all 39)" \
+      python3 scripts/check_required_files.py $STRICT_FLAG
+  fi
+fi
 
 # D#3 — Inline JS parse-check
 if [ -f scripts/check_inline_js_parse.py ]; then
