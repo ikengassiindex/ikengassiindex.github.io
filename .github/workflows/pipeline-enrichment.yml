@@ -4,7 +4,11 @@ name: SSI Pipeline — Data Enrichment
 # Also supports manual trigger with country selection
 on:
   schedule:
-    - cron: '0 6 1-7 * 4'  # 1st Thursday of each month
+    # KB §91.A — narrow cron to "every Thursday at 06:00 UTC", then runtime-gate
+    # to dom <= 7 (1st Thursday). The previous expression '0 6 1-7 * 4' looked
+    # like "1st Thursday" but GitHub Actions cron uses OR semantics when both
+    # day-of-month AND day-of-week are restricted, so it fired ~10×/month.
+    - cron: '0 6 * * 4'  # every Thursday at 06:00 UTC (runtime-gated below)
   workflow_dispatch:
     inputs:
       countries:
@@ -40,17 +44,38 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      # KB §91.B — gate scheduled runs to 1st Thursday (dom <= 7). Manual
+      # workflow_dispatch always proceeds. If this is a scheduled run and
+      # today is NOT in the first calendar week, exit 0 (no-op success).
+      - name: Gate to 1st Thursday (scheduled runs only)
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            DOM=$(date -u +%-d)
+            if [ "$DOM" -gt "7" ]; then
+              echo "::notice::Scheduled run on day-of-month=$DOM — not 1st Thursday. Exiting."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python 3.11
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
+        if: steps.gate.outputs.skip != 'true'
         run: |
           pip install --upgrade pip
           # Optional: netCDF4 for real CDS data processing
@@ -58,6 +83,7 @@ jobs:
           echo "Pipeline uses stdlib only — no external dependencies required"
 
       - name: Restore ingestion cache
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/cache@v4
         with:
           path: scripts/pipeline/.cache
@@ -67,6 +93,7 @@ jobs:
 
       - name: Determine countries
         id: countries
+        if: steps.gate.outputs.skip != 'true'
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             COUNTRIES="${{ github.event.inputs.countries }}"
@@ -76,6 +103,7 @@ jobs:
           echo "countries=$COUNTRIES" >> $GITHUB_OUTPUT
 
       - name: Run pipeline
+        if: steps.gate.outputs.skip != 'true'
         run: |
           COUNTRIES="${{ steps.countries.outputs.countries }}"
           FLAGS=""
@@ -97,14 +125,14 @@ jobs:
           python -m scripts.pipeline.run $FLAGS --output-report pipeline-report.json -v
 
       - name: Upload pipeline report
-        if: always()
+        if: always() && steps.gate.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: pipeline-report-${{ github.run_number }}
           path: pipeline-report.json
 
       - name: Cache-bust ESG report assets
-        if: github.event.inputs.dry_run != 'true'
+        if: steps.gate.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
         run: |
           STAMP=$(date +%s)
           # KB §57 — iterate countries.json single source of truth (no more hardcoded list).
@@ -121,7 +149,7 @@ jobs:
           done
 
       - name: Commit enriched data
-        if: github.event.inputs.dry_run != 'true'
+        if: steps.gate.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
         run: |
           git config user.name "SSI Pipeline Bot"
           git config user.email "pipeline@ikengassiindex.github.io"
@@ -138,7 +166,18 @@ jobs:
           - Monte Carlo rescoring (10k iterations)
 
           See pipeline-report artifact for full diff."
-            git push
+            # KB §91.A — pull-rebase before push to defuse cron race
+            # against external pushes (intelligence/esg-refresh, manual).
+            # Fallback to merge -X ours if rebase conflicts (we always want
+            # to keep our enrichment data).
+            for attempt in 1 2 3; do
+              git pull --rebase --autostash origin main && break
+              echo "Rebase attempt ${attempt} failed; trying merge -X ours"
+              git rebase --abort 2>/dev/null || true
+              git pull --no-rebase --no-edit -X ours origin main && break
+              sleep 5
+            done
+            git push origin main
             echo "✓ Committed and pushed enriched data"
           else
             echo "No changes to commit"

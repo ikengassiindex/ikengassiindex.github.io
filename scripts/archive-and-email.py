@@ -94,6 +94,16 @@ PAGES = [
 # larger files need upload session. We'll skip files > 3 MB.
 MAX_ATTACHMENT_BYTES = 3 * 1024 * 1024
 
+# KB §91.D — Graph API rejects sendMail payloads over ~35 MB with
+# HTTP 400 ErrorMessageSizeExceeded (April 2026 incident: 44.5 MB / 84 atts).
+# When the candidate attachment set (after base64 expansion) exceeds this
+# soft cap, we drop the PDFs and keep the HTML snapshots only. Rationale:
+# HTMLs are the canonical archive (live in the repo under archive/<YYYY-MM>/);
+# PDFs are convenience and remain available as workflow artifacts even when
+# dropped from the email. Cap is 28 MB to leave headroom for base64 + JSON
+# envelope + the ~4/3 expansion factor over the raw bytes already counted.
+MAX_TOTAL_EMAIL_BYTES = 28 * 1024 * 1024
+
 
 def get_graph_token():
     """Acquire an OAuth2 access token using client credentials flow."""
@@ -146,10 +156,30 @@ def send_email_graph(files, edition_label, edition_key):
     pdfs = [f for f in files if f.suffix == ".pdf"]
     htmls = [f for f in files if f.suffix == ".html"]
 
+    # KB §91.D — Drop-PDFs-if-too-large policy. Estimate raw bytes first
+    # (base64 expands ~4/3). If the full set would breach the Graph soft
+    # cap, drop PDFs and keep HTMLs only. HTMLs are the canonical archive;
+    # PDFs are still captured under archive/<YYYY-MM>/ and re-uploaded as a
+    # workflow artifact, so nothing is lost — only un-emailed.
+    raw_total = sum(f.stat().st_size for f in files)
+    b64_estimate = int(raw_total * 4 / 3)
+    pdfs_dropped_for_size = False
+    if b64_estimate > MAX_TOTAL_EMAIL_BYTES and pdfs:
+        pdfs_dropped_for_size = True
+        candidate_files = htmls
+        print(
+            f"  Email payload would be ~{b64_estimate/1024/1024:.1f} MB > "
+            f"{MAX_TOTAL_EMAIL_BYTES/1024/1024:.0f} MB cap — dropping "
+            f"{len(pdfs)} PDF(s), keeping {len(htmls)} HTML(s) only "
+            f"(PDFs remain in archive/ + workflow artifact)"
+        )
+    else:
+        candidate_files = list(files)
+
     # Build attachments array
     attachments = []
     skipped = 0
-    for file_path in files:
+    for file_path in candidate_files:
         file_bytes = file_path.read_bytes()
         if len(file_bytes) > MAX_ATTACHMENT_BYTES:
             print(f"    SKIP attachment {file_path.name} ({len(file_bytes)/1024:.0f} KB > 3 MB limit)")
@@ -164,12 +194,23 @@ def send_email_graph(files, edition_label, edition_key):
             "contentBytes": base64.b64encode(file_bytes).decode("ascii"),
         })
 
+    if pdfs_dropped_for_size:
+        attached_summary = (
+            f"Attached: {len(attachments)} HTML snapshot(s) "
+            f"— PDFs omitted (email size cap); PDFs remain in repo under "
+            f"archive/{edition_key}/ and in the workflow run artifact"
+        )
+    else:
+        attached_summary = (
+            f"Attached: {len(attachments)} files ({len(pdfs)} PDFs + {len(htmls)} HTMLs)"
+            f"{f' — {skipped} skipped (>3 MB)' if skipped else ''}"
+        )
+
     body_text = (
         f"SSI Monthly Archive — Edition {edition_label}\n"
         f"Period: {edition_key}\n"
         f"Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n\n"
-        f"Attached: {len(attachments)} files ({len(pdfs)} PDFs + {len(htmls)} HTMLs)"
-        f"{f' — {skipped} skipped (>3 MB)' if skipped else ''}\n"
+        f"{attached_summary}\n"
         f"Pages: Intelligence + ESG Report per country\n"
         f"Countries: {', '.join(c.upper() for c in COUNTRIES)}\n\n"
         f"Save these files to:\n"
@@ -230,6 +271,9 @@ def send_email_graph(files, edition_label, edition_key):
         "recipient": recipient,
         "attachments": len(attachments),
         "skipped": skipped,
+        "pdfs_dropped_for_size": pdfs_dropped_for_size,
+        "raw_total_bytes": raw_total,
+        "b64_estimate_bytes": b64_estimate,
     }
     if err is not None:
         RUN_LOG["email"]["status"] = "failed"

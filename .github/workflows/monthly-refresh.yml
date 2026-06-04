@@ -1,8 +1,10 @@
 name: Monthly Intelligence & ESG Refresh
 on:
   schedule:
-    # Second Thursday of each month at 10:00 UTC
-    - cron: '0 10 8-14 * 4'
+    # KB §91.B — narrow cron to "every Thursday at 10:00 UTC", then runtime-gate
+    # to 8 <= dom <= 14 (2nd Thursday). The previous expression '0 10 8-14 * 4'
+    # used GitHub's OR semantics for restricted DOM+DOW, firing ~10×/month.
+    - cron: '0 10 * * 4'  # every Thursday at 10:00 UTC (runtime-gated below)
   workflow_dispatch:
     inputs:
       force_edition:
@@ -28,24 +30,43 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
+      # KB §91.B — gate scheduled runs to 2nd Thursday (8 <= dom <= 14).
+      # Manual workflow_dispatch always proceeds.
+      - name: Gate to 2nd Thursday (scheduled runs only)
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            DOM=$(date -u +%-d)
+            if [ "$DOM" -lt "8" ] || [ "$DOM" -gt "14" ]; then
+              echo "::notice::Scheduled run on day-of-month=$DOM — not 2nd Thursday. Exiting."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.skip != 'true'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       # ── Step 1: Archive current pages (before rotation) as PDF + HTML + email ──
       - name: Install Playwright for PDF/HTML capture
-        if: ${{ github.event.inputs.skip_archive != 'true' }}
+        if: ${{ steps.gate.outputs.skip != 'true' && github.event.inputs.skip_archive != 'true' }}
         run: |
           pip install playwright
           playwright install chromium --with-deps
 
       - name: Archive Intelligence + ESG pages (PDF + HTML + email)
-        if: ${{ github.event.inputs.skip_archive != 'true' }}
+        if: ${{ steps.gate.outputs.skip != 'true' && github.event.inputs.skip_archive != 'true' }}
         env:
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -55,7 +76,7 @@ jobs:
         run: python3 scripts/archive-and-email.py
 
       - name: Upload run log artifact
-        if: ${{ always() && github.event.inputs.skip_archive != 'true' }}
+        if: ${{ always() && steps.gate.outputs.skip != 'true' && github.event.inputs.skip_archive != 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: ssi-archive-run-log
@@ -65,10 +86,11 @@ jobs:
 
       # ── Step 2: Update edition config ──
       - name: Update edition config
+        if: steps.gate.outputs.skip != 'true'
         run: python3 scripts/update-edition.py
 
       - name: Override edition if forced
-        if: ${{ github.event.inputs.force_edition != '' }}
+        if: ${{ steps.gate.outputs.skip != 'true' && github.event.inputs.force_edition != '' }}
         run: |
           python3 -c "
           import json
@@ -83,6 +105,7 @@ jobs:
 
       # ── Step 3: Cache-bust and commit (includes archive/ folder) ──
       - name: Cache-bust intelligence + ESG assets
+        if: steps.gate.outputs.skip != 'true'
         run: |
           STAMP=$(date +%s)
           CURRENT_YM=$(date -u +%Y-%m)
@@ -91,7 +114,11 @@ jobs:
           COUNTRIES=$(python3 -c "import json; print(' '.join(json.load(open('intelligence/countries.json'))['slugs']))")
           for country in $COUNTRIES; do
             FIRST=$(python3 -c "import json; print(json.load(open('intelligence/countries.json'))['first_refresh'].get('$country', ''))")
-            if [ -n "$FIRST" ] && [ "$CURRENT_YM" \< "$FIRST" ]; then
+            # KB §91.C — truncate to YYYY-MM so "2026-06-04" compares cleanly
+            # against CURRENT_YM "2026-06". Previously a YYYY-MM-DD value would
+            # always evaluate as > YYYY-MM and silently skip the country.
+            FIRST_YM="${FIRST:0:7}"
+            if [ -n "$FIRST_YM" ] && [ "$CURRENT_YM" \< "$FIRST_YM" ]; then
               echo "  SKIP ${country}: first automated refresh ${FIRST} (current ${CURRENT_YM})"
               continue
             fi
@@ -104,6 +131,7 @@ jobs:
           done
 
       - name: Commit and push (edition update + archive files)
+        if: steps.gate.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -113,5 +141,15 @@ jobs:
           else
             EDITION=$(python3 -c "import json; print(json.load(open('intelligence/edition-config.json'))['current_edition'])")
             git commit -m "chore: monthly refresh — Edition $(printf '%03d' $EDITION) + archive [$(date +%Y-%m-%d)]"
-            git push
+            # KB §91.A — pull-rebase before push to defuse cron race against
+            # external pushes. Fallback to merge -X ours if rebase conflicts;
+            # the cron's edition bump + archive payload always wins.
+            for attempt in 1 2 3; do
+              git pull --rebase --autostash origin main && break
+              echo "Rebase attempt ${attempt} failed; trying merge -X ours"
+              git rebase --abort 2>/dev/null || true
+              git pull --no-rebase --no-edit -X ours origin main && break
+              sleep 5
+            done
+            git push origin main
           fi

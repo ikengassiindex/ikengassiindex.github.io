@@ -1,8 +1,11 @@
 name: Monthly ESG Report Refresh
 on:
   schedule:
-    # Second Thursday of each month at 11:00 UTC (1 hour after intelligence refresh)
-    - cron: '0 11 8-14 * 4'
+    # KB §91.B — narrow cron to "every Thursday at 11:00 UTC" (1 h after the
+    # intelligence refresh), then runtime-gate to 8 <= dom <= 14 (2nd Thursday).
+    # The previous expression '0 11 8-14 * 4' used GitHub's OR semantics for
+    # restricted DOM+DOW, firing ~10×/month.
+    - cron: '0 11 * * 4'  # every Thursday at 11:00 UTC (runtime-gated below)
   workflow_dispatch:
     inputs:
       cache_bust_only:
@@ -24,12 +27,31 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
+      # KB §91.B — gate scheduled runs to 2nd Thursday (8 <= dom <= 14).
+      # Manual workflow_dispatch always proceeds.
+      - name: Gate to 2nd Thursday (scheduled runs only)
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            DOM=$(date -u +%-d)
+            if [ "$DOM" -lt "8" ] || [ "$DOM" -gt "14" ]; then
+              echo "::notice::Scheduled run on day-of-month=$DOM — not 2nd Thursday. Exiting."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.skip != 'true'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # ── Step 1: Cache-bust ESG report pages ──
       - name: Cache-bust ESG report assets
+        if: steps.gate.outputs.skip != 'true'
         run: |
           STAMP=$(date +%s)
           # Country slugs come from intelligence/countries.json single source of truth
@@ -56,6 +78,7 @@ jobs:
 
       # ── Step 2: Update reporting period date in footer ──
       - name: Update report generation date
+        if: steps.gate.outputs.skip != 'true'
         run: |
           REPORT_DATE=$(date +"%d %B %Y")
           # Country slugs come from intelligence/countries.json single source of truth
@@ -76,6 +99,7 @@ jobs:
 
       # ── Step 3: Commit and push ──
       - name: Commit and push
+        if: steps.gate.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -84,5 +108,15 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: monthly ESG report refresh [$(date +%Y-%m-%d)]"
-            git push
+            # KB §91.A — pull-rebase before push to defuse cron race against
+            # external pushes. Fallback to merge -X ours if rebase conflicts;
+            # the cron's cache-bust + footer-date payload always wins.
+            for attempt in 1 2 3; do
+              git pull --rebase --autostash origin main && break
+              echo "Rebase attempt ${attempt} failed; trying merge -X ours"
+              git rebase --abort 2>/dev/null || true
+              git pull --no-rebase --no-edit -X ours origin main && break
+              sleep 5
+            done
+            git push origin main
           fi
