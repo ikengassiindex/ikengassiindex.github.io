@@ -29,6 +29,27 @@ REPO_ROOT  = Path(__file__).resolve().parent.parent.parent
 CONFIG_DIR = REPO_ROOT / "templates" / "configs"
 
 META_RE = re.compile(r'<meta\s+name="description"\s+content="([^"]+)"', re.I)
+# H1 inner content — captures the inner HTML so Colombia's <span>flag</span> + text survives
+H1_RE = re.compile(r'<h1>(.*?)</h1>', re.S | re.I)
+# Subheader paragraph after H1
+SUBHEADER_RE = re.compile(
+    r'<h1>.*?</h1>\s*<p>(.*?)</p>', re.S | re.I
+)
+# KPI #2 (Data Sources) value — second kpi-value
+KPI_SOURCES_RE = re.compile(
+    r'<div class="kpi-label">Data Sources</div>\s*<div class="kpi-value"[^>]*>([^<]+)</div>',
+    re.S | re.I
+)
+# KPI #4 (Max Frequency) value (e.g. "Weekly", "Monthly")
+KPI_FREQ_RE = re.compile(
+    r'<div class="kpi-label">Max Frequency</div>\s*<div class="kpi-value"[^>]*>([^<]+)</div>',
+    re.S | re.I
+)
+# dl-geo card description — "X coordinates + SSI scores"
+DL_GEO_RE = re.compile(
+    r'<div id="dl-geo"[^>]*>.*?<div style="font-size:12px;color:var\(--warm-grey\)">([^<]+?) coordinates \+ SSI scores</div>',
+    re.S | re.I
+)
 # Layer E "Country Adjective Open Data" — may have " + Energy Policy" suffix
 # Also captures the optional suffix so the full label can be reconstructed
 COUNTRY_ADJ_RE = re.compile(
@@ -83,6 +104,31 @@ def extract_one(slug):
         out['country_adjective'] = None
         out['layer_e_extended'] = False
 
+    # H1 inner — preserve Colombia-style <span>flag</span> + text
+    STANDARD_H1 = "Data &amp; Download"
+    m_h1 = H1_RE.search(html)
+    if m_h1:
+        h1 = m_h1.group(1).strip()
+        out['h1_html'] = h1 if h1 != STANDARD_H1 else None
+    else:
+        out['h1_html'] = None
+
+    # Subheader paragraph (full text after H1) — store only if non-default
+    m_sub = SUBHEADER_RE.search(html)
+    out['subheader_html'] = html_decode(m_sub.group(1).strip()) if m_sub else None
+
+    # KPI #2 sources count (separate from Source Registry span)
+    m_kpi = KPI_SOURCES_RE.search(html)
+    out['kpi_sources_count'] = html_decode(m_kpi.group(1).strip()) if m_kpi else None
+
+    # KPI #4 max frequency (Weekly/Monthly)
+    m_freq = KPI_FREQ_RE.search(html)
+    out['kpi_max_frequency'] = html_decode(m_freq.group(1).strip()) if m_freq else None
+
+    # dl-geo card label (e.g. "Kommune", "Région", "State")
+    m_geo = DL_GEO_RE.search(html)
+    out['geo_label'] = html_decode(m_geo.group(1).strip()) if m_geo else None
+
     m_reg = SOURCE_REGISTRY_RE.search(html)
     out['source_registry_count'] = html_decode(m_reg.group(1).strip()) if m_reg else None
 
@@ -110,6 +156,18 @@ def update_config(slug, extracted, dry_run=False):
         d['country_adjective'] = extracted['country_adjective']
     # Always set layer_e_extended so the template knows which variant to render
     d['layer_e_extended'] = extracted.get('layer_e_extended', False)
+    if extracted.get('h1_html'):
+        d['h1_html'] = extracted['h1_html']
+    elif 'h1_html' in d:
+        del d['h1_html']  # was non-standard, now standard — drop the override
+    if extracted.get('subheader_html'):
+        d['subheader_html'] = extracted['subheader_html']
+    if extracted.get('kpi_sources_count'):
+        d['kpi_sources_count'] = extracted['kpi_sources_count']
+    if extracted.get('kpi_max_frequency'):
+        d['kpi_max_frequency'] = extracted['kpi_max_frequency']
+    if extracted.get('geo_label'):
+        d['geo_label'] = extracted['geo_label']
     if extracted.get('source_registry_count'):
         d['source_registry_count'] = extracted['source_registry_count']
     if extracted.get('data_layers'):

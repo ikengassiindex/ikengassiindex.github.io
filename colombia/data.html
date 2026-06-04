@@ -5,15 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Download the complete SSI dataset for Colombia — JSON, CSV, GeoJSON. 30+ verified public data sources, 95 variables, 10 data layers. XM + ISA INTERCOLOMBIA + CREG + UPME + DANE + Banco de la República + IDEAM + SGC + ColCERT/CSIRT-XM + Unidad de Víctimas + Migración Colombia.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Colombia Data &amp; Download</title>
+<title>SSI Index — Data &amp; Download</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
-<script src="../ssi-versions.js?v=dffbd5ace6"></script>
+<script src="../ssi-versions.js?_=3"></script>
 <script src="../nav.js?v=00e36e5935"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=db8a3cd1c1"></script>
 <script>renderNav('data');</script>
+
+
 
 <main class="page-shell">
   <div class="page-header animate-in">
@@ -26,7 +28,7 @@
     <div class="kpi-card">
       <div class="kpi-label">Total Variables</div>
       <div class="kpi-value" style="color:var(--ink)">95</div>
-      <div class="kpi-sub">Across 10 data layers</div>
+      <div class="kpi-sub">Across 11 data layers</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Data Sources</div>
@@ -35,13 +37,13 @@
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Substations</div>
-      <div class="kpi-value" style="color:var(--sage)" id="data-subs">—</div>
-      <div class="kpi-sub" id="data-subs-sub">Loading…</div>
+      <div class="kpi-value" style="color:var(--sage)" id="data-subs">&mdash;</div>
+      <div class="kpi-sub" id="data-subs-sub">Loading&hellip;</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Max Frequency</div>
       <div class="kpi-value" style="color:var(--terracotta)">Daily</div>
-      <div class="kpi-sub">XM ASIC + IDEAM ENSO feeds</div>
+      <div class="kpi-sub">Layer B proxy/fuzzy vars</div>
     </div>
   </div>
 
@@ -54,8 +56,8 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px">
       <div id="dl-full" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📊</div>
-        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (CSV)</div>
-        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">— substations · all fields</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">&mdash; substations &middot; all fields</div>
       </div>
       <div id="dl-summary" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📋</div>
@@ -64,7 +66,7 @@
       </div>
       <div id="dl-geo" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">🗺️</div>
-        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Geographic Data (JSON)</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Geographic Data (PDF)</div>
         <div style="font-size:12px;color:var(--warm-grey)">Departamento coordinates + SSI scores</div>
       </div>
       <div id="dl-formula" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
@@ -73,19 +75,13 @@
         <div style="font-size:12px;color:var(--warm-grey)">Complete v4.0.2 technical reference</div>
       </div>
     </div>
-    <div style="margin-top:12px;font-size:11px;color:var(--warm-grey)">Direct file: <a href="ssi-data.json" style="color:var(--terracotta);text-decoration:none">ssi-data.json</a> · <a href="grid-geo.json" style="color:var(--terracotta);text-decoration:none">grid-geo.json</a> · <a href="versions.json" style="color:var(--terracotta);text-decoration:none">versions.json</a></div>
   </div>
 
-  <!-- Raw Substation Table removed (hotfix #6): no renderer hook in data-sections.js;
-       CR + IL canonical pages do not include this section. The 381 substations are
-       available via the Download SSI Dataset card above (ssi-data.json) and surfaced
-       on map.html + regional.html. Removing avoids a permanent Loading… placeholder. -->
-
-  <!-- Data Layers — 95 SSI v4.0.2 variables grouped A-I -->
+  <!-- Data Layers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Layers</h3>
-      <span class="label-xs">10 layers · 95 variables</span>
+      <span class="label-xs">11 layers &middot; 95 variables</span>
     </div>
     <table class="data-table" style="margin-top:4px">
       <thead>
@@ -166,7 +162,7 @@
           <td>Network &amp; Topology</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
-          <td style="font-size:12px">UPME PERT 2024-2034 transmission expansion · SGC seismic + volcanic observatory · OSM Overpass ISO3166-1='CO' ring analysis (Ecuador 230 kV Pasto-Quito ACTIVE; Venezuela 230 kV Cuestecitas-Cuatricentenario SUSPENDED commercial flow since 2008; Panama Andean-CA interconnect extension planned 500 kV Cerromatoso-Veladero pending environmental approval)</td>
+          <td style="font-size:12px">UPME PERT 2024-2034 transmission expansion · SGC seismic + volcanic observatory · OSM Overpass ISO3166-1=&#39;CO&#39; ring analysis (Ecuador 230 kV Pasto-Quito ACTIVE; Venezuela 230 kV Cuestecitas-Cuatricentenario SUSPENDED commercial flow since 2008; Panama Andean-CA interconnect extension planned 500 kV Cerromatoso-Veladero pending environmental approval)</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#8e44ad">I</td>
@@ -183,7 +179,7 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Source Registry</h3>
-      <span class="label-xs">30+ verified · all free &amp; public</span>
+      <span class="label-xs">30+ verified &middot; all free &amp; public</span>
     </div>
     <div class="source-grid" style="margin-top:12px" id="data-source-grid"></div>
   </div>
@@ -195,11 +191,11 @@
       <span class="label-xs">Client-side formula implementation</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:12px">
-      The SSI v4.0.2 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 8 modifier functions (R2 adaptive IRI, R3 consequence sigmoid 5-tier, R4 graph criticality, R6a_seismic Andean subduction, R6_volcanic active, R6_drought reservoir-electricity-nexus NEW form, R6_armed_conflict NEW cohort-FIRST durable modifier, R7 digital-readiness — Colombia ceiling 1,030 mid-cohort), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1.000 iterations for browser performance).
+      The SSI v4.0.2 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b network topology, R7 digital readiness), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
     </p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">—</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">&mdash;</div>
         <div style="font-size:10px;color:var(--warm-grey)">Public API functions</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
@@ -207,41 +203,38 @@
         <div style="font-size:10px;color:var(--warm-grey)">Global weight entries</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">8</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">6</div>
         <div style="font-size:10px;color:var(--warm-grey)">Modifier functions</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">1.000</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">1,000</div>
         <div style="font-size:10px;color:var(--warm-grey)">MC iterations (browser)</div>
       </div>
     </div>
   </div>
 
   <!-- API / Schema -->
-  <div class="card animate-in" style="margin-bottom:32px">
+  <div class="card animate-in">
     <div class="card-header">
       <h3>Output Schema</h3>
       <span class="label-xs">JSON per substation</span>
     </div>
     <div class="formula-block" id="schema-block" style="font-size:12px;line-height:1.6">
-      Loading live sample…
+      Loading live sample&hellip;
     </div>
-  </div>
-
-  <!-- Cohort attribution -->
-  <div style="text-align:center;padding:24px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:16px">
-    <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Data &amp; Download — Colombia · Session 39 inaugural</p>
-    <p style="margin-bottom:4px">381 substations · 33 departamentos · 95 variables across 10 data layers · COP currency convention ($ symbol, pre-numeric, `.` thousands, `,` decimal)</p>
-    <p>Currency context: mid-2026 ≈ 4.000-4.400 COP/USD per Banco de la República. Direct numeric strings on this page follow Colombian local convention (e.g., 17.000 km, 23.000 fatalities, $8.000 COP/kWh).</p>
   </div>
 </main>
 
-<!-- jsPDF + autotable for the PDF download buttons -->
+<!-- jsPDF + autotable for the 4 PDF download buttons -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.5 · KB §65)
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/data.html.j2 + templates/configs/colombia.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../data-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../data-sections.js?v=44cf6cb5de"></script>

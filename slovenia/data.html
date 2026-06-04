@@ -15,6 +15,8 @@
 <script src="ssi-metadata.js?v=6ba09293e2"></script>
 <script>renderNav('data');</script>
 
+
+
 <main class="page-shell">
   <div class="page-header animate-in">
     <h1>Data &amp; Download</h1>
@@ -31,12 +33,12 @@
     <div class="kpi-card">
       <div class="kpi-label">Data Sources</div>
       <div class="kpi-value" style="color:var(--bronze)">30+</div>
-      <div class="kpi-sub">All verified & public</div>
+      <div class="kpi-sub">All verified &amp; public</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Substations</div>
-      <div class="kpi-value" style="color:var(--sage)" id="data-subs">—</div>
-      <div class="kpi-sub" id="data-subs-sub">Loading…</div>
+      <div class="kpi-value" style="color:var(--sage)" id="data-subs">&mdash;</div>
+      <div class="kpi-sub" id="data-subs-sub">Loading&hellip;</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Max Frequency</div>
@@ -55,7 +57,7 @@
       <div id="dl-full" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📊</div>
         <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (PDF)</div>
-        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">— substations · all fields</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">&mdash; substations &middot; all fields</div>
       </div>
       <div id="dl-summary" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📋</div>
@@ -79,7 +81,7 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Layers</h3>
-      <span class="label-xs">11 layers · 95 variables</span>
+      <span class="label-xs">11 layers &middot; 95 variables</span>
     </div>
     <table class="data-table" style="margin-top:4px">
       <thead>
@@ -157,7 +159,7 @@
         </tr>
         <tr>
           <td style="font-weight:600;color:#e67e22">H</td>
-          <td>Network & Topology</td>
+          <td>Network &amp; Topology</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
           <td style="font-size:12px">ELES Network Statement · ARSO + ZAG-EQS · OSM</td>
@@ -177,7 +179,7 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Source Registry</h3>
-      <span class="label-xs">18+ verified · all free & public</span>
+      <span class="label-xs">18+ verified &middot; all free &amp; public</span>
     </div>
     <div class="source-grid" style="margin-top:12px" id="data-source-grid"></div>
   </div>
@@ -193,7 +195,7 @@
     </p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">—</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">&mdash;</div>
         <div style="font-size:10px;color:var(--warm-grey)">Public API functions</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
@@ -218,7 +220,7 @@
       <span class="label-xs">JSON per substation</span>
     </div>
     <div class="formula-block" id="schema-block" style="font-size:12px;line-height:1.6">
-      Loading live sample…
+      Loading live sample&hellip;
     </div>
   </div>
 </main>
@@ -227,14 +229,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.5 · KB §65)
-     The ~310-line inline IIFE previously here (KPI counts, source-grid
-     render, engine-fns count, 4× PDF generators, live schema sample) is
-     now factored into ../data-sections.js. Country-specific values
-     (file_slug, region_field, region labels, Formula PDF data-layer
-     narrative) live in ../intelligence/country-configs/slovenia.json
-     under data_page. DATA_SOURCES still live on ssi-metadata.js.
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/data.html.j2 + templates/configs/slovenia.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../data-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../data-sections.js?v=44cf6cb5de"></script>

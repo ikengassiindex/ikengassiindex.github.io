@@ -9,11 +9,13 @@
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
+<script src="../ssi-versions.js?_=3"></script>
 <script src="../nav.js?v=00e36e5935"></script>
-<script src="../ssi-engine.js"></script>
-<script src="ssi-metadata.js"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=172ce39771"></script>
 <script>renderNav('data');</script>
+
+
 
 <main class="page-shell">
   <div class="page-header animate-in">
@@ -31,12 +33,12 @@
     <div class="kpi-card">
       <div class="kpi-label">Data Sources</div>
       <div class="kpi-value" style="color:var(--bronze)">30</div>
-      <div class="kpi-sub">All verified & public</div>
+      <div class="kpi-sub">All verified &amp; public</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Substations</div>
-      <div class="kpi-value" style="color:var(--sage)" id="data-subs">—</div>
-      <div class="kpi-sub" id="data-subs-sub">Loading…</div>
+      <div class="kpi-value" style="color:var(--sage)" id="data-subs">&mdash;</div>
+      <div class="kpi-sub" id="data-subs-sub">Loading&hellip;</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Max Frequency</div>
@@ -55,7 +57,7 @@
       <div id="dl-full" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📊</div>
         <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (PDF)</div>
-        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">— substations · all fields</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">&mdash; substations &middot; all fields</div>
       </div>
       <div id="dl-summary" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📋</div>
@@ -70,7 +72,7 @@
       <div id="dl-formula" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
         <div style="font-size:22px;margin-bottom:6px">📐</div>
         <div style="font-weight:500;font-size:14px;margin-bottom:2px">Formula Construct (PDF)</div>
-        <div style="font-size:12px;color:var(--warm-grey)">Complete v4.0 technical reference</div>
+        <div style="font-size:12px;color:var(--warm-grey)">Complete v4.0.2 technical reference</div>
       </div>
     </div>
   </div>
@@ -79,7 +81,7 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Layers</h3>
-      <span class="label-xs">11 layers · 95 variables</span>
+      <span class="label-xs">11 layers &middot; 95 variables</span>
     </div>
     <table class="data-table" style="margin-top:4px">
       <thead>
@@ -94,7 +96,7 @@
       <tbody>
         <tr>
           <td style="font-weight:600;color:var(--crimson)">A</td>
-          <td>SSI v4.0 Resilience</td>
+          <td>SSI v4.0.2 Resilience</td>
           <td class="num">17</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
           <td style="font-size:12px">TEİAŞ · TCMB · Dimovski · TÜİK SBS</td>
@@ -143,7 +145,7 @@
         </tr>
         <tr>
           <td style="font-weight:600;color:var(--sage)">F</td>
-          <td>Markov Transitions</td>
+          <td>Network Transitions</td>
           <td class="num">12</td>
           <td><span class="band-badge medium" style="font-size:10px">BAYESIAN</span></td>
           <td style="font-size:12px">DSO history OR IEEE/CIGRÉ + priors</td>
@@ -157,14 +159,14 @@
         </tr>
         <tr>
           <td style="font-weight:600;color:#e67e22">H</td>
-          <td>Seismic & Corrosion</td>
+          <td>Network &amp; Topology</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
           <td style="font-size:12px">AFAD Seismic Hazard · ISO 9223 · EEA · AFAD</td>
         </tr>
         <tr>
           <td style="font-weight:600;color:#8e44ad">I</td>
-          <td>Markov Outputs</td>
+          <td>Output Scores</td>
           <td class="num">7</td>
           <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
           <td style="font-size:12px">Fleet Markov Chain · IEEE/CIGRÉ degradation</td>
@@ -173,11 +175,11 @@
     </table>
   </div>
 
-  <!-- Source Registry (all 30, rendered from metadata) -->
+  <!-- Source Registry (all 30+, rendered from metadata) -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>Data Source Registry</h3>
-      <span class="label-xs">30 verified · all free & public</span>
+      <span class="label-xs">30 verified &middot; all free &amp; public</span>
     </div>
     <div class="source-grid" style="margin-top:12px" id="data-source-grid"></div>
   </div>
@@ -189,11 +191,11 @@
       <span class="label-xs">Client-side formula implementation</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:12px">
-      The SSI v4.0.2 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b seismic hazard, R7 cyber-exposure), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
+      The SSI v4.0.2 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b network topology, R7 digital readiness), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
     </p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">—</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">&mdash;</div>
         <div style="font-size:10px;color:var(--warm-grey)">Public API functions</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
@@ -218,22 +220,21 @@
       <span class="label-xs">JSON per substation</span>
     </div>
     <div class="formula-block" id="schema-block" style="font-size:12px;line-height:1.6">
-      Loading live sample…
+      Loading live sample&hellip;
     </div>
   </div>
 </main>
 
+<!-- jsPDF + autotable for the 4 PDF download buttons -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.5 · KB §65, Wave C § 83)
-     The ~310-line inline IIFE previously here (KPI counts, source-grid render,
-     engine-fns count, 4× PDF generators, live schema sample) is now factored into
-     ../data-sections.js. Country-specific values (file_slug, region_field, region
-     labels, Formula PDF data-layer narrative) live in
-     ../intelligence/country-configs/<slug>.json under data_page.
-     DATA_SOURCES still live on ssi-metadata.js.
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/data.html.j2 + templates/configs/turkey.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../data-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../data-sections.js?v=44cf6cb5de"></script>
