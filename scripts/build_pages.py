@@ -36,7 +36,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from jinja2 import Environment, FileSystemLoader, StrictUndefined
+    from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 except ImportError:
     print("ERROR: Jinja2 is required. Install with: pip3 install jinja2 --break-system-packages")
     sys.exit(1)
@@ -124,8 +124,10 @@ def make_env():
         lstrip_blocks=True,
         keep_trailing_newline=True,
         undefined=StrictUndefined,
+        autoescape=select_autoescape(['html', 'j2']),
     )
     env.filters['cb'] = cache_buster
+    env.filters['thousands'] = lambda n: f"{n:,}"
     return env
 
 

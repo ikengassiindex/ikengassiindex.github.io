@@ -14,9 +14,7 @@
 <!DOCTYPE html>
 <html lang="en">
 {% set page_title = "SSI Index — Map Explorer" %}
-{% set page_description -%}
-Interactive map of {{ country_possessive }} electrical grid with SSI v4.0.2 resilience scores for {{ fleet_count }} substations across {{ admin.count }} {{ admin.level_label_plural }}. 95 variables, topology network + ELES + Borzen registry risk.
-{%- endset %}
+{% set page_description = descriptions.map %}
 {% set page_specific_styles %}{% include "_partials/map_styles.j2" %}{% endset %}
 {% include "_base/head.j2" %}
 <body>
@@ -26,7 +24,7 @@ Interactive map of {{ country_possessive }} electrical grid with SSI v4.0.2 resi
 <main class="page-shell" style="max-width:1440px">
   <div class="page-header animate-in">
     <h1>Map Explorer</h1>
-    <p>Explore {{ fleet_count }} substations across {{ country_possessive }} transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
+    <p>Explore {{ fleet_count | thousands }} substations across {{ country_possessive }} transmission and distribution grid. Click to inspect scores, components, and modifiers.</p>
   </div>
 
   <!-- Filter Bar -->
@@ -46,11 +44,8 @@ Interactive map of {{ country_possessive }} electrical grid with SSI v4.0.2 resi
     <label>Power Voltage</label>
     <select id="filter-voltage">
       <option value="all">All Voltages</option>
-      <option value="400">400 kV</option>
-      <option value="220">220 kV</option>
-      <option value="110">110 kV</option>
-      <option value="other">&lt; 110 kV</option>
-    </select>
+{% for opt in map.voltage_filter_options %}      <option value="{{ opt.value }}">{{ opt.label }}</option>
+{% endfor %}    </select>
     <label>Component Focus</label>
     <select id="filter-component">
       <option value="overall">Overall R Score</option>
