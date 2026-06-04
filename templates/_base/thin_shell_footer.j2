@@ -4,8 +4,10 @@
    CountryRenderer.init(slug, page), and renders the footer.
    Variables: slug, page, section_module_name (e.g. "map-sections.js")
    Optional: additional_pre_renderer_scripts (list) — for pages that need
-   pre-renderer scripts like map.js (which must load before SSIMap is referenced) #}
-{% if additional_pre_renderer_scripts %}
+   pre-renderer scripts like map.js (which must load before SSIMap is referenced)
+   Optional: skip_trailing_renderfooter (bool) — for pages that call renderFooter()
+   inline (e.g. regional.html where switchTab is in the body) #}
+{% if additional_pre_renderer_scripts is defined %}
 {% for script_src in additional_pre_renderer_scripts %}
 <script src="{{ script_src }}?v={{ script_src | cb }}"></script>
 {% endfor %}
@@ -24,4 +26,6 @@
     CountryRenderer.init('{{ slug }}', '{{ page }}');
   });
 </script>
+{% if not skip_trailing_renderfooter | default(false) %}
 <script>renderFooter();</script>
+{% endif %}
