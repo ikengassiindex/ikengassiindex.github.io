@@ -53,6 +53,14 @@ PAGE_TYPES = ['intelligence', 'esg-report', 'data', 'methodology',
 # Schema version this build expects
 EXPECTED_SCHEMA_VERSION = "1.0"
 
+# Bespoke (slug, page) pairs — skipped from --all sweeps (Lesson 9 defer-by-design).
+# Always editable via explicit --country <slug> --page <page> for one-offs.
+BESPOKE_PAIRS = {
+    ('greenland',  'esg-report'),     # #749 — 694 lines vs 167-173 cohort, custom narrative
+    ('colombia',   'methodology'),    # #746 — bespoke methodology beyond cohort scope
+    ('colombia',   'esg-report'),     # #754 — Andean/ENSO/Just Energy Transition prose embedded in section subtitles
+}
+
 
 # ────────────────────────────────────────────────────────────────────────
 # Cache-buster filter (Q7 — auto-computed from git SHA of file content)
@@ -193,6 +201,12 @@ def main():
             continue
 
         for page in pages:
+            # Skip bespoke pairs (Lesson 9 defer-by-design) on --all sweeps, but allow
+            # explicit single-page builds via --country <slug> --page <page>.
+            sweep_mode = (args.all or args.country == 'all' or args.page == 'all')
+            if sweep_mode and (slug, page) in BESPOKE_PAIRS:
+                print(f"  · {slug}/{page:<16} BESPOKE (defer-by-design — skipped from sweep)")
+                continue
             template_file = TEMPLATES_DIR / f"{page}.html.j2"
             if not template_file.exists():
                 print(f"  - {slug}/{page:<16} (template not built yet)")

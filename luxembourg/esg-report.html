@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSI Index — Luxembourg · ESG Report</title>
-<link rel="stylesheet" href="../style.css?v=1780566745">
+<link rel="stylesheet" href="../style.css?v=00582c6548">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-<link rel="stylesheet" href="../esg-report.css?v=1777500000">
+<link rel="stylesheet" href="../esg-report.css?v=500">
 </head>
 <body>
-<script src="../nav.js?v=1780566745"></script>
-<script src="../esg-helpers.js?v=418"></script>
-<script src="ssi-metadata.js"></script>
-<script src="../intelligence/intelligence-loader.js?v=1780566745" data-country="luxembourg" id="ssi-esg-page"></script>
+<script src="../nav.js?v=00e36e5935"></script>
+<script src="../esg-helpers.js?v=500"></script>
+<script src="ssi-metadata.js?v=e76a65caa8"></script>
+<script src="../intelligence/intelligence-loader.js?v=75bae9a80d" data-country="luxembourg" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
@@ -39,7 +39,7 @@
     <div class="section-header">
       <div class="section-title-group">
         <h2>Component Fingerprint</h2>
-        <div class="section-sub">Six-component weighted decomposition of the SSI composite score — the substation's structural risk profile</div>
+        <div class="section-sub">Six-component weighted decomposition of the SSI composite score &mdash; the substation's structural risk profile</div>
       </div>
     </div>
     <div class="card">
@@ -63,7 +63,7 @@
     <div class="section-header">
       <div class="section-title-group">
         <h2>Markov Degradation Profile</h2>
-        <div class="section-sub">CIGRE TB 761 five-state condition model — steady-state probability distribution and expected time to criticality</div>
+        <div class="section-sub">CIGRE TB 761 five-state condition model &mdash; steady-state probability distribution and expected time to criticality</div>
       </div>
     </div>
     <div class="card">
@@ -79,22 +79,22 @@
           <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
             <div class="kpi-card">
               <div class="kpi-label">Risk Score</div>
-              <div class="kpi-value" id="markovRiskScore" style="font-size:28px;">—</div>
+              <div class="kpi-value" id="markovRiskScore" style="font-size:28px;">&mdash;</div>
               <div class="kpi-sub">Composite Markov risk</div>
             </div>
             <div class="kpi-card">
               <div class="kpi-label">ETTC</div>
-              <div class="kpi-value" id="markovETTC" style="font-size:28px;">—</div>
+              <div class="kpi-value" id="markovETTC" style="font-size:28px;">&mdash;</div>
               <div class="kpi-sub">Expected time to critical</div>
             </div>
             <div class="kpi-card">
               <div class="kpi-label">P(Critical) 20yr</div>
-              <div class="kpi-value" id="markovPCrit" style="font-size:28px;">—</div>
+              <div class="kpi-value" id="markovPCrit" style="font-size:28px;">&mdash;</div>
               <div class="kpi-sub">Probability of reaching critical</div>
             </div>
             <div class="kpi-card">
               <div class="kpi-label">Corrosion</div>
-              <div class="kpi-value" id="markovCorrosion" style="font-size:28px;">—</div>
+              <div class="kpi-value" id="markovCorrosion" style="font-size:28px;">&mdash;</div>
               <div class="kpi-sub">ISO 9223 classification</div>
             </div>
           </div>
@@ -110,7 +110,7 @@
     <div class="section-header">
       <span class="section-number">A</span>
       <div class="section-title-group">
-        <h2>ESG Radar — Six-Report Overview</h2>
+        <h2>ESG Radar &mdash; Six-Report Overview</h2>
         <div class="section-sub">Composite readiness across 6 ESG dimensions, each linked to UN Sustainable Development Goals</div>
       </div>
     </div>
@@ -136,7 +136,7 @@
     <div class="section-header">
       <span class="section-number">C</span>
       <div class="section-title-group">
-        <h2>Audit Trail & Methodology Note</h2>
+        <h2>Audit Trail &amp; Methodology Note</h2>
         <div class="section-sub">Traceability for CSRD Article 29a limited assurance</div>
       </div>
     </div>
@@ -153,13 +153,12 @@
 
 </div><!-- /page-shell -->
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2b · KB §65, Wave B § 82)
-     The ~860-line inline block previously here is now factored into
-     ../country-renderer.js (loader + schema normaliser + dispatcher)
-     and ../esg-sections.js (per-section renderers). All country-specific
-     ESG data sources live in this country's ssi-metadata.js as
-     window.SSI_METADATA.ESG_SOURCES.
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/esg-report.html.j2 + templates/configs/luxembourg.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../esg-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../esg-sections.js?v=fab0364a4f"></script>
@@ -168,5 +167,3 @@
     CountryRenderer.init('luxembourg', 'esg-report');
   });
 </script>
-</body>
-</html>
