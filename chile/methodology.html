@@ -9,23 +9,24 @@
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
-<script src="../ssi-versions.js?_=1"></script>
+<script src="../ssi-versions.js?_=3"></script>
 <script src="../nav.js?v=00e36e5935"></script>
-<script src="../ssi-engine.js"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=fb4fa0dea5"></script>
 <script>renderNav('methodology');</script>
+
 
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
     <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+    <p>How the SSI v4.0.2 is calculated &mdash; from raw data to final classification. Open methodology, open data, fully reproducible.</p>
   </div>
 
   <!-- Thesis -->
   <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
     <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
     <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A substation serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+      Power grid resilience is inseparable from its socio-economic context. A substation serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data &mdash; all from public sources.
     </p>
   </div>
 
@@ -36,7 +37,9 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 25+ verified public data sources — CEN, CNE, INE, DMC, CIREN, SERNAGEOMIN, CSN, OpenStreetMap, Copernicus CDS, CNE, ACERA, state distribution companies (CGE, Enel Distribución Chiledistribution company, Powercor, Western Power), and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: monthly.</p>
+        <p>
+          95 variables from 30+ verified public data sources &mdash; CEN, CNE, INE, DMC, CIREN, SERNAGEOMIN, CSN, OpenStreetMap, Copernicus CDS, CNE, ACERA, state distribution companies (CGE, Enel Distribución Chiledistribution company, Powercor, Western Power), and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: monthly.
+        </p>
       </div>
     </div>
     <div class="method-step">
@@ -64,21 +67,21 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy). Plus 5 micro-enrichments for vulnerable populations, seismic hazard zones, flood zones, digital capabilities, and healthcare criticality.</p>
+        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">6</div>
       <div class="method-step-content">
         <h3>Monte Carlo</h3>
-        <p>10,000 iterations per substation using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.</p>
+        <p>10,000 iterations per substation using a 20&times;20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">7</div>
       <div class="method-step-content">
         <h3>Classify</h3>
-        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+        <p>Four bands: Low (0.00&ndash;0.25), Medium (0.25&ndash;0.50), High (0.50&ndash;0.75), Critical (0.75&ndash;1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
       </div>
     </div>
   </div>
@@ -90,22 +93,22 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base &times; F_topo &times; C_mult &times; R6a_mult &times; R6b_net &times; Cyber_factor )
 
-<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>&middot;C + <span class="hl-num">0.10</span>&middot;V + <span class="hl-num">0.25</span>&middot;I + <span class="hl-num">0.10</span>&middot;E + <span class="hl-num">0.20</span>&middot;S + <span class="hl-num">0.05</span>&middot;T
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10]</span>
-<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">soci_digital_index</span>(region, voltage)         <span class="hl-comment">// R7 — [0.99, 1.05]</span>
+<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 &mdash; [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 &mdash; [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a &mdash; [0.90, 1.10]</span>
+<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b &mdash; [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 &mdash; [0.99, 1.05]</span>
     </div>
   </div>
 
   <!-- Components -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>6 Components · 20 Metrics</h3>
+      <h3>6 Components &middot; 20 Metrics</h3>
     </div>
     <table class="data-table">
       <thead>
@@ -120,37 +123,37 @@
         <tr>
           <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
           <td class="num">0.30</td>
-          <td>4 — SAIDI, SAIFI, CAIDI, MAIFI</td>
+          <td>4 &mdash; Duration, Count, MT exceed, Planned</td>
           <td>Outage frequency and duration</td>
         </tr>
         <tr>
           <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
           <td class="num">0.10</td>
-          <td>3 — Voltage deviation, THD, power factor</td>
+          <td>1 &mdash; Severity-weighted dips</td>
           <td>Power quality events</td>
         </tr>
         <tr>
           <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
           <td class="num">0.25</td>
-          <td>9 — Climate IRI (2), asset age, capacity, topology, seismic, corrosion, flood, N-1, seismic hazard</td>
-          <td>Physical asset condition & environment</td>
+          <td>9 &mdash; Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
+          <td>Physical asset condition &amp; environment</td>
         </tr>
         <tr>
           <td><strong style="color:#3b9eff">E</strong> Economic</td>
           <td class="num">0.10</td>
-          <td>2 — Energy price index, unemployment rate</td>
+          <td>2 &mdash; Regulatory penalties, productivity loss</td>
           <td>Economic impact of interruptions</td>
         </tr>
         <tr>
           <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
           <td class="num">0.20</td>
-          <td>3 — DER capacity, DER stress, EV penetration</td>
+          <td>3 &mdash; Regional KPI, reverse power flow, criticality class</td>
           <td>Grid capacity utilisation</td>
         </tr>
         <tr>
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
-          <td>2 — Renewable energy share, transition readiness score</td>
+          <td>1 &mdash; DER Stress Index (DER penetration + variability + EV load)</td>
           <td>Energy transition exposure</td>
         </tr>
       </tbody>
@@ -160,7 +163,7 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
+      <h3>Modifiers R2&ndash;R7 (incl. R6a + R6b)</h3>
       <span class="label-xs">Context multipliers</span>
     </div>
     <table class="data-table">
@@ -172,41 +175,42 @@
           <td style="font-weight:500">R2</td>
           <td>Adaptive IRI + Climate</td>
           <td class="num">internal</td>
-          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking seismic hazard and cyclone risk.</td>
+          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R3</td>
           <td>Consequence + Poverty</td>
           <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for comunas serving large/energy-poor populations with high economic dependency. Includes demographic, elderly, and flood enrichments via INE and CASEN.</td>
+          <td>Amplifies risk for comunas serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
           <td>Graph Criticality</td>
           <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph across SEN (SIC and SING) networks.</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
-          <td>distribution companySEC-CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two substations with identical SAIDI can have different risk profiles.</td>
+          <td>regulator-CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two comunas with identical SAIDI can have different risk profiles.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6b</td>
           <td>Network Topology</td>
           <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality and ring topology. Penalises substations in single-source or radial configurations. Based on physical network analysis of the SEN transmission backbone.</td>
+          <td>Network centrality and ring topology. Penalises comunas in single-source or low-redundancy configurations. Based on physical network analysis.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
           <td>Digital Readiness</td>
           <td class="num">[0.99, 1.05]</td>
-          <td>regulatory cyber-physical baseline, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability at the grid edge.</td>
+          <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability.</td>
         </tr>
       </tbody>
     </table>
   </div>
+
 
   <!-- Classification -->
   <div class="card animate-in" style="margin-bottom:32px">
@@ -216,22 +220,22 @@
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 &ndash; 0.25</div>
         <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 &ndash; 0.50</div>
         <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 &ndash; 0.75</div>
         <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 &ndash; 1.00</div>
         <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
       </div>
     </div>
@@ -244,7 +248,7 @@
       <span class="label-xs">Monte Carlo engine</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+      Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20&times;20 Gaussian copula to preserve empirical correlations between metrics (e.g., &rho;(C1, E1) &asymp; 0.70&ndash;0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
     </p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
@@ -252,11 +256,11 @@
         <div style="font-size:11px;color:var(--warm-grey)">MC iterations per substation</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20&times;20</div>
         <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~17.5 min</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~5.5 min</div>
         <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
       </div>
     </div>
@@ -276,7 +280,7 @@
   <!-- Data Layers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Data Layers — 95 Variables</h3>
+      <h3>Data Layers &mdash; 95 Variables</h3>
       <span class="label-xs">11 layers</span>
     </div>
     <table class="data-table" id="method-layers">
@@ -288,7 +292,7 @@
   <!-- Data Sources -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>25+ Verified Data Sources for Chile</h3>
+      <h3>30+ Verified Data Sources for Chile</h3>
       <span class="label-xs">All open + free registration only</span>
     </div>
     <table class="data-table" id="method-sources">
@@ -312,7 +316,7 @@
   <!-- Changelog -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>v3.4 → v4.0.2 Changelog</h3>
+      <h3>v3.4 &rarr; v4.0.2 Changelog</h3>
     </div>
     <table class="data-table" id="method-changelog">
       <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
@@ -327,17 +331,17 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive regulatory reporting data) and asset health (requires proprietary distribution company data the SSI deliberately avoids) remain as acknowledged gaps.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
 </main>
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.4 · KB §65, Wave D § 84)
-     The inline IIFE previously here (~100 lines, six section renderers) is now
-     factored into ../methodology-sections.js. All content arrays — COMPONENTS,
-     NORM_METHODS, DATA_LAYERS, DATA_SOURCES, VALIDATION_CHECKS, CHANGELOG — live
-     on window.SSIMetadata (set by ssi-metadata.js).
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/methodology.html.j2 + templates/configs/chile.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../methodology-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../methodology-sections.js?v=8d98056b70"></script>

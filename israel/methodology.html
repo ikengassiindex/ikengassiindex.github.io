@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 7 modifiers (Israel: R6_seismic Dead Sea Transform + R6_drought NEW α anchor + R6_volcanic inactive + R7 1.040 cohort-LEADING), 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Israel Methodology</title>
+<title>SSI Index — Methodology</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
-<script src="../ssi-versions.js?v=dffbd5ace6"></script>
+<script src="../ssi-versions.js?_=3"></script>
 <script src="../nav.js?v=00e36e5935"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=f5b013efbc"></script>
 <script>renderNav('methodology');</script>
+
 
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
@@ -36,21 +37,23 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 30+ verified public data sources — IEC annual reports + transmission plan 2023-2030, Noga ILITO monthly + SMP wholesale market data (open since the November 2021 reform), PUA tariff resolutions + quality-of-service indicators (2023-24 annual report), CBS regional accounts at the mehoz level, Bank of Israel macro + ILS FX, IMS (Israel Meteorological Service) climate + drought indices, GSI (Geological Survey of Israel) seismology + 475-yr PGA hazard maps, INCD + CERT-IL critical-infrastructure scope, Mekorot national water utility + desalination plant electricity-demand data, MoEP air-quality monitoring, Copernicus ERA5 + CMIP6, IEA + OECD energy benchmarks, OSM Overpass (ISO3166-1='IL'). Israel is NOT an ENTSO-E member (effectively-insular Mediterranean grid; EuroAsia Interconnector under construction, target 2027-2028). Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
+        <p>
+          95 variables from 30+ verified public data sources — IEC annual reports + transmission plan 2023-2030, Noga ILITO monthly + SMP wholesale market data (open since the November 2021 reform), PUA tariff resolutions + quality-of-service indicators (2023-24 annual report), CBS regional accounts at the mehoz level, Bank of Israel macro + ILS FX, IMS (Israel Meteorological Service) climate + drought indices, GSI (Geological Survey of Israel) seismology + 475-yr PGA hazard maps, INCD + CERT-IL critical-infrastructure scope, Mekorot national water utility + desalination plant electricity-demand data, MoEP air-quality monitoring, Copernicus ERA5 + CMIP6, IEA + OECD energy benchmarks, OSM Overpass (ISO3166-1='IL'). Israel is NOT an ENTSO-E member (effectively-insular Mediterranean grid; EuroAsia Interconnector under construction, target 2027-2028). Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.
+        </p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">2</div>
       <div class="method-step-content">
         <h3>Normalise</h3>
-        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience. Hebrew-source feeds (IEC, PUA, CBS) are transliterated to Latin in dashboard rendering per `language_mode: 'latin_only'`; the original Hebrew labels are preserved in the source layer only.</p>
+        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">3</div>
       <div class="method-step-content">
         <h3>Weight</h3>
-        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis on the Israeli substation fleet.</p>
+        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis.</p>
       </div>
     </div>
     <div class="method-step">
@@ -64,21 +67,21 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Seven multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI — at ~31-33°N Mediterranean-to-arid latitudes summer heat-wave loading + AC peak is structurally high; winter is mild), R3 (consequence + energy poverty — Israel uses a 4-tier calibration reflecting the Tel Aviv-to-Negev GDP gradient at 1.06 / 1.05 / 1.04 / 1.03), R4 (graph-theoretic network criticality on an effectively-insular grid with zero synchronous interconnects), R6_seismic (Dead Sea Transform strike-slip — cohort-first transform-fault primary source), R6_volcanic (formally inactive — Israel has no active volcanoes; preserved in stack with `active: false` flag for cohort consistency), R6_drought (NEW α anchor — Negev arid + desalination electricity-load multiplier), R7 (digital readiness, cohort-LEADING ceiling 1.040 reflecting INCD + Unit 8200 + CERT-IL posture).</p>
+        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">6</div>
       <div class="method-step-content">
         <h3>Monte Carlo</h3>
-        <p>10,000 iterations per mehoz using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each Israeli substation.</p>
+        <p>10,000 iterations per region using a 20&times;20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each region.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">7</div>
       <div class="method-step-content">
         <h3>Classify</h3>
-        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+        <p>Four bands: Low (0.00&ndash;0.25), Medium (0.25&ndash;0.50), High (0.50&ndash;0.75), Critical (0.75&ndash;1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
       </div>
     </div>
   </div>
@@ -90,23 +93,22 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × R6_drought × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base &times; F_topo &times; C_mult &times; R6a_mult &times; R6b_net &times; Cyber_factor )
 
-<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>&middot;C + <span class="hl-num">0.10</span>&middot;V + <span class="hl-num">0.25</span>&middot;I + <span class="hl-num">0.10</span>&middot;E + <span class="hl-num">0.20</span>&middot;S + <span class="hl-num">0.05</span>&middot;T
 
-<span class="hl-var">F_topo</span>     = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)          <span class="hl-comment">// R4 — [0.80, 1.35] · insular IL grid</span>
-<span class="hl-var">C_mult</span>     = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)        <span class="hl-comment">// R3 — [0.70, 1.30] · 4-tier IL</span>
-<span class="hl-var">R6a_mult</span>   = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)               <span class="hl-comment">// R6a — [0.90, 1.10] · Negev periphery</span>
-<span class="hl-var">R6b_net</span>    = <span class="hl-fn">network_topology</span>(centrality, ring)             <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">R6_drought</span> = <span class="hl-fn">desalination_load</span>(arid_index, plant_demand)    <span class="hl-comment">// NEW [1.00, 1.18]</span>
-<span class="hl-var">Cyber</span>      = <span class="hl-fn">incd_posture_index</span>(region, voltage)             <span class="hl-comment">// R7 — [0.99, 1.040] cohort-LEADING</span>
+<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 &mdash; [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 &mdash; [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a &mdash; [0.90, 1.10]</span>
+<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b &mdash; [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 &mdash; [0.99, 1.05]</span>
     </div>
   </div>
 
   <!-- Components -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>6 Components · 20 Metrics</h3>
+      <h3>6 Components &middot; 20 Metrics</h3>
     </div>
     <table class="data-table">
       <thead>
@@ -121,37 +123,37 @@
         <tr>
           <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
           <td class="num">0.30</td>
-          <td>4 — Duration, Count, MT exceed, Planned</td>
-          <td>Outage frequency and duration (PUA + IEC reliability indicators; SAIDI ~30-50 min/yr national)</td>
+          <td>4 &mdash; Duration, Count, MT exceed, Planned</td>
+          <td>Outage frequency and duration</td>
         </tr>
         <tr>
           <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
           <td class="num">0.10</td>
-          <td>1 — Severity-weighted dips</td>
-          <td>Power quality events (161 kV main transmission + 22 kV / 12.6 kV distribution)</td>
+          <td>1 &mdash; Severity-weighted dips</td>
+          <td>Power quality events</td>
         </tr>
         <tr>
           <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
           <td class="num">0.25</td>
-          <td>9 — Climate IRI (3), density (2), thermal stress, summer-peak loading, industrial corrosion (C3 Mediterranean coastal → C5+ Dead Sea ultra-saline), hydrogeological</td>
+          <td>9 &mdash; Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
           <td>Physical asset condition &amp; environment</td>
         </tr>
         <tr>
           <td><strong style="color:#3b9eff">E</strong> Economic</td>
           <td class="num">0.10</td>
-          <td>2 — Regulatory penalties (PUA tariff resolutions), productivity loss</td>
-          <td>Economic impact of interruptions, weighted by mehoz GDP/capita (~$75-90k Tel Aviv vs ~$35-45k Northern/Southern)</td>
+          <td>2 &mdash; Regulatory penalties, productivity loss</td>
+          <td>Economic impact of interruptions</td>
         </tr>
         <tr>
           <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
           <td class="num">0.20</td>
-          <td>3 — Regional KPI, reverse power flow, criticality class</td>
-          <td>Grid capacity utilisation (summer peak ~14-17 GW vs ~22-24 GW installed)</td>
+          <td>3 &mdash; Regional KPI, reverse power flow, criticality class</td>
+          <td>Grid capacity utilisation</td>
         </tr>
         <tr>
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
-          <td>1 — DER Stress Index (T_share ~10% baseline 2023: gas ~70% Tamar + Leviathan + coal ~20% Orot Rabin/Rutenberg phase-out + solar ~10% Negev-dominant; trajectory to 30% renewable by 2030 per Government Decision May 2020 + ₪80 B / ≈ $22 B plan)</td>
+          <td>1 &mdash; DER Stress Index (DER penetration + variability + EV load)</td>
           <td>Energy transition exposure</td>
         </tr>
       </tbody>
@@ -161,7 +163,7 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7 (incl. R6a + R6b + R6_drought)</h3>
+      <h3>Modifiers R2&ndash;R7 (incl. R6a + R6b)</h3>
       <span class="label-xs">Context multipliers</span>
     </div>
     <table class="data-table">
@@ -173,53 +175,42 @@
           <td style="font-weight:500">R2</td>
           <td>Adaptive IRI + Climate</td>
           <td class="num">internal</td>
-          <td>Shifts weight from climate-IRI to structural metrics. CMIP6 SSP2-4.5 projections drive forward-looking risk; at Israel's Mediterranean-to-arid latitudes, summer heat-wave + AC peak load is the dominant climatic stressor, and the precipitation gradient runs from ~600-800 mm in Galilee to ~25-200 mm in the Negev.</td>
+          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R3</td>
           <td>Consequence + Poverty</td>
           <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for mehozot serving large or energy-poor populations with high economic dependency. Israel uses a 4-tier calibration: <strong>Capital-Tech 1.06</strong> (Tel Aviv — Silicon Wadi HQ concentration, TASE, Check Point, Wix, Monday.com, Fiverr) · <strong>Industrial-Tech 1.05</strong> (Central + Haifa — Sharon Plain corridor, Rosh HaAyin, Bazan refinery + Carmel chemical, Yokne'am chip cluster) · <strong>Capital-Services 1.04</strong> (Jerusalem — Knesset, Bank of Israel, Hebrew University, Mobileye HQ, Hadassah) · <strong>Periphery 1.03</strong> (Northern Galilee + Southern Negev — agriculture, Dead Sea Works, Dimona, Beersheba CyberSpark, Eilat). Distribution 1/2/1/2 across 6 mehozot.</td>
+          <td>Amplifies risk for mehozot serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
           <td>Graph Criticality</td>
           <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph filtered on ISO3166-1='IL'. Israel is effectively insular: `cross_border_lines: []` at first edition; the EuroAsia Interconnector (HVDC 2,000 MW IL-CY-GR, Nexans cable contract awarded, target 2027-2028) is documented as forward outlook and will be added to the topology graph at commissioning.</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
-          <td>PUA-quality-report-based: rewards fast-restoring urban areas (Jerusalem ~24 min average restoration; Dan-Tel Aviv core ~59 min), penalises slow-restoring periphery (Negev sub-regions up to ~241 min in non-metropolitan zones per State Comptroller 2024). The 4.1× metro:periphery ratio is one of the steeper gradients in the cohort.</td>
+          <td>regulator-CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two mehozot with identical SAIDI can have different risk profiles.</td>
         </tr>
         <tr>
-          <td style="font-weight:500">R6_seismic</td>
-          <td>Network Topology + Seismic</td>
-          <td class="num">[1.00, 1.20]</td>
-          <td>Network centrality + Dead Sea Transform (DST) strike-slip seismic hazard — <strong>cohort-first transform-fault primary source</strong>. The DST is the active African-Arabian plate boundary running north-south through the Arava → Dead Sea → Jordan River → Hula Valley, slip rate ~5 mm/yr. Modern anchor: <strong>1927 Jericho earthquake Mw 6.2</strong> (11 July 1927; ~350-500 deaths; damage Jerusalem + Nablus + Amman). Regional companion: <strong>1995 Aqaba Mw 7.2</strong> (Gulf of Eilat, southern DST). Pre-instrumental anchor: <strong>1837 Galilee earthquake</strong> (Safed/Tiberias catastrophic); the 1837-to-present interval of ~190 years is at or past the modelled 80-150-yr recurrence on northern DST segments — "overdue major event" hypothesis is widely discussed in Israeli seismology. R6_seismic α band [0.10, 0.16]: Northern (Galilee + Hula on/near DST) 0.14-0.16 · Jerusalem 0.13-0.15 · Southern (Arava/Negev on southern DST) 0.11-0.13 · Tel Aviv coastal 0.10-0.11 · Haifa coastal 0.11-0.13 · Central 0.10-0.12. GSI publishes the 475-yr PGA hazard maps.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_volcanic</td>
-          <td>Volcanic Activity</td>
-          <td class="num">[1.00, 1.00]</td>
-          <td>INACTIVE — Israel has no active volcanoes (last activity Pliocene basalts of the Golan Heights and Mt Hermon plateau, ~4 Mya; geological-historical only, not active hazard). R6_volcanic is preserved in the modifier stack with `active: false` flag for cohort schema consistency, but does not contribute to R_final. This is the <strong>first precedent-setting use</strong> of the inactive-flag non-erasure pattern: the modifier module remains schema-loaded but contributes zero to the engine, maintaining parity with active-volcanism cohort peers without code-path activation.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_drought</td>
-          <td>Arid-Climate Drought + Desalination Load (NEW)</td>
-          <td class="num">[1.00, 1.18]</td>
-          <td>FIRST IN COHORT — Israel is the first country where arid-climate drought is a primary R6 anchor coupled to electricity demand via the desalination-water-electricity nexus. Mechanism: arid baseline (Negev precipitation 25-200 mm/yr vs Galilee 600-800 mm/yr) → desalination provides ~85% of municipal water → five major plants (Sorek + Hadera + Ashkelon + Palmachim + Soreq B) consume ~3.4% of national electricity at baseline → drought intensification (e.g. 2013-2018 multi-year drought) → desalination capacity utilised more aggressively → electricity-load multiplier rises → summer-peak stress increases. Distinct from any hydropower-deficit mechanism (Israel has no hydropower) and from any glacial-flood mechanism (Israel has no glaciers). α band [0.08, 0.18]: Southern (Negev arid; Beersheba; Dimona; Mitzpe Ramon) 0.16-0.18 · Central (coastal Sorek + Palmachim + Hadera plants) 0.12-0.14 · Haifa (coastal + Bazan industrial water) 0.11-0.13 · Tel Aviv (coastal, lower agricultural water) 0.10-0.12 · Jerusalem (highland, Kinneret-fed) 0.09-0.11 · Northern (Galilee, less drought-stressed) 0.08-0.10.</td>
+          <td style="font-weight:500">R6b</td>
+          <td>Network Topology</td>
+          <td class="num">[1.00, 1.25]</td>
+          <td>Network centrality and ring topology. Penalises mehozot in single-source or low-redundancy configurations. Based on physical network analysis.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
-          <td>Digital Readiness + Cyber Posture</td>
-          <td class="num">[0.99, 1.040]</td>
-          <td>Cohort-LEADING ceiling. Reflects: <strong>INCD</strong> (Israel National Cyber Directorate, established Dec 2017 via Government Resolution 3270, under the Prime Minister's Office); <strong>CERT-IL</strong> (operational 2014, based at CyberSpark Beersheba alongside Ben-Gurion University); <strong>Unit 8200</strong> (IDF military SIGINT, 1952 lineage — functionally equivalent to US NSA / UK GCHQ; talent-pipeline backbone of Israel's ~350+ cyber companies and ~10% of the global cyber industry). Stress anchors: Stuxnet 2010 (state-level cyber-physical attack on Iranian centrifuges, attribution widely associated with US-Israel cooperation); 2020 Iran water-utility cyber incident (attribution debated; reported attack on Mekorot SCADA, response widely attributed to Israeli authorities); Hezbollah rocket campaign Nov 2023 – Nov 2024 (ceasefire); Iran missile + drone barrages 13/14 April 2024 + 1 October 2024 (Arrow + David's Sling + Iron Dome interception). R7 1.040 reflects continuous-state high posture <em>plus</em> active-conflict context — the `is_high_threat_grid: true` country-config flag absorbs the kinetic-stress dimension without creating a new R6_terror modifier.</td>
+          <td>Digital Readiness</td>
+          <td class="num">[0.99, 1.05]</td>
+          <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability.</td>
         </tr>
       </tbody>
     </table>
   </div>
+
 
   <!-- Classification -->
   <div class="card animate-in" style="margin-bottom:32px">
@@ -229,22 +220,22 @@
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 &ndash; 0.25</div>
         <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 &ndash; 0.50</div>
         <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 &ndash; 0.75</div>
         <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 &ndash; 1.00</div>
         <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
       </div>
     </div>
@@ -257,44 +248,22 @@
       <span class="label-xs">Monte Carlo engine</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every Israeli substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70-0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness — the latter is especially relevant during active-conflict periods when PUA reliability bulletins lag the live grid state.
+      Every region score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20&times;20 Gaussian copula to preserve empirical correlations between metrics (e.g., &rho;(C1, E1) &asymp; 0.70&ndash;0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
     </p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
-        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per substation</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per region</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20&times;20</div>
         <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~9 min</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime (257 substations)</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~5.5 min</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
       </div>
     </div>
-  </div>
-
-  <!-- Forward Outlook -->
-  <div class="card animate-in" style="margin-bottom:32px;border-left:3px solid var(--bronze)">
-    <div class="card-header">
-      <h3>Forward Outlook — EuroAsia Interconnector &amp; Insular-to-Connected Transition</h3>
-      <span class="label-xs">2027-2028</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7">
-      Israel's grid is documented at first edition as effectively insular: `is_insular_grid: true`, `cross_border_lines: []`. The Egypt link at Eilat-Taba (~80 MW DC, intermittent post-2011) and the Jordan link (bilateral gas-for-electricity swaps, few hundred MW intermittent) are not synchronous and do not enter the topology graph. The <strong>EuroAsia Interconnector (Great Sea Interconnector)</strong> is a 1,000-2,000 MW HVDC subsea cable — 310 km Israel-Cyprus + 898 km Cyprus-Greece, 1,208 km total, depths up to 3,000 m, the world's longest + deepest HVDC subsea cable at commissioning. The Nexans cable contract has been awarded. Target operational entry 2027-2028 for the Israel leg. When commissioned, the project will end Israel's grid insularity mid-cohort-lifecycle and trigger an R4 + topology re-baselining; the methodology will switch from `cross_border_lines: []` to a populated array, and the R6_drought + R7 modifiers will not change.
-    </p>
-  </div>
-
-  <!-- Boundary edge documentation -->
-  <div class="card animate-in" style="margin-bottom:32px;border-left:3px solid var(--warm-grey)">
-    <div class="card-header">
-      <h3>OSM Extraction Boundary Notes</h3>
-      <span class="label-xs">Transparency</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7">
-      Substations are extracted via Overpass on the ISO3166-1='IL' area filter. This is a tagging convention and not a political endorsement. Coverage: within the Green Line + East Jerusalem (Israeli civil law since the 1980 Basic Law) + Golan Heights (Israeli civil law since 1981, internationally disputed) — INCLUDED per the ISO tag. West Bank Areas A/B/C: partial — IEC-served facilities tagged 'IL' are included; PA-tagged facilities are excluded. Gaza: EXCLUDED — pre-October-2023 substations are not counted toward the Israeli fleet for transparency; IEC formally cut supply per government decision in March 2025. The SSI v4.0.2 documentation uses neutral language on disputed political matters.
-    </p>
   </div>
 
   <!-- Detailed Metrics -->
@@ -311,7 +280,7 @@
   <!-- Data Layers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Data Layers — 95 Variables</h3>
+      <h3>Data Layers &mdash; 95 Variables</h3>
       <span class="label-xs">11 layers</span>
     </div>
     <table class="data-table" id="method-layers">
@@ -347,7 +316,7 @@
   <!-- Changelog -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>v3.4 → v4.0.2 Changelog</h3>
+      <h3>v3.4 &rarr; v4.0.2 Changelog</h3>
     </div>
     <table class="data-table" id="method-changelog">
       <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
@@ -362,13 +331,17 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model — Israel is not subject to NIS2 as a non-EU member, so the cyber posture is captured via INCD/CERT-IL/Unit 8200 indicators rather than DESI sub-dimensions) and asset health (requires proprietary IEC SCADA data the SSI deliberately avoids) remain as acknowledged gaps.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
 </main>
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.4 · KB §65)
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/methodology.html.j2 + templates/configs/israel.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../methodology-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../methodology-sections.js?v=8d98056b70"></script>

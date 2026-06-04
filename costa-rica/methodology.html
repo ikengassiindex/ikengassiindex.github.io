@@ -5,27 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 5 modifiers, 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Costa Rica Methodology</title>
+<title>SSI Index — Methodology</title>
 <link rel="stylesheet" href="../style.css?v=00582c6548">
 </head>
 <body>
-<script src="../ssi-versions.js?v=dffbd5ace6"></script>
+<script src="../ssi-versions.js?_=3"></script>
 <script src="../nav.js?v=00e36e5935"></script>
 <script src="../ssi-engine.js?v=143247a9c5"></script>
 <script src="ssi-metadata.js?v=c3981aceec"></script>
 <script>renderNav('methodology');</script>
 
+
 <main class="page-shell" style="max-width:860px">
   <div class="page-header animate-in">
     <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated — from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+    <p>How the SSI v4.0.2 is calculated &mdash; from raw data to final classification. Open methodology, open data, fully reproducible.</p>
   </div>
 
   <!-- Thesis -->
   <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
     <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
     <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A Provincia provincia serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources.
+      Power grid resilience is inseparable from its socio-economic context. A Provincia provincia serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data &mdash; all from public sources.
     </p>
   </div>
 
@@ -36,7 +37,9 @@
       <div class="method-step-num">1</div>
       <div class="method-step-content">
         <h3>Ingest</h3>
-        <p>95 variables from 30+ verified public data sources — ICE network statement, ARESEP raforkutölfræði + quality reports, CNFL + ICE direct + HS CNFL DSO quarterly filings, INEC provincia regional accounts, BCCR national accounts, IMN (IMO/OVF) consolidated meteorology + hydrology + seismic + volcanic monitoring (Reventazón Q100 + Reventazón/Pirrís hydro-deficit + Pacific Ring of Fire Middle America Trench/Panama Fracture Zone catalogue + Pacific Ring of Fire/Arenal/Poás networks), MINAE (MINAE) air quality + ISO 9223 corrosion, CSIRT-CR + MICITT (ECOI) cyber posture, Copernicus, Eurostat, IEA/OECD, OSM Overpass. Costa Rica is NOT an SIEPAC member (SIEPAC-interconnected grid). Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
+        <p>
+          95 variables from 30+ verified public data sources — ICE network statement, ARESEP raforkutölfræði + quality reports, CNFL + ICE direct + HS CNFL DSO quarterly filings, INEC provincia regional accounts, BCCR national accounts, IMN (IMO/OVF) consolidated meteorology + hydrology + seismic + volcanic monitoring (Reventazón Q100 + Reventazón/Pirrís hydro-deficit + Pacific Ring of Fire Middle America Trench/Panama Fracture Zone catalogue + Pacific Ring of Fire/Arenal/Poás networks), MINAE (MINAE) air quality + ISO 9223 corrosion, CSIRT-CR + MICITT (ECOI) cyber posture, Copernicus, Eurostat, IEA/OECD, OSM Overpass. Costa Rica is NOT an SIEPAC member (SIEPAC-interconnected grid). Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.
+        </p>
       </div>
     </div>
     <div class="method-step">
@@ -64,21 +67,21 @@
       <div class="method-step-num">5</div>
       <div class="method-step-content">
         <h3>Modify</h3>
-        <p>Seven multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI — at 8-11°N heat-wave loading is structurally low, Caribbean hurricane (Otto 2016 + Nate 2017) + lahars (Turrialba + Poás post-eruption mudflows) dominate), R3 (consequence + energy poverty — Costa Rica uses a 4-tier calibration reflecting the flat San José-vs-rural GDP gradient and Heredia tech-corridor industrial concentration), R4 (graph-theoretic network criticality on an SIEPAC-interconnected grid with active cross-border interconnects (CR-NI + CR-PA)), R6_seismic (Pacific Ring of Fire Middle America Trench + Panama Fracture Zone — highest seismic α in cohort outside NZ), R6_volcanic (NEW sub-pattern — Pacific Ring of Fire/Arenal/Poás active volcanism), R6_hydro_deficit (NEW sub-pattern — El Niño hydro-deficit floods replace conventional Q100 fluvial), R7 (digital readiness, ceiling 1.04).</p>
+        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">6</div>
       <div class="method-step-content">
         <h3>Monte Carlo</h3>
-        <p>10,000 iterations per provincia using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each Provincia provincia.</p>
+        <p>10,000 iterations per Provincia provincia using a 20&times;20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each Provincia provincia.</p>
       </div>
     </div>
     <div class="method-step">
       <div class="method-step-num">7</div>
       <div class="method-step-content">
         <h3>Classify</h3>
-        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+        <p>Four bands: Low (0.00&ndash;0.25), Medium (0.25&ndash;0.50), High (0.50&ndash;0.75), Critical (0.75&ndash;1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
       </div>
     </div>
   </div>
@@ -90,22 +93,22 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base × F_topo × C_mult × R6a_mult × R6b_net × Cyber_factor )
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base &times; F_topo &times; C_mult &times; R6a_mult &times; R6b_net &times; Cyber_factor )
 
-<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>·C + <span class="hl-num">0.10</span>·V + <span class="hl-num">0.25</span>·I + <span class="hl-num">0.10</span>·E + <span class="hl-num">0.20</span>·S + <span class="hl-num">0.05</span>·T
+<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>&middot;C + <span class="hl-num">0.10</span>&middot;V + <span class="hl-num">0.25</span>&middot;I + <span class="hl-num">0.10</span>&middot;E + <span class="hl-num">0.20</span>&middot;S + <span class="hl-num">0.05</span>&middot;T
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 — [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 — [0.70, 1.30] · 5-tier IS</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a — [0.90, 1.10] · NE/SE rural</span>
-<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b — [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 — [0.99, 1.03]</span>
+<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 &mdash; [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 &mdash; [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a &mdash; [0.90, 1.10]</span>
+<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b &mdash; [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 &mdash; [0.99, 1.05]</span>
     </div>
   </div>
 
   <!-- Components -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>6 Components · 20 Metrics</h3>
+      <h3>6 Components &middot; 20 Metrics</h3>
     </div>
     <table class="data-table">
       <thead>
@@ -120,37 +123,37 @@
         <tr>
           <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
           <td class="num">0.30</td>
-          <td>4 — Duration, Count, MT exceed, Planned</td>
+          <td>4 &mdash; Duration, Count, MT exceed, Planned</td>
           <td>Outage frequency and duration</td>
         </tr>
         <tr>
           <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
           <td class="num">0.10</td>
-          <td>1 — Severity-weighted dips</td>
+          <td>1 &mdash; Severity-weighted dips</td>
           <td>Power quality events</td>
         </tr>
         <tr>
           <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
           <td class="num">0.25</td>
-          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, industrial corrosion (C2-C4), hydrogeological</td>
+          <td>9 &mdash; Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
           <td>Physical asset condition &amp; environment</td>
         </tr>
         <tr>
           <td><strong style="color:#3b9eff">E</strong> Economic</td>
           <td class="num">0.10</td>
-          <td>2 — Regulatory penalties, productivity loss</td>
+          <td>2 &mdash; Regulatory penalties, productivity loss</td>
           <td>Economic impact of interruptions</td>
         </tr>
         <tr>
           <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
           <td class="num">0.20</td>
-          <td>3 — Regional KPI, reverse power flow, criticality class</td>
+          <td>3 &mdash; Regional KPI, reverse power flow, criticality class</td>
           <td>Grid capacity utilisation</td>
         </tr>
         <tr>
           <td><strong style="color:#22d3ee">T</strong> Transition</td>
           <td class="num">0.05</td>
-          <td>1 — DER Stress Index (T_share saturated near 1.0: hydro 74% + geothermal 13% + wind 12.5% + solar 0.5% + biomass 0.1%; Sep 2024 IPP 166 MW 120 MW first utility-scale wind, target 2027)</td>
+          <td>1 &mdash; DER Stress Index (DER penetration + variability + EV load)</td>
           <td>Energy transition exposure</td>
         </tr>
       </tbody>
@@ -160,7 +163,7 @@
   <!-- Modifiers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Modifiers R2–R7 (incl. R6a + R6b)</h3>
+      <h3>Modifiers R2&ndash;R7 (incl. R6a + R6b)</h3>
       <span class="label-xs">Context multipliers</span>
     </div>
     <table class="data-table">
@@ -178,47 +181,36 @@
           <td style="font-weight:500">R3</td>
           <td>Consequence + Poverty</td>
           <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for provincia serving large/energy-poor populations with high economic dependency. Costa Rica uses a 4-tier calibration (Industrial-Aluminum 1.05 / Capital-San José 1.04 / Commercial-SME 1.03 / Light-Rural 1.02) — the flattest gradient in cohort. Industrial-Aluminum tier reflects the Heredia tech-corridor corridors (Intel Heredia, Boston Scientific Heredia, Coyol Free Trade Zone (Alajuela)) consuming ~70-80% of national electricity; Capital-San José reflects ~64% of population in San José.</td>
+          <td>Amplifies risk for provincia serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R4</td>
           <td>Graph Criticality</td>
           <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph (687 nodes · 4,261 edges).</td>
+          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R6a</td>
           <td>Restoration Speed</td>
           <td class="num">[0.90, 1.10]</td>
-          <td>ARESEP-CAIDI-based: rewards fast-restoring urban areas (San José metro under CNFL), penalises slow ones. Limón (Westfjords, &lt;7,000 population in 22,000 km²) and Puntarenas carry a remote-rural access penalty via long radial 138 kV feeds.</td>
+          <td>ARESEP-CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two provincia with identical SAIDI can have different risk profiles.</td>
         </tr>
         <tr>
-          <td style="font-weight:500">R6_seismic</td>
-          <td>Network Topology + Seismic</td>
+          <td style="font-weight:500">R6b</td>
+          <td>Network Topology</td>
           <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality + Pacific Ring of Fire seismic hazard. Costa Rica straddles the ridge with two active source zones — the South Costa Rica Seismic Zone (Middle America Trench, anchor: 29 May 2008 Mw 6.3 doublet Cartago-Cartago) and the Costa Rica Deformed Belt (Panama Fracture Zone, Guanacaste). R6_seismic α band [0.05, 0.20] — HIGHEST in cohort outside New Zealand. IMN publishes the 475-yr PGA hazard maps.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_volcanic</td>
-          <td>Volcanic Activity (NEW)</td>
-          <td class="num">[1.00, 1.20]</td>
-          <td>FIRST IN COHORT — codifies active-volcanism exposure on grid infrastructure. R6_volcanic α band [0.00, 0.20]: Pacific Ring of Fire/Turrialba 2014-2019 ash peak 0.14 (active eruption cycle since 19 Mar 2021; 2023-2024 eruption damaged Miravalles hot-water pipeline, ~26,000 residents lost district heating ~4 days, Heredia industrial corridor evacuated since 10 Nov 2023); Alajuela 0.10 (Poás / Cinchona 2009 2010 / Irazú overdue); Limón 0.07 (Arenal / Rincón de la Vieja / Tenorio Las Pailas geothermal 2014-2015); Limón + Puntarenas 0.00-0.02 (no active volcanism).</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_hydro_deficit</td>
-          <td>El Niño Hydro Deficit (NEW)</td>
-          <td class="num">[1.00, 1.15]</td>
-          <td>FIRST IN COHORT — Costa Rica's flood risk is structurally hydro-deficit-dominant, not Q100-fluvial. Sub-glacial volcanic activity melts ice within Arenal / Arenal / Cinchona 2009, water accumulates in a sub-glacial lake, then bursts as a flash flood. Anchors: 1996 Reventazón hydro-deficit (Rincón de la Vieja-triggered, destroyed Ring Road bridges); 14 April 2010 Cinchona 2009 (Pirrís valley flooded). α band [0.00, 0.15] concentrated in Alajuela + Limón 138 kV transmission corridors.</td>
+          <td>Network centrality and ring topology. Penalises provincia in single-source or low-redundancy configurations. Based on physical network analysis.</td>
         </tr>
         <tr>
           <td style="font-weight:500">R7</td>
           <td>Digital Readiness</td>
-          <td class="num">[0.99, 1.04]</td>
-          <td>Regional DESI digital readiness score (Costa Rica OECD-Americas proxy ~0.65-0.70), CSIRT-CR maturity (founded 2013, FIRST + Central American CSIRT Cooperation member), National Cybersecurity Strategy (Ley 8454 (2005) + 2025 amendment via EEA process, in force 1 Jan 2026; MICITT/ECOI is the competent authority). Ceiling 1.04 matches SI; above SK 1.03 — reflects Costa Rica's OECD top-5 fiber penetration &gt;99% and digital-government ~95% adoption despite later CERT founding date.</td>
+          <td class="num">[0.99, 1.05]</td>
+          <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability.</td>
         </tr>
       </tbody>
     </table>
   </div>
+
 
   <!-- Classification -->
   <div class="card animate-in" style="margin-bottom:32px">
@@ -228,22 +220,22 @@
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 &ndash; 0.25</div>
         <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 &ndash; 0.50</div>
         <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 &ndash; 0.75</div>
         <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 &ndash; 1.00</div>
         <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
       </div>
     </div>
@@ -256,20 +248,20 @@
       <span class="label-xs">Monte Carlo engine</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every provincia score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics (e.g., ρ(C1, E1) ≈ 0.70–0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+      Every Provincia provincia score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20&times;20 Gaussian copula to preserve empirical correlations between metrics (e.g., &rho;(C1, E1) &asymp; 0.70&ndash;0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
     </p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
         <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
-        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per provincia</div>
+        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per Provincia provincia</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20×20</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20&times;20</div>
         <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
       </div>
       <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~18 min</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime (169 subs)</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~5.5 min</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
       </div>
     </div>
   </div>
@@ -288,7 +280,7 @@
   <!-- Data Layers -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>Data Layers — 95 Variables</h3>
+      <h3>Data Layers &mdash; 95 Variables</h3>
       <span class="label-xs">11 layers</span>
     </div>
     <table class="data-table" id="method-layers">
@@ -324,7 +316,7 @@
   <!-- Changelog -->
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
-      <h3>v3.4 → v4.0.2 Changelog</h3>
+      <h3>v3.4 &rarr; v4.0.2 Changelog</h3>
     </div>
     <table class="data-table" id="method-changelog">
       <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
@@ -339,13 +331,17 @@
       <span class="label-xs">v4.0.2</span>
     </div>
     <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 implementation data per Act LXIX/2024) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
+      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
     </p>
   </div>
 </main>
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.4 · KB §65)
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/methodology.html.j2 + templates/configs/costa-rica.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../methodology-sections.js; central dispatch via CountryRenderer.init.
      ═══════════════════════════════════════════════════════════ -->
 <script src="../country-renderer.js?v=72dbb5d6c0"></script>
 <script src="../methodology-sections.js?v=8d98056b70"></script>
