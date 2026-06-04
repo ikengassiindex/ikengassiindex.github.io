@@ -83,8 +83,12 @@ def build_substation(osm_sub, idx, config):
     S = max(0.10, min(0.95, det_var(seed+'S', min(0.85, ref.get('pga_base', 0.1) * seismic_alpha * 2), 0.20)))
     T = max(0.05, min(0.95, det_var(seed+'T', ref.get('T_base', 0.3), 0.30)))
 
-    components = {k: round(v, 3) for k, v in {'C':C,'V':V,'I':I,'E':E,'S':S,'T':T}.items()}
-    R_base = sum(WEIGHTS[k] * components[k] for k in WEIGHTS)
+    # Components — compute R_base from RAW unrounded values so precision propagates correctly,
+    # then store at 6-decimal precision (per Session 102 — fixes 3-decimal quantization that
+    # masked R3/component granularity across all greenfield-onboarded countries).
+    components_raw = {'C':C,'V':V,'I':I,'E':E,'S':S,'T':T}
+    R_base = sum(WEIGHTS[k] * components_raw[k] for k in WEIGHTS)
+    components = {k: round(v, 6) for k, v in components_raw.items()}
 
     # 5 Modifiers
     R3 = max(0.85, min(1.15, det_var(seed+'R3', 1.0, 0.08)))
@@ -93,8 +97,10 @@ def build_substation(osm_sub, idx, config):
     R6b = max(1.00, min(1.50, det_var(seed+'R6b', 1.0 + ref.get('pga_base', 0.1) * 0.5, 0.10)))
     R7 = max(0.90, min(1.10, det_var(seed+'R7', 0.98, 0.05)))
 
-    modifiers = {'R3_C_mult': round(R3,3), 'R4_F_topo': round(R4,3),
-                 'R6_restoration': round(R6a,3), 'R6_seismic': round(R6b,3), 'R7_cyber': round(R7,3)}
+    # Modifiers stored at 6-decimal precision (Session 102 — D#29 PASS-by-construction).
+    # mod_product below uses RAW values so R_median math is unaffected by storage precision.
+    modifiers = {'R3_C_mult': round(R3,6), 'R4_F_topo': round(R4,6),
+                 'R6_restoration': round(R6a,6), 'R6_seismic': round(R6b,6), 'R7_cyber': round(R7,6)}
     mod_product = R3 * R4 * R6a * R6b * R7
     R_median = max(0.05, min(0.95, R_base * mod_product))
 
