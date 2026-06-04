@@ -1,0 +1,27 @@
+{# Standard thin-shell footer — shared across the 7 thin-shell page types
+   (intelligence + esg-report + data + methodology + index + regional + map).
+   Loads central renderer + per-page section module, dispatches
+   CountryRenderer.init(slug, page), and renders the footer.
+   Variables: slug, page, section_module_name (e.g. "map-sections.js")
+   Optional: additional_pre_renderer_scripts (list) — for pages that need
+   pre-renderer scripts like map.js (which must load before SSIMap is referenced) #}
+{% if additional_pre_renderer_scripts %}
+{% for script_src in additional_pre_renderer_scripts %}
+<script src="{{ script_src }}?v={{ script_src | cb }}"></script>
+{% endfor %}
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/{{ page }}.html.j2 + templates/configs/{{ slug }}.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../{{ section_module_name }}; central dispatch via CountryRenderer.init.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v={{ '../country-renderer.js' | cb }}"></script>
+<script src="../{{ section_module_name }}?v={{ ('../' + section_module_name) | cb }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('{{ slug }}', '{{ page }}');
+  });
+</script>
+<script>renderFooter();</script>

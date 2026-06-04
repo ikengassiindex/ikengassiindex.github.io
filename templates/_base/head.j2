@@ -1,0 +1,16 @@
+{# Head block — shared across all 8 page templates.
+   Variables: page_title, page_description, page_specific_styles (optional)
+   Cache-buster via the cb() filter (auto-computed git hash). #}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="{{ page_description }}">
+<meta name="theme-color" content="#941914">
+<title>{{ page_title }}</title>
+<link rel="stylesheet" href="../style.css?v={{ '../style.css' | cb }}">
+{% if page_specific_styles %}
+<style>
+{{ page_specific_styles }}
+</style>
+{% endif %}
+</head>
