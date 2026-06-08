@@ -2,6 +2,26 @@
 """
 SSI v4.0.2 — Reusable Scoring Engine
 
+⚠️  DEPRECATED (PR-4, audit memo 2026-06-08)
+    This script is deprecated in favour of the canonical Python pipeline
+    at `scripts/pipeline/scoring/engine.py`. The pipeline carries:
+      • numpy-vectorized 10,000-iteration Monte Carlo (F-L3-1)
+      • Gaussian copula correlation via Cholesky (F-L3-2)
+      • Per-metric perturbation against the 20-metric SIGMA_TOTAL (F-L3-3)
+      • Registry-driven modifier chain via MODIFIER_REGISTRY (F-L3-4)
+      • Per-modifier provenance (mult_product / add_sum / modifier_impacts)
+
+    score-country.py is retained for backward-compat during the Phase 1
+    transition (build_hungary_ssi.py + build_slovakia_ssi.py still depend
+    on it). PR-7 will hard-retire this script + migrate the 2 callers to
+    the canonical pipeline via declarative country configs.
+
+    Until PR-7:
+      → New countries: use the pipeline directly:
+            python -m scripts.pipeline.run <country>
+      → Existing wrappers (HU + SK): unchanged, but emit a deprecation
+        warning at startup pointing to this banner.
+
 Standardized pipeline for scoring ANY country's substations.
 Takes OSM substations + country config → produces ssi-data.json.
 
@@ -18,26 +38,36 @@ The config file specifies:
 This ensures every country goes through the SAME scoring pipeline,
 producing consistent ssi-data.json with identical schema.
 """
-import json, hashlib, math, argparse, os, sys
+import json, hashlib, math, argparse, os, sys, warnings
 from pathlib import Path
+
+# PR-4 deprecation banner — emitted at module import so any caller surfaces it
+# in CI logs + local terminals. Does not block execution (Phase 1 transition).
+warnings.warn(
+    "scripts/score-country.py is DEPRECATED (PR-4). Migrate to the canonical "
+    "pipeline: python -m scripts.pipeline.run <country>. "
+    "See SSI Index/PHASE_1_IMPLEMENTATION_PLAN.md PR-7 for migration plan.",
+    DeprecationWarning, stacklevel=2
+)
 
 # ═══ SSI v4.0.2 Constants ═══
 WEIGHTS = {'C': 0.30, 'V': 0.10, 'I': 0.25, 'E': 0.10, 'S': 0.20, 'T': 0.05}
 
-# KB §56 — Fleet-size floors (mirrors scripts/validate-schema.py::MIN_FLEET).
-# Inlined here because validate-schema.py has a hyphen in its filename and is
-# not safely importable as a module. Keep these two in lock-step.
-MIN_FLEET = {
-    "AT": 1200, "CH": 800,  "DE": 10000,
-    "IT": 4000, "ES": 3500, "IE": 990, "JP": 4500,
-    "LU": 700,  "BE": 1000, "NL": 1300, "CZ": 800,
-    "LV": 1000, "LT": 400,  "EE": 500, "SI": 120,
-    "FR": 6500,
-    "AU": 5000, "CA": 8000, "CL": 1500, "DK": 1500,
-    "FI": 3000, "GR": 1500, "GL": 100,  "MX": 4000,
-    "NZ": 1000, "NO": 4000, "PL": 3000, "PT": 1500,
-    "SE": 3500, "TR": 4000, "GB": 2500, "US": 30000,
-}
+# KB §56 — Fleet-size floors. PR-5 (audit memo 2026-06-08) retired the inlined
+# copy in favour of importing from the canonical scripts/validate_schema.py.
+# This closes the drift class that produced the LU 700 → 80 / CL 1500 → 900 /
+# GL 100 → 30 recalibration gaps between Session 32 and the inlined copy here.
+try:
+    from validate_schema import MIN_FLEET  # canonical source-of-truth
+except ImportError:
+    # Fallback path: load by file path (script run from a context where
+    # scripts/ is not on sys.path, e.g. pytest fixture).
+    import importlib.util
+    _vs_path = Path(__file__).resolve().parent / "validate_schema.py"
+    _spec = importlib.util.spec_from_file_location("validate_schema_canonical", _vs_path)
+    _vs_mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_vs_mod)
+    MIN_FLEET = _vs_mod.MIN_FLEET
 
 CLASSIFICATION_BANDS = [
     (0.75, 'Critical'),

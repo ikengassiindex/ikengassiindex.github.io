@@ -188,10 +188,10 @@
   <div class="card animate-in" style="margin-bottom:32px">
     <div class="card-header">
       <h3>SSI Engine</h3>
-      <span class="label-xs">Client-side formula implementation</span>
+      <span class="label-xs">Server-side canonical engine</span>
     </div>
     <p style="font-size:13px;line-height:1.7;margin-bottom:12px">
-      The SSI v4.0.2 calculation engine is implemented in <code>ssi-engine.js</code> and runs entirely in the browser. It exposes the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b network topology, R7 digital readiness), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a client-side Monte Carlo simulation (1,000 iterations for browser performance).
+      The SSI v4.0.2 canonical scoring engine is <code>scripts/pipeline/scoring/engine.py</code> (Python, numpy-vectorized). It implements the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b network topology, R7 digital readiness), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a 10,000-iteration Monte Carlo (20×20 Gaussian copula via Cholesky decomposition). The browser-side <code>ssi-engine.js</code> engine is retired (PR-4, audit memo 2026-06-08); it now reads precomputed R_median, R_P5, R_P95, CI_width, P_critical, skewness, modifier_impacts directly from <code>ssi-data.json</code>.
     </p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
@@ -207,8 +207,8 @@
         <div style="font-size:10px;color:var(--warm-grey)">Modifier functions</div>
       </div>
       <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">1,000</div>
-        <div style="font-size:10px;color:var(--warm-grey)">MC iterations (browser)</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">10,000</div>
+        <div style="font-size:10px;color:var(--warm-grey)">MC iterations (server)</div>
       </div>
     </div>
   </div>

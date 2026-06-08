@@ -174,6 +174,12 @@
     if (s.modifier_pct == null && s.modifier_impact != null && s.R_base_median) {
       s.modifier_pct = (s.modifier_impact / s.R_base_median * 100).toFixed(1);
     }
+    // PR-3 (audit memo 2026-06-08) added three provenance fields to every
+    // substation record: mult_product (scalar Π of multiplicative modifiers),
+    // add_sum (Σ of additive modifier deltas), and modifier_impacts (dict
+    // of {modifier_name: round(value − 1.0, 4)}). They are pass-through here:
+    // no legacy alias exists, so no normalization is required. Renderers
+    // consume them directly from s.mult_product / s.add_sum / s.modifier_impacts.
     // Markov sub-schema (KB §64.3 anti-pattern A1)
     var mk = s.markov;
     if (mk && typeof mk === 'object') {

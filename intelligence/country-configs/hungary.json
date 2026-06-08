@@ -302,5 +302,93 @@
       "context": "Mátra lignite end-2028 + CCGT replacement",
       "context_detail": "MVM Mátra Visonta + Bükkábrány lignite (closure end-2028); 500-650 MW CCGT under construction Sep 2025; Eger services pole"
     }
-  ]
+  ],
+  "pipeline_enrichment": {
+    "_comment": "PR-4 declarative replacement for scripts/build_hungary_ssi.py. The canonical Python pipeline (scripts/pipeline/, queued for PR-7) will consume this block to drive country-specific post-processing. Until PR-7 lands, build_hungary_ssi.py remains the producer; the data below mirrors its hardcoded tables exactly.",
+    "scoring_config_path": "data/hungary_config.json",
+    "grid_geo_path": "hungary/grid-geo.json",
+    "output_path": "hungary/ssi-data.json",
+    "default_region": "HU110",
+    "province_resolution": {
+      "strategy": "diacritic_table_then_config_fallback",
+      "diacritic_table": {
+        "HU110": "Budapest",
+        "HU120": "Pest",
+        "HU211": "Fejér",
+        "HU212": "Komárom-Esztergom",
+        "HU213": "Veszprém",
+        "HU221": "Győr-Moson-Sopron",
+        "HU222": "Vas",
+        "HU223": "Zala",
+        "HU231": "Baranya",
+        "HU232": "Somogy",
+        "HU233": "Tolna",
+        "HU311": "Borsod-Abaúj-Zemplén",
+        "HU312": "Heves",
+        "HU313": "Nógrád",
+        "HU321": "Hajdú-Bihar",
+        "HU322": "Jász-Nagykun-Szolnok",
+        "HU323": "Szabolcs-Szatmár-Bereg",
+        "HU331": "Bács-Kiskun",
+        "HU332": "Békés",
+        "HU333": "Csongrád-Csanád"
+      },
+      "fallback_field": "name",
+      "strip_paren_suffix": true
+    },
+    "capital_resolution": {
+      "strategy": "diacritic_table_then_config_fallback",
+      "diacritic_table": {
+        "HU110": "Budapest",
+        "HU120": "Budapest",
+        "HU211": "Székesfehérvár",
+        "HU212": "Tatabánya",
+        "HU213": "Veszprém",
+        "HU221": "Győr",
+        "HU222": "Szombathely",
+        "HU223": "Zalaegerszeg",
+        "HU231": "Pécs",
+        "HU232": "Kaposvár",
+        "HU233": "Szekszárd",
+        "HU311": "Miskolc",
+        "HU312": "Eger",
+        "HU313": "Salgótarján",
+        "HU321": "Debrecen",
+        "HU322": "Szolnok",
+        "HU323": "Nyíregyháza",
+        "HU331": "Kecskemét",
+        "HU332": "Békéscsaba",
+        "HU333": "Szeged"
+      },
+      "fallback_field": "capital"
+    },
+    "field_aliases": {
+      "province": "from province_resolution",
+      "kreis": "from capital_resolution",
+      "megye_name_hu": "alias of province",
+      "region_code": "from substation.region"
+    },
+    "fleet_post_processing": {
+      "compute_fleet_percentile": true,
+      "sort_by": "R_median",
+      "compute_band_pct": true,
+      "compute_confidence_pct": true,
+      "compute_R_mean_alias": true,
+      "compute_P5_P95": true
+    },
+    "socio_economic_unit_fix": {
+      "convert_fractions_to_percentages": true,
+      "fields": [
+        "EP_rate_region",
+        "unemployment_rate",
+        "elderly_pct"
+      ]
+    },
+    "meta_enrichment": {
+      "version": "v4.0.2",
+      "include_generation_timestamp": true,
+      "include_variables_count": true,
+      "include_total_departments": true
+    }
+  }
 }

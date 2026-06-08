@@ -1,7 +1,16 @@
 # SSI Pipeline — Dependencies
-# Core pipeline uses Python stdlib only (json, csv, math, urllib, etc.)
-# Optional dependencies for full CDS data processing:
+# Core pipeline now requires numpy for vectorized 10k Monte Carlo per
+# Phase 1 PR-1 (AUDIT_v4_0_2 §7.7 Decision 1: F-L3-1 + F-L3-3 + F-L3-4).
+# See PHASE_1_IMPLEMENTATION_PLAN.md PR-1.
 
+numpy>=1.24,<2.0    # Vectorized Monte Carlo (canonical scoring engine, PR-2)
+
+# ── Optional dependencies for full CDS data processing ──
 # netCDF4>=1.6.0    # For processing ERA5/CMIP6 NetCDF files from Copernicus CDS
 # cdsapi>=0.7.0     # For Copernicus Climate Data Store API access
-# numpy>=1.24.0     # For faster numerical operations (Monte Carlo, interpolation)
+
+# ── Test harness (PR-1) ──
+# pytest is required only for running tests/ locally + in CI.
+# Not needed for production pipeline runs. Install via:
+#   pip install -r scripts/pipeline/requirements-dev.txt
+# See requirements-dev.txt for test-only dependencies.

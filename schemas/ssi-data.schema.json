@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ikengassiindex.github.io/schemas/ssi-data.schema.json",
-  "title": "SSI Index — ssi-data.json (canonical schema)",
-  "description": "Per-country SSI scoring output. Top-level fleet summary + array of substation records. Canonical sub-schema captures the COMMON CORE across all 31 countries; country-specific extensions are permitted via additionalProperties (e.g. Baltic trio's richer R3_tier / R6c_flood modifiers, Mexico/Denmark/Greenland's degradation-model Markov variant). Renderer code must use defensive optional-chaining for fields outside the core (KB §64.3 anti-pattern A1).",
+  "$id": "https://ikengassiindex.github.io/schemas/ssi-data/v4.0.2.json",
+  "title": "SSI Index — ssi-data.json (canonical schema, v4.0.2)",
+  "description": "Per-country SSI scoring output. Top-level fleet summary + array of substation records. Canonical sub-schema captures the COMMON CORE across all 39 SoT countries; country-specific extensions are permitted via additionalProperties (e.g. Baltic trio's richer R3_tier / R6c_flood modifiers, Mexico/Denmark/Greenland's degradation-model Markov variant). Renderer code must use defensive optional-chaining for fields outside the core (KB §64.3 anti-pattern A1). PR-5 (audit memo 2026-06-08): $id pinned with v4.0.2 path segment; new substation fields mult_product / add_sum / modifier_impacts declared as OPTIONAL during the Phase 1 transition (promotion to required scheduled for PR-7 post daily-routine refresh).",
   "type": "object",
   "required": ["meta", "fleet_summary", "regions", "substations"],
   "additionalProperties": true,
@@ -91,6 +91,23 @@
         },
         "modifiers": {
           "$ref": "#/$defs/modifiers"
+        },
+        "mult_product": {
+          "type": "number",
+          "description": "PR-3 (audit memo 2026-06-08): Π of the multiplicative modifier chain after registry clipping. Used by renderer tooltips + v4.2 W-axis governance gate. Optional during Phase 1 transition; promoted to required in PR-7.",
+          "minimum": 0.0,
+          "maximum": 5.0
+        },
+        "add_sum": {
+          "type": "number",
+          "description": "PR-3: Σ of additive modifier deltas (sum of (value − 1.0) for type='add' modifiers like R6c_flood). Applied OUTSIDE soft_clip_upper per the master equation. Optional during Phase 1 transition.",
+          "minimum": -1.0,
+          "maximum": 1.0
+        },
+        "modifier_impacts": {
+          "type": "object",
+          "description": "PR-3: per-modifier delta-from-identity dict {name: round(value − 1.0, 4)} for every recognised modifier on this substation. Renderers consume this for the modifier-breakdown tooltip; v4.2 W1-W10 anti-maladaptation gate consumes it to verify adaptive capacity (R8) balances new risk injections (R6c flood, R6d wildfire, etc.).",
+          "additionalProperties": {"type": "number"}
         },
         "markov": {"$ref": "#/$defs/markov"},
         "seismic": {"type": "object"},

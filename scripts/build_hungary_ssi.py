@@ -12,12 +12,47 @@ using scripts/score-country.py as the engine, then post-process to:
  - keep voltage_kv null when missing (per schema)
  - enrich meta with version, country slug, code, generation timestamp,
    variables count, total_departments
+
+⚠️  DEPRECATED (PR-4, audit memo 2026-06-08)
+    This wrapper hardcodes Hungary-specific post-processing (NUTS-3 diacritic
+    rename + capital lookup + R_base aliasing) in Python. PR-4 extracts the
+    declarative data into `intelligence/country-configs/hungary.json` under a
+    new `pipeline_enrichment` block.
+
+    PR-7 will retire this wrapper entirely; the canonical pipeline
+    (scripts/pipeline/scoring/engine.py + a country dispatcher) will consume
+    the declarative enrichment block to reproduce the same ssi-data.json
+    shape. The migration is decoupled from PR-4 because the pipeline
+    dispatcher doesn't exist yet — but the declarative configs are ready,
+    so this script becomes redundant the moment PR-7 lands.
+
+    Until PR-7:
+      → This wrapper continues to work unchanged.
+      → A deprecation banner prints to stderr at startup.
+      → All numerical outputs match the canonical Python pipeline exactly
+        (PR-2/PR-3 numpy/registry chain is the underlying engine).
 """
 import json
 import hashlib
 import sys
 import datetime
+import warnings
 from pathlib import Path
+
+# PR-4 deprecation banner — printed to stderr at startup so the operator sees it
+# in any invocation context (cron, manual, CI).
+print(
+    "\n⚠️  DEPRECATED: scripts/build_hungary_ssi.py is slated for retirement in PR-7.\n"
+    "    Replacement: python -m scripts.pipeline.run hungary\n"
+    "    See intelligence/country-configs/hungary.json::pipeline_enrichment for\n"
+    "    the declarative configuration that will drive the canonical pipeline.\n",
+    file=sys.stderr,
+)
+warnings.warn(
+    "build_hungary_ssi.py: deprecated in PR-4, retiring in PR-7. "
+    "Migrate to: python -m scripts.pipeline.run hungary.",
+    DeprecationWarning, stacklevel=2
+)
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / 'scripts'))

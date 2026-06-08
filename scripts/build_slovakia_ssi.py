@@ -12,12 +12,36 @@ using scripts/score-country.py as the engine, then post-process to:
  - keep voltage_kv null when missing (per schema)
  - enrich meta with version, country slug, code, generation timestamp,
    variables count, total_departments
+
+⚠️  DEPRECATED (PR-4, audit memo 2026-06-08)
+    Sister wrapper to build_hungary_ssi.py. Same retirement plan:
+    PR-7 will retire this script in favour of the canonical pipeline
+    consuming intelligence/country-configs/slovakia.json::pipeline_enrichment.
+
+    Until PR-7:
+      → Unchanged behaviour.
+      → Deprecation banner printed at startup.
 """
 import json
 import hashlib
 import sys
 import datetime
+import warnings
 from pathlib import Path
+
+# PR-4 deprecation banner — printed to stderr at startup.
+print(
+    "\n⚠️  DEPRECATED: scripts/build_slovakia_ssi.py is slated for retirement in PR-7.\n"
+    "    Replacement: python -m scripts.pipeline.run slovakia\n"
+    "    See intelligence/country-configs/slovakia.json::pipeline_enrichment for\n"
+    "    the declarative configuration that will drive the canonical pipeline.\n",
+    file=sys.stderr,
+)
+warnings.warn(
+    "build_slovakia_ssi.py: deprecated in PR-4, retiring in PR-7. "
+    "Migrate to: python -m scripts.pipeline.run slovakia.",
+    DeprecationWarning, stacklevel=2
+)
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / 'scripts'))

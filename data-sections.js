@@ -93,7 +93,7 @@
       { title: 'Modifier Functions',
         text: 'R3 — Consequence sigmoid: amplifies scores for high-consequence regions\nR4 — Graph criticality: betweenness centrality & bridge status from network topology\nR6a — Restoration speed: DSO historical MTTR or Bayesian estimate\nR6b — Network topology: Centrality and ring topology from physical network analysis\nR7 — Digital readiness: DESI digital index & smart meter penetration proxy' },
       { title: 'Monte Carlo Uncertainty',
-        text: '1,000 iterations per region (browser mode)\nEach metric perturbed ± based on confidence tier:\n  Tier A (measured): σ = 5%\n  Tier B (proxy): σ = 12%\n  Tier C (fuzzy): σ = 20%\nOutputs: R_median, R_P5, R_P95, CI_width' },
+        text: '10,000 iterations per substation, computed server-side by the canonical Python pipeline (scripts/pipeline/scoring/engine.py).\nNumpy-vectorized; 20×20 Gaussian copula correlation matrix via Cholesky decomposition preserves empirical correlations between metrics.\nPer-metric perturbation against the 20-metric SIGMA_TOTAL table:\n  Mean-shift error: zero (centred draws)\n  Per-metric σ: 0.13-0.45 depending on confidence tier (see SIGMA_TOTAL)\nOutputs persisted to ssi-data.json: R_median, R_P5, R_P95, CI_width, P_critical, skewness.\nBrowser-side MC retired (PR-4, audit memo 2026-06-08); ssi-engine.js now reads precomputed values.' },
       { title: 'Classification Bands',
         text: 'LOW risk: R_median < 0.35\nMEDIUM-LOW: 0.35 ≤ R < 0.45\nMEDIUM: 0.45 ≤ R < 0.55\nMEDIUM-HIGH: 0.55 ≤ R < 0.65\nHIGH risk: R_median ≥ 0.65' },
       { title: 'Data Layers (11 layers, 95 variables)',

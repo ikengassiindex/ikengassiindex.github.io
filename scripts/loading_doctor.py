@@ -87,7 +87,14 @@ global.fetch = (url) => {
 };
 
 // 2. Stub window + document
-global.window = {
+// IMPORTANT: window IS global (mirroring how `window === globalThis` in real
+// browsers). This means `window.X = Y` inside external scripts (e.g.
+// `window.CountryRenderer = {...}` inside country-renderer.js) automatically
+// makes X a top-level global, so subsequent external/inline scripts that
+// reference `X` as a bare name resolve correctly. Without this, inline calls
+// like `CountryRenderer.register(...)` crash with ReferenceError because
+// `window` is just a stubbed object the harness owns.
+Object.assign(global, {
   devicePixelRatio: 1,
   innerWidth: 1280, innerHeight: 800,
   Chart: function(){ this.destroy = ()=>{}; },
@@ -97,11 +104,9 @@ global.window = {
   sessionStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
   addEventListener: () => {}, removeEventListener: () => {},
   requestAnimationFrame: (fn) => setTimeout(fn, 16),
-  setTimeout: setTimeout, clearTimeout: clearTimeout, setInterval: setInterval, clearInterval: clearInterval,
   matchMedia: () => ({ matches: false, addEventListener: () => {} }),
-};
-global.location = global.window.location;
-global.localStorage = global.window.localStorage;
+});
+global.window = global;
 global.NodeFilter = { SHOW_TEXT: 4, SHOW_ELEMENT: 1, FILTER_ACCEPT: 1, FILTER_REJECT: 2, FILTER_SKIP: 3 };
 global.SSI_COUNTRY = __COUNTRY__;
 global.document = {
@@ -236,6 +241,9 @@ def diagnose_page(html_path: Path, verbose: bool = False) -> dict:
                 pass
 
     # Build final test script: harness + externals + inline blocks (each wrapped in try/catch)
+    # Note: the harness header sets `global.window = global`, so any external
+    # script that does `window.X = {...}` automatically makes X a top-level
+    # global — no after-the-fact bridge needed.
     script_parts = [harness]
     script_parts.extend(external_code_parts)
     for line, code in inline_blocks:
