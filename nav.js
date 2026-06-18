@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI Dashboard — Shared Navigation Component
-   v4.1 — Multi-country support (landing page + country subfolders)
+   v4.2 — Multi-country support (landing page + country subfolders) — 11 modifiers + Re composite (LP-10, 18 Jun 2026)
    ═══════════════════════════════════════════════════════════ */
 
 // >>> BEGIN AUTO-GENERATED FROM countries.json (do not edit by hand)
@@ -178,7 +178,7 @@ function renderNav(activePage) {
     '<a class="topnav-brand" href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga — Visit website" style="gap:10px">' +
       SSI_LOGO +
       '<div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15">' +
-        '<h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.0.2</span></h1>' +
+        '<h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.2</span></h1>' +
       '</div>' +
     '</a>' +
     (countryLabel ? '<div class="nav-country-badge">' + countryLabel + '</div>' : '') +
@@ -339,7 +339,7 @@ function renderFooter() {
   footer.className = 'site-footer';
   footer.setAttribute('role', 'contentinfo');
   footer.innerHTML =
-    '<div>SSI Index v4.0.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>' +
+    '<div>SSI Index v4.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>' +
     '<div>' + stats + '</div>' +
     '<div class="copyright-notice">Copyright &copy; 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Societ&agrave; Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div>';
   document.body.appendChild(footer);
