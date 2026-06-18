@@ -17,7 +17,7 @@ window.SSIMetadata = {
     { id:"GIOS",   name:"GIOŚ — Environmental Inspection", url:"gios.gov.pl", freq:"Real-time", res:"Station", vars:8, category:"Environment", feeds:"I6 (corrosion class, SO₂, PM exposure), air quality network" },
     { id:"UDT",    name:"UDT — Technical Inspection Office", url:"udt.gov.pl", freq:"Annual", res:"Distribution Company", vars:9, category:"Grid", feeds:"E1–E3, equipment compliance, transformer inspections, asset registration" },
     { id:"OSM",    name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, 2,248 substations mapped, PSE/DSO networks" },
-    { id:"COPER",  name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, humidity, wind, CMIP6 forward projections for flood risk" },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id:"KZGW",   name:"KZGW — Wody Polskie (Water Authority)", url:"wody.gov.pl", freq:"Annual", res:"Coastal Grid", vars:5, category:"Hazard", feeds:"I5 (flood hazard ISOK maps), river basin plans, drought data, water stress" },
     { id:"KOBiZE", name:"KOBiZE — National Emissions Centre", url:"kobize.pl", freq:"Quarterly", res:"Mining Region", vars:4, category:"Industrial", feeds:"I9 (coal transition risk), CO₂ emissions by installation, EU ETS data" },
     { id:"GUGiK",  name:"GUGiK — Geodesy & Cartography", url:"geoportal.gov.pl", freq:"Annual", res:"Utility Service", vars:5, category:"Environment", feeds:"Land use, infrastructure mapping, BDOT10k database, DEM, orthophotos" },
@@ -37,7 +37,9 @@ window.SSIMetadata = {
     { id:"PORTS",  name:"Port Authority (Gdańsk, Gdynia, Szczecin)", url:"", freq:"Quarterly", res:"Mining District", vars:3, category:"Industrial", feeds:"Regional economic proxy, Baltic shipping impact" },
     { id:"GDDKiA", name:"GDDKiA — Road Infrastructure", url:"gddkia.gov.pl", freq:"Annual", res:"Road Network", vars:3, category:"Environment", feeds:"Infrastructure density proxy, transport nodes" },
     { id:"CIREN",  name:"CIREN — Soil Data (PIG supplement)", url:"", freq:"Annual", res:"Grid 1 km", vars:6, category:"Infrastructure", feeds:"I6 (ISO 9223 corrosion by soil), soil properties, vegetation index" },
-    { id:"WORLD",  name:"World Bank / OECD", url:"", freq:"Annual", res:"National", vars:4, category:"Socio-Econ", feeds:"International benchmarks, socio-economic indicators, cross-validation" }
+    { id:"WORLD",  name:"World Bank / OECD", url:"", freq:"Annual", res:"National", vars:4, category:"Socio-Econ", feeds:"International benchmarks, socio-economic indicators, cross-validation" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ],
 
   /* ── 6 components · 20 metrics ── */

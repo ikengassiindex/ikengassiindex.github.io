@@ -31,7 +31,7 @@ window.SSIMetadata = (function () {
     { id:"SMHI_ENV", name:"Naturvårdsverket — Swedish Environmental Protection Agency", url:"naturvardsverket.se", freq:"Annual", res:"Grid 0.1°", vars:6, category:"Hazard", feeds:"I7 (snow/ice loading zone mapping), environmental hazards, water availability" },
     { id:"SSM", name:"SSM — Strålsäkerhetsmyndigheten (Radiation Safety Authority)", url:"ssm.se", freq:"Quarterly", res:"Nuclear Site", vars:5, category:"Energy", feeds:"I9 (nuclear concentration risk), safety metrics, Forsmark + Ringhals + Barsebäck operational data" },
     { id:"OSM", name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, ~3,570 substations mapped, transmission + distribution networks" },
-    { id:"COPERNICUS", name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, snow loading, winter storm risk, CMIP6 forward projections for Nordic region" },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id:"ENTSOE", name:"ENTSO-E Transparency Platform", url:"transparency.entsoe.eu", freq:"Hourly", res:"Substation", vars:2, category:"Grid", feeds:"C1 (capacity), cross-border flows with Norway/Finland/Germany, Nordic grid exchange" },
     { id:"EUROSTAT", name:"Eurostat — EU Statistics", url:"ec.europa.eu/eurostat", freq:"Annual", res:"Kommun", vars:3, category:"Socio-Econ", feeds:"E2 (population served), water-energy nexus, Nordic energy poverty indicators" },
     { id:"TULLV", name:"Tullverket (Swedish Customs)", url:"tullverket.se", freq:"Annual", res:"National", vars:2, category:"Trade", feeds:"Trade data proxy, industrial activity" },
@@ -52,7 +52,9 @@ window.SSIMetadata = (function () {
     { id:"DNO_REPORTS", name:"DNO Reports — Distribution Network Companies", url:"", freq:"Annual", res:"Distribution Area", vars:4, category:"Grid", feeds:"SAIDI/SAIFI by company, winter storm restoration metrics, CAIDI by geography" },
     { id:"SMHI_HIST", name:"SMHI / State Weather Archive", url:"smhi.se", freq:"Monthly", res:"Station", vars:3, category:"Climate", feeds:"Historical winter storm severity index, snow accumulation records, Arctic wind patterns" },
     { id:"SKATTEV", name:"Skatteverket / Swedish Tax Agency", url:"skatteverket.se", freq:"Annual", res:"Kommun", vars:3, category:"Socio-Econ", feeds:"E2 (population served), demographic shifts, remote region identification" },
-    { id:"KLIM_RESILIENCE", name:"Ministry of Enterprise — Nordic Resilience", url:"regeringen.se", freq:"Annual", res:"Regional", vars:2, category:"Environment", feeds:"Arctic thermal preservation baseline, permafrost stability data" }
+    { id:"KLIM_RESILIENCE", name:"Ministry of Enterprise — Nordic Resilience", url:"regeringen.se", freq:"Annual", res:"Regional", vars:2, category:"Environment", feeds:"Arctic thermal preservation baseline, permafrost stability data" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ],
 
   /* ── 6 components · 20 metrics ── */

@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (US)
-   95 variables · 40 sources · 20 metrics · 6 components · 5 modifiers
+   95 variables · 35 sources · 20 metrics · 6 components · 5 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -15,7 +15,7 @@ window.SSIMetadata = (function () {
     { id: 'EIA-ISO', name: 'EIA/ISO-RTE (PJM/CAISO/MISO) — Data Portal',               url: 'eia.gov / pjm.com / caiso.com',              freq: 'Hourly',    res: 'Balancing Authority',    vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'USGS',    name: 'USGS (US Geological Survey)',                    url: 'usgs.gov',                     freq: 'Static',    res: 'County',       vars: 3,  category: 'Hazard',        feeds: 'USGS seismic hazard, PGA values' },
     { id: 'OSM',     name: 'OSM Power Infrastructure',                                    url: 'overpass-api.de',            freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 45,003 substations' },
-    { id: 'CDS',     name: 'Copernicus CDS / ERA5',                                       url: 'cds.climate.copernicus.eu',  freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'NERC',    name: 'NERC (North American Electric Reliability Corp)',             url: 'nerc.com',     freq: 'Annual',    res: 'Regional',    vars: 2,  category: 'Standards',     feeds: 'Reliability standards, regional compliance metrics' },
     { id: 'FEMA',    name: 'FEMA / EPA (Federal Emergency Management Agency)',            url: 'fema.gov / epa.gov',          freq: 'Annual',    res: 'County',            vars: 4,  category: 'Environment',   feeds: 'Energy poverty, flood risk, environmental indicators' },
     { id: 'DIM',     name: 'Dimovski et al. (2025)',                                       url: 'Academic paper',             freq: 'Static',    res: 'County',       vars: 3,  category: 'Grid',          feeds: 'S1 breakpoints, calibration data' },
@@ -45,6 +45,8 @@ window.SSIMetadata = (function () {
     { id: 'ENTSO-E', name: 'ENTSO-E Transparency',                                        url: 'transparency.entsoe.eu',     freq: 'Hourly',    res: 'Cross-border',    vars: 2,  category: 'Standards',    feeds: 'T1 DER variability patterns (reference)', registration: true },
     { id: 'Eurostat', name: 'Eurostat Energy Statistics',                                  url: 'ec.europa.eu/eurostat',      freq: 'Annual',    res: 'EU Regional',     vars: 3,  category: 'Reference',     feeds: 'Energy poverty cross-validation (reference data)' },
     { id: 'JRC',     name: 'JRC European Commission',                                      url: 'ses.jrc.ec.europa.eu',       freq: 'Annual',    res: 'European',        vars: 2,  category: 'Reference',     feeds: 'Standards reference, methodology guidance' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Census-ACS", name: "US Census Bureau ACS 5-year", url: "api.census.gov", freq: "Annual", res: "State / tract", vars: 5, category: "Socio-Econ", feeds: "R2 per-state GDP-proxy, unemp, elderly% (US Govt public domain)", registration: true },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

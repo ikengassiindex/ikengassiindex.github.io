@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (Greece)
-   95 variables · 30 sources · 20 metrics · 6 components · 8 modifiers
+   95 variables · 29 sources · 20 metrics · 6 components · 8 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -15,7 +15,7 @@ window.SSIMetadata = (function () {
     { id: 'HENEX',    name: 'HEnEx (Ελληνική Ηλεκτρική Ανταλλαγή)',  url: 'henex.gr',                                 freq: 'Hourly',    res: 'National',     vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'RAE',      name: 'RAE (Ρυθμιστική Αρχή Ενέργειας)',      url: 'rae.gr',                                   freq: 'Quarterly',  res: 'Prefecture',   vars: 3,  category: 'Regulatory',    feeds: 'I9 regulatory compliance, penalty data' },
     { id: 'OSM',      name: 'OSM Power Infrastructure',            url: 'overpass-api.de',                         freq: 'Weekly',    res: 'Node/edge',    vars: 3,  category: 'Infrastructure', feeds: 'R4 graph topology, BC, bridges · 1,850 substations' },
-    { id: 'COPERNICUS', name: 'Copernicus CDS / ERA5',             url: 'cds.climate.copernicus.eu',               freq: 'Static',    res: '0.25° (~25 km)', vars: 4, category: 'Climate',      feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'ENTSOE',   name: 'ENTSO-E Transparency',                url: 'transparency.entsoe.eu',                  freq: 'Hourly',    res: 'Control Area',  vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border flows', registration: true },
     { id: 'NOA',      name: 'NOA (Εθνικό Αστεροσκοπείο)',          url: 'noa.gr',                                   freq: 'Real-time', res: 'Prefecture',   vars: 4,  category: 'Hazard',        feeds: 'I9 seismic risk, EAK 2003 zones' },
     { id: 'HEPI',     name: 'HEPI (Hellenic Energy Policy Index)', url: 'hepi.gr',                                  freq: 'Annual',    res: 'National',     vars: 3,  category: 'Economic',      feeds: 'E2 energy transition metrics' },
@@ -39,6 +39,7 @@ window.SSIMetadata = (function () {
     { id: 'DIMOVSKI', name: 'Dimovski et al. (2025)',              url: 'Academic paper',                          freq: 'Static',    res: 'Municipal',    vars: 3,  category: 'Grid',          feeds: 'S1 breakpoints, calibration data' },
     { id: 'ISLAND-ISO', name: 'Island Isolation Factor',           url: 'admie.gr',                                 freq: 'Static',    res: 'Prefecture',   vars: 1,  category: 'Infrastructure', feeds: 'R8 island interconnection status' },
     { id: 'COG-GR',   name: 'COG Prefecture Registry',             url: 'statistics.gr',                            freq: 'Static',    res: 'Prefecture',   vars: 1,  category: 'Infrastructure', feeds: 'Prefecture code join key' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

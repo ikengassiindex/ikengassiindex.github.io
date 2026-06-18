@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (Switzerland)
-   95 variables · 35 sources · 20 metrics · 6 components · 7 modifiers
+   95 variables · 34 sources · 20 metrics · 6 components · 7 modifiers
    26 Kantone · 148 districts · 2,148 municipalities · TSO: Swissgrid
    KB §53 Switzerland calibration (Session 21)
    ═══════════════════════════════════════════════════════════ */
@@ -16,7 +16,7 @@ window.SSIMetadata = (function () {
     { id: 'PRONOVO', name: 'Pronovo (Guarantees of Origin Registry)', url: 'pronovo.ch',                      freq: 'Monthly',   res: 'Substation',     vars: 3,  category: 'Transition',    feeds: 'T1 DER capacity, hydropower, solar, wind registry' },
     { id: 'SED',    name: 'SED Swiss Seismological Service',          url: 'seismo.ethz.ch',                 freq: 'Continuous',res: '200+ stations',  vars: 3,  category: 'Hazard',        feeds: 'R6b seismic PGA 475-yr, alpine seismicity (Wallis)' },
     { id: 'OSM',    name: 'OSM Power Infrastructure',                 url: 'overpass-api.de',                freq: 'Weekly',    res: 'Node/edge',      vars: 3,  category: 'Infrastructure', feeds: 'R4 graph topology, BC, bridges · ~1,250 substations' },
-    { id: 'COPER',  name: 'Copernicus CDS / ERA5',                    url: 'cds.climate.copernicus.eu',      freq: 'Static',    res: '~25 km',         vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3), CMIP6 RCP4.5', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'ENTSE',  name: 'ENTSO-E Transparency (CH observer)',       url: 'transparency.entsoe.eu',         freq: 'Hourly',    res: 'CH bidding zone',vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border bilateral flows', registration: true },
     { id: 'BAFU',   name: 'BAFU Federal Office for the Environment',  url: 'bafu.admin.ch',                  freq: 'Annual',    res: 'Kanton / station',vars: 4, category: 'Environment',   feeds: 'I8 air quality, PM2.5, NO₂, O₃ corrosion · R6c flood' },
     { id: 'METEO',  name: 'MeteoSwiss',                               url: 'meteoschweiz.admin.ch',          freq: 'Daily',     res: '~2 km',          vars: 3,  category: 'Climate',       feeds: 'I1–I3 snow/storms/heatwaves, ERA5 calibration' },
@@ -45,6 +45,7 @@ window.SSIMetadata = (function () {
     { id: 'AVENIR', name: 'Avenir Suisse — Policy Research',          url: 'avenir-suisse.ch',               freq: 'Annual',    res: 'Kanton',         vars: 1,  category: 'Economic',      feeds: 'Regional convergence metrics, energy policy' },
     { id: 'AEE',    name: 'AEE Suisse — Renewable Energy Agency',     url: 'aeesuisse.ch',                   freq: 'Annual',    res: 'Kanton',         vars: 1,  category: 'Transition',    feeds: 'Regional renewable transition progress' },
     { id: 'BFS-GMD', name: 'BFS Gemeindeverzeichnis (Municipality Registry)', url: 'bfs.admin.ch',           freq: 'Static',    res: '2,148 Gemeinden',vars: 1,  category: 'Infrastructure', feeds: 'Join key, Kanton-district-municipality mapping' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

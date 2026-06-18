@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (Italy)
-   95 variables · 35 sources · 20 metrics · 6 components · 5 modifiers
+   95 variables · 34 sources · 20 metrics · 6 components · 5 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -15,7 +15,7 @@ window.SSIMetadata = (function () {
     { id: 'TERNA',    name: 'Terna Transparency (Gaudi)',                       url: 'rte-italy.com',                        freq: 'Hourly',    res: 'Bidding zone',    vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'ISPRA',   name: 'ISPRA (Istituto Superiore Protezione e Ricerca Ambientale)',                        url: 'brgm.fr',                               freq: 'Static',    res: 'Provincia',     vars: 3,  category: 'Hazard',        feeds: 'I9 hydrogeological risk, soil stability, seismic zones' },
     { id: 'OSM',    name: 'OSM Power Infrastructure',                      url: 'overpass-api.de',                       freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 7,898 substations' },
-    { id: 'D10',    name: 'Copernicus CDS / ERA5',                         url: 'cds.climate.copernicus.eu',             freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'ENTSE',  name: 'ENTSO-E Transparency',                          url: 'transparency.entsoe.eu',                freq: 'Hourly',    res: 'Bidding zone',    vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border flows', registration: true },
     { id: 'ENEA',  name: 'ENEA (Agenzia Nazionale Nuove Tecnologie Energia)',    url: 'ademe.fr',                              freq: 'Annual',    res: 'Provincia',     vars: 4,  category: 'Environment',   feeds: 'Energy poverty, environmental indicators' },
     { id: 'DIM',    name: 'Dimovski et al. (2025)',                        url: 'Academic paper',                        freq: 'Static',    res: 'Municipal',       vars: 3,  category: 'Grid',          feeds: 'S1 breakpoints, calibration data' },
@@ -44,6 +44,7 @@ window.SSIMetadata = (function () {
     { id: 'SVIMEZ',   name: 'SVIMEZ Economic Research',                        url: 'ofce.sciences-po.fr',                   freq: 'Annual',    res: 'Région',          vars: 1,  category: 'Economic',      feeds: 'Regional convergence metrics' },
     { id: 'ENEA-R', name: 'ENEA Regioni',                                url: 'ademe.fr',                              freq: 'Annual',    res: 'Région',          vars: 1,  category: 'Transition',    feeds: 'Regional energy transition progress' },
     { id: 'COG',    name: 'COG ISTAT Provincia Registry',                url: 'insee.fr',                              freq: 'Static',    res: 'Provincia',     vars: 1,  category: 'Infrastructure',feeds: 'Provincia code join key, provincia-regione mapping' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

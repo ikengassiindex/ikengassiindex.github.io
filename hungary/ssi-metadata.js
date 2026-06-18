@@ -79,7 +79,7 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd04b_mnb',         name: 'MNB — Magyar Nemzeti Bank (central bank · ESCB non-€)',                freq: 'Quarterly',  status: 'live', vars: 4,  feeds: 'E1,E2', sources: 'mnb.hu national accounts + financial stability' },
   { id: 'd05_osm',          name: 'OSM Overpass — grid topology (ISO3166-1=HU area filter)',              freq: 'Monthly',    status: 'live', vars: 8,  feeds: 'I1,I2,I3,R4', sources: 'overpass-api.de power=substation/line · ISO3166 HU' },
   { id: 'd06_aqi',          name: 'OMSZ + OLM — Hungarian Air Quality Network (ISO 9223 corrosion)',      freq: 'Monthly',    status: 'live', vars: 5,  feeds: 'R5_corrosion,I8', sources: 'OLM PM2.5/NO₂ + ISO 9223 C2-C4 (no C5 — landlocked)' },
-  { id: 'd07_copernicus',   name: 'Copernicus ERA5 + CMIP6',                                              freq: 'Monthly',    status: 'live', vars: 4,  feeds: 'R6_climate', sources: 'cds.climate.copernicus.eu SSP2-4.5' },
+  { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
   { id: 'd08_oah',          name: 'OAH — Országos Atomenergia Hivatal (nuclear safety)',                  freq: 'Quarterly',  status: 'live', vars: 5,  feeds: 'R6_seismic,I3,I4', sources: 'oah.hu Paks I oversight + Paks II construction licensing + IAEA INSAG' },
   { id: 'd09_govcert_hu',   name: 'GovCERT-Hungary (National Cyber Defence Institute, SZTFH lineage)',    freq: 'Continuous', status: 'live', vars: 5,  feeds: 'R7_cyber', sources: 'govcert.hu incident database + CERT-Hungary 2008 baseline' },
   { id: 'd10_sztfh',        name: 'SZTFH — Szabályozott Tevékenységek Felügyeleti Hatósága (NIS2 CA)',    freq: 'Annual',     status: 'live', vars: 3,  feeds: 'R7_cyber', sources: 'sztfh.hu NIS2 competent authority (Act LXIX/2024 in force 1 Jan 2025; repealed Act XXIII/2023)' },
@@ -87,7 +87,9 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd12_eurostat',     name: 'Eurostat — EU-27 NUTS-3 benchmarks',                                   freq: 'Annual',     status: 'live', vars: 8,  feeds: 'E1,S1,T1', sources: 'ec.europa.eu/eurostat NUTS-3 regional + energy + DESI' },
   { id: 'd13_mvm_paks',     name: 'MVM Paksi Atomerőmű (Paks I) + Paks II Atomerőmű Zrt.',                freq: 'Annual',     status: 'live', vars: 5,  feeds: 'I1,I3,R6_seismic', sources: 'paksnuclearpowerplant.com Paks I 4×500 MWe + Paks II Unit 5 First Concrete 5 Feb 2026' },
   { id: 'd14_hupx',         name: 'HUPX — Hungarian Power Exchange (NEMO) + CORE FB-MC',                  freq: 'Daily',      status: 'live', vars: 4,  feeds: 'T1,E1', sources: 'hupx.hu market coupling + SDAC + SIDC + CORE FB-MC since 8 Jun 2022' },
-  { id: 'd15_iea_oecd',     name: 'IEA + OECD — energy benchmarks (HU joined OECD 7 May 1996, 24th member)', freq: 'Annual',  status: 'live', vars: 6,  feeds: 'T1,E1', sources: 'iea.org + oecd.org energy statistics' }
+  { id: 'd15_iea_oecd',     name: 'IEA + OECD — energy benchmarks (HU joined OECD 7 May 1996, 24th member)', freq: 'Annual',  status: 'live', vars: 6,  feeds: 'T1,E1', sources: 'iea.org + oecd.org energy statistics' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
 ];
 
 window.SSI_METADATA.FREQ_DISTRIBUTION = {

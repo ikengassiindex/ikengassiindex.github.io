@@ -31,7 +31,7 @@ window.SSIMetadata = (function () {
     { id:"DSB", name:"DSB — Direktoratet for samfunnssikkerhet og beredskap", url:"dsb.no", freq:"Annual", res:"Grid 0.1°", vars:6, category:"Hazard", feeds:"I7 (snow/ice/rime loading zone mapping), avalanche hazard, environmental hazards, civil protection data" },
     { id:"NSM", name:"NSM/NorCERT — Cybersecurity Authority", url:"nsm.no", freq:"Quarterly", res:"Infrastructure Site", vars:5, category:"Energy", feeds:"Digital security baseline, critical infrastructure protection, cyber-physical resilience for SCADA systems" },
     { id:"OSM", name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, ~6,495 substations mapped across 15 Fylker, transmission + distribution networks" },
-    { id:"COPERNICUS", name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, snow loading, winter storm risk, avalanche probability, CMIP6 forward projections for Arctic region" },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id:"ENTSOE", name:"ENTSO-E Transparency Platform", url:"transparency.entsoe.eu", freq:"Hourly", res:"Substation", vars:2, category:"Grid", feeds:"C1 (capacity), cross-border flows with Sweden/Finland/Germany/UK/Denmark, Nordic grid exchange, bidding zone flows" },
     { id:"EUROSTAT", name:"Eurostat — EU Statistics", url:"ec.europa.eu/eurostat", freq:"Annual", res:"Kommune", vars:3, category:"Socio-Econ", feeds:"E2 (population served), water-energy nexus, Nordic energy poverty indicators" },
     { id:"ENOVA", name:"Enova SF — Energy Efficiency & Transition", url:"enova.no", freq:"Annual", res:"National", vars:3, category:"Transition", feeds:"Energy efficiency programs, RE transition support, grid flexibility initiatives" },
@@ -52,7 +52,8 @@ window.SSIMetadata = (function () {
     { id:"HAVFORSK", name:"Havforskningsinstituttet — Institute of Marine Research", url:"hi.no", freq:"Annual", res:"Regional", vars:2, category:"Environment", feeds:"Fjord dynamics, marine ecosystem stress indicators, offshore power infrastructure impacts" },
     { id:"SINTEF", name:"SINTEF Energy Research", url:"sintef.no", freq:"Annual", res:"Regional", vars:3, category:"Transition", feeds:"Grid stability research, microgrid capability, demand-side flexibility, storage readiness" },
     { id:"METNOR_HIST", name:"MET Norway / Historical Archive", url:"met.no", freq:"Monthly", res:"Station", vars:3, category:"Climate", feeds:"Historical winter storm severity index, snow accumulation records, Arctic wind patterns, rime ice events" },
-    { id:"ENTSOE_TSOS", name:"ENTSO-E TSO Interconnects (Statnett)", url:"entsoe.eu", freq:"Continuous", res:"Border Point", vars:2, category:"Grid", feeds:"HVDC flows: NordLink (DE), North Sea Link (UK), NorNed (NL), Skagerrak 1-4 (DK)" }
+    { id:"ENTSOE_TSOS", name:"ENTSO-E TSO Interconnects (Statnett)", url:"entsoe.eu", freq:"Continuous", res:"Border Point", vars:2, category:"Grid", feeds:"HVDC flows: NordLink (DE), North Sea Link (UK), NorNed (NL), Skagerrak 1-4 (DK)" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ],
 
   /* ── 6 components · 20 metrics ── */

@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (UK)
-   95 variables · 30 sources · 20 metrics · 6 components · 5 modifiers
+   95 variables · 29 sources · 20 metrics · 6 components · 5 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -15,7 +15,7 @@ window.SSIMetadata = (function () {
     { id: 'NGESO',    name: 'NGESO (National Grid ESO) — Data Portal',               url: 'nationalgrideso.com',                     freq: 'Hourly',    res: 'Bidding zone',    vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'BGS',    name: 'BGS (British Geological Survey)',                    url: 'bgs.ac.uk',                     freq: 'Static',    res: 'County',       vars: 3,  category: 'Hazard',        feeds: 'BGS seismic hazard, PGA values' },
     { id: 'OSM',    name: 'OSM Power Infrastructure',                                    url: 'overpass-api.de',            freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 3,150 substations' },
-    { id: 'CDS',    name: 'Copernicus CDS / ERA5',                                       url: 'cds.climate.copernicus.eu',  freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'ENTSE',  name: 'ENTSO-E Transparency',                                        url: 'transparency.entsoe.eu',     freq: 'Hourly',    res: 'Bidding zone',    vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border flows', registration: true },
     { id: 'DEFRA', name: 'DEFRA/EA (Dept for Environment, Food & Rural Affairs)',            url: 'data.gov.uk/environment-agency',              freq: 'Annual',    res: 'regions',            vars: 4,  category: 'Environment',   feeds: 'Energy poverty, environmental indicators' },
     { id: 'DIM',    name: 'Dimovski et al. (2025)',                                       url: 'Academic paper',             freq: 'Static',    res: 'Municipal',       vars: 3,  category: 'Grid',          feeds: 'S1 breakpoints, calibration data' },
@@ -39,6 +39,8 @@ window.SSIMetadata = (function () {
     { id: 'DFT',    name: 'DfT/DVLA (Driver and Vehicle Licensing Agency)',                           url: 'gov.uk/dft',                     freq: 'Annual',    res: 'Countyl',      vars: 1,  category: 'Transition',    feeds: 'EV registration data' },
     { id: 'ONS-GEO', name: 'ONS Geography Registry',                                       url: 'ons.gov.uk',                     freq: 'Static',    res: 'Countyl',      vars: 1,  category: 'Infrastructure',feeds: 'County code join key, region mapping' },
     { id: 'OFGEM-M', name: 'Ofgem RIIO Monitoring Report',                                       url: 'ofgem.gov.uk',                    freq: 'Annual',    res: 'DNO-level',       vars: 2,  category: 'Grid',          feeds: 'CAIDI, restoration speed, quality regulation' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "ONS-Regional", name: "ONS Regional Accounts + Nomis", url: "ons.gov.uk + nomisweb.co.uk", freq: "Annual", res: "12 NUTS-1 regions", vars: 5, category: "Socio-Econ", feeds: "R2 per-region GVA/cap, unemp, elderly% (Open Govt Licence v3.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

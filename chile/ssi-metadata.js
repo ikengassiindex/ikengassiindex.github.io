@@ -15,7 +15,7 @@ window.SSIMetadata = {
     { id:"CSN",    name:"CSN (Centro Sismológico Nacional)", url:"sismologia.cl", freq:"Continuous", res:"Grid 0.1°", vars:7, category:"Hazard", feeds:"I5 (seismic PGA), earthquake catalog, hazard maps (critical for Chile)" },
     { id:"SERNA",  name:"SERNAGEOMIN (Servicio Nacional de Geología y Minería)", url:"sernageomin.cl", freq:"Static", res:"Grid 0.1°", vars:6, category:"Hazard", feeds:"I5 variant (volcanic), geological mapping, tsunamis, landslide zones" },
     { id:"DMC",    name:"DMC (Dirección Meteorológica de Chile)", url:"meteochile.cl", freq:"Daily", res:"Station", vars:8, category:"Climate", feeds:"I3 (thermal stress), humidity, wind, precipitation, drought indices" },
-    { id:"COPER",  name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, humidity, wind, CMIP6 forward projections for Andes exposure" },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id:"OSM",    name:"OpenStreetMap — Power Infrastructure", url:"openstreetmap.org", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, 1,095 substations mapped, SIC/SING networks" },
     { id:"SHOA",   name:"SHOA (Servicio Hidrográfico y Oceanográfico)", url:"shoa.cl", freq:"Static", res:"Coastal Grid", vars:5, category:"Hazard", feeds:"I5 variant (tsunami hazard), coastal inundation risk maps (critical for central Chile)" },
     { id:"CONAF",  name:"CONAF (Corporación Nacional Forestal)", url:"conaf.cl", freq:"Seasonal", res:"Grid 1 km", vars:4, category:"Environment", feeds:"I3 variant (forest fire risk index), fire season exposure, dry season duration" },
@@ -37,7 +37,9 @@ window.SSIMetadata = {
     { id:"SII",    name:"SII (Servicio de Impuestos Internos)", url:"sii.cl", freq:"Annual", res:"Business Zone", vars:3, category:"Economic", feeds:"E3 (business density), industry concentration, economic activity clusters" },
     { id:"MINSAL", name:"MINSAL (Ministerio de Salud)", url:"minsal.cl", freq:"Annual", res:"Health District", vars:3, category:"Socio-Econ", feeds:"Energy poverty health link, vulnerable population proximity, healthcare criticality" },
     { id:"CASEN",  name:"CASEN — Characterization of Socioeconomic Status", url:"ministeriodesarrollosocial.gob.cl", freq:"Biennial", res:"Comuna", vars:5, category:"Socio-Econ", feeds:"E2–E3, income vulnerability, employment precarity, energy poverty" },
-    { id:"GEOAPI", name:"Geospatial API — Combined Hazard", url:"ide.cl", freq:"Quarterly", res:"Grid 0.1°", vars:4, category:"Hazard", feeds:"Composite hazard index combining seismic, flood, wildfire, and tsunami risk" }
+    { id:"GEOAPI", name:"Geospatial API — Combined Hazard", url:"ide.cl", freq:"Quarterly", res:"Grid 0.1°", vars:4, category:"Hazard", feeds:"Composite hazard index combining seismic, flood, wildfire, and tsunami risk" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "BCCh-INE", name: "Banco Central CCNR + INE ENE", url: "bcentral.cl + ine.cl", freq: "Annual", res: "16 regiones", vars: 5, category: "Socio-Econ", feeds: "R2 per-regi\u00f3n GDP/cap, unemp, elderly% (Open Data)" },
   ],
 
   /* ── 6 components · 20 metrics ── */

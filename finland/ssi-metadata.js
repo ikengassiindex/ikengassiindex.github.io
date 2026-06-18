@@ -16,7 +16,7 @@ window.SSIMetadata = {
     { id:"SYKE", name:"SYKE — Finnish Environment Institute", url:"syke.fi", freq:"Annual", res:"Grid 0.1°", vars:6, category:"Hazard", feeds:"I7 (snow/ice loading zone mapping), environmental hazards, water availability" },
     { id:"STUK", name:"STUK — Radiation & Nuclear Safety Authority", url:"stuk.fi", freq:"Quarterly", res:"Nuclear Site", vars:5, category:"Energy", feeds:"I9 (nuclear concentration risk), safety metrics, Olkiluoto + Loviisa operational data" },
     { id:"OSM", name:"OpenStreetMap — Power Infrastructure", url:"overpass-api.de", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, ~4,022 substations mapped, transmission + distribution networks" },
-    { id:"COPERNICUS", name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, snow loading, winter storm risk, CMIP6 forward projections for Arctic" },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id:"ENTSOE", name:"ENTSO-E Transparency Platform", url:"transparency.entsoe.eu", freq:"Hourly", res:"Substation", vars:2, category:"Grid", feeds:"C1 (capacity), cross-border flows with Sweden/Norway, Nordic grid exchange" },
     { id:"EUROSTAT", name:"Eurostat — EU Statistics", url:"ec.europa.eu/eurostat", freq:"Annual", res:"Kunta", vars:3, category:"Socio-Econ", feeds:"E2 (population served), water-energy nexus, Arctic energy poverty indicators" },
     { id:"TULLI", name:"Tulli (Finnish Customs)", url:"tulli.fi", freq:"Annual", res:"National", vars:2, category:"Trade", feeds:"Trade data proxy, industrial activity" },
@@ -37,7 +37,9 @@ window.SSIMetadata = {
     { id:"SIIRTOYHTIO", name:"Siirto-yhtiot Reports (Network Companies)", url:"", freq:"Annual", res:"Distribution Area", vars:4, category:"Grid", feeds:"SAIDI/SAIFI by company, winter storm restoration metrics, CAIDI by geography" },
     { id:"HAKELA", name:"Hakela / State Weather Archive", url:"", freq:"Monthly", res:"Station", vars:3, category:"Climate", feeds:"Historical winter storm severity index, snow accumulation records, Arctic wind patterns" },
     { id:"POPDENS", name:"Population Register Centre", url:"dvv.fi", freq:"Annual", res:"Kunta", vars:3, category:"Socio-Econ", feeds:"E2 (population served), demographic shifts, remote region identification" },
-    { id:"KESTAVAOSAKSI", name:"Ministry of Environment — Arctic Resilience", url:"", freq:"Annual", res:"Regional", vars:2, category:"Environment", feeds:"Arctic thermal preservation baseline, permafrost stability data" }
+    { id:"KESTAVAOSAKSI", name:"Ministry of Environment — Arctic Resilience", url:"", freq:"Annual", res:"Regional", vars:2, category:"Environment", feeds:"Arctic thermal preservation baseline, permafrost stability data" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ],
 
   /* ── 6 components · 20 metrics ── */

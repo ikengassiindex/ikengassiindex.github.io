@@ -62,7 +62,7 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd04b_bs',         name: 'Banka Slovenije — central bank',        freq: 'Quarterly',  status: 'live', vars: 4,  feeds: 'E1,E2',                 sources: 'bsi.si national accounts + financial stability' },
   { id: 'd05_osm',         name: 'OSM Overpass — grid topology',          freq: 'Monthly',    status: 'live', vars: 8,  feeds: 'I1,I2,I3,R4',           sources: 'overpass-api.de power=substation/line · ISO3166 SI' },
   { id: 'd06_arso_met',    name: 'ARSO — Meteorology + climate',          freq: 'Continuous', status: 'live', vars: 5,  feeds: 'R6_storm,R5_corrosion', sources: 'arso.gov.si meteo + bora wind + ice storm' },
-  { id: 'd07_copernicus',  name: 'Copernicus ERA5 + CMIP6',               freq: 'Monthly',    status: 'live', vars: 4,  feeds: 'R6_climate',             sources: 'cds.climate.copernicus.eu SSP2-4.5' },
+  { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
   { id: 'd08_ursjv',       name: 'URSJV — Nuclear safety (Krško)',        freq: 'Quarterly',  status: 'live', vars: 3,  feeds: 'R6_seismic,I3',          sources: 'ursjv.gov.si Krško NPP oversight' },
   { id: 'd09_si_cert',     name: 'SI-CERT — National CERT (1995)',         freq: 'Continuous', status: 'live', vars: 5,  feeds: 'R7_cyber',               sources: 'cert.si incident database + NIS2 reporting' },
   { id: 'd10_entsoe',      name: 'ENTSO-E TYNDP + Transparency',           freq: 'Annual',     status: 'live', vars: 6,  feeds: 'I1,I2,T1',              sources: 'tyndp.entsoe.eu + transparency.entsoe.eu' },
@@ -70,7 +70,9 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd12_nek_krsko',   name: 'NEK Krško — SI/HR joint operator',       freq: 'Quarterly',  status: 'live', vars: 4,  feeds: 'I1,I3,R6_seismic',       sources: 'nek.si annual + URSJV PSR (2043 life-extension)' },
   { id: 'd13_hse',         name: 'HSE — Hydro + lignite generation',       freq: 'Annual',     status: 'live', vars: 5,  feeds: 'I1,T1',                  sources: 'hse.si annual reports · Drava+Soča+Sava cascades + TEŠ-6' },
   { id: 'd14_gen_energija',name: 'GEN Energija — Krško 50% + Brestanica',  freq: 'Annual',     status: 'live', vars: 3,  feeds: 'I1,T1',                  sources: 'gen-energija.si annual + JEK 2 planning' },
-  { id: 'd15_iea_oecd',    name: 'IEA + OECD — energy benchmarks',         freq: 'Annual',     status: 'live', vars: 6,  feeds: 'T1,E1',                  sources: 'iea.org + oecd.org energy statistics' }
+  { id: 'd15_iea_oecd',    name: 'IEA + OECD — energy benchmarks',         freq: 'Annual',     status: 'live', vars: 6,  feeds: 'T1,E1',                  sources: 'iea.org + oecd.org energy statistics' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
 ];
 
 window.SSI_METADATA.FREQ_DISTRIBUTION = {

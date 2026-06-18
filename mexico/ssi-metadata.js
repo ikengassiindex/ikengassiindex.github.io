@@ -47,7 +47,8 @@ window.SSIMetadata = (function () {
     { id:"SAT", name:"SAT — Servicio de Administración Tributaria", url:"sat.gob.mx", freq:"Annual", res:"Municipio", vars:2, category:"Economic", feeds:"E3 (economic activity), business registrations, industrial activity, tax-based economic indicators" },
     { id:"PEMEX", name:"PEMEX — Petróleos Mexicanos", url:"pemex.gob.mx", freq:"Monthly", res:"Regional", vars:3, category:"Energy", feeds:"S1 variant (natural gas infrastructure overlap with electricity), gas supply security, fuel costs, energy corridor planning" },
     { id:"ASEA", name:"ASEA — Agencia de Seguridad, Energía y Ambiente", url:"gob.mx/asea", freq:"Annual", res:"Infrastructure Site", vars:2, category:"Safety", feeds:"I1 (asset safety compliance), industrial safety inspections, hazardous site proximity, accident risk assessment" },
-    { id:"SE", name:"SE — Secretaría de Economía", url:"gob.mx/se", freq:"Annual", res:"Municipio", vars:2, category:"Economic", feeds:"E3 (industrial concentration), manufacturing centers, export zone mapping, industrial cluster data, economic development programs" }
+    { id:"SE", name:"SE — Secretaría de Economía", url:"gob.mx/se", freq:"Annual", res:"Municipio", vars:2, category:"Economic", feeds:"E3 (industrial concentration), manufacturing centers, export zone mapping, industrial cluster data, economic development programs" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ],
 
   /* ── 6 components · 20 metrics ── */

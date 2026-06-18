@@ -15,7 +15,7 @@ window.SSIMetadata = {
     { id:"CSIRO", name:"CSIRO — Energy Research", url:"csiro.au", freq:"Annual", res:"National", vars:4, category:"Transition", feeds:"T1–T2, renewable integration, GenCost" },
     { id:"GA",    name:"Geoscience Australia", url:"ga.gov.au", freq:"Static", res:"Grid 0.1°", vars:5, category:"Hazard", feeds:"I5 (seismic PGA), flood mapping, landslide zones" },
     { id:"OSM",   name:"OpenStreetMap — Power Infrastructure", url:"openstreetmap.org", freq:"Continuous", res:"Node", vars:8, category:"Infrastructure", feeds:"I4 (graph degree), topology, 8,500 substations mapped" },
-    { id:"COPER", name:"Copernicus ERA5 — Climate Reanalysis", url:"cds.climate.copernicus.eu", freq:"Monthly", res:"Grid 0.25°", vars:6, category:"Climate", feeds:"Thermal stress, humidity, wind, CMIP6 forward projections" },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id:"CER",   name:"Clean Energy Regulator — DER Register", url:"cleanenergyregulator.gov.au", freq:"Quarterly", res:"Postcode", vars:5, category:"Transition", feeds:"S1 (DER capacity), T1 (RE share), rooftop solar" },
     { id:"AEMC",  name:"AEMC (Australian Energy Market Commission)", url:"aemc.gov.au", freq:"Annual", res:"National", vars:3, category:"Economic", feeds:"E1 (energy price index), market reform tracking" },
     { id:"ARENA", name:"ARENA (Australian Renewable Energy Agency)", url:"arena.gov.au", freq:"Annual", res:"REZ", vars:3, category:"Transition", feeds:"T2 (transition readiness), REZ capacity planning" },
@@ -32,7 +32,8 @@ window.SSIMetadata = {
     { id:"WEST",  name:"Western Power", url:"westernpower.com.au", freq:"Annual", res:"Substation", vars:5, category:"Grid", feeds:"C1–C4, SWIS network data", registration:true },
     { id:"IEC-IEEE", name:"IEEE / IEC Standards", url:"ieee.org", freq:"Static", res:"Reference", vars:3, category:"Standards", feeds:"Thermal limits (IEEE C57.91), degradation curves, PQ standards" },
     { id:"EUROSTAT", name:"Eurostat / IEA — Cross-country", url:"eurostat.ec.europa.eu", freq:"Annual", res:"Country", vars:2, category:"Standards", feeds:"EU SAIDI benchmark, unplanned outage comparisons" },
-    { id:"OM-ERA5", name:"Open-Meteo / ERA5", url:"open-meteo.com", freq:"Monthly", res:"Grid 0.25°", vars:4, category:"Climate", feeds:"Temperature extremes, cyclone track, bushfire weather" }
+    { id:"OM-ERA5", name:"Open-Meteo / ERA5", url:"open-meteo.com", freq:"Monthly", res:"Grid 0.25°", vars:4, category:"Climate", feeds:"Temperature extremes, cyclone track, bushfire weather" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ],
 
   /* ── 6 components · 20 metrics ── */

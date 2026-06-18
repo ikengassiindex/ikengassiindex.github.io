@@ -68,7 +68,7 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd04b_nbs',         name: 'NBS — Národná banka Slovenska (central bank)',           freq: 'Quarterly',  status: 'live', vars: 4,  feeds: 'E1,E2', sources: 'nbs.sk national accounts + financial stability' },
   { id: 'd05_osm',          name: 'OSM Overpass — grid topology',                            freq: 'Monthly',    status: 'live', vars: 8,  feeds: 'I1,I2,I3,R4', sources: 'overpass-api.de power=substation/line · ISO3166 SK' },
   { id: 'd06_sazp',         name: 'SAŽP — Slovenská agentúra životného prostredia',         freq: 'Monthly',    status: 'live', vars: 5,  feeds: 'R5_corrosion,I8', sources: 'sazp.sk air-quality + ESPRI EIA portal' },
-  { id: 'd07_copernicus',   name: 'Copernicus ERA5 + CMIP6',                                 freq: 'Monthly',    status: 'live', vars: 4,  feeds: 'R6_climate', sources: 'cds.climate.copernicus.eu SSP2-4.5' },
+  { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
   { id: 'd08_ujd_sr',       name: 'ÚJD SR — Úrad jadrového dozoru (nuclear safety)',         freq: 'Quarterly',  status: 'live', vars: 4,  feeds: 'R6_seismic,I3', sources: 'ujd.gov.sk Mochovce + Bohunice oversight + IAEA INSAG' },
   { id: 'd09_sk_cert',      name: 'SK-CERT (operated by NBÚ) + GovCERT.SK',                  freq: 'Continuous', status: 'live', vars: 5,  feeds: 'R7_cyber', sources: 'sk-cert.sk + govcert.gov.sk incident database + Act 366/2024' },
   { id: 'd10_nbu',          name: 'NBÚ — Národný bezpečnostný úrad (NIS2 competent authority)', freq: 'Annual', status: 'live', vars: 3,  feeds: 'R7_cyber', sources: 'nbu.gov.sk NIS2 single point of contact' },
@@ -76,7 +76,9 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd12_eurostat',     name: 'Eurostat — EU-27 NUTS-3 benchmarks',                      freq: 'Annual',     status: 'live', vars: 8,  feeds: 'E1,S1,T1', sources: 'ec.europa.eu/eurostat NUTS-3 regional + energy + DESI' },
   { id: 'd13_se',           name: 'Slovenské elektrárne (Mochovce + Bohunice V2)',           freq: 'Annual',     status: 'live', vars: 5,  feeds: 'I1,I3,R6_seismic', sources: 'seas.sk annual + Mochovce Unit 3 (Oct 2023) + Unit 4 commissioning' },
   { id: 'd14_okte',         name: 'OKTE — SK day-ahead + intraday operator',                 freq: 'Daily',      status: 'live', vars: 4,  feeds: 'T1,E1', sources: 'okte.sk market coupling + SDAC + SIDC' },
-  { id: 'd15_iea_oecd',     name: 'IEA + OECD — energy benchmarks',                          freq: 'Annual',     status: 'live', vars: 6,  feeds: 'T1,E1', sources: 'iea.org + oecd.org energy statistics' }
+  { id: 'd15_iea_oecd',     name: 'IEA + OECD — energy benchmarks',                          freq: 'Annual',     status: 'live', vars: 6,  feeds: 'T1,E1', sources: 'iea.org + oecd.org energy statistics' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
 ];
 
 window.SSI_METADATA.FREQ_DISTRIBUTION = {

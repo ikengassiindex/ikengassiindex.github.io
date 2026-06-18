@@ -74,7 +74,7 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd04b_bok',         name: 'Bank of Korea (central bank, non-€)',                              freq: 'Quarterly',  status: 'live', vars: 4,  feeds: 'E1,E2', sources: 'bok.or.kr national accounts + regional analysis' },
   { id: 'd05_osm',          name: 'OSM Overpass — grid topology (ISO3166-1=KR area filter)',          freq: 'Monthly',    status: 'live', vars: 8,  feeds: 'I1,I2,I3,R4', sources: 'overpass-api.de power=substation/line · 1,184 subs + 4,004 lines' },
   { id: 'd06_iso9223',      name: 'ISO 9223 corrosion classes (C2-C5 — C5 RESTORED, peninsula full)', freq: 'Multi-year', status: 'live', vars: 5,  feeds: 'R5_corrosion,I8', sources: 'ISO 9223 + KMA + KEPCO industrial atmospheres' },
-  { id: 'd07_copernicus',   name: 'Copernicus ERA5 + CMIP6',                                          freq: 'Monthly',    status: 'live', vars: 4,  feeds: 'R6_climate', sources: 'cds.climate.copernicus.eu SSP2-4.5' },
+  { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
   { id: 'd08_khnp',         name: 'KHNP — Korea Hydro & Nuclear Power (operator of 24 reactors)',     freq: 'Quarterly',  status: 'live', vars: 5,  feeds: 'R6_seismic,I3,I4', sources: 'khnp.co.kr Kori/Hanul/Hanbit/Wolsong oversight' },
   { id: 'd09_kisa_krcert',  name: 'KISA + KrCERT/CC (founded 2001 — 25-yr cyber catalogue)',           freq: 'Continuous', status: 'live', vars: 5,  feeds: 'R7_cyber', sources: 'kisa.or.kr + krcert.or.kr C-TAS platform' },
   { id: 'd10_msit',         name: 'MSIT — Ministry of Science & ICT (NIS2-equivalent competent authority)', freq: 'Annual', status: 'live', vars: 3, feeds: 'R7_cyber', sources: 'msit.go.kr Act on the Protection of Information and Communications Infrastructure 2001-present' },
@@ -82,7 +82,9 @@ window.SSI_METADATA.DATA_SOURCES = [
   { id: 'd12_motie',        name: 'MOTIE — Ministry of Trade, Industry and Energy (11th Basic Plan 2025)', freq: 'Annual',    status: 'live', vars: 6,  feeds: 'T1,E1', sources: 'motie.go.kr Basic Plan for Electricity Supply' },
   { id: 'd13_korail',       name: 'KORAIL + Korea Rail Network Authority (rail traction power 25-55 kV)', freq: 'Annual', status: 'live', vars: 3, feeds: 'I3,I4', sources: 'korail.com + kr.or.kr traction substation registry' },
   { id: 'd14_jeju_hvdc',    name: 'Jeju HVDC submarine cables (Haenam-Jeju #1 300 MW + Jindo-Jeju #2 400 MW)', freq: 'Annual', status: 'live', vars: 2, feeds: 'I1,R4', sources: 'KEPCO HVDC operational data — isolated island sub-grid' },
-  { id: 'd15_almannavarnir_kr', name: 'NEMA — National Disaster Management Research Institute + KIGAM crisis coordination', freq: 'Annual', status: 'live', vars: 4, feeds: 'R6_typhoon,R6_seismic,R6_restoration', sources: 'nema.go.kr + kigam.re.kr emergency coordination' }
+  { id: 'd15_almannavarnir_kr', name: 'NEMA — National Disaster Management Research Institute + KIGAM crisis coordination', freq: 'Annual', status: 'live', vars: 4, feeds: 'R6_typhoon,R6_seismic,R6_restoration', sources: 'nema.go.kr + kigam.re.kr emergency coordination' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "KOSIS", name: "KOSIS Regional Income GRDP", url: "kosis.kr", freq: "Annual", res: "17 sido", vars: 5, category: "Socio-Econ", feeds: "R2 per-sido GRDP/cap, unemp, elderly% (Open Data)" },
 ];
 
 window.SSI_METADATA.FREQ_DISTRIBUTION = {

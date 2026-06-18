@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (Austria)
-   95 variables · 35 sources · 20 metrics · 6 components · 8 modifiers
+   95 variables · 34 sources · 20 metrics · 6 components · 8 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -15,7 +15,7 @@ window.SSIMetadata = (function () {
     { id: 'APG',    name: 'APG Transmission System Operator',    url: 'apg.at',                                freq: 'Monthly',   res: 'Control area',    vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'GBA',    name: 'GBA Geological Survey Austria',       url: 'geologie.ac.at',                        freq: 'Static',    res: 'Bezirk',          vars: 3,  category: 'Hazard',        feeds: 'I9 hydrogeological risk, soil stability' },
     { id: 'OSM',    name: 'OSM Power Infrastructure',            url: 'overpass-api.de',                       freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 1,406 substations' },
-    { id: 'D10',    name: 'Copernicus CDS / ERA5',               url: 'cds.climate.copernicus.eu',             freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'ENTSE',  name: 'ENTSO-E Transparency',                url: 'transparency.entsoe.eu',                freq: 'Hourly',    res: 'Bidding zone',    vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border flows', registration: true },
     { id: 'UBA-AT', name: 'Umweltbundesamt Austria',             url: 'umweltbundesamt.at',                    freq: 'Annual',    res: 'Bezirk / station',vars: 4,  category: 'Environment',   feeds: 'I8 air quality, PM2.5, NO₂, O₃ corrosion' },
     { id: 'DIM',    name: 'Dimovski et al. (2025)',              url: 'Academic paper',                        freq: 'Static',    res: 'Municipal',       vars: 3,  category: 'Grid',          feeds: 'S1 breakpoints, calibration data' },
@@ -44,6 +44,8 @@ window.SSIMetadata = (function () {
     { id: 'IHS',    name: 'IHS Institute for Advanced Studies',   url: 'ihs.ac.at',                             freq: 'Annual',    res: 'Bundesland',      vars: 1,  category: 'Economic',      feeds: 'Regional convergence metrics' },
     { id: 'AEA',    name: 'Austrian Energy Agency',               url: 'energyagency.at',                       freq: 'Annual',    res: 'Bundesland',      vars: 1,  category: 'Transition',    feeds: 'Regional energy transition progress' },
     { id: 'GKZ',    name: 'Gemeindekennziffer / GKZ Registry',   url: 'statistik.at',                          freq: 'Static',    res: 'Bezirk (5-digit)',vars: 1,  category: 'Infrastructure',feeds: 'GKZ join key, Bezirk-Bundesland mapping' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

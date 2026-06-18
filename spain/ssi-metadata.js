@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (Spain)
-   95 variables · 30 sources · 20 metrics · 6 components · 5 modifiers
+   95 variables · 29 sources · 20 metrics · 6 components · 5 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -15,7 +15,7 @@ window.SSIMetadata = (function () {
     { id: 'REE',    name: 'REE (Red Eléctrica de España) — Transparency',               url: 'ree.es',                     freq: 'Hourly',    res: 'Bidding zone',    vars: 3,  category: 'Grid',          feeds: 'T1 peak load, generation mix, DER variability' },
     { id: 'IGN',    name: 'IGN/IGME (Instituto Geográfico Nacional)',                    url: 'ign.es',                     freq: 'Static',    res: 'Provincia',       vars: 3,  category: 'Hazard',        feeds: 'NCSE-02 seismic hazard, PGA values' },
     { id: 'OSM',    name: 'OSM Power Infrastructure',                                    url: 'overpass-api.de',            freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 3,529 substations' },
-    { id: 'CDS',    name: 'Copernicus CDS / ERA5',                                       url: 'cds.climate.copernicus.eu',  freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'ENTSE',  name: 'ENTSO-E Transparency',                                        url: 'transparency.entsoe.eu',     freq: 'Hourly',    res: 'Bidding zone',    vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border flows', registration: true },
     { id: 'MITECO', name: 'MITECO (Ministerio para la Transición Ecológica)',            url: 'miteco.gob.es',              freq: 'Annual',    res: 'CCAA',            vars: 4,  category: 'Environment',   feeds: 'Energy poverty, environmental indicators' },
     { id: 'DIM',    name: 'Dimovski et al. (2025)',                                       url: 'Academic paper',             freq: 'Static',    res: 'Municipal',       vars: 3,  category: 'Grid',          feeds: 'S1 breakpoints, calibration data' },
@@ -39,6 +39,8 @@ window.SSIMetadata = (function () {
     { id: 'DGT',    name: 'DGT (Dirección General de Tráfico)',                           url: 'dgt.es',                     freq: 'Annual',    res: 'Provincial',      vars: 1,  category: 'Transition',    feeds: 'EV registration data' },
     { id: 'COG-ES', name: 'INE Municipal Registry',                                       url: 'ine.es',                     freq: 'Static',    res: 'Provincial',      vars: 1,  category: 'Infrastructure',feeds: 'Provincia code join key, CCAA mapping' },
     { id: 'CNMC-M', name: 'CNMC Monitoring Report',                                       url: 'cnmc.es',                    freq: 'Annual',    res: 'DSO-level',       vars: 2,  category: 'Grid',          feeds: 'CAIDI, restoration speed, quality regulation' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

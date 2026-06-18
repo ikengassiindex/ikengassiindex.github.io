@@ -19,7 +19,7 @@ window.SSIMetadata = (function () {
     { id: 'EDAS-OSM', name: 'EDAŞ Companies + OSM Power Infrastructure',          url: 'overpass-api.de',                  freq: 'Quarterly', res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · 4,092 substations' },
     { id: 'ETKB',     name: 'ETKB (Enerji ve Tabii Kaynaklar Bakanlığı)',        url: 'etkb.gov.tr',                      freq: 'Annual',    res: 'Province',       vars: 5,  category: 'Transition',    feeds: 'T1 DER capacity, renewable energy registry' },
     { id: 'GBML',     name: 'GBML (Gözlemci Ağı - Ground-Based Monitoring)',      url: 'afad.gov.tr',                      freq: 'Hourly',    res: '~25 km',          vars: 1,  category: 'Hazard',        feeds: 'I5 ambient temperature, seismic monitoring' },
-    { id: 'CEDA',     name: 'CEDA Energy Data Archive (Copernicus)',              url: 'cds.climate.copernicus.eu',        freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'OMT',      name: 'Open-Meteo Historical Weather',                     url: 'open-meteo.com',                   freq: 'Hourly',    res: '~1 km',           vars: 3,  category: 'Climate',       feeds: 'I1–I3 snow/ice, storms, heat-wave events' },
     { id: 'IEEE-1',   name: 'IEEE C57.91 / IEC 60076 / TBDY 2018',               url: 'standards.ieee.org',               freq: 'Static',    res: 'Asset-level',     vars: 16, category: 'Standards',     feeds: 'I5 thermal model, B.3 Markov states' },
     { id: 'EPDK-MON', name: 'EPDK Monitoring & Enforcement Reports',             url: 'epdk.gov.tr',                      freq: 'Annual',    res: 'DSO-level',       vars: 2,  category: 'Grid',          feeds: 'R7 province-level cyber-exposure (secondary)' },
@@ -40,6 +40,7 @@ window.SSIMetadata = (function () {
     { id: 'COGIL',    name: 'Central Address Registry (Merkezi Adresleme)',       url: 'cbbs.nvi.gov.tr',                  freq: 'Static',    res: 'Province',       vars: 1,  category: 'Infrastructure',feeds: 'Province code join key, province-region mapping' },
     { id: 'ETKB-REN', name: 'ETKB Renewable Energy Action Plans (YEKP)',         url: 'etkb.gov.tr',                      freq: 'Quarterly', res: 'Province',       vars: 2,  category: 'Transition',    feeds: 'Provincial renewable targets, transition plan alignment' },
     { id: 'CBBB',     name: 'Central Bank Blue Book (Economic Data)',             url: 'tcmb.gov.tr',                      freq: 'Annual',    res: 'Regional',        vars: 1,  category: 'Economic',      feeds: 'Regional economic indicators, sectoral contribution' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

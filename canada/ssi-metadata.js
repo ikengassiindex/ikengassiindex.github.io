@@ -34,7 +34,7 @@ window.SSIMetadata = {
     { id: "D7",  name: "OSM Power Infrastructure", agency: "OpenStreetMap Contributors", url: "https://overpass-turbo.eu/", feeds: "R4 Graph topology, ~20,000 substations", freq: "Live (Overpass)", resolution: "Node/edge level", status: "LIVE" },
     { id: "D8",  name: "NRCan/GSC NBCC 2020 Seismic Hazard (CanadaSHM6)", agency: "Natural Resources Canada / Geological Survey of Canada", url: "https://www.earthquakescanada.nrcan.gc.ca/hazard-alea/", feeds: "R6b PGA seismic (2%/50yr return)", freq: "Static", resolution: "Grid point (~10 km) + CD", status: "LIVE" },
     { id: "D9",  name: "Transport Canada ZEV + NRCan EV Charging", agency: "Transport Canada / NRCan", url: "https://tc.canada.ca/en/road-transportation/innovative-technologies/zero-emission-vehicles", feeds: "T1 EV/heat pump penetration", freq: "Annual", resolution: "Provincial / municipal", status: "LIVE" },
-    { id: "D10", name: "Copernicus CDS / ERA5", agency: "ECMWF / Copernicus", url: "https://cds.climate.copernicus.eu/", feeds: "R2 Climate trajectory (CMIP6 SSP2-4.5)", freq: "Static / Hourly", resolution: "0.25deg (~25 km)", status: "LIVE" },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: "D11", name: "Open-Meteo Weather API", agency: "Open-Meteo", url: "https://open-meteo.com/", feeds: "T_amb (ambient temperature for I5 thermal proxy)", freq: "Hourly", resolution: "~1 km", status: "LIVE" },
     { id: "D12", name: "Statistics Canada Census of Population", agency: "Statistics Canada", url: "https://www12.statcan.gc.ca/census-recensement/index-eng.cfm", feeds: "Pop density, aging, households, demographics", freq: "5-year", resolution: "CD / CSD", status: "LIVE" },
     { id: "D13", name: "Statistics Canada Business Register (CANSIM)", agency: "Statistics Canada", url: "https://www150.statcan.gc.ca/n1/en/type/data", feeds: "E2 beta weights (industry mix)", freq: "Annual", resolution: "CD x NAICS", status: "LIVE" },
@@ -586,7 +586,8 @@ window.SSI_METADATA.DATA_SOURCES = [
     { id:"Census", name:"Canadian Census (StatCan)", freq:"5-year", res:"Census Division", vars:4, category:"Socio-Econ", feeds:"E1-E2, R3 — elderly pct, median income, housing, population" },
     { id:"CIB", name:"Canada Infrastructure Bank (CIB)", freq:"Annual", res:"Project", vars:3, category:"Transition", feeds:"I1, T1 — infrastructure investment, green bond, project pipeline" },
     { id:"ISO9223", name:"ISO 9223 — Corrosion Classification", freq:"Static", res:"Zone", vars:3, category:"Hazard", feeds:"I2, R6a — corrosion class, maritime exposure" },
-    { id:"SSI-MC", name:"SSI v4.0.2 Monte Carlo Engine (internal)", freq:"On-demand", res:"Substation", vars:4, category:"Derived", feeds:"C, V, I, E, S, T — composite R scoring" }
+    { id:"SSI-MC", name:"SSI v4.0.2 Monte Carlo Engine (internal)", freq:"On-demand", res:"Substation", vars:4, category:"Derived", feeds:"C, V, I, E, S, T — composite R scoring" },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ];
 
 window.SSI_METADATA.VALIDATION_CHECKS = [

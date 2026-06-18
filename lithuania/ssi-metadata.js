@@ -143,6 +143,8 @@ window.SSI_METADATA = {
     { name: 'NordBalt LV-SE HVDC',                                category: 'Cross-bd',    freq: 'Hourly',          res: 'LV-SE',     vars:  4, feeds: 'R4 cross-border',            registration: '' },
     { name: 'LitPol Link HVDC',                            category: 'Cross-bd',    freq: 'Hourly',          res: 'LT-PL',     vars:  4, feeds: 'R4 cross-border',            registration: '' },
     { name: 'Ignitis Group phase-out tracker',              category: 'Transition',  freq: 'Quarterly',       res: 'Utena',  vars:  5, feeds: 'T1 transition',              registration: '' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ],
 
   FREQ_DISTRIBUTION: {

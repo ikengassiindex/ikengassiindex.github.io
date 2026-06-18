@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (New Zealand / Aotearoa)
-   95 variables · 28 sources · 20 metrics · 6 components · 5 modifiers
+   95 variables · 27 sources · 20 metrics · 6 components · 5 modifiers
    Complete reference data for methodology page + data page
    ═══════════════════════════════════════════════════════════ */
 
@@ -32,11 +32,12 @@ window.SSIMetadata = (function () {
     { id: 'MetService',name: 'MetService', url: 'metservice.com',                           freq: 'Hourly',    res: '~5 km',       vars: 2,  category: 'Climate',       feeds: 'Weather forecasts, severe weather warnings' },
     { id: 'EQC',    name: 'Earthquake Commission (EQC)', url: 'eqc.govt.nz',                 freq: 'Annual',    res: 'Regional',    vars: 2,  category: 'Hazard',        feeds: 'Seismic risk, natural disaster insurance, hazard maps' },
     { id: 'OSM',    name: 'OpenStreetMap — Power Infrastructure', url: 'overpass-api.de',    freq: 'Weekly',    res: 'Node/edge',   vars: 3,  category: 'Infrastructure', feeds: 'Power infrastructure geometry, topology · ~11,500 substations' },
-    { id: 'Copernicus',name: 'ERA5 / Copernicus Climate Data Store', url: 'cds.climate.copernicus.eu', freq: 'Static', res: '0.25° (~27 km)', vars: 4, category: 'Climate', feeds: 'Climate reanalysis, temperature, precipitation patterns', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'GeoTech',name: 'NZ Geotechnical Database', url: 'nzgd.gns.cri.nz',               freq: 'Static',    res: 'Site-level',   vars: 2,  category: 'Hazard',        feeds: 'Ground conditions, liquefaction potential, soil properties' },
     { id: 'LGNZ',   name: 'LGNZ (Local Government NZ)', url: 'lgnz.co.nz',                   freq: 'Annual',    res: 'TA',          vars: 2,  category: 'Socio-Econ',    feeds: 'Regional council data, local resilience planning' },
     { id: 'BRANZ',  name: 'BRANZ (Building Research Association)', url: 'branz.co.nz',      freq: 'Annual',    res: 'National',    vars: 2,  category: 'Environment',   feeds: 'Building research, resilience standards, infrastructure aging' },
     { id: 'EDB-Disc',name: 'EDB Information Disclosures', url: 'ea.govt.nz',                freq: 'Annual',    res: 'EDB',         vars: 3,  category: 'Grid',          feeds: 'Annual performance data from ~29 EDBs across NZ' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    SSI v4.0.2 — Metadata Registry (Germany)
-   95 variables · 35 sources · 20 metrics · 6 components · 8 modifiers
+   95 variables · 34 sources · 20 metrics · 6 components · 8 modifiers
    Complete reference data for methodology page + data page
    Session 22 · KB §54 · DACH cohort completion (AT → CH → DE)
    ═══════════════════════════════════════════════════════════ */
@@ -18,7 +18,7 @@ window.SSIMetadata = (function () {
     { id: 'DESTAT', name: 'DESTATIS (Statistisches Bundesamt)',       url: 'destatis.de',                           freq: 'Annual',    res: 'Landkreis (NUTS-3)',vars: 8,  category: 'Socio-Econ',    feeds: 'R3 population, elderly, GDP, fiscal capacity (16 Länder × 401 Landkreise × 11,054 Gemeinden)' },
     { id: 'BGR',    name: 'BGR Geowissenschaften und Rohstoffe',      url: 'bgr.bund.de',                           freq: 'Static',    res: 'Landkreis',       vars: 3,  category: 'Hazard',        feeds: 'R6b Rhine Graben seismic PGA 475-yr (Karlsruhe+Köln+Aachen+Mainz 0.08g)' },
     { id: 'OSM',    name: 'OSM Power Infrastructure',                  url: 'overpass-api.de',                       freq: 'Weekly',    res: 'Node/edge',       vars: 3,  category: 'Infrastructure',feeds: 'R4 graph topology, BC, bridges · ~6,500 substations (post-§38+§52 filter; largest OECD fleet)' },
-    { id: 'COPER',  name: 'Copernicus CDS / ERA5',                    url: 'cds.climate.copernicus.eu',             freq: 'Static',    res: '0.25° (~25 km)',  vars: 4,  category: 'Climate',       feeds: 'R2 Δ_climate (I1–I3 trajectory)', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'ENTSE',  name: 'ENTSO-E Transparency',                     url: 'transparency.entsoe.eu',                freq: 'Hourly',    res: 'Bidding zone',    vars: 2,  category: 'Transition',    feeds: 'T1 DER variability, cross-border flows (DE-LU bidding zone)', registration: true },
     { id: 'UBA',    name: 'UBA Umweltbundesamt',                      url: 'umweltbundesamt.de',                    freq: 'Annual',    res: 'Landkreis',       vars: 4,  category: 'Environment',   feeds: 'I8 air quality, PM2.5, NO₂, O₃ corrosion' },
     { id: 'DWD',    name: 'DWD (Deutscher Wetterdienst)',             url: 'dwd.de',                                freq: 'Daily',     res: '~1 km',           vars: 3,  category: 'Climate',       feeds: 'I1–I3 snow/ice, storms, heat-wave events' },
@@ -44,7 +44,9 @@ window.SSIMetadata = (function () {
     { id: 'GOVDE',  name: 'GovData.de (federal open data)',            url: 'govdata.de',                            freq: 'Annual',    res: 'Landkreis',       vars: 1,  category: 'Socio-Econ',    feeds: 'Urban/rural classification, settlement structure' },
     { id: 'DIW',    name: 'DIW Berlin (Wirtschaftsforschung)',        url: 'diw.de',                                freq: 'Annual',    res: 'Bundesland',      vars: 1,  category: 'Economic',      feeds: 'Regional convergence metrics, East/West income gap monitor' },
     { id: 'AGS',    name: 'AGS Amtlicher Gemeindeschlüssel',          url: 'destatis.de/AGS',                       freq: 'Static',    res: 'Gemeinde (8-digit)',vars: 1,  category: 'Infrastructure',feeds: 'AGS join key, Landkreis-Bundesland-Gemeinde mapping (11,054 Gemeinden)' },
-    { id: 'BMI',    name: 'BMI Bundesinnenministerium (KRITIS coord)',url: 'bmi.bund.de',                           freq: 'Annual',    res: 'KRITIS asset',    vars: 1,  category: 'Grid',          feeds: 'KRITIS classification cross-ref (coordinated with BSI)' }
+    { id: 'BMI',    name: 'BMI Bundesinnenministerium (KRITIS coord)',url: 'bmi.bund.de',                           freq: 'Annual',    res: 'KRITIS asset',    vars: 1,  category: 'Grid',          feeds: 'KRITIS classification cross-ref (coordinated with BSI)' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ];
 
   // ─── 6 Components ────────────────────────────────────────

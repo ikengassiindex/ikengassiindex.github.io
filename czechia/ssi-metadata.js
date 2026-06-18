@@ -44,7 +44,7 @@ window.SSI_METADATA = {
     { id: 'CHMU',    name: 'ČHMÚ — Czech Hydrometeorological Inst.', url: 'chmi.cz',                       freq: 'Hourly/Annual',  res: 'Station',       vars: 5, category: 'Climate',       feeds: 'S2 T_amb, ice load, wind κ, flood Q100, AQI' },
     { id: 'CHMU-FL', name: 'ČHMÚ HPPS + VÚV TGM HEIS',               url: 'hpps.chmi.cz',                  freq: 'Continuous',     res: 'Watershed',     vars: 1, category: 'Hazard',        feeds: 'flood_zone_pct (R3 hazard) — DOMINANT CZ HAZARD (Elbe/Vltava/Morava)' },
     { id: 'EEA',     name: 'EEA Air Quality e-Reporting',            url: 'eea.europa.eu',                 freq: 'Annual',         res: '~1 km',         vars: 3, category: 'Environment',   feeds: 'P3 PM2.5/NO₂/AQI corrosion (CZ C2-C3 typical, Ostrava C4)' },
-    { id: 'CDS',     name: 'Copernicus CDS / ERA5',                  url: 'cds.climate.copernicus.eu',     freq: 'Hourly/Static',  res: '0.25° (~25 km)',vars: 4, category: 'Climate',       feeds: 'R2 climate trajectory δI1/δI2/δI3', registration: true },
+    { id: "CDS", name: "Copernicus CDS / ERA5-Land", url: "cds.climate.copernicus.eu", freq: "Annual", res: "0.1° (~11 km, ERA5-Land + daily-stats)", vars: 5, category: "Climate", feeds: "R2 Δ_climate (t_mean_c, heat_days, ice_days at 0.1° land grid)", registration: true },
     { id: 'OPM',     name: 'Open-Meteo Weather API',                 url: 'open-meteo.com',                freq: 'Hourly',         res: '~1 km',         vars: 1, category: 'Climate',       feeds: 'S2 T_amb, heatwave duration' },
     { id: 'OSM',     name: 'OSM Power Infrastructure',               url: 'overpass-api.de',               freq: 'Continuous',     res: 'Node/edge',     vars: 4, category: 'Infrastructure',feeds: 'F1 degree, R4 BC, bridge, line lengths (~6,200 km HV / ~110,000 km MV)' },
     { id: 'CENIA',   name: 'CENIA — Environmental Information',       url: 'cenia.cz',                      freq: 'Annual',         res: 'Kraj',          vars: 2, category: 'Environment',   feeds: 'Emissions, environmental quality. Replaces ISPRA.' },
@@ -57,7 +57,9 @@ window.SSI_METADATA = {
     { id: 'IEEE-1',  name: 'IEEE C57.91 Thermal Model',              url: 'standards.ieee.org',            freq: 'Static',         res: 'Asset-level',   vars: 1, category: 'Standards',     feeds: 'P2 transformer thermal degradation' },
     { id: 'IEC-1',   name: 'IEC 60076 Power Transformers',           url: 'iec.ch',                        freq: 'Static',         res: 'Asset-level',   vars: 1, category: 'Standards',     feeds: 'Voltage regulation proxy' },
     { id: 'IEC-826', name: 'IEC 60826 Overhead Line Loading',        url: 'iec.ch',                        freq: 'Static',         res: 'Zone',          vars: 1, category: 'Standards',     feeds: 'Ice load class (CZ Krkonoše/Beskydy zones 4-5)' },
-    { id: 'ISO-9223',name: 'ISO 9223 Atmospheric Corrosion',         url: '(derived from EEA + ČHMÚ)',     freq: 'Derived',        res: 'Kraj',          vars: 1, category: 'Standards',     feeds: 'P3 corrosion class C1-C5' }
+    { id: 'ISO-9223',name: 'ISO 9223 Atmospheric Corrosion',         url: '(derived from EEA + ČHMÚ)',     freq: 'Derived',        res: 'Kraj',          vars: 1, category: 'Standards',     feeds: 'P3 corrosion class C1-C5' },
+    { id: "GEM", name: "GEM Global Seismic Hazard Map 2023.1", url: "globalquakemodel.org", freq: "Static", res: "0.05° (~5.5 km, rock-site PGA 475-yr)", vars: 1, category: "Hazard", feeds: "R6a seismic PGA, substation-level overlay (CC BY-NC-SA 4.0)" },
+    { id: "Eurostat-NUTS3", name: "Eurostat NUTS-3 Regional Statistics", url: "ec.europa.eu/eurostat", freq: "Annual", res: "NUTS-3 (province / NUTS-2 unemployment)", vars: 5, category: "Socio-Econ", feeds: "R2 GDP/cap, unemp, elderly%, ep_rate, migration (CC BY 4.0)" },
   ],
 
   // ─── 6 Components (matches Wave B scoring engine: C/E/F/P/S/T) ──────
