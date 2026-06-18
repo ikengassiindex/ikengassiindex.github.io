@@ -88,7 +88,7 @@ var SSI_COUNTRY_LABELS = {
   'spain': '\uD83C\uDDEA\uD83C\uDDF8 Spain',
   'sweden': '\uD83C\uDDF8\uD83C\uDDEA Sweden',
   'switzerland': '\uD83C\uDDE8\uD83C\uDDED Switzerland',
-  'turkey': '\uD83C\uDDF9\uD83C\uDDF7 Turkey',
+  'turkey': '\uD83C\uDDF9\uD83C\uDDF7 Türkiye',
   'uk': '\uD83C\uDDEC\uD83C\uDDE7 United Kingdom',
   'us': '\uD83C\uDDFA\uD83C\uDDF8 United States'
 };
