@@ -5,9 +5,24 @@
 
 numpy>=1.24,<2.0    # Vectorized Monte Carlo (canonical scoring engine, PR-2)
 
-# ── Optional dependencies for full CDS data processing ──
-# netCDF4>=1.6.0    # For processing ERA5/CMIP6 NetCDF files from Copernicus CDS
-# cdsapi>=0.7.0     # For Copernicus Climate Data Store API access
+# ── Phase 1.5 data ingestion (P15-A, 8 June 2026) ──
+# cdsapi unblocks Copernicus CDS ERA5 + CMIP6 fetching for the 28 countries
+# missing climate baselines after Phase 1's --all refresh. Requires operator's
+# CDS API key — register free at https://cds.climate.copernicus.eu, then
+# either export CDS_API_KEY=<key> or place it in ~/.cdsapirc per the cdsapi
+# package convention. See scripts/pipeline/data/README.md §"Climate".
+cdsapi>=0.7.0       # Copernicus Climate Data Store API client
+netCDF4>=1.6.0      # NetCDF reader for ERA5 .nc files returned by CDS
+                    # (uncommented during P15-A triage 8 June 2026 — Korea
+                    # ERA5 fetch hit "netCDF4 not available" after CDS
+                    # download succeeded; install unblocks the parse step)
+rasterio>=1.3       # GeoTIFF reader for GEM 2023.1 Global Seismic Hazard
+                    # Map raster (P15-B-2, 8 June 2026 — switched from
+                    # imagined CSV to actual GeoTIFF format GEM publishes).
+                    # Heavy dep (~50 MB with GDAL backend) but only used by
+                    # the seismic.py global-fallback path. Operators who
+                    # pre-extract their own CSV at gem_global_pga475.csv
+                    # don't need rasterio installed.
 
 # ── Test harness (PR-1) ──
 # pytest is required only for running tests/ locally + in CI.
