@@ -3,167 +3,289 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSI Index — ESG Report</title>
-<link rel="stylesheet" href="../style.css?v=1781188092c6548">
+<title>SSI Index — Spain — ESG Report (v4.2)</title>
+<meta name="description" content="SSI v4.2 ESG Report — per-substation Environmental, Social, Governance assessment across the 3529-substation Spain fleet. CSRD/ESRS/EU Taxonomy/TCFD/SFDR aligned. Open methodology." data-canonical-content="page-headline">
+<meta name="theme-color" content="#941914">
+<link rel="stylesheet" href="../style.css?v=20260614-s17">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-<link rel="stylesheet" href="../esg-report.css?v=c58bb5b24d">
+<link rel="stylesheet" href="../esg-report.css?v=20260614-s17">
 </head>
 <body>
-<script src="../nav.js?v=1781188092e36e5935"></script>
-<script src="../esg-helpers.js?v=72a635be53"></script>
-<script src="ssi-metadata.js?v=23160fbb21"></script>
-<script src="../intelligence/intelligence-loader.js?v=1781188092bae9a80d" data-country="spain" id="ssi-esg-page"></script>
+<!-- W2.5 SSI_CANONICAL_LITERALS -->
+<script>/* W2.5 — Spain-literal lookup table for meta-tag content substitution. Read by country-renderer.js::fillCanonicalContentAttrs. */
+window.SSI_CANONICAL_LITERALS = {
+ "fleet.total": "3,529",
+ "fleet.voltage.ehv": "939",
+ "fleet.voltage.hv": "1,004",
+ "fleet.voltage.distribution": "1,586",
+ "fleet.grid_lines": "—",
+ "fleet.grid_lines_km": "—",
+ "fleet.engine.mc_simulations_label": "42.9",
+ "fleet.engine.source_data_points": "146,000",
+ "fleet.engine.total_arithmetic_label": "1.78",
+ "fleet.engine.output_data_points": "244,701",
+ "fleet.engine.evals_per_substation": "196,608"
+};
+</script>
+
+<script src="../nav.js?v=20260614-s17"></script>
+<script src="../esg-helpers.js?v=20260614-s17"></script>
+<script src="ssi-metadata.js?v=20260614-s17"></script>
+<script src="../intelligence/intelligence-loader.js?v=20260614-s17" data-country="spain" id="ssi-esg-page"></script>
 <script>renderNav('esg-report');</script>
 
 <!-- ═══ Page Shell ═══ -->
 <div class="page-shell">
 
-  <!-- ── Header ── -->
-  <div class="page-header">
-    <div class="label-xs" style="margin-bottom:6px;">ANNUAL ESG DISCLOSURE — REPORTING PERIOD 2025 · SPAIN EDITION 01</div>
-    <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇪🇸</span>Substation ESG Report</h1>
-    <p>Substation-level Environmental, Social, and Governance assessment aligned to CSRD/ESRS, EU Taxonomy, TCFD, SFDR, and UN PRI frameworks. Updated annually via the SSI Index scoring engine.</p>
-  </div>
+ <!-- ── Header ── -->
+ <div class="page-header">
+ <div class="label-xs" style="margin-bottom:6px;">ANNUAL ESG DISCLOSURE — REPORTING PERIOD 2025 · SPAIN EDITION 01 · SSI v4.2</div>
+ <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇪🇸</span><span data-canonical="cfg.country_name" style="font-weight:600">Spain</span> &mdash; Substation ESG Report <span style="font-size:0.45em;color:var(--terracotta);font-weight:500">v4.2</span></h1>
+ <p>Substation-level Environmental, Social, and Governance assessment aligned to CSRD/ESRS, EU Taxonomy, TCFD, SFDR, and UN PRI frameworks, across the <span data-canonical="fleet.total">3,529</span>-substation Spain fleet. Updated monthly via the SSI Index v4.2 scoring engine (<span data-canonical="meta.n_variables">101</span> variables · <span data-canonical="meta.n_data_sources">34</span> sources · <span data-canonical="meta.n_modifiers">11</span> modifiers · Re composite bounded [0.920, 1.787]).</p>
+ </div>
 
-  <!-- ── Substation Identity KPIs ── -->
-  <div class="kpi-grid" id="kpiGrid" style="margin-bottom:32px;"></div>
+ <!-- ── Substation Identity KPIs ── -->
+ <div class="kpi-grid" id="kpiGrid" style="margin-bottom:32px;"></div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       MOD 1: COMPONENT BAR CHART (C/V/I/E/S/T fingerprint)
-       ══════════════════════════════════════════════════════════ -->
-  <div class="section-block component-bar-wrap">
-    <div class="section-header">
-      <div class="section-title-group">
-        <h2>Component Fingerprint</h2>
-        <div class="section-sub">Six-component weighted decomposition of the SSI composite score &mdash; the substation's structural risk profile</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="grid-2">
-        <div>
-          <div class="label-sm" style="margin-bottom:8px;">Weighted Contribution to R<sub>base</sub></div>
-          <div class="component-bar" id="componentBar"></div>
-          <div class="component-legend" id="componentLegend"></div>
-        </div>
-        <div>
-          <canvas id="componentChart" height="180"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
+ <!-- ══════════════════════════════════════════════════════════
+ MOD 1: COMPONENT BAR CHART (C/V/I/E/S/T fingerprint)
+ ══════════════════════════════════════════════════════════ -->
+ <div class="section-block component-bar-wrap">
+ <div class="section-header">
+ <div class="section-title-group">
+ <h2>Component Fingerprint <span style="font-size:0.5em;color:var(--terracotta);font-weight:500;vertical-align:middle">+ Re composite v4.2</span></h2>
+ <div class="section-sub">Six-component weighted decomposition of the SSI composite score (C / V / I / E / S / T) &mdash; the substation's structural risk profile &mdash; PLUS the v4.2 <strong style="color:var(--terracotta)">Re composite</strong>, a bounded resilience aggregate of the new modifier family (R6c flood + R6d wildfire + R6e winter + R8 adapt + R9 compound + R10 just). Layout: <em>left</em> &mdash; the 6 components rendered as a weighted contribution bar &middot; <em>right</em> &mdash; the same 6 components rendered as horizontal bars side-by-side with Re_norm as the comparable 7th bar (terracotta) on the [0, 1] scale &middot; <em>below</em> &mdash; the Re composite tier card (numeric value + bounded trajectory bar + classification + formula explainer). Re composite re-appears as the 7th axis of the ESG Radar in Section A below.</div>
+ </div>
+ </div>
+ <div class="card">
+ <div class="grid-2">
+ <div>
+ <div class="label-sm" style="margin-bottom:8px;">Weighted Contribution to R<sub>base</sub></div>
+ <div class="component-bar" id="componentBar"></div>
+ <div class="component-legend" id="componentLegend"></div>
+ </div>
+ <div>
+ <canvas id="componentChart" height="180"></canvas>
+ </div>
+ </div>
+ </div>
+ <!-- ── v4.2 Re Composite Tier card — co-located with the Component Fingerprint per its section heading promise ──
+ Populated by spain-section-overrides.js from canonical ssi-data.json.v4.2::substations[].Re_norm.
+ Placeholder visible only if override fails to fire (Convention #10 graceful degradation). -->
+ <div class="card" style="margin-top:14px;padding:16px 18px;background:#fff" data-v42-re-tier-card>
+ <div style="display:flex;align-items:center;gap:14px;color:var(--warm-grey);font-size:13px">
+ <span style="font-size:18px">⏳</span>
+ <span><em>Re composite tier loading from canonical ssi-data.json.v4.2 &mdash; if this placeholder persists, see the page footer's Foundation contact.</em></span>
+ </div>
+ </div>
+ <div style="margin-top:8px;font-size:11px;color:var(--warm-grey);line-height:1.6">
+ Re composite tier classification: <strong style="color:var(--sage)">low</strong> (Re_norm &lt; 0.25) &middot; <strong style="color:var(--bronze)">moderate</strong> (0.25&ndash;0.50) &middot; <strong style="color:var(--terracotta)">elevated</strong> (&ge; 0.50). Bounds [0.920, 1.787] map to Re_norm [0, 1] via clip((Re_raw &minus; 0.920) / (1.787 &minus; 0.920), 0, 1).
+ </div>
+ </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       MOD 2: MARKOV STEADY-STATE DIAGRAM
-       ══════════════════════════════════════════════════════════ -->
-  <div class="section-block">
-    <div class="section-header">
-      <div class="section-title-group">
-        <h2>Markov Degradation Profile</h2>
-        <div class="section-sub">CIGRE TB 761 five-state condition model &mdash; steady-state probability distribution and expected time to criticality</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="grid-2">
-        <div>
-          <div class="label-sm" style="margin-bottom:8px;">Steady-State Distribution</div>
-          <div class="markov-diagram" id="markovDiagram"></div>
-          <div style="margin-top:12px; font-size:12px; color:var(--warm-grey);">
-            Markov 5-state model calibrated from CIGRE Technical Brochure 761 (2019). States represent asset condition from new/good through critical. Steady-state probabilities indicate the long-run proportion of time the asset spends in each condition state given current operating environment.
-          </div>
-        </div>
-        <div>
-          <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
-            <div class="kpi-card">
-              <div class="kpi-label">Risk Score</div>
-              <div class="kpi-value" id="markovRiskScore" style="font-size:28px;">&mdash;</div>
-              <div class="kpi-sub">Composite Markov risk</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">ETTC</div>
-              <div class="kpi-value" id="markovETTC" style="font-size:28px;">&mdash;</div>
-              <div class="kpi-sub">Expected time to critical</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">P(Critical) 20yr</div>
-              <div class="kpi-value" id="markovPCrit" style="font-size:28px;">&mdash;</div>
-              <div class="kpi-sub">Probability of reaching critical</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">Corrosion</div>
-              <div class="kpi-value" id="markovCorrosion" style="font-size:28px;">&mdash;</div>
-              <div class="kpi-sub">ISO 9223 classification</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+ <!-- ══════════════════════════════════════════════════════════
+ MOD 2: MARKOV STEADY-STATE DIAGRAM
+ ══════════════════════════════════════════════════════════ -->
+ <div class="section-block">
+ <div class="section-header">
+ <div class="section-title-group">
+ <h2>Markov Degradation Profile</h2>
+ <div class="section-sub">CIGRE TB 761 five-state condition model &mdash; steady-state probability distribution and expected time to criticality</div>
+ </div>
+ </div>
+ <div class="card">
+ <div class="grid-2">
+ <div>
+ <div class="label-sm" style="margin-bottom:8px;">Steady-State Distribution</div>
+ <div class="markov-diagram" id="markovDiagram"></div>
+ <div style="margin-top:12px; font-size:12px; color:var(--warm-grey);">
+ Markov 5-state model calibrated from CIGRE Technical Brochure 761 (2019). States represent asset condition from new/good through critical. Steady-state probabilities indicate the long-run proportion of time the asset spends in each condition state given current operating environment.
+ </div>
+ </div>
+ <div>
+ <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:0;">
+ <div class="kpi-card">
+ <div class="kpi-label">Risk Score</div>
+ <div class="kpi-value" id="markovRiskScore" style="font-size:28px;">&mdash;</div>
+ <div class="kpi-sub">Composite Markov risk</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">ETTC</div>
+ <div class="kpi-value" id="markovETTC" style="font-size:28px;">&mdash;</div>
+ <div class="kpi-sub">Expected time to critical</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">P(Critical) 20yr</div>
+ <div class="kpi-value" id="markovPCrit" style="font-size:28px;">&mdash;</div>
+ <div class="kpi-sub">Probability of reaching critical</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Corrosion</div>
+ <div class="kpi-value" id="markovCorrosion" style="font-size:28px;">&mdash;</div>
+ <div class="kpi-sub">ISO 9223 classification</div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       SECTION A: ESG RADAR CHART
-       ══════════════════════════════════════════════════════════ -->
-  <div class="section-block">
-    <div class="section-header">
-      <span class="section-number">A</span>
-      <div class="section-title-group">
-        <h2>ESG Radar &mdash; Six-Report Overview</h2>
-        <div class="section-sub">Composite readiness across 6 ESG dimensions, each linked to UN Sustainable Development Goals</div>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:24px; overflow:visible;">
-      <div class="radar-wrap">
-        <div class="radar-chart-box">
-          <canvas id="esgRadar" width="500" height="420"></canvas>
-        </div>
-        <div class="radar-legend" id="radarLegend"></div>
-      </div>
-    </div>
-  </div>
+ <!-- ══════════════════════════════════════════════════════════
+ SECTION A: ESG RADAR CHART
+ ══════════════════════════════════════════════════════════ -->
+ <div class="section-block">
+ <div class="section-header">
+ <span class="section-number">A</span>
+ <div class="section-title-group">
+ <h2>ESG Radar &mdash; Seven-Report Overview <span style="font-size:0.5em;color:var(--terracotta);font-weight:500;vertical-align:middle">v4.2</span></h2>
+ <div class="section-sub">Composite readiness across 7 ESG dimensions per FC v3 §14 (R1 Climate Physical · R2 Grid Equity &amp; Social · R3 Infrastructure Resilience [Re composite ESG home] · R4 Pollution &amp; Corrosion · R5 Energy Transition &amp; DER Stress · R6 Cybersecurity · R7 SFDR PAI Infrastructure, FC v3 §14 subsection 13.7), each linked to UN Sustainable Development Goals. <em style="font-size:11px;color:var(--warm-grey)">Note: R7 here is the SFDR ESG-disclosure axis (Re_norm proxy under Convention #7) &mdash; distinct from the v4.0.2 formula-chain R7 cyber/digital modifier documented in methodology.html. The two R7s share a number by design (V4_2_IMPLEMENTATION_ARCHITECTURE.md §4.5).</em></div>
+ </div>
+ </div>
+ <div class="card" style="margin-bottom:24px; overflow:visible;">
+ <div class="radar-wrap">
+ <div class="radar-chart-box">
+ <canvas id="esgRadar" width="500" height="420"></canvas>
+ <!-- v4.2 Re composite badge — populated by spain-section-overrides.js from canonical ssi-data.json.v4.2 -->
+ <div data-v42-re-badge="esgRadar"></div>
+ </div>
+ <div class="radar-legend" id="radarLegend"></div>
+ </div>
+ </div>
+ </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       SECTION B: INDIVIDUAL ESG REPORTS (dynamically rendered)
-       ══════════════════════════════════════════════════════════ -->
-  <div id="esgReportsContainer"></div>
+ <!-- ══════════════════════════════════════════════════════════
+ SECTION B: INDIVIDUAL ESG REPORTS (dynamically rendered)
+ ══════════════════════════════════════════════════════════ -->
+ <div id="esgReportsContainer"></div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       SECTION C: AUDIT TRAIL
-       ══════════════════════════════════════════════════════════ -->
-  <div class="section-block" id="audit">
-    <div class="section-header">
-      <span class="section-number">C</span>
-      <div class="section-title-group">
-        <h2>Audit Trail &amp; Methodology Note</h2>
-        <div class="section-sub">Traceability for CSRD Article 29a limited assurance</div>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:20px;">
-      <table class="data-table">
-        <thead><tr><th>Item</th><th>Value</th></tr></thead>
-        <tbody id="auditTrailBody"></tbody>
-      </table>
-    </div>
-  </div>
+ <!-- ══════════════════════════════════════════════════════════
+ SECTION C: AUDIT TRAIL
+ ══════════════════════════════════════════════════════════ -->
+ <div class="section-block" id="audit">
+ <div class="section-header">
+ <span class="section-number">C</span>
+ <div class="section-title-group">
+ <h2>Audit Trail &amp; Methodology Note</h2>
+ <div class="section-sub">Traceability for CSRD Article 29a limited assurance</div>
+ </div>
+ </div>
+ <div class="card" style="margin-bottom:20px;">
+ <table class="data-table">
+ <thead><tr><th>Item</th><th>Value</th></tr></thead>
+ <tbody id="auditTrailBody"></tbody>
+ </table>
+ </div>
+ </div>
 
-  <!-- ── Footer ── -->
-  <div class="page-footer" id="footerContainer"></div>
+ <!-- ── v4.2 Re composite Section D reference (was "E" pre-renumber 12 Jun 2026 — closes A/B/C/E lettering gap) ── -->
+ <div class="section-block" id="re-composite-ref">
+ <div class="section-header">
+ <span class="section-number">D</span>
+ <div class="section-title-group">
+ <h2>Re composite — bounded resilience aggregate (v4.2)</h2>
+ <div class="section-sub">Resilience composite anchoring CSRD/ESRS climate-resilience disclosure</div>
+ </div>
+ </div>
+ <div class="card" style="margin-bottom:20px;padding:18px">
+ <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 10px 0">
+ The Re composite (v4.2) is a bounded resilience aggregate capturing the new R6c flood / R6d wildfire / R6e winter / R8 adapt / R9 compound / R10 just modifier family in a single scalar suitable for CSRD/ESRS climate-resilience disclosure:
+ </p>
+ <code style="display:block;padding:10px;background:#f5f5f5;border-radius:4px;font-size:13px;margin-bottom:10px">Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00)</code>
+ <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+ Bounds: <strong>[0.920, 1.787]</strong>. Re_raw &lt; 1.000 when R8_adapt &lt; 1.00 dominates other near-neutral factors. Spanish fleet observed range across <span data-canonical="fleet.total">3,529</span> substations: the methodology-bounded extremes [0.920, 1.787] — low-end values arise at interior low-exposure substations with R8_adapt &lt; 1.00 dominating near-neutral other modifiers, high-end values at coastal compound-exposure substations where R6c flood + R9 compound stack multiplicatively. v4.2 explicitly retires the pre-Path-B "winter exposure is a real climate burden" reading per Convention #6 §2.3.1 (Bourgouin freezing-rain p99 tail-event amplifier per §6 design — winter exposure signal correctly lives in v4.0.2 I1 Snow/Ice metric, where it methodologically belongs). See <a href="../reference-docs/SSI_v4_2_W1_W10_Substation_Formula_Construct_Spain_v2.html">W1-W10 FC v2</a> for per-substation worked examples + W4 Climate resilience baselines.
+ </p>
+ </div>
+ </div>
+
+ <!-- ── Footer ── -->
+ <div class="page-footer" id="footerContainer"></div>
+
+ <!-- v4.2 Foundation contact block (Convention #2 — byte-identical across instances) -->
+ <div class="card" style="margin:24px 0;padding:18px;border-left:3px solid var(--terracotta);background:#fef8f7">
+ <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:6px;color:var(--terracotta)">Foundation contact</div>
+ <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+ The SSI Index is a non-profit foundation project, please mail to <a href="mailto:ssi_index@ikenga.eu" style="color:var(--terracotta);font-weight:500">ssi_index@ikenga.eu</a> for more details.
+ </p>
+ </div>
 
 </div><!-- /page-shell -->
 
 
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
-     Generated from templates/esg-report.html.j2 + templates/configs/spain.yaml
-     by scripts/build_pages.py. Per-page section logic lives in
-     ../esg-sections.js; central dispatch via CountryRenderer.init.
-     ═══════════════════════════════════════════════════════════ -->
-<script src="../country-renderer.js?v=72dbb5d6c0"></script>
-<script src="../esg-sections.js?v=fab0364a4f"></script>
+ DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+ Generated from templates/esg-report.html.j2 + templates/configs/spain.yaml
+ by scripts/build_pages.py. Per-page section logic lives in
+ ../esg-sections.js; central dispatch via CountryRenderer.init.
+ ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=20260614-s17"></script>
+<script src="../esg-sections.js?v=20260614-s17"></script>
+<!-- v4.2 per-country override (Spain only — Convention #3 compliant; loaded after shared section JS, before init) -->
+<script src="spain-section-overrides.js?v=20260614-s17"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    CountryRenderer.init('spain', 'esg-report');
-  });
+ document.addEventListener('DOMContentLoaded', function () {
+ CountryRenderer.init('spain', 'esg-report');
+ });
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+ ESG MONTHLY EDITION AUTO-PATCHER — V4.2-disc-43 (12 Jun 2026)
+ Prefers canonical SSI_EDITION (set by intelligence-loader.js from
+ intelligence/edition-config.json), falls back to date formula only
+ when the loader fails (Convention #10 graceful degradation).
+ Mirrors intelligence.html's patcher (V4.2-disc-43-aligned).
+ ═══════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+ var MN=['January','February','March','April','May','June',
+ 'July','August','September','October','November','December'];
+
+ function patchWithEdition(ed){
+ var now=new Date(), m=now.getMonth(), y=now.getFullYear();
+ var edN, eS, MY;
+
+ if(ed && ed.label && ed.month){
+ // ── Canonical path: SSI_EDITION populated by intelligence-loader.js ──
+ edN = ed.number || parseInt(ed.label, 10) || 1;
+ eS = ed.label; // already zero-padded "020"
+ MY = ed.month; // "May 2026"
+ } else {
+ // ── Legacy fallback (Convention #10) ──
+ // ESG monthly editions begin June 2026 (Edition 001) when no canonical
+ // loader is available. Formula: (y-2026)*12 + (m+1) - 5 → June 2026 → 1
+ edN = Math.max(1, (y-2026)*12 + (m+1) - 5);
+ eS = ('00'+edN).slice(-3);
+ MY = MN[m] + ' ' + y;
+ console.warn('[ESG-EDITION-AUTO-PATCHER] SSI_EDITION unavailable — using date formula fallback');
+ }
+
+ function R(o,n){
+ var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false),t;
+ while(t=w.nextNode()) if(t.nodeValue.indexOf(o)!==-1) t.nodeValue=t.nodeValue.split(o).join(n);
+ }
+ // Patch masthead — header + browser tab title
+ document.title=document.title.replace(/Substation ESG Report/,'Substation ESG Report · '+MY);
+ R('ANNUAL ESG DISCLOSURE — REPORTING PERIOD 2025 · SPAIN EDITION 01 · SSI v4.2',
+ 'MONTHLY ESG DISCLOSURE — REPORTING PERIOD '+MY+' · SPAIN EDITION '+eS+' · SSI v4.2');
+ // Convention #11 — propagate edition number to any [Edition NNN] / [Month Year] token in body prose
+ R('[Edition NNN]','Edition '+eS);
+ R('[Month Year]',MY);
+ }
+
+ // Prefer canonical SSI_EDITION when intelligence-loader.js has populated it
+ if(window.SSI_EDITION && window.SSI_EDITION.label){
+ patchWithEdition(window.SSI_EDITION);
+ } else if(window.SSI_CONFIG_READY === false){
+ // Loader pending — wait for ssi-config-ready event, then patch
+ document.addEventListener('ssi-config-ready', function(e){
+ patchWithEdition(e.detail);
+ }, { once: true });
+ } else {
+ // Loader not present → fallback
+ patchWithEdition(null);
+ }
+})();
 </script>

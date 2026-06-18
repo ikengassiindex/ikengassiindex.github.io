@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Download the complete SSI dataset — JSON, CSV, GeoJSON. 28 verified public data sources, 95 variables, 11 data layers.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Data &amp; Download</title>
+<link rel="stylesheet" href="../style.css?v=00582c6548">
+</head>
+<body>
+<script src="../ssi-versions.js?_=3"></script>
+<script src="../nav.js?v=00e36e5935"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=17aa91a6fa"></script>
+<script>renderNav('data');</script>
+
+
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Data &amp; Download</h1>
+    <p>All 28 data sources are public, free, and independently verifiable. Download the full SSI dataset or explore source documentation. v4.0.2 — 95 variables, 1,640 substations (LIVE OSM).</p>
+  </div>
+
+  <!-- Data Status -->
+  <div class="kpi-grid animate-in delay-1" style="margin-bottom:32px">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Variables</div>
+      <div class="kpi-value" style="color:var(--ink)">95</div>
+      <div class="kpi-sub">Across 11 data layers</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Data Sources</div>
+      <div class="kpi-value" style="color:var(--bronze)">28</div>
+      <div class="kpi-sub">All verified &amp; public</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Substations</div>
+      <div class="kpi-value" style="color:var(--sage)" id="data-subs">&mdash;</div>
+      <div class="kpi-sub" id="data-subs-sub">Loading&hellip;</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Max Frequency</div>
+      <div class="kpi-value" style="color:var(--terracotta)">Weekly</div>
+      <div class="kpi-sub">Layer B proxy/fuzzy vars</div>
+    </div>
+  </div>
+
+  <!-- Download Section -->
+  <div class="card animate-in delay-2" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Download SSI Dataset</h3>
+      <span class="label-xs">Latest fleet run</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px">
+      <div id="dl-full" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📊</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Full Dataset (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)" id="dl-full-info">&mdash; substations &middot; all fields</div>
+      </div>
+      <div id="dl-summary" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📋</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Summary Report (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">R_median, band, components, CI</div>
+      </div>
+      <div id="dl-geo" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">🗺️</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Geographic Data (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">Province coordinates + SSI scores</div>
+      </div>
+      <div id="dl-formula" class="dl-card" style="padding:16px;border:1px solid var(--card-border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--terracotta)'" onmouseout="this.style.borderColor='var(--card-border)'">
+        <div style="font-size:22px;margin-bottom:6px">📐</div>
+        <div style="font-weight:500;font-size:14px;margin-bottom:2px">Formula Construct (PDF)</div>
+        <div style="font-size:12px;color:var(--warm-grey)">Complete v4.0.2 technical reference</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Layers -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Layers</h3>
+      <span class="label-xs">11 layers &middot; 95 variables</span>
+    </div>
+    <table class="data-table" style="margin-top:4px">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Domain</th>
+          <th style="text-align:right">Variables</th>
+          <th>Status</th>
+          <th>Key Sources</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600;color:var(--crimson)">A</td>
+          <td>SSI v4.0.2 Resilience</td>
+          <td class="num">20</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">ACM · TenneT + Netbeheer Nederland Open Data · EPEX · CBS</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.1</td>
+          <td>Grid Telemetry: Open</td>
+          <td class="num">3</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">Open-Meteo / ERA5 · ACM</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.2</td>
+          <td>Grid Telemetry: Proxy</td>
+          <td class="num">4</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">IEEE C57.91 · TenneT + Netbeheer Nederland · TIQE</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">B.3</td>
+          <td>Grid Telemetry: Fuzzy</td>
+          <td class="num">12</td>
+          <td><span class="band-badge medium" style="font-size:10px">FUZZY</span></td>
+          <td style="font-size:12px">IEEE/CIGRÉ standards · EEA</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#a67cff">C</td>
+          <td>Socio-Economic</td>
+          <td class="num">9</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">CBS · Eurostat · DESI</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#ff8c42">D</td>
+          <td>Environmental Hazards</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">EEA · GSB · Copernicus · KNMI</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#3b9eff">E</td>
+          <td>Dutch Open Data</td>
+          <td class="num">8</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">CBS EU-SILC / EEPR · EPEX SPOT · KNMI · KNMI HPPS</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:var(--sage)">F</td>
+          <td>Network Transitions</td>
+          <td class="num">12</td>
+          <td><span class="band-badge medium" style="font-size:10px">BAYESIAN</span></td>
+          <td style="font-size:12px">DSO history OR IEEE/CIGRÉ + priors</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#22d3ee">G</td>
+          <td>Modifier Inputs</td>
+          <td class="num">3</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">ACM TIQE · OSM Power · JRC DSO</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#e67e22">H</td>
+          <td>Network &amp; Topology</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">TenneT + Netbeheer Nederland Data · GSB · OSM</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#8e44ad">I</td>
+          <td>Output Scores</td>
+          <td class="num">7</td>
+          <td><span class="band-badge low" style="font-size:10px">LIVE</span></td>
+          <td style="font-size:12px">Fleet Markov Chain · IEEE/CIGRÉ analysis</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Source Registry (all 30+, rendered from metadata) -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>Data Source Registry</h3>
+      <span class="label-xs">28 verified &middot; all free &amp; public</span>
+    </div>
+    <div class="source-grid" style="margin-top:12px" id="data-source-grid"></div>
+  </div>
+
+  <!-- Engine Info -->
+  <div class="card animate-in" style="margin-bottom:32px">
+    <div class="card-header">
+      <h3>SSI Engine</h3>
+      <span class="label-xs">Server-side canonical engine</span>
+    </div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:12px">
+      The SSI v4.0.2 canonical scoring engine is <code>scripts/pipeline/scoring/engine.py</code> (Python, numpy-vectorized). It implements the complete formula construct: 6 component weights, 20 metric intra-weights, all 6 modifier functions (R2 adaptive IRI, R3 consequence sigmoid, R4 graph criticality, R6a restoration speed, R6b network topology, R7 digital readiness), T1 DER stress composite, normalisation methods, soft-clip overflow compression, and a 10,000-iteration Monte Carlo (20×20 Gaussian copula via Cholesky decomposition). The browser-side <code>ssi-engine.js</code> engine is retired (PR-4, audit memo 2026-06-08); it now reads precomputed R_median, R_P5, R_P95, CI_width, P_critical, skewness, modifier_impacts directly from <code>ssi-data.json</code>.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)" id="engine-fns">&mdash;</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Public API functions</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">20</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Global weight entries</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">6</div>
+        <div style="font-size:10px;color:var(--warm-grey)">Modifier functions</div>
+      </div>
+      <div style="padding:10px;background:var(--cream);border-radius:var(--radius-sm);text-align:center">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink)">10,000</div>
+        <div style="font-size:10px;color:var(--warm-grey)">MC iterations (server)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API / Schema -->
+  <div class="card animate-in">
+    <div class="card-header">
+      <h3>Output Schema</h3>
+      <span class="label-xs">JSON per substation</span>
+    </div>
+    <div class="formula-block" id="schema-block" style="font-size:12px;line-height:1.6">
+      Loading live sample&hellip;
+    </div>
+  </div>
+</main>
+
+<!-- jsPDF + autotable for the 4 PDF download buttons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/data.html.j2 + templates/configs/netherlands.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../data-sections.js; central dispatch via CountryRenderer.init.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../data-sections.js?v=44cf6cb5de"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('netherlands', 'data');
+  });
+</script>
+<script>renderFooter();</script>
+</body>
+</html>

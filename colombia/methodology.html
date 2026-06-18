@@ -3,414 +3,481 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, modifiers including R6_armed_conflict + R6_volcanic + R6_drought (reservoir-electricity nexus), 95 variables, Monte Carlo uncertainty. Colombia edition.">
+<meta name="description" content="SSI v4.2 methodology — master equation, 6 components, 11 modifiers, 101 variables, 21 data sources, 381 substations, Re composite, Monte Carlo uncertainty. Open, reproducible." data-canonical-content="page-headline">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Colombia Methodology</title>
-<link rel="stylesheet" href="../style.css?v=00582c6548">
+<title>SSI Index — Colombia — Methodology (v4.2)</title>
+<link rel="stylesheet" href="../style.css?v=20260614-s17">
 </head>
 <body>
-<script src="../ssi-versions.js?v=dffbd5ace6"></script>
-<script src="../nav.js?v=00e36e5935"></script>
-<script src="../ssi-engine.js?v=143247a9c5"></script>
-<script src="ssi-metadata.js?v=db8a3cd1c1"></script>
+<!-- W2.5 SSI_CANONICAL_LITERALS -->
+<script>/* W2.5 — Colombia-literal lookup table for meta-tag content substitution. Read by country-renderer.js::fillCanonicalContentAttrs. */
+window.SSI_CANONICAL_LITERALS = {
+ "fleet.total": "381",
+ "fleet.voltage.ehv": "62",
+ "fleet.voltage.hv": "319",
+ "fleet.voltage.distribution": "0",
+ "fleet.grid_lines": "—",
+ "fleet.grid_lines_km": "—",
+ "fleet.engine.mc_simulations_label": "42.9",
+ "fleet.engine.source_data_points": "146,000",
+ "fleet.engine.total_arithmetic_label": "1.78",
+ "fleet.engine.output_data_points": "244,701",
+ "fleet.engine.evals_per_substation": "196,608"
+};
+</script>
+
+<script src="../ssi-versions.js?_=20260614-s17"></script>
+<script src="../nav.js?v=20260614-s17"></script>
+<script src="../ssi-engine.js?v=20260614-s17"></script>
+<script src="ssi-metadata.js?v=20260614-s17"></script>
+<script src="../intelligence/intelligence-loader.js?v=20260614-s17" data-country="colombia" id="ssi-methodology-page"></script>
 <script>renderNav('methodology');</script>
 
+
 <main class="page-shell" style="max-width:860px">
-  <div class="page-header animate-in">
-    <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇨🇴</span>Methodology — Colombia</h1>
-    <p>How the SSI v4.0.2 score is calculated for Colombia — from raw data to final classification. Open methodology, open data, fully reproducible across 33 departamentos.</p>
-  </div>
+ <div class="page-header animate-in">
+ <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇨🇴</span><span data-canonical="cfg.country_name" style="font-weight:600">Colombia</span> &mdash; Methodology <span style="font-size:0.45em;color:var(--terracotta);font-weight:500">v4.2</span></h1>
+ <p>How the SSI v4.2 is calculated &mdash; from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+ <!-- v4.2 validation badge -->
+ <div style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:6px 14px;background:#e8f5e9;border:1px solid #43a047;border-radius:14px;font-size:12px;color:#1b5e20;font-weight:500">
+ <span style="font-weight:700">✓</span> Open methodology · 33 of 33 checks pass · zero failures · zero unverified
+ </div>
+ </div>
 
-  <!-- Thesis -->
-  <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
-    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
-    <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Grid resilience in Colombia is inseparable from its hydro-dependent generation matrix, its active Andean seismic + volcanic regime, its internal armed-conflict legacy, and its socio-economic gradient running from Bogotá D.C. to the Amazon frontier. A substation serving a Chocó or Amazonas department with slow restoration, weak fiscal capacity, and proximity to a historical pylon-attack corridor is structurally more vulnerable than one with identical electrical characteristics in the Bogotá metro. The SSI captures this by fusing grid metrics with DANE socio-economic, IDEAM hydro-meteorological, SGC seismic + volcanic, ColCERT cyber, and Unidad de Víctimas + Migración Colombia displacement data — all from public sources.
-    </p>
-  </div>
+ <!-- Thesis -->
+ <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
+ <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
+ <p style="font-size:14px;line-height:1.7;color:var(--ink)">
+ Power grid resilience is inseparable from its socio-economic context. A substation serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data &mdash; all from public sources.
+ </p>
+ </div>
 
-  <!-- Pipeline -->
-  <div class="animate-in delay-2" style="margin-bottom:40px">
-    <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
-    <div class="method-step">
-      <div class="method-step-num">1</div>
-      <div class="method-step-content">
-        <h3>Ingest</h3>
-        <p>95 variables from 30+ verified public Colombian sources — DANE (Departamento Administrativo Nacional de Estadística) census + departamento-level GDP per capita + multidimensional poverty (MPI), UPME (Unidad de Planeación Minero-Energética) transmission + generation expansion plans, CREG (Comisión de Regulación de Energía y Gas) tariff + reliability + market structure, XM market dispatch + reservoir-level monitoring + CSIRT-XM cyber posture, IDEAM (Instituto de Hidrología, Meteorología y Estudios Ambientales) ENSO advisories + flood-hazard maps + climate baselines, SGC (Servicio Geológico Colombiano) 475-yr PGA hazard maps + volcanic-observatory alert bulletins (OVSM Manizales for Nevado del Ruiz, OVSP Pasto for Galeras, OVSPop Popayán for Puracé), ColCERT national CERT + CONPES 3854/2016 + 3995/2020 cyber framework, Unidad de Víctimas (IDP cumulative register), Migración Colombia (Venezuelan refugee register), Ministerio de Defensa (pylon-attack incident reporting), OSM Overpass (substation + line geometry via `out geom`). Zero proprietary SCADA dependencies. Maximum ingestion frequency: daily.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">2</div>
-      <div class="method-step-content">
-        <h3>Normalise</h3>
-        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">3</div>
-      <div class="method-step-content">
-        <h3>Weight</h3>
-        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol global sensitivity analysis.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">4</div>
-      <div class="method-step-content">
-        <h3>Compose R_base</h3>
-        <p>Weighted mean of normalised C/V/I/E component scores plus T_base produces the base resilience score, prior to modifiers.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">5</div>
-      <div class="method-step-content">
-        <h3>Modify</h3>
-        <p>Multiplicative modifiers adjust R_base for context: R3 (consequence + energy poverty — Colombia uses a 5-tier calibration reflecting the steep Bogotá-vs-Amazon GDP gradient), R4 (graph-theoretic criticality on the SIN backbone with ~17,000 km of 220+ kV circuits operated by ISA INTERCOLOMBIA), R6_seismic (Andean Nazca subduction zone + Bucaramanga seismic nest + 1999 Armenia Mw 6.2 cohort-anchor), R6_volcanic (SGC alert-level proximity multiplier; Galeras ORANGE +0.40 within 15 km; Nevado del Ruiz YELLOW +0.25 within 25 km — cohort-second highest after Iceland), R6_drought (reservoir-electricity nexus — ENSO-warm-phase reservoir-drawdown factor coupled to hydro_dependence per departamento), R6_armed_conflict (NEW cohort-first — department + 50-km historical-attack-corridor proximity), R6_flood (La Niña anchors + IDEAM flood-hazard map), R7 (cyber — ColCERT + sectoral CSIRT-XM since 2019; CONPES 3854/2016 + 3995/2020 framework; ceiling 1.030).</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">6</div>
-      <div class="method-step-content">
-        <h3>Monte Carlo + Sobol</h3>
-        <p>10,000 iterations per substation using a 20×20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Sobol first-order + total-order indices identify dominant drivers. Produces median, P5, P95, skewness, and P_critical per substation.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">7</div>
-      <div class="method-step-content">
-        <h3>Classify</h3>
-        <p>Four bands: Low (0.00–0.25), Medium (0.25–0.50), High (0.50–0.75), Critical (0.75–1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
-      </div>
-    </div>
-  </div>
+ <!-- Pipeline -->
+ <div class="animate-in delay-2" style="margin-bottom:40px">
+ <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
+ <div class="method-step">
+ <div class="method-step-num">1</div>
+ <div class="method-step-content">
+ <h3>Ingest</h3>
+ <p>
+ 101 variables from 21 verified public data sources &mdash; CREG, XM, Codensa+EPM+EEB+ESSA, UPME, DANE, MinAmbiente (IDEAM Flood Atlas + UNGRD flood + IDEAM Fire Registry wildfire), national forestry agency, national energy-research institute, ENTSO-E, Copernicus CDS / EFFIS / ERA5 Bourgouin, NASA FIRMS, EU-SILC + national household survey, OpenStreetMap, Eurostat, national system-research institute, national environment ministry, national geoportal, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly. v4.2 covers the <span data-canonical="fleet.total">381</span>-substation Colombia fleet end-to-end.
+ </p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">2</div>
+ <div class="method-step-content">
+ <h3>Normalise</h3>
+ <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">3</div>
+ <div class="method-step-content">
+ <h3>Weight</h3>
+ <p>6-level hierarchical weighting across <span data-canonical="meta.n_components">6</span> components (C/V/I/E/S/T) and <span data-canonical="meta.n_metrics">20</span> metrics summing to R_base. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis (verified 12 Jun 2026 against <span data-canonical="fleet.total">381</span> Colombia substations; first-order S_i indices in Validation Framework below). The v4.2 <strong style="color:var(--terracotta)">Re composite</strong> aggregate is computed separately from the modifier family and surfaces as the 7th radar axis &mdash; it is <strong>NOT</strong> part of this weighting tree.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">4</div>
+ <div class="method-step-content">
+ <h3>Compose R_base</h3>
+ <p>Weighted sum of 6 normalised component scores produces the base resilience score.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">5</div>
+ <div class="method-step-content">
+ <h3>Modify <span style="font-size:11px;color:var(--terracotta);font-weight:500">11 modifiers</span></h3>
+ <p><strong>v4.0.2 baseline (five baseline factors):</strong> R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed, CREG CAIDI), R6b (network topology — centrality + ring redundancy), R7 (digital readiness proxy).<br>
+ <strong>v4.2 resilience family — six new resilience modifiers added to bring the total to 11 modifiers:</strong> <em>R6c_flood</em> (IDEAM Flood Atlas + UNGRD additive cliff +0.00..+0.30, P3=high/P2=medium/P1=low per Colombia convention) · <em>R6d_wildfire</em> (Canadian Fire Weather Index via EFFIS + NASA FIRMS + IDEAM Fire Registry national-tier, multiplicative [1.00, 1.20]) · <em>R6e_winter</em> (Bourgouin freezing-rain p99 tail-event amplifier per Bourgouin 2000 + Birk-Lenning 2021, multiplicative [1.00, 1.15]; Colombia collapses to ~1.005 per brief §6 methodologically-defensible absence) · <em>R8_adapt</em> (adaptive capacity from CREG bulk smart meter rollout + national energy-research institute + DESI) · <em>R9_compound</em> (pairwise hazard coupling — R6b×R6c, R6c×R6d, R6c×R6e) · <em>R10_just</em> (energy justice from EU-SILC + national energy-poverty research).</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">5b</div>
+ <div class="method-step-content">
+ <h3>Re composite <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2 — bounded resilience aggregate</span></h3>
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: Re_raw and Re_norm formula bounds [0.920, 1.787] are methodology constants derived from the multiplicative band of (R6d × R6e × R8 × R9 × R10) at modifier-tier extremes + R6c additive cliff range. Per-substation reference values now trace to canonical ssi-data.json.v4.2::substations[].Re_raw and Re_norm fields (Phase 1 closed 11 Jun 2026 via apply-v4.2-modifiers.py canonical-Re extension). low-exposure reference station: Re_raw 1.097, Re_norm 0.204. high-exposure reference station: Re_raw 1.477, Re_norm 0.642. Numbers shown match the canonical formula exactly, superseding the FC v2 §"Per-substation worked examples" hand-computed 0.198 / 0.620 (FC v2 had ~0.022 rounding error). -->
+ <p>The Re composite is the bounded resilience aggregate that captures the v4.2 modifier family in a single scalar:<br>
+ <code style="display:block;margin:6px 0;padding:8px;background:#f5f5f5;border-radius:4px;font-size:13px">Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00)</code>
+ Bounds: <strong>[0.920, 1.787]</strong> (Re_raw can fall below 1.000 when R8_adapt &lt; 1.00 dominates other near-neutral factors). Normalised: <code>Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1)</code>. Colombia fleet observed range (post-Path-B, canonical-computed from ssi-data.json.v4.2): low-exposure reference station Re_raw 1.097 / Re_norm 0.204; high-exposure reference station Re_raw 1.477 / Re_norm 0.642.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">6</div>
+ <div class="method-step-content">
+ <h3>Monte Carlo</h3>
+ <p>10,000 iterations per substation using a 20&times;20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">7</div>
+ <div class="method-step-content">
+ <h3>Classify</h3>
+ <p>Four bands: Low (0.00&ndash;0.25), Medium (0.25&ndash;0.50), High (0.50&ndash;0.75), Critical (0.75&ndash;1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+ </div>
+ </div>
+ </div>
 
-  <!-- Master Equation -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Master Equation</h3>
-      <span class="label-xs">v4.0.2 · Colombia</span>
-    </div>
-    <div class="formula-block">
-<span class="hl-fn">R_modified</span> = ( <span class="hl-fn">mean</span>(C, V, I, E, S) + T_base ) × R3 × R4 × ( 1 + Σ R6_α ) × R7
+ <!-- Master Equation -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Master Equation</h3>
+ <span class="label-xs">v4.2</span>
+ </div>
+ <div class="formula-block">
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base &times; &prod;<sub>i</sub> mult<sub>i</sub> ) + &Sigma;<sub>j</sub> ( add<sub>j</sub> &minus; <span class="hl-num">1.0</span> )
 
-<span class="hl-var">C</span>  Continuity        <span class="hl-comment">// SAIDI/SAIFI per Operador de Red</span>
-<span class="hl-var">V</span>  Voltage quality   <span class="hl-comment">// severity-weighted dips</span>
-<span class="hl-var">I</span>  Infrastructure    <span class="hl-comment">// climate IRI + density + corrosion C2-C5</span>
-<span class="hl-var">E</span>  Economic          <span class="hl-comment">// regulatory penalty + productivity loss</span>
-<span class="hl-var">S</span>  Saturation        <span class="hl-comment">// load + reverse flow + criticality</span>
-<span class="hl-var">T</span>  Transition        <span class="hl-comment">// DER stress + hydro-share volatility</span>
+<span class="hl-comment">// Expanded — 10 multiplicative modifiers inside soft_clip + 1 additive (R6c) outside</span>
 
-<span class="hl-var">R3</span> = consequence multiplier              <span class="hl-comment">// 5-tier · [1.01, 1.05]</span>
-<span class="hl-var">R4</span> = graph criticality (degree, BC, bridge) <span class="hl-comment">// [0.80, 1.35]</span>
-<span class="hl-var">R6_α</span> = Σ ( seismic + volcanic + drought + armed_conflict + flood )
-<span class="hl-var">R7</span> = cyber readiness                      <span class="hl-comment">// ColCERT + CSIRT-XM · ceiling 1.030</span>
-    </div>
-  </div>
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base
+ &times; F_topo &times; C_mult &times; R6a_mult &times; R6b_net &times; Cyber
+ &times; R6d_wf &times; R6e_winter &times; R8_adapt &times; R9_compound &times; R10_just )
+ + ( R6c_flood &minus; <span class="hl-num">1.0</span> ) <span class="hl-comment">// &larr; ADDITIVE shift, OUTSIDE clip</span>
 
-  <!-- Components -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>6 Components · 95 Variables (post-S38 canonical)</h3>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Component</th>
-          <th>Weight</th>
-          <th>Metrics</th>
-          <th>Domain</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
-          <td class="num">0.30</td>
-          <td>4 — SAIDI, SAIFI, MT exceed, Planned</td>
-          <td>Operador de Red quality reports per CREG annual</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
-          <td class="num">0.10</td>
-          <td>1 — Severity-weighted dips</td>
-          <td>Power quality events (XM + DSO filings)</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
-          <td class="num">0.25</td>
-          <td>9 — Climate IRI (3), density (2), thermal stress, load stress, ISO 9223 corrosion (C2 inland → C5 Pacific/Caribbean), hydrogeological</td>
-          <td>Physical asset condition &amp; environment</td>
-        </tr>
-        <tr>
-          <td><strong style="color:#3b9eff">E</strong> Economic</td>
-          <td class="num">0.10</td>
-          <td>2 — Regulatory penalties (CREG), productivity loss</td>
-          <td>Economic impact of interruptions in COP</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
-          <td class="num">0.20</td>
-          <td>3 — Regional KPI, reverse power flow, criticality class</td>
-          <td>Grid capacity utilisation</td>
-        </tr>
-        <tr>
-          <td><strong style="color:#22d3ee">T</strong> Transition</td>
-          <td class="num">0.05</td>
-          <td>1 — DER Stress Index (hydro ~70% normal year / ~50% El Niño; ~2.5 GW solar+wind by mid-2024; 12 GW renewable target 2030 per UPME)</td>
-          <td>Energy transition exposure</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<span class="hl-var">R_base</span> = <span class="hl-num">0.30</span>&middot;C + <span class="hl-num">0.10</span>&middot;V + <span class="hl-num">0.25</span>&middot;I + <span class="hl-num">0.10</span>&middot;E + <span class="hl-num">0.20</span>&middot;S + <span class="hl-num">0.05</span>&middot;T
 
-  <!-- R3 — 5-tier Colombia -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>R3 Consequence — 5-Tier Colombia Calibration</h3>
-      <span class="label-xs">vs CR 4-tier · KB §77</span>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr><th>Tier</th><th>α</th><th>Departamentos</th><th>Rationale</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>T1</strong> Capital-Metro / Industrial</td>
-          <td class="num">1.045+</td>
-          <td>Bogotá D.C., Antioquia</td>
-          <td>~16% national GDP (Bogotá) + Medellín industrial heartland (Antioquia); GDP/cap ~$8-11k; major financial centre + EPM hydro fleet.</td>
-        </tr>
-        <tr>
-          <td><strong>T2</strong> Regional-Capital</td>
-          <td class="num">1.035 – 1.045</td>
-          <td>Valle del Cauca, Santander, Cundinamarca, Atlántico, Bolívar, Casanare</td>
-          <td>GDP/cap ~$6-8k; regional capitals; petroleum economy (Casanare); Caribbean thermal hubs (Atlántico Tebsa, Bolívar Termocandelaria).</td>
-        </tr>
-        <tr>
-          <td><strong>T3</strong> Andean Intermediate</td>
-          <td class="num">1.025 – 1.035</td>
-          <td>Boyacá, Caldas, Risaralda, Quindío, Tolima, Huila, Nariño, Norte de Santander, Cesar, Magdalena, Córdoba, Meta, San Andrés</td>
-          <td>GDP/cap ~$5-6k; coffee zone, agro-industrial, Caribbean insular, Llanos petroleum.</td>
-        </tr>
-        <tr>
-          <td><strong>T4</strong> Pacific / Frontier</td>
-          <td class="num">1.015 – 1.025</td>
-          <td>Chocó, Cauca, Caquetá, Putumayo, La Guajira, Arauca, Sucre, Guaviare</td>
-          <td>GDP/cap ~$3-5k; Pacific rainforest + Llanos + frontier zones with significant IDP + Venezuelan-refugee populations.</td>
-        </tr>
-        <tr>
-          <td><strong>T5</strong> Amazon-Frontier Sparse</td>
-          <td class="num">&lt; 1.015</td>
-          <td>Vichada, Guainía, Vaupés, Amazonas</td>
-          <td>GDP/cap ~$3-4k; very sparse; substantial ZNI (Zonas No Interconectadas) overlap; limited grid penetration.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<span class="hl-comment">// ── v4.0.2 baseline multiplicative modifiers ──────────────────────────</span>
+<span class="hl-var">F_topo</span> = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge) <span class="hl-comment">// R4 &mdash; [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span> = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio) <span class="hl-comment">// R3 &mdash; [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local) <span class="hl-comment">// R6a &mdash; [0.90, 1.10]</span>
+<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring) <span class="hl-comment">// R6b &mdash; [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span> = <span class="hl-fn">desi_digital_index</span>(region, voltage) <span class="hl-comment">// R7 &mdash; [0.99, 1.05]</span>
 
-  <!-- R6 modifiers Colombia -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>R6 Hazard Modifiers — Colombia α Formulas</h3>
-      <span class="label-xs">5 sub-multipliers</span>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr><th>Modifier</th><th>Range α</th><th>Formula / Anchor</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="font-weight:500">R6_seismic</td>
-          <td class="num">[0.05, 0.20]</td>
-          <td>PGA-based per departamento. Andean subduction (Nazca plate underthrust) drives Pacific-coast + Western-Cordillera PGA 0.30-0.40g (475-yr); Bucaramanga seismic nest adds intermediate-depth source under Santander. Anchors: 1979 Tumaco-Esmeraldas Mw 8.2 (subduction megathrust), 1999 Armenia Mw 6.2 (≈1,200 fatalities, coffee-zone SAIDI/SAIFI anchor), 2008 Quetame Mw 5.9 (capital-proximate). ~45% of fleet at PGA ≥ 0.25g.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_volcanic</td>
-          <td class="num">[0.00, 0.40]</td>
-          <td>SGC alert-level proximity multiplier. Galeras (current ORANGE) +0.40 for substations within 15 km. Nevado del Ruiz (YELLOW, 1985 Armero lahar ≈23,000 fatalities — cohort-anchor catastrophic event) +0.25 within 25 km. Puracé / Nevado del Tolima / Nevado del Huila YELLOW +0.15. Approximately 41 substations in the volcanic-proximity envelope. Cohort-second after Iceland.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_drought</td>
-          <td class="num">[0.00, 0.18]</td>
-          <td>Reservoir-electricity nexus — hydro_dependence × ENSO-warm-phase reservoir-drawdown factor. Anchors: 1992-1993 Apagón (90-day nationwide rationing; triggered Law 142+143/1994 unbundling); 2015-2016 strong El Niño; 2023-2024 strong El Niño with emergency CREG-101-009-2024 demand curtailment + reservoir levels &lt;35% by March 2024. +0.10 V_climate for hydro_dependence &gt; 40% (Cundinamarca, Huila, Santander); +0.18 for &gt; 60% (Antioquia EPM portfolio: Guatapé / Ituango / Porce / San Carlos).</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_armed_conflict</td>
-          <td class="num">[0.00, 0.15]</td>
-          <td><strong>COHORT-FIRST.</strong> Department + 50-km historical-attack-corridor proximity. Pre-2016 FARC-EP era: several thousand pylon attacks 1985-2002 (200-300/year peak mid-1990s). Post-2016 Peace Accord: ≈40-80 pylon attacks/year + 5-10 substation attacks/year (per Ministerio de Defensa). High-risk corridors: Catatumbo (Norte de Santander, ELN), Cauca/Nariño Pacific (dissident FARC), Bajo Cauca/Sur de Córdoba (Clan del Golfo), Arauca + Casanare (ELN historical). ~12% of fleet in elevated zone.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6_flood</td>
-          <td class="num">[0.00, 0.10]</td>
-          <td>La Niña ENSO-cool-phase anchors (2010-2011 floods, 2017 Mocoa landslide 333 fatalities) + IDEAM flood-hazard map per zone. +0.05 V_climate baseline for Pacific coast (Chocó), Andean foothills (Boyacá, Caldas), Caribbean (Atlántico, Bolívar); up to +0.10 in validated high-risk floodplain zones.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<span class="hl-comment">// ── v4.2 resilience family ─────────────────────────────────────────────</span>
+<span class="hl-var">R6c_flood</span> = <span class="hl-fn">additive_flood</span>(PGRA: P3 / P2 / P1) <span class="hl-comment">// R6c [ADD] &mdash; +0.00..+0.30 OUTSIDE clip</span>
+<span class="hl-var">R6d_wf</span> = <span class="hl-fn">effis_fwi_combined</span>(FIRMS, EFFIS, IDEAM) <span class="hl-comment">// R6d &mdash; [1.00, 1.20]</span>
+<span class="hl-var">R6e_winter</span> = <span class="hl-fn">era5_freezing_rain_p99</span>(Bourgouin, Birk-Lenning) <span class="hl-comment">// R6e &mdash; [1.00, 1.15]</span>
+<span class="hl-var">R8_adapt</span> = <span class="hl-fn">digital_readiness_REVEnational system-research institute</span>(SM, national energy-research institute, DESI) <span class="hl-comment">// R8 [REV] &mdash; [0.92, 1.05], &lt;1.00 = R-relief</span>
+<span class="hl-var">R9_compound</span> = <span class="hl-fn">compound_step</span>(R6c, R6d, R6e, R6_seismic) <span class="hl-comment">// R9 [STEP] &mdash; {1.00, 1.04, 1.08, 1.10}</span>
+<span class="hl-var">R10_just</span> = <span class="hl-fn">energy_justice</span>(ENCV (Encuesta Nacional de Calidad de Vida), national energy-poverty research, CREG SAIDI) <span class="hl-comment">// R10 &mdash; [1.00, 1.12]</span>
 
-  <!-- R3/R4/R7 -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>R3 / R4 / R7 — Structural Multipliers</h3>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="font-weight:500">R3</td>
-          <td>Consequence + V_socio</td>
-          <td class="num">[1.01, 1.05]</td>
-          <td>5-tier consequence multiplier per departamento (see table above). Amplifies risk for substations serving large/energy-poor populations with high economic dependency.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R4</td>
-          <td>Graph Criticality</td>
-          <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph of the SIN (Sistema Interconectado Nacional) — ~17,000 km of 220+ kV circuits + ~150 HV substations owned by ISA INTERCOLOMBIA (~70% of STN backbone).</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R7</td>
-          <td>Cyber Readiness</td>
-          <td class="num">[1.000, 1.030]</td>
-          <td>ColCERT national CERT (operational since 2011, joint MinTIC + Ministerio de Defensa) + sectoral CSIRT-XM (operated by XM since 2019 post-CONPES 3854/2016 mandate). National framework: CONPES 3854/2016 (Cyber Security Strategy) + CONPES 3995/2020 (Cyber Defence Policy Update). Cyber Defence Command (CCOCI) under Ministerio de Defensa. <strong>Ceiling 1.030, baseline 1.020</strong> — reflects pre-crisis maturity (no major sectoral electrical-grid incident as of mid-2024). Active threats per ColCERT 2023 annual: ransomware (Conti, LockBit), state-actor + APT activity.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<span class="hl-comment">// ── v4.2 Re composite (bounded resilience aggregate) ────────────────────</span>
+<span class="hl-var">Re_raw</span> = ( R6d &times; R6e &times; R8 &times; R9 &times; R10 ) + ( R6c &minus; <span class="hl-num">1.0</span> )
+<span class="hl-var">Re_norm</span> = <span class="hl-fn">clip</span>( ( Re_raw &minus; <span class="hl-num">0.920</span> ) / ( <span class="hl-num">1.787</span> &minus; <span class="hl-num">0.920</span> ), <span class="hl-num">0</span>, <span class="hl-num">1</span> )
+ </div>
+ <p style="font-size:12px;color:var(--warm-grey);line-height:1.6;margin:14px 0 0 0">
+ <strong>Why the v4.2 form distinguishes multiplicative from additive.</strong> R6c (flood) is the only additive modifier &mdash; high-flood substations would otherwise be silently clipped by <code>soft_clip_upper</code>, hiding genuine hazard. Placing the R6c shift OUTSIDE the clip preserves the full <code>+0.00&hellip;+0.30</code> range in the final score. The other ten modifiers remain inside the clip because their bounded multiplicative behaviour is well-defined for the soft-clip compression. All bounds, vintages, and data sources are documented in the Modifiers table below.
+ </p>
+ </div>
 
-  <!-- Classification -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Classification Bands</h3>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 – 0.25</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 – 0.50</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 – 0.75</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 – 1.00</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
-      </div>
-    </div>
-  </div>
+ <!-- Components -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>6 Components + <span style="color:var(--terracotta)">Re composite</span> (7th radar axis) &middot; 20 Metrics + Re_norm <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2</span></h3>
+ <div style="font-size:11px;color:var(--warm-grey);line-height:1.6;margin-top:4px">The 6 R_base components (C/V/I/E/S/T) carry 20 weighted metrics that sum to R_base. The <strong style="color:var(--terracotta)">Re composite</strong> is a bounded resilience aggregate of the v4.2 modifier family (R6c + R6d + R6e + R8 + R9 + R10) shown alongside the 6 components but <strong>NOT</strong> summed into R_base — it surfaces as the 7th radar axis on every v4.2 visualisation.</div>
+ </div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Component</th>
+ <th>Weight</th>
+ <th>Metrics</th>
+ <th>Domain</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
+ <td class="num">0.30</td>
+ <td>4 &mdash; Duration, Count, MT exceed, Planned</td>
+ <td>Outage frequency and duration</td>
+ </tr>
+ <tr>
+ <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
+ <td class="num">0.10</td>
+ <td>1 &mdash; Severity-weighted dips</td>
+ <td>Power quality events</td>
+ </tr>
+ <tr>
+ <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
+ <td class="num">0.25</td>
+ <td>9 &mdash; Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
+ <td>Physical asset condition &amp; environment</td>
+ </tr>
+ <tr>
+ <td><strong style="color:#3b9eff">E</strong> Economic</td>
+ <td class="num">0.10</td>
+ <td>2 &mdash; Regulatory penalties, productivity loss</td>
+ <td>Economic impact of interruptions</td>
+ </tr>
+ <tr>
+ <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
+ <td class="num">0.20</td>
+ <td>3 &mdash; Regional KPI, reverse power flow, criticality class</td>
+ <td>Grid capacity utilisation</td>
+ </tr>
+ <tr>
+ <td><strong style="color:#22d3ee">T</strong> Transition</td>
+ <td class="num">0.05</td>
+ <td>1 &mdash; DER Stress Index (DER penetration + variability + EV load)</td>
+ <td>Energy transition exposure</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
 
-  <!-- Markov + MC + Sobol -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Uncertainty Quantification</h3>
-      <span class="label-xs">Markov 8-state · Monte Carlo · Sobol</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20×20 Gaussian copula to preserve empirical correlations between metrics. Three uncertainty sources are modelled: measurement error, spatial disaggregation noise across 33 departamentos, and data staleness. An 8-state Markov degradation model (extending CIGRE TB 761) tracks asset condition from new to critical with ENSO-modulated transition rates. Sobol first-order + total-order indices identify dominant drivers for each region.
-    </p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
-        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per substation</div>
-      </div>
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">8-state</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Markov degradation chain</div>
-      </div>
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">33</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Departamentos aggregated</div>
-      </div>
-    </div>
-  </div>
+ <!-- Modifiers -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Modifiers R2&ndash;R10 — 11 in active register + R2 internal (incl. R6a/R6b/R6c/R6d/R6e + R8 R-relief + R9 step + R10 justice)</h3>
+ <span class="label-xs">v4.0.2 baseline (five active: R3, R4, R6a, R6b, R7) &middot; v4.2 resilience family (six new: R6c, R6d, R6e, R8, R9, R10) &middot; total 11 modifiers in the active register &middot; R2 internal weight-shifter shown below for completeness (not in master equation)</span>
+ </div>
+ <p style="font-size:12px;color:var(--warm-grey);line-height:1.6;margin:8px 0 14px 0">
+ Three special-handler badges appear in the v4.2 family: <strong style="color:var(--terracotta)">[ADD]</strong> = additive shift applied OUTSIDE the soft-clip (only R6c) &middot;
+ <strong style="color:var(--sage)">[REV]</strong> = reverse-signed (α &lt; 1.00 = R-relief; only R8) &middot;
+ <strong style="color:var(--bronze)">[STEP]</strong> = step function (only R9: 1.00 / 1.04 / 1.08 / 1.10).
+ </p>
+ <table class="data-table">
+ <thead>
+ <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
+ </thead>
+ <tbody>
+ <!-- ── v4.0.2 baseline (5 active + R2 internal weight-shifter) ───────── -->
+ <tr style="background:var(--cream-deep)"><td colspan="4" style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);font-weight:600">v4.0.2 baseline — five active in master equation (R3, R4, R6a, R6b, R7) + R2 internal weight-shifter (shown for completeness)</td></tr>
+ <tr>
+ <td style="font-weight:500">R2</td>
+ <td>Adaptive IRI + Climate</td>
+ <td class="num">internal</td>
+ <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R3</td>
+ <td>Consequence + Poverty</td>
+ <td class="num">[0.70, 1.30]</td>
+ <td>Amplifies risk for regioni serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R4</td>
+ <td>Graph Criticality</td>
+ <td class="num">[0.80, 1.35]</td>
+ <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6a</td>
+ <td>Restoration Speed</td>
+ <td class="num">[0.90, 1.10]</td>
+ <td>CREG CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two regioni with identical SAIDI can have different risk profiles.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6b</td>
+ <td>Network Topology</td>
+ <td class="num">[1.00, 1.25]</td>
+ <td>Network centrality and ring topology. Penalises regioni in single-source or low-redundancy configurations. Based on physical network analysis.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R7</td>
+ <td>Digital Readiness <span style="font-size:9px;color:var(--terracotta);font-weight:600;letter-spacing:0.04em">(formula modifier &mdash; distinct from ESG-axis <strong>R7 SFDR</strong>)</span></td>
+ <td class="num">[0.99, 1.05]</td>
+ <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability.
+ <br><span style="font-size:10px;color:var(--warm-grey);font-style:italic;line-height:1.45">
+ <strong style="font-style:normal">Note &mdash; R7 duality:</strong>
+ the ESG Radar&rsquo;s seventh axis is <strong style="font-style:normal">R7 SFDR PAI Infrastructure</strong> (FC v3 §14 subsection 13.7 &ldquo;R7 &mdash; SFDR Principal Adverse Impact Statement (Infrastructure Module)&rdquo;), populated by the Re_norm composite as a documented-proxy under Convention #7 (Data-Layer Anchoring). The R7 <em>formula modifier</em> (this row) and the R7 <em>ESG axis</em> share the same numbering by design &mdash; they index different surfaces of v4.2 (rescore formula vs ESG disclosure) and are intentionally not unified at the numbering layer.
+ </span>
+ </td>
+ </tr>
+ <!-- ── v4.2 resilience family ──────────────────────────────────── -->
+ <tr style="background:#fef8f7"><td colspan="4" style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--terracotta);font-weight:600">v4.2 resilience family — six new modifiers (post-Convention #6 §5.6 mesh resolution)</td></tr>
+ <tr>
+ <td style="font-weight:500">R6c <span style="font-size:9px;letter-spacing:0.08em;color:var(--terracotta);font-weight:700;background:#fef0ee;padding:1px 4px;border-radius:2px">ADD</span></td>
+ <td>Flood Exposure</td>
+ <td class="num">+0.00&hellip;+0.30</td>
+ <td>Additive shift derived from IDEAM Flood Atlas + UNGRD flood-hazard zones (P3 high &middot; P2 medium &middot; P1 low). Applied OUTSIDE soft_clip so high-flood substations register full hazard without being clipped.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6d</td>
+ <td>Wildfire Exposure</td>
+ <td class="num">[1.00, 1.20]</td>
+ <td>Canadian Fire Weather Index combined with NASA FIRMS active-fire detections and IDEAM Fire Registry national-tier burned-area statistics. Multiplicative penalty for fire-prone substations.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6e</td>
+ <td>Winter-Storm Exposure</td>
+ <td class="num">[1.00, 1.15]</td>
+ <td>Bourgouin (2000) + Birk-Lenning (2021) Revised Bourgouin Algorithm freezing-rain p99 tail-event amplifier from ECMWF ERA5. Colombia collapses to ~1.005 per Convention #6 §2.3.6 Path B (low-exposure signal correctly lives in v4.0.2 I1 Snow/Ice).</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R8 <span style="font-size:9px;letter-spacing:0.08em;color:var(--sage);font-weight:700;background:#f0f6f1;padding:1px 4px;border-radius:2px">REV</span></td>
+ <td>Adaptive Capacity</td>
+ <td class="num">[0.92, 1.05]</td>
+ <td>Reverse-signed: α &lt; 1.00 = R-relief from digital readiness (CREG bulk smart meter rollout + national energy-research institute + DESI). Provinces with high adaptive capacity actively reduce SSI risk.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R9 <span style="font-size:9px;letter-spacing:0.08em;color:var(--bronze);font-weight:700;background:#fbf3e6;padding:1px 4px;border-radius:2px">STEP</span></td>
+ <td>Compound Hazard</td>
+ <td class="num">{1.00, 1.04, 1.08, 1.10}</td>
+ <td>Step function on the count of elevated hazards (R6b seismic, R6c flood, R6d wildfire, R6e winter). Zscheischler (2018) compound-event framework; national multi-hazard incident database cross-product for Colombia.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R10</td>
+ <td>Energy Justice</td>
+ <td class="num">[1.00, 1.12]</td>
+ <td>ENCV (Encuesta Nacional de Calidad de Vida) material-deprivation gradient Colombia energy-poverty Observatory + CREG regional SAIDI. Surfaces socio-economic exposure to grid disruption.</td>
+ </tr>
+ </tbody>
+ </table>
+ <p style="font-size:11px;color:var(--warm-grey);line-height:1.6;margin:14px 0 0 0">
+ <strong>Re composite</strong> aggregates the v4.2 resilience family in a single bounded scalar (bounds [0.920, 1.787], see Master Equation section above). Per-modifier briefs are at <a href="../methodology/" style="color:var(--terracotta);text-decoration:none">/methodology/</a>.
+ </p>
+ </div>
 
-  <!-- Detailed Metrics -->
-  <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
 
-  <!-- Normalisation Methods -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Normalisation Methods</h3>
-    </div>
-    <div id="method-norm"></div>
-  </div>
+ <!-- Classification -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Classification Bands</h3>
+ </div>
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
+ <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 &ndash; 0.25</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
+ </div>
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
+ <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 &ndash; 0.50</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
+ </div>
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
+ <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 &ndash; 0.75</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
+ </div>
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
+ <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 &ndash; 1.00</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
+ </div>
+ </div>
+ </div>
 
-  <!-- Data Layers -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Data Layers — 95 Variables</h3>
-      <span class="label-xs">10 layers</span>
-    </div>
-    <table class="data-table" id="method-layers">
-      <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+ <!-- MC & Confidence -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Uncertainty Quantification</h3>
+ <span class="label-xs">Monte Carlo engine</span>
+ </div>
+ <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
+ Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20&times;20 Gaussian copula to preserve empirical correlations between metrics (e.g., &rho;(C1, E1) &asymp; 0.70&ndash;0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+ </p>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+ <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+ <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
+ <div style="font-size:11px;color:var(--warm-grey)">MC iterations per substation</div>
+ </div>
+ <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+ <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20&times;20</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
+ </div>
+ <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+ <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~5.5 min</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
+ </div>
+ </div>
+ </div>
 
-  <!-- Data Sources -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>30+ Verified Data Sources for Colombia</h3>
-      <span class="label-xs">All open + free registration only</span>
-    </div>
-    <div style="overflow-x:auto;max-width:100%"><table class="data-table" id="method-sources" style="table-layout:auto;word-break:break-word">
-      <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
-      <tbody></tbody>
-    </table></div>
-  </div>
+ <!-- Detailed Metrics -->
+ <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
 
-  <!-- Validation -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Validation Framework</h3>
-      <span class="label-xs" id="method-val-count"></span>
-    </div>
-    <table class="data-table" id="method-validation">
-      <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+ <!-- Normalisation Methods -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Normalisation Methods</h3>
+ </div>
+ <div id="method-norm"></div>
+ </div>
 
-  <!-- Changelog -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>v3.4 → v4.0.2 Changelog</h3>
-    </div>
-    <table class="data-table" id="method-changelog">
-      <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+ <!-- Data Layers -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Data Layers &mdash; 101 Variables <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2</span></h3>
+ <span class="label-xs">11 layers &middot; v4.0.2 baseline 95 + v4.2 family 6 = 101 variables total</span>
+ </div>
+ <table class="data-table" id="method-layers">
+ <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
 
-  <!-- Competitive Positioning Note -->
-  <div class="card animate-in" style="border-left:3px solid var(--sage)">
-    <div class="card-header">
-      <h3>Competitive Positioning</h3>
-      <span class="label-xs">v4.0.2 · Colombia</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 introduces with Colombia the cohort-first <strong>R6_armed_conflict</strong> modifier (durable infrastructure-targeting form, distinct from acute national-conflict readings elsewhere in the cohort). Colombia is also the cohort-first country with a predominantly-hydro electricity matrix subject to recurring El Niño drought stress, so the <strong>R6_drought</strong> modifier is recalibrated to a reservoir-electricity-nexus form. Active-volcanism exposure (R6_volcanic) reuses the engine introduced for Iceland with Colombia-specific α-calibration anchored on the 1985 Armero lahar. Acknowledged gaps remain: comprehensive sectoral incident reporting on R6_armed_conflict 2024-2025 attack counts (depends on Ministerio de Defensa release cadence) and the Cyber Security Law enactment status (still draft in Congreso as of mid-2024).
-    </p>
-  </div>
+ <!-- Data Sources -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>34 Verified Data Sources for Colombia <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2 adds 4 sources for resilience modifiers</span></h3>
+ <span class="label-xs">All open + free registration only &middot; v4.0.2 baseline (30) + v4.2 family (4: IDEAM Flood Atlas + UNGRD, IDEAM Fire Registry wildfire, ECMWF ERA5 Bourgouin, CREG bulk smart meter rollout)</span>
+ </div>
+ <table class="data-table" id="method-sources" style="table-layout:fixed;width:100%">
+ <colgroup>
+ <col style="width:21%">
+ <col style="width:16%">
+ <col style="width:10%">
+ <col style="width:13%">
+ <col style="width:8%">
+ <col style="width:32%">
+ </colgroup>
+ <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
+
+ <!-- Validation -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Validation Framework</h3>
+ <span class="label-xs" id="method-val-count"></span>
+ </div>
+ <table class="data-table" id="method-validation">
+ <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
+
+ <!-- Changelog -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>v3.4 &rarr; v4.0.2 &rarr; v4.2 Changelog</h3>
+ <span class="label-xs">v4.2 extends the modifier set to 11 total + adds the Re composite + 4 new data sources + W1–W10 governance gate</span>
+ </div>
+ <table class="data-table" id="method-changelog">
+ <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
+
+ <!-- Competitive Positioning Note -->
+ <div class="card animate-in" style="border-left:3px solid var(--sage)">
+ <div class="card-header">
+ <h3>Competitive Positioning</h3>
+ <span class="label-xs">v4.2</span>
+ </div>
+ <p style="font-size:13px;line-height:1.7">
+ SSI v4.2 extends the v4.0.2 baseline (which scored competitively or leads on 15 of 16 dimensions versus CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks) with the resilience-modifier family (R6c flood / R6d wildfire / R6e winter / R8 adapt / R9 compound / R10 just), the Re composite (bounded resilience aggregate of the v4.2 modifier family; surfaced as the 7th radar axis but methodologically a modifier-family aggregate, NOT a 7th SSI component), and the W1–W10 anti-maladaptation governance gate (5/1/1/3 4-tier mesh resolution per Convention #6 §5.6). The remaining acknowledged gap is asset-health monitoring, which requires proprietary DSO data the SSI deliberately avoids in service of full open-data reproducibility.
+ </p>
+ </div>
+
+ <!-- v4.2 Foundation contact block (Convention #2 — byte-identical across instances)
+ Moved INSIDE <main> 12 Jun 2026 (V4.2-disc-36) so it inherits page-shell padding +
+ aligns row-by-row with Competitive Positioning above. -->
+ <div class="card animate-in" style="margin-top:32px;padding:20px;border-left:3px solid var(--terracotta);background:#fef8f7">
+ <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Foundation contact</div>
+ <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+ The SSI Index is a non-profit foundation project, please mail to <a href="mailto:ssi_index@ikenga.eu" style="color:var(--terracotta);font-weight:500">ssi_index@ikenga.eu</a> for more details.
+ </p>
+ </div>
 </main>
 
+
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2d.4 · KB §65 · §77)
-     ═══════════════════════════════════════════════════════════ -->
-<script src="../country-renderer.js?v=72dbb5d6c0"></script>
-<script src="../methodology-sections.js?v=8d98056b70"></script>
+ DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+ Generated from templates/methodology.html.j2 + templates/configs/colombia.yaml
+ by scripts/build_pages.py. Per-page section logic lives in
+ ../methodology-sections.js; central dispatch via CountryRenderer.init.
+ ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=20260614-s17"></script>
+<script src="../methodology-sections.js?v=20260614-s17"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    CountryRenderer.init('colombia', 'methodology');
-  });
+ document.addEventListener('DOMContentLoaded', function () {
+ CountryRenderer.init('colombia', 'methodology');
+ });
 </script>
 <script>renderFooter();</script>
 </body>

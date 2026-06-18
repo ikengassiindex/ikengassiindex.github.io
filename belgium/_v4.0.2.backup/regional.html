@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare Belgium provinces by SSI resilience score, component breakdown, and socio-economic context.">
+<meta name="theme-color" content="#941914">
+<title>SSI Index — Belgium · Regional · 11 Provinces</title>
+<link rel="stylesheet" href="../style.css?v=00582c6548">
+</head>
+<body>
+<script src="../ssi-versions.js?_=3"></script>
+<script src="../nav.js?v=00e36e5935"></script>
+<script src="../ssi-engine.js?v=143247a9c5"></script>
+<script src="ssi-metadata.js?v=6a8330f303"></script>
+<script>renderNav('regional');</script>
+
+
+<main class="page-shell">
+  <div class="page-header animate-in">
+    <h1>Regional Analysis</h1>
+    <p>Compare Belgium&#39;s 11 provinces by SSI score, component breakdown, and socio-economic context — 1,220 substations LIVE from OpenStreetMap.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs animate-in delay-1">
+    <button class="tab-btn active" onclick="switchTab(this,'tab-ranking')">Regional Ranking</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-compare')">Province Comparison</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-decomp')">Component Decomposition</button>
+  </div>
+
+  <!-- Tab: Regional Ranking -->
+  <div id="tab-ranking">
+    <div class="card animate-in delay-2" style="margin-bottom:24px">
+      <div class="card-header">
+        <h3>Provinces Ranked by Median R Score</h3>
+        <span class="label-xs" id="ranking-count">13 Provinces · sorted worst → best</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th>Province</th>
+            <th style="text-align:right">Median R</th>
+            <th style="text-align:right">Substations</th>
+            <th style="text-align:right">% Critical</th>
+            <th style="text-align:right">% High</th>
+            <th>Distribution</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data&hellip;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Province Comparison -->
+  <div id="tab-compare" style="display:none">
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-header"><h3>Select Province to Compare</h3></div>
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">Province A</div>
+            <select id="prov-a" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="label-xs" style="margin-bottom:6px">Province B</div>
+            <select id="prov-b" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid rgba(44,36,32,0.12);border-radius:6px;background:var(--cream)">
+            </select>
+          </div>
+        </div>
+        <!-- Comparison Table -->
+        <table class="data-table" id="compare-table">
+          <thead>
+            <tr><th>Metric</th><th style="text-align:right" id="th-prov-a">&mdash;</th><th style="text-align:right" id="th-prov-b">&mdash;</th><th style="text-align:right">Delta</th></tr>
+          </thead>
+          <tbody id="compare-tbody">
+            <tr><td colspan="4" style="text-align:center;color:var(--warm-grey);padding:24px">Select Province above</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-header"><h3>Component Radar</h3></div>
+        <div id="radar-container" style="display:flex;flex-direction:column;align-items:center;color:var(--warm-grey);flex:1;min-height:0">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+            <svg id="radar-svg" width="320" height="300" viewBox="0 0 280 260"></svg>
+          </div>
+          <div id="radar-legend" style="display:flex;flex-direction:column;align-items:center;font-size:11px;padding-bottom:0px;margin-top:0px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Component Decomposition -->
+  <div id="tab-decomp" style="display:none">
+    <div class="card animate-in">
+      <div class="card-header">
+        <h3>Average Component Contribution by Province</h3>
+        <span class="label-xs">Stacked horizontal bars · 13 Provinces</span>
+      </div>
+      <div id="decomp-bars" style="margin-top:16px">
+        <div style="text-align:center;color:var(--warm-grey);padding:32px"><div class="loading-spinner"></div> Loading data&hellip;</div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);font-size:11px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--crimson);border-radius:2px"></div>C Continuity</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--terracotta);border-radius:2px"></div>V Voltage</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--sage);border-radius:2px"></div>I Infrastructure</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#3b9eff;border-radius:2px"></div>E Economic</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:var(--bronze);border-radius:2px"></div>S Saturation</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:8px;background:#22d3ee;border-radius:2px"></div>T Transition</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TAB SWITCHING — light inline helper (no data dependency)
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(function(t) { t.style.display = 'none'; });
+  document.getElementById(tabId).style.display = 'block';
+}
+renderFooter();
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+     Generated from templates/regional.html.j2 + templates/configs/belgium.yaml
+     by scripts/build_pages.py. Per-page section logic lives in
+     ../regional-sections.js; central dispatch via CountryRenderer.init.
+     ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=72dbb5d6c0"></script>
+<script src="../regional-sections.js?v=8b69458499"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CountryRenderer.init('belgium', 'regional');
+  });
+</script>
+</body>
+</html>

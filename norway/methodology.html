@@ -3,352 +3,481 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.0.2 methodology — master equation, 6 components, 6 modifiers, 95 variables, 30+ data sources, Monte Carlo uncertainty. Open, reproducible.">
+<meta name="description" content="SSI v4.2 methodology — master equation, 6 components, 11 modifiers, 101 variables, 30 data sources, 6,495 substations, Re composite, Monte Carlo uncertainty. Open, reproducible." data-canonical-content="page-headline">
 <meta name="theme-color" content="#941914">
-<title>SSI Index — Methodology</title>
-<link rel="stylesheet" href="../style.css?v=00582c6548">
+<title>SSI Index — Norway — Methodology (v4.2)</title>
+<link rel="stylesheet" href="../style.css?v=20260614-s17">
 </head>
 <body>
-<script src="../ssi-versions.js?_=3"></script>
-<script src="../nav.js?v=00e36e5935"></script>
-<script src="../ssi-engine.js?v=143247a9c5"></script>
-<script src="ssi-metadata.js?v=8acbc3894d"></script>
+<!-- W2.5 SSI_CANONICAL_LITERALS -->
+<script>/* W2.5 — Norway-literal lookup table for meta-tag content substitution. Read by country-renderer.js::fillCanonicalContentAttrs. */
+window.SSI_CANONICAL_LITERALS = {
+ "fleet.total": "6,495",
+ "fleet.voltage.ehv": "213",
+ "fleet.voltage.hv": "596",
+ "fleet.voltage.distribution": "5,686",
+ "fleet.grid_lines": "—",
+ "fleet.grid_lines_km": "—",
+ "fleet.engine.mc_simulations_label": "42.9",
+ "fleet.engine.source_data_points": "146,000",
+ "fleet.engine.total_arithmetic_label": "1.78",
+ "fleet.engine.output_data_points": "244,701",
+ "fleet.engine.evals_per_substation": "196,608"
+};
+</script>
+
+<script src="../ssi-versions.js?_=20260614-s17"></script>
+<script src="../nav.js?v=20260614-s17"></script>
+<script src="../ssi-engine.js?v=20260614-s17"></script>
+<script src="ssi-metadata.js?v=20260614-s17"></script>
+<script src="../intelligence/intelligence-loader.js?v=20260614-s17" data-country="norway" id="ssi-methodology-page"></script>
 <script>renderNav('methodology');</script>
 
 
 <main class="page-shell" style="max-width:860px">
-  <div class="page-header animate-in">
-    <h1>Methodology</h1>
-    <p>How the SSI v4.0.2 is calculated &mdash; from raw data to final classification. Open methodology, open data, fully reproducible.</p>
-  </div>
+ <div class="page-header animate-in">
+ <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇳🇴</span><span data-canonical="cfg.country_name" style="font-weight:600">Norway</span> &mdash; Methodology <span style="font-size:0.45em;color:var(--terracotta);font-weight:500">v4.2</span></h1>
+ <p>How the SSI v4.2 is calculated &mdash; from raw data to final classification. Open methodology, open data, fully reproducible.</p>
+ <!-- v4.2 validation badge -->
+ <div style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:6px 14px;background:#e8f5e9;border:1px solid #43a047;border-radius:14px;font-size:12px;color:#1b5e20;font-weight:500">
+ <span style="font-weight:700">✓</span> Open methodology · 33 of 33 checks pass · zero failures · zero unverified
+ </div>
+ </div>
 
-  <!-- Thesis -->
-  <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
-    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
-    <p style="font-size:14px;line-height:1.7;color:var(--ink)">
-      Power grid resilience is inseparable from its socio-economic context. A fylke serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data &mdash; all from public sources.
-    </p>
-  </div>
+ <!-- Thesis -->
+ <div class="card animate-in delay-1" style="margin-bottom:32px;border-left:3px solid var(--terracotta)">
+ <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Breaking the Silos</div>
+ <p style="font-size:14px;line-height:1.7;color:var(--ink)">
+ Power grid resilience is inseparable from its socio-economic context. A substation serving an energy-poor region with slow restoration times and weak fiscal capacity is fundamentally more vulnerable than one with identical electrical characteristics in a prosperous area. The SSI captures this reality by fusing traditional grid metrics with socio-economic, environmental, and energy-transition data &mdash; all from public sources.
+ </p>
+ </div>
 
-  <!-- Pipeline -->
-  <div class="animate-in delay-2" style="margin-bottom:40px">
-    <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
-    <div class="method-step">
-      <div class="method-step-num">1</div>
-      <div class="method-step-content">
-        <h3>Ingest</h3>
-        <p>
-          95 variables from 30+ verified public data sources &mdash; 95 variables from 30+ verified Norwegian public data sources — Statnett SF, NVE/RME, SSB (Statistisk sentralbyrå), MET Norway, NGU, DSB, NSM, OSM, Copernicus, and others. Zero proprietary SCADA dependencies. Max frequency: real-time (Statnett SF dispatch).. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly.
-        </p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">2</div>
-      <div class="method-step-content">
-        <h3>Normalise</h3>
-        <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">3</div>
-      <div class="method-step-content">
-        <h3>Weight</h3>
-        <p>6-level hierarchical weighting across 6 components and 20 metrics. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">4</div>
-      <div class="method-step-content">
-        <h3>Compose R_base</h3>
-        <p>Weighted sum of 6 normalised component scores produces the base resilience score.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">5</div>
-      <div class="method-step-content">
-        <h3>Modify</h3>
-        <p>Six multiplicative modifiers adjust R_base for context: R2 (adaptive climate IRI), R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed), R6b (network topology), R7 (digital readiness proxy). Plus 5 micro-enrichments for vulnerable populations, flood zones, landslides, digital capabilities, and healthcare criticality.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">6</div>
-      <div class="method-step-content">
-        <h3>Monte Carlo</h3>
-        <p>10,000 iterations per fylke using a 20&times;20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each fylke.</p>
-      </div>
-    </div>
-    <div class="method-step">
-      <div class="method-step-num">7</div>
-      <div class="method-step-content">
-        <h3>Classify</h3>
-        <p>Four bands: Low (0.00&ndash;0.25), Medium (0.25&ndash;0.50), High (0.50&ndash;0.75), Critical (0.75&ndash;1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
-      </div>
-    </div>
-  </div>
+ <!-- Pipeline -->
+ <div class="animate-in delay-2" style="margin-bottom:40px">
+ <div class="label-xs" style="margin-bottom:16px">Processing Pipeline</div>
+ <div class="method-step">
+ <div class="method-step-num">1</div>
+ <div class="method-step-content">
+ <h3>Ingest</h3>
+ <p>
+ 101 variables from 30 verified public data sources &mdash; RME-NVE, Statnett, Elvia+Glitre+Lyse, Olje- og energidepartementet, SSB, Miljødirektoratet (NVE Flood Atlas flood + EFFIS NO wildfire), national forestry agency, national energy-research institute, ENTSO-E, Copernicus CDS / EFFIS / ERA5 Bourgouin, NASA FIRMS, EU-SILC + national household survey, OpenStreetMap, Eurostat, national system-research institute, national environment ministry, national geoportal, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly. v4.2 covers the <span data-canonical="fleet.total">6,495</span>-substation Norway fleet end-to-end.
+ </p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">2</div>
+ <div class="method-step-content">
+ <h3>Normalise</h3>
+ <p>Four normalisation methods: Method A (robust fleet percentile P5/P95), Method B (standard fleet percentile), Method C (bounded rescaling), and Method D (categorical mapping). Inverted metrics for density measures where higher = better resilience.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">3</div>
+ <div class="method-step-content">
+ <h3>Weight</h3>
+ <p>6-level hierarchical weighting across <span data-canonical="meta.n_components">6</span> components (C/V/I/E/S/T) and <span data-canonical="meta.n_metrics">20</span> metrics summing to R_base. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis (verified 12 Jun 2026 against <span data-canonical="fleet.total">6,495</span> Norway substations; first-order S_i indices in Validation Framework below). The v4.2 <strong style="color:var(--terracotta)">Re composite</strong> aggregate is computed separately from the modifier family and surfaces as the 7th radar axis &mdash; it is <strong>NOT</strong> part of this weighting tree.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">4</div>
+ <div class="method-step-content">
+ <h3>Compose R_base</h3>
+ <p>Weighted sum of 6 normalised component scores produces the base resilience score.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">5</div>
+ <div class="method-step-content">
+ <h3>Modify <span style="font-size:11px;color:var(--terracotta);font-weight:500">11 modifiers</span></h3>
+ <p><strong>v4.0.2 baseline (five baseline factors):</strong> R3 (consequence + energy poverty), R4 (graph-theoretic network criticality), R6a (restoration speed, RME-NVE CAIDI), R6b (network topology — centrality + ring redundancy), R7 (digital readiness proxy).<br>
+ <strong>v4.2 resilience family — six new resilience modifiers added to bring the total to 11 modifiers:</strong> <em>R6c_flood</em> (NVE Flood Atlas additive cliff +0.00..+0.30, P3=high/P2=medium/P1=low per Norway convention) · <em>R6d_wildfire</em> (Canadian Fire Weather Index via EFFIS + NASA FIRMS + EFFIS NO national-tier, multiplicative [1.00, 1.20]) · <em>R6e_winter</em> (Bourgouin freezing-rain p99 tail-event amplifier per Bourgouin 2000 + Birk-Lenning 2021, multiplicative [1.00, 1.15]; Norway collapses to ~1.005 per brief §6 methodologically-defensible absence) · <em>R8_adapt</em> (adaptive capacity from RME-NVE bulk smart meter rollout + national energy-research institute + DESI) · <em>R9_compound</em> (pairwise hazard coupling — R6b×R6c, R6c×R6d, R6c×R6e) · <em>R10_just</em> (energy justice from EU-SILC + national energy-poverty research).</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">5b</div>
+ <div class="method-step-content">
+ <h3>Re composite <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2 — bounded resilience aggregate</span></h3>
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: Re_raw and Re_norm formula bounds [0.920, 1.787] are methodology constants derived from the multiplicative band of (R6d × R6e × R8 × R9 × R10) at modifier-tier extremes + R6c additive cliff range. Per-substation reference values now trace to canonical ssi-data.json.v4.2::substations[].Re_raw and Re_norm fields (Phase 1 closed 11 Jun 2026 via apply-v4.2-modifiers.py canonical-Re extension). low-exposure reference station: Re_raw 1.097, Re_norm 0.204. high-exposure reference station: Re_raw 1.477, Re_norm 0.642. Numbers shown match the canonical formula exactly, superseding the FC v2 §"Per-substation worked examples" hand-computed 0.198 / 0.620 (FC v2 had ~0.022 rounding error). -->
+ <p>The Re composite is the bounded resilience aggregate that captures the v4.2 modifier family in a single scalar:<br>
+ <code style="display:block;margin:6px 0;padding:8px;background:#f5f5f5;border-radius:4px;font-size:13px">Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00)</code>
+ Bounds: <strong>[0.920, 1.787]</strong> (Re_raw can fall below 1.000 when R8_adapt &lt; 1.00 dominates other near-neutral factors). Normalised: <code>Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1)</code>. Norway fleet observed range (post-Path-B, canonical-computed from ssi-data.json.v4.2): low-exposure reference station Re_raw 1.097 / Re_norm 0.204; high-exposure reference station Re_raw 1.477 / Re_norm 0.642.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">6</div>
+ <div class="method-step-content">
+ <h3>Monte Carlo</h3>
+ <p>10,000 iterations per substation using a 20&times;20 Gaussian copula correlation matrix. Captures measurement, spatial, and staleness uncertainty. Produces median, P5, P95, skewness, and P_critical for each substation.</p>
+ </div>
+ </div>
+ <div class="method-step">
+ <div class="method-step-num">7</div>
+ <div class="method-step-content">
+ <h3>Classify</h3>
+ <p>Four bands: Low (0.00&ndash;0.25), Medium (0.25&ndash;0.50), High (0.50&ndash;0.75), Critical (0.75&ndash;1.00). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+ </div>
+ </div>
+ </div>
 
-  <!-- Master Equation -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Master Equation</h3>
-      <span class="label-xs">v4.0.2</span>
-    </div>
-    <div class="formula-block">
-<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base &times; F_topo &times; C_mult &times; R6a_mult &times; R6b_net &times; Cyber_factor )
+ <!-- Master Equation -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Master Equation</h3>
+ <span class="label-xs">v4.2</span>
+ </div>
+ <div class="formula-block">
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base &times; &prod;<sub>i</sub> mult<sub>i</sub> ) + &Sigma;<sub>j</sub> ( add<sub>j</sub> &minus; <span class="hl-num">1.0</span> )
 
-<span class="hl-var">R_base</span>  = <span class="hl-num">0.30</span>&middot;C + <span class="hl-num">0.10</span>&middot;V + <span class="hl-num">0.25</span>&middot;I + <span class="hl-num">0.10</span>&middot;E + <span class="hl-num">0.20</span>&middot;S + <span class="hl-num">0.05</span>&middot;T
+<span class="hl-comment">// Expanded — 10 multiplicative modifiers inside soft_clip + 1 additive (R6c) outside</span>
 
-<span class="hl-var">F_topo</span>   = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge)     <span class="hl-comment">// R4 &mdash; [0.80, 1.35]</span>
-<span class="hl-var">C_mult</span>   = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio)   <span class="hl-comment">// R3 &mdash; [0.70, 1.30]</span>
-<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local)          <span class="hl-comment">// R6a &mdash; [0.90, 1.10]</span>
-<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring)        <span class="hl-comment">// R6b &mdash; [1.00, 1.25]</span>
-<span class="hl-var">Cyber</span>    = <span class="hl-fn">desi_digital_index</span>(region, voltage)          <span class="hl-comment">// R7 &mdash; [0.99, 1.05]</span>
-    </div>
-  </div>
+<span class="hl-fn">R_final</span> = <span class="hl-fn">soft_clip_upper</span>( R_base
+ &times; F_topo &times; C_mult &times; R6a_mult &times; R6b_net &times; Cyber
+ &times; R6d_wf &times; R6e_winter &times; R8_adapt &times; R9_compound &times; R10_just )
+ + ( R6c_flood &minus; <span class="hl-num">1.0</span> ) <span class="hl-comment">// &larr; ADDITIVE shift, OUTSIDE clip</span>
 
-  <!-- Components -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>6 Components &middot; 20 Metrics</h3>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Component</th>
-          <th>Weight</th>
-          <th>Metrics</th>
-          <th>Domain</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
-          <td class="num">0.30</td>
-          <td>4 &mdash; Duration, Count, MT exceed, Planned</td>
-          <td>Outage frequency and duration</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
-          <td class="num">0.10</td>
-          <td>1 &mdash; Severity-weighted dips</td>
-          <td>Power quality events</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
-          <td class="num">0.25</td>
-          <td>9 &mdash; Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
-          <td>Physical asset condition &amp; environment</td>
-        </tr>
-        <tr>
-          <td><strong style="color:#3b9eff">E</strong> Economic</td>
-          <td class="num">0.10</td>
-          <td>2 &mdash; Regulatory penalties, productivity loss</td>
-          <td>Economic impact of interruptions</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
-          <td class="num">0.20</td>
-          <td>3 &mdash; Regional KPI, reverse power flow, criticality class</td>
-          <td>Grid capacity utilisation</td>
-        </tr>
-        <tr>
-          <td><strong style="color:#22d3ee">T</strong> Transition</td>
-          <td class="num">0.05</td>
-          <td>1 &mdash; DER Stress Index (DER penetration + variability + EV load)</td>
-          <td>Energy transition exposure</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<span class="hl-var">R_base</span> = <span class="hl-num">0.30</span>&middot;C + <span class="hl-num">0.10</span>&middot;V + <span class="hl-num">0.25</span>&middot;I + <span class="hl-num">0.10</span>&middot;E + <span class="hl-num">0.20</span>&middot;S + <span class="hl-num">0.05</span>&middot;T
 
-  <!-- Modifiers -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Modifiers R2&ndash;R7 (incl. R6a + R6b)</h3>
-      <span class="label-xs">Context multipliers</span>
-    </div>
-    <table class="data-table">
-      <thead>
-        <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="font-weight:500">R2</td>
-          <td>Adaptive IRI + Climate</td>
-          <td class="num">internal</td>
-          <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R3</td>
-          <td>Consequence + Poverty</td>
-          <td class="num">[0.70, 1.30]</td>
-          <td>Amplifies risk for fylker serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R4</td>
-          <td>Graph Criticality</td>
-          <td class="num">[0.80, 1.35]</td>
-          <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6a</td>
-          <td>Restoration Speed</td>
-          <td class="num">[0.90, 1.10]</td>
-          <td>DNO-CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two fylker with identical SAIDI can have different risk profiles.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R6b</td>
-          <td>Network Topology</td>
-          <td class="num">[1.00, 1.25]</td>
-          <td>Network centrality and ring topology. Penalises fylker in single-source or low-redundancy configurations. Based on physical network analysis.</td>
-        </tr>
-        <tr>
-          <td style="font-weight:500">R7</td>
-          <td>Digital Readiness</td>
-          <td class="num">[0.99, 1.05]</td>
-          <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<span class="hl-comment">// ── v4.0.2 baseline multiplicative modifiers ──────────────────────────</span>
+<span class="hl-var">F_topo</span> = <span class="hl-fn">graph_criticality</span>(degree, BC, bridge) <span class="hl-comment">// R4 &mdash; [0.80, 1.35]</span>
+<span class="hl-var">C_mult</span> = <span class="hl-fn">consequence_sigmoid</span>(pop, load, V_socio) <span class="hl-comment">// R3 &mdash; [0.70, 1.30]</span>
+<span class="hl-var">R6a_mult</span> = <span class="hl-fn">restoration_sigmoid</span>(CAIDI_local) <span class="hl-comment">// R6a &mdash; [0.90, 1.10]</span>
+<span class="hl-var">R6b_net</span> = <span class="hl-fn">network_topology</span>(centrality, ring) <span class="hl-comment">// R6b &mdash; [1.00, 1.25]</span>
+<span class="hl-var">Cyber</span> = <span class="hl-fn">desi_digital_index</span>(region, voltage) <span class="hl-comment">// R7 &mdash; [0.99, 1.05]</span>
+
+<span class="hl-comment">// ── v4.2 resilience family ─────────────────────────────────────────────</span>
+<span class="hl-var">R6c_flood</span> = <span class="hl-fn">additive_flood</span>(PGRA: P3 / P2 / P1) <span class="hl-comment">// R6c [ADD] &mdash; +0.00..+0.30 OUTSIDE clip</span>
+<span class="hl-var">R6d_wf</span> = <span class="hl-fn">effis_fwi_combined</span>(FIRMS, EFFIS, EFFIS_NO) <span class="hl-comment">// R6d &mdash; [1.00, 1.20]</span>
+<span class="hl-var">R6e_winter</span> = <span class="hl-fn">era5_freezing_rain_p99</span>(Bourgouin, Birk-Lenning) <span class="hl-comment">// R6e &mdash; [1.00, 1.15]</span>
+<span class="hl-var">R8_adapt</span> = <span class="hl-fn">digital_readiness_REVEnational system-research institute</span>(SM, national energy-research institute, DESI) <span class="hl-comment">// R8 [REV] &mdash; [0.92, 1.05], &lt;1.00 = R-relief</span>
+<span class="hl-var">R9_compound</span> = <span class="hl-fn">compound_step</span>(R6c, R6d, R6e, R6_seismic) <span class="hl-comment">// R9 [STEP] &mdash; {1.00, 1.04, 1.08, 1.10}</span>
+<span class="hl-var">R10_just</span> = <span class="hl-fn">energy_justice</span>(EU-SILC NO (national household survey), national energy-poverty research, RME-NVE SAIDI) <span class="hl-comment">// R10 &mdash; [1.00, 1.12]</span>
+
+<span class="hl-comment">// ── v4.2 Re composite (bounded resilience aggregate) ────────────────────</span>
+<span class="hl-var">Re_raw</span> = ( R6d &times; R6e &times; R8 &times; R9 &times; R10 ) + ( R6c &minus; <span class="hl-num">1.0</span> )
+<span class="hl-var">Re_norm</span> = <span class="hl-fn">clip</span>( ( Re_raw &minus; <span class="hl-num">0.920</span> ) / ( <span class="hl-num">1.787</span> &minus; <span class="hl-num">0.920</span> ), <span class="hl-num">0</span>, <span class="hl-num">1</span> )
+ </div>
+ <p style="font-size:12px;color:var(--warm-grey);line-height:1.6;margin:14px 0 0 0">
+ <strong>Why the v4.2 form distinguishes multiplicative from additive.</strong> R6c (flood) is the only additive modifier &mdash; high-flood substations would otherwise be silently clipped by <code>soft_clip_upper</code>, hiding genuine hazard. Placing the R6c shift OUTSIDE the clip preserves the full <code>+0.00&hellip;+0.30</code> range in the final score. The other ten modifiers remain inside the clip because their bounded multiplicative behaviour is well-defined for the soft-clip compression. All bounds, vintages, and data sources are documented in the Modifiers table below.
+ </p>
+ </div>
+
+ <!-- Components -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>6 Components + <span style="color:var(--terracotta)">Re composite</span> (7th radar axis) &middot; 20 Metrics + Re_norm <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2</span></h3>
+ <div style="font-size:11px;color:var(--warm-grey);line-height:1.6;margin-top:4px">The 6 R_base components (C/V/I/E/S/T) carry 20 weighted metrics that sum to R_base. The <strong style="color:var(--terracotta)">Re composite</strong> is a bounded resilience aggregate of the v4.2 modifier family (R6c + R6d + R6e + R8 + R9 + R10) shown alongside the 6 components but <strong>NOT</strong> summed into R_base — it surfaces as the 7th radar axis on every v4.2 visualisation.</div>
+ </div>
+ <table class="data-table">
+ <thead>
+ <tr>
+ <th>Component</th>
+ <th>Weight</th>
+ <th>Metrics</th>
+ <th>Domain</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td><strong style="color:var(--crimson)">C</strong> Continuity</td>
+ <td class="num">0.30</td>
+ <td>4 &mdash; Duration, Count, MT exceed, Planned</td>
+ <td>Outage frequency and duration</td>
+ </tr>
+ <tr>
+ <td><strong style="color:var(--terracotta)">V</strong> Voltage</td>
+ <td class="num">0.10</td>
+ <td>1 &mdash; Severity-weighted dips</td>
+ <td>Power quality events</td>
+ </tr>
+ <tr>
+ <td><strong style="color:var(--sage)">I</strong> Infrastructure</td>
+ <td class="num">0.25</td>
+ <td>9 &mdash; Climate IRI (3), density (2), thermal stress, load stress, air corrosion, hydrogeological</td>
+ <td>Physical asset condition &amp; environment</td>
+ </tr>
+ <tr>
+ <td><strong style="color:#3b9eff">E</strong> Economic</td>
+ <td class="num">0.10</td>
+ <td>2 &mdash; Regulatory penalties, productivity loss</td>
+ <td>Economic impact of interruptions</td>
+ </tr>
+ <tr>
+ <td><strong style="color:var(--bronze)">S</strong> Saturation</td>
+ <td class="num">0.20</td>
+ <td>3 &mdash; Regional KPI, reverse power flow, criticality class</td>
+ <td>Grid capacity utilisation</td>
+ </tr>
+ <tr>
+ <td><strong style="color:#22d3ee">T</strong> Transition</td>
+ <td class="num">0.05</td>
+ <td>1 &mdash; DER Stress Index (DER penetration + variability + EV load)</td>
+ <td>Energy transition exposure</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Modifiers -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Modifiers R2&ndash;R10 — 11 in active register + R2 internal (incl. R6a/R6b/R6c/R6d/R6e + R8 R-relief + R9 step + R10 justice)</h3>
+ <span class="label-xs">v4.0.2 baseline (five active: R3, R4, R6a, R6b, R7) &middot; v4.2 resilience family (six new: R6c, R6d, R6e, R8, R9, R10) &middot; total 11 modifiers in the active register &middot; R2 internal weight-shifter shown below for completeness (not in master equation)</span>
+ </div>
+ <p style="font-size:12px;color:var(--warm-grey);line-height:1.6;margin:8px 0 14px 0">
+ Three special-handler badges appear in the v4.2 family: <strong style="color:var(--terracotta)">[ADD]</strong> = additive shift applied OUTSIDE the soft-clip (only R6c) &middot;
+ <strong style="color:var(--sage)">[REV]</strong> = reverse-signed (α &lt; 1.00 = R-relief; only R8) &middot;
+ <strong style="color:var(--bronze)">[STEP]</strong> = step function (only R9: 1.00 / 1.04 / 1.08 / 1.10).
+ </p>
+ <table class="data-table">
+ <thead>
+ <tr><th>Modifier</th><th>Domain</th><th style="text-align:right">Range</th><th>What It Captures</th></tr>
+ </thead>
+ <tbody>
+ <!-- ── v4.0.2 baseline (5 active + R2 internal weight-shifter) ───────── -->
+ <tr style="background:var(--cream-deep)"><td colspan="4" style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);font-weight:600">v4.0.2 baseline — five active in master equation (R3, R4, R6a, R6b, R7) + R2 internal weight-shifter (shown for completeness)</td></tr>
+ <tr>
+ <td style="font-weight:500">R2</td>
+ <td>Adaptive IRI + Climate</td>
+ <td class="num">internal</td>
+ <td>Shifts weight from climate-IRI to structural metrics where local climate risk is low. CMIP6 SSP2-4.5 projections adjust forward-looking risk.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R3</td>
+ <td>Consequence + Poverty</td>
+ <td class="num">[0.70, 1.30]</td>
+ <td>Amplifies risk for regioni serving large/energy-poor populations with high economic dependency. Includes fiscal, demographic, elderly, and flood enrichments.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R4</td>
+ <td>Graph Criticality</td>
+ <td class="num">[0.80, 1.35]</td>
+ <td>Penalises topological bottlenecks: high betweenness centrality, bridge nodes, low degree. Built from OSM power graph.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6a</td>
+ <td>Restoration Speed</td>
+ <td class="num">[0.90, 1.10]</td>
+ <td>RME-NVE CAIDI-based: rewards fast-restoring areas, penalises slow ones. Two regioni with identical SAIDI can have different risk profiles.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6b</td>
+ <td>Network Topology</td>
+ <td class="num">[1.00, 1.25]</td>
+ <td>Network centrality and ring topology. Penalises regioni in single-source or low-redundancy configurations. Based on physical network analysis.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R7</td>
+ <td>Digital Readiness <span style="font-size:9px;color:var(--terracotta);font-weight:600;letter-spacing:0.04em">(formula modifier &mdash; distinct from ESG-axis <strong>R7 SFDR</strong>)</span></td>
+ <td class="num">[0.99, 1.05]</td>
+ <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability.
+ <br><span style="font-size:10px;color:var(--warm-grey);font-style:italic;line-height:1.45">
+ <strong style="font-style:normal">Note &mdash; R7 duality:</strong>
+ the ESG Radar&rsquo;s seventh axis is <strong style="font-style:normal">R7 SFDR PAI Infrastructure</strong> (FC v3 §14 subsection 13.7 &ldquo;R7 &mdash; SFDR Principal Adverse Impact Statement (Infrastructure Module)&rdquo;), populated by the Re_norm composite as a documented-proxy under Convention #7 (Data-Layer Anchoring). The R7 <em>formula modifier</em> (this row) and the R7 <em>ESG axis</em> share the same numbering by design &mdash; they index different surfaces of v4.2 (rescore formula vs ESG disclosure) and are intentionally not unified at the numbering layer.
+ </span>
+ </td>
+ </tr>
+ <!-- ── v4.2 resilience family ──────────────────────────────────── -->
+ <tr style="background:#fef8f7"><td colspan="4" style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--terracotta);font-weight:600">v4.2 resilience family — six new modifiers (post-Convention #6 §5.6 mesh resolution)</td></tr>
+ <tr>
+ <td style="font-weight:500">R6c <span style="font-size:9px;letter-spacing:0.08em;color:var(--terracotta);font-weight:700;background:#fef0ee;padding:1px 4px;border-radius:2px">ADD</span></td>
+ <td>Flood Exposure</td>
+ <td class="num">+0.00&hellip;+0.30</td>
+ <td>Additive shift derived from NVE Flood Atlas flood-hazard zones (P3 high &middot; P2 medium &middot; P1 low). Applied OUTSIDE soft_clip so high-flood substations register full hazard without being clipped.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6d</td>
+ <td>Wildfire Exposure</td>
+ <td class="num">[1.00, 1.20]</td>
+ <td>Canadian Fire Weather Index combined with NASA FIRMS active-fire detections and EFFIS NO national-tier burned-area statistics. Multiplicative penalty for fire-prone substations.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R6e</td>
+ <td>Winter-Storm Exposure</td>
+ <td class="num">[1.00, 1.15]</td>
+ <td>Bourgouin (2000) + Birk-Lenning (2021) Revised Bourgouin Algorithm freezing-rain p99 tail-event amplifier from ECMWF ERA5. Norway collapses to ~1.005 per Convention #6 §2.3.6 Path B (low-exposure signal correctly lives in v4.0.2 I1 Snow/Ice).</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R8 <span style="font-size:9px;letter-spacing:0.08em;color:var(--sage);font-weight:700;background:#f0f6f1;padding:1px 4px;border-radius:2px">REV</span></td>
+ <td>Adaptive Capacity</td>
+ <td class="num">[0.92, 1.05]</td>
+ <td>Reverse-signed: α &lt; 1.00 = R-relief from digital readiness (RME-NVE bulk smart meter rollout + national energy-research institute + DESI). Provinces with high adaptive capacity actively reduce SSI risk.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R9 <span style="font-size:9px;letter-spacing:0.08em;color:var(--bronze);font-weight:700;background:#fbf3e6;padding:1px 4px;border-radius:2px">STEP</span></td>
+ <td>Compound Hazard</td>
+ <td class="num">{1.00, 1.04, 1.08, 1.10}</td>
+ <td>Step function on the count of elevated hazards (R6b seismic, R6c flood, R6d wildfire, R6e winter). Zscheischler (2018) compound-event framework; national multi-hazard incident database cross-product for Norway.</td>
+ </tr>
+ <tr>
+ <td style="font-weight:500">R10</td>
+ <td>Energy Justice</td>
+ <td class="num">[1.00, 1.12]</td>
+ <td>EU-SILC NO (national household survey) material-deprivation gradient Norway energy-poverty Observatory + RME-NVE regional SAIDI. Surfaces socio-economic exposure to grid disruption.</td>
+ </tr>
+ </tbody>
+ </table>
+ <p style="font-size:11px;color:var(--warm-grey);line-height:1.6;margin:14px 0 0 0">
+ <strong>Re composite</strong> aggregates the v4.2 resilience family in a single bounded scalar (bounds [0.920, 1.787], see Master Equation section above). Per-modifier briefs are at <a href="../methodology/" style="color:var(--terracotta);text-decoration:none">/methodology/</a>.
+ </p>
+ </div>
 
 
-  <!-- Classification -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Classification Bands</h3>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 &ndash; 0.25</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 &ndash; 0.50</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 &ndash; 0.75</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
-      </div>
-      <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 &ndash; 1.00</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
-      </div>
-    </div>
-  </div>
+ <!-- Classification -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Classification Bands</h3>
+ </div>
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
+ <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 &ndash; 0.25</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
+ </div>
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
+ <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 &ndash; 0.50</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
+ </div>
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
+ <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 &ndash; 0.75</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
+ </div>
+ <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
+ <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
+ <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 &ndash; 1.00</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
+ </div>
+ </div>
+ </div>
 
-  <!-- MC & Confidence -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Uncertainty Quantification</h3>
-      <span class="label-xs">Monte Carlo engine</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
-      Every fylke score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20&times;20 Gaussian copula to preserve empirical correlations between metrics (e.g., &rho;(C1, E1) &asymp; 0.70&ndash;0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
-    </p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
-        <div style="font-size:11px;color:var(--warm-grey)">MC iterations per fylke</div>
-      </div>
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20&times;20</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
-      </div>
-      <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~5.5 min</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
-      </div>
-    </div>
-  </div>
+ <!-- MC & Confidence -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Uncertainty Quantification</h3>
+ <span class="label-xs">Monte Carlo engine</span>
+ </div>
+ <p style="font-size:13px;line-height:1.7;margin-bottom:16px">
+ Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20&times;20 Gaussian copula to preserve empirical correlations between metrics (e.g., &rho;(C1, E1) &asymp; 0.70&ndash;0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
+ </p>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+ <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+ <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">10,000</div>
+ <div style="font-size:11px;color:var(--warm-grey)">MC iterations per substation</div>
+ </div>
+ <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+ <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">20&times;20</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Correlation matrix</div>
+ </div>
+ <div style="text-align:center;padding:14px;background:var(--cream);border-radius:var(--radius-sm)">
+ <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)">~5.5 min</div>
+ <div style="font-size:11px;color:var(--warm-grey)">Full fleet runtime</div>
+ </div>
+ </div>
+ </div>
 
-  <!-- Detailed Metrics -->
-  <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
+ <!-- Detailed Metrics -->
+ <div class="card animate-in" style="margin-bottom:32px" id="method-metrics-detail"></div>
 
-  <!-- Normalisation Methods -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Normalisation Methods</h3>
-    </div>
-    <div id="method-norm"></div>
-  </div>
+ <!-- Normalisation Methods -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Normalisation Methods</h3>
+ </div>
+ <div id="method-norm"></div>
+ </div>
 
-  <!-- Data Layers -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Data Layers &mdash; 95 Variables</h3>
-      <span class="label-xs">11 layers</span>
-    </div>
-    <table class="data-table" id="method-layers">
-      <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+ <!-- Data Layers -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Data Layers &mdash; 101 Variables <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2</span></h3>
+ <span class="label-xs">11 layers &middot; v4.0.2 baseline 95 + v4.2 family 6 = 101 variables total</span>
+ </div>
+ <table class="data-table" id="method-layers">
+ <thead><tr><th>Layer</th><th style="text-align:right">Vars</th><th>Status</th><th>Key Sources</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
 
-  <!-- Data Sources -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>30+ Verified Data Sources for Norway</h3>
-      <span class="label-xs">All open + free registration only</span>
-    </div>
-    <table class="data-table" id="method-sources">
-      <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+ <!-- Data Sources -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>34 Verified Data Sources for Norway <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2 adds 4 sources for resilience modifiers</span></h3>
+ <span class="label-xs">All open + free registration only &middot; v4.0.2 baseline (30) + v4.2 family (4: NVE Flood Atlas, EFFIS NO wildfire, ECMWF ERA5 Bourgouin, RME-NVE bulk smart meter rollout)</span>
+ </div>
+ <table class="data-table" id="method-sources" style="table-layout:fixed;width:100%">
+ <colgroup>
+ <col style="width:21%">
+ <col style="width:16%">
+ <col style="width:10%">
+ <col style="width:13%">
+ <col style="width:8%">
+ <col style="width:32%">
+ </colgroup>
+ <thead><tr><th>Source</th><th>Category</th><th>Freq.</th><th>Resolution</th><th style="text-align:right">Vars</th><th>Feeds</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
 
-  <!-- Validation -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>Validation Framework</h3>
-      <span class="label-xs" id="method-val-count"></span>
-    </div>
-    <table class="data-table" id="method-validation">
-      <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+ <!-- Validation -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>Validation Framework</h3>
+ <span class="label-xs" id="method-val-count"></span>
+ </div>
+ <table class="data-table" id="method-validation">
+ <thead><tr><th>Check</th><th>Criterion</th><th>Status</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
 
-  <!-- Changelog -->
-  <div class="card animate-in" style="margin-bottom:32px">
-    <div class="card-header">
-      <h3>v3.4 &rarr; v4.0.2 Changelog</h3>
-    </div>
-    <table class="data-table" id="method-changelog">
-      <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+ <!-- Changelog -->
+ <div class="card animate-in" style="margin-bottom:32px">
+ <div class="card-header">
+ <h3>v3.4 &rarr; v4.0.2 &rarr; v4.2 Changelog</h3>
+ <span class="label-xs">v4.2 extends the modifier set to 11 total + adds the Re composite + 4 new data sources + W1–W10 governance gate</span>
+ </div>
+ <table class="data-table" id="method-changelog">
+ <thead><tr><th>ID</th><th>Change</th><th>Type</th></tr></thead>
+ <tbody></tbody>
+ </table>
+ </div>
 
-  <!-- Competitive Positioning Note -->
-  <div class="card animate-in" style="border-left:3px solid var(--sage)">
-    <div class="card-header">
-      <h3>Competitive Positioning</h3>
-      <span class="label-xs">v4.0.2</span>
-    </div>
-    <p style="font-size:13px;line-height:1.7">
-      SSI v4.0.2 scores competitively or leads on 15 of 16 dimensions in the competitive scoring matrix against CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks. Only digital readiness (proxy model, awaiting comprehensive NIS2 data) and asset health (requires proprietary DSO data the SSI deliberately avoids) remain as acknowledged gaps.
-    </p>
-  </div>
+ <!-- Competitive Positioning Note -->
+ <div class="card animate-in" style="border-left:3px solid var(--sage)">
+ <div class="card-header">
+ <h3>Competitive Positioning</h3>
+ <span class="label-xs">v4.2</span>
+ </div>
+ <p style="font-size:13px;line-height:1.7">
+ SSI v4.2 extends the v4.0.2 baseline (which scored competitively or leads on 15 of 16 dimensions versus CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks) with the resilience-modifier family (R6c flood / R6d wildfire / R6e winter / R8 adapt / R9 compound / R10 just), the Re composite (bounded resilience aggregate of the v4.2 modifier family; surfaced as the 7th radar axis but methodologically a modifier-family aggregate, NOT a 7th SSI component), and the W1–W10 anti-maladaptation governance gate (5/1/1/3 4-tier mesh resolution per Convention #6 §5.6). The remaining acknowledged gap is asset-health monitoring, which requires proprietary DSO data the SSI deliberately avoids in service of full open-data reproducibility.
+ </p>
+ </div>
+
+ <!-- v4.2 Foundation contact block (Convention #2 — byte-identical across instances)
+ Moved INSIDE <main> 12 Jun 2026 (V4.2-disc-36) so it inherits page-shell padding +
+ aligns row-by-row with Competitive Positioning above. -->
+ <div class="card animate-in" style="margin-top:32px;padding:20px;border-left:3px solid var(--terracotta);background:#fef8f7">
+ <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Foundation contact</div>
+ <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+ The SSI Index is a non-profit foundation project, please mail to <a href="mailto:ssi_index@ikenga.eu" style="color:var(--terracotta);font-weight:500">ssi_index@ikenga.eu</a> for more details.
+ </p>
+ </div>
 </main>
 
 
 <!-- ═══════════════════════════════════════════════════════════
-     DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
-     Generated from templates/methodology.html.j2 + templates/configs/norway.yaml
-     by scripts/build_pages.py. Per-page section logic lives in
-     ../methodology-sections.js; central dispatch via CountryRenderer.init.
-     ═══════════════════════════════════════════════════════════ -->
-<script src="../country-renderer.js?v=72dbb5d6c0"></script>
-<script src="../methodology-sections.js?v=8d98056b70"></script>
+ DATA MODEL & RENDERING ENGINE — thin-shell (Phase 3 · S110)
+ Generated from templates/methodology.html.j2 + templates/configs/norway.yaml
+ by scripts/build_pages.py. Per-page section logic lives in
+ ../methodology-sections.js; central dispatch via CountryRenderer.init.
+ ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=20260614-s17"></script>
+<script src="../methodology-sections.js?v=20260614-s17"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    CountryRenderer.init('norway', 'methodology');
-  });
+ document.addEventListener('DOMContentLoaded', function () {
+ CountryRenderer.init('norway', 'methodology');
+ });
 </script>
 <script>renderFooter();</script>
 </body>
