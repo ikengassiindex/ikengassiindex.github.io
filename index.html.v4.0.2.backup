@@ -41,56 +41,14 @@
 
   /* Country card styles removed — replaced by interactive map + info strip */
 
-  /* Thesis cards — 3 columns on desktop, 2 on tablet, 1 on mobile */
+  /* Thesis cards */
   .thesis-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin-bottom: 32px;
   }
 
-  /* "Breaking the Silos" — sub-block for peer-review credentials */
-  .silos-reproducibility {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    font-size: 11.5px;
-    line-height: 1.55;
-    color: var(--ink);
-  }
-  .silos-reproducibility .pillars {
-    font-weight: 600;
-    color: var(--terracotta);
-    margin-bottom: 4px;
-    letter-spacing: 0.2px;
-  }
-  .silos-reproducibility a {
-    color: var(--terracotta);
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .silos-reproducibility a:hover { text-decoration: underline; }
-
-  /* "How to read" card list styling */
-  .how-to-list {
-    margin: 0;
-    padding-left: 0;
-    list-style: none;
-    font-size: 12.5px;
-    line-height: 1.55;
-    color: var(--ink);
-  }
-  .how-to-list li {
-    margin-bottom: 7px;
-  }
-  .how-to-list strong {
-    color: var(--terracotta);
-    font-weight: 600;
-  }
-
-  @media (max-width: 1024px) {
-    .thesis-grid { grid-template-columns: 1fr 1fr; }
-  }
   @media (max-width: 768px) {
     .thesis-grid { grid-template-columns: 1fr; }
     .landing-hero h1 { font-size: 28px; }
@@ -291,7 +249,7 @@
   <a href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga — Visit website">
     <img src="ikenga-logo.png" alt="Ikenga" style="height:187px;width:auto;display:block" />
     <div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15">
-      <h1>SSI <span>Index</span> <span class="topnav-version">v4.2</span></h1>
+      <h1>SSI <span>Index</span> <span class="topnav-version">v4.0.2</span></h1>
     </div>
   </a>
 </nav>
@@ -313,27 +271,12 @@
       <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
         Power grid resilience is inseparable from its socio-economic context. The SSI fuses traditional grid metrics with socio-economic, environmental, and energy-transition data — all from public sources — to capture what single-discipline indices miss.
       </p>
-      <div class="silos-reproducibility">
-        <div class="pillars">📐 Open methodology · 📊 Open data · 🔬 Peer-reviewed</div>
-        Every data source is public; every calculation is reproducible; the methodology is validated in <a href="https://link.springer.com/article/10.1186/s43065-026-00193-z" target="_blank" rel="noopener noreferrer"><em>JIPR v16 — Markov degradation modelling for fleet-scale substation preservation</em></a> (<em>Journal of Infrastructure Preservation and Resilience</em>, 2026) — 1,220 documented substation failures across 18 OECD countries, ROC AUC = 0.78, Spearman ρ = 0.71. Code GPL-3.0 · Data CC BY-SA 4.0.
-      </div>
     </div>
     <div class="card" style="border-left:3px solid var(--sage)">
       <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:6px;color:var(--sage)">OECD Coverage</div>
       <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
-        Now covering 38 OECD countries plus Greenland: Italy, Germany, France, Spain, United Kingdom, United States, Switzerland, Austria, Canada, Japan, Australia, Chile, Denmark, Norway, Finland, Poland, Sweden, Mexico, Greece, Turkey, Ireland, Portugal, New Zealand, Czechia, Luxembourg, Belgium, Netherlands, Estonia, Latvia, Lithuania, Slovenia, Slovakia, Hungary, Iceland, Korea, Costa Rica, Israel, Colombia, and Greenland <em style="font-style:italic;color:var(--warm-grey)">(autonomous territory within the Kingdom of Denmark — grid independent from Denmark's)</em>. Each country's digital twin uses the same SSI v4.2 methodology adapted to local data sources, enabling cross-border comparison and pan-OECD risk insights. Targeting full OECD membership coverage.
+        Now covering 38 OECD countries plus Greenland: Italy, Germany, France, Spain, United Kingdom, United States, Switzerland, Austria, Canada, Japan, Australia, Chile, Denmark, Norway, Finland, Poland, Sweden, Mexico, Greece, Turkey, Ireland, Portugal, New Zealand, Czechia, Luxembourg, Belgium, Netherlands, Estonia, Latvia, Lithuania, Slovenia, Slovakia, Hungary, Iceland, Korea, Costa Rica, Israel, Colombia, and Greenland <em style="font-style:italic;color:var(--warm-grey)">(autonomous territory within the Kingdom of Denmark — grid independent from Denmark's)</em>. Each country's digital twin uses the same SSI v4.0.2 methodology adapted to local data sources, enabling cross-border comparison and pan-OECD risk insights. Targeting full OECD membership coverage.
       </p>
-    </div>
-    <div class="card" style="border-left:3px solid var(--bronze)">
-      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:4px;color:var(--bronze)">How to read this dashboard</div>
-      <div class="label-xs" style="color:var(--warm-grey);margin-bottom:8px;font-size:11px;letter-spacing:0.3px">60-second tour</div>
-      <ul class="how-to-list">
-        <li>Each substation is a dot on the map. Click any dot to see four things:</li>
-        <li><strong>The score (R_final)</strong> — one number, 0 → 1+; lower is calmer, higher is stressed. Colour bands classify it.</li>
-        <li><strong>The radar</strong> — R_final's shape across 7 axes (CVIESTR). Two substations with the same R can have very different stress patterns.</li>
-        <li><strong>Eleven modifiers</strong> — multipliers showing <em>why</em> the score is what it is (R6c flood, R6d wildfire, R10 justice…). Above 1.0 adds risk; below subtracts.</li>
-        <li><strong>Provenance</strong> — every value comes from a labelled public source; degraded values are honestly flagged.</li>
-      </ul>
     </div>
   </div>
 
@@ -537,9 +480,9 @@
   <div class="card animate-in" style="border-left:3px solid var(--bronze);background:linear-gradient(135deg, var(--cream) 0%, var(--cream-deep) 100%)">
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
       <div style="flex:1;min-width:260px">
-        <div class="label-xs" style="color:var(--bronze);margin-bottom:6px">SSI v4.2 Formula Construct</div>
-        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:6px">R_final = soft_clip(R_base × Π R_modifiers × Re)</div>
-        <p style="font-size:13px;line-height:1.6;color:var(--warm-grey);margin:0">6 components (C·V·I·E·S·T) · 20 metrics · <strong>11 modifiers</strong> — 5 baseline (R3 consequence · R4 topology · R6a seismic · R6b network · R7 SFDR digital readiness) + 6 v4.2 resilience (R6c flood · R6d wildfire · R6e winter · R8 adapt · R9 compound · R10 just) · <strong>Re composite</strong> bounded [0.920, 1.787] · 10,000 Monte Carlo iterations with Gaussian copula correlation. Same methodology across all countries.</p>
+        <div class="label-xs" style="color:var(--bronze);margin-bottom:6px">SSI v4.0.2 Formula Construct</div>
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);margin-bottom:6px">R = soft_clip(R_base × F_topo × C_mult × R6 × Cyber)</div>
+        <p style="font-size:13px;line-height:1.6;color:var(--warm-grey);margin:0">6 components, 20 metrics, 5 modifiers (R3 · R4 · R6a · R6b · R7), 10,000 Monte Carlo iterations with Gaussian copula correlation. Same methodology across all countries.</p>
       </div>
     </div>
   </div>
@@ -548,7 +491,7 @@
 
 <!-- Footer -->
 <footer class="site-footer" role="contentinfo">
-  <div>SSI Index v4.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>
+  <div>SSI Index v4.0.2 · Systemic System Infrastructure Index · <a href="https://ikenga.eu" target="_blank" rel="noopener noreferrer">Ikenga</a></div>
   <div>Open data, open methodology · Pan-OECD countries grid resilience</div>
   <div class="copyright-notice">Copyright &copy; 2026 Altinium Invest S.r.L. All Rights Reserved. This software program protected by the United States Copyright Law, and Societ&agrave; Italiana degli Autori ed Editori, under the Berne Convention. Unauthorised reproduction, distribution, or modification of this software program is strictly prohibited and protected under international copyright treaties.</div>
 </footer>
@@ -699,7 +642,7 @@
       tooltip.innerHTML =
         '<div><span class="tt-flag">' + flag + '</span><span class="tt-name">' + name + '</span></div>' +
         localName +
-        '<div class="tt-stat">' + subs + ' substations · SSI v4.2</div>' +
+        '<div class="tt-stat">' + subs + ' substations · SSI v4.0.2</div>' +
         realmNote +
         '<div class="tt-cta">Click to explore \u2192</div>';
       tooltip.style.display = 'block';

@@ -13,24 +13,23 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 CONFIG_PATH = Path('intelligence/edition-config.json')
-# denmark, norway, finland, poland, sweden, mexico: first automated refresh May 2026 (skip April)
-# new-zealand: first automated refresh June 2026 (skip April + May)
-# greenland:   Session 1 scored 2026-04-16 (brought forward from 2026-07). Bundled with Denmark for archive/email from next cycle.
-COUNTRIES = ['france','italy','uk','us','germany','spain','switzerland','austria','canada','japan','australia','chile','czechia',
-             'denmark','norway','finland','poland','sweden','mexico','greece','turkey','ireland','portugal','new-zealand','greenland',
-             'luxembourg',
-             'belgium',
-             'netherlands']
+
+# KB §91.A / DRY — Single source of truth: intelligence/countries.json.
+# Pre-LP-3b (18 Jun 2026) this script carried a hardcoded 29-country list
+# that silently skipped 10 of 39 cohort countries (incl. Israel + Korea)
+# from the monthly ssi-data.json timestamp refresh. archive-and-email.py
+# already reads from countries.json; this script now mirrors that pattern.
+_COUNTRIES_JSON = Path(__file__).resolve().parent.parent / 'intelligence' / 'countries.json'
+with _COUNTRIES_JSON.open('r', encoding='utf-8') as _fh:
+    _COUNTRIES_CONF = json.load(_fh)
+COUNTRIES = list(_COUNTRIES_CONF['slugs'])
+# countries.json::first_refresh carries YYYY-MM-DD strings; we only need the
+# YYYY-MM prefix for cron gating. Filter out the _comment metadata key.
 FIRST_REFRESH = {
-    'denmark': '2026-05', 'norway': '2026-05', 'finland': '2026-05',
-    'poland':  '2026-05', 'sweden': '2026-05', 'mexico':  '2026-05',
-    'new-zealand': '2026-06',
-    'czechia':     '2026-06',
-    # 'greenland' removed — Session 1 completed 2026-04-16 (early bring-forward);
-    # subsequent refreshes follow standard monthly cadence starting 2026-05.,
-    'luxembourg': '2026-07',
-    'belgium': '2026-08',
-    'netherlands': '2026-09'}
+    slug: ym[:7]
+    for slug, ym in _COUNTRIES_CONF['first_refresh'].items()
+    if not slug.startswith('_')
+}
 
 def main():
     if not CONFIG_PATH.exists():
