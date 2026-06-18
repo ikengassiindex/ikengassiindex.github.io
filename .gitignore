@@ -22,7 +22,25 @@ __pycache__/
 
 # Pipeline cache
 scripts/pipeline/.cache/
+scripts/pipeline/cache/
 scoring-output/
+
+# Phase 1.5 ingestion — large source files (P15-A-3 + P15-B-2, 8 June 2026)
+# These exceed GitHub's 100 MB hard limit on push. Operator downloads
+# locally; the bbox-clipped per-country CSVs that derive from them ARE
+# committed (small, ~10-25 MB total).
+#
+# Sources:
+#   gshm-2023-1.tif        — GEM 2023.1 Global Seismic Hazard Map (~173 MB)
+#                            Download: https://cloud.openquake.org/s/6SnFk2f92JEr76H
+#                            License: CC BY-NC-SA 4.0
+#   era5land_*.nc          — ERA5-Land NetCDF intermediate cache (~50-200 MB each)
+#                            Re-downloadable via CDS API; not deliverable artifacts
+scripts/pipeline/data/cross-cutting/gshm-2023-1.tif
+scripts/pipeline/data/cross-cutting/*.tif
+*.nc
+*.grib
+*.grib2
 
 # Phase 1 housekeeping (8 June 2026): backup files are local-only working state
 *.pre-*-backup

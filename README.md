@@ -1,10 +1,10 @@
 # SSI Index Dashboard — v4.0.2
 
-**Systemic System Infrastructure Index** — a composite resilience score for Italy's 4,293 substations.
+**Systemic System Infrastructure Index** — a composite resilience score now spanning **39 SoT countries** (substations totalling >130k across Italy, US, France, Germany, Spain, Korea, Norway, UK and 31 more).
 
-475 EHV (≥220 kV) · 3,035 HV (100–219 kV) · 115 MV (20–99 kV) · 668 LV (<20 kV)
+Italy reference baseline: 4,293 substations · 475 EHV (≥220 kV) · 3,035 HV (100–219 kV) · 115 MV (20–99 kV) · 668 LV (<20 kV)
 
-95 variables · 30 public data sources · 6 components · 20 metrics · 8 modifiers · 11 data layers · 10k Monte Carlo iterations
+95 variables · 30+ public data sources · 6 components · 20 metrics · 8 modifiers · 11 data layers · 10k Monte Carlo iterations
 
 ## Live Dashboard
 
@@ -55,9 +55,21 @@ Cyber   = province_DESI_cyber(region, province, voltage)       // R7  [0.99, 1.0
 
 ## Data Sources
 
-30 verified public data sources — 28 fully open, 2 require free registration (Copernicus CDS, ENTSO-E).
+30+ verified public data sources per country — most fully open, ~3 require free registration (Copernicus CDS, ENTSO-E, US Census ACS).
 
-Key sources: E-Distribuzione, ARERA TIQE, ISTAT, BdI QEF 737, GSE Atlaimpianti, Terna Open Data, OSM Overpass, Copernicus CDS/ERA5, OIPE LIHC, EEA Air Quality, ISPRA IdroGEO, Eurostat.
+Italy key sources: E-Distribuzione, ARERA TIQE, ISTAT, BdI QEF 737, GSE Atlaimpianti, Terna Open Data, OSM Overpass, Copernicus CDS/ERA5, OIPE LIHC, EEA Air Quality, ISPRA IdroGEO, Eurostat.
+
+### Phase 1.5 ingestion (June 2026) — multi-country L1
+
+Three data classes ingested for all 39 SoT countries:
+
+| Class | Granularity | Sources |
+|---|---|---|
+| **Climate** | ERA5-Land 0.1° (~11 km mesh) + daily-statistics for true heat/ice day counts | Copernicus CDS |
+| **Seismic** | GEM 2023.1 Global Seismic Hazard Map 0.05° (~5.5 km) — CC BY-NC-SA 4.0 | GEM Foundation + INGV (italy) + EAK (greece) |
+| **Socio-economic** | NUTS-3 / state / canton / prefecture per-region | Eurostat (20 EU) + 16 non-EU per-agency (US Census ACS, ONS Nomis, StatCan, ABS, e-Stat, KOSIS, BFS, DANE, CBS, INEC, Hagstofa, Statistics Greenland) |
+
+Full provenance + license catalog: [`scripts/pipeline/data/SOURCES_AND_LICENSES.md`](scripts/pipeline/data/SOURCES_AND_LICENSES.md)
 
 ## Technology
 
