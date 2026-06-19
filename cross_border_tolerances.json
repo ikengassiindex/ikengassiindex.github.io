@@ -1,0 +1,29 @@
+{
+  "_schema": "Per-country boundary tolerance for the cross-border substation gate (Discipline #36).",
+  "_default_tolerance_km": 0.1,
+  "_purpose": "Override the default 100m boundary-precision tolerance per country where the bounds.json polygon resolution is known to produce false-positive outlier flags (Failure mode 2 per CROSS_BORDER_SUBSTATION_AUDIT_20260618.md). The tolerance is the maximum acceptable distance from the polygon boundary at which a substation is still considered 'inside' — set to a value that absorbs the coastline-simplification error specific to each country's source polygon.",
+  "_audit_memo": "CROSS_BORDER_SUBSTATION_AUDIT_20260618.md",
+  "_follow_on_plan": "MODE_2_3_FOLLOWON_PLAN.md",
+  "_methodology_note": "Per-country tolerance is the transparent alternative to refreshing each country's bounds.json against Natural Earth 10m source data. Tolerance + rationale published openly; the polygon precision is declared rather than hidden. Source-data refresh remains the longer-term work for the per-country Phase 2 pass.",
+  "_version": "1.0",
+  "_authored_utc": "2026-06-18T20:30:00Z",
+  "countries": {
+    "greenland": {
+      "boundary_tolerance_km": 5.0,
+      "rationale": "Heavily indented fjord coastline; bounds.json derived from Natural Earth 50m simplification. 100% of audit outliers sit within 5 km of polygon edge. Real Greenlandic substations on coastal fjord settlements (Ilulissat, Sisimiut, Nuuk, etc.). Clears 31 of 31 audit outliers; max observed drift 4.6 km."
+    },
+    "new-zealand": {
+      "boundary_tolerance_km": 5.0,
+      "rationale": "Heavily indented Pacific coastline (North Cape, East Cape, Coromandel, Fiordland, Stewart Island); bounds.json simplified at sub-cadastral precision. 100% of audit outliers sit within 5 km of polygon edge. Clears 101 of 101 audit outliers; max observed drift 3.8 km."
+    },
+    "denmark": {
+      "boundary_tolerance_km": 5.0,
+      "rationale": "Coastal + offshore-wind territorial-waters allowance. 105 of 123 audit outliers within 5 km coastline tolerance. Remaining 18 outliers between 5-34 km include offshore wind transformer platforms (Anholt Havmøllepark in Kattegat, Horns Rev). Offshore wind platforms are legitimate Danish substations in Danish EEZ; explicit allowance pending bounds.json maritime polygon extension in Phase 2."
+    },
+    "norway": {
+      "boundary_tolerance_km": 5.0,
+      "rationale": "Norwegian fjord coastline; bounds.json simplified. 811 of 1,464 outliers within 5 km coastline tolerance. Remaining 653 outliers split into: Svalbard (already in bounds.json, may need separate polygon-edge refresh) + Swedish-side substations misattributed at ingestion (Mode 1 remediation queued separately)."
+    }
+  },
+  "_phase_2_note": "Mode 3 territorial gaps (Canadian Arctic, UK Northern Ireland, French DOM-TOM, Chilean Patagonian islands) and pure Mode 1 cases (Canada US-side, UK European-side mis-coords, France Spanish-side, Chile Argentinian-side, Norway Swedish-side) are handled by scripts/remediate_cross_border.py substation removal rather than tolerance — see MODE_2_3_FOLLOWON_PLAN.md."
+}
