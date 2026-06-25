@@ -80,7 +80,12 @@ jobs:
           pip install --upgrade pip
           # Optional: netCDF4 for real CDS data processing
           # pip install netCDF4 cdsapi
-          echo "Pipeline uses stdlib only — no external dependencies required"
+          # Discipline #36 — shapely required for the post-ingestion cross-border
+          # remediation step. Lazy-imported by scripts/pipeline/utils/geo.py so
+          # absence wouldn't break the ingestion run itself, but the remediation
+          # step needs it. See CROSS_BORDER_SUBSTATION_AUDIT_20260618.md.
+          pip install 'shapely>=2.0'
+          echo "Pipeline uses stdlib + shapely (Discipline #36)"
 
       - name: Restore ingestion cache
         if: steps.gate.outputs.skip != 'true'
@@ -130,6 +135,68 @@ jobs:
         with:
           name: pipeline-report-${{ github.run_number }}
           path: pipeline-report.json
+
+      # ── Discipline #36 — Post-ingestion cross-border filter ──
+      # Closes the failure-mode that surfaced 18 Jun 2026: ingestion bounding-box
+      # queries against upstream OSM/regulator sources overshoot national polygons,
+      # so per-country ssi-data.json inherits substations from neighbours. Without
+      # this step the monthly pipeline silently re-leaks ~17% of cohort substations
+      # (Austria 47.5%, Canada 74.4%, Greenland 86.5% pre-fix).
+      #
+      # The remediation script (scripts/remediate_cross_border.py) loads each
+      # country's bounds.json + cross_border_tolerances.json, performs point-in-
+      # polygon filtering with optional coastline tolerance, recomputes meta +
+      # fleet_summary + regions, and writes the cleaned ssi-data.json in place.
+      # Idempotent — countries already inside the threshold pass through unchanged.
+      #
+      # Then clean_grid_geo.py propagates the filter to grid-geo.json (substations
+      # + connecting lines + areas — connecting lines that cross borders to filtered-
+      # in substations are KEPT per the "keep relevant power lines" requirement);
+      # refresh_country_counts.py propagates the post-remediation counts to every
+      # country's HTML/JS pages + the root landing data-subs.
+      #
+      # See CROSS_BORDER_SUBSTATION_AUDIT_20260618.md + PR_CROSS_BORDER_GUARD.md.
+      - name: Post-ingestion cross-border remediation (Discipline #36)
+        if: steps.gate.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'
+        run: |
+          COUNTRIES=$(python3 -c "import json; print(' '.join(json.load(open('intelligence/countries.json'))['slugs']))")
+          echo "::group::Cross-border remediation — substation filter per country"
+          for DIR in $COUNTRIES; do
+            if [ -f "$DIR/bounds.json" ] && [ -f "$DIR/ssi-data.json" ]; then
+              # --force allows the script to rewrite even if outside-% is below
+              # the default 5% threshold; the script remains idempotent because
+              # already-clean canonicals produce identical output.
+              python3 scripts/remediate_cross_border.py "$DIR" --force || {
+                echo "::warning::remediate_cross_border failed for $DIR — continuing"
+              }
+            else
+              echo "  SKIP $DIR: missing bounds.json or ssi-data.json"
+            fi
+          done
+          echo "::endgroup::"
+
+          echo "::group::Cross-border remediation — grid-geo line filter"
+          # --all-remediated walks every country whose ssi-data.json was modified
+          # in the loop above and rewrites the matching grid-geo.json. Lines that
+          # connect filtered-in substations to filtered-out ones are evaluated
+          # against the "keep relevant power lines" rule.
+          python3 scripts/clean_grid_geo.py --all-remediated || {
+            echo "::warning::clean_grid_geo --all-remediated failed — continuing"
+          }
+          echo "::endgroup::"
+
+          echo "::group::Cross-border remediation — refresh hardcoded counts"
+          python3 scripts/refresh_country_counts.py --all-remediated || {
+            echo "::warning::refresh_country_counts --all-remediated failed — continuing"
+          }
+          echo "::endgroup::"
+
+          echo "::group::Cross-border remediation — final audit"
+          # The sentinel runs after remediation to confirm cohort is clean. If any
+          # country still has >5% outside its polygon (after tolerance), exit
+          # non-zero so the workflow fails before committing dirty data.
+          python3 scripts/check_cross_border.py --all --strict --json audit/cross-border-$(date -u +%Y-%m-%d).json
+          echo "::endgroup::"
 
       - name: Cache-bust ESG report assets
         if: steps.gate.outputs.skip != 'true' && github.event.inputs.dry_run != 'true'

@@ -629,7 +629,7 @@
               '<tr><td style="color:var(--warm-grey);">Tier classification</td><td class="num"><strong style="color:' + reColor + ';text-transform:uppercase;">' + reBand + '</strong></td></tr>' +
               '<tr><td style="color:var(--warm-grey);">Methodology bounds</td><td class="num"><strong>[0.920, 1.787]</strong></td></tr>' +
               '<tr><td style="color:var(--warm-grey);">Austrian fleet observed range</td><td class="num"><strong>1.104 → 1.137</strong></td></tr>' +
-              '<tr><td style="color:var(--warm-grey);">Coverage</td><td class="num"><strong>1,406 substations</strong></td></tr>' +
+              '<tr><td style="color:var(--warm-grey);">Coverage</td><td class="num"><strong>741 substations</strong></td></tr>' +
             '</table>' +
           '</div>' +
         '</div>' +
@@ -667,7 +667,7 @@
           '</div>' +
           '<div class="method-box">' +
             '<div class="method-label">Technical Validity</div>' +
-            '<p>The Re composite is the bounded aggregate Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00) with normalisation Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1). Bounds [0.920, 1.787] derived from the multiplicative band of the 5 multiplicative v4.2 modifiers at tier extremes plus the R6c additive cliff range. Austrian fleet observed range [0.974, 1.604] across 1,406 substations. SFDR PAI Infrastructure proxy validated against TCFD physical-risk framework and ESRS E1-9 anticipated-financial-effects disclosure. See FC v3 §14 subsection 13.7 for the R7 SFDR PAI axis derivation.</p>' +
+            '<p>The Re composite is the bounded aggregate Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00) with normalisation Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1). Bounds [0.920, 1.787] derived from the multiplicative band of the 5 multiplicative v4.2 modifiers at tier extremes plus the R6c additive cliff range. Austrian fleet observed range [0.974, 1.604] across 741 substations. SFDR PAI Infrastructure proxy validated against TCFD physical-risk framework and ESRS E1-9 anticipated-financial-effects disclosure. See FC v3 §14 subsection 13.7 for the R7 SFDR PAI axis derivation.</p>' +
           '</div>' +
         '</div>' +
       '</div>';

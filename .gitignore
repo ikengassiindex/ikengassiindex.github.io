@@ -44,6 +44,16 @@ scripts/pipeline/data/cross-cutting/*.tif
 
 # Phase 1 housekeeping (8 June 2026): backup files are local-only working state
 *.pre-*-backup
+*.pre-*.backup
 *.bak
 .coverage
 .coverage.*
+
+# Discipline #36 cross-border audit (18 June 2026): per-country rejection
+# logs from scripts/remediate_cross_border.py + clean_grid_geo.py. These
+# are forensic audit-trail artifacts (full record of which substations
+# were removed at remediation time) — useful locally for review but too
+# large for the repo (Canada's alone is 52 MB). The audit memo
+# CROSS_BORDER_SUBSTATION_AUDIT_20260618.md preserves the per-country
+# summary; the full rejection lists stay on the operator's machine.
+*/ingestion_rejected_*.json

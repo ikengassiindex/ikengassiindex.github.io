@@ -18,10 +18,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Discipline #36 — sparse-checkout extended to include per-country
+          # bounds.json + ssi-data.json so the cross-border gate (below) can
+          # run point-in-polygon checks. cross_border_tolerances.json carries
+          # the per-country tolerance defaults the gate consumes.
           sparse-checkout: |
             scripts/
             versions.json
             intelligence/
+            cross_border_tolerances.json
+            */bounds.json
+            */ssi-data.json
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
@@ -72,6 +79,33 @@ jobs:
             sys.exit(1)
           print('All data files within size limits')
           "
+
+      # ── Discipline #36 — Cross-border substation gate ──
+      # Closes the failure-mode the 18 Jun 2026 audit surfaced: per-country
+      # ssi-data.json inheriting substations from neighbouring countries via
+      # ingestion bounding-box overshoot (Austria 47.5% pre-fix, Canada 74.4%,
+      # Greenland 86.5%). Any push or PR that touches */ssi-data.json or
+      # */grid-geo.json now runs the audit and fails if any country has >5%
+      # of its substations outside its national polygon (with per-country
+      # tolerance from cross_border_tolerances.json — defaults to 100m,
+      # Greenland/NZ/Denmark/Norway 5km for fjord/coastline simplification).
+      #
+      # See CROSS_BORDER_SUBSTATION_AUDIT_20260618.md + PR_CROSS_BORDER_GUARD.md.
+      - name: Install shapely for cross-border gate
+        run: pip install 'shapely>=2.0'
+
+      - name: Cross-border substation gate (Discipline #36)
+        run: |
+          python3 scripts/check_cross_border.py --all --strict --json cross-border-report.json
+          echo "::notice::Cross-border audit passed — no country exceeds 5% outside-polygon threshold."
+
+      - name: Upload cross-border audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-border-report
+          path: cross-border-report.json
+          if-no-files-found: warn
 
       - name: Summary
         run: echo "Validation passed"
