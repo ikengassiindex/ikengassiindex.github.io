@@ -1,7 +1,7 @@
 # CLAUDE.md — SSI Index public dashboard briefing
 
 > Auto-loaded briefing for Claude sessions on the `ikengassiindex.github.io` repo. Read this first before touching the codebase.
-> Maintained by Ikenga / Cowork · Last updated: **25 June 2026 (Discipline #36 closure — cross-border substation enforcement gate live + pytest sentinel + 39-country cohort canonical at 174,046 substations cleaned of cross-border leakage)**
+> Maintained by Ikenga / Cowork · Last updated: **25 June 2026 (Discipline #36 closure end-to-end — cross-border substation enforcement gate live + pytest sentinel + map.js viewport safeguard for Mode-3 territorial bounds + 39-country cohort canonical at 174,046 substations cleaned of cross-border leakage)**
 
 ## What this repo is
 
@@ -61,6 +61,8 @@ GitHub Pages auto-deploys `main` HEAD within ~30-90 seconds of any push. There i
 
 **Closure status.** Discipline #36 codified 18 June 2026; PR #1 merged 24 June 2026 (commit `86d7c9df`). Austria 1,406 → 741 substations on the live site. All 10 originally-leaking countries remediated and pinned by sentinel.
 
+**Map renderer interaction — Mode-3 viewport safeguard (25 June 2026, commit `a7585fc6`).** The Mode-3 bounds.json extensions correctly serve the cross-border filter — they include overseas territories (France Guyane française / Réunion / Polynésie, NZ Chatham + Kermadec + Tokelau, UK Northern Ireland, Chile Easter Island, Canada Arctic, Greenland fjord additions) so legitimately territorial substations pass the gate. But the map renderer's auto-fit-to-viewport logic (`map.js` `view._fitBbox` computation, ~line 1438) was originally written assuming bounds.json represents the geographic frame where the grid sits. After the territorial extensions, fitting to bounds.json extent produced pathological viewports — France's mainland became a pixel-sized blob (bounds span 117° vs cluster span 14°), New Zealand crossed the anti-meridian (bounds span 357° vs cluster span 11°) and failed to render at all. The safeguard added in `a7585fc6` detects pathological geometry (bounds span >60° OR >2× substation cluster span) and falls back to the substation cluster extent for those cases; the 35 non-pathological countries continue to use bounds.json extent unchanged. **If you ever rewrite the map renderer, preserve this safeguard or replicate equivalent geometry-pathology detection** — otherwise Mode-3 countries will regress to either invisible-mainland viewports (DOM-TOM class) or whole-globe / anti-meridian failures (NZ class). The same issue will recur for any future country onboarded with non-contiguous territories; the safeguard is country-agnostic and will catch new cases automatically.
+
 ### KB §57 — Single source of truth for the 39-country slug list
 
 The 39-country slug list lives in `intelligence/countries.json::slugs` and ONLY there. Never hardcode the list in shell scripts, workflows, Python modules, HTML pages, JS files, or anywhere else. Read from the SoT at runtime via `json.load(open('intelligence/countries.json'))['slugs']`. Pre-KB-§57 the `pipeline-enrichment.yml` cache-bust loop hardcoded 24 countries and silently excluded BE/NL/LU/CZ/LV/LT/EE from the monthly enrichment loop. This is the failure-mode that motivated the rule.
@@ -112,6 +114,8 @@ python -m scripts.pipeline.run --all --skip-rescore --dry-run  # fast preview
 | Add a tolerance for a new Mode 2 country | `cross_border_tolerances.json::per_country` | Verify pytest `TestToleranceConfig` passes |
 | Add a new country to the cohort | `intelligence/countries.json::slugs` + create `{slug}/` folder + drop `bounds.json` + run pipeline | Verify all 39+1 tests pass; CI gate runs on PR |
 | Change the cross-border threshold | `scripts/check_cross_border.py` default + `tests/test_no_cross_border_leakage.py::THRESHOLD_PCT` + workflow files (find via grep `THRESHOLD_PCT`) | The threshold lives in three places — keep in sync |
+| Extend a country's bounds.json with overseas territory (Mode-3 pattern: DOM-TOM, anti-meridian islands, Arctic territories, etc.) | `{slug}/bounds.json` + add a tolerance to `cross_border_tolerances.json` if coastline simplification (Mode 2) | Run `python3 scripts/check_cross_border.py {slug}` + `pytest tests/test_no_cross_border_leakage.py -v`. The map.js viewport safeguard (auto-fit-to-bounds at ~line 1438) will auto-detect the pathological span and fall back to substation cluster — no map.js change needed |
+| Rewrite or refactor `map.js` | the whole file is fair game, BUT preserve the Mode-3 viewport safeguard at `~line 1438` (substation-cluster fallback when bounds span >60° OR >2× cluster span) | Without it: France's mainland becomes a pixel-sized blob; New Zealand crosses the anti-meridian and fails to render at all. The 35 non-pathological countries are unaffected by the safeguard either way. See commit `a7585fc6` |
 | Add a new pipeline modifier | `scripts/pipeline/scoring/modifier_registry.py` + write tests | `pytest tests/test_modifier_registry.py -v` |
 
 ## Pre-commit checklist
