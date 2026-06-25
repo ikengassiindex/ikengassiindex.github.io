@@ -1435,6 +1435,27 @@ if (!hasNested) {
               if (la<minLat) minLat=la; if (la>maxLat) maxLat=la;
             }
           }
+          // Mode-3 territorial-outlier safeguard (Discipline #36 follow-on, 25 Jun 2026).
+          // bounds.json correctly includes overseas territories (Guyane française, Polynésie,
+          // Chatham Islands, Tokelau, Réunion, Northern Ireland, Easter Island, Canadian Arctic
+          // etc.) so the cross-border filter accepts legitimate territorial substations. But
+          // the map viewport needs to frame WHERE THE GRID ACTUALLY IS — not where every
+          // overseas territory sits. If bounds-extent is >60° in longitude (catches DOM-TOM
+          // and anti-meridian crossings) or >2× the substation cluster (catches Easter-Island-
+          // class compression), fall back to substation cluster extent. France 117° → mainland
+          // ~14°; NZ 357° (anti-meridian) → mainland ~12°; Chile 43° → mainland ~9°. The 35
+          // non-pathological countries continue to use bounds.json extent unchanged.
+          let subMinLon=Infinity, subMaxLon=-Infinity, subMinLat=Infinity, subMaxLat=-Infinity;
+          for (const s of subEntries) {
+            if (s.x<subMinLon) subMinLon=s.x; if (s.x>subMaxLon) subMaxLon=s.x;
+            if (s.y<subMinLat) subMinLat=s.y; if (s.y>subMaxLat) subMaxLat=s.y;
+          }
+          const boundsLonSpan = maxLon - minLon;
+          const subsLonSpan = Math.max(0.01, subMaxLon - subMinLon);
+          if (boundsLonSpan > 60 || boundsLonSpan > subsLonSpan * 2) {
+            minLon = subMinLon; maxLon = subMaxLon;
+            minLat = subMinLat; maxLat = subMaxLat;
+          }
         } else {
           for (const s of subEntries) {
             if (s.x<minLon) minLon=s.x; if (s.x>maxLon) maxLon=s.x;
