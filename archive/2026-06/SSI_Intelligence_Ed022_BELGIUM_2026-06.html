@@ -1,0 +1,938 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI Monthly Intelligence — Belgium — Edition 005</title>
+<link rel="stylesheet" href="../style.css?v=20260614-s17">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet">
+</head>
+<body><nav class="topnav" role="navigation" aria-label="Main navigation"><a class="topnav-brand" href="https://ikenga.eu" target="_blank" rel="noopener" aria-label="Ikenga — Visit website" style="gap:10px"><img src="../ikenga-logo.png" alt="Ikenga" style="height:187px;width:auto;display:block"><div style="display:flex;flex-direction:column;justify-content:center;line-height:1.15"><h1 style="margin:0;font-size:15px">SSI <span>Index</span> <span class="topnav-version">v4.2</span></h1></div></a><div class="nav-country-badge">🇧🇪 Belgium</div><a href="../index.html" class="nav-back" aria-label="Back to country selection">← All Countries</a><button class="nav-toggle" onclick="document.querySelector('.topnav-links').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="topnav-links" role="menubar"><a href="index.html" role="menuitem">Overview</a><a href="map.html" role="menuitem">Map Explorer</a><a href="regional.html" role="menuitem">Regional</a><a href="methodology.html" role="menuitem">Methodology</a><a href="data.html" role="menuitem">Data &amp; Download</a><a href="intelligence.html" role="menuitem" class="active" aria-current="page">Intelligence</a><a href="esg-report.html" role="menuitem">ESG Report</a></div></nav><noscript><div class="noscript-banner">This dashboard requires JavaScript to display interactive data and maps.</div></noscript><a href="#main-content" class="skip-link">Skip to main content</a>
+<!-- W2.5 SSI_CANONICAL_LITERALS -->
+<script>/* W2.5 — Belgium-literal lookup table for meta-tag content substitution. Read by country-renderer.js::fillCanonicalContentAttrs. */
+window.SSI_CANONICAL_LITERALS = {
+ "fleet.total": "1,220",
+ "fleet.voltage.ehv": "55",
+ "fleet.voltage.hv": "199",
+ "fleet.voltage.distribution": "966",
+ "fleet.grid_lines": "4,017",
+ "fleet.grid_lines_km": "5,917",
+ "fleet.engine.mc_simulations_label": "42.9",
+ "fleet.engine.source_data_points": "146,000",
+ "fleet.engine.total_arithmetic_label": "1.78",
+ "fleet.engine.output_data_points": "244,701",
+ "fleet.engine.evals_per_substation": "196,608"
+};
+</script>
+
+<script src="../nav.js?v=20260614-s17"></script>
+<script src="ssi-metadata.js?v=20260614-s17"></script>
+<script src="../intelligence/intelligence-loader.js?v=20260614-s17" data-country="belgium"></script>
+<script>
+// Config-ready bridge: SSI_EDITION available for all inline scripts
+window.SSI_EDITION = window.SSI_EDITION || null;
+document.addEventListener("ssi-config-ready", function(e) {
+ if (e.detail) { window.SSI_EDITION = e.detail; }
+});
+</script>
+<script>renderNav('intelligence');</script>
+
+<main class="page-shell" style="max-width:860px">
+
+<!-- ═══════════════════════════════════════════════════════
+ PAGE HEADER
+ ═══════════════════════════════════════════════════════ -->
+<div class="page-header animate-in">
+ <h1><span style="font-size:0.75em;vertical-align:middle;margin-right:8px">🇧🇪</span><span data-canonical="cfg.country_name" style="font-weight:600">Belgium</span> — Monthly Intelligence Report <span style="font-size:0.45em;color:var(--terracotta);font-weight:500">v4.2</span></h1>
+ <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--terracotta);letter-spacing:0.3px;margin-top:-4px;margin-bottom:8px" data-edition="full-title">Edition 005 — Deep-Dive Theme</div>
+ <p>Where the energy transition is outrunning the grid. edition · July 2026 · SSI v4.2 (refreshed June 2026)</p>
+</div>
+
+<!-- ═══════════════════ TABLE OF CONTENTS ═══════════════════ -->
+<div class="card animate-in delay-1" style="margin-bottom:24px">
+ <span class="label-xs" style="margin-bottom:12px;display:block">Contents</span>
+ <div style="columns:2;column-gap:24px;font-size:13px;line-height:2">
+ <a href="#exec" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">A</span> Executive Summary</a>
+ <a href="#cyber-econ" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">B</span> Cyber &amp; Economic Exposure Monitor</a>
+ <a href="#data" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">C</span> Data Refresh &amp; Changelog</a>
+ <a href="#deep" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">D</span> Deep-Dive: Monthly Theme</a>
+ <a href="#eu" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">E</span> European Context Card</a>
+ <a href="#enn" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F</span> SSI Enhanced Neural Network</a>
+ <a href="#radar2" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">F.5</span> Anti-maladaptation Gate (Radar 2 · W1–W10) <span style="font-size:10px;color:var(--terracotta);font-weight:500;margin-left:4px">v4.2</span></a>
+ <a href="#ahead" style="display:block;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--card-border)"><span style="color:var(--terracotta);font-weight:600;margin-right:6px">G</span> Looking Ahead</a>
+ </div>
+</div>
+
+<!-- ═══════════════════ A. EXECUTIVE SUMMARY ═══════════════════ -->
+<section id="exec" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section A</span>
+<h2>Executive Summary</h2>
+
+<!-- ═══ v4.2 Radar 1 (7-axis) with the new Re composite as the explicit 7th axis ═══ -->
+<div class="card" style="margin:20px 0;padding:20px;border-left:3px solid var(--terracotta);background:var(--cream)">
+ <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Radar 1 — v4.2: now 7-axis with the new Re composite</div>
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: Bavegem Re_norm 0.219 / Beernem Re_norm 0.260 are the canonical-computed values now persisted in ssi-data.json.v4.2 (Re_raw + Re_norm fields, added 11 Jun 2026 via apply-v4.2-modifiers.py Phase 1 closure). Per-substation lookup: substations[].Re_norm. Static text literals here are anchored to the canonical computation, not hand-computed worked-example numbers. The slightly different values vs FC v2 hand-computed 0.198/0.620 reflect FC v2 rounding imprecision (~0.006 and ~0.022); the canonical formula computation is mathematically exact: Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1). -->
+ <p style="font-size:12px;color:var(--warm-grey);line-height:1.6;margin:0 0 14px 0">v4.0.2 Radar 1 had 6 axes (C/V/I/E/S/T). <strong>v4.2 adds <span style="color:var(--terracotta);font-weight:600">Re</span> — the bounded resilience composite</strong> capturing the new modifier family (R6c flood + R6d wildfire + R6e winter + R8 adapt + R9 compound + R10 just) in one normalised scalar (Re_norm ∈ [0, 1] via clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1)). Two worked examples overlaid: <strong style="color:#4d7d62"><span data-canonical="fleet.exemplar_low.name">Substation OostVlaanderen 003 (DSO)</span></strong> (low-exposure reference, Re_norm <span data-canonical="fleet.exemplar_low.re_norm">0.000</span>) · <strong style="color:#941914"><span data-canonical="fleet.exemplar_high.name">15 kV</span></strong> (high-exposure reference, Re_norm <span data-canonical="fleet.exemplar_high.re_norm">1.000</span>). The Re axis is colour-highlighted in cayenne to emphasise the v4.2 architectural addition.</p>
+ <svg viewBox="0 0 600 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Radar 1 — six SSI components C V I E S T plus the v4.2 Re composite 7th axis" style="width:100%;max-width:600px;height:auto;font-family:'DM Sans',system-ui,sans-serif;display:block;margin:0 auto">
+ <!-- SVG_MATH: heptagon-grid | center (300,220) radius r∈{34,68,102,136,170} | θ_i = -90° + i·360°/7 for i=0..6 | vertex (cx + r·cos θ, cy + r·sin θ) | verified 2026-06-11 (Python recompute Convention #8 closure) -->
+ <g style="stroke:var(--card-border);stroke-width:0.8;fill:none">
+ <polygon points="300.0,186.0 326.6,198.8 333.1,227.6 314.8,250.6 285.2,250.6 266.9,227.6 273.4,198.8"></polygon>
+ <polygon points="300.0,152.0 353.2,177.6 366.3,235.1 329.5,281.3 270.5,281.3 233.7,235.1 246.8,177.6"></polygon>
+ <polygon points="300.0,118.0 379.7,156.4 399.4,242.7 344.3,311.9 255.7,311.9 200.6,242.7 220.3,156.4"></polygon>
+ <polygon points="300.0,84.0 406.3,135.2 432.6,250.3 359.0,342.5 241.0,342.5 167.4,250.3 193.7,135.2"></polygon>
+ <polygon points="300.0,50.0 432.9,114.0 465.7,257.8 373.8,373.2 226.2,373.2 134.3,257.8 167.1,114.0" style="fill:var(--cream);fill-opacity:0.5"></polygon>
+ </g>
+ <!-- SVG_MATH: heptagon-axes | center (300,220) endpoint r=170 | same θ_i as grid | line from (cx,cy) to vertex | verified 2026-06-11 -->
+ <g style="stroke:var(--warm-grey-light);stroke-width:0.8">
+ <line x1="300" y1="220" x2="300.0" y2="50.0"></line>
+ <line x1="300" y1="220" x2="432.9" y2="114.0"></line>
+ <line x1="300" y1="220" x2="465.7" y2="257.8"></line>
+ <line x1="300" y1="220" x2="373.8" y2="373.2"></line>
+ <line x1="300" y1="220" x2="226.2" y2="373.2"></line>
+ <line x1="300" y1="220" x2="134.3" y2="257.8"></line>
+ <line x1="300" y1="220" x2="167.1" y2="114.0"></line>
+ </g>
+ <!-- v4.2 Re axis emphasis (axis index i=6, θ=218.57°). Brand accent --terracotta to mark the new dimension; --crimson reserved for critical-band only. -->
+ <line x1="300" y1="220" x2="167.1" y2="114.0" style="stroke:var(--terracotta);stroke-width:2;stroke-linecap:round" opacity="0.45"></line>
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: Bavegem Re_norm 0.219 is the canonical value from ssi-data.json.v4.2 (Phase 1 closure 11 Jun 2026). C/V/I/E/S/T are pinned canonical too. -->
+ <!-- SVG_MATH: low-exemplar-polygon | center (300,220) | per-axis r_i = value_i × 170 | values from ssi-data.json.v4.2::substations[name='Bavegem']: C=0.420, V=0.350, I=0.493, E=0.502, S=0.608, T=0.534, Re_norm=0.219 | verified 2026-06-11 -->
+ <polygon points="300.0,148.6 346.5,182.9 381.8,238.7 337.0,296.9 255.1,313.2 211.4,240.2 270.9,196.8" style="fill:var(--sage);fill-opacity:0.22;stroke:var(--sage);stroke-width:1.5;stroke-linejoin:round"></polygon>
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: Beernem Re_norm 0.260 is canonical (Phase 1). -->
+ <!-- SVG_MATH: high-exemplar-polygon | center (300,220) | per-axis r_i = value_i × 170 | values from ssi-data.json.v4.2::substations[name='Beernem']: C=0.441, V=0.586, I=0.450, E=0.519, S=0.432, T=0.473, Re_norm=0.260 | verified 2026-06-11 -->
+ <polygon points="300.0,145.0 377.9,157.9 374.6,237.0 338.3,299.4 268.1,286.2 221.7,237.9 265.5,192.5" style="fill:var(--terracotta);fill-opacity:0.18;stroke:var(--terracotta);stroke-width:1.5;stroke-linejoin:round"></polygon>
+ <!-- Data-point markers — Bavegem (sage, low-exposure exemplar) -->
+ <g style="fill:var(--sage)">
+ <circle cx="300.0" cy="148.6" r="3"></circle><circle cx="346.5" cy="182.9" r="3"></circle><circle cx="381.8" cy="238.7" r="3"></circle><circle cx="337.0" cy="296.9" r="3"></circle><circle cx="255.1" cy="313.2" r="3"></circle><circle cx="211.4" cy="240.2" r="3"></circle><circle cx="270.9" cy="196.8" r="4" style="fill:var(--sage);stroke:#ffffff;stroke-width:1.5"></circle>
+ </g>
+ <!-- Data-point markers — Beernem (terracotta, high-exposure exemplar) -->
+ <g style="fill:var(--terracotta)">
+ <circle cx="300.0" cy="145.0" r="3"></circle><circle cx="377.9" cy="157.9" r="3"></circle><circle cx="374.6" cy="237.0" r="3"></circle><circle cx="338.3" cy="299.4" r="3"></circle><circle cx="268.1" cy="286.2" r="3"></circle><circle cx="221.7" cy="237.9" r="3"></circle><circle cx="265.5" cy="192.5" r="4" style="fill:var(--terracotta);stroke:#ffffff;stroke-width:1.5"></circle>
+ </g>
+ <circle cx="300" cy="220" r="2" style="fill:var(--warm-grey-light)"></circle>
+ <!-- Axis labels — Re emphasised in --terracotta (brand accent) to mark the v4.2 addition; tone-of-voice editorial, no decorative starburst. -->
+ <g font-size="13" font-weight="600" text-anchor="middle" style="fill:var(--ink)">
+ <text x="300" y="34">C <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Continuity</tspan></text>
+ <text x="455" y="105">V <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Voltage</tspan></text>
+ <text x="492" y="261">I <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Infrastructure</tspan></text>
+ <text x="389" y="395">E <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Economic</tspan></text>
+ <text x="211" y="395">S <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Saturation</tspan></text>
+ <text x="108" y="261">T <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Transition</tspan></text>
+ <text x="145" y="105" style="fill:var(--terracotta)" font-weight="700">Re <tspan font-size="10" font-weight="500">composite</tspan></text>
+ <text x="145" y="118" style="fill:var(--terracotta)" font-size="9" font-weight="500">v4.2 ✦</text>
+ </g>
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: Bavegem Re_norm 0.219 and Beernem Re_norm 0.260 are canonical from ssi-data.json.v4.2::substations[].Re_norm (Phase 1, 11 Jun 2026). -->
+ <g font-size="11">
+ <rect x="385" y="423" width="205" height="32" rx="5" style="fill:#ffffff;stroke:var(--card-border);stroke-width:0.8"></rect>
+ <rect x="395" y="432" width="12" height="9" style="fill:var(--sage);fill-opacity:0.55;stroke:var(--sage)"></rect>
+ <text x="412" y="440" font-size="10" style="fill:var(--ink)"><tspan font-weight="600" style="fill:var(--sage)" data-canonical="fleet.exemplar_low.name">Substation OostVlaanderen 003 (DSO)</tspan> Re_norm <tspan data-canonical="fleet.exemplar_low.re_norm">0.000</tspan></text>
+ <rect x="395" y="445" width="12" height="9" style="fill:var(--terracotta);fill-opacity:0.40;stroke:var(--terracotta)"></rect>
+ <text x="412" y="453" font-size="10" style="fill:var(--ink)"><tspan font-weight="600" style="fill:var(--terracotta)" data-canonical="fleet.exemplar_high.name">15 kV</tspan> Re_norm <tspan data-canonical="fleet.exemplar_high.re_norm">1.000</tspan></text>
+ </g>
+ </svg>
+ <p style="font-size:11px;color:var(--warm-grey);line-height:1.6;margin:14px 0 0 0;text-align:center"><em>The Re composite (★, cayenne-highlighted axis at upper-left) captures the v4.2 resilience modifier family in one bounded scalar — formula <code>Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00)</code>, bounds [0.920, 1.787]. Per Convention #6 §2.3.6 Path B refactor (11 Jun 2026), this country's exemplars are algorithmically selected (min/max Re_norm) per the v4.2 methodology. The Substation in Focus radar canvas (Section A below) is rendered by shared <code>intelligence-sections.js</code> and now also displays the 7th Re axis (Convention #11 surface-pair coherence, V4.2-disc-24 closure 12 Jun 2026).</em></p>
+</div>
+
+<div class="kpi-grid" style="margin:20px 0">
+ <div class="kpi-card">
+ <div class="kpi-label">Substations Scored</div>
+ <div class="kpi-value" style="color:var(--ink)"><span data-canonical="fleet.total">1,220</span></div>
+ <div class="kpi-sub"><span data-canonical="fleet.voltage.ehv">55</span> EHV · <span data-canonical="fleet.voltage.hv">199</span> HV · <span data-canonical="fleet.voltage.distribution">966</span> distribution-tier</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Grid Lines Mapped</div>
+ <div class="kpi-value" style="color:var(--ink)"><span data-canonical="fleet.grid_lines">4,017</span></div>
+ <div class="kpi-sub">~<span data-canonical="fleet.grid_lines_km">5,917</span> km coverage</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">MC Simulations</div>
+ <div class="kpi-value" style="color:var(--ink)"><span data-canonical="fleet.engine.mc_simulations_label">42.9</span> M</div>
+ <div class="kpi-sub">10,000 per substation</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Public Data Sources</div>
+ <div class="kpi-value" style="color:var(--ink)">34</div>
+ <div class="kpi-sub">101 variables · zero proprietary</div>
+ </div>
+</div>
+
+<p style="font-size:13px;line-height:1.7">The SSI Index is the only operational framework that fuses substation-level engineering metrics with socio-economic consequence valuation in a single composite score — scoring 71/80 (89%) across 16 competitive dimensions, ahead of GMLC 1.1 (48/80), EPRI (40/80), and academic MCDA frameworks (41/80). Its engine processes <span data-canonical="fleet.engine.source_data_points">146,000</span>+ source data points per run, executes <span data-canonical="fleet.engine.mc_simulations_label">42.9</span> million Monte Carlo simulations through a 20×20 Gaussian copula correlation matrix, and performs <span data-canonical="fleet.engine.total_arithmetic_label">1.78</span> billion arithmetic operations — producing <span data-canonical="fleet.engine.output_data_points">244,701</span> output data points with full uncertainty quantification across <span data-canonical="fleet.total">1,220</span> substations and <span data-canonical="fleet.grid_lines">4,017</span> grid lines spanning ~<span data-canonical="fleet.grid_lines_km">5,917</span> km. v4.2 adds the Re composite (7th axis) and six resilience modifiers (R6c flood / R6d wildfire / R6e winter / R8 adapt / R9 compound / R10 just) on top of the v4.0.2 foundation.</p>
+
+<p style="font-size:13px;line-height:1.7">Operated as a non-profit through a dedicated foundation, the SSI Index serves the public interest with zero dependency on proprietary data. All <span data-canonical="meta.n_variables">101</span> variables are drawn from <span data-canonical="meta.n_data_sources">34</span> verified public sources, making the methodology fully auditable and reproducible. Initially covering Belgium's entire transmission and distribution grid, the Index is progressively being rolled out to all OECD countries — applying the same silo-breaking approach: fusing grid risk with societal exposure at asset-level resolution wherever open data permits.</p>
+
+<!-- Substation in Focus — auto-populated from ssi-data.json -->
+<div class="card" style="border-left:3px solid var(--crimson);margin:20px 0" id="focus-card">
+ <div style="display:flex;gap:24px;flex-wrap:wrap">
+ <div style="flex:1;min-width:200px">
+ <h3 style="margin-top:0">Substation in Focus</h3>
+ <div style="font-size:13px;line-height:1.7">
+ <div style="font-size:16px;font-weight:600;margin-bottom:4px" id="focus-name">Substation VlaamsBrabant 021 (MV)</div>
+ <div style="color:var(--warm-grey);font-size:13px;margin-bottom:12px" id="focus-location">Flemish Brabant, Flemish Brabant · distribution-tier</div>
+ <div style="display:flex;gap:20px;flex-wrap:wrap">
+ <div style="text-align:left">
+ <div style="font-family: &quot;Playfair Display&quot;, serif; font-size: 18px; font-weight: 600; color: var(--terracotta);" id="focus-r">0.720</div>
+ <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">R_final</div>
+ </div>
+ <div style="text-align:left">
+ <div style="font-family: &quot;Playfair Display&quot;, serif; font-size: 18px; font-weight: 600; color: var(--terracotta);" id="focus-band">High</div>
+ <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">Classification</div>
+ </div>
+ <div style="text-align:left">
+ <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600" id="focus-ci">0.175</div>
+ <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">CI Width</div>
+ </div>
+ <div style="text-align:left">
+ <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600" id="focus-pctile">68th</div>
+ <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--warm-grey);margin-top:2px">Fleet Percentile</div>
+</div>
+</div>
+ </div>
+          </div>
+          <div style="width:220px;flex-shrink:0">
+ <canvas id="focus-radar" width="220" height="180"></canvas>
+ <!-- v4.2 Re composite badge — populated by belgium-section-overrides.js from canonical ssi-data.json.v4.2 -->
+ <div data-v42-re-badge="focus-radar"><div style="margin:8px 0"><div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:8px;row-gap:4px;padding:8px 12px;background:#ffffff;border:1px solid rgba(44,36,32,0.08);border-left:3px solid #aa4234;border-radius:6px;font-family:DM Sans,system-ui,sans-serif;font-size:12px;line-height:1.6"><span style="font-weight:600;color:#aa4234">Re composite <span style="font-size:10px;color:#8a7e76">v4.2 7th axis</span></span><span style="color:rgba(44,36,32,0.08)">·</span><span style="color:#2c2420;white-space:nowrap"><strong>Re_raw</strong> 1.1398</span><span style="color:rgba(44,36,32,0.08)">·</span><span style="color:#2c2420;white-space:nowrap"><strong>Re_norm</strong> 0.866</span><span style="color:rgba(44,36,32,0.08)">·</span><span style="text-transform:uppercase;font-size:10px;letter-spacing:0.4px;color:#aa4234;white-space:nowrap">elevated exposure</span><button type="button" id="v42-re-btn-772590074" aria-controls="v42-re-explainer-337230891" aria-expanded="false" title="Click to expand methodology + bounds explainer" style="margin-left:auto;background:transparent;border:1px solid rgba(44,36,32,0.08);border-radius:50%;width:22px;height:22px;cursor:pointer;color:#8a7e76;font-size:12px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;font-family:inherit" onmouseover="this.style.color='#aa4234';this.style.borderColor='#aa4234'" onmouseout="this.style.color='#8a7e76';this.style.borderColor='rgba(44,36,32,0.08)'" onclick="(function(b){var e=document.getElementById(b.getAttribute('aria-controls'));var open=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded', open?'false':'true');b.textContent=open?'\u24D8':'\u2715';if(e){e.style.display=open?'none':'block';}})(this)">ⓘ</button></div><div id="v42-re-explainer-337230891" role="region" aria-label="Re composite explainer" style="display:none;margin-top:6px;padding:10px 14px;background:#fef8f7;border:1px solid rgba(170,66,52,0.18);border-left:3px solid #aa4234;border-radius:6px;font-family:DM Sans,system-ui,sans-serif;font-size:11px;color:#2c2420;line-height:1.7"><div style="font-weight:600;color:#aa4234;margin-bottom:4px">Re composite — bounded resilience aggregate (v4.2)</div><div><strong>Formula.</strong> <code style="background:#fff;padding:1px 4px;border-radius:3px;font-size:10px">Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00)</code></div><div><strong>Bounds.</strong> Re_raw ∈ [0.920, 1.787]. Normalised: <code style="background:#fff;padding:1px 4px;border-radius:3px;font-size:10px">Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1)</code></div><div><strong>Tier classification.</strong> low &lt; 0.25 · moderate 0.25–0.50 · elevated ≥ 0.50</div><div><strong>For this substation.</strong> Re_raw = 1.1398, Re_norm = <strong style="color:#aa4234">0.866</strong>, tier = <strong style="color:#aa4234;text-transform:uppercase">elevated</strong></div><div><strong>Provenance.</strong> Computed canonically by <code style="background:#fff;padding:1px 4px;border-radius:3px;font-size:10px">apply-v4.2-modifiers.py</code> + persisted in <code style="background:#fff;padding:1px 4px;border-radius:3px;font-size:10px">ssi-data.json.v4.2</code>.</div></div></div></div>
+ </div>
+ </div>
+ <!-- Component + Modifier detail rows -->
+ <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--card-border);display:flex;gap:16px;flex-wrap:wrap">
+ <div style="flex:1;min-width:200px">
+ <div class="label-xs" style="margin-bottom:6px">Components</div>
+ <div id="focus-components" style="font-size:12px;line-height:2"><div><strong style="color:var(--crimson)">C</strong> Continuity: 0.132 / 0.30 (44%)</div><div><strong style="color:var(--sage)">I</strong> Infrastructure: 0.810 / 0.25 (324%)</div><div><strong style="color:var(--bronze)">S</strong> Saturation: 0.405 / 0.20 (202%)</div><div><strong style="color:var(--terracotta)">V</strong> Voltage: 0.836 / 0.10 (836%)</div><div><strong style="color:#3b9eff">E</strong> Economic: 0.549 / 0.10 (549%)</div><div><strong style="color:#22d3ee">T</strong> Transition: 0.606 / 0.05 (1212%)</div></div>
+ </div>
+ <div style="flex:1;min-width:200px">
+ <div class="label-xs" style="margin-bottom:6px">Modifiers</div>
+ <div id="focus-modifiers" style="font-size:12px;line-height:2"><div><strong>R3 Consequence:</strong> <span style="color:var(--crimson)">1.077</span> ↑ amplifies</div><div><strong>R4 Graph Criticality:</strong> <span style="color:var(--crimson)">1.238</span> ↑ amplifies</div><div><strong>R6a Restoration:</strong> <span style="color:var(--sage)">0.949</span> ↓ dampens</div><div><strong>R6b Seismic:</strong> <span style="color:var(--warm-grey)">0.998</span> → neutral</div><div><strong>R7 Digital Readiness:</strong> <span style="color:var(--warm-grey)">1.000</span> → neutral</div></div>
+</div>
+</div>
+  </div>
+
+<p style="font-size:13px;line-height:1.7" id="focus-narrative">This month's spotlight — automatically selected for July 2026 — is <strong>Substation VlaamsBrabant 021 (MV)</strong> in Flemish Brabant, Flemish Brabant. With an R_final of 0.720 (High band, 68th fleet percentile), its risk profile is dominated by the T (Transition) component at 1212% of its weight ceiling, followed by V (Voltage) at 836%. Modifiers collectively shift R_base by 46.5%%, reflecting the substation's specific geographic, socio-economic, and network context.</p>
+
+</section>
+
+<div style="margin:32px 0"></div>
+
+<!-- ═══════════════════ B. CYBER & ECONOMIC EXPOSURE MONITOR ═══════════════════ -->
+<section id="cyber-econ" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section B — Recurring Module</span>
+<h2>Cyber &amp; Economic Exposure Monitor</h2>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+ <p style="font-size:13px;line-height:1.7;margin:0"><strong>Why this section exists:</strong> Traditional grid risk frameworks treat cybersecurity and economic vulnerability as separate domains. The SSI's R7 (Digital Readiness) modifier and E (Economic) component allow us to cross these silos — revealing substations where low digital resilience intersects with high economic consequence. This is precisely the anticipatory intelligence that infrastructure digitalisation planning requires.</p>
+</div>
+
+<!-- B.1 KPI boxes -->
+<div class="kpi-grid" style="margin:16px 0" id="b1-kpis">
+ <div class="kpi-card">
+ <div class="kpi-label">Cyber HIGH Exposure</div>
+ <div class="kpi-value" style="color:var(--crimson)" id="b1-cyber-high">0</div>
+ <div class="kpi-sub" id="b1-cyber-high-sub">0.0% of fleet</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Blind Spots</div>
+ <div class="kpi-value" style="color:var(--terracotta)" id="b1-blindspots">0</div>
+ <div class="kpi-sub" id="b1-blindspots-sub">High/Critical + R7 &lt; median</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Avg R7 Modifier</div>
+ <div class="kpi-value" style="color:var(--bronze)" id="b1-avg-r7">1.0000</div>
+ <div class="kpi-sub">Range [0.99, 1.05]</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">High-Consequence Subs</div>
+ <div class="kpi-value" style="color:var(--ink)" id="b1-high-conseq">310</div>
+ <div class="kpi-sub" id="b1-high-conseq-sub">25.4% · R3 ≥ 1.09</div>
+ </div>
+</div>
+
+<h3>B.1   Cyber-Physical Risk Matrix</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Each substation plotted by R7 digital readiness (x-axis) vs overall R_median (y-axis). The upper-left quadrant — high risk, low digital readiness — identifies <em>blind spots</em> where grid stress is high but monitoring/response capacity is weakest.</p>
+
+<canvas id="b1-matrix" style="width:100%;height:320px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff" width="796" height="320"></canvas>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0;font-size:11px;color:var(--warm-grey)">
+ <span>● <span style="color:var(--sage)">Low</span></span>
+ <span>● <span style="color:var(--bronze)">Medium</span></span>
+ <span>● <span style="color:var(--terracotta)">High</span></span>
+ <span>● <span style="color:var(--crimson)">Critical</span></span>
+ <span style="margin-left:auto">Dashed lines = fleet medians</span>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="b1-narrative">The cyber-physical matrix identifies <strong>0 blind-spot substations</strong> — scoring High or Critical on overall risk while sitting below the fleet median for digital readiness (R7 &lt; 1.0000). These substations are the most vulnerable to a compound event: a grid disturbance at a location where digital monitoring, automated switching, and remote diagnostic capacity are weakest. The blind spots concentrate in <strong>—</strong>. Across the full fleet, 0 substations (0.0%) carry a HIGH cyber-exposure classification, while 0 (0.0%) are in the LOW tier.</p>
+
+<!-- B.2 Economic Impact by Business Fabric -->
+<h3>B.2   Economic Impact by Business Fabric</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Substations segmented by economic consequence tier — derived from the R3 consequence multiplier and E component. Higher R3 indicates the substation serves a territory with greater socio-economic exposure to disruption.</p>
+
+<div id="b2-tiers" style="margin:16px 0"><div class="card" style="margin-bottom:12px;border-left:3px solid #941914"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:14px;font-weight:600">🏭 Capital-Intensive / High-Consequence</span><span style="font-size:12px;color:var(--warm-grey)">Est. VoLL: €15–30/kWh (EUR)</span></div><p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">Capital nodes — highest economic loss per interruption (semiconductor fabs, data centers, refineries, hospitals)</p><div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px"><span><strong>310</strong> substations (25.4%)</span><span>High/Critical: <strong style="color:var(--crimson)">260</strong> (83.9%)</span><span>Avg R: <strong>0.629</strong></span><span>Avg E: <strong>0.498</strong> / 0.10</span></div><div style="height:8px;border-radius:4px;overflow:hidden;display:flex"><div style="width:16.1%;height:100%;background:#b8863a" title="Medium: 50"></div><div style="width:67.1%;height:100%;background:#aa4234" title="High: 208"></div><div style="width:16.8%;height:100%;background:#941914" title="Critical: 52"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px"><span>Low 0</span><span>Med 50</span><span>High 208</span><span>Crit 52</span></div></div><div class="card" style="margin-bottom:12px;border-left:3px solid #aa4234"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:14px;font-weight:600">🔧 Industrial / Medium-Large Enterprise</span><span style="font-size:12px;color:var(--warm-grey)">Est. VoLL: €8–15/kWh (EUR)</span></div><p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">Industrial belt — significant continuity requirements (manufacturing, logistics hubs)</p><div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px"><span><strong>304</strong> substations (24.9%)</span><span>High/Critical: <strong style="color:var(--crimson)">257</strong> (84.5%)</span><span>Avg R: <strong>0.638</strong></span><span>Avg E: <strong>0.494</strong> / 0.10</span></div><div style="height:8px;border-radius:4px;overflow:hidden;display:flex"><div style="width:15.5%;height:100%;background:#b8863a" title="Medium: 47"></div><div style="width:65.5%;height:100%;background:#aa4234" title="High: 199"></div><div style="width:19.1%;height:100%;background:#941914" title="Critical: 58"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px"><span>Low 0</span><span>Med 47</span><span>High 199</span><span>Crit 58</span></div></div><div class="card" style="margin-bottom:12px;border-left:3px solid #b8863a"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:14px;font-weight:600">🏪 Commercial / SME-Dense</span><span style="font-size:12px;color:var(--warm-grey)">Est. VoLL: €3–8/kWh (EUR)</span></div><p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">Service economy + retail — moderate individual impact (commercial districts, mixed-use)</p><div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px"><span><strong>294</strong> substations (24.1%)</span><span>High/Critical: <strong style="color:var(--crimson)">247</strong> (84.0%)</span><span>Avg R: <strong>0.655</strong></span><span>Avg E: <strong>0.507</strong> / 0.10</span></div><div style="height:8px;border-radius:4px;overflow:hidden;display:flex"><div style="width:16.0%;height:100%;background:#b8863a" title="Medium: 47"></div><div style="width:59.2%;height:100%;background:#aa4234" title="High: 174"></div><div style="width:24.8%;height:100%;background:#941914" title="Critical: 73"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px"><span>Low 0</span><span>Med 47</span><span>High 174</span><span>Crit 73</span></div></div><div class="card" style="margin-bottom:12px;border-left:3px solid #5d8563"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:14px;font-weight:600">🌾 Light / Agricultural / Rural</span><span style="font-size:12px;color:var(--warm-grey)">Est. VoLL: €1–3/kWh (EUR)</span></div><p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">Sparse activity, agricultural land — lower VoLL (residential, agricultural)</p><div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px"><span><strong>311</strong> substations (25.5%)</span><span>High/Critical: <strong style="color:var(--crimson)">274</strong> (88.1%)</span><span>Avg R: <strong>0.704</strong></span><span>Avg E: <strong>0.498</strong> / 0.10</span></div><div style="height:8px;border-radius:4px;overflow:hidden;display:flex"><div style="width:11.9%;height:100%;background:#b8863a" title="Medium: 37"></div><div style="width:48.2%;height:100%;background:#aa4234" title="High: 150"></div><div style="width:39.9%;height:100%;background:#941914" title="Critical: 124"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px"><span>Low 0</span><span>Med 37</span><span>High 150</span><span>Crit 124</span></div></div></div>
+
+<div class="card" style="margin:16px 0;border-left:3px solid var(--bronze);background:var(--cream)">
+ <p style="font-size:13px;line-height:1.7;margin:0" id="b2-voll-note"><strong>Value of Lost Load (VoLL) context:</strong> ACER's 2023 estimate places average VoLL at €13.1/kWh for industrial customers and €3.2/kWh for residential. The SSI's R3 consequence multiplier allows us to identify which substations serve the most economically exposed territories. <strong>260 substations</strong> combine capital-intensive economic fabric (R3 ≥ 1.09) with High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.</p>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="b2-narrative">The capital-intensive tier concentrates in <strong>Antwerp (82), Flemish Brabant (77), East Flanders (58)</strong> — regions where industrial corridors depend on uninterrupted power for continuous processes. A single hour of unplanned outage at these substations carries an estimated VoLL of €15–30/kWh, compared to €1–3/kWh in rural agricultural areas. The fleet-wide average energy poverty rate is 9.8%, but this masks sharp regional variation: Southern regions combine higher energy poverty with higher grid risk, creating a double vulnerability that the E component captures. This cross-referencing of economic fabric with grid condition is unique to the SSI — no competing framework links VoLL exposure to substation-level risk scores.</p>
+
+<!-- B.3 Province Digital Readiness Heatmap -->
+<h3>B.3   <span data-canonical="admin.l2.label_plural" style="text-transform:capitalize">Province</span> Digital Readiness Ranking</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px"><span data-canonical="admin.l2.label_plural" style="text-transform:capitalize">Provinces</span> ranked by average R7 modifier — lower values indicate weaker digital infrastructure (DESI sub-dimensions). Cross-referenced with average R_median to identify <span data-canonical="admin.l2.label_plural">provinces</span> combining digital exposure with high grid stress.</p>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
+ <canvas id="b3-map" style="flex:1;min-width:260px;height:300px;border:1px solid var(--card-border);border-radius:var(--radius);background:#fff" width="391" height="300"></canvas>
+ <div style="flex:1;min-width:260px" id="b3-ranking"><div class="label-xs" style="margin-bottom:8px">Worst Digital Readiness — Top 15 region regions</div><div style="font-size:11px;color:var(--warm-grey);margin-bottom:6px">Longer bar = higher R7 = better digital infrastructure.</div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">1</span><span style="min-width:110px;font-weight:500">Antwerp</span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">2</span><span style="min-width:110px;font-weight:500">Brussels-Capital<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span></span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">3</span><span style="min-width:110px;font-weight:500">East Flanders</span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">4</span><span style="min-width:110px;font-weight:500">Flemish Brabant</span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">5</span><span style="min-width:110px;font-weight:500">Hainaut<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span></span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">6</span><span style="min-width:110px;font-weight:500">Limburg</span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">7</span><span style="min-width:110px;font-weight:500">Liège<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span></span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">8</span><span style="min-width:110px;font-weight:500">Luxembourg (BE)<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span></span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">9</span><span style="min-width:110px;font-weight:500">Namur<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span></span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">10</span><span style="min-width:110px;font-weight:500">Walloon Brabant<span style="color:var(--crimson);font-weight:600;font-size:10px"> ⚠ high R</span></span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px"><span style="min-width:14px;color:var(--warm-grey);font-size:10px">11</span><span style="min-width:110px;font-weight:500">West Flanders</span><div style="flex:1;height:5px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:55.6%;height:100%;background:rgba(124,110,51,0.6);border-radius:3px"></div></div><span style="min-width:48px;text-align:right;font-family:Consolas,monospace;font-size:10px">1.0000</span></div></div>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="b3-narrative">region-level analysis reveals a clear digital divide mirroring the broader DESI pattern. <strong>Antwerp</strong> has the lowest average R7 (1.0000), while <strong>West Flanders</strong> leads at 1.0000 — a spread of 0.0000 across the R7 range. <strong>0 region regions</strong> combine below-median digital readiness with above-median grid risk, making them priority targets for digitalisation investment. The R7 modifier is intentionally narrow to reflect the current limitations of open DESI data — as NIS2 compliance reporting matures, future editions will expand R7's dynamic range and incorporate operational technology (OT) security indicators.</p>
+
+<!-- B.4 Monthly Pulse -->
+<h3>B.4   Monthly Pulse</h3>
+
+<div class="card" style="border-left:3px solid var(--sage);background:var(--cream)">
+ <p style="font-size:13px;line-height:1.7;margin:0" id="b4-pulse"><strong>Inaugural edition — Baseline Snapshot (July 2026).</strong> This edition establishes the baseline for the Cyber &amp; Economic Exposure Monitor. Key reference points: fleet average R7 = 1.0000, median = 1.0000; 0 substations classified HIGH cyber-exposure; 0 blind-spot substations (High/Critical risk + below-median R7); 0 Critical-band substations with below-median digital readiness. Future editions will track deltas against this baseline.</p>
+</div>
+
+</section>
+
+<div style="margin:32px 0"></div>
+
+<!-- ═══════════════════ C. DATA REFRESH — AUTO-POPULATED ═══════════════════ -->
+<section id="data" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section C</span>
+<h2>Data Refresh &amp; Changelog</h2>
+
+<p style="font-size:13px;line-height:1.7" id="sec-c-intro">The SSI v4.0.2 draws on <strong>— verified public data sources</strong> feeding — variables across — components and — modifiers. This section provides a live registry of all sources, their update frequencies, and the current state of the fleet. Transparency in data vintage is central to the SSI's credibility.</p>
+
+<!-- Frequency Distribution KPIs -->
+<div class="kpi-grid" style="margin:16px 0" id="sec-c-freq-kpis">
+ <div class="kpi-card">
+ <div class="kpi-label">Total Sources</div>
+ <div class="kpi-value" style="color:var(--ink)" id="c-total-src">—</div>
+ <div class="kpi-sub" id="c-total-vars">— variables</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Hourly — Monthly</div>
+ <div class="kpi-value" style="color:var(--sage)" id="c-freq-fast">0</div>
+ <div class="kpi-sub">High-frequency feeds</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Quarterly / Annual</div>
+ <div class="kpi-value" style="color:var(--bronze)" id="c-freq-slow">0</div>
+ <div class="kpi-sub">Regular refresh cycle</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Static / Derived</div>
+ <div class="kpi-value" style="color:var(--warm-grey)" id="c-freq-static">0</div>
+ <div class="kpi-sub">Standards + scenarios</div>
+ </div>
+</div>
+
+<!-- Data Source Registry Table -->
+<div class="card" style="margin:16px 0">
+ <div class="card-header" id="c-table-header"><h3 style="margin:0">Data Source Registry — July 2026</h3></div>
+ <div id="sec-c-source-list" style="display:flex;flex-direction:column;gap:0"><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">OSM</span><span style="font-weight:500;line-height:1.5">OpenStreetMap Power Infrastructure</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Continuous</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Node / edge">Node / edge</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">4 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">SYNERGRID</span><span style="font-weight:500;line-height:1.5">Synergrid — Federated DSO aggregate (11 DSOs)</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Quarterly</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="National">National</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">3 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">NUCLEAR</span><span style="font-weight:500;line-height:1.5">Engie + EDF Belgium — nuclear phase-out tracker</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Quarterly</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="NPP">NPP</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">2 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">NBB</span><span style="font-weight:500;line-height:1.5">NBB — Banque nationale de Belgique</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Quarterly</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="NUTS2">NUTS2</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">2 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">CREG</span><span style="font-weight:500;line-height:1.5">CREG — Federal Quality of Supply Reports</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="National">National</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">5 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">VREG</span><span style="font-weight:500;line-height:1.5">VREG — Flemish regional regulator</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Region">Region</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">3 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">CWAPE</span><span style="font-weight:500;line-height:1.5">CWaPE — Walloon regional regulator</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Region">Region</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">3 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">BRUGEL</span><span style="font-weight:500;line-height:1.5">BRUGEL — Brussels regional regulator</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Region">Region</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">2 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">FLUVIUS</span><span style="font-weight:500;line-height:1.5">Fluvius — Flemish single-DSO annual report</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="DSO area">DSO area</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">4 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">ORES</span><span style="font-weight:500;line-height:1.5">ORES — Walloon dominant DSO annual report</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="DSO area">DSO area</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">4 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">SIBELGA</span><span style="font-weight:500;line-height:1.5">Sibelga — Brussels-Capital DSO annual report</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="DSO area">DSO area</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">4 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">STATBEL</span><span style="font-weight:500;line-height:1.5">STATBEL — Statistics Belgium</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Commune">Commune</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">8 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">EUR</span><span style="font-weight:500;line-height:1.5">Eurostat — Energy Statistics (BE NUTS2 cuts)</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="NUTS2">NUTS2</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">3 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">EEA</span><span style="font-weight:500;line-height:1.5">EEA Air Quality e-Reporting</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="~1 km">~1 km</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">2 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">DESI</span><span style="font-weight:500;line-height:1.5">DESI Digital Economy &amp; Society Index</span><span style="font-size:10px;color:var(--bronze);background:rgba(184,134,58,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="EU Regional">EU Regional</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">GSB</span><span style="font-weight:500;line-height:1.5">GSB — Geological Survey of Belgium + EMSC</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Static</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="~5 km">~5 km</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">2 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">AGE-FLOOD</span><span style="font-weight:500;line-height:1.5">Administration générale Eau — Flood maps</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Static</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="~250 m">~250 m</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">CATTENOM</span><span style="font-weight:500;line-height:1.5">Cattenom NPP (EDF FR) — cross-border proximity</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Static</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Province">Province</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">IEEE-1</span><span style="font-weight:500;line-height:1.5">IEEE C57.91 Thermal Model</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Static</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Asset">Asset</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">IEC-1</span><span style="font-weight:500;line-height:1.5">IEC 60076 Power Transformers</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Static</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Asset">Asset</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">IEC-826</span><span style="font-weight:500;line-height:1.5">IEC 60826 Overhead Line Loading</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Static</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Zone">Zone</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">ISO-9223</span><span style="font-weight:500;line-height:1.5">ISO 9223 Atmospheric Corrosion</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Derived</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Province">Province</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">ELIA</span><span style="font-weight:500;line-height:1.5">Elia — TSO annual + 10-min telemetry</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Annual + 10-min</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="National + zone">National + zone</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">8 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">EPEX</span><span style="font-weight:500;line-height:1.5">EPEX SPOT — BE day-ahead clearing</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Hourly</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Zone">Zone</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">3 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">ENTSOE</span><span style="font-weight:500;line-height:1.5">ENTSO-E Transparency — BE bidding zone</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Hourly</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Bidding zone">Bidding zone</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">4 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">RMI</span><span style="font-weight:500;line-height:1.5">RMI / IRM — Royal Meteorological Institute</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Hourly + 30y norms</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Station">Station</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">5 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">CDS</span><span style="font-weight:500;line-height:1.5">Copernicus CDS / ERA5 + CMIP6 SSP2-4.5</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Hourly + static</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="0.25° (~25 km)">0.25° (~25 km)</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">4 vars</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">OPM</span><span style="font-weight:500;line-height:1.5">Open-Meteo Weather API</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Hourly</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="~1 km">~1 km</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div><div style="display:grid;grid-template-columns:80px 1fr 90px 110px 60px;column-gap:12px;align-items:start;font-size:12px;padding:10px 0;"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">ENISA</span><span style="font-weight:500;line-height:1.5">ENISA — EU cybersecurity index</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start">Biennial</span><span style="color:var(--warm-grey);font-size:11px;text-align:right;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="EU country">EU country</span><span style="font-weight:600;text-align:right;font-variant-numeric:tabular-nums">1 var</span></div></div>
+</div>
+
+<!-- Frequency Timeline -->
+<h3>C.1   Update Frequency Timeline</h3>
+<div id="sec-c-timeline" style="margin:16px 0"><div class="label-xs" style="margin-bottom:10px">Expected Update Windows</div></div>
+
+<!-- Fleet Score Summary -->
+<h3>C.2   Fleet Score Snapshot</h3>
+<div id="sec-c-fleet" style="margin:16px 0"><div class="kpi-grid" style="margin-bottom:16px"><div class="kpi-card"><div class="kpi-label">Fleet Size</div><div class="kpi-value" style="color:var(--ink)">1,219</div><div class="kpi-sub">substations scored</div></div><div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">0.655</div><div class="kpi-sub">P5=0.428 · P95=0.910</div></div><div class="kpi-card"><div class="kpi-label">High + Critical</div><div class="kpi-value" style="color:var(--crimson)">1038</div><div class="kpi-sub">85.2% of fleet</div></div><div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">99%</div><div class="kpi-sub">1202 subs · CI/R &lt; 0.50</div></div></div><div style="margin-bottom:8px"><div class="label-xs" style="margin-bottom:6px">Band Distribution</div><div style="height:10px;border-radius:5px;overflow:hidden;display:flex"><div style="width:0.0%;height:100%;background:#5d8563" title="Low: 0 (0.0%)"></div><div style="width:14.8%;height:100%;background:#b8863a" title="Medium: 181 (14.8%)"></div><div style="width:60.0%;height:100%;background:#aa4234" title="High: 731 (60.0%)"></div><div style="width:25.2%;height:100%;background:#941914" title="Critical: 307 (25.2%)"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--warm-grey);margin-top:4px"><span>Low 0 (0.0%)</span><span>Medium 181 (14.8%)</span><span>High 731 (60.0%)</span><span>Critical 307 (25.2%)</span></div></div></div>
+<p style="font-size:13px;line-height:1.7" id="sec-c-fleet-narrative">No primary data sources have been updated since the v4.0.2 launch baseline. All <strong>1,219 substation scores remain unchanged</strong> this edition. The fleet median R of 0.655 (mean 0.656) reflects a distribution skewed toward the lower bands, with 0.0% in Low and 14.8% in Medium. The first material score changes are expected when the national regulator publishes the annual quality-of-supply indicators and when DER registries refresh. High-frequency sources (OSM, weather) update weekly but feed only infrastructure topology (R4) and thermal proxy (I5), which have minimal impact on fleet-level score distribution.</p>
+
+<!-- Changelog -->
+<h3>C.3   Changelog — v3.4 → v4.0.2 → v4.2</h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">v4.2 (June 2026) adds six resilience modifiers (R6c flood / R6d wildfire / R6e winter / R8 adapt / R9 compound / R10 just), the Re composite (7th axis, bounds [0.920, 1.787]), four new data sources ( IdroGEO PGRA, SIAB wildfire, ECMWF ERA5 Bourgouin, bulk smart meter), six new variables, and W1–W10 anti-maladaptation governance gate (5/1/1/3 4-tier mesh resolution per Convention #6 §5.6) on top of the v4.0.2 baseline.</p>
+<div id="sec-c-changelog" style="margin:16px 0"><div style="font-size:11px;color:var(--warm-grey);margin-bottom:10px">11 changes tracked across P0, P1, and P2 releases</div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-1</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">R6c_flood — PGRA-style flood-vulnerability modifier (additive cliff +0.00..+0.30, P3=high/P2=medium/P1=low per national flood-hazard tier convention)</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§5</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-2</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">R6d_wildfire — Canadian Fire Weather Index modifier (EFFIS FWI + NASA FIRMS + national fire-registry, multiplicative [1.00, 1.20])</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§5</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-3</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">R6e_winter — Bourgouin winter-storm modifier (ECMWF ERA5 winter-precipitation signal, multiplicative [1.00, 1.02])</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§5</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-4</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">R8_adapt — Adaptive-capacity multiplier (smart-meter penetration + DSO investment + DESI index, multiplicative [0.95, 1.05])</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§5</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-5</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">R9_compound — Compound-hazard STEP function (R6b/R6c/R6d/R6e elevated-count gates, multiplicative {1.00, 1.04, 1.08, 1.10})</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§5</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-6</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">R10_just — Energy-justice modifier (EU-SILC or national-equivalent household material-deprivation gradient, multiplicative [1.00, 1.12])</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§5</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-7</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">Re composite — bounded resilience scalar Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00); Re_norm = clip((Re_raw − 0.920)/(1.787 − 0.920), 0, 1)</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§7</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-8</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">R7 SFDR PAI Infrastructure axis — added to ESG Radar (Re_norm proxy under Convention #7 Data-Layer Anchoring)</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§14</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-9</span><span style="font-size:10px;color:var(--sage);background:rgba(93,133,99,0.12);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">New</span><span style="line-height:1.55">W1–W10 audit-state mesh — 5 Published / 1 Published-baseline▲ / 1 Baseline-only / 3 Commercial (Convention #6 §5.6)</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">§4</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;border-bottom:1px solid var(--card-border);"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-10</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">change</span><span style="line-height:1.55">95 → 101 variables (+6 from v4.2 modifier inputs); 30 → 34 data sources (+4 hazard / monitoring layers)</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">data</span></div><div style="display:grid;grid-template-columns:56px 80px 1fr 80px;column-gap:12px;align-items:start;font-size:12px;padding:8px 0;"><span style="font-weight:700;font-size:10px;color:var(--warm-grey);font-family:Consolas,monospace;padding-top:2px;word-break:break-all">V42-11</span><span style="font-size:10px;color:var(--warm-grey);background:rgba(44,36,32,0.06);padding:3px 8px;border-radius:3px;font-weight:600;text-transform:uppercase;text-align:center;justify-self:center;align-self:start;white-space:nowrap">change</span><span style="line-height:1.55">Substation fleet: 1,220 substations (per OSM canonical extract + national TSO/DSO registry cross-validation)</span><span style="color:var(--warm-grey);font-size:10px;text-align:right;line-height:1.55">data</span></div></div>
+
+</section>
+
+<div style="margin:32px 0"></div>
+
+<!-- ═══════════════════ D. THEMATIC DEEP-DIVE ═══════════════════ -->
+<section id="deep" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section D — Monthly Deep-Dive</span>
+<h2 data-edition="subtitle">Monthly Deep-Dive Theme</h2>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+ <p style="font-size:13px;line-height:1.7;margin:0"><strong>Deep-dive rotation:</strong> Each edition features a substantive thematic analysis. The 12-month rotation: <strong>Ed. 001</strong> the monthly theme · <strong>002</strong> DER saturation hotspots · <strong>003</strong> Climate vulnerability under CMIP6 · <strong>004</strong> North-South economic impact disparity · <strong>005</strong> Voltage quality and industrial output · <strong>006</strong> Infrastructure age vs investment · <strong>007</strong> Stress–Resilience quadrant trends · <strong>008</strong> T-component forward projections · <strong>009</strong> Sub-national Grid Health Cards · <strong>010</strong> Academic validation and peer feedback · <strong>011</strong> European replication feasibility · <strong>012</strong> Year in review.</p>
+</div>
+
+<!-- D.1 KPI summary — auto-populated -->
+<h3>D.1   Theme Context</h3>
+
+<div class="kpi-grid" style="margin:16px 0" id="puglia-kpis">
+ <div class="kpi-card">
+ <div class="kpi-label">Theme-Relevant Substations</div>
+ <div class="kpi-value" style="color:var(--ink)" id="pug-total">50</div>
+ <div class="kpi-sub" id="pug-total-sub">10 EHV · 40 HV</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">High Band</div>
+ <div class="kpi-value" style="color:var(--terracotta)" id="pug-high">10 + 40</div>
+ <div class="kpi-sub" id="pug-high-sub">100.0% of corridor</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Corridor Median R</div>
+ <div class="kpi-value" style="color:var(--crimson)" id="pug-median">0.872</div>
+ <div class="kpi-sub" id="pug-median-sub">Fleet median: 0.655</div>
+ </div>
+ <div class="kpi-card">
+ <div class="kpi-label">Worst <span data-canonical="admin.l2.label_short">Province</span></div>
+ <div class="kpi-value" style="color:var(--ink);font-size:20px" id="pug-worst-prov">Luxembourg (BE)</div>
+ <div class="kpi-sub" id="pug-worst-sub">Avg R: 0.848 · 50 substations</div>
+ </div>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="pug-narrative-d1">The Luxembourg (BE) hosts <strong>50 substations</strong> across 1 region regions, making it the locus of this edition's deep-dive analysis. Its risk profile is concentrated in the upper bands: <strong>10 substations (20.0%)</strong> are classified High and <strong>40</strong> Critical, with only <strong>0</strong> in the Low band. 98% of corridor substations score above the national fleet median of 0.655. The corridor median R of 0.872 reflects the local risk profile. The corridor concentrates the country's industrial heartland. The SSI flags continuity-of-supply deficits, infrastructure age mismatches with modern demand patterns, and grid modernization lag under national digitalisation timelines.</p>
+
+<!-- D.2 Corridor Map + Table — auto-populated -->
+<h3>D.2   Corridor Map and Scoring</h3>
+
+<div style="position:relative;height:380px;background:var(--cream-deep);border-radius:var(--radius);overflow:hidden;margin:16px 0">
+ <canvas id="puglia-map" style="width:100%;height:100%" width="796" height="380"></canvas>
+ <div style="position:absolute;bottom:8px;right:12px;display:flex;gap:10px;font-size:10px;color:var(--warm-grey)">
+ <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-low);margin-right:3px"></span>Low</span>
+ <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-medium);margin-right:3px"></span>Medium</span>
+ <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-high);margin-right:3px"></span>High</span>
+ <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--band-critical);margin-right:3px"></span>Critical</span>
+ </div>
+</div>
+
+<table class="data-table" style="width:100%;border-collapse:collapse;font-size:13px;margin:16px 0">
+<thead style="background:var(--ink);color:#fff"><tr>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Substation</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600"><span data-canonical="admin.l2.label_short">Province</span></th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">R_final</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Band</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">C</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">V</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">I</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">E</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">S</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600">T</th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:right;font-weight:600;color:var(--terracotta)" title="Re composite — v4.2 7th axis, bounds [0.920, 1.787]">Re <span style="font-size:9px;font-weight:500">v4.2</span></th>
+ <th style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:10px;text-align:left;font-weight:600">Alert</th>
+</tr></thead>
+<tbody id="puglia-tbody"><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Substation LuxembourgBE 018 (MV)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.988</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">1.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.810</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.292</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.913</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.555</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Poste 220/70/15 kV de Heinsch</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.982</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">1.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.113</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.666</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.762</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">1.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.674</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Substation LuxembourgBE 016 (MV)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.975</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.963</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.138</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.670</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.483</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.988</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.423</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Rouvroy</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.975</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.909</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.165</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.431</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.931</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.959</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">1.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Substation LuxembourgBE 004 (DSO)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.973</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.874</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.087</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.812</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.652</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">1.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.365</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Substation LuxembourgBE 008 (DSO)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.972</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.881</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.135</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.691</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.976</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.969</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.726</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Bonnert</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.970</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.900</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.096</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.836</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.531</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.854</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.721</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Substation LuxembourgBE 020 (MV)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.966</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.917</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.703</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.715</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">1.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.461</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Substation LuxembourgBE 005 (MV)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.965</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.857</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.653</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.754</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">1.000</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.966</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;font-weight:500">Substation LuxembourgBE 009 (MV)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;">Luxembourg (BE)</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;color:#941914;font-weight:600"="">0.950</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:#941914;font-weight:600">Critical</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.964</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.134</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.617</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.683</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.903</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;text-align:right;font-family:" playfair="" display",serif;font-weight:500;"="">0.458</td><td style="padding:8px 10px;border-bottom:1px solid var(--card-border);vertical-align:top;color:var(--crimson);font-weight:600">C</td></tr><tr><td colspan="11" style="text-align:center;color:var(--warm-grey);font-style:italic;font-size:12px;padding:8px 10px">… 40 additional substations — <a href="map.html" style="color:var(--terracotta)">explore full corridor in Digital Twin →</a></td></tr></tbody>
+</table>
+
+<!-- D.3 Component Analysis — auto-populated -->
+<h3>D.3   Component Analysis</h3>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0">
+ <div style="flex:1;min-width:280px" id="puglia-comp-bars"><div class="label-xs" style="margin-bottom:10px">Component Averages — Luxembourg (BE) vs Fleet</div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">C — Continuity</span><span style="color:var(--warm-grey)">0.915 vs 0.341 (+168%)</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative"><div style="position:absolute;width:100%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div><div style="position:absolute;width:100%;height:100%;background:#941914;border-radius:3px;opacity:0.75"></div></div></div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">I — Infrastructure</span><span style="color:var(--warm-grey)">0.349 vs 0.500 (-30%)</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative"><div style="position:absolute;width:100%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div><div style="position:absolute;width:100%;height:100%;background:#5d8563;border-radius:3px;opacity:0.75"></div></div></div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">S — Saturation</span><span style="color:var(--warm-grey)">0.933 vs 0.508 (+84%)</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative"><div style="position:absolute;width:100%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div><div style="position:absolute;width:100%;height:100%;background:#b8863a;border-radius:3px;opacity:0.75"></div></div></div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">V — Voltage</span><span style="color:var(--warm-grey)">0.087 vs 0.525 (-83%)</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative"><div style="position:absolute;width:100%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div><div style="position:absolute;width:87%;height:100%;background:#aa4234;border-radius:3px;opacity:0.75"></div></div></div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">E — Economic</span><span style="color:var(--warm-grey)">0.571 vs 0.499 (+15%)</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative"><div style="position:absolute;width:100%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div><div style="position:absolute;width:100%;height:100%;background:#3b9eff;border-radius:3px;opacity:0.75"></div></div></div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">T — Transition</span><span style="color:var(--warm-grey)">0.492 vs 0.494 (-0%)</span></div><div style="height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;position:relative"><div style="position:absolute;width:100%;height:100%;background:rgba(44,36,32,0.12);border-radius:3px"></div><div style="position:absolute;width:100%;height:100%;background:#22d3ee;border-radius:3px;opacity:0.75"></div></div></div></div>
+ <div style="flex:1;min-width:280px" id="puglia-mod-bars"><div class="label-xs" style="margin-bottom:10px">Modifier Averages — Luxembourg (BE) vs Fleet</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px"><span style="min-width:120px;font-weight:500">R3 Consequence</span><span style="color:var(--sage);font-weight:600;min-width:45px">1.038</span><span style="color:var(--warm-grey);min-width:55px">fleet 1.078</span><span style="font-size:11px;color:var(--sage)">↑</span></div><div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px"><span style="min-width:120px;font-weight:500">R4 Graph Crit.</span><span style="color:var(--warm-grey);font-weight:600;min-width:45px">1.238</span><span style="color:var(--warm-grey);min-width:55px">fleet 1.238</span><span style="font-size:11px;color:var(--warm-grey)">↑</span></div><div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px"><span style="min-width:120px;font-weight:500">R6a Restoration</span><span style="color:var(--warm-grey);font-weight:600;min-width:45px">0.949</span><span style="color:var(--warm-grey);min-width:55px">fleet 0.949</span><span style="font-size:11px;color:var(--warm-grey)">↓</span></div><div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px"><span style="min-width:120px;font-weight:500">R6b Seismic</span><span style="color:var(--warm-grey);font-weight:600;min-width:45px">0.996</span><span style="color:var(--warm-grey);min-width:55px">fleet 0.997</span><span style="font-size:11px;color:var(--warm-grey)">→</span></div><div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px"><span style="min-width:120px;font-weight:500">R7 Digital Read.</span><span style="color:var(--warm-grey);font-weight:600;min-width:45px">1.000</span><span style="color:var(--warm-grey);min-width:55px">fleet 1.000</span><span style="font-size:11px;color:var(--warm-grey)">→</span></div></div>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="pug-narrative-d3">The dominant risk driver across the Luxembourg (BE) corridor is <strong>T (Transition)</strong>, averaging 0.492 against a fleet average of 0.494 — occupying 984% of its weight ceiling (w = 0.05). The second contributor is <strong>E (Economic)</strong> at 0.571 vs fleet 0.499 (571% of ceiling). Among modifiers, the R3 consequence multiplier averages 1.038 (fleet: 1.078), reflecting the socio-economic exposure of the corridor. The R6b seismic modifier averages 0.996, capturing the local seismic exposure — a dimension invisible to every competing framework.</p>
+
+<!-- D.4 Province Breakdown — auto-populated -->
+<h3>D.4   <span data-canonical="admin.l2.label_short" style="text-transform:capitalize">Province</span> Breakdown</h3>
+
+<div id="puglia-province-bars" style="margin:16px 0"><div class="label-xs" style="margin-bottom:10px">region Risk Profile — Sorted by Mean R</div><div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div><div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">Luxembourg (BE)</span><span style="color:var(--warm-grey)">50 subs · avg R = 0.848 · H:10 C:40 M:0</span></div><div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:15.2%;height:100%;background:#941914;border-radius:4px;opacity:0.7"></div></div></div></div>
+
+<p style="font-size:13px;line-height:1.7" id="pug-narrative-d4">The region regions-level breakdown reveals significant intra-regional variation. <strong>Luxembourg (BE)</strong> leads with a mean R of 0.848 across 50 substations, while <strong>Luxembourg (BE)</strong> scores 0.848 — a spread of 0.000 within a single corridor. The SSI's substation-level granularity reveals that the Luxembourg (BE) is not uniformly stressed but contains distinct sub-corridors of concentrated risk — precisely the kind of spatial pattern that investment planning requires.</p>
+
+<!-- D.5 Implications -->
+<h3>D.5   Implications</h3>
+
+<p style="font-size:13px;line-height:1.7" id="pug-narrative-d5"><strong>49 Luxembourg (BE) substations</strong> score R ≥ 0.650, placing them in the upper quartile of national risk. For NEPN / national digital plan / RRP investment prioritisation, this analysis identifies the Luxembourg (BE) sub-corridor as the highest-priority target — where DER deployment is accelerating against ageing infrastructure with above-average continuity deficits and significant socio-economic exposure. The SSI's silo-breaking approach reveals what no single-discipline framework can: that these substations matter not only because of their engineering condition, but because the communities they serve are disproportionately vulnerable to disruption. This is precisely the anticipatory grid planning capability that the SSI was built to provide.</p>
+
+</section>
+
+<div style="margin:32px 0"></div>
+
+<!-- ═══════════════════ E. OECD CONTEXT CARD ═══════════════════ -->
+<section id="eu" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section E — Recurring Module</span>
+<h2>OECD Context Card</h2>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+ <p style="font-size:13px;line-height:1.7;margin:0"><strong>How this works:</strong> Each edition includes one OECD Context Card drawn from the §16 Peer Benchmarking framework. The card is selected to complement the month's deep-dive theme. This month: <strong>SAIDI comparison</strong> — because the Southern Coastal corridor analysis hinges on Belgium's continuity performance relative to OECD peers. Future editions rotate through: VoLL comparison (Ed. 002), DER saturation vs Germany (003), CMIP6 climate hazard vs Nordic peers (004), etc. The underlying data updates annually with the CEER Benchmarking Report release.</p>
+</div>
+
+<!-- THE CARD ITSELF -->
+<div class="card" style="border-top:3px solid var(--terracotta);margin:20px 0">
+ <div style="padding:0;margin:-20px -24px 16px;padding:12px 24px;background:var(--cream-deep);border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:12px">
+ <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--warm-grey);font-weight:600;flex:1">OECD Context Card — SAIDI Benchmarking</span>
+ <span style="font-size:10px;color:var(--warm-grey)">Ed. 001 · July 2026</span>
+ </div>
+  <h3 style="margin-top:0;font-size:14px">Unplanned SAIDI (min/customer/year) — Selected OECD Countries</h3>
+  <p style="font-size:11px;color:var(--warm-grey);margin:0 0 10px">Longer bar = lower SAIDI = better reliability. Values in min/customer/year.</p>
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇩🇪 Germany</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:96%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">11.7</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇨🇭 Switzerland</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:95%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">~15</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇳🇱 Netherlands</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:92%;height:100%;background:var(--sage);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--sage);font-weight:600">23.9</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇫🇷 France</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:88%;height:100%;background:var(--bronze);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~36</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇬🇧 UK</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:87%;height:100%;background:var(--bronze);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~40</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇮🇹 Italy</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:86%;height:100%;background:var(--bronze);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--bronze);font-weight:600">~43</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇪🇸 Spain</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:84%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~48</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇭🇺 Hungary</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:81%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~57</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇵🇱 Poland</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:68%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~95</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <span style="min-width:130px">🇷🇴 Romania</span>
+      <div style="flex:1;height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">
+        <div style="width:3%;height:100%;background:var(--warm-grey);border-radius:4px"></div>
+      </div>
+      <span class="num" style="min-width:40px;text-align:right;color:var(--warm-grey);font-weight:600">~290</span>
+    </div>
+  </div>
+
+  <div style="padding:12px 0;margin-top:12px;border-top:1px solid var(--card-border);font-size:11px;color:var(--warm-grey);line-height:1.6">
+    Source: CEER 7th Benchmarking Report (2022); Bundesnetzagentur (2024); ARERA (2023). · See §16 Peer Benchmarking for full methodology and caveats. · Updated annually with CEER BR release. · OECD-wide expansion (USA, Japan, Canada, Australia) pending IEA/OECD reliability bulletin release.
+  </div>
+
+<!-- Key insight + regional ranking — auto-populated -->
+<p style="font-size:13px;line-height:1.7" id="eu-insight"><strong>This month's key insight:</strong> The Luxembourg (BE) corridor deep-dive shows <strong>50 substations</strong> (of 50) with C-component above 70% of its weight ceiling — indicating continuity-of-supply performance consistent with rural territory classification. The corridor's average C of 0.915 is <strong>2.7× the fleet average</strong> of 0.341. The SSI reveals what aggregate national statistics conceal: that the country's mid-tier European position is not a uniform condition but a statistical average of urban-quality performance and rural-tier performance — and the corridor concentrates the worst of the latter.</p>
+
+<h3 style="margin-top:20px"><span data-canonical="admin.l1.label_plural" style="text-transform:capitalize">Regions</span> Risk Ranking — All <span data-canonical="fleet.n_regions">11</span> <span data-canonical="cfg.country_name">Belgian</span> <span data-canonical="admin.l1.label_plural" style="text-transform:capitalize">Regions</span></h3>
+<p style="font-size:12px;color:var(--warm-grey);margin-bottom:12px">Where does this corridor sit within the national landscape? Regions sorted by mean R_median, with band distribution and fleet comparison.</p>
+
+<div id="eu-regional-ranking" style="margin:16px 0"><div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience. Sorted worst → best.</div><div style="margin-bottom:8px;background:rgba(148,25,20,0.04);border-left:3px solid var(--crimson);padding-left:8px;border-radius:4px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:700;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#1</span>Luxembourg (BE)</span><span style="color:var(--warm-grey);font-size:11px">50 subs · avg R = 0.848 · H:10 C:40</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:15.2%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:80.0%;height:100%;background:#941914" title="Critical: 40"></div><div style="width:20.0%;height:100%;background:#aa4234" title="High: 10"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#2</span>Hainaut</span><span style="color:var(--warm-grey);font-size:11px">100 subs · avg R = 0.816 · H:30 C:70</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:18.4%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:70.0%;height:100%;background:#941914" title="Critical: 70"></div><div style="width:30.0%;height:100%;background:#aa4234" title="High: 30"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#3</span>Brussels-Capital</span><span style="color:var(--warm-grey);font-size:11px">18 subs · avg R = 0.814 · H:3 C:15</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:18.6%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:83.3%;height:100%;background:#941914" title="Critical: 15"></div><div style="width:16.7%;height:100%;background:#aa4234" title="High: 3"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#4</span>Walloon Brabant</span><span style="color:var(--warm-grey);font-size:11px">43 subs · avg R = 0.777 · H:15 C:28</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:22.3%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:65.1%;height:100%;background:#941914" title="Critical: 28"></div><div style="width:34.9%;height:100%;background:#aa4234" title="High: 15"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#5</span>Liège</span><span style="color:var(--warm-grey);font-size:11px">124 subs · avg R = 0.773 · H:56 C:68</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:22.7%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:54.8%;height:100%;background:#941914" title="Critical: 68"></div><div style="width:45.2%;height:100%;background:#aa4234" title="High: 56"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#6</span>Namur</span><span style="color:var(--warm-grey);font-size:11px">53 subs · avg R = 0.678 · H:34 C:16</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:32.2%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:30.2%;height:100%;background:#941914" title="Critical: 16"></div><div style="width:64.2%;height:100%;background:#aa4234" title="High: 34"></div><div style="width:5.7%;height:100%;background:#b8863a" title="Medium: 3"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#7</span>Antwerp</span><span style="color:var(--warm-grey);font-size:11px">125 subs · avg R = 0.633 · H:96 C:16</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:36.7%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:12.8%;height:100%;background:#941914" title="Critical: 16"></div><div style="width:76.8%;height:100%;background:#aa4234" title="High: 96"></div><div style="width:10.4%;height:100%;background:#b8863a" title="Medium: 13"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#8</span>Flemish Brabant</span><span style="color:var(--warm-grey);font-size:11px">126 subs · avg R = 0.617 · H:89 C:17</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:38.3%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:13.5%;height:100%;background:#941914" title="Critical: 17"></div><div style="width:70.6%;height:100%;background:#aa4234" title="High: 89"></div><div style="width:15.9%;height:100%;background:#b8863a" title="Medium: 20"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#9</span>East Flanders</span><span style="color:var(--warm-grey);font-size:11px">144 subs · avg R = 0.615 · H:103 C:15</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:38.5%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:10.4%;height:100%;background:#941914" title="Critical: 15"></div><div style="width:71.5%;height:100%;background:#aa4234" title="High: 103"></div><div style="width:18.1%;height:100%;background:#b8863a" title="Medium: 26"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#10</span>West Flanders</span><span style="color:var(--warm-grey);font-size:11px">138 subs · avg R = 0.576 · H:97 C:7</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:42.4%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:5.1%;height:100%;background:#941914" title="Critical: 7"></div><div style="width:70.3%;height:100%;background:#aa4234" title="High: 97"></div><div style="width:24.6%;height:100%;background:#b8863a" title="Medium: 34"></div></div></div></div><div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;align-items:baseline"><span style="font-weight:500;min-width:180px"><span style="color:var(--warm-grey);font-size:10px;margin-right:6px">#11</span>Limburg</span><span style="color:var(--warm-grey);font-size:11px">298 subs · avg R = 0.574 · H:198 C:15</span></div><div style="display:flex;gap:4px;align-items:center"><div style="flex:1;height:6px;background:var(--cream-deep);border-radius:3px;overflow:hidden;display:flex;justify-content:flex-end"><div style="width:42.6%;height:100%;background:#941914;border-radius:3px;opacity:0.7"></div></div><div style="width:80px;height:6px;border-radius:3px;overflow:hidden;display:flex"><div style="width:5.0%;height:100%;background:#941914" title="Critical: 15"></div><div style="width:66.4%;height:100%;background:#aa4234" title="High: 198"></div><div style="width:28.5%;height:100%;background:#b8863a" title="Medium: 85"></div></div></div></div></div>
+
+<p style="font-size:13px;line-height:1.7" id="eu-ranking-narrative">The Luxembourg (BE) ranks <strong>#1 of 11 region regions</strong> by mean R_median, placing it among the upper tier of national risk. The three most stressed are Luxembourg (BE), Hainaut, Brussels-Capital, while the three most resilient are Limburg, West Flanders, East Flanders. 6 of 11 score above the fleet average of 0.656. This ranking — possible only because the SSI scores every substation individually rather than relying on aggregate DSO or national statistics — reveals the true spatial distribution of grid stress. It is precisely this substation-level granularity that positions the SSI as a tool for investment prioritisation: not treating entire regions as monoliths, but identifying the specific corridors within each that demand attention.</p>
+
+</div></section>
+
+<div style="margin:32px 0"></div>
+
+<!-- ═══════════════════ F. SSI ENHANCED NEURAL NETWORK — MONTHLY DEEP-DIVE ═══════════════════ -->
+<section id="enn" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F — Recurring Module</span>
+<h2>SSI Enhanced Neural Network — Monthly Topic</h2>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream)">
+ <p style="font-size:13px;line-height:1.7;margin:0"><strong>From grid intelligence to BESS valuation platform.</strong> The SSI Index answers <em>"How healthy is this substation?"</em> The SSI Enhanced Neural Network (SSI-ENN) extends this into: <em>"What is a BESS worth at this substation — to the DNO and to the community?"</em> Each edition of this report explores one building block of the SSI-ENN's five-layer architecture, showing how the SSI Index data feeds directly into investment-grade grid analytics.</p>
+</div>
+
+<!-- ═══ SSI-ENN 5-lens stakeholder value-articulation radar (v4.2 — Phase 2 closure of Convention #7 architecture coverage) ═══ -->
+<!-- Per architecture memo §5 Decision #12: the SSI-ENN evaluates each substation through 5 stakeholder lenses, distinct from Radar 1 (SSI score components) and Radar 2 (W1-W10 community floor). Pentagonal radar showing the 5-lens value-articulation framework. -->
+<div class="card" style="margin:20px 0;padding:20px;border-left:3px solid var(--bronze);background:#fdfaf6">
+ <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:8px;color:var(--bronze)">SSI-ENN value-articulation radar — 5-lens stakeholder taxonomy</div>
+ <p style="font-size:12px;color:var(--warm-grey);line-height:1.6;margin:0 0 14px 0">The SSI-ENN's commercial-tier value articulation answers "what is a BESS worth at this substation — and to whom?" through five stakeholder lenses (architecture memo §5 Decision #12): <strong style="color:#52796f">V<sub>Community</sub></strong> (welfare avoided outages, energy-poverty relief, employment) · <strong style="color:#1d6a96">V<sub>Grid</sub></strong> (V_DSO — avoided reinforcement, reliability, voltage, congestion, frequency, black-start, hosting capacity) · <strong style="color:#bb6f1e">V<sub>Owner</sub></strong> (NPV / IRR / payback per asset class) · <strong style="color:#941914">V<sub>Investor</sub></strong> (risk-adjusted equity return at the financing tier) · <strong style="color:#52796f">V<sub>LP</sub></strong> (limited-partner cash-on-cash + DPI / TVPI portfolio metrics). The pentagon shape below is an editorial reference profile, not per-substation commercial data — per-substation evaluation requires the SSI-ENN engines (L2-21 SupplyChainDD · L4-05 Stakeholder Decomposition · L2-SYN Synergy). Foundation contact: <a href="mailto:ssi_index@ikenga.eu">ssi_index@ikenga.eu</a>.</p>
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: The 5-lens polygon vertices below are ILLUSTRATIVE methodology-reference values, NOT per-substation data. Anchor source: V_Community 0.55 / V_Grid 0.75 / V_Owner 0.65 / V_Investor 0.50 / V_LP 0.45 — a reference profile reflecting the canonical reference fleet "V_Grid dominates" pattern per architecture memo §5 narrative ("V_DSO captures the bulk of measurable BESS value at the substation locus"). These are EDITORIAL VALUES for the inaugural Section F teaser, not commercial output. Per architecture memo §3.3 + §5.2 "the public dashboard never names SSI-ENN engines except in this Section F editorial bridge". -->
+ <svg viewBox="0 0 600 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SSI-ENN 5-lens stakeholder value-articulation radar — V_Community V_Grid V_Owner V_Investor V_LP" style="width:100%;max-width:600px;height:auto;font-family:'DM Sans',system-ui,sans-serif;display:block;margin:0 auto">
+ <!-- SVG_MATH: pentagon-grid | center (300,240) radius r∈{34,68,102,136,170} | θ_i = -90° + i·72° for i=0..4 | vertex (cx + r·cos θ, cy + r·sin θ) | verified 2026-06-11 (geometry was already correct pre-Convention #8; only color tokens updated) -->
+ <g style="stroke:var(--card-border);stroke-width:0.8;fill:none">
+ <polygon points="300,206 332.3,229.5 320,267.5 280,267.5 267.7,229.5"></polygon>
+ <polygon points="300,172 364.7,218.9 340,295 260,295 235.3,218.9"></polygon>
+ <polygon points="300,138 397,208.5 360,322.5 240,322.5 203,208.5"></polygon>
+ <polygon points="300,104 429.3,198 380,350 220,350 170.7,198"></polygon>
+ <polygon points="300,70 461.7,187.5 399.9,377.5 200.1,377.5 138.3,187.5" style="fill:var(--cream);fill-opacity:0.5"></polygon>
+ </g>
+ <!-- SVG_MATH: pentagon-axes | center (300,240) endpoint r=170 | same θ_i as grid | line from (cx,cy) to vertex | verified 2026-06-11 -->
+ <g style="stroke:var(--warm-grey-light);stroke-width:0.8">
+ <line x1="300" y1="240" x2="300" y2="70"></line>
+ <line x1="300" y1="240" x2="461.7" y2="187.5"></line>
+ <line x1="300" y1="240" x2="399.9" y2="377.5"></line>
+ <line x1="300" y1="240" x2="200.1" y2="377.5"></line>
+ <line x1="300" y1="240" x2="138.3" y2="187.5"></line>
+ </g>
+ <!-- SVG_MATH: ssi-enn-reference-polygon | center (300,240) | per-axis r_i = value_i × 170 | illustrative values V_Com=0.55, V_Grid=0.75, V_Owner=0.65, V_Investor=0.50, V_LP=0.45 | verified 2026-06-11 -->
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: These values are EDITORIAL ILLUSTRATIVE per architecture memo §5 + §3.3 — Section F is the only place the SSI-ENN engine is named on the public dashboard; per-substation commercial values stay with SSI-ENN. The "V_Grid dominates" narrative is the operator-approved editorial choice. -->
+ <polygon points="300,146.5 421.3,200.6 365,329.4 250,308.8 227.3,216.4" style="fill:var(--bronze);fill-opacity:0.25;stroke:var(--bronze);stroke-width:1.5;stroke-linejoin:round"></polygon>
+ <g style="fill:var(--bronze)">
+ <circle cx="300" cy="146.5" r="3"></circle>
+ <circle cx="421.3" cy="200.6" r="3"></circle>
+ <circle cx="365" cy="329.4" r="3"></circle>
+ <circle cx="250" cy="308.8" r="3"></circle>
+ <circle cx="227.3" cy="216.4" r="3"></circle>
+ </g>
+ <circle cx="300" cy="240" r="2" style="fill:var(--warm-grey-light)"></circle>
+ <!-- Axis labels — each stakeholder lens picks a coherent design-system colour. Bronze for the SSI-ENN narrative (consistent with the polygon), --sage for community + LP (people-facing tiers), --terracotta for the financial tiers (Owner / Investor), --ink for the grid-services anchor. -->
+ <g font-size="13" font-weight="600" text-anchor="middle">
+ <text x="300" y="55" style="fill:var(--sage)">V<tspan font-size="10" baseline-shift="sub">Community</tspan> <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">welfare</tspan></text>
+ <text x="490" y="178" style="fill:var(--ink)" text-anchor="start">V<tspan font-size="10" baseline-shift="sub">Grid</tspan> <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">V_DSO services</tspan></text>
+ <text x="412" y="400" style="fill:var(--bronze)" text-anchor="start">V<tspan font-size="10" baseline-shift="sub">Owner</tspan> <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">NPV / IRR</tspan></text>
+ <text x="188" y="400" style="fill:var(--terracotta)" text-anchor="end">V<tspan font-size="10" baseline-shift="sub">Investor</tspan> <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">equity</tspan></text>
+ <text x="110" y="178" style="fill:var(--sage)" text-anchor="end">V<tspan font-size="10" baseline-shift="sub">LP</tspan> <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">portfolio</tspan></text>
+ </g>
+ <g font-size="11">
+ <rect x="380" y="425" width="215" height="32" rx="5" style="fill:#ffffff;stroke:var(--card-border);stroke-width:0.8"></rect>
+ <rect x="390" y="434" width="12" height="9" style="fill:var(--bronze);fill-opacity:0.55;stroke:var(--bronze)"></rect>
+ <text x="407" y="442" font-size="10" style="fill:var(--ink)"><tspan font-weight="600" style="fill:var(--bronze)">SSI-ENN reference profile</tspan></text>
+ <text x="407" y="453" font-size="9" font-style="italic" style="fill:var(--warm-grey)">illustrative — Foundation contact</text>
+ </g>
+ </svg>
+ <p style="font-size:11px;color:var(--warm-grey);line-height:1.6;margin:14px 0 0 0;text-align:center"><em>Editorial reference shape — V<sub>Grid</sub> dominates (V_DSO captures avoided reinforcement + reliability + voltage support + congestion relief + frequency + black-start + hosting capacity, the bulk of measurable BESS value at the substation locus per architecture memo §5). V<sub>Community</sub> + V<sub>Owner</sub> are co-secondary. V<sub>Investor</sub> + V<sub>LP</sub> reflect the financing-tier waterfall above V<sub>Owner</sub> NPV. Per-substation commercial decomposition lives in the SSI-ENN — mail to <a href="mailto:ssi_index@ikenga.eu">ssi_index@ikenga.eu</a> for analytics.</em></p>
+</div>
+
+<!-- Architecture overview — always visible -->
+<div style="display:flex;gap:6px;margin:16px 0;flex-wrap:wrap" id="enn-layer-nav"><div style="flex:1;min-width:120px;padding:8px 12px;border-radius:var(--radius);border:2px solid var(--card-border);background:#fff;color:var(--warm-grey);font-size:11px;text-align:center;transition:all 0.2s"><div style="font-weight:700">Layer 1 — Data</div><div style="font-size:10px;opacity:0.7;margin-top:2px">SSI v4.0 component taxonomy, normalisation, MC engine</div></div><div style="flex:1;min-width:120px;padding:8px 12px;border-radius:var(--radius);border:2px solid var(--card-border);background:#fff;color:var(--warm-grey);font-size:11px;text-align:center;transition:all 0.2s"><div style="font-weight:700">Layer 2 — Valuation</div><div style="font-size:10px;opacity:0.7;margin-top:2px">DSO/TSO + Community value stacks, TCO, real options</div></div><div style="flex:1;min-width:120px;padding:8px 12px;border-radius:var(--radius);border:2px solid #6c3483;background:#6c3483;color:#fff;font-size:11px;text-align:center;transition:all 0.2s"><div style="font-weight:700">Layer 3 — Neural Net</div><div style="font-size:10px;opacity:0.7;margin-top:2px">GBT+DNN ensemble, transfer learning, SHAP</div></div><div style="flex:1;min-width:120px;padding:8px 12px;border-radius:var(--radius);border:2px solid var(--card-border);background:#fff;color:var(--warm-grey);font-size:11px;text-align:center;transition:all 0.2s"><div style="font-weight:700">Layer 4 — Coverage</div><div style="font-size:10px;opacity:0.7;margin-top:2px">Country prioritisation, DCI, registry, calibration</div></div><div style="flex:1;min-width:120px;padding:8px 12px;border-radius:var(--radius);border:2px solid var(--card-border);background:#fff;color:var(--warm-grey);font-size:11px;text-align:center;transition:all 0.2s"><div style="font-weight:700">Layer 5 — Platform</div><div style="font-size:10px;opacity:0.7;margin-top:2px">Products, API, revenue model, unit economics</div></div></div>
+
+<!-- Topic content — auto-populated -->
+<div id="enn-topic" style="margin:16px 0"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:#6c3483;color:#fff;padding:4px 10px;border-radius:3px">Layer 3</span><span style="font-size:10px;color:var(--warm-grey);letter-spacing:0.05em">§0.5.5 · July 2026</span></div><h3 style="margin:0 0 4px;font-size:17px">Uncertainty Quantification</h3><p style="font-size:12px;color:var(--warm-grey);margin:0 0 16px;font-style:italic">Investment-grade predictions require calibrated confidence intervals, not just point estimates</p><p style="font-size:13px;line-height:1.7;margin-bottom:16px">A point estimate without uncertainty bounds is unusable for investment-grade analysis. The SSI-ENN produces calibrated P10/P50/P90 prediction intervals using two complementary approaches: quantile regression (pinball loss) and conformal prediction (distribution-free guaranteed coverage). The SSI's own Monte Carlo confidence intervals (CI_width, P5/P95) serve as the ground truth for calibration. This calibration is verified per country, per voltage class, and per risk band.</p><div class="card" style="border-left:3px solid #6c3483;margin-bottom:16px"><div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#6c3483;margin-bottom:8px">Key Concepts</div><div style="display:flex;align-items:baseline;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(44,36,32,0.04)"><span style="color:#6c3483;font-weight:700;flex-shrink:0">→</span><span>Quantile regression (pinball loss) + conformal prediction</span></div><div style="display:flex;align-items:baseline;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(44,36,32,0.04)"><span style="color:#6c3483;font-weight:700;flex-shrink:0">→</span><span>Calibrated against SSI Monte Carlo ground truth</span></div><div style="display:flex;align-items:baseline;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(44,36,32,0.04)"><span style="color:#6c3483;font-weight:700;flex-shrink:0">→</span><span>Per-country, per-voltage, per-band calibration verification</span></div><div style="display:flex;align-items:baseline;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(44,36,32,0.04)"><span style="color:#6c3483;font-weight:700;flex-shrink:0">→</span><span>Investment-grade: P10/P50/P90 for all outputs</span></div></div></div>
+
+<!-- SSI data connection — auto-populated -->
+<div id="enn-data-link" style="margin:16px 0"><div class="card" style="border-left:3px solid var(--sage);background:var(--cream)"><div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--sage);margin-bottom:6px">Live SSI Data Connection</div><p style="font-size:13px;line-height:1.7;margin:0">The training set comprises 1,219 substations with complete feature vectors. Average CI_width of 0.162 across the fleet provides the uncertainty ground truth that the neural network's quantile regression heads must calibrate against. The fleet's risk distribution — 0 Low, 181 Medium, 731 High, 307 Critical — ensures balanced training across all risk bands.</p></div></div>
+
+<!-- Coming next -->
+<div class="card" style="border-left:3px solid var(--bronze);background:var(--cream);margin-top:16px" id="enn-next"><p style="font-size:13px;line-height:1.7;margin:0"><strong>Coming next month:</strong> <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:#c0392b;color:#fff;padding:2px 8px;border-radius:3px;margin:0 4px">Layer 2</span> Total Cost of Ownership Model — <em>Stochastic cost modelling — because BESS economics are not deterministic</em></p></div>
+
+</section>
+
+<div style="margin:32px 0"></div>
+
+<!-- ═══════════════════ F.5 ANTI-MALADAPTATION GOVERNANCE GATE — RADAR 2 (v4.2 NEW) ═══════════════════
+ Per AUDIT_intelligence_v2.md V4.2-N3 + Convention #6 §5.6 mesh resolution (11 Jun 2026).
+ Radar 2 lives ONLY on this page. 10 W-axes. 5/1/1/3 4-tier classification:
+ 5 Published solid : W1 W2 W3 W4 W8
+ 1 Published-baseline : W9 (solid fill + chevron corner marker ▲ + mandatory transparency tooltip)
+ 1 Baseline-only : W5 (striped fill)
+ 3 Commercial : W6 W7 W10 (dashed-faded with Foundation tooltip)
+ ═══════════════════════════════════════════════════════════════════════════════════════ -->
+<section id="radar2" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section F.5 — v4.2 Anti-maladaptation Governance Gate</span>
+<h2>Radar 2 — W1–W10 Substation Community Value</h2>
+
+<div class="card" style="border-left:3px solid var(--terracotta);background:var(--cream);margin-bottom:20px">
+ <p style="font-size:13px;line-height:1.7;margin:0"><strong>Wall 1 — Public W1–W10 framework.</strong> The 10-axis Radar 2 expresses per-substation community-value baseline pre-intervention: <em>W1 Reliability · W2 Carbon · W3 Local Economic · W4 Climate Resilience · W5 Digital Inclusion · W6 Sovereignty · W7 Local Value Retention · W8 Communications · W9 Supply Security · W10 Compute Multiplier</em>. The discipline floor that the anti-maladaptation governance gate protects: <em>"no W axis worse off after intervention."</em></p>
+</div>
+
+<!-- 5/1/1/3 4-tier audit-state legend -->
+<div class="card" style="margin-bottom:20px">
+ <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;margin-bottom:10px;color:var(--terracotta)">5/1/1/3 4-tier audit-state classification (mesh resolution per Convention #6 §5.6)</div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;font-size:12px;line-height:1.6">
+ <div>
+ <strong style="color:#2d6a4f">Published (5)</strong> — solid fill<br>
+ <span style="color:var(--warm-grey)">W1 · W2 · W3 · W4 · W8</span><br>
+ <em style="font-size:11px;color:var(--warm-grey)">Peer-reviewed methodology operational at fleet scale.</em>
+ </div>
+ <div>
+ <strong style="color:#52796f">Published-baseline (1) ▲</strong> — solid fill + chevron corner marker<br>
+ <span style="color:var(--warm-grey)">W9 — Supply Security</span><br>
+ <em style="font-size:11px;color:var(--warm-grey)">Peer-reviewed academic basis (Albert/Holme topology-only baseline) with acknowledged scope limit (Buldyrev/IEEE 493 — N-1 contingency dynamics not captured at baseline).</em>
+ </div>
+ <div>
+ <strong style="color:#bb6f1e">Baseline-only (1)</strong> — striped fill<br>
+ <span style="color:var(--warm-grey)">W5 — Digital Inclusion</span><br>
+ <em style="font-size:11px;color:var(--warm-grey)">Foundation methodology under development; baseline value defensible at v4.2.</em>
+ </div>
+ <div>
+ <strong style="color:#941914">Commercial (3)</strong> — dashed-faded<br>
+ <span style="color:var(--warm-grey)">W6 · W7 · W10</span><br>
+ <em style="font-size:11px;color:var(--warm-grey)">Commercial deliverables — please contact the Foundation.</em>
+ </div>
+ </div>
+ <p style="margin:14px 0 0 0;font-size:12px;color:var(--warm-grey);line-height:1.6">
+ Per Convention #6 §5.6.7 academic-defensibility: the 4-tier classification aligns with IPCC AR6 + JRC COIN + Reckien (2021) continuum literature. The Published-baseline tier (W9) is the principled mesh resolution that honors both peer-review status + acknowledged scope limit without forcing a false binary.
+ </p>
+</div>
+
+
+<!-- SPRINT_1_3_Q5_DISCLOSURE_BANNER -->
+<div class="card" style="margin:0 0 20px 0;padding:14px 18px;background:#fefaef;border-left:3px solid var(--terracotta);border-radius:4px">
+  <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--terracotta)">v4.2 methodology disclosure — per-country normalisation</div>
+  <p style="font-size:12px;line-height:1.65;margin:0;color:var(--ink)">
+    Across Belgium, the substation fleet's component scores (C / V / I / E / S / T) and the Re composite have been normalised to <strong>[0, 1]</strong> via the canonical <strong>P5/P95 percentile</strong> method, using <em>per-country empirical bounds</em>. This is the same procedure Italy's v4.0.2 deployment applied at the scoring stage (<code>SSI_v4_0&nbsp;Italy/.../scoring-it/normalise.py</code>); for v4.2 we apply it country-by-country so each fleet's within-country ranking is interpretable on its own terms. Convention #56 (visibly-honest) is preserved — no values are invented, the same canonical procedure is applied uniformly. Italy's pilot fleet keeps its native spread (0.17&nbsp;–&nbsp;0.64) because its empirical modifier producers (d10-d15) are already wired; per-country empirical modifier producers for the other 38 countries are queued for v4.5 and will refine the absolute risk ranking. Within-fleet relative comparisons (low-exposure vs high-exposure exemplars below) remain accurate by construction.
+  </p>
+</div>
+
+<!-- ═══ Radar 2 visualization — 10-axis decagonal with Bavegem + Beernem worked examples ═══ -->
+<div class="card" style="margin-bottom:20px;padding:20px">
+ <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Radar 2 visualization — anti-maladaptation governance gate</div>
+ <p style="font-size:12px;color:var(--warm-grey);line-height:1.6;margin:0 0 14px 0">Two worked examples overlaid: <strong style="color:#4d7d62">Substation OostVlaanderen 003 (DSO)</strong> (low-exposure reference, Re_norm 0.000) and <strong style="color:#941914">15 kV</strong> (high-exposure reference, Re_norm 1.000). Axis labels are colour-coded per the 5/1/1/3 mesh resolution; the ▲ chevron marks W9 as Published-baseline. Hover any axis label for the methodology tooltip.</p>
+ <svg viewBox="0 0 700 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Radar 2 — W1 through W10 substation community-value baseline" style="width:100%;max-width:700px;height:auto;font-family:'DM Sans',system-ui,sans-serif;display:block;margin:0 auto">
+ <!-- SVG_MATH: decagon-grid | center (350,290) radius r∈{44,88,132,176,220} | θ_i = -90° + i·36° for i=0..9 | vertex (cx + r·cos θ, cy + r·sin θ) | verified 2026-06-11 (Python recompute Convention #8 closure) -->
+ <g style="stroke:var(--card-border);stroke-width:0.8;fill:none">
+ <polygon points="350.0,246.0 375.9,254.4 391.8,276.4 391.8,303.6 375.9,325.6 350.0,334.0 324.1,325.6 308.2,303.6 308.2,276.4 324.1,254.4"></polygon>
+ <polygon points="350.0,202.0 401.7,218.8 433.7,262.8 433.7,317.2 401.7,361.2 350.0,378.0 298.3,361.2 266.3,317.2 266.3,262.8 298.3,218.8"></polygon>
+ <polygon points="350.0,158.0 427.6,183.2 475.5,249.2 475.5,330.8 427.6,396.8 350.0,422.0 272.4,396.8 224.5,330.8 224.5,249.2 272.4,183.2"></polygon>
+ <polygon points="350.0,114.0 453.5,147.6 517.4,235.6 517.4,344.4 453.5,432.4 350.0,466.0 246.5,432.4 182.6,344.4 182.6,235.6 246.5,147.6"></polygon>
+ <polygon points="350.0,70.0 479.3,112.0 559.2,222.0 559.2,358.0 479.3,468.0 350.0,510.0 220.7,468.0 140.8,358.0 140.8,222.0 220.7,112.0" style="fill:var(--cream);fill-opacity:0.5"></polygon>
+ </g>
+ <!-- SVG_MATH: decagon-axes | center (350,290) endpoint r=220 | same θ_i as grid | line from (cx,cy) to vertex | verified 2026-06-11 -->
+ <g style="stroke:var(--warm-grey-light);stroke-width:0.8">
+ <line x1="350" y1="290" x2="350.0" y2="70.0"></line>
+ <line x1="350" y1="290" x2="479.3" y2="112.0"></line>
+ <line x1="350" y1="290" x2="559.2" y2="222.0"></line>
+ <line x1="350" y1="290" x2="559.2" y2="358.0"></line>
+ <line x1="350" y1="290" x2="479.3" y2="468.0"></line>
+ <line x1="350" y1="290" x2="350.0" y2="510.0"></line>
+ <line x1="350" y1="290" x2="220.7" y2="468.0"></line>
+ <line x1="350" y1="290" x2="140.8" y2="358.0"></line>
+ <line x1="350" y1="290" x2="140.8" y2="222.0"></line>
+ <line x1="350" y1="290" x2="220.7" y2="112.0"></line>
+ </g>
+ <!-- Commercial-tier dashed-faded axes overlay (W6 index 5, W7 index 6, W10 index 9) -->
+ <g style="stroke:var(--warm-grey);stroke-width:1;stroke-dasharray:4 3" opacity="0.45">
+ <line x1="350" y1="290" x2="350.0" y2="510.0"></line>
+ <line x1="350" y1="290" x2="220.7" y2="468.0"></line>
+ <line x1="350" y1="290" x2="220.7" y2="112.0"></line>
+ </g>
+ <!-- SVG_MATH: high-exemplar-w-polygon | center (350,290) | per-axis r_i = value_i × 220 | values computed by d3_radar2_per_country.py against ssi-data.json::substations[name='Beernem']: W1=0.381, W2=0.153, W3=1, W4=1, W5=1, W6=0, W7=0, W8=0.286, W9=0.5, W10=0 | verified 2026-06-11 -->
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: W-values from compute_w_baselines.py output canonical run 11 Jun 2026. Commercial axes (W6/W7/W10) set to 0 → vertex at center; the polygon thus collapses on those three slots, signaling "Foundation contact required". -->
+ <polygon points="350.0,206.2 369.8,262.8 559.2,222.0 559.2,358.0 479.3,468.0 350.0,290.0 350.0,290.0 290.1,309.4 245.4,256.0 350.0,290.0" style="fill:var(--terracotta);fill-opacity:0.18;stroke:var(--terracotta);stroke-width:1.5;stroke-linejoin:round"></polygon>
+ <!-- SVG_MATH: low-exemplar-w-polygon | center (350,290) | per-axis r_i = value_i × 220 | values from d3_radar2_per_country.py against ssi-data.json::substations[name='Bavegem']: W1=0.161, W2=0.181, W3=0, W4=0, W5=0, W6=0, W7=0, W8=0.406, W9=0.5, W10=0 | verified 2026-06-11 -->
+ <!-- CONVENTION_7_HARDCODED_ANCHOR: Bavegem + Beernem W-baselines computed by d3_radar2_per_country.py; commercial axes (W6/W7/W10) set to 0 per design. -->
+ <polygon points="350.0,254.5 373.4,257.8 350.0,290.0 350.0,290.0 350.0,290.0 350.0,290.0 350.0,290.0 265.1,317.6 245.4,256.0 350.0,290.0" style="fill:var(--sage);fill-opacity:0.22;stroke:var(--sage);stroke-width:1.5;stroke-linejoin:round"></polygon>
+ <g style="fill:var(--sage)">
+ <circle cx="370.4" cy="261.9" r="3"></circle><circle cx="351.3" cy="289.6" r="3"></circle><circle cx="393.8" cy="350.3" r="3"></circle><circle cx="214.2" cy="245.9" r="4" style="fill:var(--sage);stroke:#ffffff;stroke-width:1.5"></circle>
+ </g>
+ <g style="fill:var(--terracotta)">
+ <circle cx="350.0" cy="162.8" r="3"></circle><circle cx="391.4" cy="233.0" r="3"></circle><circle cx="559.2" cy="222.0" r="3"></circle><circle cx="559.2" cy="358.0" r="3"></circle><circle cx="479.3" cy="468.0" r="3"></circle><circle cx="228.6" cy="329.4" r="3"></circle><circle cx="289.5" cy="270.4" r="4" style="fill:var(--terracotta);stroke:#ffffff;stroke-width:1.5"></circle>
+ </g>
+ <circle cx="350" cy="290" r="2" style="fill:var(--warm-grey-light)"></circle>
+ <!-- Axis labels — tier colour-coded with design-system tokens. Published=--ink solid, Published-baseline=--sage (W9 ▲), Baseline-only=--bronze (W5), Commercial=--warm-grey-light (W6/W7/W10 dashed-faded). -->
+ <g font-size="13" font-weight="600" text-anchor="middle">
+ <text x="350" y="55" style="fill:var(--ink)">W1 <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Reliability</tspan></text>
+ <text x="498" y="100" style="fill:var(--ink)">W2 <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Carbon</tspan></text>
+ <text x="586" y="220" style="fill:var(--ink)">W3 <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Local Econ</tspan></text>
+ <text x="586" y="368" style="fill:var(--ink)">W4 <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Climate</tspan></text>
+ <text x="498" y="490" style="fill:var(--bronze)">W5 <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Digital Incl</tspan><title>Baseline-only — Foundation methodology under development; baseline value defensible at v4.2.</title></text>
+ <text x="350" y="535" style="fill:var(--warm-grey)">W6 <tspan font-size="10" font-weight="400">Sovereignty</tspan><title>Commercial — Foundation contact (ssi_index@ikenga.eu)</title></text>
+ <text x="202" y="490" style="fill:var(--warm-grey)">W7 <tspan font-size="10" font-weight="400">Local Value</tspan><title>Commercial — Foundation contact (ssi_index@ikenga.eu)</title></text>
+ <text x="114" y="368" style="fill:var(--ink)">W8 <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Comms</tspan></text>
+ <text x="114" y="220" style="fill:var(--sage)">W9 ▲ <tspan font-size="10" font-weight="400" style="fill:var(--warm-grey)">Supply Sec</tspan><title>W9 — Supply Security (Published-baseline). Public-tier methodology: betweenness centrality + bridge identification + degree-based redundancy, computed deterministically from OpenStreetMap power-graph data. Peer-reviewed academic basis: Albert et al. (2000) Nature; Holme et al. (2002); broad power-grid centrality literature. Acknowledged scope limit (per Buldyrev et al. (2010) Nature + IEEE 493): topology-only baseline does not capture N-1 contingency dynamics or interdependent-network cascades. Richer methodology — N-1 contingency simulation + flexibility-services valuation — lives in SSI-ENN L2-22 / L2-23 commercial deliverables. Mail to ssi_index@ikenga.eu for extended analysis.</title></text>
+ <text x="202" y="100" style="fill:var(--warm-grey)">W10 <tspan font-size="10" font-weight="400">Compute</tspan><title>Commercial — Foundation contact (ssi_index@ikenga.eu)</title></text>
+ </g>
+ <!-- SVG_MATH: w9-tier-chevron | decorative triangle, NOT data-encoding | small ▲ marker adjacent to W9 axis label, indicating Published-baseline tier per Convention #6 §5.6 mesh resolution | vertices hand-positioned at (100,215),(110,208),(110,222) | verified 2026-06-11 -->
+ <polygon points="100,215 110,208 110,222" style="fill:var(--sage)"></polygon>
+ <g font-size="11">
+ <rect x="490" y="535" width="180" height="40" rx="5" style="fill:#ffffff;stroke:var(--card-border);stroke-width:0.8"></rect>
+ <rect x="500" y="544" width="14" height="10" style="fill:var(--sage);fill-opacity:0.55;stroke:var(--sage)"></rect>
+ <text x="520" y="553" style="fill:var(--ink)"><tspan font-weight="600" style="fill:var(--sage)">Bavegem</tspan> · low-exposure</text>
+ <rect x="500" y="558" width="14" height="10" style="fill:var(--terracotta);fill-opacity:0.40;stroke:var(--terracotta)"></rect>
+ <text x="520" y="567" style="fill:var(--ink)"><tspan font-weight="600" style="fill:var(--terracotta)">Beernem</tspan> · high-exposure</text>
+ </g>
+ </svg>
+ <p style="font-size:11px;color:var(--warm-grey);line-height:1.6;margin:14px 0 0 0;text-align:center"><em>Bavegem polygon (sage): the low-exposure reference for this country — compact footprint reflects the fleet floor on the W-axis baselines. Beernem polygon (terracotta): the high-exposure reference — larger footprint where this country's fleet's W-axis values reach the upper percentile. Commercial-tier axes (W6 data sovereignty, W7 local value retention, W10 compute multiplier) display at zero per Convention #6 §5.6 mesh design — no public-data computation. W2 carbon uses EU-average MEF fallback (0.36) per v4.2 calibration.</em></p>
+</div>
+
+<!-- Per-axis classification table -->
+<div class="card" style="margin-bottom:20px">
+ <div class="card-header" style="margin-bottom:10px">
+ <h3>W1–W10 axis enumeration with audit-state classification</h3>
+ <span class="label-xs">5/1/1/3 4-tier · v4.2 mesh resolution · live values via <code>compute_w_baselines.py</code></span>
+ </div>
+ <table class="data-table" style="font-size:12px">
+ <thead><tr><th style="width:60px">Axis</th><th>Name</th><th style="width:170px">Audit state</th><th>Methodology basis</th></tr></thead>
+ <tbody>
+ <tr><td><strong>W1</strong></td><td>Reliability</td><td style="color:#2d6a4f"><strong>Published</strong></td><td>C × E2_local × population ( SAIDI + + -POV)</td></tr>
+ <tr><td><strong>W2</strong></td><td>Carbon</td><td style="color:#2d6a4f"><strong>Published</strong></td><td>T1 × zonal MEF × (V · deg / 100) ( + EEA)</td></tr>
+ <tr><td><strong>W3</strong></td><td>Local Economic</td><td style="color:#2d6a4f"><strong>Published</strong></td><td>norm(R10_just) — EU-SILC + OIPE energy-poverty</td></tr>
+ <tr><td><strong>W4</strong></td><td>Climate Resilience</td><td style="color:#2d6a4f"><strong>Published</strong></td><td>(R6d − 1) + (R6e − 1) + (R6c − 1) + ½(R9 − 1) — v4.2 resilience modifier family</td></tr>
+ <tr><td><strong>W5</strong></td><td>Digital Inclusion</td><td style="color:#bb6f1e"><strong>Baseline-only</strong></td><td>norm(R8_adapt) — bulk SM + + DESI</td></tr>
+ <tr><td><strong>W6</strong></td><td>Sovereignty</td><td style="color:#941914"><strong>Commercial</strong></td><td>Foundation contact (<a href="mailto:ssi_index@ikenga.eu">ssi_index@ikenga.eu</a>)</td></tr>
+ <tr><td><strong>W7</strong></td><td>Local Value Retention</td><td style="color:#941914"><strong>Commercial</strong></td><td>Foundation contact (<a href="mailto:ssi_index@ikenga.eu">ssi_index@ikenga.eu</a>)</td></tr>
+ <tr><td><strong>W8</strong></td><td>Communications</td><td style="color:#2d6a4f"><strong>Published</strong></td><td>C × p_crit_10yr × population (Markov 10-yr critical probability)</td></tr>
+ <tr><td><strong>W9 ▲</strong></td><td>Supply Security</td><td style="color:#52796f"><strong>Published-baseline ▲</strong></td><td>0.60 × BC_pct + 0.30 × bridge + 0.10 × (1 − deg / 20) — OSM power-graph betweenness centrality + bridge identification + degree-based redundancy</td></tr>
+ <tr><td><strong>W10</strong></td><td>Compute Multiplier</td><td style="color:#941914"><strong>Commercial</strong></td><td>Foundation contact (<a href="mailto:ssi_index@ikenga.eu">ssi_index@ikenga.eu</a>)</td></tr>
+ </tbody>
+ </table>
+</div>
+
+<!-- W9 Published-baseline mandatory transparency tooltip — byte-identical per Convention #2 -->
+<div class="card" style="border-left:3px solid #52796f;background:#f5f9f7;margin-bottom:20px">
+ <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;margin-bottom:8px;color:#52796f">▲ W9 Published-baseline — mandatory transparency tooltip</div>
+ <p style="font-size:13px;line-height:1.7;margin:0;color:var(--ink)">
+ W9 — Supply Security (Published-baseline). Public-tier methodology: betweenness centrality + bridge identification + degree-based redundancy, computed deterministically from OpenStreetMap power-graph data. Peer-reviewed academic basis: Albert et al. (2000) <em>Nature</em>; Holme et al. (2002); broad power-grid centrality literature. Acknowledged scope limit (per Buldyrev et al. (2010) <em>Nature</em> + IEEE 493): topology-only baseline does not capture N-1 contingency dynamics or interdependent-network cascades. Richer methodology — N-1 contingency simulation + flexibility-services valuation — lives in SSI-ENN L2-22 / L2-23 commercial deliverables. Mail to <a href="mailto:ssi_index@ikenga.eu">ssi_index@ikenga.eu</a> for extended analysis.
+ </p>
+</div>
+
+<!-- Per-substation worked examples cross-reference -->
+<div class="note-blue" style="background:#eff7fd;border-left:3px solid #1d6a96;padding:14px 18px;margin-bottom:20px;border-radius:4px;font-size:13px;line-height:1.7">
+ <strong>Worked examples.</strong> The W1-W10 per-substation baseline values for two anchor cases — Bavegem (low-exposure reference) and Beernem (high-exposure reference) — are computed live by <code>_audit-snapshot/scripts/d3_radar2_per_country.py</code> against the country's <code>ssi-data.json</code>. Per Convention #6 §2.3.6 Path B refactor (11 Jun 2026), this country's exemplars are now algorithmically selected (min/max Re_norm) rather than named picks. See the FC v2 reference for W-axis methodology + commercial-tier rationale.
+</div>
+
+<!-- Anti-maladaptation discipline footer -->
+<div class="card" style="background:var(--cream);font-size:12px;line-height:1.7;color:var(--warm-grey)">
+ <strong style="color:var(--ink)">Anti-maladaptation discipline.</strong> The 10-axis Radar 2 baseline is the per-substation floor that any post-intervention scenario must protect. No W axis may degrade after a BESS deployment, line upgrade, or operational change. The discipline is enforced per axis (not in aggregate), and per substation (not in fleet average). This is the v4.2 governance gate that ensures grid-modernisation projects deliver net community value without hidden trade-offs.
+</div>
+
+</section>
+
+<div style="margin:32px 0"></div>
+
+<!-- ═══════════════════ G. LOOKING AHEAD ═══════════════════ -->
+<section id="ahead" style="margin-bottom:32px">
+<span class="label-xs" style="color:var(--terracotta);margin-bottom:12px;display:block">Section G</span>
+<h2>Looking Ahead</h2>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0">
+ <!-- Card 1: Next Edition — deterministic deep-dive rotation -->
+ <div class="card" style="border-top:3px solid var(--bronze)" id="g-next-edition"><span class="label-xs" style="color:var(--bronze);margin-bottom:8px;display:block">Next Month — Edition 03</span><h3 style="margin-top:0;font-size:15px">Capital Metropolitan</h3><p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0">Deep-dive into Region 02's grid risk profile — substation map, component analysis, region regions breakdown. European Context Card: Capital-intensive tier + flood overlay.</p></div>
+ <!-- Card 2: Next Data Refresh — from SSIMetadata source frequencies -->
+ <div class="card" style="border-top:3px solid var(--sage)" id="g-data-refresh"><span class="label-xs" style="color:var(--sage);margin-bottom:8px;display:block">Next Data Refresh</span><h3 style="margin-top:0;font-size:15px">Q4 2026 — 0 Quarterly Sources</h3><p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0"><strong>none</strong> are due for refresh in Q4. Impact: DER registry (T1), business fabric indicators (E2), macro-economic data. Highest-impact annual source pending: <strong>STATBEL — Statistics Belgium</strong> (8 variables → P1 pop density, EP_rate ~7.8% national, elderly, healthcare; per-province + per-commune).</p></div>
+ <!-- Card 3: Fleet Spotlight — rotating stat from ssi-data.json -->
+ <div class="card" style="border-top:3px solid var(--crimson)" id="g-spotlight"><span class="label-xs" style="color:var(--crimson);margin-bottom:8px;display:block">Fleet Spotlight</span><h3 style="margin-top:0;font-size:15px">0 Bridge Substations — Single Points of Failure</h3><p style="font-size:13px;color:var(--warm-grey);line-height:1.6;margin:8px 0"><strong>0 substations</strong> are topological bridges — their failure disconnects part of the network. Of these, <strong>0</strong> are classified High or Critical. These are the fleet's single points of failure: high graph centrality (R4) combined with elevated risk makes them priority candidates for both grid reinforcement and BESS deployment.</p></div>
+</div>
+
+<p style="font-size:13px;line-height:1.7" id="g-closing">Edition 03 will be published on the second Thursday of August 2026. Deep-dive region: <strong>Region 02</strong>. To ensure you receive it, confirm your subscription segment (General / Institutional / Academic) by email to ssi_index@ikenga.eu.</p>
+
+<div style="margin-top:20px;padding:16px;background:var(--cream-deep);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--warm-grey);font-weight:400">
+ <strong style="color:var(--ink)">Feedback welcome.</strong> The SSI Index is designed to evolve through stakeholder dialogue. If you represent an Belgian utility, , municipal energy company, or academic institution and would like to contribute data or methodology feedback, please contact us at ssi_index@ikenga.eu. The SSI's credibility depends on open scrutiny.
+</div>
+</section>
+
+<!-- ═══════════════════ COLOPHON ═══════════════════ -->
+<div style="text-align:center;padding:32px 0;font-size:11px;color:var(--warm-grey);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
+ <p style="font-family:'Playfair Display',serif;font-weight:600;margin-bottom:6px;font-size:13px">SSI Monthly Intelligence Report — Edition 005</p>
+ <p style="margin-bottom:4px">Published 9 July 2026 · SSI Index <strong>v4.2</strong> (refreshed June 2026) · <span data-canonical="fleet.total">1,220</span> substations · <span data-canonical="fleet.grid_lines">4,017</span> grid lines · 6 components + <strong>Re composite</strong> (Radar 1 7th axis, bounds [0.920, 1.787]) · 20 metrics · 11 modifiers (5 baseline + 6 v4.2 resilience family)</p>
+ <p>10,000-iteration Gaussian Copula Monte Carlo · Sobol global sensitivity analysis (<span data-canonical="fleet.engine.evals_per_substation">196,608</span> evals/substation) · CMIP6 SSP2-4.5 · W1-W10 anti-maladaptation governance gate (5/1/1/3 4-tier mesh resolution per Convention #6 §5.6)</p>
+</div>
+
+<!-- v4.2 Foundation contact block (Convention #2 — byte-identical across instances) -->
+<div class="card" style="margin:24px 0;padding:20px;border-left:3px solid var(--terracotta);background:#fef8f7">
+ <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Foundation contact</div>
+ <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+ The SSI Index is a non-profit foundation project, please mail to <a href="mailto:ssi_index@ikenga.eu" style="color:var(--terracotta);font-weight:500">ssi_index@ikenga.eu</a> for more details.
+ </p>
+</div>
+
+</main>
+
+<footer style="text-align:center;padding:16px 0;font-size:10px;color:var(--warm-grey-light);line-height:1.8;border-top:1px solid var(--card-border);margin-top:32px">
+ © 2026 Altinium Invest · Corso Vittorio Emanuele 110/5, 80121 Napoli · P.IVA 10656441218<br>
+ USCO Registration pending · SIAE Deposito Opere Inedite · Protected under L. 633/1941, Berne Convention, Copyright Act 1976<br>
+ <a href="#" style="color:var(--warm-grey-light);text-decoration:none">View in browser</a>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+ DATA MODEL & RENDERING ENGINE — thin-shell (Phase 2c · KB §65 · Wave A 2026-06-03)
+ ═══════════════════════════════════════════════════════════ -->
+<script src="../country-renderer.js?v=20260614-s17"></script>
+<script src="../intelligence-sections.js?v=20260614-s17"></script>
+<!-- v4.2 per-country override (Italy only — Convention #3 compliant; loaded after shared section JS, before init) -->
+<script src="belgium-section-overrides.js?v=20260614-s17"></script>
+<script>
+ document.addEventListener('DOMContentLoaded', function () {
+ CountryRenderer.init('belgium', 'intelligence');
+ });
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+ EDITION AUTO-PATCHER — V4.2-disc-43 (12 Jun 2026)
+ Closes the three-layer edition-number inconsistency:
+ (1) Prior date formula: edN=(y-2026)*12+(m+1)-2 → Edition 4 (June)
+ (2) Stub intelligence-loader.js: hardcoded Edition 01
+ (3) Canonical edition-config.json: current_edition = 20
+ Now PREFERS window.SSI_EDITION (set by canonical intelligence-loader.js
+ from intelligence/edition-config.json), falls back to date formula
+ only when the loader fails (Convention #10 graceful degradation).
+ ═══════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+ var MN=['January','February','March','April','May','June',
+ 'July','August','September','October','November','December'];
+
+ function patchWithEdition(ed){
+ var now=new Date(), m=now.getMonth(), y=now.getFullYear();
+ var edN, eS, MY, pMY;
+
+ if(ed && ed.label && ed.month){
+ // ── Canonical path: SSI_EDITION populated by intelligence-loader.js ──
+ edN = ed.number || parseInt(ed.label, 10) || 1;
+ eS = ed.label; // already zero-padded "020"
+ MY = ed.month; // "May 2026"
+ // Previous month for "June 2026" → previous YYYY-MM lookup
+ if(ed.monthKey && /^\d{4}-\d{2}$/.test(ed.monthKey)){
+ var parts = ed.monthKey.split('-');
+ var ky = parseInt(parts[0],10), kmIdx = parseInt(parts[1],10) - 1;
+ var pmIdx = kmIdx - 1 < 0 ? 11 : kmIdx - 1;
+ var pyy = kmIdx - 1 < 0 ? ky - 1 : ky;
+ pMY = MN[pmIdx] + ' ' + pyy;
+ } else {
+ pMY = MN[m-1<0?11:m-1] + ' ' + (m-1<0?y-1:y);
+ }
+ } else {
+ // ── Legacy fallback: loader unavailable, infer from date ──
+ edN = Math.max(1, (y-2026)*12 + (m+1) - 2);
+ eS = ('00'+edN).slice(-3);
+ MY = MN[m] + ' ' + y;
+ pMY = MN[m-1<0?11:m-1] + ' ' + (m-1<0?y-1:y);
+ console.warn('[EDITION-AUTO-PATCHER] SSI_EDITION unavailable — using date formula fallback (Convention #10)');
+ }
+
+ // Compute 2nd-Thursday publish date for current month
+ var d1=new Date(now.getFullYear(),now.getMonth(),1).getDay();
+ var thu2=((4-d1+7)%7)+8;
+ var pub=thu2+' '+MN[now.getMonth()]+' '+now.getFullYear();
+
+ function R(o,n){
+ var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false),t;
+ while(t=w.nextNode()) if(t.nodeValue.indexOf(o)!==-1) t.nodeValue=t.nodeValue.split(o).join(n);
+ }
+ R('July 2026',MY);
+ if(edN>1){
+ document.title=document.title.replace(/Edition \d{3}/,'Edition '+eS);
+ R('Published 9 July 2026','Published '+pub);
+ R('Edition 005','Edition '+eS);
+ R('July 2026',MY);
+ R('June 2026',pMY);
+ R('','');R('','');
+ R('edition','edition');R('','');R('','');
+ }
+ }
+
+ // Prefer canonical SSI_EDITION when intelligence-loader.js has populated it
+ if(window.SSI_EDITION && window.SSI_EDITION.label){
+ patchWithEdition(window.SSI_EDITION);
+ } else if(window.SSI_CONFIG_READY === false){
+ // Loader pending — wait for ssi-config-ready event, then patch
+ document.addEventListener('ssi-config-ready', function(e){
+ patchWithEdition(e.detail);
+ }, { once: true });
+ } else {
+ // Loader not present (no window.SSI_CONFIG_READY sentinel) → fallback
+ patchWithEdition(null);
+ }
+})();
+</script>
+
+
+</body></html>
