@@ -232,8 +232,14 @@ def process_country(slug: str, dry_run: bool = False) -> Dict[str, Any]:
     meta["phase2c_reclassify_runs"] = prior[-3:]  # keep last 3 runs for audit
 
     if not dry_run:
+        # Preserve original file's compact JSON encoding — the pipeline emits
+        # ssi-data.json without indent for size (US has 45k substations ->
+        # ~90 MB compact but ~270 MB pretty-printed which exceeds GitHub's
+        # 100 MB per-file limit). A 25 Jun 2026 initial run used indent=2
+        # and blew us/ssi-data.json to 114 MB — push rejected by GitHub.
+        # Fixed here; do NOT re-introduce indent without testing US size.
         with open(path, "w") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+            json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
     return {
         "slug": slug,
