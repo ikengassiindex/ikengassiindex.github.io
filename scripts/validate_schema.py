@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SSI v4.0.2 — JSON Schema Validator
+SSI v4.0.2 / v4.2 — JSON Schema Validator
 
 PR-5 (audit memo 2026-06-08): renamed from validate-schema.py (hyphen-named,
 not importable) to validate_schema.py (underscore-named, proper Python module).
@@ -9,6 +9,24 @@ The 3 historical callers continue to work:
   • scripts/pipeline/run.py   — was subprocess-calling; now imports validate_file()
   • CLI invocation `python3 scripts/validate-schema.py <path>` continues to
     work via a backward-compat shim at scripts/validate-schema.py
+
+Phase 2A (25 June 2026 — v4.2 alignment closure post 39-country empirical audit):
+  • Check 7 R_median range extended [0, 1] → [0, 1.30] to accept the additive
+    R6c_flood contribution (soft_clip_upper compresses multiplicative to ≤1.0;
+    R6c_flood layers on top with range [1.00, 1.30]; max R_median = 1.30).
+  • Check 8 classification banding extended 4 bands → 5 bands (Extreme added
+    for R_median ∈ [1.00, 1.30]) — operator decision Q1(b) 25 June 2026.
+  • Modifier registry (_MODIFIER_RANGES below) synced with pipeline
+    scoring.modifier_registry.MODIFIER_REGISTRY: R3_C_mult ceiling 1.30→1.50,
+    R7_cyber ceiling 1.50→1.05.
+  • --all mode now iterates intelligence/countries.json::slugs (39 countries)
+    rather than COUNTRY_BOUNDS (was 30) — closes KB §57 silent-skip gap for
+    denmark / finland / greece / mexico / norway / poland / sweden / turkey /
+    ireland which the pre-Phase-2A validator was silently bypassing.
+  • MIN_FLEET recalibrated for Austria (1200→700) and Canada (8000→6000) to
+    reflect post-Discipline-#36 remediated cohort reality (Austria 1406→741;
+    Canada was 24986→6399 pre-vs-post cross-border filter).
+  • COUNTRY_BOUNDS extended with the 9 previously-missing SoT countries.
 
 Usage:
   python3 scripts/validate_schema.py <country_folder>/ssi-data.json
@@ -23,8 +41,8 @@ Checks (PR-5 expanded — was 8 in pre-PR-5; now 11):
   3. Substation core schema: substation_id, lat, lon, R_median, components, classification
   4. Component format: raw (compSum > 1.0)
   5. Lat/lon within country bounds
-  6. R_median within [0, 1]
-  7. Classification matches R_median band (PR-5: ERROR not warning)
+  6. R_median within [0, 1.30]   (Phase 2A: v4.2 additive R6c_flood layered on top of soft_clip_upper)
+  7. Classification matches R_median band, 5-band system incl. Extreme (Phase 2A)
   8. ESG field completeness (markov, seismic, transition)
   9. (PR-5 NEW) Per-modifier value within MODIFIER_REGISTRY range
   10. (PR-5 NEW) Regional summary ↔ substation membership consistency
@@ -76,6 +94,20 @@ COUNTRY_BOUNDS = {
     # PR-5 acceptance audit — Slovenia was missing from the bounds table
     # (had MIN_FLEET entry SI=120 but no bounds, so --all skipped it).
     'slovenia':     (45.4, 46.9, 13.4, 16.6),      # Republic of Slovenia
+    # ─── Phase 2A (25 June 2026): 9 SoT countries previously missing from
+    # COUNTRY_BOUNDS — the pre-Phase-2A --all mode iterated this dict rather
+    # than intelligence/countries.json::slugs so these 9 were silently
+    # bypassed by the daily validator. Bounds derived from observed lat/lon
+    # extrema of each country's HEAD ssi-data.json + conservative padding.
+    'denmark':      (54.0, 58.0,  8.0, 15.5),
+    'finland':      (59.5, 70.5, 19.0, 32.0),
+    'greece':       (34.5, 42.0, 19.5, 30.0),
+    'mexico':       (14.5, 33.0, -118.0, -86.5),
+    'norway':       (57.5, 71.5,  4.0, 32.0),      # incl. Bear Island
+    'poland':       (49.0, 55.0, 14.0, 24.5),
+    'sweden':       (55.0, 69.0, 10.5, 25.0),
+    'turkey':       (35.5, 42.5, 25.5, 45.0),
+    'ireland':      (51.4, 55.5, -10.6, -5.8),
 }
 
 
@@ -90,7 +122,11 @@ WEIGHTS = {'C': 0.30, 'V': 0.10, 'I': 0.25, 'E': 0.10, 'S': 0.20, 'T': 0.05}
 # DATA and fails validation. Source-of-truth for MIN_FLEET; score-country.py
 # now imports this rather than maintaining its own inlined copy.
 MIN_FLEET = {
-    "AT": 1200, "CH": 800,  "DE": 10000,
+    # Phase 2A (25 June 2026): AT 1200→700 post-Discipline-#36 cross-border
+    # remediation reality (Austria 1406 pre-remediation → 741 post; 700 floor
+    # leaves ~5% headroom below current observed cohort size and prevents a
+    # second-pass remediation from silently tripping the floor).
+    "AT": 700, "CH": 800,  "DE": 10000,
     "IT": 4000, "ES": 3500, "IE": 990, "JP": 4500,
     # Session 32 recalibration: LU 700→80 (actual 91; small country, coarse OSM canton-level)
     "LU": 80,   "BE": 1000, "NL": 1300, "CZ": 800,
@@ -99,7 +135,10 @@ MIN_FLEET = {
     # Other live countries — conservative floors based on live ssi-data.json counts.
     # Session 32 recalibration: CL 1500→900 (actual 1095; OSM completeness gap),
     #                            GL 100→30 (actual 37; pre-launch dataset).
-    "AU": 5000, "CA": 8000, "CL": 900,  "DK": 1500,
+    # Phase 2A (25 June 2026): CA 8000→6000 post-Discipline-#36 cross-border
+    # remediation reality (Canada was 24986 pre-remediation with 74% cross-border
+    # leakage → 6399 post; 6000 floor leaves ~6% headroom below current observed).
+    "AU": 5000, "CA": 6000, "CL": 900,  "DK": 1500,
     "FI": 3000, "GR": 1500, "GL": 30,   "MX": 4000,
     "NZ": 1000, "NO": 4000, "PL": 3000, "PT": 1500,
     "SE": 3500, "TR": 4000, "GB": 2500, "US": 30000,
@@ -158,18 +197,24 @@ _SLUG_TO_ISO2 = {
 # the registry is the single source of truth — this is a deliberate copy
 # kept in sync via the PR-5 regression test (test_modifier_ranges_match_registry).
 _MODIFIER_RANGES = {
+    # Phase 2A (25 June 2026): synced with pipeline
+    # scripts/pipeline/scoring/modifier_registry.py::MODIFIER_REGISTRY
+    # so the validator can never disagree with the engine on what a
+    # modifier's declared range is.
+    #   • R3_C_mult ceiling 1.30 → 1.50 (was drifting from pipeline's 1.50).
+    #   • R7_cyber ceiling 1.50 → 1.05 (was permissive; pipeline says 1.05).
     # Canonical v4.0.2 (5 modifiers)
-    "R3_C_mult":      (0.70, 1.30),
+    "R3_C_mult":      (0.70, 1.50),
     "R4_F_topo":      (0.80, 1.35),
     "R6_restoration": (0.90, 1.10),
     "R6_seismic":     (1.00, 1.25),
-    "R7_cyber":       (0.99, 1.50),
+    "R7_cyber":       (0.99, 1.05),
     # Per-country adaptations
-    "R6_volcanic":     (1.00, 1.30),
-    "R6_drought":      (1.00, 1.15),
-    "R6_armed_conflict": (1.00, 1.20),
-    "R6_typhoon":      (1.00, 1.25),
-    "R6_chaebol":      (1.00, 1.15),
+    "R6_volcanic":     (1.00, 1.20),
+    "R6_drought":      (1.00, 1.18),
+    "R6_armed_conflict": (1.00, 1.12),
+    "R6_typhoon":      (1.00, 1.15),
+    "R6_chaebol":      (1.00, 1.10),
     # v4.2-ready
     "R6c_flood":       (1.00, 1.30),   # additive type
     "R6d_wildfire":    (1.00, 1.25),
@@ -458,23 +503,43 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
                 warnings.append(f"{out_of_bounds} substations ({pct:.1f}%) outside {country} bounds")
 
     # ─── Check 7: R_median range ──
+    # Phase 2A (25 June 2026): range extended [0, 1] → [0, 1.30] for v4.2.
+    # The v4.2 master equation is
+    #   R_final = soft_clip_upper(R_base × Π mult_i) + Σ (add_i − 1.0)
+    # where the multiplicative chain is compressed asymptotically toward 1.0
+    # by soft_clip_upper, and the ADDITIVE R6c_flood (range [1.00, 1.30])
+    # layers on top. Max theoretical R_median is 1.30. See Convention #77
+    # + methodology brief for the derivation. Values above 1.30 signal a
+    # scoring engine bug (additive stack overflow) and remain an error.
     r_values = [s.get('R_median', 0) for s in substations]
     r_min, r_max = min(r_values), max(r_values)
-    if r_min < 0 or r_max > 1:
-        errors.append(f"R_median out of [0,1] range: {r_min:.3f}–{r_max:.3f}")
+    if r_min < 0 or r_max > 1.30:
+        errors.append(f"R_median out of [0, 1.30] range: {r_min:.3f}–{r_max:.3f}")
 
     # ─── Check 8: classification ↔ R_median band invariant ──
-    # PR-5: promoted from warning (legacy: first 500 only) to error (whole fleet).
-    # Threshold: warn ≥ 0.5%, error ≥ 2.0%. The 2% threshold accommodates
-    # boundary-edge cases produced by the legacy pipeline (e.g. R_median=0.337
-    # classified 'Low' instead of 'Medium' — fractional drift at the band
-    # boundaries). The next daily-routine refresh (PR-7) re-emits with the
-    # post-PR-3 engine; threshold tightens to 0.5% then.
+    # Phase 2A (25 June 2026): 4-band → 5-band system per operator Q1(b)
+    # decision. The 5th band 'Extreme' [1.00, 1.30] captures the additive
+    # R6c_flood zone where multiplicative saturation combines with flood-
+    # driven overflow. See methodology cascade in Phase 2B: methodology.html
+    # + intelligence-sections.js + esg-sections.js + map.js + regional-
+    # sections.js all updated for the 5-band system.
+    # Thresholds preserved: warn ≥ 0.5%, error ≥ 2.0%. The 2% threshold
+    # accommodates boundary-edge cases produced by the legacy pipeline
+    # (e.g. R_median=0.337 classified 'Low' instead of 'Medium' — fractional
+    # drift at band boundaries). Phase 2C full-cohort rescore against the
+    # 5-band system should collapse mismatch rates to near-zero cohort-wide.
+    def _expected_band_v42(r):
+        if r < 0.25:  return 'Low'
+        if r < 0.50:  return 'Medium'
+        if r < 0.75:  return 'High'
+        if r < 1.00:  return 'Critical'
+        return 'Extreme'
+
     misclassified = 0
     sample_violation = None
     for s in substations:
         r = s.get('R_median', 0)
-        expected = 'Low' if r < 0.25 else 'Medium' if r < 0.50 else 'High' if r < 0.75 else 'Critical'
+        expected = _expected_band_v42(r)
         if s.get('classification') != expected:
             misclassified += 1
             if sample_violation is None:
@@ -519,6 +584,34 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
 #  CLI entry point
 # ═══════════════════════════════════════════════════════════
 
+def _load_sot_country_slugs() -> List[str]:
+    """
+    Phase 2A (25 June 2026 · KB §57 alignment): --all mode iterates the
+    canonical SoT slug list at intelligence/countries.json rather than the
+    validator's own COUNTRY_BOUNDS dict. Pre-Phase-2A the validator silently
+    bypassed 9 SoT countries (denmark, finland, greece, mexico, norway,
+    poland, sweden, turkey, ireland) because their bounds weren't in
+    COUNTRY_BOUNDS. Bounds for all 39 SoT slugs are now populated so this
+    change is safe.
+
+    Fallback (when countries.json isn't reachable — e.g. sparse-checkout
+    CI context that omits intelligence/): iterate sorted(COUNTRY_BOUNDS)
+    for backward compatibility.
+    """
+    sot_path = Path(__file__).resolve().parent.parent / "intelligence" / "countries.json"
+    if sot_path.exists():
+        try:
+            with open(sot_path) as f:
+                cfg = json.load(f)
+            slugs = cfg.get("slugs", [])
+            if isinstance(slugs, list) and slugs:
+                return sorted(slugs)
+        except (json.JSONDecodeError, OSError):
+            pass
+    # Fallback — sparse-checkout or malformed SoT
+    return sorted(COUNTRY_BOUNDS.keys())
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python3 validate_schema.py <file.json> [--all]")
@@ -526,7 +619,7 @@ def main():
 
     if sys.argv[1] == '--all':
         all_pass = True
-        for country in COUNTRY_BOUNDS:
+        for country in _load_sot_country_slugs():
             filepath = f"{country}/ssi-data.json"
             if os.path.exists(filepath):
                 errors, warnings = validate_file(filepath)
