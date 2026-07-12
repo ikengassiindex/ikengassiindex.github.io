@@ -202,7 +202,10 @@
       var pLow  = total ? ((bands.Low      || 0) / total * 100).toFixed(0) : 0;
       var pMed  = total ? ((bands.Medium   || 0) / total * 100).toFixed(0) : 0;
       var pHigh = total ? ((bands.High     || 0) / total * 100).toFixed(0) : 0;
-      var pCrit = total ? ((bands.Critical || 0) / total * 100).toFixed(0) : 0;
+      // Phase 2B-2 (25 June 2026): 5-band system; pCrit shows Critical +
+      // Extreme aggregated (both are 'R >= 0.75' semantically) — matches
+      // front-page dist-crit + kpi-critical semantics.
+      var pCrit = total ? (((bands.Critical || 0) + (bands.Extreme || 0)) / total * 100).toFixed(0) : 0;
       var displayName = (r.name && r.name !== r.region) ? r.name : (r.region || '—');
       return '<tr>' +
         '<td style="color:var(--warm-grey)">' + (i + 1) + '</td>' +

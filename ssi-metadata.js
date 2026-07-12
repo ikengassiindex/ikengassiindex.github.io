@@ -203,7 +203,7 @@ window.SSIMetadata = (function () {
     { step: 4, name: 'Compose',    desc: 'R_base = Σ wᵢ·Cᵢ (6 components, 20 metrics)', icon: '④' },
     { step: 5, name: 'Modify',     desc: 'R2 adaptive + R3 consequence × R4 topology × R6a restoration × R6b network × R7 digital', icon: '⑤' },
     { step: 6, name: 'Monte Carlo', desc: '10,000 iterations with 20×20 Gaussian copula', icon: '⑥' },
-    { step: 7, name: 'Classify',   desc: '4 bands (Low/Medium/High/Critical) + confidence tiers + alerts', icon: '⑦' },
+    { step: 7, name: 'Classify',   desc: '5 bands (Low/Medium/High/Critical/Extreme v4.2) + confidence tiers + alerts', icon: '⑦' },
   ];
 
   // ─── Normalisation Methods ────────────────────────────────
@@ -215,11 +215,16 @@ window.SSIMetadata = (function () {
   ];
 
   // ─── Classification Bands ─────────────────────────────────
+  // Phase 2B-2 (25 June 2026): 4-band → 5-band per operator Q1(b) decision.
+  // Extreme captures the additive-R6c_flood overflow zone [1.00, 1.30]
+  // per v4.2 master equation. Colour is darker crimson (structurally
+  // deeper than the Critical crimson) per operator Q1(b) colour choice A.
   const CLASSIFICATION = [
     { name: 'Low',      range: '0.00 – 0.25', meaning: 'Good resilience — stable grid, low exposure',   expected: '~35–45%', color: '#5d8563' },
     { name: 'Medium',   range: '0.25 – 0.50', meaning: 'Moderate — some vulnerabilities, monitor',      expected: '~30–40%', color: '#b8863a' },
     { name: 'High',     range: '0.50 – 0.75', meaning: 'Elevated risk — investment priority area',      expected: '~10–20%', color: '#aa4234' },
     { name: 'Critical', range: '0.75 – 1.00', meaning: 'Severe vulnerability — urgent intervention',    expected: '~3–8%',   color: '#941914' },
+    { name: 'Extreme',  range: '1.00 – 1.30', meaning: 'Compound flood-hazard overflow (v4.2 R6c additive)', expected: '~0–3%',   color: '#5a0d0a' },
   ];
 
   // ─── Master Equation ─────────────────────────────────────

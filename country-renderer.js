@@ -296,7 +296,7 @@
     fmt: function (v, dp) { return (v == null || isNaN(v)) ? '—' : Number(v).toFixed(dp == null ? 3 : dp); },
     pct: function (v, dp) { return (v == null || isNaN(v)) ? '—' : Number(v).toFixed(dp == null ? 1 : dp) + '%'; },
     bandColor: function (band) {
-      return ({ Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914' })[band] || '#888';
+      return ({ Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914', Extreme: '#5a0d0a' })[band] || '#888';
     },
     el: function (id) { return document.getElementById(id); },
     setText: function (id, text) { var e = document.getElementById(id); if (e) e.textContent = text; },
@@ -484,7 +484,7 @@
          var blind = Safe.filterFinite(fleet,
            function (s) { return s.modifiers && s.modifiers.R7_cyber; },
            function (v, s) { return v < medianR7 &&
-             (s.classification === 'High' || s.classification === 'Critical'); });
+             (s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme'); });
        ──────────────────────────────────────────────────────────────── */
     filterFinite: function (subs, accessor, predicate) {
       if (!Array.isArray(subs)) return [];

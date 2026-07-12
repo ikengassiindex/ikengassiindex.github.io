@@ -50,7 +50,12 @@
     Low: 'var(--band-low)',
     Medium: 'var(--band-medium)',
     High: 'var(--band-high)',
-    Critical: 'var(--band-critical)'
+    Critical: 'var(--band-critical)',
+    // Phase 2B-2 (25 June 2026): 5-band system; Extreme for R_median in
+    // [1.00, 1.30]. Front-page distribution bar preserves 4-segment shape
+    // by folding Extreme into Critical (both are 'R >= 0.75' semantically);
+    // Extreme is separately visible in intelligence-page widgets.
+    Extreme: 'var(--band-extreme)'
   };
 
   /* ── Default fleet-average component catalogue (SSI v4.0.2 universal).
@@ -187,8 +192,13 @@
     var p95 = fs.P95 != null ? fs.P95 : (fs.R_max != null ? fs.R_max : 0);
     var bands = fs.bands || {};
     var bandPct = fs.band_pct || {};
-    var critCount = bands.Critical || 0;
-    var critPct = bandPct.Critical != null ? bandPct.Critical : 0;
+    // Phase 2B-2 (25 June 2026): 5-band system; kpi-critical now shows
+    // Critical+Extreme aggregated (both are 'R >= 0.75' semantically).
+    // Preserves the "Critical Band" KPI label truthfulness since Extreme
+    // R_median in [1.00, 1.30] is by definition also above the threshold.
+    var critCount = (bands.Critical || 0) + (bands.Extreme || 0);
+    var critPct = (bandPct.Critical != null ? bandPct.Critical : 0) +
+                  (bandPct.Extreme  != null ? bandPct.Extreme  : 0);
 
     H.setText('kpi-total', Safe.locale(total));
     H.setText('kpi-median', Safe.fmt(medianR, 3));
@@ -241,7 +251,13 @@
     setWidth('dist-low', bp.Low);
     setWidth('dist-med', bp.Medium);
     setWidth('dist-high', bp.High);
-    setWidth('dist-crit', bp.Critical);
+    // Phase 2B-2 (25 June 2026): dist-crit segment now shows
+    // Critical+Extreme aggregated (both are 'R >= 0.75' semantically).
+    // The legend label follows suit. Extreme is separately visible in
+    // the intelligence-page distribution widgets.
+    var critAndExtremePct = Number(bp.Critical || 0) + Number(bp.Extreme || 0);
+    var critAndExtremeCnt = Number(bc.Critical || 0) + Number(bc.Extreme || 0);
+    setWidth('dist-crit', critAndExtremePct);
 
     var setLegend = function (id, label, count, pct) {
       H.setText(id, label + ' ' + Number(count || 0).toLocaleString() +
@@ -250,7 +266,8 @@
     setLegend('legend-low', 'Low', bc.Low, bp.Low);
     setLegend('legend-med', 'Medium', bc.Medium, bp.Medium);
     setLegend('legend-high', 'High', bc.High, bp.High);
-    setLegend('legend-crit', 'Critical', bc.Critical, bp.Critical);
+    var critLabel = (bc.Extreme > 0) ? 'Crit+Ext' : 'Critical';
+    setLegend('legend-crit', critLabel, critAndExtremeCnt, critAndExtremePct);
   });
 
   /* ── 4. Top critical substations table (top 8 by R_median) ──────────── */

@@ -41,15 +41,20 @@
   var Safe = CR.Safe;  // SK hotfix #2 — KB §68.9
 
   /* ── Universal palette ──────────────────────────────────────────────── */
+  // Phase 2B-2 (25 June 2026): 4-band → 5-band with Extreme #5a0d0a
+  // (darker crimson, operator Q1(b) colour choice A). Extreme captures
+  // the additive-R6c_flood overflow zone R_median ∈ [1.00, 1.30].
   var BAND_COLORS_HEX = {
-    Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914'
+    Low: '#5d8563', Medium: '#b8863a', High: '#aa4234', Critical: '#941914', Extreme: '#5a0d0a'
   };
   var BAND_COLORS_RGBA = {
     Low: 'rgba(93,133,99,0.5)', Medium: 'rgba(184,134,58,0.5)',
-    High: 'rgba(170,66,52,0.5)', Critical: 'rgba(148,25,20,0.7)'
+    High: 'rgba(170,66,52,0.5)', Critical: 'rgba(148,25,20,0.7)',
+    Extreme: 'rgba(90,13,10,0.8)'
   };
   var BAND_VAR = {
-    Low: 'var(--sage)', Medium: 'var(--bronze)', High: 'var(--terracotta)', Critical: 'var(--crimson)'
+    Low: 'var(--sage)', Medium: 'var(--bronze)', High: 'var(--terracotta)',
+    Critical: 'var(--crimson)', Extreme: 'var(--band-extreme)'
   };
 
   /* ── Default R3 tier ladder for non-migrated countries.
@@ -372,7 +377,7 @@
     // A12.3 fix: require R7 to be present — substations without R7 data
     // shouldn't count as blind spots (we don't know their digital readiness).
     var blindSpots = fleet.filter(function (s) {
-      if (s.classification !== 'High' && s.classification !== 'Critical') return false;
+      if (s.classification !== 'High' && s.classification !== 'Critical' && s.classification !== 'Extreme') return false;
       var r7 = Safe.get(s, 'modifiers.R7_cyber');
       return r7 != null && r7 < medianR7;
     });
@@ -391,7 +396,7 @@
     H.setText('b1-cyber-high', cyberCounts.HIGH);
     H.setText('b1-cyber-high-sub', Safe.pct(cyberCounts.HIGH / n * 100, 1) + ' of fleet');
     H.setText('b1-blindspots', blindSpots.length);
-    H.setText('b1-blindspots-sub', 'High/Critical + R7 < median');
+    H.setText('b1-blindspots-sub', 'High/Critical/Extreme + R7 < median');
     H.setText('b1-avg-r7', Safe.fmt(avgR7, 4));
     H.setText('b1-high-conseq', highConseq.length.toLocaleString());
     H.setText('b1-high-conseq-sub', Safe.pct(highConseq.length / n * 100, 1) + ' · R3 ≥ ' + Safe.fmt(hcThr, 2));
@@ -408,7 +413,7 @@
 
     H.setHTML('b1-narrative',
       'The cyber-physical matrix identifies <strong>' + blindSpots.length + ' blind-spot substations</strong> — ' +
-      'scoring High or Critical on overall risk while sitting below the fleet median for digital readiness (R7 &lt; ' + Safe.fmt(medianR7, 4) + '). ' +
+      'scoring High, Critical, or Extreme on overall risk while sitting below the fleet median for digital readiness (R7 &lt; ' + Safe.fmt(medianR7, 4) + '). ' +
       'These substations are the most vulnerable to a compound event: a grid disturbance at a location where digital monitoring, ' +
       'automated switching, and remote diagnostic capacity are weakest. ' +
       'The blind spots concentrate in <strong>' + blindStr + '</strong>. ' +
@@ -426,15 +431,15 @@
         return typeof v === 'number' && v >= lower && v < upper;
       });
       var nTier = subs.length;
-      var highCrit = subs.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical'; }).length;
+      var highCrit = subs.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme'; }).length;
       var avgR = nTier ? subs.reduce(function (a, s) { return a + Safe.num(s.R_median, 0); }, 0) / nTier : 0;
       var avgE = nTier ? subs.reduce(function (a, s) { return a + Safe.num(Safe.get(s, 'components.E'), 0); }, 0) / nTier : 0;
       var pctFleet = Safe.fmt(nTier / n * 100, 1);
 
-      var tierBands = { Low: 0, Medium: 0, High: 0, Critical: 0 };
+      var tierBands = { Low: 0, Medium: 0, High: 0, Critical: 0, Extreme: 0 };
       subs.forEach(function (s) { if (tierBands[s.classification] !== undefined) tierBands[s.classification]++; });
       var bandBar = '';
-      ['Low', 'Medium', 'High', 'Critical'].forEach(function (b) {
+      ['Low', 'Medium', 'High', 'Critical', 'Extreme'].forEach(function (b) {
         if (tierBands[b] > 0 && nTier > 0) {
           var w = Safe.fmt(tierBands[b] / nTier * 100, 1);
           bandBar += '<div style="width:' + w + '%;height:100%;background:' + BAND_COLORS_HEX[b] + '" title="' + b + ': ' + tierBands[b] + '"></div>';
@@ -448,13 +453,13 @@
         (tier.desc ? '<p style="font-size:12px;color:var(--warm-grey);margin:0 0 8px">' + tier.desc + '</p>' : '') +
         '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">' +
           '<span><strong>' + nTier.toLocaleString() + '</strong> substations (' + pctFleet + '%)</span>' +
-          '<span>High/Critical: <strong style="color:var(--crimson)">' + highCrit + '</strong> (' + (nTier ? Safe.fmt(highCrit / nTier * 100, 1) : '0') + '%)</span>' +
+          '<span>High/Crit/Ext: <strong style="color:var(--crimson)">' + highCrit + '</strong> (' + (nTier ? Safe.fmt(highCrit / nTier * 100, 1) : '0') + '%)</span>' +
           '<span>Avg R: <strong>' + Safe.fmt(avgR, 3) + '</strong></span>' +
           '<span>Avg E: <strong>' + Safe.fmt(avgE, 3) + '</strong> / 0.10</span></div>' +
         '<div style="height:8px;border-radius:4px;overflow:hidden;display:flex">' + bandBar + '</div>' +
         '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--warm-grey);margin-top:3px">' +
           '<span>Low ' + tierBands.Low + '</span><span>Med ' + tierBands.Medium + '</span>' +
-          '<span>High ' + tierBands.High + '</span><span>Crit ' + tierBands.Critical + '</span></div>' +
+          '<span>High ' + tierBands.High + '</span><span>Crit ' + tierBands.Critical + '</span><span>Ext ' + tierBands.Extreme + '</span></div>' +
       '</div>';
     });
     H.setHTML('b2-tiers', tiersHTML);
@@ -464,7 +469,7 @@
     var topLower = (topTier && typeof topTier.lower === 'number') ? topTier.lower : 1.05;
     var totalHCHR = fleet.filter(function (s) {
       var v = s.modifiers && s.modifiers.R3_C_mult;
-      return v >= topLower && (s.classification === 'High' || s.classification === 'Critical');
+      return v >= topLower && (s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme');
     }).length;
     // KR S31 hotfix #6: country-config override for B.2 VoLL note (currency localization)
     // Placeholders supported: {totalHCHR}, {topLower}
@@ -479,7 +484,7 @@
         '<strong>Value of Lost Load (VoLL) context:</strong> ACER\'s 2023 estimate places average VoLL at €13.1/kWh for industrial customers ' +
         'and €3.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
         'exposed territories. <strong>' + totalHCHR + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ ' + topLower.toFixed(2) + ') with ' +
-        'High or Critical risk classification — representing the highest VoLL-weighted exposure in the fleet.');
+        'High, Critical, or Extreme risk classification — representing the highest VoLL-weighted exposure in the fleet.');
     }
 
     // B.2 Narrative
@@ -566,7 +571,7 @@
 
     // B.4 Monthly Pulse
     var highRiskLowDigital = fleet.filter(function (s) {
-      return s.classification === 'Critical' && (s.modifiers && s.modifiers.R7_cyber < medianR7);
+      return (s.classification === 'Critical' || s.classification === 'Extreme') && (s.modifiers && s.modifiers.R7_cyber < medianR7);
     }).length;
     var monthYear = editionMonthYear();
     H.setHTML('b4-pulse',
@@ -574,7 +579,7 @@
       'This edition establishes the baseline for the Cyber & Economic Exposure Monitor. Key reference points: ' +
       'fleet average R7 = ' + avgR7.toFixed(4) + ', median = ' + medianR7.toFixed(4) + '; ' +
       cyberCounts.HIGH + ' substations classified HIGH cyber-exposure; ' +
-      blindSpots.length + ' blind-spot substations (High/Critical risk + below-median R7); ' +
+      blindSpots.length + ' blind-spot substations (High/Critical/Extreme risk + below-median R7); ' +
       highRiskLowDigital + ' Critical-band substations with below-median digital readiness. ' +
       'Future editions will track deltas against this baseline.');
   });
@@ -828,7 +833,7 @@
       var p5  = rVals[Math.floor(n * 0.05)];
       var p95 = rVals[Math.floor(n * 0.95)];
       var mean = rVals.reduce(function (a, b) { return a + b; }, 0) / n;
-      var bands = { Low: 0, Medium: 0, High: 0, Critical: 0 };
+      var bands = { Low: 0, Medium: 0, High: 0, Critical: 0, Extreme: 0 };
       fleet.forEach(function (s) { if (bands[s.classification] !== undefined) bands[s.classification]++; });
       var confTiers = { high: 0, medium: 0, low: 0 };
       fleet.forEach(function (s) {
@@ -838,14 +843,14 @@
         else confTiers.low++;
       });
       var bandBar = '';
-      ['Low', 'Medium', 'High', 'Critical'].forEach(function (b) {
+      ['Low', 'Medium', 'High', 'Critical', 'Extreme'].forEach(function (b) {
         var pct = (bands[b] / n * 100).toFixed(1);
         bandBar += '<div style="width:' + pct + '%;height:100%;background:' + BAND_COLORS_HEX[b] + '" title="' + b + ': ' + bands[b] + ' (' + pct + '%)"></div>';
       });
       var fleetHTML = '<div class="kpi-grid" style="margin-bottom:16px">' +
         '<div class="kpi-card"><div class="kpi-label">Fleet Size</div><div class="kpi-value" style="color:var(--ink)">' + n.toLocaleString() + '</div><div class="kpi-sub">substations scored</div></div>' +
         '<div class="kpi-card"><div class="kpi-label">Median R</div><div class="kpi-value" style="color:var(--sage)">' + med.toFixed(3) + '</div><div class="kpi-sub">P5=' + p5.toFixed(3) + ' · P95=' + p95.toFixed(3) + '</div></div>' +
-        '<div class="kpi-card"><div class="kpi-label">High + Critical</div><div class="kpi-value" style="color:var(--crimson)">' + (bands.High + bands.Critical) + '</div><div class="kpi-sub">' + ((bands.High + bands.Critical) / n * 100).toFixed(1) + '% of fleet</div></div>' +
+        '<div class="kpi-card"><div class="kpi-label">High + Critical + Extreme</div><div class="kpi-value" style="color:var(--crimson)">' + (bands.High + bands.Critical + bands.Extreme) + '</div><div class="kpi-sub">' + ((bands.High + bands.Critical + bands.Extreme) / n * 100).toFixed(1) + '% of fleet</div></div>' +
         '<div class="kpi-card"><div class="kpi-label">High Confidence</div><div class="kpi-value" style="color:var(--sage)">' + (confTiers.high / n * 100).toFixed(0) + '%</div><div class="kpi-sub">' + confTiers.high + ' subs · CI/R &lt; 0.50</div></div>' +
       '</div>';
       fleetHTML += '<div style="margin-bottom:8px"><div class="label-xs" style="margin-bottom:6px">Band Distribution</div>' +
@@ -981,10 +986,10 @@
     var nMV = nTotal - nHV;
     H.setText('pug-total', nTotal);
     H.setText('pug-total-sub', nHV + ' EHV · ' + nMV + ' HV');
-    var bands = { Low: 0, Medium: 0, High: 0, Critical: 0 };
+    var bands = { Low: 0, Medium: 0, High: 0, Critical: 0, Extreme: 0 };
     puglia.forEach(function (s) { if (bands[s.classification] !== undefined) bands[s.classification]++; });
-    H.setText('pug-high', bands.High + (bands.Critical ? ' + ' + bands.Critical : ''));
-    H.setText('pug-high-sub', ((bands.High + bands.Critical) / nTotal * 100).toFixed(1) + '% of corridor');
+    H.setText('pug-high', bands.High + (bands.Critical ? ' + ' + bands.Critical : '') + (bands.Extreme ? ' + ' + bands.Extreme : ''));
+    H.setText('pug-high-sub', ((bands.High + bands.Critical + bands.Extreme) / nTotal * 100).toFixed(1) + '% of corridor');
 
     var rVals = puglia.map(function (s) { return s.R_median || 0; }).sort(sortNum);
     var medianR = rVals[Math.floor(rVals.length / 2)];
@@ -1132,7 +1137,7 @@
       '<div style="font-size:11px;color:var(--warm-grey);margin-bottom:8px">Longer bar = lower R = better resilience.</div>';
     provAvgs.forEach(function (pv) {
       var provSubs = puglia.filter(function (s) { return s.province === pv.name; });
-      var provBands = { Low: 0, Medium: 0, High: 0, Critical: 0 };
+      var provBands = { Low: 0, Medium: 0, High: 0, Critical: 0, Extreme: 0 };
       provSubs.forEach(function (s) { if (provBands[s.classification] !== undefined) provBands[s.classification]++; });
       var barPct = ((1 - pv.avg) * 100).toFixed(1);
       var col = pv.avg > 0.6 ? '#941914' : pv.avg > 0.5 ? '#aa4234' : '#b8863a';
@@ -1140,7 +1145,7 @@
         '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">' +
           '<span style="font-weight:600">' + pv.name + '</span>' +
           '<span style="color:var(--warm-grey)">' + pv.n + ' subs · avg R = ' + pv.avg.toFixed(3) +
-          ' · H:' + provBands.High + (provBands.Critical ? ' C:' + provBands.Critical : '') + ' M:' + provBands.Medium + '</span></div>' +
+          ' · H:' + provBands.High + (provBands.Critical ? ' C:' + provBands.Critical : '') + (provBands.Extreme ? ' E:' + provBands.Extreme : '') + ' M:' + provBands.Medium + '</span></div>' +
         '<div style="height:8px;background:var(--cream-deep);border-radius:4px;overflow:hidden;display:flex;justify-content:flex-end">' +
           '<div style="width:' + barPct + '%;height:100%;background:' + col + ';border-radius:4px;opacity:0.7"></div>' +
         '</div></div>';
@@ -1213,7 +1218,7 @@
     puglia.forEach(function (s) {
       if (!s.lon || !s.lat) return;
       var p = proj(s.lon, s.lat);
-      var r = s.classification === 'Critical' ? 6 : s.classification === 'High' ? 4.5 : 3.5;
+      var r = s.classification === 'Extreme' ? 6.5 : s.classification === 'Critical' ? 6 : s.classification === 'High' ? 4.5 : 3.5;
       ctx.beginPath();
       ctx.arc(p[0], p[1], r, 0, Math.PI * 2);
       ctx.fillStyle = BAND_COLORS_HEX[s.classification] || '#999';
@@ -1269,7 +1274,7 @@
     fleet.forEach(function (s) {
       var r = s.region;
       if (!r) return;
-      if (!regData[r]) regData[r] = { subs: [], sumR: 0, bands: { Low: 0, Medium: 0, High: 0, Critical: 0 } };
+      if (!regData[r]) regData[r] = { subs: [], sumR: 0, bands: { Low: 0, Medium: 0, High: 0, Critical: 0, Extreme: 0 } };
       regData[r].subs.push(s);
       regData[r].sumR += s.R_median || 0;
       if (regData[r].bands[s.classification] !== undefined) regData[r].bands[s.classification]++;
@@ -1378,7 +1383,7 @@
     if (n > 0) {
       var avgR = fleet.reduce(function (a, s) { return a + (s.R_median || 0); }, 0) / n;
       var avgCI = fleet.reduce(function (a, s) { return a + (s.CI_width || 0); }, 0) / n;
-      var highCrit = fleet.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical'; }).length;
+      var highCrit = fleet.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme'; }).length;
       var compAvgs = {};
       ['C', 'V', 'I', 'E', 'S', 'T'].forEach(function (k) {
         compAvgs[k] = fleet.reduce(function (a, s) { return a + ((s.components && s.components[k]) || 0); }, 0) / n;
@@ -1518,7 +1523,7 @@
       if (!provData[p]) provData[p] = { subs: [], sumR: 0, highCrit: 0 };
       provData[p].subs.push(s);
       provData[p].sumR += s.R_median || 0;
-      if (s.classification === 'High' || s.classification === 'Critical') provData[p].highCrit++;
+      if (s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme') provData[p].highCrit++;
     });
     var provList = Object.keys(provData).map(function (p) {
       var d = provData[p];
@@ -1554,7 +1559,7 @@
 
     // 3. Bridge substations
     var bridges = fleet.filter(function (s) { return s.graph_topology && s.graph_topology.is_bridge; });
-    var bridgeHighCrit = bridges.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical'; });
+    var bridgeHighCrit = bridges.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme'; });
     spots.push({
       title: bridges.length + ' Bridge Substations — Single Points of Failure',
       body: '<strong>' + bridges.length + ' substations</strong> are topological bridges — their failure disconnects ' +
@@ -1565,7 +1570,7 @@
 
     // 4. Seismic
     var seismicHigh = fleet.filter(function (s) { return s.seismic && s.seismic.zone <= 1; });
-    var seismicHighRisk = seismicHigh.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical'; });
+    var seismicHighRisk = seismicHigh.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme'; });
     spots.push({
       title: 'Seismic Zone 4–5: ' + seismicHigh.length + ' Substations in Highest Hazard',
       body: '<strong>' + seismicHigh.length + ' substations</strong> sit in the highest seismic hazard zones ' +
@@ -1576,7 +1581,7 @@
 
     // 5. Energy poverty
     var highEP = fleet.filter(function (s) { return s.socio_economic && s.socio_economic.EP_rate_region > 14; });
-    var highEP_highRisk = highEP.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical'; });
+    var highEP_highRisk = highEP.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme'; });
     spots.push({
       title: 'Energy Poverty Double Jeopardy',
       body: '<strong>' + highEP.length + ' substations</strong> serve regions with energy poverty rates above 14% — ' +

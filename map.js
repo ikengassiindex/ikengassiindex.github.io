@@ -40,11 +40,15 @@
   const COS42 = Math.cos(42 * Math.PI / 180);
 
   // ------ Ikenga Colors ------
+  // Phase 2B-2 (25 June 2026): 5-band system; Extreme = #5a0d0a (darker
+  // crimson, operator Q1(b) colour choice A). Extreme captures R_median
+  // in [1.00, 1.30] — the additive-R6c_flood overflow zone.
   const BAND_COLORS = {
     Low: '#5d8563',
     Medium: '#b8863a',
     High: '#aa4234',
-    Critical: '#941914'
+    Critical: '#941914',
+    Extreme: '#5a0d0a'
   };
 
   const KV_COLORS = {
@@ -1310,7 +1314,7 @@ if (!hasNested) {
       // ------ Compact format adapter ------
       // If substations are arrays (US compact format), expand to objects
       if (SSI.substations.length > 0 && Array.isArray(SSI.substations[0])) {
-        const BAND_MAP = { L: 'Low', M: 'Medium', H: 'High', C: 'Critical' };
+        const BAND_MAP = { L: 'Low', M: 'Medium', H: 'High', C: 'Critical', E: 'Extreme' };
         var totalSubs = SSI.substations.length;
         SSI.substations = SSI.substations.map(function(a, idx) {
           var comps = { C: a[6][0], V: a[6][1], I: a[6][2], E: a[6][3], S: a[6][4], T: a[6][5] };

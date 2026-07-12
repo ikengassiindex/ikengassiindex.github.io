@@ -120,7 +120,11 @@
         if (!stats) return;
         var fs = (ssi && ssi.fleet_summary) || {};
         var total = (fs.total != null ? fs.total : (ssi && ssi.substations ? ssi.substations.length : 0)) || 0;
-        var critical = (fs.bands && fs.bands.Critical != null) ? fs.bands.Critical : 0;
+        // Phase 2B-2 (25 June 2026): 5-band system; the "critical" count in
+        // map stats aggregates Critical + Extreme (both are 'R >= 0.75'
+        // semantically) — matches front-page kpi-critical semantics.
+        var critical = ((fs.bands && fs.bands.Critical != null) ? fs.bands.Critical : 0)
+                     + ((fs.bands && fs.bands.Extreme  != null) ? fs.bands.Extreme  : 0);
         var medianR = (fs.median_R != null) ? fs.median_R
                     : (fs.R_median != null ? fs.R_median : null);
         var nRegions = (ssi && ssi.regions && ssi.regions.length) || 0;
