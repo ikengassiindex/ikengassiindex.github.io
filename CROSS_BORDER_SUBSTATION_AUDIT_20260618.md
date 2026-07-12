@@ -297,3 +297,56 @@ Audit script can be wired into CI as a deploy-blocking gate per Failure-mode-1 r
 ---
 
 *CROSS_BORDER_SUBSTATION_AUDIT_20260618.md v1 · authored 18 June 2026 deep night · audit performed against `ikengassiindex.github.io` repository state at audit date · methodology: Shapely Point-in-Polygon against per-country `bounds.json` GeoJSON FeatureCollection · CC BY-SA 4.0*
+
+---
+
+## Addendum · 25 June 2026 — v4.3 gap-audit forward reference + line-coupling invariant restatement
+
+**Closure loop.** The 18 June 2026 audit above surfaced the 4-mode failure taxonomy + remediated ≈24,650 misattributed substations. Discipline #36 codified the enforcement gate (5-layer defense + 3 enforcement points) and the pytest sentinel landed 25 June 2026. The remediation was correct — it corrected misattribution — but exposed a second-order question: **how big is each country's true fleet?** For 5 countries where >20 % of pre-D#36 counts were removed, the answer required a dedicated gap audit rather than a re-ingestion sweep, because those countries' current ingestion (OSM Overpass) is structurally under-collecting relative to the public regulator source stack.
+
+**v4.3 gap-audit outcome** (`Report Production/02-v4_3-gap-audit-2026-07/v4_3-gap-audit.md`, 25 June 2026):
+
+| Country | Post-D#36 | Hypothesised true fleet | Additional sources identified | v4.3 engineering (subs + lines) |
+|---|---:|---:|---|---:|
+| Canada | 6,399 | 14,000–18,000 | CER + NRCan Atlas + 6 provincial utilities + 3 territorial utilities | 25-32 days |
+| Norway | 5,842 | 7,200–8,500 | Statnett + NVE + 5 largest DSOs + Longyearbyen (Svalbard) | 18-22 days |
+| Mexico | 2,436 | 3,600–4,800 | CENACE SIM (verification pending) + CFE + SENER + CRE | 10-13 days |
+| Austria | 741 | 850–1,100 | E-Control + APG + 5 Bundesland DSOs | 14-19 days |
+| Greenland | 37 | 65–80 | Nukissiorfiit (71-supply-point statutory anchor) + Danish DataHub cross-ref | 7-10 days |
+| **Cohort** | **15,455** | **25,715–32,480** | | **77-99 days** |
+
+**Line-coupling invariant** (operator directive 25 June 2026, extending this audit's Failure-mode-1 remediation #3).
+
+The 18 June 2026 audit established the removal-side invariant in the D#36 pipeline: *"Transmission lines connecting filtered-in substations to filtered-out substations are KEPT"* (`scripts/clean_grid_geo.py` docstring). The line-preservation logic reads: any transmission line touching a cross-border-remediated substation is retained on the graph — the substation being filtered out doesn't orphan the connecting edge, because the neighbouring country's substation is still there (correctly attributed) to hold the other endpoint.
+
+The v4.3 gap-audit extends this invariant in the **additive** direction:
+
+> **v4.3 Line-Coupling Invariant (Discipline #41).** Every substation added to a country's `ssi-data.json` via v4.3 gap-closure MUST be paired with the ingestion of its connecting transmission lines into the same country's `grid-geo.json` in the same pipeline pass.
+
+**Why this matters analytically.** R4 Graph-Theoretic Network Criticality (Sobol first-order S_i = 0.37 on Italy, validated 12 June 2026) and R6b Network Topology (S_i = 0.99, the dominant per-modifier sensitivity in v4.2) both depend on graph connectivity. Substation nodes without connecting edges appear as zero-degree nodes — R6b's Betweenness Centrality reads them as topologically peripheral even if they're transmission-backbone assets. Without line pairing, the v4.3 augmented cohort's R6b + R4 signals become silently biased downward.
+
+**Where the line data lives per country.** The gap audit verified that all 5 gap-audit publishers bundle substation + line data in the same registry:
+
+- **Canada**: NRCan Atlas of Canada transmission-line layer (paired GeoJSON with substation nodes) + provincial utility one-line diagrams. Yield: ~15-22 k km.
+- **Norway**: Statnett grid GeoJSON (transmission topology bundled) + NVE Kraftsystemutredning (line + substation registry paired). Yield: ~3-4.5 k km.
+- **Mexico**: CENACE SIM includes topological line data + CFE per-region one-line diagrams. Yield: ~4-6 k km.
+- **Austria**: APG grid map (line + substation bundled per Austrian grid code) + Bundesland DSO one-line diagrams. Yield: ~600-1.2 k km.
+- **Greenland**: Nukissiorfiit publishes interconnection map covering the 71 supply points. Yield: ~150-400 km.
+
+**Enforcement — new sentinel class** (queued Q3 2026 alongside first Canada landing). Extend `tests/test_no_cross_border_leakage.py` with `TestSubstationLineParity`:
+
+1. Every substation in `<country>/ssi-data.json` has ≥1 transmission line touching it in `<country>/grid-geo.json` (Greenland-class islanded-settlement subs explicitly exempted per per-country whitelist)
+2. No transmission line has zero endpoints in the substation registry (line orphaned by substation removal — the D#36 removal-side cleanup class)
+3. Line-count / substation-count ratio stays within its pre-v4.3 country-specific empirical distribution ±2σ
+
+Same enforcement structure as Discipline #36: PR-time gate + monthly auto-remediation + pytest sentinel.
+
+**Auditability chain per line-ingestion event** (operator directive 25 June 2026). Every per-country line-ingestion pass emits `v4_3-line-ingestion-audit-<country>.yaml` recording: source URL + retrieval date (UTC) + SHA-256 of downloaded artefact + line-count delta + orphan-check status + commit hash + CI job run URL + cross-reference to the substation-ingestion audit YAML for the same pass. Traceable at read-time.
+
+**Where this cross-references.**
+
+- `Report Production/02-v4_3-gap-audit-2026-07/v4_3-gap-audit.md` — full per-country dossier + LP-DD provenance narrative
+- `REPORTS_FRAMING_KB.md` §8bis Discipline #40 (5-band system) + Discipline #41 (line-coupling invariant)
+- `ikengassiindex.github.io/CLAUDE.md` — Phase 2A/B/C closure block + v4.3 gap-closure forward-reference + power-lines invariant
+
+*Addendum authored 25 June 2026 as session-close discipline pass per Convention #54-equivalent housekeeping. CC BY-SA 4.0.*
