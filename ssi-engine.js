@@ -40,12 +40,21 @@
 window.SSIEngine = (function () {
   'use strict';
 
-  // ─── Classification thresholds (preserved) ───────────────
+  // ─── Classification thresholds ──────────────────────────
+  // Phase 2B-1 (25 June 2026): 4-band → 5-band per operator Q1(b) decision.
+  // The 5th 'Extreme' band [1.00, 1.30] captures the additive-R6c_flood
+  // overflow zone where soft_clip_upper multiplicative saturation combines
+  // with flood-driven additive push per the v4.2 master equation
+  //   R_final = soft_clip_upper(R_base × Π mult_i) + Σ (add_i − 1.0)
+  // Mirror of scripts/pipeline/scoring/engine.py::BANDS — kept in sync
+  // manually; drift here breaks the frontend rendering vs the canonical
+  // classification field.
   var BANDS = [
     { name: 'Low',      min: 0.00, max: 0.25 },
     { name: 'Medium',   min: 0.25, max: 0.50 },
     { name: 'High',     min: 0.50, max: 0.75 },
-    { name: 'Critical', min: 0.75, max: 1.00 }
+    { name: 'Critical', min: 0.75, max: 1.00 },
+    { name: 'Extreme',  min: 1.00, max: 1.30 }
   ];
 
   var CONFIDENCE_TIERS = [

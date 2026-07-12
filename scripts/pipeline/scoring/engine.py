@@ -70,11 +70,19 @@ METRIC_CORRELATIONS = {
 }
 
 # Classification bands
+# Phase 2B-1 (25 June 2026): 4-band → 5-band per operator Q1(b) decision.
+# The 5th 'Extreme' band [1.00, 1.30] captures the additive-R6c_flood
+# overflow zone where soft_clip_upper multiplicative saturation combines
+# with flood-driven additive push. See v4.2 master equation
+#   R_final = soft_clip_upper(R_base × Π mult_i) + Σ (add_i − 1.0)
+# and Sobol sensitivity (V4.2_COMPLETENESS_AUDIT.md §15.4) where R6c
+# was the second-highest first-order index (S_i=0.96).
 BANDS = [
     {"name": "Low",      "min": 0.00, "max": 0.25},
     {"name": "Medium",   "min": 0.25, "max": 0.50},
     {"name": "High",     "min": 0.50, "max": 0.75},
     {"name": "Critical", "min": 0.75, "max": 1.00},
+    {"name": "Extreme",  "min": 1.00, "max": 1.30},
 ]
 
 # T1 DER Stress sub-metric weights and normalisation
@@ -609,7 +617,8 @@ def compute_fleet_summary(substations):
         return {}
 
     R_vals = sorted(s["R_median"] for s in substations)
-    bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0}
+    # Phase 2B-1 (25 June 2026): 4-band → 5-band with Extreme
+    bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0, "Extreme": 0}
     conf = {"high": 0, "medium": 0, "low": 0}
 
     for s in substations:
@@ -642,7 +651,8 @@ def compute_regional_summary(substations):
     for region, subs in regions.items():
         R_vals = sorted(s["R_median"] for s in subs)
         n = len(subs)
-        bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0}
+        # Phase 2B-1 (25 June 2026): 4-band → 5-band with Extreme
+        bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0, "Extreme": 0}
         for s in subs:
             bands[classify_band(s["R_median"])] += 1
 
@@ -652,8 +662,14 @@ def compute_regional_summary(substations):
             "median_R": round(_percentile(R_vals, 0.50), 4),
             "mean_R": round(sum(R_vals) / n, 4),
             "bands": bands,
+            # Phase 2B-1 (25 June 2026): pct_critical stays SINGLE-BAND
+            # (its original semantic per pre-Phase-2B-1) to preserve API
+            # back-compat. pct_high stays CUMULATIVE-FROM-HIGH (extended
+            # to include Extreme so the "top-of-fleet share" semantic
+            # holds). New pct_extreme is peer to pct_critical (single-band).
             "pct_critical": round(bands["Critical"] / n * 100, 1),
-            "pct_high": round((bands["High"] + bands["Critical"]) / n * 100, 1),
+            "pct_extreme":  round(bands["Extreme"]  / n * 100, 1),
+            "pct_high": round((bands["High"] + bands["Critical"] + bands["Extreme"]) / n * 100, 1),
         })
 
     return sorted(summaries, key=lambda x: x["median_R"], reverse=True)
