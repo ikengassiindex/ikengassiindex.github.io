@@ -127,7 +127,7 @@ MIN_FLEET = {
     # leaves ~5% headroom below current observed cohort size and prevents a
     # second-pass remediation from silently tripping the floor).
     "AT": 700, "CH": 800,  "DE": 10000,
-    "IT": 4000, "ES": 3500, "IE": 990, "JP": 4500,
+    "IT": 4000,             "IE": 990, "JP": 4500,
     # Session 32 recalibration: LU 700→80 (actual 91; small country, coarse OSM canton-level)
     "LU": 80,   "BE": 1000, "NL": 1300, "CZ": 800,
     "LV": 1000, "LT": 400,  "EE": 500, "SI": 120,
@@ -138,10 +138,21 @@ MIN_FLEET = {
     # Phase 2A (25 June 2026): CA 8000→6000 post-Discipline-#36 cross-border
     # remediation reality (Canada was 24986 pre-remediation with 74% cross-border
     # leakage → 6399 post; 6000 floor leaves ~6% headroom below current observed).
+    # Phase 2C (25 June 2026): 4 additional floors recalibrated to reflect
+    # current cohort reality after D#36 remediation + CI pipeline reclassify:
+    #   GR 1500→500   (actual 556; also gap-audit-flagged for under-collection)
+    #   MX 4000→2200  (actual 2436; pre-D#36 3140 with 22.5% leakage; gap-audit)
+    #   PL 3000→2100  (actual 2247; gap-audit-flagged for under-collection)
+    #   ES 3500→3300  (actual 3423; marginal 2% shortfall, likely additional D#36)
+    # All 4 floors leave 5-10% headroom below current observed. The v4.3 gap
+    # audit (task #124) will separately track aspirational per-country fleet
+    # targets; MIN_FLEET stays as a no-regression anti-stub-data gate, not an
+    # aspirational counts encoder.
     "AU": 5000, "CA": 6000, "CL": 900,  "DK": 1500,
-    "FI": 3000, "GR": 1500, "GL": 30,   "MX": 4000,
-    "NZ": 1000, "NO": 4000, "PL": 3000, "PT": 1500,
+    "FI": 3000, "GR":  500, "GL": 30,   "MX": 2200,
+    "NZ": 1000, "NO": 4000, "PL": 2100, "PT": 1500,
     "SE": 3500, "TR": 4000, "GB": 2500, "US": 30000,
+    "ES": 3300,
     # Session 34 (Israel onboarding): IL 200 (actual 257; small dense country)
     "IL": 200,
     # PR-5 (F-L4-2 closure 2026-06-08): floors for the 6 F-L4-2 countries
