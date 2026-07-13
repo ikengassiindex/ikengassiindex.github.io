@@ -1,0 +1,37 @@
+"""
+SSI Index v4.3 workstream — Austria ingestion package.
+
+Priority 4 Austria workstream (Editorial Calendar Q1 2027).
+
+Connectors:
+  - osm_overpass.py   AT-C1  OSM Overpass API (primary — federal-canonical unavailable)
+
+Discovery + empirical anchors:
+  - austria/v4_3-ingestion-audit-austria-preflight.yaml (Step 1)
+  - austria/v4_3-ingestion-audit-austria-fetch.yaml (Step 2)
+
+Architectural distinctions vs Canada + Norway + Mexico:
+  - Federal-canonical machine-accessible data unavailable (APG TSO + E-Control
+    regulator + data.gv.at CKAN all behind interactive UIs / PDFs from cloud IPs)
+  - OSM Overpass empirically confirmed as PRIMARY canonical (15,213 substations
+    — 20× ratio vs existing 741 baseline, LARGEST in v4.3)
+  - BEST-IN-COHORT OSM tagging discipline: 77.2% operator + 79.8% voltage +
+    75% name (vs Mexico 16.6% operator; vs Norway ~30% pre-NVE)
+  - FRAGMENTED market structure — 9 distinct utilities dominant (APG TSO +
+    Wiener Netze + 7 Bundesland DSOs + ÖBB railway traction)
+  - NO monopoly-fallback rule needed (unlike Mexico's CFE-monopoly rule)
+  - Convention #56 visibly-honest degradation applies only to ~23% untagged tail
+
+Architectural discipline:
+  - Discipline #36 cross-border filter — default 100m tolerance
+    (Austria bounds already Mode-2 remediated per task #56, 2026-06-24)
+  - Discipline #41 line-substation pairing preserved
+  - Convention #56 visibly-honest degradation — missing OSM tags → None,
+    not fabricated defaults
+  - Convention #60 non-commercial provenance — OSM (ODbL) only; ENTSO-E
+    Transparency Platform queued as Phase 2 candidate (open, needs token)
+
+Phase 2+ candidates (queued):
+  - AT-C2 ENTSO-E Transparency Platform (APG-tier transmission enrichment)
+  - AT-C3 Bundesländer INSPIRE-compliant WFS federation (Vienna wien.gv.at + Salzburg + etc.)
+"""
