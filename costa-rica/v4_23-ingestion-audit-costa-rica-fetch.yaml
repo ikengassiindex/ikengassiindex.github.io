@@ -1,0 +1,78 @@
+# Costa Rica v4.23 Ingestion Audit — Step 2 Fetch
+# ================================================
+# Task: #219 (WAVE2-Step2 Costa Rica)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: costa-rica/v4_23-ingestion-audit-costa-rica-preflight.yaml
+# Status: FETCH_COMPLETE
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: costa-rica
+source_id: CR-C1-osm-overpass
+fetched_at_utc: "2026-07-13T00:00:00Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 36377
+raw_sha256: 42db211e9cd40aeb4401c72a3efc6fbf2a410645d3af1c55951e5340e92bf230
+provincial_scope: null  # Single-query, whole country
+
+empirical_counts:
+  substations: 112  # post Discipline #36 (well below pre-flight 500-1500 estimate)
+  transmission_lines: 580  # post Discipline #36 (3 lines dropped outside polygon)
+
+empirical_finding_of_note:
+  finding: >
+    Costa Rica OSM coverage is unexpectedly SPARSE — 112 substations vs
+    pre-flight estimate of 500-1500. This reflects that Costa Rica's
+    distribution grid is underrepresented in OSM; most tagged infrastructure
+    is transmission tier (ICE 230/138 kV backbone) + urban SJ metro (CNFL).
+    Rural DSO territory (Coopelesca San Carlos + Coopeguanacaste NW + rural
+    Puntarenas/Limón) has very sparse OSM tagging.
+  implication: >
+    The baseline canonical 169 subs already captured Costa Rica's national
+    transmission-tier grid comprehensively. The 500m proximity match found
+    112 pairs; the remaining 58 baseline subs had no OSM neighbor within
+    threshold and required Step 5 retroactive owner attribution via the
+    same monopoly-with-overlay resolver (Layer 1 TSO threshold ≥138 kV).
+    All 58 resolved to ICE cleanly.
+
+owner_resolution_provenance:
+  direct_osm_operator_tag: 66
+  alias_normalised_osm_operator: 26
+  layer_1_ICE_TSO_threshold_ge_138kv: 3   # OSM subs with 138+ kV
+  layer_2_dso_overlay_geofence: 7          # 5 CNFL + 1 Coopeguanacaste + 1 Coopesantos
+  layer_3_ICE_default: 10                  # Remaining unmapped territory
+  unresolved: 0                            # ICE default catches all — Convention #56 preserved
+
+layer_2_geofence_breakdown:
+  CNFL: 5
+  Coopeguanacaste: 1
+  Coopesantos: 1
+
+discipline_41_line_parity:
+  post_fetch: PASS (112 subs + 580 lines, ratio 5.18)
+
+discipline_36_cross_border_filter:
+  polygon_source: costa-rica/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 0
+  lines_dropped_outside_polygon: 3
+  polygon_healing: "7 self-intersecting features healed via buffer(0) — cross-border tolerance filter clean"
+
+wall_clock:
+  step_2_fetch_seconds: ~130  # substations + line query with 504 gateway retry + 429 backoff
+  cache_hit_second_run: true
+
+warnings:
+  - "Overpass 504 gateway on primary endpoint — retried via kumi.systems successfully"
+  - "Overpass 429 rate-limited on line query — 30s backoff successful"
+  - "Discipline #36 — dropped 0 substations + 3 lines outside Costa Rica polygon (100m default tolerance)"
+
+auditability_chain:
+  parent_preflight: costa-rica/v4_23-ingestion-audit-costa-rica-preflight.yaml
+  step_2_fetch: costa-rica/v4_23-ingestion-audit-costa-rica-fetch.yaml
+  step_4_merge: costa-rica/v4_23-ingestion-audit-costa-rica-merge.yaml
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: costa-rica/ssi-data.json
+
+status: READY_FOR_STEP_4
