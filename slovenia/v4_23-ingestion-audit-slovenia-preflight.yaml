@@ -1,0 +1,181 @@
+# Slovenia v4.23 Ingestion Audit — Pre-flight
+# ============================================
+# Task: #213 (WAVE2-Step1 Slovenia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: slovenia
+  iso2: SI
+  iso3: SVN
+  wave: 2
+  priority: 12
+  step: 1
+  target: "Owner enrichment via OSM Overpass — 5th region-jurisdiction × voltage class"
+  rationale: >
+    Slovenia carries 157 substations at 0% owner tagged and 100% voltage-tagged
+    at 66 kV (baseline captured only Slovenia's unique HV distribution tier —
+    OSM will surface 400 kV + 220 kV EHV + 110 kV HV + 20/35 kV MV). Fifth
+    application of the region-jurisdiction × voltage-class pattern (after
+    Belgium 3-region + Netherlands 4-region + Hungary 4-region NUTS-3 +
+    Chile latitude-band). Slovenia is architecturally close to Hungary
+    (NUTS-3 codes stored as SI### format) with 5 clear DSO territories.
+
+baseline_state:
+  ssi_data_substations: 157
+  grid_geo_substations: 158
+  grid_geo_lines: 4384
+  lines_per_substation_ratio: 27.9  # VERY HIGH — MV distribution deep-ingestion (task #182 outlier class)
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0
+  region_coverage_pct: 100.0  # 12 NUTS-3 codes populated
+  nuts3_split:
+    SI032_Podravska: 37       # Maribor + NE
+    SI041_Osrednjeslovenska_a: 19  # Ljubljana urban
+    SI043_Savinjska: 18       # Celje + Savinjska basin
+    SI042_Gorenjska: 16       # Kranj + Alps NW
+    SI033_Koroška: 14         # Slovenj Gradec (N border)
+    SI034_Savinjska_split: 12 # Celje overflow
+    SI038_Posavska: 10        # Krško + Brežice
+    SI031_Pomurska: 8         # Murska Sobota (E)
+    SI037_Zasavska: 8         # Trbovlje (central)
+    SI036_Osrednjeslovenska_b: 6  # Ljubljana suburbs
+    SI035_Obalno-kraška: 5    # Koper + coast (SW)
+    SI044_Goriška: 4          # Nova Gorica (W)
+  voltage_class_baseline:
+    66_kv: 157   # ALL — Slovenia's unique HV distribution tier
+    other: 0     # 100% missing on EHV/HV/MV tiers — OSM fill critical
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [13.35, 45.40, 16.65, 46.90]  # west, south, east, north
+    strategy: >
+      Single-query pattern — Slovenia bbox ~20k km² (compact Alpine +
+      Pannonian). Sub-2-minute fetch expected. Similar order to Belgium
+      (~30k km²) and 8× larger than Luxembourg.
+    expected_yield:
+      substations: 400-800
+      lines: 3000-8000
+    tag_completeness_hypothesis: >
+      Slovenia OSM tagging density typically 60-80% for metropolitan
+      (Ljubljana + Maribor + Celje). Alpine + eastern rural cantons 30-50%.
+    lp_dd_class: canonical
+
+  fallback_region_jurisdiction:
+    strategy: 5_dso_territory_geofence_plus_alias
+    rationale: >
+      Fifth application of the region-jurisdiction × voltage-class pattern.
+      Slovenia has 5 regional DSOs mapped to NUTS-3 territories, plus ELES
+      as sole TSO ≥110 kV. Voltage-class disambiguates TSO vs DSO ownership
+      at substations sitting inside a DSO's geofence.
+    tso_threshold_kv: 110  # ELES operates 400 + 220 + 110 kV transmission
+    tso_operator: ELES d.o.o.  # Elektro-Slovenija (state-owned TSO)
+    dso_territories_by_nuts3:
+      Elektro Ljubljana:
+        nuts3: [SI041, SI037, SI038, SI036]
+        rationale: "Central Slovenia — Ljubljana urban + Zasavska + Posavska + Ljubljana suburbs"
+      Elektro Maribor:
+        nuts3: [SI032, SI033, SI031]
+        rationale: "Northeast — Maribor + Koroška + Pomurska (extends to E border)"
+      Elektro Celje:
+        nuts3: [SI043, SI034]
+        rationale: "Central-east — Savinjska basin + Celje canton"
+      Elektro Gorenjska:
+        nuts3: [SI042]
+        rationale: "Northwest — Gorenjska/Kranj + Alpine belt (Julian Alps)"
+      Elektro Primorska:
+        nuts3: [SI044, SI035]
+        rationale: "West + coast — Goriška + Obalno-kraška (Nova Gorica + Koper)"
+
+  dso_alias_normalisation:
+    aliases:
+      "ELES": "ELES d.o.o."
+      "ELES d.o.o.": "ELES d.o.o."
+      "Elektro-Slovenija": "ELES d.o.o."
+      "Elektro Slovenija": "ELES d.o.o."
+      "Elektro Ljubljana": "Elektro Ljubljana"
+      "Elektro Ljubljana d.d.": "Elektro Ljubljana"
+      "Elektro Maribor": "Elektro Maribor"
+      "Elektro Maribor d.d.": "Elektro Maribor"
+      "Elektro Celje": "Elektro Celje"
+      "Elektro Celje d.d.": "Elektro Celje"
+      "Elektro Gorenjska": "Elektro Gorenjska"
+      "Elektro Gorenjska d.d.": "Elektro Gorenjska"
+      "Elektro Primorska": "Elektro Primorska"
+      "Elektro Primorska d.d.": "Elektro Primorska"
+      "SODO": "SODO d.o.o."  # Slovenian DSO market operator (aggregator entity)
+      "SŽ - Slovenske železnice": "Slovenske železnice"  # Slovenian Railways
+      "Slovenske železnice": "Slovenske železnice"
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/slovenia/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # ELES TSO threshold + 5-DSO NUTS-3 geofence + alias map
+    - osm_overpass.py  # single-query fetch (~20k km²)
+    - merge_into_ssi_data.py  # 500m proximity + region fallback + NUTS-3 mapping
+  pattern_reused_from: hungary (4-region NUTS-3 codes + case-insensitive alias)
+  differentiators_vs_hungary:
+    - dso_count: 5 territories vs Hungary's 4 (E.ON DÉDÁSZ / ELMŰ-ÉMÁSZ / MVM Démász / OPUS)
+    - tso_threshold: 110 kV vs Hungary's 200 kV (Slovenia has no 132 kV DSO tier)
+    - unique_voltage_tier: 66 kV baseline (Slovenia's HV distribution)
+    - nuts3_granularity: 12 codes mapped to 5 DSOs (2-3 codes per DSO typical)
+    - state_ownership: ELES + all 5 DSOs are 100% state-owned via SDH holding
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # 5-DSO geofence + ELES TSO threshold
+  post_merge_voltage_coverage: 60-90%  # from 100% single-tier to multi-tier
+  post_merge_substations: 400-800
+  post_merge_lines: 3000-8000
+  km_of_lines: 5000-15000
+
+risks_flagged:
+  - risk_1: >
+      Slovenia's 66 kV HV distribution tier is architecturally unusual —
+      most EU DSOs operate at 110 kV. TSO threshold at 110 kV means most
+      66 kV subs will resolve to DSO by NUTS-3 geofence. ELES also operates
+      some 110 kV substations that are TSO — geofence-only fallback would
+      misattribute these; voltage-class disambiguation is essential.
+  - risk_2: >
+      Line ratio 27.9 in baseline is FLAGGED task #182 outlier. Slovenia
+      has been ingested with MV distribution deep-scan. Post-merge net-new
+      lines may compound this — verify grid-geo file size + line count
+      after Step 4 merge.
+  - risk_3: >
+      3-country border zones with Italy (SW) + Austria (N) + Croatia (SE)
+      + Hungary (NE) — Discipline #36 cross-border filter must handle the
+      Karavanke Alps tunnel interconnections + Trieste cross-border 400 kV
+      to Divača substation cleanly.
+
+convention_preservation:
+  discipline_36:
+    scope: Slovenia bounds already CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      Historical operator names preserved via osm_original_operator field.
+      Multi-tier ELES 110 kV overlap with DSO 66 kV disambiguated by voltage-class.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to slovenia/ + scripts/pipeline/ingestion/slovenia/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.slovenia.osm_overpass`
+    locally. Expected wall-clock <2 min (compact country).
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.slovenia.merge_into_ssi_data`.
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2
