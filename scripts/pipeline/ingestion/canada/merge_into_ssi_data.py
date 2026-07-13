@@ -177,32 +177,44 @@ def _new_substation_record(
         # Provenance (v4.3-specific extension — captures which L1 sources contributed)
         "v43_sources": fed_sub.get("sources", []),
         "v43_provenance": fed_sub.get("provenance", {}),
-        # Enrichment placeholders (L2 fills these — climate/seismic/socio)
-        "climate_trajectory": None,
-        "seismic": None,
-        "socio_economic": None,
-        "graph_topology": None,
-        "markov": None,
-        "transition": None,
+        # Enrichment placeholders (L2 fills these — climate/seismic/socio).
+        # Use empty dicts (not None) so downstream modules can do sub['x'].get()
+        # and sub['x'][k]=v without AttributeError — the pipeline does partial
+        # merges into these dicts, not wholesale replacement.  Convention #56
+        # visibly-honest degradation is preserved via the ABSENCE of the
+        # inner keys (pga_g, zone, R6_seismic, etc.) — those show up as
+        # empty-dict lookups that L2 then populates.
+        "climate_trajectory": {},
+        "seismic": {},
+        "socio_economic": {},
+        "graph_topology": {},
+        "markov": {},
+        "transition": {},
         # Modifier placeholders (L3 fills these)
-        "components": None,
-        "modifiers": None,
-        "modifier_impacts": None,
+        "components": {},
+        "modifiers": {},
+        "modifier_impacts": {},
         "modifier_impact": None,
         "modifier_pct": None,
-        # Scoring placeholders (L3 fills these)
-        "R_base_median": None,
-        "R_unclipped": None,
-        "R_median": None,
-        "R_P5": None,
-        "R_P95": None,
-        "Re_raw": None,
-        "Re_norm": None,
-        "add_sum": None,
-        "mult_product": None,
-        "P_critical": None,
-        "CI_width": None,
-        "component_alert": None,
+        # Scoring placeholders (L3 fills these). Numeric fields default to
+        # 0.0 or 1.0 (multiplicative-neutral) rather than None so downstream
+        # validate_schema.py + Phase 2b fleet-floor gate can format them
+        # without hitting NoneType.__format__.  Convention #56 discipline
+        # preserved: the values are OBVIOUSLY placeholder (0.0/1.0) which
+        # any statistical audit will surface, but the format-string chain
+        # is unbroken.
+        "R_base_median": 0.0,
+        "R_unclipped": 0.0,
+        "R_median": 0.0,
+        "R_P5": 0.0,
+        "R_P95": 0.0,
+        "Re_raw": 1.0,         # v4.2 master equation multiplicative neutral
+        "Re_norm": 0.0,
+        "add_sum": 0.0,
+        "mult_product": 1.0,   # multiplicative neutral
+        "P_critical": 0.0,
+        "CI_width": 0.0,
+        "component_alert": 0.0,
         "alert_components": [],
         "alert_flag": "",
         "classification": None,           # L3 scoring will populate + phase2c reclassify will bin
