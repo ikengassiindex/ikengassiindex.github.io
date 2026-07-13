@@ -59,22 +59,17 @@ logger = logging.getLogger(__name__)
 SOURCE_ID = "CA-C4-ns-nstdb-utilities-point"
 GEOJSON_URL = "https://data.novascotia.ca/api/geospatial/eiwy-kfrj?method=export&format=GeoJSON"
 
-# Placeholder — the actual electrical-substation FEAT_CODE must be verified
-# against the NSTDB Feature Code table.  Empirical probe surfaced UTTK60 = TANK;
-# candidate substation codes to verify (from the UT-prefix pattern) are stored
-# in this whitelist.  Downstream federation narrows the filter after the code
-# is anchored.
-CANDIDATE_SUBSTATION_FEAT_CODES = {
-    # Feature Code Table check queued for Step 3 follow-on.  Once anchored:
-    # replace this open whitelist with the empirically-verified code(s).
-    # Placeholder pattern: UTSS* or UTEL* per NSTDB naming convention.
-    "UTSS40",
-    "UTSS50",
-    "UTSS60",
-    "UTEL40",
-    "UTEL50",
-    "UTEL60",
-}
+# Empirically anchored 2026-07-13 by probing the live NS-NSTDB Utilities Point
+# Layer (all 2,371 features):
+#   UTTK60 (1288)  TANK (6-15m diameter) point
+#   UTTO60 (1010)  TOWER (all except transmission line towers) point
+#   UTSP60   (41)  SEWAGE SETTLING POND
+#   UTSS60   (24)  SUBSTATION (transformer) point   ← ELECTRICAL
+#   UTTO65    (5)  TOWER indefinite/approximate
+#   UTTK65    (3)  TANK indefinite/approximate
+# So exactly ONE code — UTSS60 — matches the electrical-substation subset.
+# 24 substations for Nova Scotia at 1:50k NSTDB scale is the empirical baseline.
+CANDIDATE_SUBSTATION_FEAT_CODES = frozenset({"UTSS60"})
 
 
 # ── Fetch ────────────────────────────────────────────────────────────────
@@ -95,9 +90,15 @@ def _fetch_geojson(timeout: int = 60) -> bytes:
 # ── Parse ────────────────────────────────────────────────────────────────
 def _substation_record_from_geojson_feature(feature: dict) -> SubstationRecord | None:
     """Normalise a NSTDB Utilities Point feature.  Returns None if not a
-    substation-candidate (mixed-payload filter)."""
+    substation-candidate (mixed-payload filter).
+
+    NS-NSTDB GeoJSON export uses lowercase field names (feat_code, feat_desc);
+    tolerant lookup handles either case.
+    """
     props = feature.get("properties", {}) or {}
-    feat_code = str(props.get("FEAT_CODE", "")).strip()
+    feat_code = str(
+        props.get("feat_code") or props.get("FEAT_CODE") or ""
+    ).strip()
     if feat_code not in CANDIDATE_SUBSTATION_FEAT_CODES:
         return None
 
@@ -106,15 +107,23 @@ def _substation_record_from_geojson_feature(feature: dict) -> SubstationRecord |
     if geom.get("type") != "Point":
         return None
 
+    feat_desc = props.get("feat_desc") or props.get("FEAT_DESC")
+    tail = (
+        props.get("OBJECTID")
+        or props.get("_id")
+        or props.get("_nstdb_idx")
+        or "?"
+    )
+
     return SubstationRecord(
         source_id=SOURCE_ID,
-        feature_id=f"nstdb-{feat_code}-{props.get('OBJECTID', props.get('_id', ''))}",
+        feature_id=f"nstdb-{feat_code}-{tail}",
         latitude=coords[1],
         longitude=coords[0],
         voltage_kv=None,             # Absent in NSTDB Point Layer schema
         owner=None,                  # Nova Scotia Power is the province utility
                                      # but publisher does not tag ownership
-        operator_station_name=props.get("FEAT_DESC"),
+        operator_station_name=feat_desc,
         raw_attributes=dict(props),
     )
 
@@ -133,12 +142,6 @@ def fetch(*, apply_bounds: bool = True) -> IngestionResult:
         fetched_at_utc=now_utc_iso(),
         source_url=GEOJSON_URL,
         provincial_scope="NS",
-    )
-    result.warnings.append(
-        "Discipline #55 stub — Nova Scotia substation FEAT_CODE whitelist is a "
-        "scaffold placeholder.  Anchor against the NSTDB Feature Code table at "
-        "https://nsgi.novascotia.ca/WSF_DDS/DDS.svc/DownloadFile?tkey=fhrTtdnDvfytwLz6&id=17 "
-        "before merging."
     )
 
     try:
@@ -159,6 +162,10 @@ def fetch(*, apply_bounds: bool = True) -> IngestionResult:
     total_features = 0
     for feat in geo.get("features", []):
         total_features += 1
+        # Assign a positional index in-place so downstream feature_id is stable
+        # even when the NSTDB export lacks OBJECTID.
+        feat.setdefault("properties", {})
+        feat["properties"].setdefault("_nstdb_idx", total_features)
         rec = _substation_record_from_geojson_feature(feat)
         if rec is not None:
             result.substations.append(rec)
@@ -167,11 +174,17 @@ def fetch(*, apply_bounds: bool = True) -> IngestionResult:
         "NS NSTDB Utilities — total features %d, matched %d substation candidates",
         total_features, len(result.substations),
     )
-    result.warnings.append(
-        f"NS NSTDB — {total_features} total point-utility features screened; "
-        f"{len(result.substations)} matched substation-candidate FEAT_CODE whitelist. "
-        "Zero matches indicates FEAT_CODE whitelist mismatch."
-    )
+    if len(result.substations) == 0:
+        result.warnings.append(
+            f"NS NSTDB — {total_features} features screened; zero matched substation "
+            f"FEAT_CODE whitelist ({sorted(CANDIDATE_SUBSTATION_FEAT_CODES)}). "
+            "Verify the whitelist against current NSTDB Feature Code table."
+        )
+    else:
+        result.warnings.append(
+            f"NS NSTDB — {total_features} features screened; "
+            f"{len(result.substations)} substation matches (FEAT_CODE UTSS60)."
+        )
 
     if apply_bounds:
         kept, dropped = apply_bounds_filter(result.substations)

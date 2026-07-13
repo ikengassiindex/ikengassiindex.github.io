@@ -37,6 +37,7 @@ from pathlib import Path
 
 from ._base import (
     SubstationRecord,
+    TransmissionLineRecord,
     IngestionResult,
     apply_bounds_filter,
     assert_line_parity,
@@ -49,22 +50,24 @@ logger = logging.getLogger(__name__)
 
 # ── Constants ────────────────────────────────────────────────────────────
 SOURCE_ID = "CA-C3-yec-substations"
-MAPSERVER_LAYER_8 = (
+_MAPSERVER_ROOT = (
     "https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/"
-    "GY_UtilitiesCommunications/MapServer/8"
+    "GY_UtilitiesCommunications/MapServer"
 )
+MAPSERVER_LAYER_8 = f"{_MAPSERVER_ROOT}/8"    # YEC Power Substations (Point)
+MAPSERVER_LAYER_9 = f"{_MAPSERVER_ROOT}/9"    # YEC Power Lines (Polyline)
 
 
 # ── Fetch ────────────────────────────────────────────────────────────────
-def _query_arcgis_geojson(timeout: int = 30) -> bytes:
-    url = f"{MAPSERVER_LAYER_8}/query?where=1%3D1&outFields=*&f=geojson"
+def _query_arcgis_geojson(mapserver_layer_url: str, timeout: int = 30) -> bytes:
+    url = f"{mapserver_layer_url}/query?where=1%3D1&outFields=*&f=geojson"
     cache = cache_path_for(url, ext=".geojson")
     if cache.exists():
         body = cache.read_bytes()
         logger.info("Cache hit: %s (%d bytes)", cache, len(body))
         return body
     req = urllib.request.Request(url, headers={"User-Agent": "SSI-Index-Foundation/1.0"})
-    logger.info("Fetching YEC substations ...")
+    logger.info("Fetching %s ...", mapserver_layer_url)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         body = r.read()
     cache.write_bytes(body)
@@ -119,51 +122,105 @@ def _substation_record_from_geojson_feature(feature: dict) -> SubstationRecord:
     )
 
 
+# ── Line parsing ─────────────────────────────────────────────────────────
+def _line_record_from_geojson_feature(feature: dict) -> TransmissionLineRecord | None:
+    """Normalise a YEC Power Lines GeoJSON feature (Layer 9)."""
+    props = feature.get("properties", {}) or {}
+    geom = feature.get("geometry") or {}
+    gtype = geom.get("type")
+    coords = geom.get("coordinates") or []
+    if gtype == "MultiLineString":
+        multiline = [list(seg) for seg in coords]
+    elif gtype == "LineString":
+        multiline = [list(coords)]
+    else:
+        return None
+
+    return TransmissionLineRecord(
+        source_id=SOURCE_ID,
+        feature_id=str(props.get("OBJECTID", props.get("FID", ""))),
+        coordinates_multilinestring=multiline,
+        voltage_kv=None,     # YEC Power Lines layer does not carry voltage
+        owner="Yukon Energy Corporation",
+        line_name=props.get("NAME"),
+        number_of_lines=None,
+        raw_attributes=dict(props),
+    )
+
+
 # ── Public entry ─────────────────────────────────────────────────────────
 def fetch(*, apply_bounds: bool = True) -> IngestionResult:
-    """Fetch YEC substations (Yukon Territory)."""
+    """Fetch YEC substations (Layer 8) + companion Power Lines (Layer 9) for
+    Yukon Territory.
+
+    Discipline #41 line-coupling satisfied by ingesting both layers in the
+    same fetch pass per operator directive 25 June 2026.
+    """
     result = IngestionResult(
         source_id=SOURCE_ID,
         fetched_at_utc=now_utc_iso(),
-        source_url=f"{MAPSERVER_LAYER_8}/query?where=1%3D1&outFields=*&f=geojson",
+        source_url=(
+            f"{MAPSERVER_LAYER_8}/query?where=1%3D1&outFields=*&f=geojson "
+            f"+ {MAPSERVER_LAYER_9}/query?where=1%3D1&outFields=*&f=geojson"
+        ),
         provincial_scope="YT",
     )
 
+    # ── Substations (Layer 8) ──
     try:
-        body = _query_arcgis_geojson()
+        body_sub = _query_arcgis_geojson(MAPSERVER_LAYER_8)
     except Exception as exc:
-        result.warnings.append(f"Convention #56 degradation — YEC fetch failed: {exc}")
+        result.warnings.append(f"Convention #56 degradation — YEC substation fetch failed: {exc}")
         return result
 
-    result.raw_bytes_fetched = len(body)
-    result.raw_sha256 = hashlib.sha256(body).hexdigest()
+    result.raw_bytes_fetched = len(body_sub)
+    result.raw_sha256 = hashlib.sha256(body_sub).hexdigest()
 
     try:
-        geo = json.loads(body)
+        geo_sub = json.loads(body_sub)
     except json.JSONDecodeError as exc:
-        result.warnings.append(f"Convention #56 degradation — GeoJSON parse failed: {exc}")
+        result.warnings.append(f"Convention #56 degradation — substation GeoJSON parse failed: {exc}")
         return result
 
-    for feat in geo.get("features", []):
+    for feat in geo_sub.get("features", []):
         try:
             result.substations.append(_substation_record_from_geojson_feature(feat))
         except Exception as exc:
-            result.warnings.append(f"Convention #56 — skipped feature: {exc}")
+            result.warnings.append(f"Convention #56 — skipped substation feature: {exc}")
+
+    # ── Transmission lines (Layer 9) ──
+    try:
+        body_lines = _query_arcgis_geojson(MAPSERVER_LAYER_9)
+        result.raw_bytes_fetched += len(body_lines)
+        geo_lines = json.loads(body_lines)
+        for feat in geo_lines.get("features", []):
+            rec = _line_record_from_geojson_feature(feat)
+            if rec is not None:
+                result.transmission_lines.append(rec)
+    except Exception as exc:
+        result.warnings.append(
+            f"Convention #56 degradation — YEC Power Lines (Layer 9) fetch failed: {exc}. "
+            "Discipline #41 line-coupling incomplete for this pass."
+        )
 
     if apply_bounds:
-        kept, dropped = apply_bounds_filter(result.substations)
-        if dropped:
+        kept_sub, dropped_sub = apply_bounds_filter(result.substations)
+        kept_line, dropped_line = apply_bounds_filter(result.transmission_lines)
+        if dropped_sub:
             result.warnings.append(
-                f"Discipline #36 filter dropped {len(dropped)} YEC substations — "
+                f"Discipline #36 filter dropped {len(dropped_sub)} YEC substations — "
                 "unexpected for a territorial-utility source; verify Canada bounds "
-                "polygon covers Yukon Territory (should — Arctic extension per "
-                "commit 86d7c9df)."
+                "polygon covers Yukon Territory."
             )
-        result.substations = kept
+        if dropped_line:
+            result.warnings.append(
+                f"Discipline #36 filter dropped {len(dropped_line)} YEC lines "
+                "outside Canada polygon."
+            )
+        result.substations = kept_sub
+        result.transmission_lines = kept_line
 
-    _, findings = assert_line_parity(
-        result, outbound_border_ok=True   # YEC substations without in-source lines are OK
-    )
+    _, findings = assert_line_parity(result, outbound_border_ok=True)
     result.warnings.extend(findings)
     return result
 
