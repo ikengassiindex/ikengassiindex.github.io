@@ -485,22 +485,30 @@ def overlay_socioeconomic(country, province_data=None):
 
         if prov_data:
             matched += 1
+            # Schema tolerance: fetchers emit either "gdp_pc" (Italy pattern)
+            # or "gdp_per_capita" (Norway/UK/etc. pattern).  Same for other
+            # fields.  Accept both key forms to unblock any country whose
+            # fetcher uses the long-form schema.
+            _gdp = prov_data.get("gdp_pc") or prov_data.get("gdp_per_capita") or 30000.0
+            _unemp = prov_data.get("unemp") or prov_data.get("unemployment_rate") or 5.0
+            _ep_rate = prov_data.get("ep_rate") or prov_data.get("EP_rate_region") or 7.0
+            _migration = prov_data.get("migration") or prov_data.get("migration_score")
             update = {
                 "substation_id": sub["substation_id"],
                 "index": idx,
                 "socio_economic": {
-                    "gdp_per_capita": prov_data["gdp_pc"],
-                    "unemployment_rate": prov_data["unemp"],
-                    "EP_rate_region": prov_data["ep_rate"],
+                    "gdp_per_capita": _gdp,
+                    "unemployment_rate": _unemp,
+                    "EP_rate_region": _ep_rate,
                     "elderly_pct": prov_data.get("elderly_pct"),
-                    "migration_score": prov_data.get("migration"),
+                    "migration_score": _migration,
                 },
                 "previous": sub.get("socio_economic", {}),
             }
 
             # Compute V_socio from components
-            ep_norm = min(1.0, prov_data["ep_rate"] / 25.0)  # normalize to [0,1]
-            gdp_norm = max(0, min(1.0, 1 - (prov_data["gdp_pc"] - 14000) / 40000))
+            ep_norm = min(1.0, _ep_rate / 25.0)  # normalize to [0,1]
+            gdp_norm = max(0, min(1.0, 1 - (_gdp - 14000) / 40000))
             elderly_norm = min(1.0, max(0, (prov_data.get("elderly_pct", 23) - 18) / 15))
             update["socio_economic"]["V_socio"] = round(
                 0.45 * ep_norm + 0.35 * gdp_norm + 0.20 * elderly_norm, 4
