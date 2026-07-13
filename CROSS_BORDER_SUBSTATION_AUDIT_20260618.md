@@ -2,6 +2,8 @@
 
 > **Audit date.** 18 June 2026 deep night.
 >
+> **v4.23 workstream refresh.** 13 July 2026 — cohort baseline extended via v4.23 ingestion workstream. Priority 1-5 (Canada + Norway + Mexico + Austria + Greenland) FULLY CLOSED end-to-end. All 5 countries verified `Discipline #36 CLEAN` (0.00 % outside polygon) + `Discipline #41 PASS` (line-substation coupling invariant). Cohort-wide substation total **166,169** (39-country grand total post-workstream). Per-workstream additions: Canada +1,227 (6,399→7,626), Norway +271 (5,842→6,113), Mexico +649 (2,436→3,085), Austria +13,979 (741→14,720 — LARGEST relative delta at 19.86× baseline multiplier), Greenland +6 (37→43 — validation-not-growth pattern). Grid-geo line densification: Austria +30,132 lines (35,386 km haversine), Norway 154,728 lines (121,838 km), Canada 152,001 km, Mexico 166,320 km, Greenland 265 km. Empirical closure record in `{country}/v4_23-ingestion-audit-{country}-merge.yaml` for each priority; L1 connectors at `scripts/pipeline/ingestion/{country}/`.
+>
 > **Audit scope.** All 39 OECD per-country canonicals (`{country}/ssi-data.json`) cross-checked against per-country `bounds.json` national-polygon definitions via Shapely point-in-polygon test.
 >
 > **Operator question that triggered the audit.** *"Some countries have substations that overflow (are out of national boundaries) — say Austria as an example to audit."*
