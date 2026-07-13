@@ -1,0 +1,156 @@
+# SSI Index v4.3 workstream — Canada Option A merge closure audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the Option A execution — merging the empirically-identified 1,227 net-new
+# substations from the L1 federation output into canada/ssi-data.json as a
+# v4.3 additive contribution.
+#
+# TL;DR — Canada substation count 6,399 → 7,626 (+19.17% growth).  New
+# substations distributed across all 11 populated provinces + territories
+# (Ontario 408, Alberta 281, Québec 188, etc.).  Existing 6,399 OSM-scored
+# state preserved unchanged.  Voltage enrichment applied to 7 matched pairs
+# where federation carried YEC-derived voltage and the existing OSM sub had
+# voltage_kv=0.
+#
+# Next steps: L2 enrichment (climate + seismic + socioeconomic) + L3
+# scoring (SSI v4.2 modifier chain) on the 1,227 new substations that
+# currently carry null placeholders for computed fields.  L2/L3 executed
+# via existing scripts/pipeline/fetch_data.py + scripts/pipeline/run.py.
+
+schema_version: v4_3-ingestion-audit-merge-1
+country_slug: canada
+merge_date_utc: "2026-07-13"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+option_chosen: A                    # per canada/v4_3-ingestion-audit-canada-delta.yaml
+parent_state_transitions:
+  - canada/v4_3-ingestion-audit-canada-preflight.yaml (schema v2)
+  - canada/v4_3-ingestion-audit-canada-delta.yaml (Option A/B/C decision anchor)
+  - scripts/pipeline/ingestion/canada/federation.py (federation output source)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Merge outcome
+# ─────────────────────────────────────────────────────────────────────────────
+merge_outcome:
+  substation_count_before: 6399
+  substation_count_after: 7626
+  growth_absolute: 1227
+  growth_percent: 19.17
+  voltage_enrichments_applied: 7    # YEC voltage → existing OSM subs with voltage_kv=0
+  new_by_province:
+    Ontario: 408
+    Alberta: 281
+    Québec: 188
+    Saskatchewan: 96
+    British Columbia: 74
+    Manitoba: 52
+    Nova Scotia: 47
+    Newfoundland and Labrador: 46
+    New Brunswick: 22
+    Yukon: 8
+    Prince Edward Island: 5
+  file_size_before_mb: 12
+  file_size_after_mb: 12.8
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Schema of new substations
+# ─────────────────────────────────────────────────────────────────────────────
+new_substation_schema:
+  populated_from_federation:
+    - internal_id       # SHA-1(fed.substation_id)[:12]
+    - substation_id     # "CA_v43_{internal_id}"
+    - name              # from YEC operator_station_name where available, else ""
+    - lat / lon         # federation coordinates (WGS84)
+    - voltage_kv        # from YEC (34.5 kV) where applicable, else 0 placeholder
+    - province / region / region_code / departement / dept_code   # bounds.json point-in-polygon
+    - tso_zone          # per-province canonical (IESO / AESO / Hydro-Québec / etc.)
+    - version           # "4.2" methodology pin
+    - v43_sources       # NEW — list of L1 source_ids that contributed
+    - v43_provenance    # NEW — dict of per-source feature_id + attribute overlay
+  null_placeholders_awaiting_L2_L3_enrichment:
+    L2_climate: climate_trajectory (I1/I2/I3 forward-looking trajectories)
+    L2_seismic: seismic (pga_g + zone + R6_seismic)
+    L2_socio: socio_economic (V_socio + EP_rate_region + unemployment_rate + ...)
+    L3_topology: graph_topology + markov + transition
+    L3_modifiers: components + modifiers + modifier_impacts + modifier_impact + modifier_pct
+    L3_scoring: R_base_median + R_unclipped + R_median + R_P5 + R_P95 + Re_raw + Re_norm
+    L3_alerts: add_sum + mult_product + P_critical + CI_width + component_alert
+    L3_classification: alert_components + alert_flag + classification + confidence_tier + fleet_percentile + skewness
+  convention_56_visibly_honest_degradation: |
+    Fields awaiting L2/L3 enrichment surface as null (not spurious default
+    values).  Downstream scripts/check_substation_schema.py + validate_schema.py
+    will flag the new subs as incomplete until L2/L3 runs against them —
+    which is the correct behaviour.  This is Convention #56 discipline
+    at the merge layer.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Existing substation state preservation
+# ─────────────────────────────────────────────────────────────────────────────
+preservation_guarantees:
+  existing_6399_subs: unchanged      # merged pass appended only; existing untouched except voltage_kv on 7 pairs
+  voltage_kv_enrichments: 7          # matched pairs where federation had known voltage AND existing was 0
+  fleet_summary: preserved            # will be recomputed by L3 after enrichment
+  regions: preserved                  # unchanged
+  meta_provenance: preserved          # normalisation_history + phase_a-d modifier runs + phase2c reclassify runs all intact
+  meta_v43_merge_runs: appended       # new list captures merge audit record
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Downstream pipeline handoff
+# ─────────────────────────────────────────────────────────────────────────────
+next_step_L2_L3_enrichment:
+  who: operator (needs CDS_API_KEY + GEM PGA data local access)
+  commands:
+    L2_enrichment: |
+      python -m scripts.pipeline.fetch_data --country canada
+      # Runs seismic + climate + socioeconomic ingestion on all subs missing them.
+      # 1,227 new subs will get populated seismic.pga_g, climate_trajectory,
+      # socio_economic dict.
+    L3_scoring: |
+      python -m scripts.pipeline.run canada
+      # Runs the SSI v4.2 modifier chain + Monte Carlo on all subs missing
+      # R_median.  1,227 new subs will get R_base_median → Re_raw → Re_norm
+      # → R_median + classification + band.
+    L3_reclassify: |
+      python3 scripts/reclassify_phase2c.py canada
+      # Runs the Phase 2C 5-band reclassification on the newly-scored subs.
+    verification: |
+      python3 scripts/pipeline/check_cross_border.py canada --strict
+      python3 scripts/check_substation_schema.py canada
+      pytest tests/test_no_cross_border_leakage.py -v
+  expected_final_state:
+    substations: 7626
+    fields_per_sub: 44                # 42 pre-existing + v43_sources + v43_provenance
+    classification_band_distribution: recomputed by L3 phase2c reclassify
+    fleet_summary: recomputed
+    file_size_mb: ~18 (up from 12.8 as new subs get enriched)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Priority 1 Canada Phase 2 forward-reference (Option C)
+# ─────────────────────────────────────────────────────────────────────────────
+phase_2_forward_reference:
+  purpose: |
+    Option A ships Q3 2026 with +19.17% Canada growth.  Option C — operational-
+    utility registries (IESO Ontario 8-12k subs, Hydro-Québec, AESO Alberta,
+    Manitoba Hydro, SaskPower) — remains the correct architectural answer for
+    real gap-audit closure but requires 25-40 engineer-days per province.
+  queued_for: Q4 2026 alongside Norway/Mexico/Austria/Greenland Priority 2-5
+  when_ready: |
+    Rerun the empirical delta analysis with the operational-utility federation
+    output vs the current 7,626 state.  Expected additional yield: 10-18k
+    net-new substations across Ontario + Quebec + Alberta.  Total Canada
+    substation count after Phase 2: estimated 18-25k (approaches OSM+utility
+    inventory upper bound).
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Auditability chain
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  state_transition: L1-federation-shipped → Option-A-merge-executed → L2/L3-pending
+  parent_state:
+    - canada/v4_3-ingestion-audit-canada-preflight.yaml
+    - canada/v4_3-ingestion-audit-canada-delta.yaml
+  child_state_options:
+    L2_L3_ran: canada/v4_3-ingestion-audit-canada-l2-l3-closure.yaml (post-enrichment)
+    P2_operational_utility: canada/v4_3-ingestion-audit-canada-phase2-utility-federation.yaml (Q4 2026+)
+  commit_hash_placeholder: TBD_at_operator_confirmation
+  ci_job_url_placeholder: TBD_at_operator_confirmation
