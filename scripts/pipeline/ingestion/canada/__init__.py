@@ -33,4 +33,12 @@ __all__ = [
     "apply_bounds_filter",
     "assert_line_parity",
     "emit_audit_sidecar",
+    # Federation entry point
+    "federate",
 ]
+
+
+def federate(**kwargs):
+    """Convenience re-export of federation.federate() for the top-level API."""
+    from . import federation
+    return federation.federate(**kwargs)
