@@ -63,9 +63,13 @@ MODIFIER_RANGES = {
     "R3_C_mult":      (0.70, 1.50),
     "R4_F_topo":      (0.80, 1.35),
     "R6_restoration": (0.90, 1.10),
-    "R6_seismic":     (1.00, 1.25),
+    "R6_seismic":     (0.95, 1.25),
     "R7_cyber":       (0.99, 1.05),
 }
+# Convention #56 note: R6_seismic floor widened 1.00 → 0.95 in task #180 to align
+# spec with empirical Central European low-seismicity reality (Belgium/Netherlands/
+# Luxembourg/Czechia tectonically-passive plates emit values 0.95-1.00). Ceiling
+# preserved. Task #179 cohort audit sweep root-cause anchor.
 
 CLASSIFICATION_BANDS = [
     {"name": "Low",      "min": 0.00, "max": 0.25},

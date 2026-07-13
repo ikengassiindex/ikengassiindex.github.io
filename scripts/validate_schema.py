@@ -218,7 +218,7 @@ _MODIFIER_RANGES = {
     "R3_C_mult":      (0.70, 1.50),
     "R4_F_topo":      (0.80, 1.35),
     "R6_restoration": (0.90, 1.10),
-    "R6_seismic":     (1.00, 1.25),
+    "R6_seismic":     (0.95, 1.25),  # task #180 (13 Jul 2026): floor 1.00 → 0.95 for BE/NL/LU/CZ low-seismicity reality
     "R7_cyber":       (0.99, 1.05),
     # Per-country adaptations
     "R6_volcanic":     (1.00, 1.20),

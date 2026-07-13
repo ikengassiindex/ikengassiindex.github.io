@@ -321,10 +321,16 @@ def enrich_substation(sub, country):
         gt['cluster_coeff'] = round(vary(0.015, name, 0.40), 4)
 
     # ── R6: R7_cyber modifier ──
+    # Task #181 (13 Jul 2026): retightened center 0.995 → 1.02, spread 0.02 → 0.015
+    # per SSI_R7_CYBER_DRIFT_DIAGNOSTIC.md Option A. Fill now stays within registry
+    # (0.99, 1.05) band by construction. Takes effect at next L3 rescore.
     if not sub['modifiers'].get('R7_cyber'):
-        sub['modifiers']['R7_cyber'] = round(vary(0.995, name, 0.02), 4)
+        sub['modifiers']['R7_cyber'] = round(vary(1.02, name, 0.015), 4)
 
     # ── Ensure other modifiers exist ──
+    # Task #180 (13 Jul 2026): R6_seismic default preserved at 1.0 (near-neutral for
+    # tectonically-passive plates). Registry floor now widened to 0.95 in config.py
+    # so the ±0.03 spread that produces 0.97-1.03 sits cleanly inside the range.
     for mod_key, default_val in [('R4_F_topo', 0.98), ('R6_restoration', 1.02), ('R6_seismic', 1.0)]:
         if not sub['modifiers'].get(mod_key):
             sub['modifiers'][mod_key] = round(vary(default_val, name, 0.03), 4)

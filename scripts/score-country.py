@@ -125,7 +125,11 @@ def build_substation(osm_sub, idx, config):
     R4 = max(0.90, min(1.10, det_var(seed+'R4', 0.98, 0.06)))
     R6a = max(0.95, min(1.20, det_var(seed+'R6a', 1.02, 0.08)))
     R6b = max(1.00, min(1.50, det_var(seed+'R6b', 1.0 + ref.get('pga_base', 0.1) * 0.5, 0.10)))
-    R7 = max(0.90, min(1.10, det_var(seed+'R7', 0.98, 0.05)))
+    # Task #181 (13 Jul 2026): retightened per SSI_R7_CYBER_DRIFT_DIAGNOSTIC.md Option A.
+    # Was max(0.90, min(1.10, det_var(seed+'R7', 0.98, 0.05))) — centered at 0.98 (below
+    # registry (0.99, 1.05) floor). Now centered at 1.02 mid-registry with ±1.5% spread,
+    # bounded to registry range. Takes effect at next L3 rescore per Option A + C combined.
+    R7 = max(0.99, min(1.05, det_var(seed+'R7', 1.02, 0.015)))
 
     # Modifiers stored at 6-decimal precision (Session 102 — D#29 PASS-by-construction).
     # mod_product below uses RAW values so R_median math is unaffected by storage precision.

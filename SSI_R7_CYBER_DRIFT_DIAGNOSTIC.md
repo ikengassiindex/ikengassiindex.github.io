@@ -234,5 +234,22 @@ tight resilience-modifier band; the DRIFT is the anomaly, not the spec.
 
 ## Status
 
-**OPEN** — Awaiting operator decision on Option A rescore scheduling.
-Investigation task #159 CLOSED per this memo shipping.
+**CODE-FIX LANDED — RESCORE PENDING** (13 July 2026, task #181).
+
+Source-generator retighten (Option A) applied in a follow-on commit alongside
+task #180 (R6_seismic registry widen):
+
+- `scripts/score-country.py::128` now emits `R7 = max(0.99, min(1.05,
+  det_var(seed+'R7', 1.02, 0.015)))` — center 1.02 mid-registry, ±1.5% spread,
+  100% within registry range.
+- `scripts/enrich_esg_gaps.py::325` now fills missing R7_cyber via `round(vary(
+  1.02, name, 0.015), 4)` — matches score-country.py by construction.
+
+**Data state unchanged by this code commit.** Existing R7_cyber values on the
+18 drift countries continue to sit below floor until the next L3 rescore
+window (operator scheduling). When the rescore lands, R_median values recompute
+with correct modifier values, and downstream deliverables (maps, dashboards,
+regional comparisons) refresh from clean vintage.
+
+Investigation task #159 CLOSED per initial memo shipping. Retighten task #181
+CLOSED per this update. Rescore is a separate operator-scheduled workstream.

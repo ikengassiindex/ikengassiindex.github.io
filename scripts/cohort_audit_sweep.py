@@ -44,7 +44,7 @@ MODIFIER_RANGES = {
     "R3_C_mult":      (0.70, 1.50),
     "R4_F_topo":      (0.80, 1.35),
     "R6_restoration": (0.90, 1.10),
-    "R6_seismic":     (1.00, 1.25),
+    "R6_seismic":     (0.95, 1.25),  # task #180 (13 Jul 2026): floor 1.00 → 0.95 for BE/NL/LU/CZ low-seismicity reality
     "R7_cyber":       (0.99, 1.05),
     "R6_volcanic":     (1.00, 1.20),
     "R6_drought":      (1.00, 1.18),
@@ -264,16 +264,20 @@ def audit_country(slug: str, repo_root: Path, auto_patch: bool = False) -> dict:
     if n_subs > 0 and findings['n_lines'] > 0:
         ratio = findings['n_lines'] / n_subs
         findings['checks']['discipline_41_ratio'] = round(ratio, 2)
-        # Cohort empirical envelope: 0.3 - 25 lines/sub is normal
+        # Cohort empirical envelope: 0.3 - 30 lines/sub is normal.
+        # Task #182 (13 Jul 2026): ceiling widened 25 → 30 after Norway (26.5) +
+        # Slovenia (27.75) diagnostic (SSI_R6_SEISMIC_AND_LINE_DENSITY_20260713.md)
+        # confirmed both are legitimate deep-ingestion (MV distribution grid at
+        # 20/22/24 kV) — not bloat. Ratios > 30 remain WARN for genuine anomalies.
         if ratio < 0.3:
             findings['findings'].append({
                 'severity': 'WARN', 'check': 'discipline_41',
                 'msg': f'lines/subs ratio {ratio:.2f} < 0.3 — line coverage possibly sparse',
             })
-        elif ratio > 25:
+        elif ratio > 30:
             findings['findings'].append({
                 'severity': 'WARN', 'check': 'discipline_41',
-                'msg': f'lines/subs ratio {ratio:.2f} > 25 — line coverage possibly bloated',
+                'msg': f'lines/subs ratio {ratio:.2f} > 30 — line coverage possibly bloated',
             })
 
     return findings
