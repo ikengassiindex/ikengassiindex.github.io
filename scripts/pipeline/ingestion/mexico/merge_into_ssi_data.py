@@ -1,9 +1,9 @@
 """
-SSI Pipeline — Mexico v4.3 federation merger.
+SSI Pipeline — Mexico v4.23 federation merger.
 
 Merges OSM Overpass L1 ingestion output into mexico/ssi-data.json.
 
-Merger operations (Option A per mexico/v4_3-ingestion-audit-mexico-delta.yaml):
+Merger operations (Option A per mexico/v4_23-ingestion-audit-mexico-delta.yaml):
 
   1. Owner-enrichment on matched pairs (500 m Discipline #41 threshold):
      existing substation gains: owner (via CFE-monopoly fallback rule), name,
@@ -13,7 +13,7 @@ Merger operations (Option A per mexico/v4_3-ingestion-audit-mexico-delta.yaml):
   2. Voltage cross-validation on matched pairs:
      Compare existing OSM-derived voltage_kv vs fresh OSM voltage_kv.  Flag
      discrepancies as data-quality findings written to
-     mexico/v4_3-voltage-cross-validation.json.  Empirically 0.04% mismatch
+     mexico/v4_23-voltage-cross-validation.json.  Empirically 0.04% mismatch
      rate for Mexico (near-empty artifact).
 
   3. Voltage fill on 312 matched pairs where existing has NO voltage:
@@ -64,7 +64,7 @@ logger = logging.getLogger(__name__)
 _HERE = Path(__file__).resolve()
 REPO_ROOT = _HERE.parent.parent.parent.parent.parent
 SSI_DATA_JSON = REPO_ROOT / "mexico" / "ssi-data.json"
-VOLTAGE_XCHECK_JSON = REPO_ROOT / "mexico" / "v4_3-voltage-cross-validation.json"
+VOLTAGE_XCHECK_JSON = REPO_ROOT / "mexico" / "v4_23-voltage-cross-validation.json"
 
 # ── Constants ────────────────────────────────────────────────────────────
 PROXIMITY_MATCH_METERS = 500.0
@@ -275,7 +275,7 @@ def merge_substations(
 # ── Voltage cross-check emission ─────────────────────────────────────────
 def emit_voltage_cross_validation(findings: list[dict], total_matched: int) -> None:
     payload = {
-        "schema_version": "v4_3-voltage-cross-validation-1",
+        "schema_version": "v4_23-voltage-cross-validation-1",
         "generated_at_utc": now_utc_iso(),
         "source_pair": {
             "existing_source": "OSM voltage= tags (mexico/ssi-data.json, prior ingestion vintage)",
@@ -372,7 +372,7 @@ def main(*, dry_run: bool = False) -> dict:
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Mexico v4.3 federation merger (Option A — subs only)")
+    parser = argparse.ArgumentParser(description="Mexico v4.23 federation merger (Option A — subs only)")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 

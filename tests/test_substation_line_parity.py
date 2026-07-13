@@ -11,7 +11,7 @@ transmission line must have both endpoints inside the substation registry
 (or be tagged as an outbound-to-cross-border boundary feature).
 
 This sentinel runs against the LIVE 39-country cohort AND against the Canada
-v4.3 L1-connector dataclasses via unit-style checks that don't require any
+v4.23 L1-connector dataclasses via unit-style checks that don't require any
 network access.
 
 Scope:
@@ -21,7 +21,7 @@ Scope:
       ≥1 line touching it (bounded by 500 m proximity, or explicit endpoint
       reference where the schema provides one);
   (b) L1-connector unit checks — scaffold-level assertions that the Canada
-      v4.3 IngestionResult dataclass round-trips through _base.assert_line_parity
+      v4.23 IngestionResult dataclass round-trips through _base.assert_line_parity
       correctly for the three canonical shapes: (i) both populated, (ii)
       lines-only source (BC Transmission Lines), (iii) empty result.
 
@@ -30,8 +30,8 @@ because the substation-to-line proximity join is O(N × M) per country.
 Runs in ~40 s wall-clock for the 39-country cohort.
 
 Cross-references:
-  - CLAUDE.md v4.3 gap-closure forward-reference (line-coupling invariant)
-  - canada/v4_3-ingestion-audit-canada-preflight.yaml (empirical anchor)
+  - CLAUDE.md v4.23 gap-closure forward-reference (line-coupling invariant)
+  - canada/v4_23-ingestion-audit-canada-preflight.yaml (empirical anchor)
   - REPORTS_FRAMING_KB.md Discipline #41
 """
 
@@ -215,7 +215,7 @@ def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     __import__("os").environ.get("SSI_LIVE_COHORT_SWEEP") != "1",
     reason=(
         "Live-cohort sweep is opt-in via SSI_LIVE_COHORT_SWEEP=1 environment "
-        "variable.  This test is designed to fire post-v4.3 country onboardings "
+        "variable.  This test is designed to fire post-v4.23 country onboardings "
         "to detect Discipline #41 orphan regressions, not to gate every PR at "
         "workstream day 1 when the 39-country legacy cohort has never been "
         "checked against the new invariant.  Run manually: "
@@ -229,12 +229,12 @@ def test_live_cohort_substation_line_parity():
 
     Reports orphan substations per-country; fails the sentinel if any country
     exceeds a 10% orphan ratio (which would indicate a systemic under-ingestion
-    of transmission lines at the v4.3 workstream layer).
+    of transmission lines at the v4.23 workstream layer).
 
-    For countries not yet processed by the v4.3 gap-closure workstream, the
+    For countries not yet processed by the v4.23 gap-closure workstream, the
     orphan ratio can legitimately exceed 10% — those countries are exempted
     via the V4_3_PENDING_COUNTRIES set below and surface as XFAIL rather than
-    FAIL.  The exemption list shrinks as each v4.3 country onboarding lands.
+    FAIL.  The exemption list shrinks as each v4.23 country onboarding lands.
 
     Gate: opt-in via SSI_LIVE_COHORT_SWEEP=1 env var.  Rationale is documented
     in the @skipif decorator above.
@@ -242,8 +242,8 @@ def test_live_cohort_substation_line_parity():
     slugs = _load_slugs()
     ORPHAN_RATIO_THRESHOLD = 0.10
 
-    # v4.3 workstream pending — orphan ratio above threshold is expected here
-    # until the country's L1 connector merges.  Update this set as each v4.3
+    # v4.23 workstream pending — orphan ratio above threshold is expected here
+    # until the country's L1 connector merges.  Update this set as each v4.23
     # country ships (Canada Q3 2026 → Norway Q4 → Mexico + Austria + Greenland
     # Q4 2026 → Q1 2027 per Editorial Calendar).
     V4_3_PENDING_COUNTRIES = {"canada", "norway", "mexico", "austria", "greenland"}
@@ -275,7 +275,7 @@ def test_live_cohort_substation_line_parity():
 
     # Summary log — captured by pytest -s
     for slug, (orphans, total) in sorted(per_country_orphans.items()):
-        marker = " [v4.3-pending]" if slug in V4_3_PENDING_COUNTRIES else ""
+        marker = " [v4.23-pending]" if slug in V4_3_PENDING_COUNTRIES else ""
         pct = (orphans / total) if total else 0.0
         print(f"  {slug:20} {orphans:>5} / {total:>6} orphan  ({pct:.1%}){marker}")
 

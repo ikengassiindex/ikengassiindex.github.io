@@ -7,12 +7,12 @@ Endpoint:    http://wfs.geonorge.no/skwms1/wfs.nettanlegg
 Licence:     Norwegian Licence for Open Government Data (NLOD 2.0)
 Vintage:     Continuously updated; per-feature kildeEndretDato timestamps.
 
-Feature classes ingested (from norway/v4_3-ingestion-audit-norway-fetch.yaml):
+Feature classes ingested (from norway/v4_23-ingestion-audit-norway-fetch.yaml):
   - app:EL_Transformatorstasjon    1,558 substations
   - app:EL_Luftlinje             145,460 overhead lines w/ spenning
   - app:EL_Sjøkabel                8,747 submarine cables
 
-Field schema per norway/v4_3-ingestion-audit-norway-line-schema.yaml:
+Field schema per norway/v4_23-ingestion-audit-norway-line-schema.yaml:
   Substation: gml_id, driftsattår, eier, eierOrgnr, lokalId, navn, posisjon
   Line:       gml_id, driftsattår, eier, eierOrgnr, lokalId, navn, nettnivå,
               spenning (VOLTAGE IN kV — 99.78% completeness), linje (geometry)

@@ -144,7 +144,7 @@ MIN_FLEET = {
     #   MX 4000→2200  (actual 2436; pre-D#36 3140 with 22.5% leakage; gap-audit)
     #   PL 3000→2100  (actual 2247; gap-audit-flagged for under-collection)
     #   ES 3500→3300  (actual 3423; marginal 2% shortfall, likely additional D#36)
-    # All 4 floors leave 5-10% headroom below current observed. The v4.3 gap
+    # All 4 floors leave 5-10% headroom below current observed. The v4.23 gap
     # audit (task #124) will separately track aspirational per-country fleet
     # targets; MIN_FLEET stays as a no-regression anti-stub-data gate, not an
     # aspirational counts encoder.

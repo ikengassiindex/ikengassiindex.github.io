@@ -1,9 +1,9 @@
 """
-SSI Pipeline — Norway v4.3 federation merger.
+SSI Pipeline — Norway v4.23 federation merger.
 
 Merges NVE Nettanlegg L1 ingestion output into norway/ssi-data.json + norway/grid-geo.json.
 
-Merger operations (Option A per norway/v4_3-ingestion-audit-norway-delta.yaml):
+Merger operations (Option A per norway/v4_23-ingestion-audit-norway-delta.yaml):
 
   1. Owner-enrichment on matched pairs (500 m Discipline #41 threshold):
      existing substation gains: owner, operator_station_name, eierOrgnr,
@@ -12,7 +12,7 @@ Merger operations (Option A per norway/v4_3-ingestion-audit-norway-delta.yaml):
   2. Voltage cross-validation on matched pairs:
      Compare NVE-derived voltage (max incident line spenning via reverse
      Discipline #41) vs existing OSM voltage_kv.  Flag discrepancies as
-     data-quality findings written to norway/v4_3-voltage-cross-validation.json.
+     data-quality findings written to norway/v4_23-voltage-cross-validation.json.
 
   3. Net-new substation ingestion:
      Any NVE substation with no existing match within 500 m is added to
@@ -70,7 +70,7 @@ _HERE = Path(__file__).resolve()
 REPO_ROOT = _HERE.parent.parent.parent.parent.parent
 SSI_DATA_JSON = REPO_ROOT / "norway" / "ssi-data.json"
 GRID_GEO_JSON = REPO_ROOT / "norway" / "grid-geo.json"
-VOLTAGE_XCHECK_JSON = REPO_ROOT / "norway" / "v4_3-voltage-cross-validation.json"
+VOLTAGE_XCHECK_JSON = REPO_ROOT / "norway" / "v4_23-voltage-cross-validation.json"
 BOUNDS_JSON = REPO_ROOT / "norway" / "bounds.json"
 
 # ── Constants ────────────────────────────────────────────────────────────
@@ -372,7 +372,7 @@ def merge_lines(nve_lines: list[TransmissionLineRecord]) -> tuple[dict, int, int
 # ── Voltage cross-check emission ─────────────────────────────────────────
 def emit_voltage_cross_validation(findings: list[dict], total_matched: int) -> None:
     payload = {
-        "schema_version": "v4_3-voltage-cross-validation-1",
+        "schema_version": "v4_23-voltage-cross-validation-1",
         "generated_at_utc": now_utc_iso(),
         "source_pair": {
             "existing_source": "OSM voltage= tags (norway/ssi-data.json)",
@@ -500,7 +500,7 @@ def main(*, ingest_lines: bool = True, dry_run: bool = False) -> dict:
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Norway v4.3 federation merger")
+    parser = argparse.ArgumentParser(description="Norway v4.23 federation merger")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--skip-lines", action="store_true")
     args = parser.parse_args()

@@ -1,5 +1,5 @@
 """
-SSI Index v4.3 workstream — Norway ingestion package.
+SSI Index v4.23 workstream — Norway ingestion package.
 
 Priority 2 Norway workstream (Editorial Calendar Q4 2026).
 
@@ -10,9 +10,9 @@ Connectors:
                               — EL_Sjøkabel (submarine cables)
 
 Discovery + empirical anchors:
-  - norway/v4_3-ingestion-audit-norway-preflight.yaml (Step 1)
-  - norway/v4_3-ingestion-audit-norway-fetch.yaml (Step 2)
-  - norway/v4_3-ingestion-audit-norway-line-schema.yaml (Step 2b)
+  - norway/v4_23-ingestion-audit-norway-preflight.yaml (Step 1)
+  - norway/v4_23-ingestion-audit-norway-fetch.yaml (Step 2)
+  - norway/v4_23-ingestion-audit-norway-line-schema.yaml (Step 2b)
 
 Architectural discipline:
   - Discipline #36 cross-border filter — 5 km fjord tolerance

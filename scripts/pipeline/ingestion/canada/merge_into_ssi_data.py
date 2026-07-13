@@ -1,8 +1,8 @@
 """
 SSI Pipeline — Canada Option A: merge federation output into canada/ssi-data.json.
 
-Purpose: execute the Option A closure of the v4.3 Canada Priority 1 workstream
-per canada/v4_3-ingestion-audit-canada-delta.yaml.
+Purpose: execute the Option A closure of the v4.23 Canada Priority 1 workstream
+per canada/v4_23-ingestion-audit-canada-delta.yaml.
 
 What this does:
   (1) reads existing canada/ssi-data.json (6,399 scored substations)
@@ -28,8 +28,8 @@ After write, operator runs L2 enrichment + L3 scoring on new substations:
     python -m scripts.pipeline.run canada
 
 Cross-references:
-  - canada/v4_3-ingestion-audit-canada-delta.yaml (parent state-transition anchor)
-  - canada/v4_3-ingestion-audit-canada-preflight.yaml (grandparent)
+  - canada/v4_23-ingestion-audit-canada-delta.yaml (parent state-transition anchor)
+  - canada/v4_23-ingestion-audit-canada-preflight.yaml (grandparent)
 """
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ PIPELINE_DIR = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT = PIPELINE_DIR.parent.parent
 EXISTING_SSI_DATA = REPO_ROOT / "canada" / "ssi-data.json"
 FEDERATED_SUBS = PIPELINE_DIR / "data" / "canada" / "substations_federated.json"
-MERGE_AUDIT_YAML = REPO_ROOT / "canada" / "v4_3-ingestion-audit-canada-merge.yaml"
+MERGE_AUDIT_YAML = REPO_ROOT / "canada" / "v4_23-ingestion-audit-canada-merge.yaml"
 
 # ── Constants ────────────────────────────────────────────────────────────
 PROXIMITY_MATCH_M = 500.0    # matches Discipline #41 sentinel threshold
@@ -174,7 +174,7 @@ def _new_substation_record(
         "tso_zone": tso_zone,
         # Physical
         "voltage_kv": voltage,
-        # Provenance (v4.3-specific extension — captures which L1 sources contributed)
+        # Provenance (v4.23-specific extension — captures which L1 sources contributed)
         "v43_sources": fed_sub.get("sources", []),
         "v43_provenance": fed_sub.get("provenance", {}),
         # Enrichment placeholders (L2 fills these — climate/seismic/socio).
@@ -289,7 +289,7 @@ def merge(*, dry_run: bool = True, write: bool = False) -> dict:
     growth_pct = (len(new_records) / n_existing) * 100 if n_existing else 0
     merge_record = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "phase": "Option A — v4.3 additive merge",
+        "phase": "Option A — v4.23 additive merge",
         "existing_subs_before": n_existing,
         "new_subs_added": len(new_records),
         "voltage_enrichments": len(voltage_enrichments),
@@ -300,7 +300,7 @@ def merge(*, dry_run: bool = True, write: bool = False) -> dict:
             "CA-C3-yec-substations",
             "CA-C4-ns-nstdb-utilities-point",
         ],
-        "parent_audit": "canada/v4_3-ingestion-audit-canada-delta.yaml",
+        "parent_audit": "canada/v4_23-ingestion-audit-canada-delta.yaml",
         "dry_run": dry_run,
     }
 
@@ -339,7 +339,7 @@ def merge(*, dry_run: bool = True, write: bool = False) -> dict:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Merge Canada v4.3 federation into ssi-data.json")
+    p = argparse.ArgumentParser(description="Merge Canada v4.23 federation into ssi-data.json")
     p.add_argument("--dry-run", action="store_true", help="Report deltas without writing (default)")
     p.add_argument("--write", action="store_true", help="Actually write canada/ssi-data.json")
     args = p.parse_args()
@@ -349,7 +349,7 @@ def main() -> None:
     summary = merge(dry_run=args.dry_run or not args.write, write=args.write)
 
     print("\n" + "=" * 70)
-    print(f"Canada v4.3 Option A merge — {'DRY RUN' if not args.write else 'WRITE'}")
+    print(f"Canada v4.23 Option A merge — {'DRY RUN' if not args.write else 'WRITE'}")
     print("=" * 70)
     print(f"  existing subs before:      {summary['n_existing']:>6,}")
     print(f"  federation subs available: {summary['n_federation']:>6,}")

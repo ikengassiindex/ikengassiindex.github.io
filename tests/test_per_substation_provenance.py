@@ -303,7 +303,7 @@ V4_2_GRANULARITY_PLAN = {
         "native": "0.25° (~28 km), p99 over 30-yr window",
         "effective_granularity": "20_50_KM",
         "brief_assumes": "20_50_KM",
-        "drift_risk": "LOW (v4.3 enhancement: bilinear across 4 cells)",
+        "drift_risk": "LOW (v4.23 enhancement: bilinear across 4 cells)",
         "v4_5_uplift": "n/a (ERA5 is methodology anchor)",
     },
     "italy.R8_adapt_i2_smart_meters": {

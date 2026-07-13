@@ -1,5 +1,5 @@
 """
-SSI Index v4.3 workstream — Mexico ingestion package.
+SSI Index v4.23 workstream — Mexico ingestion package.
 
 Priority 3 Mexico workstream (Editorial Calendar Q4 2026).
 
@@ -7,8 +7,8 @@ Connectors:
   - osm_overpass.py   MX-C1  OSM Overpass API (primary — federal-canonical unavailable)
 
 Discovery + empirical anchors:
-  - mexico/v4_3-ingestion-audit-mexico-preflight.yaml (Step 1)
-  - mexico/v4_3-ingestion-audit-mexico-fetch.yaml (Step 2)
+  - mexico/v4_23-ingestion-audit-mexico-preflight.yaml (Step 1)
+  - mexico/v4_23-ingestion-audit-mexico-fetch.yaml (Step 2)
 
 Architectural distinctions vs Canada + Norway:
   - Federal-canonical data ARCHITECTURALLY CLOSED (CENACE, SENER, CFE, CRE all
@@ -21,7 +21,7 @@ Architectural distinctions vs Canada + Norway:
 
 Architectural discipline:
   - Discipline #36 cross-border filter — default 100m tolerance
-    (US border longest single-border in v4.3 at 3,145 km; no fjord complexity)
+    (US border longest single-border in v4.23 at 3,145 km; no fjord complexity)
   - Discipline #41 line-substation pairing preserved
   - Convention #56 visibly-honest degradation — missing OSM tags → None,
     not fabricated defaults

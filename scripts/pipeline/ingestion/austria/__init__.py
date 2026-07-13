@@ -1,5 +1,5 @@
 """
-SSI Index v4.3 workstream — Austria ingestion package.
+SSI Index v4.23 workstream — Austria ingestion package.
 
 Priority 4 Austria workstream (Editorial Calendar Q1 2027).
 
@@ -7,14 +7,14 @@ Connectors:
   - osm_overpass.py   AT-C1  OSM Overpass API (primary — federal-canonical unavailable)
 
 Discovery + empirical anchors:
-  - austria/v4_3-ingestion-audit-austria-preflight.yaml (Step 1)
-  - austria/v4_3-ingestion-audit-austria-fetch.yaml (Step 2)
+  - austria/v4_23-ingestion-audit-austria-preflight.yaml (Step 1)
+  - austria/v4_23-ingestion-audit-austria-fetch.yaml (Step 2)
 
 Architectural distinctions vs Canada + Norway + Mexico:
   - Federal-canonical machine-accessible data unavailable (APG TSO + E-Control
     regulator + data.gv.at CKAN all behind interactive UIs / PDFs from cloud IPs)
   - OSM Overpass empirically confirmed as PRIMARY canonical (15,213 substations
-    — 20× ratio vs existing 741 baseline, LARGEST in v4.3)
+    — 20× ratio vs existing 741 baseline, LARGEST in v4.23)
   - BEST-IN-COHORT OSM tagging discipline: 77.2% operator + 79.8% voltage +
     75% name (vs Mexico 16.6% operator; vs Norway ~30% pre-NVE)
   - FRAGMENTED market structure — 9 distinct utilities dominant (APG TSO +
