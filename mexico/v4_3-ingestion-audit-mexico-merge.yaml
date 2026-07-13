@@ -165,17 +165,48 @@ file_impact:
     modified: false                     # Step 5b will modify with lines from operator local
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 7. Step 5b — line densification (operator local)
+# 7. Step 5b — line densification EXECUTED (same session, sandbox)
 # ─────────────────────────────────────────────────────────────────────────────
-step_5b_line_ingestion_pending:
-  scope: 5,000-20,000 net-new lines from OSM Mexico (2-3× multiplier over existing 8,701)
-  who: operator (residential IP — Overpass API rate limits cloud IPs)
-  commands: |
-    python3 -m scripts.pipeline.ingestion.mexico.osm_overpass 2>&1 | tail -30
-    # Runs full line ingestion (4 bbox quadrants) + delta match vs existing grid-geo
-  followup_action_after_5b: |
-    Re-run scripts.pipeline.run mexico to update fleet after line-densified topology.
-    Emit mexico/v4_3-ingestion-audit-mexico-merge-step-5b.yaml addendum.
+step_5b_line_ingestion_executed:
+  status: COMPLETE — executed in-session (Overpass API accessible from sandbox after slot reset)
+  quadrant_partition_used:
+    SW: bbox(14.5, -118.5, 23.6, -102.35) — 920 raw lines
+    NW: bbox(23.6, -118.5, 32.7, -102.35) — 27,105 raw lines
+    SE: bbox(14.5, -102.35, 23.6, -86.5) — 6,508 raw lines
+    NEw: bbox(23.6, -102.35, 32.7, -94.4) — 25,872 raw lines
+    NEe: bbox(23.6, -94.4, 32.7, -86.5) — 9,589 raw lines
+    fetch_note: |
+      Original 4-quadrant partition triggered 42MB truncation on NE quadrant.
+      NE further split into west (-102.35 to -94.4) + east (-94.4 to -86.5)
+      halves for reliable transfer.  Both halves returned HTTP 200 in <30s.
+  empirical_yield:
+    total_raw_fetched: 69994
+    deduplicated_by_osm_id: 69882
+    discipline_36_dropped: 59412              # 85% — bbox quadrants extended into US + Guatemala + Belize
+    mexico_polygon_kept: 10470
+    midpoint_voltage_tier_dedup_skipped: 1962
+    net_new_lines_added: 8508
+  line_count_before: 8701
+  line_count_after: 17209
+  growth_multiplier: 2.0                       # matches Step 2 low-end projection (2-3×)
+  interpretation: |
+    Line densification lands at the LOW end of the projected 2-3× range,
+    confirming Step 2's assessment that OSM Mexico has essentially no
+    distribution-grid coverage (only 78 lines <33 kV = 0.5% of final cohort).
+    The 85% Discipline #36 drop rate reflects bbox quadrant overshoot into
+    US + Guatemala + Belize — polygon filter correctly retained only Mexican
+    features.  This is a MODERATE line-densification event (2.0× vs Norway's
+    MASSIVE 11.6×).
+  voltage_tier_distribution_final:
+    transmission_ge_300kv: 647
+    hv_115_230kv: 6267
+    mv_hv_33_115kv: 423
+    distribution_lt_33kv: 78                   # essentially absent — Step 2 finding confirmed
+    unspecified: 9794                          # 57% — OSM voltage tag sparse on line features
+  file_impact_final:
+    grid_geo_json_before_mb: 3
+    grid_geo_json_after_mb: 16.1
+    under_convention_125_90mb_threshold: true
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 8. Priority 3 Mexico Phase 2 forward-reference (Options B + C)
