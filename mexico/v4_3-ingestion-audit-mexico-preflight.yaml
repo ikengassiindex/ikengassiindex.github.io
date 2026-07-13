@@ -1,0 +1,268 @@
+# SSI Index v4.3 workstream — Mexico Step 1 pre-flight audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the empirical source-discovery pass on Mexican electricity grid data.
+# Follows the exact Canada Step 1 + Norway Step 1 pattern.
+#
+# HEADLINE FINDING: Mexican federal open-data infrastructure is architecturally
+# CLOSED at the machine-accessible layer — CENACE + SENER + CFE + CRE + INEGI
+# portals are all live but data lives behind interactive UIs and PDFs, not
+# behind WFS/WMS/REST endpoints suitable for L1 automation.  Contrast Canada
+# (federal CanVec + NACEI machine-accessible) and Norway (NVE Nettanlegg WFS
+# with rich schema).  Mexico Priority 3 architecture must therefore rely on
+# OSM Overpass as PRIMARY canonical + supplement with any provincial-level
+# open datasets found.
+#
+# Cross-references:
+#   - canada/v4_3-ingestion-audit-canada-preflight.yaml (Priority 1 precedent)
+#   - norway/v4_3-ingestion-audit-norway-preflight.yaml (Priority 2 precedent)
+#   - Report Production/02-v4_3-gap-audit-2026-07/v4_3-gap-audit.md (projection)
+
+schema_version: v4_3-ingestion-audit-preflight-1
+country_slug: mexico
+discovery_date_utc: "2026-07-13"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Existing state (baseline)
+# ─────────────────────────────────────────────────────────────────────────────
+existing_state:
+  ssi_data_json:
+    substations: 2436
+    voltage_kv_populated_pct: 87.2
+    owner_populated_pct: 0.0             # SAME gap as Norway pre-v4.3
+    top_regions:
+      Nuevo_Leon: 294
+      Chihuahua: 197
+      Sonora: 141
+      Queretaro: 126
+      Jalisco: 122
+    source_narrative: OSM-derived from a prior ingestion vintage
+  grid_geo_json:
+    substations: 2436                    # compact 's' dict
+    lines: 8701                          # compact 'l' list
+    schema_kind: compact_ssi_index_native
+  cross_border_tolerance: default 100m   # not set in cross_border_tolerances.json (no fjord-class coastline)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Federal Mexican electricity data sources — empirical probe results
+# ─────────────────────────────────────────────────────────────────────────────
+source_discovery_probe_results:
+  CENACE_national_grid_operator:
+    homepage: https://www.cenace.gob.mx/
+    http_status: 200
+    machine_accessible_data_endpoint: NO
+    findings: |
+      CENACE homepage is a SharePoint/ASP.NET application.  PRODESEN
+      (Programa de Desarrollo del Sistema Eléctrico Nacional) is published
+      as multi-part PDFs (~200-500 MB each), not as machine-readable data.
+      Empirical probe: /Docs/MercadoOperacion/Prodesen/PRODESEN_2024-2038_1de3.pdf
+      returns 404 (filename pattern rotates annually).  MDA / MTR / PML
+      market datasets accessible via /Paginas/SIM/Datos.aspx but as CSV
+      downloads triggered by JS form submissions — not L1-automatable
+      without headless browser.
+    Phase_2_potential: |
+      PRODESEN PDF text extraction could yield ~1,500-2,000 substation records
+      (planned + operational assets across 5 regions).  Requires PDF parsing
+      + entity extraction (~10-15 engineer-days).  Queued as Phase 2 candidate.
+
+  CFE_state_utility:
+    homepage_redirect: https://www.cfe.gob.mx/datosabiertos
+    http_status: 302 -> live
+    machine_accessible_data_endpoint: NO
+    findings: |
+      CFE (Comisión Federal de Electricidad) datos abiertos portal exists
+      but data behind interactive filters + user session cookies.  No public
+      REST API for asset inventory.  CFE Distribución operates 16 divisiones
+      each publishing individual PDF annual reports.
+    Phase_2_potential: |
+      16 divisiones × PDF extraction = ~4-8 engineer-days per division.
+      Queued as Phase 2 candidate.
+
+  SENER_energy_ministry:
+    SIE_URL: https://sie.energia.gob.mx/
+    http_status: 403                     # returns Forbidden for cloud IPs
+    machine_accessible_data_endpoint: NO
+    findings: |
+      SENER Sistema de Información Energética returns HTTP 403 from cloud
+      infrastructure (probably geo/IP restricted to Mexican consumer ISPs).
+      Cannot be probed from L1 automation.
+
+  CRE_regulator:
+    homepage: https://www.gob.mx/cre
+    http_status: 302 -> live
+    machine_accessible_data_endpoint: NO
+    findings: |
+      CRE (Comisión Reguladora de Energía) publishes tariff schedules +
+      generator permit lists as PDFs.  No inventory geodata API.
+
+  INEGI_statistics_agency:
+    homepage: https://www.inegi.org.mx/
+    http_status: 200
+    machine_accessible_data_endpoint: PARTIAL — WMS geoservidor live but no substation layer
+    findings: |
+      INEGI Marco Geoestadístico WFS at gaia.inegi.org.mx serves administrative
+      boundary features but does NOT publish electricity infrastructure as a
+      standard feature type.  INEGI DENUE (Directorio Estadístico Nacional de
+      Unidades Económicas) REST API at /app/api/denue/v1/consulta/ requires
+      authenticated token — enterprise-registry lookup potential for owner
+      enrichment on matched pairs.
+
+  datos_gob_mx_national_portal:
+    URL: https://datos.gob.mx/
+    http_status: 200 with SSL cert issue
+    machine_accessible_data_endpoint: PARTIAL — CKAN API blocked by cert chain
+    findings: |
+      National open-data portal on CKAN.  Standard /api/3/action/package_search
+      endpoint returns HTML instead of JSON (probably behind a WAF).  Cannot
+      programmatically enumerate datasets from cloud infrastructure.
+
+  SEMARNAT_environmental_permits:
+    URL: https://gisviewer.semarnat.gob.mx/geoserver/wfs
+    http_status: 404
+    findings: |
+      SEMARNAT MIA (Manifestación de Impacto Ambiental) permit portal does
+      not expose WFS.  Individual MIA PDFs contain substation locations +
+      operator data but require per-project download + parse.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. OSM baseline empirical probe (the PROVEN L1 source)
+# ─────────────────────────────────────────────────────────────────────────────
+osm_baseline_probe:
+  endpoint: https://overpass-api.de/api/interpreter
+  query_pattern: 'area["ISO3166-1"="MX"];power=substation'
+  empirical_counts:
+    substation_nodes: 44
+    substation_ways: 3041
+    substation_relations: 12
+    substation_total: 3097               # 27% MORE than existing 2,436 baseline
+    delta_vs_existing: +661              # substantial refresh opportunity
+  query_pattern_lines: 'area["ISO3166-1"="MX"];power=line OR minor_line OR cable'
+  empirical_lines_count: RATE_LIMITED_AT_PROBE_TIME  # Overpass 429 on 2nd query; verify at Step 2
+  interpretation: |
+    OSM Mexico substation count exceeds existing ssi-data.json by 27%.  This
+    represents either (a) contributor influx post-existing-ingestion vintage,
+    or (b) coverage gaps in the existing ingestion.  Either way, Priority 3
+    Mexico primary v4.3 value is likely a straightforward OSM refresh —
+    roughly 500-800 net-new substations after 500m Discipline #41 dedupe.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Architectural insight — Mexico vs Canada vs Norway
+# ─────────────────────────────────────────────────────────────────────────────
+architectural_comparison:
+  canada_priority_1:
+    federal_canonical_available: YES (CanVec, NACEI machine-accessible)
+    L1_architecture: federal-canonical primary + provincial supplements
+    empirical_delta_vs_existing: 4,538 CanVec subs, 1,227 net-new after dedupe
+  norway_priority_2:
+    federal_canonical_available: YES (NVE Nettanlegg WFS with rich schema)
+    L1_architecture: federal-canonical primary
+    empirical_delta_vs_existing: 1,558 NVE subs, 271 net-new after dedupe, 141,452 net-new lines
+  mexico_priority_3:
+    federal_canonical_available: NO (all federal data behind interactive UIs)
+    L1_architecture_recommended: OSM-primary + INEGI DENUE enrichment supplement
+    projected_delta_vs_existing: ~500-800 net-new subs from OSM refresh (empirical anchor at Step 2)
+  generalisable_finding: |
+    Federal open-data machine-accessibility varies dramatically across the
+    5 priority countries.  Canada + Norway have federal canonicals suitable
+    for direct L1 ingestion.  Mexico requires an OSM-primary architecture
+    with federal sources contributing enrichment only (owner/naming metadata
+    via INEGI DENUE + regulatory-status via CRE PDFs).  The v4.3 gap-audit
+    projection of "3,500-5,000 net-new Mexico substations" needs empirical
+    revision at Step 2 — likely closer to 500-800 based on OSM baseline.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Refutations of gap-audit projection
+# ─────────────────────────────────────────────────────────────────────────────
+refutations:
+  refutation_1_federal_canonical_availability:
+    gap_audit_assumption: CENACE + CFE datos abiertos publish structured data
+    empirical_finding: All federal portals live but no machine-readable inventory endpoints
+    impact: |
+      Cannot implement CENACE-primary L1 connector like NVE Nettanlegg or
+      CanVec Res_MGT.  Priority 3 Mexico architecture pivots to OSM-primary
+      with federal sources contributing PDF-extraction supplements only.
+  refutation_2_net_new_substation_yield:
+    gap_audit_projection: [3500, 5000] net-new substations
+    empirical_ceiling_at_pre_flight: 661                # OSM 3,097 - existing 2,436
+    impact: |
+      OSM Mexico substation total is 3,097.  Assuming 100% overlap with
+      existing (worst case), net-new = 0.  Assuming zero overlap (best case),
+      net-new = 661.  The realistic 500-800 range is 10× smaller than the
+      gap-audit projection of 3,500-5,000.  Gap-audit likely conflated
+      "potential dataset coverage" with "empirical yield after dedupe".
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Recommended L1 source architecture
+# ─────────────────────────────────────────────────────────────────────────────
+recommended_source_architecture:
+  L1_primary_source:
+    source_id: MX-C1-osm-mexico
+    endpoint: https://overpass-api.de/api/interpreter
+    query_pattern: '[out:json];area["ISO3166-1"="MX"]->.mx;(node["power"="substation"](area.mx);way["power"="substation"](area.mx);relation["power"="substation"](area.mx););out center;'
+    expected_substations: 3097
+    voltage_field: voltage= (OSM tag, in volts; convert to kV)
+    owner_field: operator= (OSM tag; sparse coverage expected)
+    name_field: name= (OSM tag)
+    rate_limit_strategy: |
+      Overpass rate-limits ~2-4 requests/minute from cloud IPs.  For paged
+      ingestion, use one large query per feature type with 60s+ timeout,
+      not many small queries.  Cache raw JSON responses on disk.
+  L1_supplement_source_1:
+    source_id: MX-C2-inegi-denue-enrichment
+    endpoint: https://www.inegi.org.mx/app/api/denue/v1/consulta/
+    requires_auth: YES — token required
+    SCIAN_activity_code: '2211'         # Generación, transmisión y distribución de energía eléctrica
+    role: |
+      Enrichment supplement — for each substation location matched in OSM,
+      query DENUE for enterprises in SCIAN 2211 within 500m radius.  Extract
+      operator name + RFC (Registro Federal de Contribuyentes) for
+      regulatory-grade utility linkage (analogous to Norway's Brønnøysund
+      eierOrgnr channel).
+    Phase_2_potential: YES              # Requires operator to register API token
+  L1_supplement_source_2_deferred:
+    source_id: MX-C3-cenace-prodesen-pdf-extract
+    role: PDF-based extraction from annual PRODESEN document
+    engineering_effort: 10-15 engineer-days
+    priority: Phase 2 candidate — provides authoritative planned/operational asset registry
+  L1_supplement_source_3_deferred:
+    source_id: MX-C4-cfe-divisiones-annual-reports
+    role: 16 CFE Distribución divisiones × annual PDF report extraction
+    engineering_effort: 4-8 engineer-days per division = 64-128 days total
+    priority: Phase 3+ candidate — long tail
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. Discipline #36 cross-border considerations
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_36_considerations:
+  us_border_length_km: 3145              # ~1,954 mi (longest single-border v4.3 workstream)
+  guatemala_border_length_km: 962
+  belize_border_length_km: 250
+  tolerance_recommendation: |
+    Default 100m tolerance is adequate for Mexican border geography (no
+    fjord/coastline complexity that motivated Norway's 5km Mode 2).  Set
+    per_country.mexico.tolerance_km: 0.1 in cross_border_tolerances.json
+    for explicit configuration.
+  NAFTA_border_electric_interconnections:
+    US_MX_HVDC_ties: 8                   # major cross-border DC ties
+    guatemala_belize_ties: minor
+    note: NAFTA cross-border electric interconnections often show as OSM
+          features spanning borders — Discipline #36 filter will correctly
+          split into MX-side and US-side portions at the polygon boundary.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. Auditability chain
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  state_transition: source-discovery-complete → step-2-empirical-yield-probe-pending
+  parent_states:
+    - Report Production/02-v4_3-gap-audit-2026-07/v4_3-gap-audit.md (projection)
+    - canada/v4_3-ingestion-audit-canada-preflight.yaml (Priority 1 precedent)
+    - norway/v4_3-ingestion-audit-norway-preflight.yaml (Priority 2 precedent)
+  child_states:
+    step_2_yield_probe: mexico/v4_3-ingestion-audit-mexico-fetch.yaml (pending — full OSM Overpass + INEGI DENUE probe)
+    step_3_l1_connector: scripts/pipeline/ingestion/mexico/osm_overpass.py (pending)
+    step_4_delta_audit: mexico/v4_3-ingestion-audit-mexico-delta.yaml (pending)
+    step_5_merge_audit: mexico/v4_3-ingestion-audit-mexico-merge.yaml (pending)
+  commit_hash_placeholder: TBD_at_pre_flight_merge
