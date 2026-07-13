@@ -123,10 +123,12 @@ class IngestionResult:
 def apply_bounds_filter(
     records: list[SubstationRecord] | list[TransmissionLineRecord],
     *,
-    bounds_json_path: Path = CANADA_BOUNDS_JSON,
-    tolerance_m: float = 5000.0,   # 5 km — Canada has fjord/coastline complexity per Mode 2
+    country_slug: str = "canada",
+    tolerance_km: float = 5.0,   # Canada Mode-3 per cross_border_tolerances.json
 ) -> tuple[list, list[dict]]:
-    """Delegate to scripts.pipeline.utils.geo.filter_by_country_polygon.
+    """Delegate to scripts.pipeline.utils.geo.filter_by_country_polygon
+    using the canonical signatures (country slug + tolerance_km + dict-shaped
+    substations with lat/lon keys).
 
     Returns:
         (kept_records, dropped_records_with_reason)
@@ -143,7 +145,6 @@ def apply_bounds_filter(
     try:
         from ...utils.geo import filter_by_country_polygon, load_country_polygon
     except ImportError as exc:
-        # Fall back to no-op with visibly-honest warning — Convention #56.
         logger.warning(
             "utils.geo not importable (%s); Discipline #36 bounds filter is a NO-OP. "
             "This is Convention #56 visibly-honest degradation.",
@@ -151,43 +152,46 @@ def apply_bounds_filter(
         )
         return list(records), []
 
-    polygon = load_country_polygon(bounds_json_path)
+    polygon = load_country_polygon(country_slug)
     if polygon is None:
         logger.warning(
-            "Canada bounds polygon missing at %s; Discipline #36 filter is NO-OP. "
+            "%s bounds polygon missing; Discipline #36 filter is NO-OP. "
             "This is Convention #56 visibly-honest degradation.",
-            bounds_json_path,
+            country_slug,
         )
         return list(records), []
 
-    # filter_by_country_polygon expects (lat, lon) tuples on each record;
-    # SubstationRecord has (latitude, longitude); TransmissionLineRecord has
-    # coordinates_multilinestring — we take the midpoint of the first line
-    # segment as the reference point (per Discipline #36 line-clipping convention).
-    kept, dropped = [], []
-    for r in records:
+    # filter_by_country_polygon takes dict-shaped substations with lat/lon keys.
+    # Wrap each record in a probe-dict indexed by list position so we can map
+    # back to the original SubstationRecord/TransmissionLineRecord.
+    probes: list[dict] = []
+    for i, r in enumerate(records):
         if isinstance(r, SubstationRecord):
-            inside = filter_by_country_polygon(
-                [(r.latitude, r.longitude)], polygon, tolerance_m=tolerance_m
-            )
+            probes.append({"_idx": i, "lat": r.latitude, "lon": r.longitude})
         elif isinstance(r, TransmissionLineRecord):
             if not r.coordinates_multilinestring or not r.coordinates_multilinestring[0]:
-                dropped.append({"record": r, "reason": "empty geometry"})
+                probes.append({"_idx": i, "lat": None, "lon": None, "_empty": True})
                 continue
-            # Midpoint of first line's start+end
+            # Midpoint of first line's start+end (per Discipline #36 line-clipping convention)
             first_line = r.coordinates_multilinestring[0]
             mid_lon = (first_line[0][0] + first_line[-1][0]) / 2.0
             mid_lat = (first_line[0][1] + first_line[-1][1]) / 2.0
-            inside = filter_by_country_polygon(
-                [(mid_lat, mid_lon)], polygon, tolerance_m=tolerance_m
-            )
+            probes.append({"_idx": i, "lat": mid_lat, "lon": mid_lon})
         else:
-            dropped.append({"record": r, "reason": "unknown record type"})
-            continue
-        if inside:
+            probes.append({"_idx": i, "lat": None, "lon": None, "_unknown_type": True})
+
+    kept_probes, dropped_probes = filter_by_country_polygon(
+        probes, polygon, tolerance_km=tolerance_km, lat_key="lat", lon_key="lon"
+    )
+    kept_indices = {p["_idx"] for p in kept_probes}
+    kept: list = []
+    dropped: list[dict] = []
+    for i, r in enumerate(records):
+        if i in kept_indices:
             kept.append(r)
         else:
-            dropped.append({"record": r, "reason": "outside Canada polygon (tolerance 5km)"})
+            reject_reason = f"outside {country_slug} polygon (tolerance {tolerance_km} km)"
+            dropped.append({"record": r, "reason": reject_reason})
     return kept, dropped
 
 

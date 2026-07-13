@@ -125,88 +125,139 @@ def _extract_gdb(zip_bytes: bytes, work_dir: Path) -> Path:
 
 
 # ── Parse ────────────────────────────────────────────────────────────────
-def _iter_features_via_pyogrio(gdb_path: Path, layer: str):
-    """Yield (attributes_dict, wgs84_geometry_geojson) for each feature.
+def _read_layer(gdb_path: Path, layer: str) -> tuple[dict, list, list]:
+    """Read a single FGDB layer via pyogrio raw + return (meta, geometries, field_rows).
 
-    Uses pyogrio when available (Phase-1.5 pipeline standard); falls back to
-    a visibly-honest warning if the runtime lacks GDAL bindings.
+    field_rows is a list of dicts (one per feature) keyed by the layer's field
+    names.  geometries is a list of shapely geometry objects (Point,
+    MultiPolygon, or MultiLineString) already decoded from WKB.
+
+    Coordinates in CanVec Res_MGT are lat/lon (NAD83 CSRS = EPSG:4617); for
+    SSI Index 100 m tolerance NAD83↔WGS84 offset (<2 m) is below the noise
+    floor — coordinates are consumed as WGS84 directly.  Convention #56
+    visibly-honest degradation: if a feature's WKB fails to parse, it is
+    skipped with a per-record warning rather than crashing the fetch.
     """
     try:
-        from pyogrio import read_info
         from pyogrio.raw import read as read_raw
+        from shapely import wkb as _wkb
     except ImportError as exc:
         raise RuntimeError(
-            "pyogrio not installed — install via `pip install pyogrio` "
-            "(GDAL 3.6+ bundled).  This is required for CanVec FGDB reading."
+            "pyogrio + shapely required for CanVec FGDB reading — "
+            "check scripts/pipeline/requirements.txt."
         ) from exc
 
-    info = read_info(gdb_path, layer=layer)
-    logger.info(
-        "%s :: layer=%s features=%s geom=%s",
-        gdb_path.name, layer, info.get("features"), info.get("geometry_type")
-    )
-    # NOTE — the actual read call semantics vary across pyogrio versions;
-    # the canonical fallback below reads via geopandas if it becomes available
-    # in the pipeline runtime.  Otherwise the raw read yields tuples that must
-    # be re-interpreted by the caller.  Downstream federation layer normalises.
-    fields, geom_type, crs, encoding, geometry, field_data = read_raw(
-        gdb_path, layer=layer,
-    )
-    yield fields, geom_type, crs, geometry, field_data
+    meta, _fids, geometry_blobs, field_data = read_raw(gdb_path, layer=layer)
+    field_names = list(meta["fields"])
+
+    geometries: list = []
+    field_rows: list[dict] = []
+    parse_failures = 0
+    for i, wkb_bytes in enumerate(geometry_blobs):
+        try:
+            geom = _wkb.loads(wkb_bytes)
+        except Exception:
+            parse_failures += 1
+            continue
+        geometries.append(geom)
+        row = {name: field_data[j][i] for j, name in enumerate(field_names)}
+        field_rows.append(row)
+
+    if parse_failures:
+        logger.warning(
+            "%s :: %d features had unparseable WKB (skipped, Convention #56)",
+            layer, parse_failures,
+        )
+    return meta, geometries, field_rows
 
 
-def _substation_record_from_feature(
-    feature_id: str, attrs: dict, latitude: float, longitude: float,
-) -> SubstationRecord:
-    """Normalise a CanVec transformer_station feature into a SubstationRecord.
+def _substation_record_from_geometry(
+    geom, row: dict, *, feature_index: int,
+) -> SubstationRecord | None:
+    """Convert a shapely geometry + attribute row into a SubstationRecord.
 
-    CanVec Res_MGT substation schema (empirically verified 2026-07-12):
-      - feature_id                      (string, publisher-canonical)
-      - md_temporal_extent_date_min     (string)
-      - md_temporal_extent_date_max     (string)
-      - md_horiz_position_accuracy_min  (float, metres)
-      - md_horiz_position_accuracy_max  (float, metres)
-      - map_selection                   (int16)
-
-    Voltage, owner, name are ABSENT at the federal layer — populated via
-    downstream federation with provincial-utility supplements.
+    Handles both transformer_station_0 (Point) and transformer_station_2
+    (MultiPolygon).  For polygons the centroid is used as the station node
+    location (Discipline #36 convention — Canada substation-yard footprints
+    at 1:50,000 scale are small enough that centroid vs perimeter distinction
+    is below the 100 m Index tolerance).
     """
+    if geom.geom_type == "Point":
+        longitude, latitude = geom.x, geom.y
+    elif geom.geom_type in ("Polygon", "MultiPolygon"):
+        c = geom.centroid
+        longitude, latitude = c.x, c.y
+    else:
+        return None
+
+    def _to_str(v) -> str | None:
+        if v is None or (isinstance(v, float) and v != v):    # NaN
+            return None
+        return str(v)
+
+    def _to_float(v) -> float | None:
+        if v is None:
+            return None
+        try:
+            f = float(v)
+            return f if f == f else None    # exclude NaN
+        except (TypeError, ValueError):
+            return None
+
     return SubstationRecord(
         source_id=SOURCE_ID,
-        feature_id=str(feature_id),
-        latitude=latitude,
-        longitude=longitude,
+        feature_id=_to_str(row.get("feature_id")) or f"unnamed-{feature_index}",
+        latitude=float(latitude),
+        longitude=float(longitude),
         voltage_kv=None,             # Convention #56 visibly-honest degradation
-        owner=None,
+        owner=None,                  # Federal CanVec layer carries no owner
         operator_station_name=None,
-        horiz_accuracy_min_m=attrs.get("md_horiz_position_accuracy_min"),
-        horiz_accuracy_max_m=attrs.get("md_horiz_position_accuracy_max"),
-        temporal_extent_min=attrs.get("md_temporal_extent_date_min"),
-        temporal_extent_max=attrs.get("md_temporal_extent_date_max"),
-        raw_attributes=dict(attrs),
+        horiz_accuracy_min_m=_to_float(row.get("md_horiz_position_accuracy_min")),
+        horiz_accuracy_max_m=_to_float(row.get("md_horiz_position_accuracy_max")),
+        temporal_extent_min=_to_str(row.get("md_temporal_extent_date_min")),
+        temporal_extent_max=_to_str(row.get("md_temporal_extent_date_max")),
+        raw_attributes={k: _to_str(v) for k, v in row.items()},
     )
 
 
-def _line_record_from_feature(
-    feature_id: str, attrs: dict, geometry_multilinestring: list,
-) -> TransmissionLineRecord:
-    """CanVec power_line_1 schema (verified 2026-07-12):
-      - feature_id / md_temporal_extent_*
-      - md_horiz_position_accuracy_min/max
-      - line_location (int16)
-      - number_of_lines (int32)
-      - map_selection (int16)
-      - Shape_Length (float64)
+def _line_record_from_geometry(
+    geom, row: dict, *, feature_index: int,
+) -> TransmissionLineRecord | None:
+    """Convert a shapely MultiLineString (or LineString) + attributes into a
+    TransmissionLineRecord.
+
+    Canonical geometry: nested list-of-list-of-[lon, lat] pairs per the
+    GeoJSON MultiLineString convention (matches TransmissionLineRecord field).
     """
+    def _to_str(v) -> str | None:
+        return None if v is None else str(v)
+    def _to_int(v) -> int | None:
+        if v is None:
+            return None
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return None
+
+    if geom.geom_type == "MultiLineString":
+        multiline = [
+            [[pt[0], pt[1]] for pt in ls.coords]
+            for ls in geom.geoms
+        ]
+    elif geom.geom_type == "LineString":
+        multiline = [[[pt[0], pt[1]] for pt in geom.coords]]
+    else:
+        return None
+
     return TransmissionLineRecord(
         source_id=SOURCE_ID,
-        feature_id=str(feature_id),
-        coordinates_multilinestring=geometry_multilinestring,
+        feature_id=_to_str(row.get("feature_id")) or f"unnamed-{feature_index}",
+        coordinates_multilinestring=multiline,
         voltage_kv=None,             # Absent at federal CanVec layer
         owner=None,
         line_name=None,
-        number_of_lines=attrs.get("number_of_lines"),
-        raw_attributes=dict(attrs),
+        number_of_lines=_to_int(row.get("number_of_lines")),
+        raw_attributes={k: _to_str(v) for k, v in row.items()},
     )
 
 
@@ -278,29 +329,33 @@ def fetch(
         return result
 
     # Substations (Point + MultiPolygon) + power_lines.
-    # The actual GDAL/pyogrio→WGS84 reprojection happens in the parse layer;
-    # scaffold body below yields per-feature records with placeholder geometry
-    # extraction and is the Step-3-follow-on target for full implementation.
+    # NAD83 CSRS (EPSG:4617) → WGS84 identity approximation: NAD83↔WGS84
+    # offset is <2 m; below the SSI Index 100 m tolerance for R6b/R4 modifiers.
     logger.info(
         "Parsing CanVec Res_MGT layers under %s (substation=%s, line=%s)",
         gdb, SUBSTATION_LAYERS, LINE_LAYER,
     )
     try:
-        # STEP-3-FOLLOW-ON: replace the placeholder yields below with the
-        # canonical pyogrio read that projects EPSG:4617 → WGS84, converts
-        # MultiPolygon substation footprints to centroid points, and populates
-        # the horiz_accuracy + temporal_extent fields per SubstationRecord.
+        # Substations across both layers (point + polygon).
         for layer in SUBSTATION_LAYERS:
-            # placeholder — implementation deferred
-            _ = layer
-        # placeholder for line parsing
-        result.warnings.append(
-            "Discipline #55 stub — CanVec Res_MGT record-extraction body is a "
-            "scaffold; full implementation deferred to Step 3 follow-on. "
-            "Pre-flight anchor + fetch + SHA-256 audit + Discipline #36 filter "
-            "hook are wired; the geometry-projection + attribute normalisation "
-            "call chain lands with the first Canada L1 merge PR."
-        )
+            meta, geometries, field_rows = _read_layer(gdb, layer)
+            layer_kept = 0
+            for i, (geom, row) in enumerate(zip(geometries, field_rows)):
+                rec = _substation_record_from_geometry(geom, row, feature_index=i)
+                if rec is not None:
+                    result.substations.append(rec)
+                    layer_kept += 1
+            logger.info("  %s :: %d substations extracted", layer, layer_kept)
+
+        # Transmission lines.
+        meta, geometries, field_rows = _read_layer(gdb, LINE_LAYER)
+        line_kept = 0
+        for i, (geom, row) in enumerate(zip(geometries, field_rows)):
+            rec = _line_record_from_geometry(geom, row, feature_index=i)
+            if rec is not None:
+                result.transmission_lines.append(rec)
+                line_kept += 1
+        logger.info("  %s :: %d lines extracted", LINE_LAYER, line_kept)
     except Exception as exc:
         result.warnings.append(f"Convention #56 degradation — parse failed: {exc}")
         return result
