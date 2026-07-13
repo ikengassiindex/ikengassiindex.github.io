@@ -1,0 +1,158 @@
+# Hungary v4.23 Ingestion Audit — Pre-flight
+# ==========================================
+# Task: #203 (WAVE2-Step1 Hungary)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: hungary
+  iso2: HU
+  iso3: HUN
+  wave: 2
+  priority: 10
+  step: 1
+  target: "Owner enrichment + voltage fill — EU cluster continuation"
+  rationale: >
+    Hungary carries 3,502 substations with 0% owner tagged and 71% voltage-null
+    (biggest voltage fill opportunity in cohort). NUTS-3 region codes populated
+    across 20 regions. Post-2020 E.ON Hungária consolidation of Hungarian DSOs
+    simplifies attribution: 2-DSO fallback (ELMŰ-ÉMÁSZ for Budapest+Northeast;
+    E.ON Hungária for rest) + MAVIR TSO ≥120 kV.
+
+baseline_state:
+  ssi_data_substations: 3502
+  grid_geo_substations: 3502
+  grid_geo_lines: 4261
+  lines_per_substation_ratio: 1.22  # moderate transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: ~29.0  # 1,016/3,502 tagged — 71% NULL (biggest cohort opportunity)
+  region_coverage_pct: ~100.0  # all 20 NUTS-3 regions populated
+  region_split_top_5:
+    HU110_Budapest: 1705
+    HU213_Veszprém: 349
+    HU120_Pest: 346
+    HU222_Vas: 144
+    HU321_Hajdú-Bihar: 114
+  voltage_class_top:
+    null: 2486  # 71% NULL — LARGE FILL OPPORTUNITY
+    11_kv: 553   # LV distribution
+    132_kv: 307  # HV distribution (Hungarian standard, differs from BE 150/NL 110)
+    22_kv: 71    # MV distribution
+    400_kv: 46   # EHV backbone
+    220_kv: 12   # older EHV
+    35_kv: 8
+    20_kv: 4
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [16.1, 45.7, 22.9, 48.6]  # west, south, east, north
+    strategy: >
+      Single-query pattern — Hungary bbox ~93k km² (~3× Belgium's 30k).
+      Should not 504 given prior wave 2 pattern success.
+    expected_yield:
+      substations: 3000-6000
+      lines: 6000-15000
+    tag_completeness_hypothesis: >
+      Budapest metro + major cities 50-70% operator= tags. Rural 20-40%.
+      Overall target 40-60% direct tag.
+    lp_dd_class: canonical
+
+  fallback_region_registry:
+    strategy: nuts3_region_by_voltage_class
+    rationale: >
+      Post-2020 E.ON Hungária acquired all Hungarian DSOs. Traditional 6-DSO
+      split (ELMŰ + ÉMÁSZ + DÉMÁSZ + 3× E.ON regional) now consolidated,
+      but ELMŰ-ÉMÁSZ brand preserved for Budapest metro + Northeast.
+    tso_threshold_kv: 120  # MAVIR operates 220/400 kV; 132 kV is high DSO tier
+    dso_mapping:
+      ELMŰ-ÉMÁSZ:  # Budapest + Pest + Northeast counties
+        nuts3_codes: [HU110, HU120, HU311, HU312, HU313, HU321, HU322, HU323]
+        note: "Preserved brand under E.ON Hungária since 2020 acquisition"
+      E.ON Hungária:  # Transdanubia + Southern Great Plain
+        nuts3_codes: [HU211, HU212, HU213, HU221, HU222, HU223, HU231, HU232, HU233, HU331, HU332, HU333]
+        note: "Consolidated national DSO (all former E.ON regional + DÉMÁSZ)"
+
+  tso_registry:
+    name: MAVIR ZRt
+    scope: >
+      MAVIR (Magyar Villamosenergia-ipari Átviteli Rendszerirányító) is the
+      Hungarian TSO — state-owned, operates AND owns the 220/400 kV network.
+    lp_dd_class: primary_owner_class
+
+  dso_alias_normalisation:
+    aliases:
+      ELMŰ: "ELMŰ-ÉMÁSZ"
+      ELMÜ: "ELMŰ-ÉMÁSZ"  # alternate accent
+      "Budapesti Elektromos Művek": "ELMŰ-ÉMÁSZ"
+      ÉMÁSZ: "ELMŰ-ÉMÁSZ"
+      "Északmagyarországi Áramszolgáltató": "ELMŰ-ÉMÁSZ"
+      DÉMÁSZ: "E.ON Hungária"  # post-2018 E.ON acquisition
+      "E.ON Észak-dunántúli": "E.ON Hungária"
+      "E.ON Dél-dunántúli": "E.ON Hungária"
+      "E.ON Tiszántúli": "E.ON Hungária"
+      "E.ON Áramhálózati": "E.ON Hungária"
+      Innogy: "E.ON Hungária"  # post-2019 Innogy → E.ON rebrand
+      "MAVIR Zrt": "MAVIR"
+      "MAVIR ZRt": "MAVIR"
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/hungary/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # NUTS-3 → DSO + case-insensitive alias norm
+    - osm_overpass.py  # single-query (Belgium/Netherlands pattern)
+    - merge_into_ssi_data.py  # 500m proximity match + region fallback
+  pattern_reused_from: netherlands (region-jurisdiction × voltage + case-insensitive alias)
+  differentiators_vs_netherlands:
+    - nuts3_code_based_mapping: HU regions use NUTS-3 codes (HU110/HU213) vs NL province names
+    - two_dso_consolidation: Hungary has 2 DSOs post-E.ON consolidation vs NL's 6
+    - hv_tier_at_132kV: Hungarian HV tier is 132 kV (not 110 or 150 like NL/BE)
+    - lat_lon_fallback_for_untagged_region: For OSM subs without region tag, use lat/lon
+
+expected_deltas:
+  post_merge_owner_coverage: 95-100%  # E.ON consolidation makes attribution simple
+  post_merge_voltage_coverage: 65-90%  # from 29% baseline — LARGEST fill opportunity in cohort
+  post_merge_substations: 3502-6500
+  post_merge_lines: 6000-15000
+  km_of_lines: 15000-40000
+
+risks_flagged:
+  - risk_1: >
+      NUTS-3 code coverage in OSM is heterogeneous — many OSM substations
+      will have addr:state= (county name) not NUTS-3 code. Fallback to lat/lon
+      geofence for county → NUTS-3 mapping.
+  - risk_2: >
+      ELMŰ-ÉMÁSZ vs E.ON boundary at Pest county (HU120) — some Pest county
+      substations are still Budapest-metro extended, others rural E.ON.
+      Convention #56 preserves ambiguity via provenance tag.
+
+convention_preservation:
+  discipline_36:
+    scope: Hungary bounds already CLEAN pre-workstream. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: Historical DSO alias tags preserved via osm_original_operator.
+  convention_60:
+    scope: OSM + MAVIR open data only — no commercial providers.
+  convention_64:
+    scope: All changes contained to hungary/ + scripts/pipeline/ingestion/hungary/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.hungary.osm_overpass`
+    locally. Expected wall-clock 3-5 min single-query.
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.hungary.merge_into_ssi_data`.
+  step_5: >
+    Cohort audit sweep re-run — expect Hungary owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2
