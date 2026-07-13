@@ -1,0 +1,245 @@
+# SSI Index v4.3 workstream — Norway Option A merge closure audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the Option A execution — merging the NVE Nettanlegg L1 federation output
+# into norway/ssi-data.json + norway/grid-geo.json + emitting the voltage
+# cross-validation data-quality report.
+#
+# TL;DR — Norway substation count 5,842 → 6,113 (+4.64% growth).  Owner
+# provenance 0.0% → 21.9% (1,337 substations gain eier + eier_orgnr +
+# navn + commissioning_year from NVE).  Line count 13,276 → 154,728
+# (11.6× multiplier — largest single Discipline #41 densification event
+# in v4.3).  Voltage cross-validation surfaces 191 tier mismatches (15%
+# of matched pairs) as OSM data-quality findings.
+#
+# Next steps: L2 enrichment (climate + seismic + socioeconomic) + L3
+# scoring (SSI v4.2 modifier chain) on the 271 new + 1,273 enriched
+# substations that currently carry null placeholders for computed fields.
+# L2/L3 executed via existing scripts/pipeline/fetch_data.py + run.py.
+
+schema_version: v4_3-ingestion-audit-merge-1
+country_slug: norway
+merge_date_utc: "2026-07-13"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+option_chosen: A                    # per norway/v4_3-ingestion-audit-norway-delta.yaml
+parent_state_transitions:
+  - norway/v4_3-ingestion-audit-norway-preflight.yaml
+  - norway/v4_3-ingestion-audit-norway-fetch.yaml
+  - norway/v4_3-ingestion-audit-norway-line-schema.yaml
+  - norway/v4_3-ingestion-audit-norway-delta.yaml (A/B/C options gate)
+  - scripts/pipeline/ingestion/norway/nve_nettanlegg.py (L1 connector, commit bc14fe74)
+  - scripts/pipeline/ingestion/norway/merge_into_ssi_data.py (federation merger, this commit)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Merge outcome — substations
+# ─────────────────────────────────────────────────────────────────────────────
+substation_merge_outcome:
+  substation_count_before: 5842
+  substation_count_after: 6113
+  growth_absolute: 271
+  growth_percent: 4.64
+  matched_pairs_enriched: 1273        # existing subs gaining owner + eier_orgnr + navn + year
+  net_new_added: 271                   # NVE subs with no existing match within 500m
+  discipline_36_bounds_filtered: 14   # NVE subs dropped by 5km fjord tolerance
+  # Enrichment coverage on final cohort:
+  owner_coverage_before_pct: 0.0
+  owner_coverage_after_pct: 21.9
+  eier_orgnr_coverage_after_pct: 21.9
+  operator_station_name_coverage_after_pct: 14.8   # NVE-native navn on 902 subs
+  commissioning_year_coverage_after_pct: 6.1        # NVE-native driftsattår on 374 subs
+  distinct_norwegian_utilities: 87
+  distinct_brønnøysund_orgnr: 81       # regulatory-grade Enhetsregisteret linkage
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Merge outcome — transmission lines (the MASSIVE Discipline #41 densification)
+# ─────────────────────────────────────────────────────────────────────────────
+line_merge_outcome:
+  line_count_before: 13276              # OSM-derived existing state
+  line_count_after: 154728               # 11.6× multiplier — largest in v4.3
+  growth_absolute: 141452
+  growth_multiplier: 11.66
+  net_new_lines_added: 141452
+  dedup_skipped: 9337                    # duplicate midpoint + voltage tier match
+  v43_tagged_coverage_pct: 91.4           # 141,452 / 154,728 lines carry v43_source
+  discipline_36_bounds_filtered: 3418     # NVE lines dropped by 5km fjord tolerance
+  voltage_tier_stratification:
+    sentralnett_transmission_ge_220kv: 231       # Statnett transmission (300/420 kV + HVDC)
+    regionalnett_36_to_150kv: 3074                # regional DSO backbone
+    distribusjonsnett_lt_36kv: 137223             # LV/MV distribution (dominant)
+    unspecified_voltage: 14200                    # ~9% pending voltage on line features
+  interpretation: |
+    Norwegian grid-geo.json now carries full 3-tier voltage stratification.
+    Distribusjonsnett dominates by volume (89% of net-new lines) — this is the
+    LV/MV distribution grid that OSM Norway had historically under-tagged.  The
+    Regionalnett + Sentralnett coverage upgrade is the topology-signal-critical
+    layer: R6b Network Topology + R4 Graph-Theoretic Network Criticality gain
+    genuine ground-truth for the first time on the Norwegian cohort.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Voltage cross-validation (reverse Discipline #41 as data-quality QA)
+# ─────────────────────────────────────────────────────────────────────────────
+voltage_cross_validation:
+  methodology: |
+    For each of the 1,273 matched substation pairs (500 m Discipline #41
+    threshold), compare existing OSM-derived voltage_kv against NVE-inherited
+    voltage (max spenning across all lines with an endpoint within 500 m of
+    the substation).  Flag pairs where ratio(max, min) > 1.5 as
+    'voltage_tier_mismatch' — indicative of OSM contributor tagging error at
+    the substation level (e.g. transmission node tagged as regional or
+    distribution).
+  matched_pairs_evaluated: 1273
+  voltage_tier_mismatches: 191
+  voltage_tier_mismatch_rate_pct: 15.0
+  sample_findings_top_5:
+    - {existing: 132, nve_inherited: 420, distance_m: 4.2, class: transmission_node_tagged_as_regional}
+    - {existing: 66, nve_inherited: 300, distance_m: 54.1, class: transmission_node_tagged_as_regional}
+    - {existing: 132, nve_inherited: 420, distance_m: 37.1, class: transmission_node_tagged_as_regional}
+    - {existing: 22, nve_inherited: 66, distance_m: 91.1, class: regional_node_tagged_as_distribution}
+    - {existing: 22, nve_inherited: 66, distance_m: 419.4, class: regional_node_tagged_as_distribution}
+  report_path: norway/v4_3-voltage-cross-validation.json
+  downstream_use_case: |
+    LP-DD reviewers see a 15% data-quality signal on the OSM Norway substation
+    corpus — high-value transmission and regional nodes materially undertagged.
+    Report can be filed as feedback to the OSM Norway community for iterative
+    correction.  Foundation deliverable value: empirical cross-source quality
+    validation not available from any single-source ingestion.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Schema of new substations + enrichment fields
+# ─────────────────────────────────────────────────────────────────────────────
+new_substation_schema:
+  populated_from_nve:
+    - substation_id                     # SHA-1(nve.lokalId)[:12], prefix "NO_v43_"
+    - name                              # NVE navn where available, else ""
+    - latitude / longitude              # NVE EPSG:4258 (WGS84)
+    - voltage_kv                        # reverse-Discipline-#41 inherited (or 0 placeholder)
+    - owner                             # NVE eier
+    - eier_orgnr                        # Norwegian Brønnøysund company registry number
+    - commissioning_year                # NVE driftsattår
+    - operator_station_name             # NVE navn
+    - nve_lokal_id                      # NVE stable UUID
+    - version                           # v4.2 methodology pin
+    - v43_sources                       # list — ["NO-C1-nve-nettanlegg"]
+    - v43_provenance                    # dict — {source_id: {feature_id, eier, ...}}
+  null_placeholders_awaiting_L2_L3_enrichment:
+    L2_climate: climate_trajectory (I1/I2/I3)
+    L2_seismic: seismic (pga_g + zone + R6_seismic)
+    L2_socio: socio_economic
+    L3_topology: graph_topology + markov + transition
+    L3_modifiers: components + modifiers + modifier_impacts + modifier_impact + modifier_pct
+    L3_scoring: R_base_median + R_unclipped + R_median + R_P5 + R_P95
+    L3_alerts: P_critical + CI_width
+    L3_classification: classification + confidence_tier + fleet_percentile + skewness
+  convention_56_visibly_honest_degradation: |
+    Fields awaiting L2/L3 enrichment surface as null (not spurious defaults).
+    Re_raw defaults to 1.0 (v4.2 master equation multiplicative neutral) and
+    Re_norm defaults to 0.0 (zero additive contribution) so the current fleet
+    aggregation math stays stable while the new subs await proper rescore.
+    Downstream scripts/validate_schema.py will flag the new subs as incomplete
+    until the next L2/L3 run — which is the correct behaviour.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Enrichment schema on matched pairs
+# ─────────────────────────────────────────────────────────────────────────────
+enrichment_schema:
+  fields_populated_on_matched_pairs:
+    - owner                             # NVE eier — NEW (was None)
+    - operator_station_name             # NVE navn — filled if empty
+    - eier_orgnr                        # Norwegian Brønnøysund reg# — NEW
+    - commissioning_year                # NVE driftsattår — NEW
+    - nve_lokal_id                      # NVE stable UUID — NEW
+    - v43_sources                       # ["NO-C1-nve-nettanlegg"] — NEW
+    - v43_provenance                    # provenance dict — NEW
+  fields_preserved:
+    - substation_id + id                # existing OSM-derived stable IDs
+    - latitude + longitude              # existing OSM coordinates
+    - voltage_kv                        # existing OSM voltage (99.8% populated)
+    - region + departement              # existing Discipline #36 geographic tagging
+    - All L2/L3 scored fields           # existing R_median + classification preserved
+  cross_check_artifact:
+    - v4_3-voltage-cross-validation.json  # 191 tier mismatches for LP-DD data quality signal
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. File impact + Convention #56 pre-commit sentinel compliance
+# ─────────────────────────────────────────────────────────────────────────────
+file_impact:
+  ssi_data_json:
+    size_before_mb: ~12.0
+    size_after_mb: 13.3
+    under_90mb_convention_125_threshold: true
+  grid_geo_json:
+    size_before_mb: ~5.0
+    size_after_mb: 58.2
+    under_90mb_convention_125_threshold: true
+    performance_note: |
+      58 MB grid-geo.json is large but within pre-commit limits.  Browser
+      load time on the map explorer will need probing — if latency becomes
+      problematic, spatial-tile the lines by voltage tier or bbox as a
+      Phase 2 optimisation.
+  voltage_cross_validation_json:
+    size_mb: <1.0
+    role: data-quality artifact
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. Downstream pipeline handoff (operator)
+# ─────────────────────────────────────────────────────────────────────────────
+next_step_L2_L3_enrichment:
+  who: operator (needs CDS_API_KEY + GEM PGA data local access)
+  commands:
+    L2_enrichment: |
+      python3 -m scripts.pipeline.fetch_data --country norway
+      # Runs seismic + climate + socioeconomic ingestion on all subs missing them.
+      # 271 net-new + 1,273 enriched-but-unrescored subs will get populated
+      # seismic.pga_g, climate_trajectory, socio_economic dict.
+    L3_scoring: |
+      python3 -m scripts.pipeline.run norway
+      # Runs the SSI v4.2 modifier chain + Monte Carlo on all subs missing
+      # R_median.  271 net-new subs will get R_base_median → Re_raw → Re_norm
+      # → R_median + classification + band.
+    L3_reclassify: |
+      python3 scripts/reclassify_phase2c.py norway
+      # Runs Phase 2C 5-band reclassification on newly-scored subs.
+    verification: |
+      python3 scripts/pipeline/check_cross_border.py norway --strict
+      python3 scripts/check_substation_schema.py norway
+      pytest tests/test_no_cross_border_leakage.py -v
+  expected_final_state:
+    substations: 6113
+    fields_per_sub: ~48 (44 pre-existing + eier_orgnr + commissioning_year + nve_lokal_id + v43_sources + v43_provenance)
+    classification_band_distribution: recomputed by L3 phase2c reclassify
+    file_size_mb: ~20 (up from 13.3 as new subs get L2/L3 enriched)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. Priority 2 Norway Phase 2 forward-reference (Option C)
+# ─────────────────────────────────────────────────────────────────────────────
+phase_2_forward_reference:
+  purpose: |
+    Option A ships Q4 2026 with +4.64% Norway substation growth + 11.6× line
+    densification + 21.9% owner-provenance upgrade + 15% voltage cross-check
+    data quality signal.  Option C — Statnett direct portal — remains the
+    correct architectural answer for real-time operational-status enrichment
+    but requires 8-14 engineer-days of registration + licence review.
+  queued_for: Q1-Q2 2027 alongside Mexico/Austria/Greenland Priorities 3-5 Phase 2
+  when_ready: |
+    Statnett direct portal integration on top of the Option A canonical.
+    Expected additional value: real-time transmission-grid operational status
+    + interconnector metadata + hourly power-flow snapshots.  Substation
+    count and line count would not materially grow beyond current 6,113 +
+    154,728 state — Statnett value is operational-real-time, not count-growth.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. Auditability chain
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  state_transition: L1-federation-shipped → Option-A-merge-executed → L2/L3-pending
+  parent_states:
+    - norway/v4_3-ingestion-audit-norway-preflight.yaml
+    - norway/v4_3-ingestion-audit-norway-fetch.yaml
+    - norway/v4_3-ingestion-audit-norway-line-schema.yaml
+    - norway/v4_3-ingestion-audit-norway-delta.yaml
+  child_state_options:
+    L2_L3_ran: norway/v4_3-ingestion-audit-norway-l2-l3-closure.yaml (post-enrichment)
+    P2_statnett_expansion: norway/v4_3-ingestion-audit-norway-phase2-statnett.yaml (Q1-Q2 2027+)
+  commit_hash_placeholder: TBD_at_merger_commit
+  ci_job_url_placeholder: TBD_at_merger_commit
