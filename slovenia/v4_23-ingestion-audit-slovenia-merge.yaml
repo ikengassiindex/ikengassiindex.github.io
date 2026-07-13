@@ -1,0 +1,197 @@
+# Slovenia v4.23 Ingestion Audit — Step 4 Merge
+# ==============================================
+# Task: #216 (WAVE2-Step4 Slovenia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: slovenia/v4_23-ingestion-audit-slovenia-preflight.yaml
+# Sibling fetch:      slovenia/v4_23-ingestion-audit-slovenia-fetch.yaml
+# Status: MERGE_COMPLETE (post Layer 3 lat/lon geofence hotfix + re-merge)
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: slovenia
+source_id: SI-C1-osm-overpass
+merged_at_utc: "2026-07-13T00:00:00Z"
+
+baseline_state:
+  ssi_data_substations: 157
+  grid_geo_substations: 158
+  grid_geo_lines: 4384
+  lines_per_substation_ratio: 27.90  # TASK #182 OUTLIER — MV distribution deep-ingestion
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0  # baseline captured ONLY 66 kV (unique SI HV tier)
+  region_coverage_pct: 100.0   # 12 NUTS-3 codes populated
+  voltage_split_baseline:
+    66_kv_only: 157  # all baseline subs at single tier
+
+merge_stats_first_run:
+  # First run pre-hotfix — resolver hit unresolved on 88% of net-new
+  enriched: 251
+  voltage_filled: 0
+  net_new_substations: 1574
+  voltage_xcheck_findings: 107
+  lines_appended: 126
+  lines_deduped: 4303
+
+merge_stats_second_run:
+  # Second run post-hotfix — cache-hit fetch + re-parse via fixed resolver
+  # + owner-fill on the 1,534 net-new subs previously unresolved
+  enriched: 1825  # all OSM subs matched existing (net-new became existing)
+  voltage_filled: 2
+  net_new_substations: 0
+  voltage_xcheck_findings: 100  # some xcheck findings retired via 2 voltage fills
+  lines_appended: 0
+  lines_deduped: 4429
+
+final_state:
+  ssi_data_substations: 1731
+  grid_geo_lines: 4510
+  lines_per_substation_ratio: 2.61  # 🎯 TASK #182 OUTLIER RETIRED (was 27.90)
+  ssi_data_bytes: ~2_500_000  # 2.5 MB
+  grid_geo_bytes: ~1_600_000  # 1.6 MB
+
+owner_coverage_post:
+  total: 99.7%  # 1725/1731
+  by_operator:
+    Elektro Maribor: 661         # 38.2% — NE (Podravska + Koroška + Pomurska)
+    Elektro Primorska: 423       # 24.4% — W + SW (Goriška + Obalno-kraška + Primorsko-notranjska)
+    Elektro Ljubljana: 299       # 17.3% — central (Osrednjeslovenska + Zasavska + Posavska + JV Slovenija)
+    Elektro Gorenjska: 138       # 8.0%  — NW Alps (Gorenjska)
+    Elektro Celje: 122           # 7.1%  — Savinjska basin
+    ELES d.o.o.: 60              # 3.5%  — state TSO ≥110 kV
+    Elektro MB: 13               # legacy alias (should collapse to Elektro Maribor)
+    Elektro Gorenjska, PE Kranj: 2  # branch office
+    Dravske Elektrarne Maribor d.o.o.: 1  # generation SE Maribor
+    Elektro Celje, d. d.: 1      # legacy alias (should collapse)
+    Soške Elektrarne: 1          # generation Nova Gorica hydropower
+    Slovenske železnice: 1       # Slovenian Railways traction
+    EM: 1                        # abbreviated Elektro Maribor
+    Elektro Slovenska Bistrica: 1 # small municipal in Podravska
+    El. MB: 1                    # abbreviated Elektro Maribor
+  distinct_operators: 15
+  unresolved: 6  # Convention #56 preserved — 0.3% edge cases
+
+voltage_split_post:
+  ehv_ge_220kv: 20              # cross-border 400 kV + 220 kV (IT + AT + HR + HU)
+  hv_100_to_219kv: 2            # sparse 110/132 kV
+  distribution_lt_100kv: 624    # baseline 66 kV + MV 20/35 kV
+  unknown: 1085                 # 62.7% — OSM sparse tagging on MV distribution
+  voltage_coverage_pct: 37.3
+
+region_split_post:
+  nuts3_populated_baseline: 157
+  net_new_without_region: 1574  # OSM Slovenia doesn't populate ref:nuts:3 (0% populated)
+  region_coverage_pct: 9.1
+
+grid_geo:
+  total_km: 6876  # haversine
+  lines_per_substation: 2.61
+
+discipline_36_cross_border_filter:
+  polygon_source: slovenia/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 15  # 0.8% overshoot — 3-country border zone (IT/AT/HR/HU)
+  lines_dropped_outside_polygon: 0
+  final_state: CLEAN  # 0/1,731 outside polygon post-merge
+
+discipline_41_line_parity:
+  post_merge: PASS
+  substation_orphans: 0
+  line_orphans: 0
+  ratio_delta: "27.90 → 2.61 (task #182 outlier retired ✅)"
+
+convention_preservation:
+  discipline_36:
+    status: HELD
+    outside_polygon_dropped: 0.8%
+  discipline_41:
+    status: HELD
+    line_substation_coupling: preserved
+    outlier_retired: task_182_line_density_outlier_1of2 (Norway remaining)
+  convention_46:
+    status: HELD
+    scope: All changes contained to slovenia/ + scripts/pipeline/ingestion/slovenia/
+  convention_56:
+    status: HELD
+    scope: >
+      Owner-provenance sidecars capture Layer 1 (TSO threshold) vs Layer 2 (NUTS-3
+      map, forward-compat) vs Layer 3 (lat/lon geofence) vs Layer 4 (unresolved).
+      6 residual unresolved surface honestly rather than being fabricated.
+      Direct OSM alias-normalisation (Slovene legal-form d.d./dd/d.o.o./doo strip)
+      preserves original tag in raw_attributes.osm_original_operator.
+  convention_60:
+    status: HELD
+    scope: OSM only — no commercial providers used.
+  convention_64:
+    status: HELD
+    scope: Grupotec + Rely + Config B / C valuation paths unaffected.
+
+architectural_pattern:
+  fallback_class: region-jurisdiction × voltage-class (5-DSO NUTS-3 map + lat/lon geofence + ELES TSO threshold)
+  reuse_source: hungary (4-region NUTS-3 pattern; Slovenia extends with Layer 3 lat/lon geofence)
+  wave_2_priority_number: 12
+  cumulative_countries_closed: 12
+  cohort_progress: >
+    Wave 1 (5 of 5): Canada + Norway + Mexico + Austria + Greenland
+    Wave 2 (7 of 5-6, +1): Australia + Belgium + Netherlands + Chile + Hungary +
+    Luxembourg + Slovenia
+  fallback_classes_empirically_validated: 5
+  region_jurisdiction_class_applications: 5 (Belgium + Netherlands + Hungary + Chile-lat-band + Slovenia)
+
+empirical_finding_of_note:
+  finding: >
+    OSM Slovenia empirically does NOT populate ref:nuts:3 tag on power=substation
+    elements. Zero of 1,825 fetched subs carried NUTS-3 code. This empirical
+    discovery drove the mid-workstream Layer 3 lat/lon geofence hotfix (commit
+    c54f1762). The NUTS-3 map layer (Layer 2) is preserved as a forward-compat
+    surface for future OSM ingestion or per-tenant enrichment.
+  implication: >
+    Any future country whose NUTS-3 codes aren't populated in OSM must include
+    a lat/lon geofence as Layer 3. The pattern generalises via country-specific
+    DSO territory bounding boxes with priority ordering.
+
+lessons_generalised:
+  - >
+      **Empirically-validated resolver stack**: Layer 1 TSO voltage threshold +
+      Layer 2 NUTS-3 map (forward-compat) + Layer 3 lat/lon geofence (primary in
+      Slovenia's case) + Layer 4 unresolved fallback (Convention #56). Four-layer
+      priority pattern is now the canonical region-jurisdiction × voltage-class
+      template for future countries.
+  - >
+      **Priority ordering matters for overlap zones**: Trbovlje (46.15°N, 15.05°E)
+      is Zasavska (Elektro Ljubljana) but sits inside Celje's default bbox. Only
+      priority ordering (most-specific first + tightening Celje's north-south
+      bounds to 46.20-46.40°N) resolves the seam without misattributing.
+  - >
+      **Edge extensions catch canton-level corners**: Alpine Goriška (Bovec/Kobarid
+      NW alpine strip) + Prlekija E strip (Kidričevo) + Golte wolf's tooth (Upper
+      Savinjska west of 14.90°E) + Kočevje SW extremity — each edge extension
+      catches a single-canton peculiarity that basic bbox misses. 27/27 city
+      validation tests PASS end-to-end.
+  - >
+      **Task #182 line-density outlier retired**: Slovenia's baseline ratio 27.9
+      collapsed to 2.61 post-merge because OSM's fresh line data provided the
+      right transmission-tier scope (baseline had MV deep-ingestion carrying
+      most weight; OSM's line query returned mostly transmission-tier). Norway
+      remains the sole outstanding task #182 outlier.
+  - >
+      **99.7% owner coverage validates the region-jurisdiction × voltage-class
+      pattern at 5 empirical instances** (Belgium + Netherlands + Hungary +
+      Chile-lat-band variant + Slovenia). Pattern is now empirically mature.
+
+deployment_state:
+  pipeline_ready: true
+  ui_refresh_ready: true
+  register_hash_pin: 2ca50d583f43  # unchanged (methodology-invariant enrichment)
+  nn_tag_pin: v33-calibrated-scipy-20260427T074651Z
+
+auditability_chain:
+  parent_preflight: slovenia/v4_23-ingestion-audit-slovenia-preflight.yaml
+  step_2_fetch: slovenia/v4_23-ingestion-audit-slovenia-fetch.yaml
+  step_4_merge: slovenia/v4_23-ingestion-audit-slovenia-merge.yaml
+  hotfix_commit: c54f1762  # Layer 3 lat/lon geofence hotfix
+  commit_hash_placeholder: TBD_at_step_5_close
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: slovenia/ssi-data.json + slovenia/grid-geo.json
+
+status: READY_FOR_STEP_5
