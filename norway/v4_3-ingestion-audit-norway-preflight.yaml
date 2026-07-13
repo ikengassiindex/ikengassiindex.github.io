@@ -1,0 +1,222 @@
+# SSI Index v4.3 workstream — Norway ingestion pre-flight audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the Norway Priority 2 v4.3 gap-closure workstream (Q4 2026 per Editorial
+# Calendar).  Follows the exact same pre-flight discipline that saved
+# 25-32 engineer-days on Canada Priority 1.
+#
+# Cross-references:
+#   - Report Production/02-v4_3-gap-audit-2026-07/v4_3-gap-audit.md §Norway
+#   - canada/v4_3-ingestion-audit-canada-preflight.yaml (Priority 1 precedent)
+#   - CROSS_BORDER_SUBSTATION_AUDIT_20260618.md §Norway (Mode 2 fjord tolerance history)
+
+schema_version: v4_3-ingestion-audit-preflight-1
+country_slug: norway
+discovery_date_utc: "2026-07-13"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Existing state
+# ─────────────────────────────────────────────────────────────────────────────
+existing_state:
+  post_discipline_36_count: 5842
+  pre_discipline_36_count: 6495
+  discipline_36_removed: 653              # 10.1% (Mode 2 fjord coastline simplification)
+  fylker_bounds_features: 21              # 11 mainland fylker + territorial extensions (Svalbard TBD)
+  methodology_version: 4.0.2
+  active_L1_sources:
+    - SSB (Statistisk sentralbyrå — socioeconomic per fylke)
+    - GEM 2023.1 (seismic PGA)
+    - ERA5-Land (climate baseline)
+    - OSM Overpass (substation ingestion with 5 km fjord tolerance per D#36)
+  last_pipeline_run_indicator: 2026-06-14 phase_a_r10_just_runs (via existing modifier machinery)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Empirical OSM baseline (2026-07-13 probe)
+# ─────────────────────────────────────────────────────────────────────────────
+osm_baseline_empirical:
+  probe_endpoint: https://overpass-api.de/api/interpreter
+  probe_query: '[out:json];area["ISO3166-1"="NO"]->.no;(node["power"="substation"](area.no);way["power"="substation"](area.no););out count;'
+  osm_norway_substations_total: 6141        # 322 nodes + 5,819 ways
+  osm_norway_capture_ratio: 0.951           # existing 5,842 / OSM 6,141 = 95.1% coverage
+  interpretation: |
+    Existing state captures ~95% of OSM-tagged Norwegian substations.  The
+    ~299-substation gap is well within the expected Mode 2 fjord coastline
+    tolerance loss and cross-border filter margins.  Beyond that, any
+    additional substation growth must come from NON-OSM authoritative
+    registries (NVE + Statnett + DSOs), which is exactly what the v4.3
+    gap-audit projected.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Gap-audit projection
+# ─────────────────────────────────────────────────────────────────────────────
+gap_audit_projection:
+  gap_audit_document: Report Production/02-v4_3-gap-audit-2026-07/v4_3-gap-audit.md §Norway
+  projected_true_fleet: [7200, 8500]
+  projected_gap: [1360, 2660]
+  projected_growth_percent: [23, 46]
+  failure_modes:
+    Mode_5_dso_undersampling: 1000-1800    # Norway ~140 DSOs post-consolidation
+    Mode_2_fjord_residual: 50-150          # Lofoten + Vesterålen outer edges
+    Mode_3_svalbard: 10-20                 # Longyearbyen + Barentsburg + Ny-Ålesund
+    Mode_7_nve_registry: 300-700           # NVE Kraftsystemutredning under-captured
+  projected_sources:
+    N-1 Statnett Grid Development Plan: 180-220 yield
+    N-2 NVE Grid data portal: 1500-2500 yield              # ← the big one
+    N-3 NVE Statistical Yearbook: validator only
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Empirical refutation of gap-audit's projected URLs
+# ─────────────────────────────────────────────────────────────────────────────
+empirical_url_refutations:
+  N-1_statnett_projected_url:
+    projected: https://www.statnett.no/en/for-stakeholders-in-the-power-industry/system-operations/grid-development-plan/
+    status_2026_07_13: LIVE_HTML_PAGE
+    empirical_finding: |
+      Page describes the grid development plan but does not link to machine-
+      readable substation registry.  Statnett open-data page contains
+      textual references to grid but no downloadable GeoJSON/CSV.  Yield
+      projection 180-220 unsupported at this URL.
+  N-2_nve_grid_portal_projected_url:
+    projected: https://www.nve.no/energi/energisystem/kraftnett/
+    status_2026_07_13: LIVE_HTML_PAGE  (description only, not a dataset)
+    empirical_finding: |
+      Projected URL is an informational page about the Norwegian grid,
+      NOT a data portal.  Gap-audit's 1,500-2,500 yield projection
+      unsupported at this URL.  The real machine-readable NVE datasets
+      are catalogued at geonorge.no under different URLs (see section 5).
+  N-2_nve_arcgis_alternative:
+    probed: https://gis3.nve.no/arcgis/rest/services
+    status_2026_07_13: LIVE_ARCGIS_SERVER
+    empirical_finding: |
+      NVE ArcGIS REST server enumerated (5 folders, 16 services total across
+      featureservice + mapservice).  Available services: AlarmInput,
+      NevinaNedbfelt3/4, VARSEL, AlphaBeta, datamottak, Kommune_Historisk,
+      NGUFjellskred, SkredKvikkleireApp_Faktaark, Solkraft, SolkraftView,
+      VindkraftView1.  ZERO electricity-grid services (only Solkraft/
+      Vindkraft for solar+wind generation, not transmission substations).
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Real machine-readable NVE sources discovered via geonorge.no
+# ─────────────────────────────────────────────────────────────────────────────
+real_source_discovery_via_geonorge:
+  probe_endpoint: https://kartkatalog.geonorge.no/api/search?text=<query>
+  discovered_datasets:
+    NVE_Transformatorstasjoner:
+      title_no: Transformatorstasjoner
+      title_en_translation: Transformer Stations (i.e. substations)
+      publisher: NVE (Norges vassdrags- og energidirektorat)
+      distribution_url: http://nedlasting.nve.no/gis/
+      status: DISCOVERED_2026_07_13
+      expected_yield_status: UNKNOWN_PENDING_STEP_2_PROBE
+    NVE_Nettanlegg_utbygd:
+      title_no: Nettanlegg utbygd
+      title_en_translation: Grid installations (built)
+      publisher: NVE
+      distribution_url: https://nedlasting.geonorge.no/api/capabilities/
+      status: DISCOVERED_2026_07_13
+    NVE_Nettanlegg_WFS:
+      title_no: Nettanlegg WFS
+      title_en_translation: Grid installations WFS (Web Feature Service)
+      publisher: NVE
+      distribution_url: http://wfs.geonorge.no/skwms1/wfs.nettanlegg?service=WFS&Version=2.0.0&request=GetCapabilities
+      status: DISCOVERED_2026_07_13
+      significance: |
+        WFS is a machine-readable OGC standard that returns GeoJSON/GML/
+        Shapefile.  Most likely the primary L1 source for the Norway
+        workstream once yield is empirically anchored in Step 2.
+    NVE_Nettanlegg_WMS:
+      title_no: Nettanlegg WMS
+      title_en_translation: Grid installations WMS (Web Map Service — visualisation only)
+      publisher: NVE
+      distribution_url: https://kart.nve.no/enterprise/services/Nettanlegg4/MapServer/WMSServer?request=GetCapabilities&service=WMS
+      status: DISCOVERED_2026_07_13
+      significance: visualisation cross-check for the WFS extraction
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Empirical refutations vs original gap-audit assumptions
+# ─────────────────────────────────────────────────────────────────────────────
+refutations:
+  refutation_1_projected_urls_are_description_pages:
+    finding: |
+      Gap-audit projected two primary URLs (Statnett Grid Development Plan
+      + NVE Kraftnett) that are LIVE but return descriptive HTML rather
+      than machine-readable substation registries.  Same failure mode as
+      Canada's NRCan Atlas refutation — projected sources exist but at
+      different URLs than the gap-audit named.
+    impact: |
+      Would have wasted 3-5 engineer-days chasing dead URLs.  Caught pre-
+      flight thanks to Step 1 discipline.
+    resolution: |
+      Real machine-readable NVE sources catalogued at geonorge.no.
+      Primary source now shifts to NVE Nettanlegg WFS (Web Feature Service).
+  refutation_2_arcgis_no_electricity:
+    finding: |
+      Alternative NVE ArcGIS REST server (gis3.nve.no/arcgis) enumerated
+      empirically — zero electricity-grid services.  Only Solkraft/Vindkraft
+      solar+wind generation datasets present.  Similar to Canada's CanVec
+      ManMade wrong-theme refutation.
+    impact: |
+      Would have wasted 2-3 engineer-days probing ArcGIS folders for grid
+      data that isn't there.  Caught pre-flight.
+    resolution: |
+      NVE's electricity-grid data lives at kart.nve.no/enterprise (WMS)
+      + wfs.geonorge.no (WFS) + nedlasting.nve.no/gis (downloads), NOT
+      the gis3.nve.no ArcGIS server.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. Empirical yield expectation — cautious
+# ─────────────────────────────────────────────────────────────────────────────
+yield_expectation_after_step_1:
+  osm_baseline: 6141                       # OSM Norway substation total
+  existing_captures: 5842                  # 95.1% of OSM already
+  osm_residual_gap: 299                    # what could still be recovered from OSM
+  nve_projected_potential: 1000-2500       # per gap-audit's DSO-tier under-sampling
+  ratio_reduction_signal: |
+    Canada Priority 1 pattern: the gap-audit projected 10-15k additional
+    Canada subs from CanVec + provincial supplements; empirical delivered
+    only ~1,240 net-new (~12× smaller).  If Norway's WFS follows the same
+    ratio, empirical yield could be 100-250 net-new (against 1,000-2,500
+    projected).  BUT Norway's DSO landscape (140 DSOs, well-published)
+    may deliver differently than Canada's federal topographic vs
+    operational-utility split.  Step 2 empirical probe of NVE WFS is
+    required before making architectural decisions.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. Next steps
+# ─────────────────────────────────────────────────────────────────────────────
+next_steps:
+  step_2_wfs_empirical_probe:
+    what: |
+      Query NVE Nettanlegg WFS GetCapabilities to enumerate feature types
+      (looking for substation / transformer / trafostasjon).  Then query
+      GetFeature on the substation feature type to extract SHA-256 anchor
+      + field schema + total count.  Similar discipline to CanVec Step 2.
+    when: Q4 2026 per Editorial Calendar (or earlier if operator wants to keep momentum)
+    estimated_effort: 0.5-1 engineer-day
+  step_3_l1_connector: |
+    Build norway_nve_nettanlegg.py connector following the Canada pattern —
+    scaffold + IngestionResult + SHA-256 audit sidecar + Discipline #36 bounds
+    filter with 5 km fjord tolerance + Discipline #41 line-coupling with the
+    Nettanlegg lines feature type (Kraftlinje / transmission line).
+  step_4_delta_analysis: |
+    Same as Canada Step 3.4: fetch NVE substations, compare against existing
+    5,842 at 500m proximity, report net-new by fylke, refute or confirm the
+    gap-audit's 1,360-2,660 projection.
+  step_5_option_decision: |
+    Same A/B/C pattern as Canada: A ship the delta; B rebuild with OSM as
+    formal L1; C escalate to per-DSO federation for real gap-closure.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. Auditability chain
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  state_transition: gap-audit-projected → pre-flight-empirically-refuted-and-redirected
+  parent_state: Report Production/02-v4_3-gap-audit-2026-07/v4_3-gap-audit.md §Norway
+  child_states:
+    step_2_fetch_audit: norway/v4_3-ingestion-audit-norway-fetch.yaml (pending)
+    step_3_federation_audit: norway/v4_3-ingestion-audit-norway-federation.yaml (pending)
+    step_4_delta_audit: norway/v4_3-ingestion-audit-norway-delta.yaml (pending)
+    step_5_merge_audit: norway/v4_3-ingestion-audit-norway-merge.yaml (pending)
+  commit_hash_placeholder: TBD_at_L1_connector_merge
