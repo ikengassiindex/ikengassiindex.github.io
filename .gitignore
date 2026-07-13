@@ -57,3 +57,30 @@ scripts/pipeline/data/cross-cutting/*.tif
 # CROSS_BORDER_SUBSTATION_AUDIT_20260618.md preserves the per-country
 # summary; the full rejection lists stay on the operator's machine.
 */ingestion_rejected_*.json
+
+# OneDrive / FUSE synced-cloud filesystem artifacts (Mac client leaves .fuse_hidden*
+# during file operations while the sync daemon holds handles open)
+.fuse_hidden*
+
+# v4.23 workstream L1 connector ingestion caches (13 July 2026) — these are
+# operator-runtime downloads from federal canonical sources + OSM Overpass.
+# Contents:
+#   canada/_canvec_cache/       NRCan CanVec 50K Res_MGT GDB + PDF (37 MB)
+#   norway/_nve_cache/          NVE Nettanlegg WFS response cache (209 MB)
+#   mexico/_osm_cache/          OSM Overpass query response cache (~1 MB)
+#   austria/_osm_cache/         OSM Overpass query response cache (empty during sandbox block)
+#   greenland/_osm_cache/       OSM Overpass query response cache (small)
+# All are re-fetchable on demand via each L1 connector.  Downstream federation +
+# merge outputs (canada/ssi-data.json, norway/ssi-data.json, etc.) ARE committed.
+scripts/pipeline/data/*/_canvec_cache/
+scripts/pipeline/data/*/_nve_cache/
+scripts/pipeline/data/*/_osm_cache/
+
+# v4.23 workstream intermediate federation JSONs — these are the raw L1 output
+# before merge into per-country ssi-data.json.  Regenerable on demand.
+scripts/pipeline/data/*/substations_federated.json
+scripts/pipeline/data/*/transmission_lines_federated.json
+
+# Pipeline run artifacts (13 July 2026)
+pipeline-run.log
+pipeline-report-*.json
