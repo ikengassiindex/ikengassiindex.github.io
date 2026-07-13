@@ -1,0 +1,81 @@
+# Hungary v4.23 Ingestion Audit — Step 2 fetch
+# ============================================
+# Task: #204 (WAVE2-Step2 Hungary)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local OSM Overpass fetch complete
+
+meta:
+  country: hungary
+  iso2: HU
+  iso3: HUN
+  wave: 2
+  step: 2
+  parent_preflight: hungary/v4_23-ingestion-audit-hungary-preflight.yaml
+  fetched_at_utc: "2026-07-13T16:28:00Z"
+  operator_environment: residential IP (sandbox arch)
+
+fetch_run_1_partial:
+  # First fetch — substation node query timed out; way + relation succeeded
+  outcome: partial_success
+  substations_parsed: 1818
+  transmission_lines: 35002
+  raw_bytes_fetched: 521445
+  raw_sha256: 2cea1e3083f689cbbf61ce8cf39e1cb17fe2b29558acca519b5e92e3691f483c
+  timeout_recovered_note: "OSM substation 'node' fetch timed out; way + relation succeeded (1,818 subs captured)"
+
+fetch_run_2_authoritative:
+  # Second fetch (merge_into_ssi_data re-invocation) — cache-assisted, complete
+  outcome: success
+  substations_parsed: 3528  # full 3-element-type fetch this time
+  lines_parsed: 35017
+  raw_bytes_fetched: 939817
+  raw_sha256: cbcd47a50e5f431d9fc7543792951b3fe607cd3e885918713831eeb8e573da9c
+
+  discipline_36_dropped:
+    substations: 0
+    lines: 15
+    reason: "~0.04% cross-border overshoot filtered by Discipline #36 (100m default tolerance)"
+
+owner_provenance_distribution_authoritative:
+  osm_operator_tag_direct: 274  # 7.8% (fewer than run-1's 264 due to more subs)
+  osm_operator_tag_direct_alias_normalised: 501  # 14.2% — BIGGEST cohort-wide alias normalisation
+  region_fallback_HU110_ELMU_EMASZ: 1121  # 31.8% — Budapest dominates
+  region_fallback_HU222_EON_Hungaria: ~230
+  region_fallback_HU323_ELMU_EMASZ: ~200
+  region_fallback_HU233_EON_Hungaria: ~180
+  region_fallback_HU333_EON_Hungaria: ~180
+  region_fallback_HU120_ELMU_EMASZ: ~170
+  # ... (all 20 NUTS-3 codes covered)
+  region_fallback_TSO_gte200kV_MAVIR: ~12
+  total_direct_osm: 775  # 274 + 501
+  total_region_fallback: 2753
+  total_unresolved: 0
+  direct_osm_pct: 22.0
+  alias_normalised_pct: 14.2  # BIGGEST cohort-wide
+  region_fallback_pct: 78.0
+
+dnsp_alias_normalisation:
+  count_normalised_via_case_insensitive_map: 501
+  breakdown: |
+    Biggest cohort-wide alias normalisation to date (501 subs / 3,528 = 14.2%).
+    Accent-insensitive matching worked exactly as designed for ELMŰ/ELMÜ/ELMU
+    variants + Hungarian multi-word canonical names (Északmagyarországi
+    Áramszolgáltató etc.). Post-2018 DÉMÁSZ + post-2019 Innogy consolidations
+    empirically confirmed.
+
+architectural_notes:
+  - "NUTS-3 code mapping validated — coarse lat/lon geofence resolved 20 regions cleanly. Zero unresolved."
+  - "200 kV TSO threshold confirmed correct — only 12 subs at MAVIR TSO (≥220 kV), reflecting Hungarian grid architecture where 132 kV is HV DSO tier."
+  - "Line ratio 35,017/3,528 = 9.92 — HIGH (deep-ingestion pattern like Norway 26.5). Reflects Hungary OSM includes MV distribution (22 kV + 35 kV + lower)."
+  - "Non-DSO/TSO operators surfaced: EED (Electric Drives — mining?), ETI (industrial), NKM (Nemzeti Közművek state energy), MÁV (Hungarian State Railways), BKV (Budapest transit), MOL (oil/gas). Convention #56 preserves these as legitimate distinct operators."
+
+warnings_preserved:
+  - "Convention #56 partial — OSM substation node fetch timed out on first attempt (recovered via cache-assisted merge re-fetch)"
+  - "Discipline #36 — dropped 0 substations + 15 lines outside Hungary polygon (100m default tolerance)"
+  - "Owner enrichment: 775/3528 direct OSM + alias-normalised = 22.0%; 2753 region_jurisdiction_fallback = 78.0%; 0 unresolved (Convention #56 preserved as None)"
+
+next_step: "Step 3 CLOSED (task #205 L1 connector shipped in commit 76edca8e). Step 4 (task #206) merge execution in progress."
+
+status: STEP_2_CLOSED
