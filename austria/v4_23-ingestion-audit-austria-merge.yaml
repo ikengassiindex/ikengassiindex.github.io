@@ -1,0 +1,161 @@
+# SSI Index v4.23 workstream — Austria Step 4b merge audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the final merge-execution pass.  Populated at Step 4b closure post-operator
+# paste-back of live merge stats from local execution.
+#
+# STATUS: PENDING operator local execution.  This file ships as a skeleton
+# with the schema locked, empirically-anchored expected outcomes populated
+# from Step 4a delta audit, and operator paste-back fields awaiting values.
+#
+# Cross-references:
+#   - austria/v4_23-ingestion-audit-austria-delta.yaml (Step 4a parent)
+#   - austria/v4_23-ingestion-audit-austria-fetch.yaml (Step 2 anchor)
+#   - austria/v4_23-ingestion-audit-austria-preflight.yaml (Step 1 anchor)
+#   - mexico/v4_23-ingestion-audit-mexico-merge.yaml (Priority 3 precedent)
+#   - norway/v4_23-ingestion-audit-norway-merge.yaml (Priority 2 precedent)
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: austria
+discovery_date_utc: "2026-07-13"
+execution_date_utc: PENDING_STEP_4B
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+parent_state_transitions:
+  - austria/v4_23-ingestion-audit-austria-delta.yaml
+  - austria/v4_23-ingestion-audit-austria-fetch.yaml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Execution context — operator local machine
+# ─────────────────────────────────────────────────────────────────────────────
+execution_context:
+  machine: operator-local Mac (~/ikengassiindex.github.io)
+  ip_class: residential (Overpass API accessible without sandbox rate-throttle)
+  invocation: python3 -m scripts.pipeline.ingestion.austria.merge_into_ssi_data
+  reason_for_local_execution: |
+    Sandbox 45s bash timeout is incompatible with the ~57s cumulative
+    substation-fetch time (3 queries × 19s average) + ~30-90s line-quadrant
+    sweep.  Overpass API access verified live from sandbox but full-run
+    duration exceeds single-call budget.  Analogue: Mexico Step 5b operator-
+    local execution.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Empirical merge stats (from operator paste-back)
+# ─────────────────────────────────────────────────────────────────────────────
+empirical_merge_stats:
+  # PENDING — populated from `Merge stats:` block at end of /tmp/austria_merge.log
+  substations:
+    enriched: PENDING_STEP_4B                    # matched pairs (500m Discipline #41)
+    voltage_filled: PENDING_STEP_4B              # matched pairs where existing had no voltage
+    net_new_substations: PENDING_STEP_4B         # OSM subs with no existing match
+    voltage_xcheck_findings: PENDING_STEP_4B     # >1.5x ratio discrepancies flagged
+    final_substation_count: PENDING_STEP_4B      # existing + net-new
+  transmission_lines:
+    lines_appended: PENDING_STEP_4B              # net-new after dedupe
+    lines_deduped: PENDING_STEP_4B               # rejected as duplicate (100m midpoint + same voltage tier)
+    final_line_count: PENDING_STEP_4B            # existing + appended
+  provenance:
+    raw_sha256: PENDING_STEP_4B                  # SHA-256 over all substation query response bodies
+    raw_bytes_fetched: PENDING_STEP_4B           # cumulative substation bytes fetched
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Expected vs actual comparison
+# ─────────────────────────────────────────────────────────────────────────────
+expected_vs_actual:
+  # Empirical anchors from Step 1+2 probes for comparison at closure
+  substations:
+    expected_total_fresh_osm: 15213
+    actual_total_fresh_osm: PENDING_STEP_4B
+    expected_owner_tag_direct_pct: 77.2
+    actual_owner_tag_direct_pct: PENDING_STEP_4B
+    delta_from_baseline: PENDING_STEP_4B         # actual_final - 741
+  transmission_lines:
+    expected_total_fresh_osm: 5651
+    actual_total_fresh_osm: PENDING_STEP_4B
+    baseline_line_count: 5252
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Discipline #36 cross-border enforcement — post-merge sentinel
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_36_post_merge:
+  # Operator runs: python3 scripts/check_cross_border.py austria --strict
+  gate_result: PENDING_STEP_4B                   # PASS | FAIL
+  outside_polygon_pct: PENDING_STEP_4B           # threshold 5% for cross-border sentinel
+  bounds_source: austria/bounds.json (remediated 2026-06-24 commit 86d7c9df)
+  tolerance_km: 0.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Discipline #41 line-substation coupling verification
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_41_verification:
+  # Operator runs: python3 -m pytest tests/test_substation_line_parity.py -v
+  parity_test_result: PENDING_STEP_4B            # PASS | FAIL
+  substations_without_incident_line: PENDING_STEP_4B
+  lines_orphaned_by_endpoint_removal: PENDING_STEP_4B
+  line_to_substation_ratio: PENDING_STEP_4B      # final_lines / final_subs
+  ratio_vs_pre_v4_23_baseline: PENDING_STEP_4B   # ±2σ envelope check
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Convention preservation matrix (empirical verification)
+# ─────────────────────────────────────────────────────────────────────────────
+convention_preservation_verified:
+  convention_46: N/A — single-country canonical (structural)
+  convention_56_owner_none_untagged_tail: PENDING_STEP_4B  # count of subs with owner=None (should ≈ 23% of net-new)
+  convention_56_null_placeholders_dict_class: PENDING_STEP_4B  # dict-typed L2/L3 fields are {} not None
+  convention_60_source_id_pin: AT-C1-osm-overpass
+  convention_60_licence: ODbL
+  convention_64_no_cross_country_writes: PENDING_STEP_4B     # git diff verify — only austria/*.json changed
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. File-size deltas
+# ─────────────────────────────────────────────────────────────────────────────
+file_size_deltas:
+  ssi_data_json:
+    baseline_bytes: 1604691
+    final_bytes: PENDING_STEP_4B
+    final_mb: PENDING_STEP_4B
+    growth_ratio: PENDING_STEP_4B                # final / baseline
+  grid_geo_json:
+    baseline_bytes: 1505779
+    final_bytes: PENDING_STEP_4B
+    final_mb: PENDING_STEP_4B
+    growth_ratio: PENDING_STEP_4B
+    size_optimisation_note: |
+      Sub-90 MB envelope preserved by construction (Austria expected to
+      remain <10 MB for both files even at 15,213 substations — much
+      smaller than Norway's 58 MB grid-geo).  Task #125 pre-commit sentinel
+      (90 MB reject) unaffected.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. Voltage cross-validation summary
+# ─────────────────────────────────────────────────────────────────────────────
+voltage_cross_validation:
+  report_file: austria/v4_23-voltage-cross-validation.json
+  matched_pairs_evaluated: PENDING_STEP_4B
+  tier_mismatches: PENDING_STEP_4B
+  mismatch_rate_pct: PENDING_STEP_4B
+  expected_mismatch_rate_pct: <0.5
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. Auditability chain closure
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  step_1_preflight: austria/v4_23-ingestion-audit-austria-preflight.yaml
+  step_2_fetch: austria/v4_23-ingestion-audit-austria-fetch.yaml
+  step_3_l1_connector: scripts/pipeline/ingestion/austria/osm_overpass.py
+  step_4a_merge_script: scripts/pipeline/ingestion/austria/merge_into_ssi_data.py
+  step_4a_delta_audit: austria/v4_23-ingestion-audit-austria-delta.yaml
+  step_4b_merge_audit: austria/v4_23-ingestion-audit-austria-merge.yaml (this file)
+  step_4b_voltage_xcheck: austria/v4_23-voltage-cross-validation.json
+  step_4b_data_deliverable_ssi: austria/ssi-data.json (final canonical)
+  step_4b_data_deliverable_grid: austria/grid-geo.json (final compact-schema)
+  commit_hash: PENDING_STEP_4B
+  ci_job_url: PENDING_STEP_4B
+  discipline_36_gate: PENDING_STEP_4B (PASS expected)
+  discipline_41_gate: PENDING_STEP_4B (PASS expected)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 10. Warnings + notes (populated at closure)
+# ─────────────────────────────────────────────────────────────────────────────
+warnings: PENDING_STEP_4B
+notes: PENDING_STEP_4B
