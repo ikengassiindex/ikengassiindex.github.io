@@ -72,11 +72,31 @@ source_options:
     strategy: 5_dso_territory_geofence_plus_alias
     rationale: >
       Fifth application of the region-jurisdiction × voltage-class pattern.
-      Slovenia has 5 regional DSOs mapped to NUTS-3 territories, plus ELES
-      as sole TSO ≥110 kV. Voltage-class disambiguates TSO vs DSO ownership
-      at substations sitting inside a DSO's geofence.
+      Slovenia has 5 regional DSOs, plus ELES as sole TSO ≥110 kV. Voltage-
+      class disambiguates TSO vs DSO ownership at substations sitting inside
+      a DSO's geofence.
     tso_threshold_kv: 110  # ELES operates 400 + 220 + 110 kV transmission
     tso_operator: ELES d.o.o.  # Elektro-Slovenija (state-owned TSO)
+    resolver_layers:
+      # Empirically the OSM Slovenia data does NOT populate ref:nuts:3 tags
+      # (13 July 2026 fetch: 0 of 1,825 subs carried NUTS-3). The lat/lon
+      # geofence Layer 3 is the primary DSO resolver in practice; NUTS-3
+      # Layer 2 is preserved as a forward-compatible surface for future
+      # OSM ingestions or per-tenant enrichment.
+      layer_1_tso_threshold_ge_110kv: "ELES d.o.o."
+      layer_2_nuts3_map: "12 SI### codes → 5 DSO (forward-compat surface)"
+      layer_3_lat_lon_geofence: "5-DSO bounding boxes with priority ordering"
+      layer_4_unresolved: "Convention #56 visibly-honest None fallback"
+    lat_lon_geofence_priority_order:
+      - "1. Elektro Gorenjska  — 46.10-46.70°N × 13.80-14.55°E (NW Alps)"
+      - "2. Elektro Primorska  — 45.40-46.20°N × 13.35-14.35°E (W main) +"
+      - "     45.40-45.90°N × 14.05-14.55°E (Primorsko-notranjska SE tip) +"
+      - "     46.15-46.45°N × 13.35-13.80°E (Alpine Goriška — Bovec/Kobarid)"
+      - "3. Elektro Maribor    — lat≥46.40 AND lon≥14.75 (NE main) +"
+      - "     46.30-46.40°N × lon≥15.65 (E Prlekija strip — Kidričevo/Ormož)"
+      - "4. Elektro Celje      — 46.20-46.40°N × 14.90-15.65°E (Savinjska) +"
+      - "     46.30-46.45°N × 14.75-14.90°E (Upper Savinjska wolf's tooth — Golte)"
+      - "5. Elektro Ljubljana  — 45.45-46.30°N × 14.30-15.75°E (catch-all)"
     dso_territories_by_nuts3:
       Elektro Ljubljana:
         nuts3: [SI041, SI037, SI038, SI036]
