@@ -47,11 +47,14 @@ _DNSP_ALIAS_MAP = {
     "iec ltd.": "IEC",
     "israel electric": "IEC",
     "israel electric corporation": "IEC",
+    "israel electric company": "IEC",  # OSM Israeli-English variant surfaced 2026-07
     "israel electric corp": "IEC",
     "israel electric corp.": "IEC",
+    "the israel electric corporation": "IEC",
     "חברת חשמל לישראל": "IEC",  # Hebrew formal name
     "חברת חשמל לישראל בעמ": "IEC",  # with Ltd suffix (bet-ayin-mem)
     "חברת החשמל לישראל": "IEC",  # with definite article
+    "חברת החשמל": "IEC",  # Hebrew "The Electric Company" (definite article, no לישראל) — OSM surfaced 2026-07
     "חברת חשמל": "IEC",             # Hebrew short
     "חשמל": "IEC",                   # Hebrew shortest (context: energy provider)
     # Noga (system operator, non-owner)
