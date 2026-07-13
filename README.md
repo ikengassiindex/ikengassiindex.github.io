@@ -8,7 +8,48 @@ Italy reference baseline: 4,293 substations · 475 EHV (≥220 kV) · 3,035 HV (
 
 ## Live Dashboard
 
-Deploy to any static host (GitHub Pages, Netlify, Vercel, or open `index.html` locally).
+Deploy to any static host (GitHub Pages, Netlify, Vercel).
+
+### Local development (task #123)
+
+**Opening `index.html` directly via `file://` will fail** with a "Data load failed"
+error because modern browsers block `fetch()` calls to same-directory JSON files
+from `file://` origins per the same-origin policy (CORS). This is a browser
+security feature, not an SSI Index bug — hosted GitHub Pages / Netlify / any
+`http://` or `https://` origin works normally.
+
+**Local dev workflow** — serve the repository through Python's built-in HTTP
+server (or any equivalent):
+
+```bash
+# From the repo root:
+python3 -m http.server 8000
+
+# Then open in your browser:
+#   http://localhost:8000/               (landing page)
+#   http://localhost:8000/austria/       (any country)
+#   http://localhost:8000/map.html       (map explorer)
+```
+
+Ctrl-C to stop. The server serves the current directory tree with correct
+`http://` origin semantics, so all `fetch()` calls resolve normally. Any port
+works — `8000` is convention; use `8080`, `3000`, etc. if `8000` is busy.
+
+Alternative one-liners for developers who prefer other stacks:
+
+```bash
+# Node.js
+npx serve .
+
+# PHP
+php -S localhost:8000
+
+# Ruby
+ruby -run -e httpd . -p 8000
+```
+
+None of these require configuration or additional dependencies. Also useful
+for reviewers who want to preview PRs without deploying to Pages first.
 
 ## Architecture
 

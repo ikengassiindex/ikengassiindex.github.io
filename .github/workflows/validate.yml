@@ -29,6 +29,7 @@ jobs:
             cross_border_tolerances.json
             */bounds.json
             */ssi-data.json
+            */grid-geo.json
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
@@ -59,25 +60,13 @@ jobs:
           print(f'intelligence/countries.json: {len(slugs)} slugs · {len(fr)} first_refresh dates · all parse OK')
           "
 
-      - name: Check data file sizes
-        run: |
-          python3 -c "
-          import os, sys
-          issues = []
-          for root, dirs, files in os.walk('.'):
-            for f in files:
-              if f == 'ssi-data.json':
-                path = os.path.join(root, f)
-                size_mb = os.path.getsize(path) / (1024*1024)
-                country = root.strip('./')
-                if size_mb > 100:
-                  issues.append(f'{country}: {size_mb:.1f} MB EXCEEDS 100 MB limit')
-                elif size_mb > 50:
-                  print(f'WARNING: {country} ssi-data.json is {size_mb:.1f} MB (> 50 MB)')
-          if issues:
-            for i in issues: print(f'ERROR: {i}')
-            sys.exit(1)
-          print('All data files within size limits')
+      - name: Check data file sizes (task #125 sentinel)
+        # Delegates to scripts/check_data_file_sizes.py — checks both
+        # ssi-data.json AND grid-geo.json, uses 90 MB hard threshold with
+        # 54 MB warn band. See script docstring for rationale.  This step
+        # catches the indent=2 pretty-printing bloat class BEFORE it hits
+        # GitHub's hard 100 MB per-file limit.
+        run: python3 scripts/check_data_file_sizes.py --threshold 90
           "
 
       # ── Discipline #36 — Cross-border substation gate ──
