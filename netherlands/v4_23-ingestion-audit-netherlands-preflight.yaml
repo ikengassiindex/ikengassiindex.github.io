@@ -1,0 +1,176 @@
+# Netherlands v4.23 Ingestion Audit — Pre-flight
+# ==============================================
+# Task: #193 (WAVE2-Step1 Netherlands)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: netherlands
+  iso2: NL
+  iso3: NLD
+  wave: 2
+  priority: 8
+  step: 1
+  target: "Owner enrichment via OSM Overpass — task #2 from SSI_COHORT_AUDIT_SWEEP_20260713.md priority tier"
+  rationale: >
+    Netherlands carries 1,639 substations with 0% owner coverage. Compact EU country
+    with clean 12-province × 6-DSO architecture post-2011 splitsingswet unbundling.
+    OSM Overpass single-query safe (~42k km² bbox). Expected Belgium-tier outcome
+    (100% owner coverage from geofence + fallback).
+
+baseline_state:
+  ssi_data_substations: 1639
+  grid_geo_substations: 1640
+  grid_geo_lines: 4757
+  lines_per_substation_ratio: 2.90  # clean transmission
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: ~54.4  # 748/1639 have voltage_kv=None — big fill opportunity
+  region_coverage_pct: ~100.0  # all 12 provinces populated
+  region_split:
+    South Holland: 463
+    North Holland: 283
+    North Brabant: 195
+    Utrecht: 127
+    Zeeland: 107
+    Gelderland: 104
+    Overijssel: 95
+    Groningen: 89
+    Limburg (NL): 63
+    Flevoland: 42
+    Friesland: 42
+    Drenthe: 29
+  voltage_class_top:
+    null: 748  # 45.6% voltage-null
+    150_kv: 315  # TenneT HV federal network
+    50_kv: 161   # DSO MV
+    110_kv: 130  # TenneT HV
+    10_kv: 80    # DSO LV
+    380_kv: 61   # TenneT EHV interconnector
+    25_kv: 42    # DSO MV
+    20_kv: 39    # DSO MV
+    220_kv: 19   # TenneT EHV
+    13_kv: 13    # DSO LV
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [3.35, 50.75, 7.25, 53.55]  # west, south, east, north
+    strategy: >
+      Single-query safe — Netherlands bbox ~42k km² (slightly larger than
+      Belgium's 30k). No partitioning needed.
+    expected_yield:
+      substations: 3000-6000
+      lines: 6000-15000
+    tag_completeness_hypothesis: >
+      Randstad urban (Amsterdam/Rotterdam/Utrecht/Den Haag) 60-80% operator=
+      tags. Rural NL 30-50%. Overall target 45-65% direct tag.
+    lp_dd_class: canonical
+
+  fallback_region_registry:
+    strategy: region_jurisdiction_by_voltage_class
+    rationale: >
+      Netherlands federal-fragmented DSO architecture post-2011 splitsingswet
+      unbundling. Voltage class disambiguates: ≥110 kV → TenneT TSO;
+      <110 kV → region DSO.
+    tso_threshold_kv: 110  # TenneT operates 110/150/220/380 kV
+    region_mapping:
+      # 3 primary DSOs (98% of subs)
+      Liander:  # 4 provinces
+        provinces: [Noord-Holland, Gelderland, Friesland, Flevoland]
+        note: "Liander is the largest NL DSO by customers"
+      Stedin:  # 3 provinces (Randstad + Zeeland)
+        provinces: [Zuid-Holland, Utrecht, Zeeland]
+        note: "Zeeland via Enduris subsidiary (normalise to Stedin)"
+      Enexis:  # 5 provinces
+        provinces: [Overijssel, Drenthe, Groningen, Noord-Brabant, Limburg (NL)]
+        note: "Enexis is the largest NL DSO by grid area"
+      # 3 small regional DSOs (geofence-resolved)
+      Coteq_Netbeheer:
+        region: Overijssel
+        geofence: "Almelo area (lat 52.31-52.42 × lon 6.60-6.75)"
+      Rendo_Netwerken:
+        region: Overijssel + Drenthe
+        geofence: "Zwolle+Steenwijk (lat 52.65-52.85 × lon 5.95-6.20)"
+      Westland_Infra:
+        region: Zuid-Holland
+        geofence: "Westland horticultural (lat 51.98-52.05 × lon 4.15-4.28)"
+
+  tso_registry:
+    name: TenneT
+    scope: >
+      TenneT operates all 110/150/220/380 kV substations. Also owns Doetinchem-
+      Wesel cross-border interconnector to Germany.
+    lp_dd_class: primary_owner_class
+
+  dso_alias_normalisation:
+    aliases:
+      Enduris: Stedin  # Enduris is Stedin's Zeeland trading subsidiary
+      Alliander: Liander  # Alliander is the holding, Liander is the DSO
+      Stedin Netbeheer: Stedin
+      Enexis Netbeheer: Enexis
+      Liander N.V.: Liander
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/netherlands/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # NetherlandsSubstationRecord + region-jurisdiction fallback + DSO alias norm
+    - osm_overpass.py  # single-query fetch (Belgium pattern)
+    - merge_into_ssi_data.py  # 500m proximity match + region fallback
+  pattern_reused_from: belgium (region-jurisdiction × voltage-class + DSO alias normalisation)
+  differentiators_vs_belgium:
+    - twelve_provinces_vs_three_regions: NL has 12-province → 6-DSO mapping vs BE 3-region
+    - small_dso_geofence: 3 small regional DSOs (Coteq/Rendo/Westland Infra) resolved via geofence
+    - tso_threshold_kv: 110 vs Belgium 150 (TenneT operates 110-380, Elia operates 150-380)
+    - alias_map_more_targeted: fewer historical mergers vs Belgium's Eandis+Infrax → Fluvius
+
+expected_deltas:
+  post_merge_owner_coverage: 90-100%  # Belgium precedent — clean 12-province geofence
+  post_merge_voltage_coverage: 65-85%  # from 54.4% baseline — moderate fill opportunity
+  post_merge_substations: 1639-4500
+  post_merge_lines: 6000-15000
+  km_of_lines: 15000-30000
+
+risks_flagged:
+  - risk_1: >
+      Randstad Zuid-Holland boundary — Amsterdam metro extends into ZH (Liander)
+      but the metro area is Stedin's dominant Rotterdam+Den Haag. Default to
+      Stedin for ZH; Amsterdam-Noord may need geofence.
+  - risk_2: >
+      Westland Infra scope is very small (~10 subs) — geofence may miss some
+      or over-capture Stedin-owned Westland substations. Convention #56
+      preserves ambiguity.
+  - risk_3: >
+      OSM tag heterogeneity — historical Nuon/Essent/Eneco tags may still
+      appear (pre-2011 splitsingswet). Alias map handles known cases;
+      unrecognized historical names fall through to region fallback.
+
+convention_preservation:
+  discipline_36:
+    scope: Netherlands bounds already CLEAN pre-workstream. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: Historical DSO alias tags preserved in raw_attributes.osm_original_operator.
+  convention_60:
+    scope: OSM + TenneT open data only — no commercial providers.
+  convention_64:
+    scope: All changes contained to netherlands/ + scripts/pipeline/ingestion/netherlands/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.netherlands.osm_overpass`
+    locally. Expected wall-clock 3-5 min single-query.
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.netherlands.merge_into_ssi_data`.
+  step_5: >
+    Cohort audit sweep re-run — expect Netherlands owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2
