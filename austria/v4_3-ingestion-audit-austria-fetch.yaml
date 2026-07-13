@@ -1,0 +1,152 @@
+# SSI Index v4.3 workstream — Austria Step 2 fetch audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the empirical OSM Overpass fetch pass on Austrian substation + line data.
+#
+# STATUS: PARTIAL — 500-sub sample + total counts empirically anchored from
+# Step 1 probes; full-cohort ingestion PENDING (Overpass API blocking sandbox
+# IP after heavy Mexico Step 5b usage).  Step 3 L1 connector build can proceed
+# in parallel; full fetch executes on operator local machine (residential IP)
+# per Mexico Step 5b precedent.
+#
+# Cross-references:
+#   - austria/v4_3-ingestion-audit-austria-preflight.yaml (parent Step 1 anchor)
+#   - mexico/v4_3-ingestion-audit-mexico-fetch.yaml (Priority 3 precedent)
+
+schema_version: v4_3-ingestion-audit-fetch-1
+country_slug: austria
+discovery_date_utc: "2026-07-13"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+parent_state_transition: austria/v4_3-ingestion-audit-austria-preflight.yaml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. OSM Overpass API probe methodology + observed capacity issue
+# ─────────────────────────────────────────────────────────────────────────────
+overpass_probe_methodology:
+  endpoint: https://overpass-api.de/api/interpreter
+  user_agent: SSI-Index-Foundation/1.0
+  observed_capacity_issue: |
+    After ~4 hours of heavy Priority 3 Mexico ingestion (2 substation queries +
+    5 line quadrant queries × ~40 MB average payload) the sandbox IP received
+    consistent HTTP 504 and 406 responses on Austria queries — even for small
+    nodes-only bbox queries.  Rate limit status API shows 2 slots available
+    but actual GetFeature requests reject in <10s with fixed 695-byte 504
+    error page or 371-byte 406 response.  Pattern indicates soft IP blocking
+    or WAF rate-throttling activated after cumulative daily volume threshold.
+  mitigation: |
+    Full Austria fetch deferred to Step 5b operator-local execution per Mexico
+    precedent (Overpass API accessible from residential IP with different
+    quota class).  L1 connector build (Step 3) proceeds with well-anchored
+    total counts + 500-sub sample tag completeness measurements from Step 1.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Empirical anchors carried forward from Step 1 probes
+# ─────────────────────────────────────────────────────────────────────────────
+empirical_anchors_from_step_1:
+  substation_counts:
+    total: 15213                          # confirmed via out count query
+    nodes: 1676
+    ways: 13528
+    relations: 9
+    areas: 0
+  line_counts:
+    power_line_ways: 5651                 # confirmed via out count query
+  sample_tag_completeness_500_ways:
+    voltage: {count: 399, pct: 79.8}
+    operator: {count: 386, pct: 77.2}    # BEST-IN-COHORT
+    name: {count: 375, pct: 75.0}
+    substation_subtype: {count: 412, pct: 82.4}
+  sample_operator_distribution_top_10:
+    - {operator: "ÖBB-Infrastruktur AG", sample_count: 48, class: railway_traction, extrapolated_total: 1461}
+    - {operator: "Netz Niederösterreich", sample_count: 46, class: dso_niederoesterreich, extrapolated_total: 1400}
+    - {operator: "Netz Oberösterreich", sample_count: 25, class: dso_oberoesterreich, extrapolated_total: 760}
+    - {operator: "Wiener Netze", sample_count: 22, class: dso_vienna, extrapolated_total: 669}
+    - {operator: "KNG-Kärnten Netz GmbH", sample_count: 21, class: dso_kaernten, extrapolated_total: 639}
+    - {operator: "Energie Steiermark", sample_count: 19, class: dso_steiermark, extrapolated_total: 578}
+    - {operator: "Energienetze Steiermark", sample_count: 16, class: dso_steiermark, extrapolated_total: 487}
+    - {operator: "Austrian Power Grid AG", sample_count: 14, class: tso_national, extrapolated_total: 426}
+    - {operator: "Netz Burgenland", sample_count: 13, class: dso_burgenland, extrapolated_total: 396}
+    - {operator: "EVN", sample_count: 12, class: energy_supplier, extrapolated_total: 365}
+    extrapolation_methodology: sample_count × (13528 / 500) — 500-way sample expected to be representative of ways-total
+  sample_substation_subtype_distribution:
+    distribution: {count: 150, pct: 30.0}
+    transmission: {count: 130, pct: 26.0}
+    unspec: {count: 88, pct: 17.6}
+    minor_distribution: {count: 79, pct: 15.8}
+    traction: {count: 44, pct: 8.8}
+    industrial_converter_generation_yes_transition: {count: 9, pct: 1.8}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Predicted full-cohort tag completeness (extrapolation from 500-sample)
+# ─────────────────────────────────────────────────────────────────────────────
+predicted_full_cohort_tag_completeness:
+  methodology: |
+    500-way sample from same country + same power tag is expected to be
+    representative for tag-completeness distributions (features that share
+    the OSM community + editing conventions).  Extrapolation caveat: OSM
+    contributor patterns for less-mapped LV distribution transformers may
+    have different (typically lower) metadata coverage than the sample.
+  extrapolated_counts_of_15213_total:
+    voltage_tagged: [~10500, ~12100]     # 79.8% ± sampling variance
+    operator_tagged: [~10200, ~11700]    # 77.2% ± sampling variance
+    name_tagged: [~9900, ~11400]         # 75.0% ± sampling variance
+  distinct_utilities_projected_full_cohort:
+    top_9_named_utilities: ~9200          # APG + 8 Bundesland DSOs
+    ÖBB_railway_traction: ~1461
+    smaller_specialty_operators: ~500
+    untagged_convention_56: ~3500          # ~23% no operator tag
+    total: ~15161                          # ≈ 15,213 total (within extrapolation error)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Yield expectation (revised from Step 1)
+# ─────────────────────────────────────────────────────────────────────────────
+yield_expectation:
+  substations:
+    existing_state: 741
+    osm_total: 15213
+    predicted_net_new_after_500m_dedupe: [9000, 12000]  # 60-80% of OSM likely unmatched
+    growth_multiplier: 12-16×               # LARGEST across v4.3 priorities
+    predicted_owner_enrichment_via_osm_tag: ~11700 direct + ~3500 no-owner (Conv #56)
+    total_post_merge_owner_coverage_pct: ~77 (matches OSM operator tag coverage)
+  lines:
+    existing_state: 5252
+    osm_total: 5651
+    predicted_net_new_after_dedupe: [200, 500]    # ~7.6% ceiling, small dedupe drop
+    predicted_multiplier: 1.04-1.1×          # MINIMAL — existing line coverage already comprehensive
+  key_takeaway: |
+    Austria v4.3 value profile:
+      - MASSIVE substation growth (12-16× multiplier — LARGEST in v4.3)
+      - STRONG direct-tag owner enrichment (~77% cohort via OSM operator= tags,
+        no monopoly-fallback rule needed)
+      - MINIMAL line densification (existing state already covers HV backbone
+        comprehensively)
+      - RICH utility diversity — 9+ distinct DSOs + APG TSO + ÖBB railway traction
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Full-fetch pending — Step 5b operator local execution
+# ─────────────────────────────────────────────────────────────────────────────
+full_fetch_pending:
+  scope: full 15,213 substation + 5,651 line features with all tags
+  who: operator (residential IP — sandbox IP soft-blocked after heavy Mexico usage today)
+  commands: |
+    python3 -m scripts.pipeline.ingestion.austria.osm_overpass 2>&1 | tail -30
+    # Runs full ingestion (way + node + relation split) + line fetch + Discipline #36 filter
+    # + operator-tag propagation (no monopoly fallback needed)
+    # + audit sidecar emission
+  followup_action: |
+    Delta match vs existing 741 subs + 5,252 lines → merge with owner enrichment
+    → L2/L3 rescore.  Emit austria/v4_3-ingestion-audit-austria-delta.yaml +
+    austria/v4_3-ingestion-audit-austria-merge.yaml.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Auditability chain
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  state_transition: source-discovery-complete → step-2-partial-empirical-anchors-carried-forward → step-3-l1-connector-build-pending
+  parent_state: austria/v4_3-ingestion-audit-austria-preflight.yaml
+  child_states:
+    step_3_l1_connector: scripts/pipeline/ingestion/austria/osm_overpass.py (pending — Mexico pattern reuse)
+    step_4_delta_audit: austria/v4_3-ingestion-audit-austria-delta.yaml (pending — post operator local fetch)
+    step_5_merge_audit: austria/v4_3-ingestion-audit-austria-merge.yaml (pending)
+  commit_hash_placeholder: TBD_at_step_2_merge
