@@ -1,0 +1,199 @@
+# Chile v4.23 Ingestion Audit — Pre-flight
+# ========================================
+# Task: #198 (WAVE2-Step1 Chile)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: chile
+  iso2: CL
+  iso3: CHL
+  wave: 2
+  priority: 9
+  step: 1
+  target: "Owner enrichment via OSM Overpass — first LatAm-cluster country in Wave 2"
+  rationale: >
+    Chile carries 965 substations with 0% owner coverage. Post-2017 SEN
+    (Sistema Eléctrico Nacional) via CEN (Coordinador Eléctrico Nacional)
+    unified grid — merger of SIC + SING. Voltage tagging is already 100%
+    complete (rare in cohort), no fill opportunity. Chile's narrow 4,400 km
+    N-S strip enables clean lat-band region geofence pattern (5th v4.23
+    fallback architecture).
+
+baseline_state:
+  ssi_data_substations: 965
+  grid_geo_substations: 965
+  grid_geo_lines: 1967
+  lines_per_substation_ratio: 2.04  # clean transmission
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: ~100.0  # very good — 965/965 have voltage tagged
+  region_coverage_pct: ~100.0  # 16 regions all populated
+  latitude_range:
+    north_arica: -17.81
+    south_magallanes: -53.29
+    span_deg: 35.48
+  region_split_16:
+    Antofagasta: 195
+    Metropolitana: 128
+    "O'Higgins": 120
+    Biobío: 108
+    Atacama: 68
+    Coquimbo: 65
+    Maule: 65
+    Tarapacá: 47
+    Los Lagos: 43
+    Ñuble: 40
+    Valparaíso: 27
+    Los Ríos: 23
+    Araucanía: 20
+    Arica y Parinacota: 12
+    Aysén: 2
+    Magallanes: 2
+  voltage_class_top:
+    220_kv: 294  # EHV — TRANSELEC dominant
+    66_kv: 231   # DSO sub-transmission
+    110_kv: 203  # sub-transmission
+    154_kv: 117  # HV
+    500_kv: 71   # EHV — TRANSELEC + ISA InterChile
+    69_kv: 24
+    100_kv: 7
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [-77.0, -56.0, -66.0, -17.5]  # west, south, east, north
+    strategy: >
+      Single-query pattern — elongated but narrow strip. Chilean landmass
+      is ~750k km² but spatially thin (mostly <200km wide E-W). OSM query
+      shouldn't 504 on single-shot.
+    expected_yield:
+      substations: 1500-4000
+      lines: 3000-8000
+    tag_completeness_hypothesis: >
+      Metropolitan Santiago + Valparaíso 60-70% operator= tags (Enel
+      Distribución + Chilquinta well-tagged). Northern mining region
+      (Antofagasta) moderate — mining companies own many substations
+      directly. Rural Patagonia + south 20-40%.
+    lp_dd_class: canonical
+
+  fallback_region_registry:
+    strategy: latitude_band_region_by_voltage_class
+    rationale: >
+      Chile's narrow N-S strip enables lat-band geofence per 16 regions.
+      Fifth v4.23 fallback architecture (previously: fragmented, monopoly,
+      state-jurisdiction, region-jurisdiction, and now latitude-band-region).
+    tso_threshold_kv: 110  # transmission ≥110 kV → TRANSELEC (dominant)
+    latitude_band_mapping:
+      # Regions in N-S order (Chile lats are negative; higher magnitude = further south)
+      "Arica y Parinacota": {lat_north: -17.5, lat_south: -18.6, dso: "CGE Distribución"}
+      Tarapacá:             {lat_north: -18.6, lat_south: -21.5, dso: "CGE Distribución"}
+      Antofagasta:          {lat_north: -21.5, lat_south: -26.0, dso: "CGE Distribución"}
+      Atacama:              {lat_north: -26.0, lat_south: -29.5, dso: "CGE Distribución"}
+      Coquimbo:             {lat_north: -29.5, lat_south: -32.3, dso: "CGE Distribución"}
+      Valparaíso:           {lat_north: -32.3, lat_south: -33.5, dso: "Chilquinta"}
+      Metropolitana:        {lat_north: -33.0, lat_south: -34.3, dso: "Enel Distribución"}
+      "O'Higgins":          {lat_north: -34.0, lat_south: -35.0, dso: "CGE Distribución"}
+      Maule:                {lat_north: -35.0, lat_south: -36.5, dso: "CGE Distribución"}
+      Ñuble:                {lat_north: -36.5, lat_south: -37.3, dso: "CGE Distribución"}
+      Biobío:               {lat_north: -37.3, lat_south: -38.5, dso: "CGE Distribución"}
+      Araucanía:            {lat_north: -38.5, lat_south: -39.7, dso: "Frontel"}
+      "Los Ríos":           {lat_north: -39.7, lat_south: -40.7, dso: "SAESA"}
+      "Los Lagos":          {lat_north: -40.7, lat_south: -44.0, dso: "SAESA"}
+      Aysén:                {lat_north: -44.0, lat_south: -49.5, dso: "Edelaysén"}
+      Magallanes:           {lat_north: -49.5, lat_south: -56.0, dso: "Edelmag"}
+    note_metropolitana_overlap: >
+      Metropolitana (Santiago) sits within a Valparaíso-Metropolitana lat
+      overlap band (-33.0 to -33.5). Longitude disambiguation: Metropolitana
+      is inland (lon > -71.0), Valparaíso is coastal (lon < -71.5).
+    tso_default_ge_110kv: "TRANSELEC"
+    tso_default_note: >
+      TRANSELEC owns ~60% of Chilean EHV transmission (LP-DD honest majority
+      default). ISA InterChile owns the remaining ~40% (500 kV backbone).
+      For strict accuracy, Convention #56 preserves as "Chilean transmission
+      network (multi-owner)" via provenance tag when appropriate; simple
+      fallback defaults to TRANSELEC.
+
+  dso_alias_normalisation:
+    aliases:
+      Chilectra: "Enel Distribución"  # Pre-2018 Enel acquisition of Chilectra
+      "Enel Chile": "Enel Distribución"
+      ELECDA: "CGE Distribución"  # Antofagasta subsidiary
+      EMELAT: "CGE Distribución"  # Atacama subsidiary
+      CONAFE: "CGE Distribución"  # Coquimbo subsidiary — Compañía Nacional de Fuerza Eléctrica
+      "CGE": "CGE Distribución"
+      "SAESA Grupo": "SAESA"
+      "Grupo SAESA": "SAESA"
+      "Edelaysén": "Edelaysén"  # canonical
+      "Edelmag": "Edelmag"  # canonical
+      "Frontel": "Frontel"  # canonical
+      "TRANSELEC": "TRANSELEC"  # canonical identity
+      "ISA InterChile": "ISA InterChile"  # canonical
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/chile/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # latitude-band geofence + DSO alias norm
+    - osm_overpass.py  # single-query fetch (Belgium/Netherlands pattern)
+    - merge_into_ssi_data.py  # 500m proximity match + region fallback
+  pattern_reused_from: netherlands (region-jurisdiction × voltage-class + case-insensitive alias norm)
+  differentiators_vs_netherlands:
+    - latitude_band_geofence: exploit Chile's N-S strip topology (16 lat-bands vs NL 12-province box)
+    - metropolitana_lon_disambiguation: Metro Santiago vs Valparaíso lat overlap resolved by longitude
+    - larger_span: 35° lat span (4,400 km) vs NL <3° (~300 km)
+    - fragmented_transmission: TRANSELEC dominant but not universal (~60%) — visibly-honest majority-default
+    - sub_100_kv_more_common: Chile has more 66/110/154 kV sub-transmission
+
+expected_deltas:
+  post_merge_owner_coverage: 85-100%  # LatAm may be lower than EU due to OSM density
+  post_merge_voltage_coverage: 95-100%  # baseline already 100% — should stay near 100%
+  post_merge_substations: 965-3500
+  post_merge_lines: 3000-8000
+  km_of_lines: 20000-50000  # Chile's N-S transmission backbone is long
+
+risks_flagged:
+  - risk_1: >
+      Metropolitana/Valparaíso boundary at -33.0 to -33.5 has both Enel
+      Distribución (inland Santiago) + Chilquinta (coastal Valparaíso).
+      Longitude disambiguation: lon > -70.5 → Metropolitana/Enel; lon < -71.5
+      → Valparaíso/Chilquinta; between → Metropolitana default.
+  - risk_2: >
+      TRANSELEC ≥110 kV default over-attributes ~40% (ISA InterChile owns
+      the 500 kV backbone). Acceptable for LP-DD as visibly-honest majority
+      default; explicit note in audit YAML.
+  - risk_3: >
+      Bío Bío south + Ñuble have small cooperatives (Copelec + Cooperativa
+      Rural Charrúa) not in mapping — will fall through to CGE Distribución
+      default. Acceptable for MVP; refinement queued.
+
+convention_preservation:
+  discipline_36:
+    scope: Chile bounds already remediated (task #64 Mode 3 partial —
+      130 Argentinian Patagonia substations removed). 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: TRANSELEC ≥110 kV majority-default explicitly documented as
+      visibly-honest over-attribution.
+  convention_60:
+    scope: OSM + CEN open data only — no commercial providers.
+  convention_64:
+    scope: All changes contained to chile/ + scripts/pipeline/ingestion/chile/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.chile.osm_overpass`
+    locally. Expected wall-clock 3-6 min single-query.
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.chile.merge_into_ssi_data`.
+  step_5: >
+    Cohort audit sweep re-run — expect Chile owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2
