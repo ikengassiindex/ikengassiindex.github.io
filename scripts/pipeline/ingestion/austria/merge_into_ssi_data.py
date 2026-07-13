@@ -373,9 +373,15 @@ def merge_lines(
     now = now_utc_iso()
 
     for ln in osm_lines:
-        # OSM line coordinates as [[lon,lat],...]
-        coords = ln.polyline
-        if not coords or len(coords) < 2:
+        # OSM line geometry as GeoJSON MultiLineString: [[[lon,lat], ...], ...]
+        # per TransmissionLineRecord.coordinates_multilinestring (canada/_base.py L77).
+        # Take first sub-line as the primary segment (branch-tee edge cases rare
+        # in OSM power=line ways).
+        coords_multi = ln.coordinates_multilinestring
+        if not coords_multi or not coords_multi[0]:
+            continue
+        coords = coords_multi[0]
+        if len(coords) < 2:
             continue
         lon0, lat0 = coords[0][0], coords[0][1]
         lon1, lat1 = coords[-1][0], coords[-1][1]
