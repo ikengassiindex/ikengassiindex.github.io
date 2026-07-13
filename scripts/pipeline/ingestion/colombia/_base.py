@@ -61,6 +61,8 @@ _DNSP_ALIAS_MAP = {
     "codensa": "Enel-Codensa",
     "codensa s.a.": "Enel-Codensa",
     "codensa esp": "Enel-Codensa",
+    "enel": "Enel-Codensa",  # OSM standalone variant surfaced 2026-07-13
+    "enel s.a.": "Enel-Codensa",
     "enel codensa": "Enel-Codensa",
     "enel-codensa": "Enel-Codensa",
     "enel colombia": "Enel-Codensa",
