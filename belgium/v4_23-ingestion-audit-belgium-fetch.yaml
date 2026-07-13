@@ -1,0 +1,79 @@
+# Belgium v4.23 Ingestion Audit — Step 2 fetch
+# ================================================
+# Task: #189 (WAVE2-Step2 Belgium)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local OSM Overpass fetch complete
+
+meta:
+  country: belgium
+  iso2: BE
+  iso3: BEL
+  wave: 2
+  step: 2
+  parent_preflight: belgium/v4_23-ingestion-audit-belgium-preflight.yaml
+  fetched_at_utc: "2026-07-13T15:09:58Z"
+  operator_environment: residential IP (sandbox arch)
+  wall_clock_secs: ~180  # 3 min — very fast, single-query small country
+
+fetch_run:
+  outcome: success
+  substations_parsed: 7302  # pre-Discipline #36 filter
+  substations_post_bounds_filter: 7299
+  lines_parsed: 8459  # pre-Discipline #36 filter
+  lines_post_bounds_filter: 8428
+  raw_bytes_fetched: 1665581
+  raw_sha256: d3d4048f0c97014a2170b2b46f133628db7bb08ef9b119301d3c6c9db566af6e
+
+  discipline_36_dropped:
+    substations: 3
+    lines: 31
+    reason: "~0.04% cross-border overshoot filtered by Discipline #36 (100m default tolerance)"
+    note: "Belgium bounds.json auto-healed 1 self-intersecting feature via buffer(0) during load"
+
+  timeouts_recovered:
+    - "OSM substation 'way' fetch on main endpoint 504 → kumi.systems fallback succeeded"
+    - "OSM substation 'relation' fetch timed out on main endpoint → skipped (no relation subs in this vintage)"
+
+owner_provenance_distribution:
+  osm_operator_tag_direct: 1612  # 22.1% of 7,299
+  osm_operator_tag_direct_alias_normalised: 168  # 2.3% — Eandis/Infrax → Fluvius live
+  region_fallback_Flanders_Fluvius_post2018_merger: 4484  # 61.4% — dominant class
+  region_fallback_Wallonia_ORES_default: 728  # 10.0%
+  region_fallback_Brussels_Capital_Sibelga: 129  # 1.8%
+  region_fallback_Wallonia_Liege_metro_Resa_geofence: 97  # 1.3%
+  region_fallback_TSO_gte150kV: 81  # 1.1%
+  total_direct_osm: 1780  # 1612 + 168
+  total_region_fallback: 5519
+  total_unresolved: 0
+  direct_osm_pct: 24.4
+  region_fallback_pct: 75.6
+
+dnsp_alias_normalisation:
+  count_normalised: 168
+  breakdown: |
+    Historical pre-2018 OSM tags (Eandis, Infrax, ORES Assets, Tecteo)
+    normalised to canonical DNSP identifiers (Fluvius, ORES, Resa).
+    Original OSM operator= tag preserved in raw_attributes.osm_original_operator
+    for audit trail.
+  known_residual_case_mismatches:
+    - "'EANDIS' (all-caps, 5 subs) not case-matched by alias map — Fluvius equivalent"
+    - "'Ores' (title-case, 14 subs) not case-matched — ORES equivalent"
+    - "Fix: extend normalise_owner_alias with case-insensitive lookup in future refresh"
+
+architectural_notes:
+  - "Belgium is COMPACT: single-query pattern (bbox 30k km²) empirically validated. No partitioning needed."
+  - "3-region fallback is CLEAN: 3 of 3 regions fully covered by geofence. Zero unresolved (0 out of 7,299)."
+  - "Fluvius dominates by construction (post-2018 Eandis+Infrax merger + 5 Flemish provinces = 831/1,219 baseline subs → 4,484/7,299 fetched)."
+  - "Wallonia 4-DNSP split: ORES 728 default + Resa 97 Liège metro (geofence lat 50.55-50.72 × lon 5.45-5.75) — clean-cut vs Australia's VIC 5-DNSP unresolved case."
+  - "Line ratio 8,428/7,299 = 1.15 (very clean transmission-tier; less dense than Australia's 3.64 or Norway's 26.5)."
+
+warnings_preserved:
+  - "Convention #56 partial — OSM substation relation fetch failed: The read operation timed out"
+  - "Discipline #36 — dropped 3 substations + 31 lines outside Belgium polygon (100m default tolerance)"
+  - "Owner enrichment: 1780/7299 direct OSM operator= tag (24.4%; of these 168 DNSP-alias-normalised e.g. Eandis→Fluvius); 5519 region_jurisdiction_fallback (75.6%); 0 unresolved (Convention #56 preserved as None)"
+
+next_step: "Step 3 CLOSED (task #190 L1 connector shipped in commit 9356fb74). Step 4 (task #191) merge execution in progress."
+
+status: STEP_2_CLOSED
