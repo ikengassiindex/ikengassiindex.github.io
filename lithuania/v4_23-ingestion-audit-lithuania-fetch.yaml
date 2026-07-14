@@ -1,0 +1,81 @@
+# Lithuania v4.23 Ingestion Audit — Step 2 Fetch
+# ==============================================
+# Task: #234 (WAVE2-Step2 Lithuania)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: lithuania/v4_23-ingestion-audit-lithuania-preflight.yaml
+# Status: FETCH_COMPLETE
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: lithuania
+source_id: LT-C1-osm-overpass
+fetched_at_utc: "2026-07-13T00:00:00Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 1240076
+raw_sha256: 0c6a11d30e94095fd564ac8a495ff2e2331ecc255c780c1906a1d7e9f50c4d19
+provincial_scope: null  # Single-query, whole country
+
+empirical_counts:
+  substations: 5094  # post Discipline #36 (0 dropped by polygon on subs; 5 lines dropped)
+  transmission_lines: 4742
+
+empirical_finding_of_note:
+  finding: >
+    Lithuania OSM tag density is MUCH higher than baseline expectations —
+    5,094 substations vs pre-flight 700-2000 range (2.5-7× higher). Baltic
+    countries (particularly Lithuania) have benefited from very active OSM
+    contributor communities mapping distribution-tier infrastructure (MV
+    substations + LV distribution transformers). Baseline only 505 subs
+    represents transmission-tier only; OSM adds full MV distribution grid.
+  implication: >
+    Lithuania becomes the FIRST cohort-country where OSM baseline growth
+    is >800% (505 → 4,901 subs). Pattern likely to repeat in Latvia +
+    Estonia (Baltic Trio siblings with similar OSM community density).
+
+owner_resolution_provenance:
+  direct_osm_operator_tag: 460
+  alias_normalised_osm_operator: 2
+  layer_1_Litgrid_TSO_threshold_ge_110kv: 272
+  layer_2_ESO_monopoly_default: 4360
+  unresolved: 0  # 2-operator monopoly catches all
+
+discipline_41_line_parity:
+  post_fetch: PASS (5,094 subs + 4,742 lines, ratio 0.93 — SUB-HEAVY)
+
+empirical_finding_line_ratio_below_1:
+  finding: >
+    Line ratio 0.93 is BELOW 1.0 — first cohort-country where post-fetch
+    ratio inverts (more subs than lines). Reflects OSM's very-fine-grained
+    MV substation tagging (many LV transformers as substations) without
+    corresponding MV distribution line tagging. Post-merge with baseline
+    lines the ratio becomes 3982/4901 = 0.81 (still sub-heavy).
+  implication: >
+    Sub-heavy ratio is architecturally honest — many small MV subs feed
+    LV distribution that isn't tagged as line=power in OSM. Not a task
+    #182 outlier concern (opposite direction).
+
+discipline_36_cross_border_filter:
+  polygon_source: lithuania/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 0
+  lines_dropped_outside_polygon: 5
+  final_state: CLEAN
+
+wall_clock:
+  step_2_fetch_seconds: ~180  # 504 gateway on primary; retried via kumi
+  cache_hit_second_run: true
+
+warnings:
+  - "Convention #56 partial — OSM substation relation fetch timed out (retry successful)"
+  - "Overpass 504 gateway on primary endpoint — retried via kumi.systems successfully"
+  - "Discipline #36 — dropped 5 lines outside Lithuania polygon (Kuršių nerija / Curonian Spit edge)"
+
+auditability_chain:
+  parent_preflight: lithuania/v4_23-ingestion-audit-lithuania-preflight.yaml
+  step_2_fetch: lithuania/v4_23-ingestion-audit-lithuania-fetch.yaml
+  step_4_merge: lithuania/v4_23-ingestion-audit-lithuania-merge.yaml
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: lithuania/ssi-data.json
+
+status: READY_FOR_STEP_4

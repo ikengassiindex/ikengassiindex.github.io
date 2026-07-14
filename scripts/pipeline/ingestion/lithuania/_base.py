@@ -56,6 +56,8 @@ _DNSP_ALIAS_MAP = {
     "elektros skirstymo operatorius": "ESO",
     "ab elektros skirstymo operatorius": "ESO",
     "elektros skirstymo operatorius ab": "ESO",
+    # Cyrillic-script variant (Russian OSM tag surfaced 2026-07-13 — Kaliningrad-adjacent)
+    "есо": "ESO",  # Cyrillic Yeryo-Es-O = ESO (Russian rendering)
     # LESTO — pre-2016 DSO predecessor
     "lesto": "ESO-legacy",
     "lesto ab": "ESO-legacy",
