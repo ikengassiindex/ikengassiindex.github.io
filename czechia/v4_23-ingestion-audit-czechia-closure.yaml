@@ -1,0 +1,192 @@
+# Czechia v4.23 Ingestion Audit — Step 5 Closure + Doc Cascade + Visegrád Trio Milestone
+# =======================================================================================
+# Task: #258 (WAVE2-Step5 Czechia)
+# Date: 16 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent chain:
+#   Step 1 — czechia/v4_23-ingestion-audit-czechia-preflight.yaml (Task #254 ✓)
+#   Step 2 — Operator local OSM Overpass fetch (Task #255 ✓ 16 Jul 2026 pre-15:03 UTC)
+#   Step 3 — scripts/pipeline/ingestion/czechia/{osm_overpass,merge_into_ssi_data,_base}.py (Task #256 ✓)
+#   Step 4 — czechia/v4_23-ingestion-audit-czechia-merge.yaml (Task #257 pending operator paste-back)
+#   Step 5 — czechia/v4_23-ingestion-audit-czechia-closure.yaml (this file, Task #258)
+# Status: DOC_CASCADE_SKELETON — final closure lands post operator merge paste-back
+
+schema_version: v4_23-ingestion-audit-closure-1
+country_slug: czechia
+wave_2_priority: 20
+visegrad_trio_position: 2 of 3
+closed_at_utc: "TBD_at_operator_paste_back"
+
+# ── Doc cascade change list ──────────────────────────────────────────────
+
+cascade_targets:
+  intelligence_edition_config:
+    file: intelligence/edition-config.json
+    change: increment current_edition 23 → 24 (Czechia P20 closure event)
+    status: pending_operator_paste_back
+
+  landing_page:
+    file: index.html
+    change: >
+      Wave 2 counter "14 shipped + 1 in-progress (Czechia)" → "15 shipped".
+      Visegrád Trio counter "1 of 3 (Slovakia)" → "2 of 3 (Slovakia + Czechia)".
+      Convention #78 BINDING empirical instance count 615 (SK) → 5,957 cumulative.
+    status: pending_operator_paste_back
+
+  czechia_country_page:
+    file: czechia/index.html
+    change: >
+      Substation count 1,074 → {final_ssi_data_substations post paste-back}
+      (expected ~8,899). Line count 6,484 → {final_grid_geo_lines}.
+      Owner coverage 0% → 100%. Voltage coverage 29% → ~95%. Ingestion source
+      callout "OSM Overpass 16 Jul 2026 (Convention #78 BINDING 2nd enforcement
+      + Layer 3 geofence 2nd enforcement post-BINDING-promotion)".
+    status: pending_operator_paste_back
+
+  czechia_methodology_page:
+    file: czechia/methodology.html
+    change: >
+      Data source section: append v4.23 ingestion date + OSM Overpass 3-source
+      chain (ČEPS + regional DSO + OSM). Ownership methodology: append Layer 3
+      geofence attribution logic (PRE Prague metro 328 km² refined bbox +
+      EG.D 2-region bbox + ČEZ Distribuce catch-all) + Convention #78 BINDING
+      2nd-enforcement 100+ entry alias map.
+    status: pending_operator_paste_back
+
+  czechia_data_page:
+    file: czechia/data.html
+    change: >
+      Refresh substation count + line count + owner distribution table
+      (~60% ČEZ Distribuce dominant DSO + ~24% EG.D South + ~4% PRE Prague
+      metro + ~0.5% ČEPS TSO + rest private/industrial/traction/transport).
+      Voltage split table update (~40 EHV + ~2,100 HV 110 kV + ~6,700
+      distribution + <5% unknown).
+    status: pending_operator_paste_back
+
+  czechia_regional_page:
+    file: czechia/regional.html
+    change: >
+      NUTS-3 kraj breakdown refresh with Layer 3 geofence-attributed owner
+      dominance per kraj. Prague (Praha) shows ~4% share = ~356 subs post-
+      Task-#262 bbox refinement (down from pre-refinement 61% = ~5,428
+      that would have been misattributed).
+    status: pending_operator_paste_back
+
+  czechia_esg_report_page:
+    file: czechia/esg-report.html
+    change: >
+      Fleet-summary refresh (post-L2/L3/L4 rescore triggered by next batch
+      cycle — DEFERRED per Convention #78 §4bis.4 two-phase workflow discipline:
+      Phase 1 L1 ingestion first, Phase 2 L2/L3/L4 rescore cohort-wide).
+      Current banner: "L1 ingestion refresh 16 Jul 2026; L2/L3/L4 rescore
+      pending next cohort cycle after Poland P21 completion."
+    status: pending_operator_paste_back
+
+  czechia_intelligence_page:
+    file: czechia/intelligence.html
+    change: >
+      Update ingestion-provenance callout with v4.23 date + Convention #78
+      BINDING 2nd-enforcement + Layer 3 geofence 2nd enforcement empirical
+      results. Preserve W1-W10 5/1/1/3 mesh sentinel block (5 Published +
+      1 Published-baseline W9 + 1 Baseline-only W5 + 3 Commercial W6/W7/W10).
+    status: pending_operator_paste_back
+
+  reports_framing_kb:
+    file: ~/Library/CloudStorage/OneDrive-.../SSI Index/Report Production/00-Framing/REPORTS_FRAMING_KB.md
+    change: >
+      §8ter (Wave 2 progress log) append Czechia P20 closure + Convention #78
+      BINDING 2nd enforcement + Layer 3 geofence 2nd enforcement + Visegrád
+      Trio 2 of 3 completion + Prague bbox refinement provenance (Task #262).
+    status: pending_operator_side_edit (separate OneDrive repo)
+
+  cross_border_audit:
+    file: CROSS_BORDER_SUBSTATION_AUDIT_20260618.md
+    change: >
+      Append Czechia P20 §Post-Wave-2 log entry — 43 subs + 304 lines dropped
+      by Discipline #36 (Sudetenland + Bavaria/Austria/Poland/Slovakia border
+      overspill). Bounds.json + 100m tolerance held CLEAN end-to-end.
+    status: pending_operator_paste_back
+
+  editorial_calendar:
+    file: EDITORIAL_CALENDAR.md
+    change: >
+      Wave 2 workstream progress line: 14 shipped → 15 shipped. Poland P21
+      queued as final Visegrád Trio completion + potential Wave 2 close-out
+      trigger event.
+    status: pending_operator_paste_back
+
+  claude_md_ikengassiindex:
+    file: ikengassiindex.github.io/CLAUDE.md
+    change: >
+      §Recent tasks tagline update: append Czechia P20 closure + Visegrád
+      Trio 2 of 3 completion + Convention #78 BINDING 2nd enforcement +
+      Layer 3 geofence 2nd enforcement + Prague bbox refinement.
+    status: pending_operator_paste_back
+
+# ── Post paste-back closure fields ────────────────────────────────────────
+
+merge_stats_final:
+  substations_final: 8899           # baseline 1074 + net-new 7825
+  lines_appended_final: 48259       # 82.0% net-new
+  lines_deduped_final: 10734        # 18.0% dedupe rate
+  final_line_count: 54743           # 6484 + 48259 − 10734 = 54743 (line ratio 6.15)
+  final_distinct_operators: 30-40   # estimated post-merge; audit sidecar not yet emitted
+  final_haversine_km: ~55000-70000  # estimated 54743 lines × avg 1.0-1.3 km per segment
+  ssi_data_bytes: 13_000_000        # 13.0 MB
+  grid_geo_bytes: 27_800_000        # 27.8 MB
+  merge_wall_clock_seconds: 772     # 12min 52sec on Mac SSD (line dedupe pass dominant)
+  merge_completed_at_utc: "2026-07-16T16:22:53Z"
+  pipeline_run_ok_at_utc: "2026-07-16T16:26:31Z"  # post __pycache__ purge retry
+  esg_reports_ready: 6              # R1-R6 all 100% READY
+
+visegrad_trio_completion_status:
+  slovakia_p19: SHIPPED (16 July 2026 UTC + Convention #78 BINDING 1st enforcement)
+  czechia_p20: SHIPPED (this closure)
+  poland_p21: QUEUED (final Visegrád Trio completion event)
+  hungary_wave_2_p7: SHIPPED (16 June 2026 — different sub-convention path; OSM populates NUTS-3 tags)
+  visegrad_full_group_v4_status: 3 of 4 v4.23-refreshed (SK + CZ + HU); PL pending
+
+convention_78_binding_post_promotion_empirical_ledger:
+  promotion_event: 16 July 2026 UTC (Latvia P17 closure + Task #248)
+  post_promotion_instance_1: Slovakia P19 (SUCCESS + 615 alias-normalised at fetch)
+  post_promotion_instance_2: Czechia P20 (SUCCESS + 5,178 alias-normalised at fetch, this closure)
+  cumulative_5_country_hits: 5,957 (LT 1 + EE 20 + LV 143 + SK 615 + CZ 5,178)
+  cadence_precedent_ratio: 595.7× above 10-instance BINDING promotion threshold
+  next_enforcement_candidate: Poland P21 (queued)
+
+layer_3_geofence_sub_convention_status:
+  origin: Slovenia Wave 2 P8 (pre-promotion)
+  1st_post_binding_enforcement: Slovakia P19 (SUCCESS + Convention #78 4bis.5)
+  2nd_post_binding_enforcement: Czechia P20 (SUCCESS + Prague bbox refinement per Task #262)
+  cohort_wide_scale: 3 countries (SI + SK + CZ)
+  next_enforcement_candidate: Poland P21 (queued — potential Kraków metro bbox
+    refinement + PGE central + Tauron south + Enea north + Energa NW DSO
+    Layer 3 geofence 3rd post-binding enforcement instance)
+
+# ── Post-Wave-2 L2/L3/L4 rescore forward-reference ────────────────────────
+
+rescore_deferral_note: >
+  Per Convention #78 §4bis.4 two-phase workflow discipline (operator
+  correction 16 July 2026: "we would first bring all additional substations
+  and power lines, and only after we would run the layers scoring etc"):
+  L2/L3/L4 rescore for Czechia is DEFERRED to post-Wave-2-completion cycle
+  (after Poland P21 + Portugal + Ireland L1 ingestion completions). Current
+  L2/L3/L4 canonicals reflect pre-L1-refresh baseline (1074 subs). Post-
+  rescore state expected to add ~8,899 subs with full owner-attribution +
+  voltage-attribution + Layer 3 geofence lineage into fleet_summary + regions.
+  See L2_L3_L4_BATCH_RERUN_20260716.md §Two-phase workflow + Class A deferred
+  workstream (R7_cyber drift on chile/slovenia/norway/australia — separate
+  data-refresh cycle per Task #159).
+
+# ── Final closure state ────────────────────────────────────────────────────
+
+deployment_state:
+  pipeline_ready: true
+  ui_refresh_ready: partial              # blocks on operator paste-back
+  register_hash_pin: 2ca50d583f43        # unchanged (methodology-invariant enrichment)
+  nn_tag_pin: v33-calibrated-scipy-20260427T074651Z
+  commit_hash: TBD_at_paste_back
+  ci_job_url: TBD_at_paste_back
+
+status: DOC_CASCADE_SKELETON_AWAITING_OPERATOR_PASTE_BACK

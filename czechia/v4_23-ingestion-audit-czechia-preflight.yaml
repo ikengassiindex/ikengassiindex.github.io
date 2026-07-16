@@ -1,0 +1,272 @@
+# Czech Republic v4.23 Ingestion Audit — Step 1 Pre-flight Source Discovery
+# ==========================================================================
+# Task: #254 (WAVE2-Step1 Czechia)
+# Date: 16 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Wave 2 Priority: 20
+# Cohort position: 20 of 39 (v4.23 workstream — 5th Wave 2 batch of 6-country continuation)
+# Convention #78 sub-convention BINDING status: 2nd enforcement test (post-Slovakia SUCCESS)
+# Convention #78 Layer 3 geofence sub-convention status: 2nd enforcement test (post-Slovakia SUCCESS)
+# Visegrád Trio position: 3rd of 4 (Hungary + Slovakia + Czechia; Poland pending)
+
+schema_version: v4_23-ingestion-audit-preflight-1
+country_slug: czechia
+country_name: Czech Republic
+iso2: CZ
+iso3: CZE
+
+baseline_state:
+  ssi_data_substations: 1074   # empirical count from ssi-data.json
+  landing_page_data_subs: 1077  # slight drift — 3 substations
+  bounds_json_present: true
+  ssi_data_bytes: 2301634       # ~2.3 MB
+  grid_geo_bytes: 2455531       # ~2.5 MB
+  voltage_split_baseline:
+    ehv_ge_220kv: 0             # ZERO — baseline has no transmission tier (OSM will add)
+    hv_100_to_219kv: 7          # SPARSE
+    distribution_lt_100kv: 300
+    unknown: 767                # 71.4% — HEAVIEST voltage attribution gap cohort-wide
+  region_split_baseline:
+    Prague: 659                  # 61.4% — SUSPICIOUS (Prague metro is ~12% of population, ~0.6% of area)
+    South Moravia: 157           # 14.6%
+    Hradec Králové: 52
+    Central Bohemia: 41
+    Moravian-Silesian: 37
+    South Bohemia: 30
+    Pardubice: 23
+    Ústí nad Labem: 21
+    Zlín: 15
+    Liberec: 13
+    Plzeň: 13
+    Olomouc: 5
+    Vysočina: 5
+    Karlovy Vary: 3
+  owner_coverage_baseline_pct: 0.0   # 0 distinct operators — unified sweep placeholder
+  distinct_operators_baseline: 0
+
+architectural_pattern:
+  fallback_class: region-jurisdiction × voltage-class + Layer 3 lat/lon geofence + PRE Prague metro carve-out
+  parallel_predecessors:
+    - slovakia (Priority 19 — Convention #78 BINDING first-enforcement SUCCESS + Layer 3 geofence 1st codified)
+    - slovenia (Priority 12 — Layer 3 lat/lon geofence originating precedent)
+    - hungary (Priority 10 — NUTS-3 code region-jurisdiction sibling)
+  wave_2_priority_number: 20
+  cohort_progress: >
+    Wave 1 (5 of 5): Canada + Norway + Mexico + Austria + Greenland
+    Wave 2 (14 of 5-6, +9 over-quota): Australia + Belgium + Netherlands + Chile + Hungary +
+    Luxembourg + Slovenia + Costa Rica + Israel + Colombia + Lithuania + Estonia + Latvia + Slovakia
+    Wave 2 continuation (15): Czechia (Visegrád Trio 3rd of 4; Poland Priority 21 candidate closes V4)
+
+national_grid_architecture:
+  bidding_zone: CZ (unified single Czech market — Nord Pool sync since 2015)
+  entsoe_synchronous_area: Continental Europe (via CEPS)
+  vertical_integration_status: unbundled
+  four_operator_resolver:
+    tso:
+      name: ČEPS a.s.
+      role: state-owned TSO 100% via Ministry of Industry and Trade (MPO)
+      voltage_scope: 400 kV + 220 kV + selected 110 kV interconnectors (with DE + AT + SK + PL)
+      predecessor: ČEZ transmission department (spun out 1998)
+      market_cap: NA (state-owned)
+      total_km: ~5,600 km (400+220 kV backbone)
+    dso_1_largest:
+      name: ČEZ Distribuce a.s.
+      role: LARGEST DSO — parent ČEZ Group (69.8% state-owned via MPO)
+      voltage_scope: 110 kV + 22/35 kV MV + 0.4 kV LV
+      territory: >
+        Bohemia excluding Prague + Silesia + Moravia excluding South Moravia (EG.D territory)
+        Rough geofence: everything NOT Prague metro AND NOT South Bohemia AND NOT South Moravia
+      customer_count: ~3.7M connections (~65% national market)
+      predecessor_aliases:
+        - ČEZ Distribuce, a. s. (comma-separated legal-form variant per Convention #78 BINDING)
+        - Východočeská energetika (pre-2003 East Bohemia predecessor)
+        - Severomoravská energetika (pre-2003 North Moravia predecessor)
+        - Středočeská energetická (pre-2003 Central Bohemia predecessor)
+        - Západočeská energetika (pre-2003 West Bohemia predecessor)
+    dso_2_south:
+      name: EG.D a.s.
+      role: DSO — rebranded 2021 from E.ON Distribuce (E.ON Germany sold Czech operations to Sazka Group)
+      voltage_scope: 110 kV + MV + LV
+      territory: South Bohemia + South Moravia + parts of Vysočina + parts of Zlín
+      customer_count: ~1.2M connections (~15% national market)
+      predecessor_aliases:
+        - E.ON Distribuce a.s. (pre-2021 rebrand — MOST COMMON legacy OSM tag)
+        - E.ON Česká republika s.r.o.
+        - E.ON Distribuce, a. s. (comma-separated legal-form variant)
+        - JČE Jihočeská energetika (pre-2001 South Bohemia predecessor)
+        - JME Jihomoravská energetika (pre-2001 South Moravia predecessor)
+    dso_3_prague:
+      name: PRE distribuce a.s.
+      role: Prague metro monopoly DSO
+      voltage_scope: 110 kV + MV + LV
+      territory: Prague metropolitan area ONLY (bbox 49.94-50.18 lat, 14.22-14.75 lon)
+      customer_count: ~750,000 connections (~4% national market)
+      parent: Pražská energetika a.s. (58% EnBW Germany + 42% City of Prague)
+      predecessor_aliases:
+        - Pražská energetika a.s. (parent holding — may appear on some OSM tags)
+        - PRE distribuce, a. s. (comma-separated legal-form variant)
+  small_operators_preserved_honestly:
+    - ČEZ Prodej a.s. (retail arm — should NOT appear on substations but may leak into OSM tags)
+    - PPD (Pražská plynárenská Distribuce — gas DSO wrongly tagged on electric subs)
+    - České dráhy Energetika (Czech Railways electric traction 25 kV AC)
+    - Dopravní podnik hl. m. Prahy (Prague public transport — tram + metro traction)
+    - Dopravní podnik měst Brna (Brno public transport)
+    - Dopravní podnik Ostrava (Ostrava public transport)
+    - Škoda Auto Energy (Mladá Boleslav VW plant industrial captive)
+    - Unipetrol (Litvínov + Kralupy refinery industrial captives)
+    - Sokolovská uhelná (Karlovy Vary lignite mining captive)
+    - ArcelorMittal Ostrava (steelworks industrial captive)
+
+layer_3_lat_lon_geofence_architecture:
+  reason: >
+    OSM Czechia is EXPECTED to NOT populate ref:nuts:3 tags on power=substation elements
+    (Slovenia + Slovakia empirical precedent at cohort-wide scale). Layer 3 geofence MUST be
+    codified preemptively at Step 3 connector authoring time per Convention #78 BINDING
+    Layer 3 geofence sub-convention.
+  four_layer_stack:
+    layer_1: ČEPS TSO threshold ≥220 kV (voltage-based)
+    layer_2: ref:nuts:3 tag → DSO map (forward-compat surface — expected 0 hits)
+    layer_3: lat/lon geofence 3-region partition:
+      pre_prague_metro:
+        bounds: lat 49.94 → 50.18, lon 14.22 → 14.75
+        resolves_to: PRE distribuce
+        rationale: Prague administrative boundary (Hl. m. Praha capital city NUTS-2 CZ01)
+      egd_south:
+        rule: (lon < 15.50 AND lat < 49.60) OR (lon > 15.50 AND lon < 17.20 AND lat < 49.30)
+        resolves_to: EG.D
+        rationale: South Bohemia (western) + South Moravia (eastern) — 2 disjoint bboxes
+        note: >
+          Simplistic 2-bbox approximation for Step 3. If empirical fetch reveals attribution
+          errors on Vysočina/Zlín boundary regions, refine bbox at Step 4 merge time
+          (Slovakia precedent — Layer 3 geofence can be refined mid-workflow).
+      cez_distribuce_default:
+        rule: everything else in Czechia (Layer 3 catch-all)
+        resolves_to: ČEZ Distribuce
+        rationale: >
+          Largest DSO by territory (~65% national coverage). Convention #56 preserved via
+          voltage cross-check + baseline region cross-check.
+    layer_4: ČEPS state-utility default (only true EHV ≥220 kV subs)
+  expected_dso_distribution_post_merge:
+    ČEZ Distribuce: 60-70%    # largest DSO
+    EG.D: 12-18%
+    PRE distribuce: 3-6%       # Prague metro
+    ČEPS: 1-3%                 # only true EHV/HV interconnectors
+    others_preserved: <2%       # railway traction + industrial captives
+
+convention_78_binding_preemptive_alias_map_design:
+  rationale: >
+    Slovakia Priority 19 empirical VERDICT: 615 alias-normalised at fetch time (HIGHEST
+    cohort-wide, 4-5× Latvia). Convention #78 BINDING enforcement PASSES. Czechia is the
+    2nd empirical enforcement test with parallel Czech commercial-registry + Cyrillic +
+    NFC diacritic + typographic-quote coverage.
+  expected_alias_hits:
+    cyrillic_low_expected: 2-8
+      # ЧЕЗ (ČEZ) + ЧЕПС (ČEPS) — potential rare Cyrillic contributions
+      # LESS common than Baltic Trio (Baltic contributors historically Russian-adjacent)
+    czech_nfc_diacritics: 15-40
+      # ě š č ř ž ý á í é ú ů ň ť ď ó
+      # ČEZ / ČEPS / ČEZ Distribuce / EG.D / PRE distribuce
+    typographic_quotes: 5-25
+      # Czech uses „…" bottom-open + top-close same as Latvian typography
+      # Latvia precedent: 122 subs; Czechia expected lower due to less common quoted-form OSM tags
+    comma_separated_legal_form: 15-40
+      # Czech commercial registry uses:
+      # ČEZ Distribuce, a. s. (with space) — MOST COMMON
+      # ČEZ Distribuce a.s.  (without space) — SECOND MOST COMMON
+      # ČEZ Distribuce a. s. (partial space) — RARE
+      # Sibling Slovak pattern per Convention #78 BINDING NEW sub-class
+    predecessor_pre_2003_dso: 5-25
+      # ČEZ absorbed 5 regional pre-2003 predecessors:
+      # Východočeská energetika + Severomoravská + Středočeská + Západočeská + Severočeská
+      # OSM tags may still carry pre-2003 legacy names — historical alias normalisation
+    predecessor_e_on_pre_2021: 20-80
+      # EG.D was E.ON Distribuce until 2021 rebrand — LARGEST predecessor alias class
+      # OSM community has NOT yet migrated all E.ON tags → EG.D
+      # Expected LARGEST predecessor alias class cohort-wide (2-4 years since rebrand)
+    total_expected_alias_normalisation: 50-200
+      # Middle-of-cohort — lower than Slovakia (615) but higher than most Baltic Trio countries
+      # Empirical hypothesis: Czech OSM community more tag-consistent than Slovak
+  expected_layer_3_geofence_hits: 800-1000
+    # Same Slovakia precedent: Layer 2 NUTS-3 returns 0 hits
+    # Layer 3 geofence carries 60-70% of DSO attribution
+  post_merge_verdict_prediction: >
+    Convention #78 BINDING 2nd enforcement test expected VERDICT: SUCCESS
+    Layer 3 geofence sub-convention 2nd enforcement test expected VERDICT: SUCCESS
+    (both sub-conventions BINDING-locked at Slovakia Priority 19; Czechia empirically reinforces)
+
+anchor_sources:
+  osm_overpass:
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback: https://overpass.kumi.systems/api/interpreter
+    license: ODbL 1.0 (© OpenStreetMap contributors)
+    query_scope: national polygon czechia/bounds.json + 100m Discipline #36 tolerance
+    expected_element_types:
+      - power=substation (node + way + relation)
+      - power=line (way — transmission + distribution lines)
+    expected_tags:
+      - operator + operator:wikidata + operator:short + name + name:cs + name:en + name:de
+      - ref + ref:nuts:3 + ref:czso + ref:iso3166-2
+      - voltage + power + substation
+      - place + boundary
+  ceps_transmission_dev_plan:
+    url: https://www.ceps.cz/en/development-plan
+    role: authoritative TSO ≥220 kV network topology
+    format: PDF + interactive map (informational; not directly ingested)
+    vintage: 2024-2033 (latest 10-year plan)
+  eru_operator_registry:
+    url: https://www.eru.cz/en/electricity/licenses
+    role: Energy Regulatory Office (ERÚ) — authoritative Czech DSO license registry
+    format: HTML browsable + CSV export
+    vintage: continuous (live)
+    role_at_step_4b: >
+      Post-merge alias cross-check reference for Convention #56 visibly-honest preservation
+      of small industrial captives + railway traction operators
+
+discipline_36_cross_border_pre_check:
+  polygon_source: czechia/bounds.json
+  tolerance_km: 0.1
+  expected_border_edges:
+    - DE-CZ (Bavarian) — potential leakage
+    - AT-CZ (Waldviertel) — potential leakage
+    - SK-CZ (Moravian-Slovak) — potential leakage
+    - PL-CZ (Silesian) — potential leakage
+  expected_subs_dropped_outside_polygon: 5-20   # 4-country border-heavy geometry
+
+discipline_41_line_parity_pre_check:
+  baseline_line_ratio: unknown  # need to compute from grid-geo.json baseline
+  expected_post_merge_ratio: 3-8   # comparable to Slovakia's 13.31 or Slovenia's 2.61
+  task_182_outlier_watch: low
+    # OSM Czechia expected to be transmission-tier-focused (Slovenia + Norway pattern)
+    # Line ratio 15+ threshold NOT expected to trigger
+
+status: READY_FOR_STEP_2
+
+auditability_chain:
+  parent_convention_78_binding: latvia/CROSS_BORDER_SUBSTATION_AUDIT_20260618.md Latvia addendum (13 July 2026)
+  parent_layer_3_geofence: slovakia/v4_23-ingestion-audit-slovakia-fetch.yaml (16 July 2026)
+  step_1_preflight: czechia/v4_23-ingestion-audit-czechia-preflight.yaml
+  step_2_fetch: czechia/v4_23-ingestion-audit-czechia-fetch.yaml (pending)
+  step_4_merge: czechia/v4_23-ingestion-audit-czechia-merge.yaml (pending)
+  downstream_deliverable: czechia/ssi-data.json + czechia/grid-geo.json
+
+lessons_forecast:
+  - >
+      **Convention #78 BINDING 2nd empirical enforcement test.** Slovakia established
+      SUCCESS at 1st enforcement (615 alias hits, 78-155× above cadence threshold).
+      Czechia 2nd enforcement expected 50-200 alias hits — reinforces BINDING status.
+  - >
+      **Layer 3 lat/lon geofence sub-convention 2nd enforcement test.** Slovakia
+      established the sub-convention (3-way longitude partition ZSD/SSD/VSD). Czechia 2nd
+      enforcement uses PRE Prague metro carve-out (bbox) + EG.D 2-region bbox +
+      ČEZ Distribuce catch-all — GENERALIZES the geofence pattern from longitude partition
+      to metro-carve-out + 2-region bbox composition.
+  - >
+      **Visegrád Trio 3rd of 4 completion.** Hungary (Priority 10) + Slovakia (Priority 19) +
+      Czechia (Priority 20). Poland (Priority 21 candidate) closes Visegrád-4 quartet.
+      Empirical hypothesis: Central European OSM contributor pattern homogeneous across V4.
+  - >
+      **E.ON → EG.D rebrand as LARGEST predecessor alias class cohort-wide.** 2021 rebrand
+      of German utility exit + Sazka Group acquisition. Expected 20-80 subs with lingering
+      E.ON tags in OSM (2-4 years old contribution date) — NEW historical-alias pattern
+      distinct from Baltic Trio state-utility renames.
