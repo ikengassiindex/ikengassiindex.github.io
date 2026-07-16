@@ -490,12 +490,25 @@ def cache_path_for(url: str, *, ext: str = ".json") -> Path:
     return POLAND_CACHE_DIR / f"{key}{ext}"
 
 
-# ── Discipline #36 bounds filter (Poland polygon) ────────────────────────
-def apply_bounds_filter(records: list) -> tuple[list, list]:
+# ── Discipline #36 bounds filter (Poland polygon, 100m default) ──────────
+def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     """Apply Discipline #36 point-in-polygon filter using poland/bounds.json.
     Returns (kept, dropped) tuple. 100m tolerance per cross_border_tolerances.json.
+
+    Follows Czechia P20 canonical signature — canada._base.apply_bounds_filter
+    is keyword-only (`country_slug` + `tolerance_km`), NOT positional path args.
     """
-    return _apply_bounds_generic(records, POLAND_BOUNDS_JSON, POLAND_TOLERANCE_JSON)
+    if tolerance_km is None:
+        try:
+            tol_cfg = json.loads(POLAND_TOLERANCE_JSON.read_text(encoding="utf-8"))
+            tolerance_km = float(
+                tol_cfg.get("per_country", {}).get("poland", {}).get("tolerance_km", 0.1)
+            )
+        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+            tolerance_km = 0.1
+    return _apply_bounds_generic(
+        records, country_slug="poland", tolerance_km=tolerance_km
+    )
 
 
 # ── Audit sidecar emission (v43_provenance sidecar per Convention #56) ───
