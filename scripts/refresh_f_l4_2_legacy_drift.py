@@ -185,8 +185,12 @@ def refresh_country(country: str, dry_run: bool = False):
         result["backup_created"] = str(backup_fp.name)
 
     tmp_fp = fp.with_suffix(".json.tmp")
+    # Compact serialisation (no indent) — aligns with cohort-wide ssi-data.json
+    # discipline + prevents Task #125 90-MB sentinel trigger on large canonicals
+    # (norway 13.6→19.1 MB indent=2, australia 21.5→29.7 MB indent=2; both stay
+    # under threshold but format-drift misaligns with 39-country cohort norm).
     tmp_fp.write_text(
-        json.dumps(data, indent=2, default=str, ensure_ascii=False),
+        json.dumps(data, default=str, ensure_ascii=False),
         encoding="utf-8",
     )
     tmp_fp.replace(fp)
