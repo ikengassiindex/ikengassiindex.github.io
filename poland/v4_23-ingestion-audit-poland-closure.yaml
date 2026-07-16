@@ -16,8 +16,11 @@
 schema_version: v4_23-ingestion-audit-closure-1
 country_slug: poland
 wave_2_priority: 21
-visegrad_trio_position: 3 of 3 (COMPLETION MILESTONE)
-closed_at_utc: "TBD_at_operator_paste_back"
+visegrad_trio_position: 3 of 3 (COMPLETION MILESTONE — 🏛 ACHIEVED)
+closed_at_utc: "2026-07-16T20:35:00Z"
+commit_6_canonical_refresh: 1a9c5a24
+commit_5_step_3_landed: 8febea7f
+commit_hotfix: 0a79e36f
 
 # ── Doc cascade change list ──────────────────────────────────────────────
 
@@ -148,48 +151,72 @@ cascade_targets:
 # ── Post paste-back closure fields ────────────────────────────────────────
 
 merge_stats_final:
-  substations_final: TBD                                    # expected 25k-42k
-  lines_appended_final: TBD                                 # expected 100k-220k
-  lines_deduped_final: TBD                                  # expected 30k-60k (20-30% dedupe rate)
-  final_line_count: TBD                                     # expected 100k-220k
-  final_distinct_operators: TBD                             # expected 40-60 (5 DSOs + rebrand predecessors + industrial + traction + transport)
-  final_haversine_km: TBD                                   # expected 100k-250k
-  ssi_data_bytes: TBD                                       # expected 40MB-75MB (under 90 MB Task #125 sentinel)
-  grid_geo_bytes: TBD                                       # expected 80MB-140MB (under 90 MB Task #125 sentinel)
-  merge_wall_clock_seconds: TBD                             # expected 30-90 min (LARGER country + 6-macroregion partition)
-  merge_completed_at_utc: "TBD_at_operator_paste_back"
-  pipeline_run_ok_at_utc: "TBD_at_operator_paste_back"      # post __pycache__ purge preemptive
-  esg_reports_ready: TBD                                    # expected R1-R6 all 100% READY
+  substations_final: 27764                                  # baseline 2247 + net-new 25517 (LARGEST cohort-wide net-new 3.26× Czechia)
+  lines_appended_final: 90898                               # 72.6% net-new
+  lines_deduped_final: 34249                                # 27.4% dedupe rate
+  final_line_count: 105254                                  # 14356 + 90898 - 34249 (line ratio 3.79)
+  final_distinct_operators: TBD_at_step_5_audit_sidecar     # audit sidecar deferred
+  final_haversine_km: ~100000_to_150000_estimated           # 105254 lines × avg 1.0-1.4 km per segment
+  ssi_data_bytes: 39900000                                  # 39.9 MB ✅ (44% of 90 MB Task #125 sentinel)
+  grid_geo_bytes: 48400000                                  # 48.4 MB ✅ (54% of 90 MB Task #125 sentinel)
+  merge_wall_clock_seconds: 3149                            # 52 min 29 sec (line-merge dedupe pass dominant)
+  step_2_fetch_wall_clock_seconds: 700                      # ~11 min 40 sec (6-macroregion Overpass across 3 endpoints)
+  pipeline_run_wall_clock_seconds: 146.1                    # L2/L3/L4 rescore
+  merge_completed_at_utc: "2026-07-16T19:01:31Z"
+  pipeline_run_ok_at_utc: "2026-07-16T19:03:57Z"
+  hotfix_applied_at_utc: "2026-07-16T18:00:00Z"             # commit 0a79e36f apply_bounds_filter signature
+  esg_reports_ready_pipeline: 6                             # R1-R6 all 100% READY per pipeline assessor
+  esg_reports_framework_catalog: 7                          # R1-R7 per FC v3 §14 canonical (R7 SFDR PAI)
+  esg_r7_workstream_ref: >
+    R7 SFDR PAI Infrastructure Disclosure gap surfaced by operator during
+    Poland P21 audit (7-vs-6 mismatch). Full workstream deliverables at
+    R7_SFDR_PAI_diligence_note.md + R7_SFDR_PAI_current_state_audit.md +
+    R7_SFDR_PAI_phase3_design_signoff.md. Empirical R7 status at Poland
+    P21 close: Re_norm populated at 7.7% (2129/27764) — GAP per Convention
+    #78 §4bis.4 two-phase workflow (Phase 1 L1 ingestion complete, Phase 2
+    modifier-chain rescore pending). Poland to be included in R7 Phase 4c
+    rescore workstream (Sequence 2 execution: this closure first, then
+    R7 workstream). Convention #56 visibly-honest: R7 GAP disclosed here.
 
 visegrad_trio_completion_status:
-  slovakia_p19: SHIPPED (16 July 2026 UTC + Convention #78 BINDING 1st enforcement)
-  czechia_p20: SHIPPED (16 July 2026 UTC + Convention #78 BINDING 2nd enforcement + Layer 3 geofence 2nd enforcement)
-  poland_p21: TBD (Visegrád Trio COMPLETION MILESTONE this closure)
+  slovakia_p19: SHIPPED (16 July 2026 UTC + Convention #78 BINDING 1st enforcement + 615 alias-normalised)
+  czechia_p20: SHIPPED (16 July 2026 UTC + Convention #78 BINDING 2nd enforcement + Layer 3 geofence 2nd enforcement + 5178 alias-normalised)
+  poland_p21: 🏛 SHIPPED (16 July 2026 UTC + Convention #78 BINDING 3rd enforcement SMASHING SUCCESS + Layer 3 geofence 3rd enforcement narrow-carve-out + 14449 alias-normalised LARGEST cohort-wide + 25517 net-new subs LARGEST cohort-wide + Visegrád Trio COMPLETION MILESTONE)
   hungary_wave_2_p7: SHIPPED (16 June 2026 — different sub-convention path; OSM populates NUTS-3 tags)
-  visegrad_full_group_v4_status_post_p21: 🏛 4 of 4 v4.23-refreshed (SK + CZ + PL + HU) — FULL VISEGRÁD GROUP COMPLETE
+  visegrad_full_group_v4_23_status_post_p21: 🏛 4 of 4 v4.23-refreshed (SK + CZ + PL + HU) — FULL VISEGRÁD GROUP COMPLETE 🎉
 
 convention_78_binding_post_promotion_empirical_ledger:
   promotion_event: 16 July 2026 UTC (Latvia P17 closure + Task #248)
   post_promotion_instance_1: Slovakia P19 (SUCCESS + 615 alias-normalised at fetch)
   post_promotion_instance_2: Czechia P20 (SUCCESS + 5,178 alias-normalised at fetch)
-  post_promotion_instance_3: Poland P21 (TBD — expected SUCCESS + ~6000-8000 alias-normalised at fetch — LARGEST cohort-wide count expected)
-  cumulative_6_country_hits: TBD (LT 1 + EE 20 + LV 143 + SK 615 + CZ 5,178 + PL TBD expected 6k-8k)
-  cadence_precedent_ratio: TBD (expected ~1200-1400× above 10-instance BINDING promotion threshold)
+  post_promotion_instance_3: 🏆 Poland P21 (SMASHING SUCCESS + 14,449 alias-normalised at fetch — LARGEST cohort-wide count, 2.79× Czechia)
+  cumulative_6_country_hits: 20406      # LT 1 + EE 20 + LV 143 + SK 615 + CZ 5,178 + PL 14,449
+  cadence_precedent_ratio: 2040.6       # 20,406 hits ÷ 10-instance BINDING promotion threshold
   next_enforcement_candidate: Portugal or Ireland (Wave 2 remaining candidates)
 
 layer_3_geofence_sub_convention_status:
   origin: Slovenia Wave 2 P8 (pre-promotion)
   1st_post_binding_enforcement: Slovakia P19 (SUCCESS + Convention #78 4bis.5)
   2nd_post_binding_enforcement: Czechia P20 (SUCCESS + Prague bbox refinement per Task #262)
-  3rd_post_binding_enforcement: Poland P21 (this closure; TBD verdict expected SUCCESS)
-  cohort_wide_scale: 4 countries (SI + SK + CZ + PL) expected
-  poland_pattern_novelty: >
-    Poland validates the sub-convention extends cleanly to countries with rich
-    NUTS-3 OSM coverage. Layer 3 geofence NARROWS to Warsaw metro carve-out
-    (Innogy Stoen ~4-8% share expected) rather than broad national catch-all
-    (Slovakia/Czechia entire national territory). Codifies BIFURCATION:
-    countries with rich OSM NUTS-3 use Layer 2 primary + Layer 3 narrow;
-    countries with sparse NUTS-3 use Layer 3 broad catch-all.
+  3rd_post_binding_enforcement: 🏆 Poland P21 (SUCCESS narrow-carve-out variant; Innogy Stoen Warsaw metro 621 subs = 2.0% of fleet)
+  cohort_wide_scale: 4 countries (SI + SK + CZ + PL) — codified
+  warsaw_bbox_refinement_status: NOT_TRIGGERED (2.0% < 10% Task #262 threshold; admin bounds 517 km² held)
+  poland_empirical_finding: >
+    🚨 CRITICAL FINDING — pre-flight NUTS-3 prediction WRONG. Polish OSM does
+    NOT populate ref:nuts:3 tags on substations (empirical: 0/30,452 attributed
+    via NUTS-3). 74-code NUTS-3 territorial map (PGE 26 + Tauron 21 + Enea 13
+    + Energa 14) codified in scripts/pipeline/ingestion/poland/_base.py is
+    DEAD CODE at Poland scale but retained defensively per Convention #56.
+    Polish OSM is architecturally similar to Slovakia/Czechia (sparse NUTS-3
+    tagging), NOT Hungary/Slovenia (rich NUTS-3 tagging). Codifies
+    architectural lesson: OSM NUTS-3 tag density is EMPIRICAL PER COUNTRY,
+    not derivable from baseline SSI-Foundation data richness.
+  layer_4_pge_catch_all_default_primary_mechanism: >
+    Layer 4 PGE Dystrybucja LARGEST DSO catch-all default resolved 45.9%
+    (13,969 subs) as PRIMARY attribution mechanism given empirical 0% NUTS-3
+    tagging. Codifies 4-layer resolver architectural robustness — even when
+    Layer 2 NUTS-3 fails empirically, Layer 4 catch-all preserves 100%
+    resolution.
 
 innogy_stoen_3_generation_rebrand_cascade_new_codification:
   status: UNIQUE_COHORT_WIDE_MULTI_GENERATION_TRACKING (first codified via this closure)
