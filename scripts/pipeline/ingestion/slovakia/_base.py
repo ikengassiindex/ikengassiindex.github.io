@@ -193,6 +193,28 @@ _DNSP_ALIAS_MAP = {
     'as „stredoslovenská distribučná“': 'SSD',
     'as "východoslovenská distribučná"': 'VSD',
     'as „východoslovenská distribučná“': 'VSD',
+
+    # ── Comma-separated legal-form variants (Slovakia Step 2 fetch surfaced) ──
+    # NEW sub-class discovered empirically — Slovak commercial registry style
+    # uses comma-separated legal form suffix (a.s. or a. s. with space variant).
+    # Convention #78 BINDING enforcement retroactively extended to catch these
+    # at connector authoring time going forward (post-Slovakia empirical finding).
+    'západoslovenská distribučná, a.s.': 'ZSD',
+    'západoslovenská distribučná, a. s.': 'ZSD',
+    'zapadoslovenska distribucna, a.s.': 'ZSD',  # accent-stripped
+    'zapadoslovenska distribucna, a. s.': 'ZSD',  # accent-stripped
+    'stredoslovenská distribučná, a.s.': 'SSD',
+    'stredoslovenská distribučná, a. s.': 'SSD',
+    'stredoslovenska distribucna, a.s.': 'SSD',  # accent-stripped
+    'stredoslovenska distribucna, a. s.': 'SSD',  # accent-stripped
+    'východoslovenská distribučná, a.s.': 'VSD',
+    'východoslovenská distribučná, a. s.': 'VSD',
+    'vychodoslovenska distribucna, a.s.': 'VSD',  # accent-stripped
+    'vychodoslovenska distribucna, a. s.': 'VSD',  # accent-stripped
+    'slovenská elektrizačná prenosová sústava, a.s.': 'SEPS',
+    'slovenská elektrizačná prenosová sústava, a. s.': 'SEPS',
+    'slovenska elektrizacna prenosova sustava, a.s.': 'SEPS',  # accent-stripped
+    'slovenska elektrizacna prenosova sustava, a. s.': 'SEPS',  # accent-stripped
 }
 
 
@@ -241,10 +263,48 @@ def resolve_owner_from_nuts3(nuts3_code: str | None) -> str | None:
     return _NUTS3_TO_DSO.get(nuts3_code.strip().upper())
 
 
+# ── Layer 3 lat/lon geofence (Slovenia precedent applied when NUTS-3 absent) ─
+# Slovakia OSM does not populate ref:nuts:3 tags on substations (empirical
+# finding Step 2 fetch — Slovenia Priority 12 precedent). Add lat/lon
+# geofence for DSO attribution. Slovak territorial partition maps cleanly
+# to longitude: ZSD west + SSD centre + VSD east, all spanning full latitude.
+#
+# Approximate boundaries based on NUTS-3 regional centroids:
+#   ZSD (SK010 Bratislava 17.11°E + SK021 Trnava 17.59 + SK022 Trenčín 18.04
+#        + SK023 Nitra 18.09): west boundary Slovakia bounds 16.83°E,
+#        east boundary ~18.50°E (mid-point between Nitra 18.09 and Žilina 18.74)
+#   SSD (SK031 Žilina 18.74°E + SK032 Banská Bystrica 19.15): west 18.50°E,
+#        east ~20.50°E (mid-point between Banská Bystrica 19.15 and Prešov 21.24)
+#   VSD (SK041 Prešov 21.24°E + SK042 Košice 21.26): west 20.50°E, east 22.57°E
+_ZSD_EAST_BOUNDARY = 18.50
+_SSD_EAST_BOUNDARY = 20.50
+
+
+def resolve_owner_from_lat_lon_geofence(lat: float, lon: float) -> str | None:
+    """Slovak 3-way DSO territorial partition by longitude.
+
+    Slovenia precedent (Priority 12) — apply when OSM does not populate
+    NUTS-3 tags. Convention #78 BINDING enforcement extends: when NUTS-3
+    tag absent, geofence MUST be preemptively coded at Step 3 connector
+    authoring time.
+
+    Returns DSO code or None if lat/lon outside Slovak bounds.
+    """
+    # Sanity check — within Slovakia bounds
+    if not (47.73 <= lat <= 49.61 and 16.83 <= lon <= 22.57):
+        return None
+    if lon < _ZSD_EAST_BOUNDARY:
+        return "ZSD"  # West Slovakia
+    elif lon < _SSD_EAST_BOUNDARY:
+        return "SSD"  # Centre Slovakia
+    else:
+        return "VSD"  # East Slovakia
+
+
 # ── SEPS TSO voltage threshold ───────────────────────────────────────────
 # SEPS operates 750/420/400/220 kV EHV backbone. Below 220 kV → DSO
-# jurisdiction via NUTS-3 map. 110 kV MIXED tier — default to SEPS if
-# no NUTS-3 (empirically 63% of baseline is 110 kV, transmission-heavy).
+# jurisdiction via NUTS-3 map or lat/lon geofence. 110 kV MIXED tier —
+# default to SEPS if voltage present but no territorial resolution.
 _SEPS_TSO_MIN_KV = 220.0
 
 
@@ -255,28 +315,37 @@ def resolve_owner_from_region_jurisdiction(
 
     Region-jurisdiction × voltage-class resolver — 7th cohort-wide
     application (after Belgium + Netherlands + Chile + Hungary + Slovenia
-    + Colombia + Norway).
+    + Colombia + Norway). Slovenia precedent (Layer 3 lat/lon geofence
+    when NUTS-3 tag absent) applied per Convention #78 BINDING enforcement.
 
     Layer 1: SEPS TSO threshold ≥220 kV → SEPS (750/420/400/220 kV backbone).
-    Layer 2: NUTS-3 → DSO map (if OSM populates NUTS-3 tags).
-    Layer 3: 110 kV threshold — MIXED tier, defaults to SEPS if no NUTS-3.
-    Layer 4: Empirical default — SEPS as unified state TSO catch-all.
+    Layer 2: NUTS-3 → DSO map (if OSM populates NUTS-3 tags — empirically
+             0 hits in Slovakia Step 2 fetch; kept for forward-compat).
+    Layer 3: Lat/lon geofence → DSO (Slovenia precedent — 3-way longitude
+             partition when NUTS-3 tag absent).
+    Layer 4: 110 kV mixed tier — defaults to SEPS if geofence fails.
+    Layer 5: Empirical default — SEPS as unified state TSO catch-all.
     """
     # Layer 1: EHV → SEPS
     if voltage_kv is not None and voltage_kv >= _SEPS_TSO_MIN_KV:
         return "SEPS", "region_jurisdiction_fallback_SEPS_TSO_threshold_ge_220kv"
 
-    # Layer 2: NUTS-3 → DSO
+    # Layer 2: NUTS-3 → DSO (empirically 0 hits — kept for forward-compat)
     if nuts3:
         dso = resolve_owner_from_nuts3(nuts3)
         if dso:
             return dso, f"region_jurisdiction_fallback_{dso}_via_nuts3_{nuts3}"
 
-    # Layer 3: 110 kV mixed tier — default to SEPS (transmission-heavy baseline)
+    # Layer 3: Lat/lon geofence → DSO (Slovenia precedent applied)
+    dso_via_geofence = resolve_owner_from_lat_lon_geofence(lat, lon)
+    if dso_via_geofence:
+        return dso_via_geofence, f"region_jurisdiction_fallback_{dso_via_geofence}_via_lat_lon_geofence"
+
+    # Layer 4: 110 kV mixed tier — default to SEPS if geofence returned None
     if voltage_kv is not None and voltage_kv >= 100.0:
         return "SEPS", "region_jurisdiction_fallback_SEPS_TSO_110kv_mixed_tier"
 
-    # Layer 4: catch-all — SEPS as unified state TSO
+    # Layer 5: catch-all — SEPS as unified state TSO
     return "SEPS", "region_jurisdiction_fallback_SEPS_state_utility_default"
 
 
