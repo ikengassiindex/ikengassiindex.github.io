@@ -456,6 +456,19 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
     except json.JSONDecodeError as e:
         return [f"FATAL: Invalid JSON — {e}"], []
 
+    # Class D fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3): guard
+    # against flat-list root schema (Latvia + any future country in Phase 1
+    # intermediate state per CONVENTION_78_BINDING_EMPIRICAL_AUDIT §4bis.4).
+    # Task #263 CLOSED — flat-list is Phase 1 pre-wrapper state, NOT a bug.
+    # Convention #56 visibly-honest degradation: surface the missing wrapper via
+    # a WARNING (post-L3 rewrite by enrichment/merge.py adds the wrapper).
+    if isinstance(data, list):
+        warnings.append(
+            "Country uses flat-list root schema (Phase 1 intermediate state per "
+            "CONVENTION_78 §4bis.4); Phase 2 L2/L3 pipeline will rewrite with wrapper"
+        )
+        data = {"substations": data}
+
     # ─── Check 1: top-level keys ──
     for key in ['meta', 'fleet_summary', 'regions', 'substations']:
         if key not in data:
@@ -522,10 +535,26 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
     # layers on top. Max theoretical R_median is 1.30. See Convention #77
     # + methodology brief for the derivation. Values above 1.30 signal a
     # scoring engine bug (additive stack overflow) and remain an error.
-    r_values = [s.get('R_median', 0) for s in substations]
-    r_min, r_max = min(r_values), max(r_values)
-    if r_min < 0 or r_max > 1.30:
-        errors.append(f"R_median out of [0, 1.30] range: {r_min:.3f}–{r_max:.3f}")
+    # Classes B/C fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3):
+    # filter pre-L3 None R_median subs per Convention #56 (visibly-honest
+    # degradation, CONVENTION_78 §4bis.4). Pre-L3 substations legitimately
+    # carry R_median=None until Phase 2 L3 rescore completes.
+    r_values = [s['R_median'] for s in substations if s.get('R_median') is not None]
+    n_unscored = len(substations) - len(r_values)
+    if not r_values:
+        warnings.append(
+            f"CHECK 7: 0/{len(substations)} substations have numeric R_median "
+            f"(all pre-L3 state); Check 7 range validation skipped"
+        )
+    else:
+        r_min, r_max = min(r_values), max(r_values)
+        if r_min < 0 or r_max > 1.30:
+            errors.append(f"R_median out of [0, 1.30] range: {r_min:.3f}–{r_max:.3f}")
+        if n_unscored > 0:
+            warnings.append(
+                f"CHECK 7: {n_unscored}/{len(substations)} substations have "
+                f"R_median=None (pre-L3 state); excluded from range validation"
+            )
 
     # ─── Check 8: classification ↔ R_median band invariant ──
     # Phase 2A (25 June 2026): 4-band → 5-band system per operator Q1(b)
@@ -539,7 +568,10 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
     # (e.g. R_median=0.337 classified 'Low' instead of 'Medium' — fractional
     # drift at band boundaries). Phase 2C full-cohort rescore against the
     # 5-band system should collapse mismatch rates to near-zero cohort-wide.
+    # Classes B/C fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3):
+    # None-guard for pre-L3 substations per Convention #56 + CONVENTION_78 §4bis.4
     def _expected_band_v42(r):
+        if r is None: return 'Unclassified'  # pre-L3 state per Convention #56
         if r < 0.25:  return 'Low'
         if r < 0.50:  return 'Medium'
         if r < 0.75:  return 'High'
@@ -547,22 +579,35 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
         return 'Extreme'
 
     misclassified = 0
+    n_skipped_pre_l3 = 0
     sample_violation = None
     for s in substations:
-        r = s.get('R_median', 0)
+        r = s.get('R_median')
+        if r is None:
+            n_skipped_pre_l3 += 1
+            continue  # Convention #56: pre-L3 subs excluded from mismatch tally
         expected = _expected_band_v42(r)
         if s.get('classification') != expected:
             misclassified += 1
             if sample_violation is None:
                 sample_violation = (s.get('substation_id', s.get('id', '?')),
                                     s.get('classification'), expected, r)
+    if n_skipped_pre_l3 > 0:
+        warnings.append(
+            f"CHECK 8: {n_skipped_pre_l3}/{len(substations)} substations "
+            f"skipped — R_median=None (pre-L3 state per Convention #56)"
+        )
     if misclassified > 0:
-        pct = misclassified / len(substations) * 100
+        n_scored = len(substations) - n_skipped_pre_l3
+        pct = misclassified / n_scored * 100 if n_scored else 0
         sid, got, expected, r = sample_violation
+        # Class B format-string guard: r_str handles None (defensive; Check 8
+        # loop above already filters None, but guarding for future safety)
+        r_str = f"{r:.4f}" if isinstance(r, (int, float)) else "None"
         msg = (
             f"CLASSIFICATION-BAND: {misclassified} substations ({pct:.2f}%) "
             f"have classification mismatched to R_median band. "
-            f"Example: substation {sid!r} has R_median={r:.4f} "
+            f"Example: substation {sid!r} has R_median={r_str} "
             f"(expected={expected}) but classification={got!r}."
         )
         if pct >= 2.0:

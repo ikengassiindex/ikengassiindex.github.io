@@ -56,6 +56,17 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
     with open(data_path) as f:
         data = json.load(f)
 
+    # Class D fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3): guard
+    # against flat-list root schema (Latvia + any future country in Phase 1
+    # intermediate state per CONVENTION_78_BINDING_EMPIRICAL_AUDIT §4bis.4).
+    # Phase 2 pipeline is expected to rewrite with proper wrapper — see line 196.
+    if isinstance(data, list):
+        logger.info(
+            f"Country {country} uses flat-list root schema (Phase 1 intermediate "
+            f"state per CONVENTION_78 §4bis.4); wrapping as {{'substations': [...]}}"
+        )
+        data = {"substations": data}
+
     raw_subs = data["substations"]
 
     # Handle compact array format (sub_fields mapping)
@@ -154,6 +165,10 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
     data["regions"] = compute_regional_summary(updated_subs)
 
     # Update metadata
+    # Class D fix: Latvia flat-list schema lacks 'meta' wrapper — bootstrap it
+    # per Convention #78 §4bis.6 (Phase 2 rewrites file with proper wrapper).
+    if "meta" not in data:
+        data["meta"] = {}
     data["meta"]["generated"] = datetime.now().strftime("%Y-%m-%d")
     data["meta"]["generator"] = "SSI v4.0.2 Pipeline (automated enrichment)"
     data["meta"]["enrichment_run"] = {
@@ -165,12 +180,19 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
     }
 
     # Compute fleet percentiles
-    R_vals = sorted(s["R_median"] for s in updated_subs)
+    # Classes B/C fix: filter pre-L3 None R_median subs per Convention #56.
+    # Substations without R_median get fleet_percentile=None (visibly-honest).
+    R_vals = sorted(
+        s["R_median"] for s in updated_subs if s.get("R_median") is not None
+    )
     for sub in updated_subs:
+        if sub.get("R_median") is None:
+            sub["fleet_percentile"] = None
+            continue
         # Binary search for fleet percentile
         import bisect
         rank = bisect.bisect_left(R_vals, sub["R_median"])
-        sub["fleet_percentile"] = round(rank / len(R_vals), 3)
+        sub["fleet_percentile"] = round(rank / len(R_vals), 3) if R_vals else None
 
     # Convert back to compact array format if source used it
     if data.get("_compact_format"):

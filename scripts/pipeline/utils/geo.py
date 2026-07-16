@@ -145,6 +145,19 @@ def load_substations(country, repo_root=None):
     with open(data_path) as f:
         data = json.load(f)
 
+    # Class D fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3): guard
+    # against flat-list root schema (Latvia + any future country in Phase 1
+    # intermediate state per CONVENTION_78_BINDING_EMPIRICAL_AUDIT §4bis.4).
+    # Task #263 CLOSED — flat-list is Phase 1 pre-wrapper state, NOT a bug.
+    if isinstance(data, list):
+        import logging as _logging
+        _logging.getLogger(__name__).info(
+            "Country %s uses flat-list root schema (Phase 1 intermediate state "
+            "per CONVENTION_78 §4bis.4); wrapping as {'substations': [...]}",
+            country,
+        )
+        data = {"substations": data}
+
     raw_subs = data.get("substations", [])
 
     # Detect compact array format and convert to dicts

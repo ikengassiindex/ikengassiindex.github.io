@@ -125,7 +125,15 @@ def soft_clip_upper(R_raw):
 
 
 def classify_band(R):
-    """Classify R_median into Low/Medium/High/Critical."""
+    """Classify R_median into Low/Medium/High/Critical/Extreme.
+
+    Classes B/C fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3):
+    guard against R=None (Convention #56 pre-L3 state per CONVENTION_78 §4bis.4).
+    Substations awaiting L3 rescore legitimately carry R_median=None; return
+    "Unclassified" so downstream aggregators can surface them visibly.
+    """
+    if R is None:
+        return "Unclassified"
     for band in reversed(BANDS):
         if R >= band["min"]:
             return band["name"]
@@ -611,31 +619,62 @@ def score_substation(sub, seismic_update=None, climate_update=None, socio_update
 # ═══════════════════════════════════════════════════════════
 
 def compute_fleet_summary(substations):
-    """Compute fleet-level statistics from scored substations."""
+    """Compute fleet-level statistics from scored substations.
+
+    Classes B/C fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3):
+    Substations with R_median=None are legitimate pre-L3 state (Convention #56
+    per CONVENTION_78 §4bis.4). Filter them out of statistical aggregations and
+    count them separately in bands as "Unclassified" — Convention #56 visibly-
+    honest degradation.
+    """
     n = len(substations)
     if n == 0:
         return {}
 
-    R_vals = sorted(s["R_median"] for s in substations)
     # Phase 2B-1 (25 June 2026): 4-band → 5-band with Extreme
-    bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0, "Extreme": 0}
+    # Classes B/C fix: Unclassified band absorbs pre-L3 None R_median subs
+    bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0, "Extreme": 0, "Unclassified": 0}
     conf = {"high": 0, "medium": 0, "low": 0}
 
     for s in substations:
-        bands[classify_band(s["R_median"])] += 1
+        bands[classify_band(s.get("R_median"))] += 1
         conf[classify_confidence(s.get("R_P5"), s.get("R_P95"))] += 1
 
-    return {
+    # Convention #56: statistics computed on subs with numeric R_median only
+    scored_R_vals = sorted(
+        s["R_median"] for s in substations if s.get("R_median") is not None
+    )
+    n_scored = len(scored_R_vals)
+
+    summary = {
         "total": n,
-        "median_R": round(_percentile(R_vals, 0.50), 4),
-        "mean_R": round(sum(R_vals) / n, 4),
-        "P5": round(_percentile(R_vals, 0.05), 4),
-        "P95": round(_percentile(R_vals, 0.95), 4),
+        "n_scored": n_scored,
+        "n_unclassified_pre_l3": n - n_scored,
         "bands": bands,
         "band_pct": {k: round(v / n * 100, 1) for k, v in bands.items()},
         "confidence_tiers": conf,
         "confidence_pct": {k: round(v / n * 100, 1) for k, v in conf.items()},
     }
+
+    # Statistical aggregates only meaningful when scored subs exist
+    if scored_R_vals:
+        summary.update({
+            "median_R": round(_percentile(scored_R_vals, 0.50), 4),
+            "mean_R": round(sum(scored_R_vals) / n_scored, 4),
+            "P5": round(_percentile(scored_R_vals, 0.05), 4),
+            "P95": round(_percentile(scored_R_vals, 0.95), 4),
+        })
+    else:
+        # Convention #56 visibly-honest: mark stats as pending L3 rescore
+        summary.update({
+            "median_R": None,
+            "mean_R": None,
+            "P5": None,
+            "P95": None,
+            "_stats_pending_l3_rescore": True,
+        })
+
+    return summary
 
 
 def compute_regional_summary(substations):
@@ -649,30 +688,50 @@ def compute_regional_summary(substations):
 
     summaries = []
     for region, subs in regions.items():
-        R_vals = sorted(s["R_median"] for s in subs)
         n = len(subs)
+        # Classes B/C fix: filter pre-L3 None R_median subs per Convention #56
+        scored_R_vals = sorted(
+            s["R_median"] for s in subs if s.get("R_median") is not None
+        )
+        n_scored = len(scored_R_vals)
         # Phase 2B-1 (25 June 2026): 4-band → 5-band with Extreme
-        bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0, "Extreme": 0}
+        # Classes B/C fix: Unclassified band absorbs pre-L3 None R_median subs
+        bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0, "Extreme": 0, "Unclassified": 0}
         for s in subs:
-            bands[classify_band(s["R_median"])] += 1
+            bands[classify_band(s.get("R_median"))] += 1
 
-        summaries.append({
+        # Phase 2B-1 (25 June 2026): pct_critical stays SINGLE-BAND
+        # (its original semantic per pre-Phase-2B-1) to preserve API
+        # back-compat. pct_high stays CUMULATIVE-FROM-HIGH (extended
+        # to include Extreme so the "top-of-fleet share" semantic
+        # holds). New pct_extreme is peer to pct_critical (single-band).
+        entry = {
             "region": region,
             "count": n,
-            "median_R": round(_percentile(R_vals, 0.50), 4),
-            "mean_R": round(sum(R_vals) / n, 4),
+            "n_scored": n_scored,
             "bands": bands,
-            # Phase 2B-1 (25 June 2026): pct_critical stays SINGLE-BAND
-            # (its original semantic per pre-Phase-2B-1) to preserve API
-            # back-compat. pct_high stays CUMULATIVE-FROM-HIGH (extended
-            # to include Extreme so the "top-of-fleet share" semantic
-            # holds). New pct_extreme is peer to pct_critical (single-band).
             "pct_critical": round(bands["Critical"] / n * 100, 1),
             "pct_extreme":  round(bands["Extreme"]  / n * 100, 1),
             "pct_high": round((bands["High"] + bands["Critical"] + bands["Extreme"]) / n * 100, 1),
-        })
+        }
+        if scored_R_vals:
+            entry.update({
+                "median_R": round(_percentile(scored_R_vals, 0.50), 4),
+                "mean_R": round(sum(scored_R_vals) / n_scored, 4),
+            })
+        else:
+            entry.update({
+                "median_R": None,
+                "mean_R": None,
+                "_stats_pending_l3_rescore": True,
+            })
+        summaries.append(entry)
 
-    return sorted(summaries, key=lambda x: x["median_R"], reverse=True)
+    # Sort: regions with numeric median_R descending, then unclassified regions last
+    return sorted(
+        summaries,
+        key=lambda x: (x["median_R"] is None, -(x["median_R"] or 0.0)),
+    )
 
 
 # ═══════════════════════════════════════════════════════════

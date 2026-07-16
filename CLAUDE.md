@@ -1,7 +1,7 @@
 # CLAUDE.md — SSI Index public dashboard briefing
 
 > Auto-loaded briefing for Claude sessions on the `ikengassiindex.github.io` repo. Read this first before touching the codebase.
-> Maintained by Ikenga / Cowork · Last updated: **25 June 2026 (Phase 2A/B/C closure — v4.2 methodology 4-band → 5-band system live cohort-wide; validator alignment + engine BANDS + JS cascade + 22,749 substations reclassified; 31/39 country PASS validator state; MIN_FLEET recalibrated post-D#36; v4.23 gap-audit landed identifying 77-99 engineer-day workstream to close 10-17k additional substations + paired transmission lines for Canada/Norway/Mexico/Austria/Greenland; commits `d1e77c00` → `8f6cd7ca`) · Earlier (25 June 2026 evening): Discipline #36 closure end-to-end — cross-border substation enforcement gate live + pytest sentinel + map.js viewport safeguard for Mode-3 territorial bounds + 39-country cohort canonical at 174,046 substations cleaned of cross-border leakage**
+> Maintained by Ikenga / Cowork · Last updated: **16 July 2026 (L2/L3/L4 batch rerun closure — 15/19 GREEN post-fix across Wave 1 + Wave 2 ingested cohort; Classes B/C/D defensive-coding guards landed: R_median=None format-string + sort-comparison guards across `validate_schema.py` + `scoring/engine.py` + `enrichment/merge.py`; Latvia flat-list root schema guard per Convention #78 §4bis.4 Phase 1 intermediate state; austria 14,720 subs rescored; class A KB §56 R7_cyber drift on chile/slovenia/norway/australia deferred to post-Wave-2 data-refresh cycle NO CODE FIX per Task #159 operator constraint; L5 SSI Foundation codebase located + W1-W10 5/1/1/3 mesh empirically confirmed cohort-wide; retrospective bbox audit validated Prague-refinement uniqueness — no other Wave 2 country requires Layer 3 geofence refinement; two-phase workflow discipline codified: L1 ingestion first, cohort-wide L2/L3/L4 rescore second; report `L2_L3_L4_BATCH_RERUN_20260716.md` + `FAILURE_SOLVING_PROPOSAL_20260716.md` + `CONVENTION_78_BINDING_EMPIRICAL_AUDIT_20260716.md`) · Earlier (25 June 2026): Phase 2A/B/C closure — v4.2 methodology 4-band → 5-band system live cohort-wide; validator alignment + engine BANDS + JS cascade + 22,749 substations reclassified; 31/39 country PASS validator state; MIN_FLEET recalibrated post-D#36; v4.23 gap-audit landed identifying 77-99 engineer-day workstream to close 10-17k additional substations + paired transmission lines for Canada/Norway/Mexico/Austria/Greenland; commits `d1e77c00` → `8f6cd7ca` · Earlier (25 June 2026 evening): Discipline #36 closure end-to-end — cross-border substation enforcement gate live + pytest sentinel + map.js viewport safeguard for Mode-3 territorial bounds + 39-country cohort canonical at 174,046 substations cleaned of cross-border leakage**
 
 ## What this repo is
 
@@ -106,6 +106,34 @@ The v4.23 gap-audit (`Report Production/02-v4_23-gap-audit-2026-07/`) identifies
 ### KB §91.A / §91.B — Cron-gate discipline
 
 GitHub Actions cron uses OR semantics when both day-of-month AND day-of-week are restricted. `'0 6 1-7 * 4'` looks like "1st Thursday at 06:00 UTC" but actually fires ~10×/month. Workflows that need "1st Thursday" / "2nd Thursday" must use a narrow cron (`'0 6 * * 4'` = every Thursday) plus a runtime DOM gate inside the workflow (DOM ≤ 7 for 1st Thursday; 8 ≤ DOM ≤ 14 for 2nd Thursday). Manual `workflow_dispatch` invocations always proceed regardless of the gate.
+
+### Discipline #37 — Defensive coding: None-guard + flat-list-root guard across L2/L3/L4 pipeline (NEW · 16 July 2026)
+
+**Problem this prevents.** Post-Wave-2 L1 ingestion, per-country `ssi-data.json` files carry two legitimate Convention #56 states that historically crashed downstream code:
+
+1. **R_median = None** — legitimate visibly-honest degradation marker per Convention #56 when substation exists on grid but scoring inputs incomplete. Phase 2C reclassify-vs-rescore discipline (`meta.phase2c_reclassify_runs`) explicitly permits this state. Downstream code assumed R_median is always float.
+
+2. **Flat-list root schema** — Latvia (Task #248 Convention #78 BINDING promotion event) ships `ssi-data.json` as `[{sub1}, {sub2}, ...]` instead of `{"substations": [...]}`. This is **Convention #78 §4bis.4 Phase 1 intermediate state** — deliberately not rewrapped during L1 ingestion because rewrapping would mask the flat-list-vs-wrapped topology signal that Convention #78 sub-convention exists to codify. Operator confirmation 16 July 2026: *"we would first bring all additional substations and power lines, and only after we would run the layers scoring etc"* — Latvia flat-list is NOT a bug to rewrap; it is the intermediate state that downstream L2/L3/L4 code MUST accommodate defensively.
+
+**Guards codified (four defensive-coding sites).**
+
+1. **`scripts/pipeline/utils/geo.py::load_substations()`** — after `json.load(f)`: `if isinstance(data, list): data = {"substations": data}` with INFO log citing Convention #78 §4bis.4.
+
+2. **`scripts/validate_schema.py::validate_file()`** — same flat-list guard + Check 7 (R_median min/max) filters None values + Check 8 `_expected_band_v42(r)` returns 'Unclassified' for None + format-string guard `r_str = f"{r:.4f}" if isinstance(r, (int, float)) else "None"` + skip None subs from classification-band mismatch tally.
+
+3. **`scripts/pipeline/scoring/engine.py`** — `classify_band(R)` returns "Unclassified" if R is None + `compute_fleet_summary(substations)` filters None from stats, adds "Unclassified" band + `n_scored` + `n_unclassified_pre_l3` audit fields + `_stats_pending_l3_rescore` flag when no scored subs + `compute_regional_summary(substations)` applies same filter pattern.
+
+4. **`scripts/pipeline/enrichment/merge.py`** — same flat-list guard + `if "meta" not in data: data["meta"] = {}` bootstrap for Latvia (which has no meta block yet in Phase 1) + fleet_percentile sort filters None R_median + assigns `sub["fleet_percentile"] = None` for None-R_median subs.
+
+**Sentinel commitment (queued for next commit cycle).**
+
+- `tests/test_validate_schema_handles_none_r_median.py` — feeds synthetic country with 10% None R_median; asserts exit 0 + 'Unclassified' band populated + no format crash
+- `tests/test_validate_schema_handles_flat_list_root.py` — feeds flat-list `ssi-data.json`; asserts wrap + validate success + INFO log citing Convention #78 §4bis.4
+- `tests/test_handles_all_none_r_median.py` — 100% None R_median edge case; asserts `_stats_pending_l3_rescore` flag emitted + no crash
+
+**What this discipline does NOT do.** It does NOT rewrap Latvia's canonical on disk (Convention #78 §4bis.4 preservation of Phase 1 intermediate state), does NOT reclassify any None R_median as a numeric value (Convention #56 preservation of visibly-honest degradation), does NOT modify `_MODIFIER_RANGES` R7_cyber 0.99 floor (Task #159 operator constraint against masking genuine cyber-risk signal drift).
+
+**Empirical impact (16 July 2026 batch rerun).** Pre-fix: 12/19 countries passed L2/L3/L4 rescore across recently-ingested cohort. Post-fix: 15/19 GREEN including austria (14,720 subs), greenland, luxembourg, netherlands (Class B format crash), lithuania, estonia, hungary (Class C sort crash), latvia (Class D flat-list). 4 residual failures are all Class A KB §56 R7_cyber drift (chile 57.7% below 0.99 floor + slovenia 59.2% + norway 92.5% + australia 24.1%) — deferred to post-Wave-2 data-refresh cycle per Task #159 operator constraint. See `L2_L3_L4_BATCH_RERUN_20260716.md` + `FAILURE_SOLVING_PROPOSAL_20260716.md`.
 
 ### KB §91.A pull-rebase race defuse
 
