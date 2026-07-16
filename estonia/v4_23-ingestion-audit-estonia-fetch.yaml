@@ -1,0 +1,124 @@
+# Estonia v4.23 Ingestion Audit — Step 2 Fetch
+# ============================================
+# Task: #239 (WAVE2-Step2 Estonia)
+# Date: 15 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: estonia/v4_23-ingestion-audit-estonia-preflight.yaml
+# Status: FETCH_COMPLETE (subs + lines post-cooldown retry)
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: estonia
+source_id: EE-C1-osm-overpass
+fetched_at_utc: "2026-07-15T20:22:19Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 543322
+raw_sha256: 3adcd16209b29ad323f07e81d0e900b53873d931862d7064a5d362be22e5bf83
+provincial_scope: null  # Single-query, whole country
+
+empirical_counts:
+  substations: 1952  # +217% vs baseline 614 (below 2,500-5,000 hypothesis band, above lower prediction)
+  transmission_lines: 5581  # post Discipline #36 (5,606 raw - 25 dropped outside polygon)
+  transmission_lines_raw: 5606  # pre Discipline #36
+  line_ratio_pre_merge: 2.86  # transmission-tier CLEAN (contrast: Lithuania 0.93 sub-heavy pre-merge)
+
+empirical_finding_of_note_baltic_trio_partial_confirmation:
+  finding: >
+    Estonia OSM density is HIGHER than baseline (614 → 1,952 = +217%,
+    3.18× multiplier) but LOWER than Lithuania's +871% (5,094, 10.09×).
+    Baltic OSM density hypothesis PARTIALLY CONFIRMED — Estonia sits between
+    the transmission-only baseline pattern (Slovenia +1,003%, Colombia +97%)
+    and Lithuania's exhaustive MV/LV mapping.
+  implication: >
+    Baltic OSM community density decreases from Lithuania → Estonia
+    (both share Feb 2025 EU synchronisation cohort). Latvia (Priority 18
+    candidate) will empirically bracket the range — expect 2,500-4,000
+    net-new subs from 1,219 baseline based on this trend.
+
+empirical_finding_of_note_convention_78_scale_uplift:
+  finding: >
+    Estonia surfaced 20 alias-normalised OSM tags requiring Estonian NFC
+    + Cyrillic script handling — vs Lithuania's 1 Cyrillic hit. Convention
+    #78 sub-convention on multi-script OSM handling validated at 21-instance
+    cumulative scale (1 LT + 20 EE) across 2-country Baltic Trio cohort.
+  implication: >
+    Ida-Virumaa (Narva 88 subs = 14.3% baseline) Russian-speaking OSM
+    contributor density is substantially higher than Lithuania's
+    Kaliningrad-adjacent Russian-speaking density (Lithuania showed 1 hit,
+    Estonia shows 20 — 20× more Cyrillic tags). Convention #78 sub-convention
+    exceeds Convention #76 5-10 cadence threshold at 2-country cohort;
+    ready for BINDING promotion consideration once cohort-wide Cyrillic
+    handling pattern empirically validated across Latvia + Slovakia +
+    Czechia + Poland (all with post-Soviet OSM communities).
+
+empirical_finding_of_note_semi_colon_compound_operator_tags:
+  finding: >
+    Estonia surfaced a NEW OSM tagging pattern absent from prior 16 cohort
+    countries: semi-colon compound operator strings representing shared-node
+    substations where transmission (Elering) hands off to distribution
+    (Elektrilevi) at the same physical location.
+  breakdown:
+    Elering_Elektrilevi_compound: 128  # 6.6% — transmission→distribution shared node
+    Elering_Imatra_Elekter_compound: 5  # cross-border joint operation
+    Elering_VKG_Elektrivõrgud_compound: 1  # industrial captive shared node
+    Elering_Eesti_Energia_compound: 1  # holding + operator shared
+    Eesti_Energia_Harju_Elekter_slash: 1  # slash-delimited variant
+  architectural_treatment: >
+    Convention #56 visibly-honest degradation — semi-colon compounds
+    PRESERVED as-is (not force-split to primary operator). Represents
+    architecturally meaningful joint-operation signal. Codifies new
+    sub-convention on multi-operator OSM tagging semantics — first
+    cohort-wide empirical instance.
+  future_countries_expected_to_surface_same_pattern: >
+    Latvia (Baltic Trio 3rd) + Slovakia (post-Soviet CE) + Czechia +
+    Slovenia (Balkans post-Yugoslavia) all have similar shared-node
+    tagging conventions in OSM community.
+
+owner_resolution_provenance:
+  direct_osm_operator_tag: 308  # 15.8%
+  alias_normalised_osm_operator: 20  # 1.0% — Estonian NFC + Cyrillic
+  layer_1_Elering_TSO_threshold_ge_110kv: 14  # 0.7%
+  layer_2_Elektrilevi_monopoly_default: 1610  # 82.5%
+  unresolved: 0  # 2-operator monopoly catches all
+
+distinct_operators_post_fetch: 16
+top_operators_pre_merge:
+  Elektrilevi: 1761  # 90.2% — unified state DSO
+  Elering_Elektrilevi_compound: 128  # 6.6% — new semi-colon compound pattern
+  Elering: 36  # 1.8% — state TSO
+  Eesti_Energia_Grupp_Holding: 7  # 0.4% — holding tag (Convention #56 preserved honestly)
+  Elering_Imatra_Elekter_compound: 5
+  VKG_Elektrivõrgud: 3  # industrial captive (Viru Keemia Grupp oil shale)
+  AS_Eesti_Raudtee: 3  # Estonian Railways electric traction
+  other_9: 9  # 3 legacy compounds + 3 name-as-operator artifacts + 3 IPPs
+
+discipline_41_line_parity:
+  post_fetch: PASS  # 1,952 substations + 5,581 lines (ratio 2.86 clean transmission-tier)
+  baseline_lines_preserved: 1486  # grid-geo.json vintage
+  post_retry_target_met: 5581  # exceeded target 2,000-4,000 by ~40%
+
+discipline_36_cross_border_filter:
+  polygon_source: estonia/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 0  # CLEAN — perfect polygon fit
+  lines_dropped_outside_polygon: 25  # Estlink HVDC terminals + Ruhnu/Saaremaa coastal + Latvia border edges
+  final_state: CLEAN
+
+wall_clock:
+  step_2_first_pass_seconds: ~450  # 7.5 min including Overpass 429/504 retries on lines
+  step_2_retry_pass_seconds: ~16  # subs cached + lines fresh via overpass-api.de attempt 1
+  cache_hit_second_run: substations only (3 element types); lines fresh
+  overnight_cooldown_hours: ~13  # 20:22 UTC → 09:26 UTC next day
+
+warnings:
+  - "Discipline #36 — dropped 0 substations + 25 lines outside Estonia polygon (100m default tolerance; Estlink HVDC terminals + coastal edges)"
+  - "Owner enrichment: 328/1952 direct OSM operator= tag (16.8%; of these 20 alias-normalised incl. Estonian NFC + Cyrillic); 14 Elering_TSO_threshold + 1610 Elektrilevi_default (83.2%)"
+
+auditability_chain:
+  parent_preflight: estonia/v4_23-ingestion-audit-estonia-preflight.yaml
+  step_2_fetch: estonia/v4_23-ingestion-audit-estonia-fetch.yaml
+  step_4_merge: estonia/v4_23-ingestion-audit-estonia-merge.yaml
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: estonia/ssi-data.json
+
+status: READY_FOR_STEP_4
