@@ -119,8 +119,8 @@
       validity: 'V_socio is computed from the LIHC (Low Income High Cost) energy poverty definition using national statistical office household expenditure data. The R3 modifier amplifies infrastructure risk scores in catchments with high unemployment, elderly concentration, and net outward migration. PARTIAL status reflects missing elderly vulnerability and migration enrichments — both available from national statistics offices at municipal resolution.'
     },
     {
-      id: 'report-3', num: '3', title: 'EU Taxonomy Alignment',
-      framework: 'Climate Delegated Act · Article 11 Climate Adaptation · Technical Screening Criteria',
+      id: 'report-3', num: '3', title: 'Infrastructure Resilience [Re composite home]',
+      framework: 'FC v3 §14 · SSI v4.2 Re composite (canonical) · EU Taxonomy Art. 11 (mapped)',
       sdgPrimary: { num: 9, label: 'SDG 9', name: 'Industry, Innovation, Infrastructure', color: '#f36d25' },
       sdgSecondary: [
         { num: 13, label: 'SDG 13', color: '#48773c' },
@@ -162,43 +162,7 @@
       validity: 'Article 11 screening uses the full SSI v4.0.2 scoring engine: 6-component weighted composite (C=0.30, V=0.10, I=0.25, E=0.10, S=0.20, T=0.05), Gaussian copula Monte Carlo (10,000 iterations), and 5 modifiers (R3 social, R4 topology, R5 asymmetric CI, R6a restoration, R7 cyber). The Markov 5-state degradation model provides the forward-looking element. All inputs are from institutional open-source data with citable vintage — meeting CSRD Article 29a limited assurance requirements.'
     },
     {
-      id: 'report-4', num: '4', title: 'Energy Transition & DER Stress',
-      framework: 'ESRS E1 Transition Plan · TCFD Transition Risk · EU Green Deal Alignment',
-      sdgPrimary: { num: 7, label: 'SDG 7', name: 'Affordable and Clean Energy', color: '#fcc30b', dark: true },
-      sdgSecondary: [
-        { num: 13, label: 'SDG 13', color: '#48773c' },
-        { num: 9, label: 'SDG 9', color: '#f36d25' }
-      ],
-      legendColor: '#e8a838',
-      why: 'The energy transition creates infrastructure stress — bidirectional power flows, EV charging load, and intermittent renewable output strain substations designed for unidirectional delivery. This report measures whether grid infrastructure is keeping pace with decarbonisation.',
-      sdgRationale: function (d) {
-        var tr = d.transition || {};
-        var der = tr.DER_ratio;
-        return 'Target 7.2 requires substantially increasing the share of renewable energy. This substation has a DER ratio of ' + (der != null ? der.toFixed(3) : '—') + (der > 1 ? ' — local renewable generation exceeds consumption, a transition success that creates operational complexity' : '') + '. The T1_score (' + (tr.T1_score != null ? tr.T1_score.toFixed(3) : '—') + ') measures the stress this places on the substation, providing the empirical feedback loop between SDG 7 ambition and infrastructure reality.';
-      },
-      getProfile: function (d) {
-        var tr = d.transition || {};
-        return [
-          ['T1 Score (transition stress)', tr.T1_score != null ? tr.T1_score.toFixed(3) : '—'],
-          ['DER Ratio', tr.DER_ratio != null ? tr.DER_ratio.toFixed(3) : '—'],
-          ['DER Variability', tr.DER_variability != null ? tr.DER_variability.toFixed(3) : '—'],
-          ['EV Load Ratio', tr.EV_load_ratio != null ? tr.EV_load_ratio.toFixed(3) : '—'],
-          ['T Component Weight', '0.05']
-        ];
-      },
-      getVariables: function (d) {
-        var tr = d.transition || {};
-        return [
-          ['T1', 'Transition stress score', tr.T1_score != null ? tr.T1_score.toFixed(3) : '—', 'ESRS E1: Transition plan assessment', tr.T1_score !== undefined ? 'ready' : 'gap'],
-          ['DER_ratio', 'Renewable/load ratio', tr.DER_ratio != null ? tr.DER_ratio.toFixed(3) : '—', 'TCFD Transition: Technology risk', tr.DER_ratio !== undefined ? 'ready' : 'gap'],
-          ['DER_var', 'Intermittency', tr.DER_variability != null ? tr.DER_variability.toFixed(3) : '—', 'EU Green Deal: Grid flexibility', tr.DER_variability !== undefined ? 'ready' : 'gap'],
-          ['EV_load', 'EV charging ratio', tr.EV_load_ratio != null ? tr.EV_load_ratio.toFixed(3) : '—', 'SDG 7: Clean energy access', tr.EV_load_ratio !== undefined ? 'ready' : 'gap']
-        ];
-      },
-      validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from national energy regulators and renewable installation registers. DER_ratio > 1.0 indicates net export during peak generation — a marker of successful energy transition with associated infrastructure stress.'
-    },
-    {
-      id: 'report-5', num: '5', title: 'Pollution & Corrosion',
+      id: 'report-4', num: '4', title: 'Pollution & Corrosion',
       framework: 'ESRS E2 Pollution · ISO 9223 Corrosion Classification · Environmental Impact',
       sdgPrimary: { num: 11, label: 'SDG 11', name: 'Sustainable Cities and Communities', color: '#f99d26' },
       sdgSecondary: [
@@ -232,6 +196,42 @@
         ];
       },
       validity: 'Corrosion class follows ISO 9223:2012 atmospheric corrosion classification (C1–CX). Status depends on whether the corrosion class shows real variance across the fleet or uses default values. Full validation requires national environmental agency air quality monitoring overlay at substation coordinates (SO2, NOx, particulate deposition).'
+    },
+    {
+      id: 'report-5', num: '5', title: 'Energy Transition & DER Stress',
+      framework: 'ESRS E1 Transition Plan · TCFD Transition Risk · EU Green Deal Alignment',
+      sdgPrimary: { num: 7, label: 'SDG 7', name: 'Affordable and Clean Energy', color: '#fcc30b', dark: true },
+      sdgSecondary: [
+        { num: 13, label: 'SDG 13', color: '#48773c' },
+        { num: 9, label: 'SDG 9', color: '#f36d25' }
+      ],
+      legendColor: '#e8a838',
+      why: 'The energy transition creates infrastructure stress — bidirectional power flows, EV charging load, and intermittent renewable output strain substations designed for unidirectional delivery. This report measures whether grid infrastructure is keeping pace with decarbonisation.',
+      sdgRationale: function (d) {
+        var tr = d.transition || {};
+        var der = tr.DER_ratio;
+        return 'Target 7.2 requires substantially increasing the share of renewable energy. This substation has a DER ratio of ' + (der != null ? der.toFixed(3) : '—') + (der > 1 ? ' — local renewable generation exceeds consumption, a transition success that creates operational complexity' : '') + '. The T1_score (' + (tr.T1_score != null ? tr.T1_score.toFixed(3) : '—') + ') measures the stress this places on the substation, providing the empirical feedback loop between SDG 7 ambition and infrastructure reality.';
+      },
+      getProfile: function (d) {
+        var tr = d.transition || {};
+        return [
+          ['T1 Score (transition stress)', tr.T1_score != null ? tr.T1_score.toFixed(3) : '—'],
+          ['DER Ratio', tr.DER_ratio != null ? tr.DER_ratio.toFixed(3) : '—'],
+          ['DER Variability', tr.DER_variability != null ? tr.DER_variability.toFixed(3) : '—'],
+          ['EV Load Ratio', tr.EV_load_ratio != null ? tr.EV_load_ratio.toFixed(3) : '—'],
+          ['T Component Weight', '0.05']
+        ];
+      },
+      getVariables: function (d) {
+        var tr = d.transition || {};
+        return [
+          ['T1', 'Transition stress score', tr.T1_score != null ? tr.T1_score.toFixed(3) : '—', 'ESRS E1: Transition plan assessment', tr.T1_score !== undefined ? 'ready' : 'gap'],
+          ['DER_ratio', 'Renewable/load ratio', tr.DER_ratio != null ? tr.DER_ratio.toFixed(3) : '—', 'TCFD Transition: Technology risk', tr.DER_ratio !== undefined ? 'ready' : 'gap'],
+          ['DER_var', 'Intermittency', tr.DER_variability != null ? tr.DER_variability.toFixed(3) : '—', 'EU Green Deal: Grid flexibility', tr.DER_variability !== undefined ? 'ready' : 'gap'],
+          ['EV_load', 'EV charging ratio', tr.EV_load_ratio != null ? tr.EV_load_ratio.toFixed(3) : '—', 'SDG 7: Clean energy access', tr.EV_load_ratio !== undefined ? 'ready' : 'gap']
+        ];
+      },
+      validity: 'T1_score is the weighted composite of DER_ratio (renewable generation vs. local demand), DER_variability (intermittency), and EV_load_ratio (electric vehicle charging load as fraction of capacity). DER data sourced from national energy regulators and renewable installation registers. DER_ratio > 1.0 indicates net export during peak generation — a marker of successful energy transition with associated infrastructure stress.'
     },
     {
       id: 'report-6', num: '6', title: 'Cybersecurity Exposure',
@@ -268,6 +268,49 @@
         ];
       },
       validity: 'R7_cyber is computed from a weighted combination of: (1) national cyber maturity via ENISA Cybersecurity Index and EU DESI connectivity indicators, (2) graph topology vulnerability (betweenness centrality = single-point-of-failure risk), and (3) SCADA protocol exposure assessment. Substation-level SCADA data is operator-proprietary — the national-level proxy provides a baseline but not asset-specific granularity.'
+    },
+    {
+      id: 'report-7', num: '7', title: 'SFDR PAI Infrastructure Disclosure',
+      framework: 'SFDR Article 4 · PAI Table 1 · Delegated Reg (EU) 2022/1288 · FC v3 §14 subsection 13.7',
+      sdgPrimary: { num: 12, label: 'SDG 12', name: 'Responsible Consumption and Production', color: '#cf8d2a' },
+      sdgSecondary: [
+        { num: 9, label: 'SDG 9', color: '#f36d25' },
+        { num: 13, label: 'SDG 13', color: '#48773c' }
+      ],
+      legendColor: '#a06938',
+      why: 'The SFDR (Sustainable Finance Disclosure Regulation) mandates that financial market participants disclose Principal Adverse Impact (PAI) indicators for infrastructure investments. PAI Table 1 requires quantitative assessment of physical + governance risk at asset level for Article 8/9 fund classification. The SSI v4.2 Re composite (resilience metric per FC v3 §14 subsection 13.7) provides the canonical proxy for Infrastructure PAI: it integrates 6-axis physical risk (C/V/I/E/S/T), 6-modifier degradation chain (R3/R4/R6c/R6d/R6e/R8/R9/R10), and Markov forward-looking trajectory into a single normalised value directly consumable by SFDR reporting.',
+      sdgRationale: function (d) {
+        var reNorm = d.Re_norm;
+        var reRaw = d.Re_raw;
+        return 'Target 12.6 encourages companies to adopt sustainable practices and integrate sustainability information into their reporting cycle. SFDR is the EU regulatory instrument that operationalises this at fund level for infrastructure investors. This substation carries an Re_norm (normalised resilience composite) of ' + (reNorm != null ? reNorm.toFixed(3) : '—') + ' and Re_raw of ' + (reRaw != null ? reRaw.toFixed(3) : '—') + ', providing the empirical basis for PAI Table 1 Infrastructure indicator disclosure under Delegated Reg (EU) 2022/1288.';
+      },
+      getProfile: function (d) {
+        var mods = d.modifiers || {};
+        return [
+          ['Re_norm (SFDR PAI composite)', d.Re_norm != null ? d.Re_norm.toFixed(3) : '—'],
+          ['Re_raw (pre-normalisation)', d.Re_raw != null ? d.Re_raw.toFixed(3) : '—'],
+          ['R6c Flood modifier', mods.R6c_flood != null ? mods.R6c_flood.toFixed(3) : '—'],
+          ['R6d Wildfire modifier', mods.R6d_wildfire != null ? mods.R6d_wildfire.toFixed(3) : '—'],
+          ['R6e Winter storm modifier', mods.R6e_winter != null ? mods.R6e_winter.toFixed(3) : '—'],
+          ['R8 Adaptation modifier', mods.R8_adapt != null ? mods.R8_adapt.toFixed(3) : '—'],
+          ['R9 Compound event modifier', mods.R9_compound != null ? mods.R9_compound.toFixed(3) : '—'],
+          ['R10 Just-transition modifier', mods.R10_just != null ? mods.R10_just.toFixed(3) : '—']
+        ];
+      },
+      getVariables: function (d) {
+        var mods = d.modifiers || {};
+        return [
+          ['Re_norm', 'SFDR PAI composite (normalised)', d.Re_norm != null ? d.Re_norm.toFixed(3) : '—', 'SFDR Art. 4 · PAI Table 1 Infrastructure', d.Re_norm != null && d.Re_norm !== 0.0 ? 'ready' : 'gap'],
+          ['Re_raw', 'Pre-normalisation resilience', d.Re_raw != null ? d.Re_raw.toFixed(3) : '—', 'FC v3 §14 subsection 13.7', d.Re_raw != null && d.Re_raw !== 1.0 ? 'ready' : 'gap'],
+          ['R6c', 'Flood modifier', mods.R6c_flood != null ? mods.R6c_flood.toFixed(3) : '—', 'SFDR PAI: Physical acute hazards', mods.R6c_flood != null ? 'ready' : 'gap'],
+          ['R6d', 'Wildfire modifier', mods.R6d_wildfire != null ? mods.R6d_wildfire.toFixed(3) : '—', 'SFDR PAI: Physical acute hazards', mods.R6d_wildfire != null ? 'ready' : 'gap'],
+          ['R6e', 'Winter storm modifier', mods.R6e_winter != null ? mods.R6e_winter.toFixed(3) : '—', 'SFDR PAI: Physical acute hazards', mods.R6e_winter != null ? 'ready' : 'gap'],
+          ['R8', 'Adaptation modifier', mods.R8_adapt != null ? mods.R8_adapt.toFixed(3) : '—', 'SFDR PAI: Adaptation planning', mods.R8_adapt != null ? 'ready' : 'gap'],
+          ['R9', 'Compound event modifier', mods.R9_compound != null ? mods.R9_compound.toFixed(3) : '—', 'SFDR PAI: Compound climate risk', mods.R9_compound != null ? 'ready' : 'gap'],
+          ['R10', 'Just-transition modifier', mods.R10_just != null ? mods.R10_just.toFixed(3) : '—', 'SFDR PAI: Social transition risk', mods.R10_just != null ? 'ready' : 'gap']
+        ];
+      },
+      validity: 'Re_norm is the canonical SFDR PAI Infrastructure composite per SSI Index v4.2 methodology (FC v3 §14 subsection 13.7). It integrates the 8 v4.2 modifiers (R6c/R6d/R6e physical acute hazards + R8 adaptation + R9 compound events + R10 just-transition + R7 cyber + R3 social) into a single value normalised against the country-fleet percentile distribution. Convention #56 visibly-honest degradation preserves Re_norm=0.0 + Re_raw=1.0 as neutral defaults for net-new substations awaiting the L2/L3/L4 modifier-chain rescore pass per Convention #78 §4bis.4 two-phase workflow. GAP status reflects sites with fewer than 50% of fleet subs carrying non-default modifiers (typical during a v4.23 L1 refresh window before the follow-on rescore).'
     }
   ];
 
@@ -306,9 +349,12 @@
     ['CMIP6 SSP2-4.5 Projections', 'Copernicus CDS', '—', 'Not ingested', 'CC-BY-4.0', 'R1 (blocked)', true]
   ];
 
-  /* ── Helper: compute 6-axis ESG readiness scores (R1..R6) ─────────────── */
+  /* ── Helper: compute 7-axis ESG readiness scores (R1..R7) ─────────────────
+     R7 SFDR PAI Infrastructure landed 16 July 2026 per FC v3 §14 subsection 13.7.
+     R3 relabelled Infrastructure Resilience [Re composite home]; R4↔R5 swapped
+     so R4=Pollution, R5=Transition per FC v3 §14 canonical order. ─────────── */
   function computeESGScores(d) {
-    var r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0;
+    var r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0, r7 = 0;
     var c = d.components || {}, se = d.socio_economic || {}, mk = d.markov || {},
         mods = d.modifiers || {}, tr = d.transition || {}, gt = d.graph_topology || {};
 
@@ -329,24 +375,24 @@
     if (se.elderly_pct) r2 += 0.10;
     if (se.population) r2 += 0.05;
 
-    // R3 Taxonomy
+    // R3 Infrastructure Resilience [Re composite home] — relabelled 16 July 2026
     if (d.R_median) r3 += 0.25;
     if (d.components) r3 += 0.25;
     if (d.modifiers) r3 += 0.20;
     if (d.markov) r3 += 0.20;
     if (d.CI_width) r3 += 0.10;
 
-    // R4 Transition
-    if (tr.T1_score !== undefined) r4 += 0.25;
-    if (tr.DER_ratio !== undefined) r4 += 0.25;
-    if (tr.DER_variability !== undefined) r4 += 0.25;
-    if (tr.EV_load_ratio !== undefined) r4 += 0.25;
+    // R4 Pollution & Corrosion — swapped from R5 position 16 July 2026
+    if (mk.corrosion_class) r4 += 0.35;
+    if (se.E2_local) r4 += 0.25;
+    if (c.E) r4 += 0.20;
+    r4 = Math.min(r4, 0.80);
 
-    // R5 Pollution
-    if (mk.corrosion_class) r5 += 0.35;
-    if (se.E2_local) r5 += 0.25;
-    if (c.E) r5 += 0.20;
-    r5 = Math.min(r5, 0.80);
+    // R5 Energy Transition & DER Stress — swapped from R4 position 16 July 2026
+    if (tr.T1_score !== undefined) r5 += 0.25;
+    if (tr.DER_ratio !== undefined) r5 += 0.25;
+    if (tr.DER_variability !== undefined) r5 += 0.25;
+    if (tr.EV_load_ratio !== undefined) r5 += 0.25;
 
     // R6 Cyber
     if (mods.R7_cyber) r6 += 0.30;
@@ -354,13 +400,29 @@
     if (gt.degree) r6 += 0.15;
     r6 = Math.min(r6, 0.70);
 
+    // R7 SFDR PAI Infrastructure Disclosure — NEW 16 July 2026 per FC v3 §14
+    //    Sourced from Re_norm (canonical SFDR PAI composite). Convention #56
+    //    visibly-honest degradation: Re_norm=0.0 + Re_raw=1.0 are neutral
+    //    defaults for net-new subs pre-modifier-chain-rescore (Convention #78
+    //    §4bis.4 two-phase workflow). Modifier-availability contributes 40%.
+    if (d.Re_norm != null && d.Re_norm !== 0.0) r7 += 0.35;
+    if (d.Re_raw != null && d.Re_raw !== 1.0) r7 += 0.25;
+    if (mods.R6c_flood != null) r7 += 0.10;
+    if (mods.R6d_wildfire != null) r7 += 0.10;
+    if (mods.R6e_winter != null) r7 += 0.05;
+    if (mods.R8_adapt != null) r7 += 0.05;
+    if (mods.R9_compound != null) r7 += 0.05;
+    if (mods.R10_just != null) r7 += 0.05;
+    r7 = Math.min(r7, 1.00);
+
     return [
       Math.round(r1 * 100) / 100,
       Math.round(r2 * 100) / 100,
       Math.round(r3 * 100) / 100,
       Math.round(r4 * 100) / 100,
       Math.round(r5 * 100) / 100,
-      Math.round(r6 * 100) / 100
+      Math.round(r6 * 100) / 100,
+      Math.round(r7 * 100) / 100
     ];
   }
 
@@ -577,8 +639,9 @@
     var scores = computeESGScores(s);
     var labels = [
       ['R1 Climate', 'Physical Risk'], ['R2 Grid Equity', '& Social'],
-      ['R3 EU Taxonomy', 'Alignment'], ['R4 Energy', 'Transition'],
-      ['R5 Pollution', '& Corrosion'], ['R6 Cybersecurity', 'Exposure']
+      ['R3 Infrastructure', 'Resilience [Re]'], ['R4 Pollution', '& Corrosion'],
+      ['R5 Energy', 'Transition'], ['R6 Cybersecurity', 'Exposure'],
+      ['R7 SFDR PAI', 'Infrastructure']
     ];
     var colors = ESG_REPORTS.map(function (r) { return r.legendColor; });
 
@@ -645,7 +708,7 @@
     H.setHTML('radarLegend', sdgHTML);
   });
 
-  /* ── 5. 6 individual ESG reports (large templated HTML) ───────────────── */
+  /* ── 5. 7 individual ESG reports (large templated HTML) — R7 landed 16 Jul 2026 ── */
   CR.register('esg-report', 'esg-reports', function (ctx) {
     var s = CR.pickMonthlySubstation(ctx.data);
     if (!s) return;

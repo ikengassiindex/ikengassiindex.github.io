@@ -81,6 +81,17 @@ CLASSIFICATION_BANDS = [
 MC_ITERATIONS = 10_000
 
 # ── ESG Report Definitions ────────────────────────────────
+# 🔥 7-report catalog per FC v3 §14 canonical (upgraded 16 July 2026 R7 workstream)
+# — R7 SFDR PAI Infrastructure Disclosure added as documented-proxy under
+# Convention #7 (Data-Layer Anchoring) using Re_normalised composite.
+# — R3 relabelled "EU Taxonomy Alignment" → "Infrastructure Resilience [Re composite home]"
+#   per FC v3 §14 subsection 13.3 (methodology home for Re composite).
+# — R4 ↔ R5 order swap per FC v3 §14 canonical: R4=Pollution (was R5), R5=Transition (was R4).
+# — R7a formula-modifier (R7_cyber) remains at R6 Cybersecurity Exposure inputs list.
+# — R7b ESG-axis (this new R7 entry) uses Re_normalised as documented-proxy per
+#   V4_2_IMPLEMENTATION_ARCHITECTURE.md §4.5 R7 duality codification.
+# See R7_SFDR_PAI_diligence_note.md + R7_SFDR_PAI_current_state_audit.md +
+# R7_SFDR_PAI_phase3_design_signoff.md for full workstream rationale.
 ESG_REPORTS = {
     "R1": {
         "name": "Climate Physical Risk Assessment",
@@ -97,25 +108,33 @@ ESG_REPORTS = {
         "required_fields": ["socio_economic.V_socio", "socio_economic.EP_rate_region"],
     },
     "R3": {
-        "name": "EU Taxonomy Alignment",
-        "framework": "Climate Delegated Act · Article 11 Adaptation",
+        # FC v3 §14 subsection 13.3 canonical — Re composite home
+        # Renamed from "EU Taxonomy Alignment" 16 July 2026 per R7 workstream.
+        # Underlying methodology unchanged (Article 11 Adaptation screening via
+        # R_median + 6 components + full modifier suite + Markov degradation).
+        "name": "Infrastructure Resilience [Re composite home]",
+        "framework": "Climate Delegated Act · Article 11 Adaptation · Re composite anchor (FC v3 §14 subsection 13.3)",
         "primary_sdg": 9,
-        "variables": ["R_median", "components", "modifiers", "CI"],
+        "variables": ["R_median", "components", "modifiers", "CI", "Re_norm"],
         "required_fields": ["R_median", "components", "modifiers"],
     },
     "R4": {
-        "name": "Energy Transition & DER Stress",
-        "framework": "ESRS E1 Transition · TCFD Transition Risk",
-        "primary_sdg": 7,
-        "variables": ["T1_score", "DER_ratio", "DER_variability", "EV_load_ratio"],
-        "required_fields": ["transition.T1_score", "transition.DER_ratio"],
-    },
-    "R5": {
+        # FC v3 §14 canonical order — R4 was previously "Energy Transition & DER Stress" but
+        # FC v3 §14 canonical places Pollution at position 4. Swapped 16 July 2026 per R7 workstream.
         "name": "Pollution & Corrosion",
         "framework": "ESRS E2 Pollution · ISO 9223",
         "primary_sdg": 11,
         "variables": ["corrosion_class", "E2_local", "E_component"],
         "required_fields": ["markov.corrosion_class", "socio_economic.E2_local"],
+    },
+    "R5": {
+        # FC v3 §14 canonical order — R5 was previously "Pollution & Corrosion" but FC v3 §14
+        # canonical places Energy Transition at position 5. Swapped 16 July 2026 per R7 workstream.
+        "name": "Energy Transition & DER Stress",
+        "framework": "ESRS E1 Transition · TCFD Transition Risk",
+        "primary_sdg": 7,
+        "variables": ["T1_score", "DER_ratio", "DER_variability", "EV_load_ratio"],
+        "required_fields": ["transition.T1_score", "transition.DER_ratio"],
     },
     "R6": {
         "name": "Cybersecurity Exposure",
@@ -123,6 +142,23 @@ ESG_REPORTS = {
         "primary_sdg": 9,
         "variables": ["R7_cyber", "BC_percentile", "degree", "is_bridge"],
         "required_fields": ["graph_topology.degree", "graph_topology.BC_percentile"],
+    },
+    "R7": {
+        # NEW 16 July 2026 — R7 SFDR PAI Infrastructure Disclosure per FC v3 §14
+        # subsection 13.7 "R7 — SFDR Principal Adverse Impact Statement (Infrastructure Module)".
+        # This is R7b (ESG-axis), distinct-by-design from R7a formula-modifier (R7_cyber)
+        # per V4_2_IMPLEMENTATION_ARCHITECTURE.md §4.5 R7 duality codification.
+        # Data source: Re_normalised composite (Convention #7 Data-Layer Anchoring documented-proxy).
+        # Bounds: [0, 1] via Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1).
+        # Re_raw underlying: Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00) bounded [0.920, 1.787].
+        # Convention #56 preservation: fresh net-new substations post-L1 refresh carry neutral
+        # defaults (Re_raw=1.0, Re_norm=0.0) per merge_into_ssi_data.py init; only Re_norm > 0
+        # counts as READY per two-phase workflow discipline (Convention #78 §4bis.4).
+        "name": "SFDR PAI Infrastructure Disclosure",
+        "framework": "SFDR Article 4 · PAI Table 1 · Delegated Reg (EU) 2022/1288 · FC v3 §14 subsection 13.7 · Infrastructure Module",
+        "primary_sdg": 12,  # Responsible Consumption & Production
+        "variables": ["Re_norm", "Re_raw", "R6c_flood", "R6d_wildfire", "R6e_winter", "R8_adapt", "R9_compound", "R10_just"],
+        "required_fields": ["Re_norm"],
     },
 }
 

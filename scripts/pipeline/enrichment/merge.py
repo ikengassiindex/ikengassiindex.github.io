@@ -272,8 +272,17 @@ def assess_esg_readiness(substations, country):
     """
     Evaluate ESG report readiness based on data completeness.
 
-    For each of the 6 reports, checks whether required fields have
+    For each of the 7 reports (R1-R7 per FC v3 §14 canonical, upgraded
+    16 July 2026 R7 workstream), checks whether required fields have
     non-default values across the fleet. Returns READY/PARTIAL/GAP.
+
+    R7 SFDR PAI Infrastructure Disclosure uses Re_normalised as
+    documented-proxy per Convention #7 Data-Layer Anchoring. Fresh
+    net-new substations post-L1 refresh carry Re_normalised=0.0
+    neutral-default per Convention #56 visibly-honest degradation; this
+    counts as NOT READY per Convention #78 §4bis.4 two-phase workflow
+    discipline (Phase 2 modifier-chain rescore populates Re_normalised
+    with actual composite values).
     """
     n = len(substations)
     if n == 0:
@@ -289,12 +298,26 @@ def assess_esg_readiness(substations, country):
             non_default = 0
             for sub in substations:
                 val = sub
+                missing = False
                 for p in parts:
-                    val = val.get(p, {}) if isinstance(val, dict) else None
-                    if val is None:
+                    if isinstance(val, dict):
+                        if p not in val:
+                            # Convention #56 gate — treat missing field as
+                            # NOT populated (fix landed 16 July 2026 R7 workstream
+                            # Phase 4a hotfix; previously sub.get(p, {}) returned
+                            # empty-dict fallback that passed 'not None' check and
+                            # falsely counted as populated).
+                            missing = True
+                            break
+                        val = val[p]
+                    else:
+                        missing = True
                         break
 
-                if val is not None and not _is_default_value(field_path, val):
+                if missing or val is None:
+                    continue
+
+                if not _is_default_value(field_path, val):
                     non_default += 1
 
             checks[field_path] = {
@@ -335,6 +358,16 @@ def _is_default_value(field_path, value):
         "climate_trajectory.I3_trajectory": [1.0],
         "socio_economic.V_socio": [0.5],  # uniform default
         "graph_topology.degree": [10],  # Germany default
+        # R7 SFDR PAI: Re_norm=0.0 is the Convention #56 neutral-default
+        # emitted by merge_into_ssi_data.py for net-new substations post-L1
+        # refresh (before Phase 2 modifier-chain rescore populates the actual
+        # Re composite). Counts as NOT READY until rescore per Convention
+        # #78 §4bis.4 two-phase workflow discipline. Note field name in
+        # ikengassiindex.github.io public dashboard ssi-data.json is `Re_norm`
+        # (not `Re_normalised` as used in the ssi-enn-compliance clone's
+        # Convention #66 EXPECTED_KEYS — cross-repo naming inconsistency
+        # documented 16 July 2026 R7 workstream Phase 4a smoke test).
+        "Re_norm": [0.0],
     }
 
     known = defaults.get(field_path, [])
