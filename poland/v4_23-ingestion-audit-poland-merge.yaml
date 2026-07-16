@@ -225,7 +225,12 @@ pipeline_run_rescore_state:
   classification_changes: 25762                      # 25,758 upgrades + 4 downgrades — expected post OSM enrichment
   esg_reports_framework_catalog_count: 7             # SSI Index v4.2 framework canonical (R1-R7 per intelligence/esg-report.html)
   esg_reports_pipeline_registered_count: 6           # scripts/pipeline/config.py::ESG_REPORTS registers only R1-R6
-  esg_reports_ready_count_pipeline: 6                # R1-R6 all 100% READY per pipeline assessor ✅
+  # RETROACTIVE UPDATE (R7 SFDR PAI Phase 5 backfill, 16 July 2026 late evening):
+  # 6-report READY count was pre-Phase-4a state; Discipline #38 codified same day
+  # revealed assess_esg_readiness() latent bug silently masking R2/R4/R5/R6 GAP
+  # for net-new subs. Phase 4c refresh (25,635 Poland subs 7.7% → 100% coverage)
+  # closed R7. See R7_SFDR_PAI_phase4a_cohort_wide_false_positive_finding.md.
+  esg_reports_ready_count_pipeline: 6                # R1-R6 all 100% READY per pipeline assessor ✅ (pre-Phase-4a state — falsely-positive for R2/R4/R5/R6 per Discipline #38 latent bug)
   esg_reports_ready_count_framework: TBD             # R7 SFDR PAI Infrastructure Disclosure readiness UNKNOWN (not assessed by pipeline)
   esg_r7_pipeline_gap:
     class: pre_existing_pipeline_frontend_divergence

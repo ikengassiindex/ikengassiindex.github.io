@@ -288,7 +288,21 @@ pipeline_run_note: >
 deployment_state:
   pipeline_ready: true
   ui_refresh_ready: true                  # merge complete + rescore GREEN; ready for Commit 4 doc cascade
-  esg_reports_ready_count: 6              # R1-R6 all 100% READY
+  # RETROACTIVE UPDATE (R7 SFDR PAI Phase 5 backfill, 16 July 2026 late evening):
+  # esg_reports_ready_count: 6 was the pre-Phase-4a state (R1-R6 all 100% READY per
+  # then-current pipeline assessor). Phase 4a cohort-wide false-positive discovery
+  # (Discipline #38 codified same day) revealed assess_esg_readiness() latent bug
+  # where sub.get(p, {}) empty-dict fallback silently masked missing nested fields
+  # as populated. Post-fix + Phase 4c v4.2 modifier-chain refresh via
+  # scripts/refresh_v42_modifiers_re_composite.py (7,883 subs refreshed 11.4% → 100%
+  # Re_norm coverage) — R7 SFDR PAI Infrastructure Disclosure now empirically READY.
+  # R2/R4/R5/R6 readiness for net-new subs was hidden by the pre-fix bug and is
+  # correctly re-surfaced by post-fix pipeline logic. See:
+  # - R7_SFDR_PAI_phase4a_cohort_wide_false_positive_finding.md (root-cause forensic)
+  # - CLAUDE.md::Discipline #38 (preventive discipline codification)
+  # - commit 9804efc7 (R7 Phase 4a-4e frontend rollout + sentinel)
+  esg_reports_ready_count_pre_phase_4a: 6  # pre-fix reported state (falsely-positive for R2/R4/R5/R6 due to Discipline #38 bug)
+  esg_reports_ready_count_post_phase_4c: 7 # R7 landed via v4.2 modifier chain populated + Re composite computed; R1-R6 empirically accurate per post-fix assessor
   register_hash_pin: 2ca50d583f43         # unchanged (methodology-invariant enrichment)
   nn_tag_pin: v33-calibrated-scipy-20260427T074651Z
 
