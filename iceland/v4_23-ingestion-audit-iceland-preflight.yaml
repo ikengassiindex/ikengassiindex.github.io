@@ -1,0 +1,332 @@
+# Iceland v4.23 Ingestion Audit — Step 1 Pre-flight Source Discovery
+# ===================================================================
+# Task: #320 (WAVE3-Step1 Iceland)
+# Date: 17 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Wave 3 Priority: 23 (SECOND Wave 3 country — smallest of remaining
+#                     Wave 3 queue at 684 baseline subs; Nordic country
+#                     joining Norway/Sweden/Finland/Denmark cohort)
+# Status: READY_FOR_STEP_2_FETCH
+
+schema_version: v4_23-ingestion-audit-preflight-1
+country_slug: iceland
+country_iso2: IS
+country_iso3: ISL
+
+# ── Baseline state (as of pre-fetch snapshot 17 July 2026) ───────────────
+
+baseline_state:
+  ssi_data_substations: 684
+  grid_geo_lines: TBD_at_step_2
+  voltage_coverage_pct: 100.0                 # ALL subs have voltage (630 MV + 54 HV)
+    # empirical baseline audit: 630 subs at 11-66 kV (MV) + 54 subs at 132 kV (HV/EHV) = 100% voltage coverage
+  region_coverage_pct: 100.0                  # 8/8 statistical regions populated
+  owner_coverage_pct: 0.0                     # ⚡ ZERO baseline — same as Czechia/Poland/Slovakia signature
+  bounds_features: 8                          # 8 statistical region polygons
+  min_fleet_pin: 600                          # KB §56 fleet-floor (Iceland 684 baseline; 500-800 range typical for small Nordic countries)
+
+# ── Data source primary — OSM Overpass API ──────────────────────────────
+
+primary_source:
+  source_id: IS-C1-osm-overpass
+  publisher: OpenStreetMap contributors via Overpass API
+  licence: ODbL (Open Database License) — attribution required
+  endpoint_primary: https://overpass-api.de/api/interpreter
+  endpoint_fallback: https://overpass.kumi.systems/api/interpreter
+  expected_query_scope: >
+    3 element-type queries for substations (way + node + relation) + 1
+    combined query for lines (power=line + cable + minor_line). Area
+    header: area["ISO3166-1"="IS"]->.is
+  expected_yield:
+    substations_way: 500-1500                 # Icelandic OSM density modest — smaller than Central European per-capita
+    substations_node: 200-600
+    substations_relation: 5-15
+    lines: 2000-8000                          # Nordic + geothermal-clustered line-density profile
+    line_ratio_pre_merge: 3.5-5.5             # Similar to Norway coastline profile
+    total_raw_bytes: ~10-25 MB                # Small fetch (below Greek scale)
+  expected_scale_context: >
+    Iceland is SECOND Wave 3 cohort at 684 baseline subs. Expected 2-5×
+    increase to ~1500-3500 net-new substations. SIMPLEST cohort-wide
+    remains Greece (single DSO); Iceland has 4-5 regional DSOs but
+    geographically distinct territories make Layer 3 geofence unlikely
+    (unlike Warsaw metro Innogy Stoen narrow carve-out). Estimated
+    ~3-5 min sandbox fetch (safely within timeout — but Greek OSM
+    sparsity precedent suggests possible timeout on 1-2 query cycles).
+
+# ── Grid architecture — Landsnet single-TSO + 4-5 regional DSOs ─────────
+
+grid_architecture:
+  tso_transmission:
+    operator_id: LANDSNET
+    operator_names_aliases:
+      - "Landsnet"                              # Icelandic
+      - "Landsnet hf."                          # Icelandic with legal form
+      - "Landsnet hf"                           # Without period
+      - "LANDSNET"                              # Uppercase
+      - "Landsnet A.S."                         # Latin legal form variant
+    voltage_thresholds:
+      backbone_kv: 220                          # 220 kV EHV backbone (Iceland has NO 400 kV — small grid)
+      high_voltage_kv: 132                      # 132 kV HV main transmission
+      subtransmission_kv: 66                    # 66 kV subtransmission (regional interties)
+    tso_threshold_rule: "≥132 kV → LANDSNET"    # Simple threshold; 66 kV could be TSO or DSO depending on region
+    established: 2005                           # Unbundled from Landsvirkjun 2005 per EU 3rd Package
+    pre_2005_operator: Landsvirkjun (state utility integrated 1965)
+    predecessor_alias_generation: 1             # Single rebrand cascade (Landsvirkjun → Landsnet)
+    grid_synchronous: FALSE                     # Iceland isolated grid — NOT synchronised with Nordic Grid
+    grid_frequency_hz: 50
+    note: >
+      Iceland is a fully isolated grid (no cross-border interconnections)
+      unlike Nordic mainland (Norway/Sweden/Finland/Denmark synchronous
+      grid). This affects Convention #56 cross-border filter — outside-
+      polygon substations are ALWAYS erroneous (no legitimate Icelandic
+      subs beyond bounds.json envelope).
+
+  dso_distribution:
+    architectural_note: >
+      Iceland has 4-5 regional DSOs — architecturally MORE complex than
+      Greece (single DEDDIE) but geographically SIMPLER than Poland
+      (regional territories are distinct + non-overlapping unlike Poland's
+      Warsaw metro exception). Layer 3 lat/lon geofence LIKELY needed
+      for Reykjavík Capital Region (Veitur + Landsnet HV coexistence).
+
+    veitur:
+      operator_id: VEITUR
+      operator_names_aliases:
+        - "Veitur"
+        - "Veitur ohf."                         # ohf. = opinbert hlutafélag (public LLC)
+        - "Veitur ohf"
+        - "Orkuveita Reykjavíkur"               # Parent OR
+        - "OR"                                  # Acronym
+        - "Orkuveitan"                          # Colloquial
+      territory: >
+        Capital Region (Höfuðborgarsvæðið) + Akranes + Borgarnes +
+        parts of South Iceland
+      share_estimated: ~35%                     # LARGEST DSO by connection count
+      predecessor: Rafmagnsveita Reykjavíkur (RR) — pre-2000
+
+    rarik:
+      operator_id: RARIK
+      operator_names_aliases:
+        - "RARIK"
+        - "Rarik"
+        - "Rarik ohf."
+        - "Rafmagnsveitur ríkisins"              # Icelandic full name (State Electricity Corporation)
+        - "Rafmagnsveitur rikisins"              # Latin transliteration
+      territory: >
+        Rural areas + North + South + East excluding Capital Region +
+        Reykjanes peninsula
+      share_estimated: ~40%                     # LARGEST by area, medium by connections
+      predecessor: Rafmagnsveitur ríkisins (state 1946-2006) — 2006 became ohf.
+
+    hs_veitur:
+      operator_id: HS_VEITUR
+      operator_names_aliases:
+        - "HS Veitur"
+        - "HS Veitur hf."
+        - "HS Veitur hf"
+        - "Hitaveita Suðurnesja"                # Pre-2008 legacy name (Suðurnes Heat Utility)
+      territory: >
+        Reykjanes peninsula + Vestmannaeyjar (Westman Islands) +
+        part of South Iceland
+      share_estimated: ~15%
+      predecessor: Hitaveita Suðurnesja (1974-2008) — geothermal-first
+
+    nordurorka:
+      operator_id: NORDURORKA
+      operator_names_aliases:
+        - "Norðurorka"                          # Icelandic
+        - "Nordurorka"                           # Latin transliteration
+        - "Norðurorka hf."
+        - "Nordurorka hf"
+      territory: >
+        Akureyri (2nd largest Icelandic city) + Eyjafjörður region
+      share_estimated: ~7%
+      predecessor: Rafveita Akureyrar (Akureyri Electric — pre-2000)
+
+    orkubu_vestfjarda:
+      operator_id: OV
+      operator_names_aliases:
+        - "Orkubú Vestfjarða"                    # Icelandic
+        - "Orkubu Vestfjarda"                    # Latin transliteration
+        - "OV"                                   # Acronym
+        - "Orkubú Vestfjarða ohf."
+        - "Orkubu Vestfjarda ohf"
+      territory: >
+        Westfjords (Vestfirðir) — isolated peninsula
+      share_estimated: ~3%
+      predecessor: None (established 1978 for Westfjords)
+
+  private_captives_estimated:
+    - "Landsvirkjun (state generation — 12 hydro + 3 geothermal + 2 wind)"
+    - "Rio Tinto Alcan (Straumsvík aluminium smelter — largest single consumer)"
+    - "Century Aluminum (Grundartangi + Helguvík smelters)"
+    - "Norðurál (Grundartangi smelter — Century Al subsidiary)"
+    - "Elkem Iceland (Grundartangi ferrosilicon plant)"
+    - "PCC BakkiSilicon (Bakki silicon metal plant)"
+    - "Fjarðaál (Reyðarfjörður aluminium smelter — Rio Tinto)"
+    - "OR/ON Power (geothermal generation — Hellisheiði + Nesjavellir)"
+    - "HS Orka (geothermal — Svartsengi + Reykjanes)"
+    - "Data centers (Verne Global + Advania + atNorth — cryptocurrency + AI compute)"
+
+  grid_topology_notes:
+    isolated_grid: TRUE                         # No submarine interconnector to mainland Europe
+    geothermal_generation_share_pct: ~30
+    hydro_generation_share_pct: ~70
+    wind_share_pct: ~0.5                        # Búrfellslundur pilot only
+    renewable_share_pct: 100                    # 🏆 100% renewable — Iceland is world leader
+    volcanic_geothermal_correlation: HIGH       # Reykjanes 2021-2023 volcanic activity impacts Svartsengi + HS Orka
+
+# ── Convention #78 BINDING 5th enforcement (post-Greece cumulative) ─────
+
+convention_78_binding_5th_enforcement:
+  enforcement_number: 5
+  cumulative_7_country_hits_pre_iceland: 20514
+    # Latvia 1 + Estonia 20 + Latvia 143 + Slovakia 615 + Czechia 5178 + Poland 14449 + Greece 108
+  expected_iceland_alias_hits: 200-800
+    # LOWER than Greece (108) or Czechia (5178) due to smaller fleet + Icelandic
+    # script normalisation dominant class; single-generation Landsnet rebrand
+  cumulative_8_country_hits_post_iceland: 20714-21314
+  cadence_precedent_ratio_post_iceland: 2071-2131x above 10-instance BINDING threshold
+  status_signal: "Convention #78 BINDING continues cohort-wide adoption — 5th enforcement"
+
+  alias_class_distribution_estimated:
+    icelandic_script: HIGH                     # 🆕 NEW class cohort-wide — Þ (thorn) + ð (eth) + æ + ö
+      # Landsnet has no Icelandic-only chars; Veitur/RARIK/HS Veitur normal Latin
+      # BUT captives like Norðurorka + Orkubú Vestfjarða use ð + ö
+    latin_transliteration: MODERATE            # d for ð + oe for ö + ae for æ + th for Þ
+    legal_form_variants:                        # Icelandic hlutafélag
+      - "hf."                                   # hlutafélag (LLC)
+      - "hf"                                    # Without period
+      - "ohf."                                  # opinbert hlutafélag (public LLC)
+      - "ohf"
+    diacritics_class: HIGH                      # á é í ó ú ý (acute accents on vowels)
+    predecessor_rebrand_alias_classes:
+      landsvirkjun_pre_2005: LOW               # Small class (few tags predate 2005 rebrand)
+      hitaveita_sudurnesja_pre_2008: MODERATE  # HS Veitur predecessor still tagged
+      rafmagnsveitur_rikisins_pre_2006: LOW    # RARIK predecessor (few subs still tagged)
+    orkubu_vestfjarda_westfjords_isolation: LOW  # Small isolated peninsula operator
+
+  new_sub_convention_candidate_status:
+    scope: >
+      Icelandic script normalisation would be a NEW alias class cohort-wide
+      (5th class after Greek + Cyrillic + typographic quotes + comma-legal-
+      form). Cumulative Wave 2/3 multi-script coverage would expand:
+      Latin (all countries) + Cyrillic (Czechia/Slovakia + Ukrainian minority
+      Poland) + Greek (Greece) + Icelandic (Iceland) + Korean/Japanese
+      (deferred East Asian Wave 3).
+
+# ── Convention #78 §4bis.4 two-phase workflow status ────────────────────
+
+convention_78_4bis_4_two_phase_workflow:
+  phase_1_l1_ingestion: PENDING_STEP_2_FETCH
+  phase_2_l2_l3_l4_rescore: DEFERRED_POST_STEP_4
+  visibly_honest_degradation_marker: >
+    Net-new subs will carry Convention #56 neutral defaults post-merge.
+    Phase 4c refresh via scripts/refresh_v42_modifiers_re_composite.py will
+    populate v4.2 modifier chain + Re composite. Iceland requires
+    _COUNTRY_HAZARD_BASELINES entry — see recommendation below.
+
+  hazard_baseline_recommendation:
+    country_slug: iceland
+    flood: 0.30                                 # LOW-MODERATE — glacial jökulhlaup floods (Grímsvötn/Katla)
+    wildfire: 0.05                              # NEGLIGIBLE — Arctic climate, sparse vegetation
+    winter: 0.90                                # HIGH — Arctic weather, blizzards, ice storms
+    adapt: 0.75                                 # HIGH — resilient adaptation via geothermal + 100% RES
+    compound: 0.55                              # MODERATE — volcanic + wind + winter compound events
+    just: 0.20                                  # LOW — already 100% renewable, no fossil transition needed
+    source_citations:
+      flood: "Icelandic Meteorological Office (Veðurstofa) glacial flood registry + IPCC AR6"
+      wildfire: "Copernicus EFFIS 2024 Iceland: negligible/near-zero fire seasons"
+      winter: "ECMWF ERA5 IS 1980-2024 + Veðurstofan blizzard registry"
+      adapt: "ND-GAIN 2024 Iceland 14/181 (VERY HIGH readiness — 4th globally)"
+      compound: "IPCC AR6 Ch 12 + 2021-2023 Reykjanes eruptions + Fagradalsfjall volcanic sequence"
+      just: "EU Just-Transition Fund IS 2021-2027 — Iceland qualifies for €0 (no coal to transition)"
+
+# ── NUTS-2/NUTS-3 territorial map ────────────────────────────────────────
+
+territorial_map:
+  nuts_2_regions:
+    IS001: "Höfuðborgarsvæðið (Capital Region — Reykjavík)"
+    IS002: "Suðurnes (Reykjanes peninsula)"
+    IS003: "Vesturland (West Iceland)"
+    IS004: "Vestfirðir (Westfjords)"
+    IS005: "Norðurland vestra (Northwest)"
+    IS006: "Norðurland eystra (Northeast — Akureyri)"
+    IS007: "Austurland (East)"
+    IS008: "Suðurland (South)"
+  osm_ref_nuts_3_density: HYPOTHESIS            # Verify at Step 2 fetch (Greek precedent — NUTS-3 tags empirical per country)
+
+# ── Convention #78 §4bis.5 Layer 3 geofence — LIKELY REQUIRED ────────────
+
+convention_78_4bis_5_layer_3_geofence:
+  status: LIKELY_REQUIRED
+  target_region: Reykjavík Capital Region (Höfuðborgarsvæðið)
+  layer_3_geofence_bbox: [64.05, 64.20, -22.05, -21.70]   # Rough Reykjavík metro
+  rationale: >
+    Veitur (DSO) operates Capital Region distribution while Landsnet
+    (TSO) has HV substations in Reykjavík metro area. Both entities
+    coexist geographically — voltage-class threshold alone may not
+    disambiguate. Prague precedent (Czechia PRE distribuce Layer 3
+    geofence) applies. Post-fetch Layer 3 refinement candidate similar
+    to Warsaw Innogy Stoen narrow carve-out.
+  cumulative_enforcement_count_post_iceland: 4    # If refinement triggered
+  fallback_if_not_triggered: 3                    # Prague + Warsaw + reserved
+
+# ── Cross-border filter (Discipline #36) preflight ──────────────────────
+
+cross_border_filter:
+  bounds_json_features: 8                        # 8 statistical region polygons
+  bbox_envelope:
+    lat_min: 63.30                               # Southernmost — Vestmannaeyjar
+    lat_max: 66.55                               # Northernmost — Grímsey (crosses Arctic Circle)
+    lon_min: -24.55                              # Westernmost — Bjargtangar
+    lon_max: -13.30                              # Easternmost — Gerpir
+  tolerance_km: 5.0                              # PROPOSED — coastline + geothermal + island tolerance
+  mode_class: MODE_2_ISOLATED_GRID               # No cross-border legitimate subs
+  iceland_specific_considerations:
+    - "Iceland is FULLY isolated grid (no submarine interconnector to Europe)"
+    - "8 disjoint polygons covering mainland + Grímsey (Arctic Circle island) + Vestmannaeyjar"
+    - "Heavily indented fjord coastline (Westfjords + Eastfjords)"
+    - "Volcanic + glacial terrain — some geothermal subs at high elevations"
+    - "Expected pre-filter substation drift <1% (fully isolated grid — no legitimate outside-polygon subs)"
+
+# ── Sequence 2 workflow — smallest-first Wave 3 cadence ─────────────────
+
+wave_3_smallest_first_sequence:
+  step_1_preflight: THIS_DOCUMENT (Task #320)
+  step_2_operator_local_fetch: PENDING (Task #321 candidate)
+  step_3_l1_connector: PENDING
+    # scripts/pipeline/ingestion/iceland/{__init__,_base,osm_overpass,merge_into_ssi_data}.py
+    # Reuse czechia canonical pattern with 4-5 DSO Layer 3 geofence potentially needed
+    # ~800-1000 LOC (more than Greek 700 due to multi-DSO but less than Poland 1000)
+  step_4_merge_execution: PENDING
+  step_5_doc_cascade: PENDING
+
+wave_3_p23_position_signals:
+  second_wave_3_country: TRUE                    # Post Greece P22
+  simplest_arctic_grid: TRUE                     # Iceland 100% RES + isolated
+  first_icelandic_script_country: TRUE           # Convention #78 empirical Þ/ð/æ/ö normalisation
+  eu_member: FALSE                               # EEA member only (via EFTA agreement 1994)
+  oecd_member: TRUE                              # OECD founding member 1961
+  eurozone: FALSE                                # ISK (Icelandic króna)
+  nordic_council_member: TRUE                    # Full Nordic Council + Nordic Cooperation Agreement
+  ecb_member: FALSE
+  isolated_grid: TRUE                            # UNIQUE — no cross-border interconnection
+
+# ── Precedent references ────────────────────────────────────────────────
+
+precedent_references:
+  ingestion_pattern_source: greece (Wave 3 P22 single-DSO precedent)
+  l1_connector_source: czechia (multi-DSO precedent)
+  merge_script_source: greece (Wave 3 canonical latest)
+  bounds_filter_source: canada (keyword-only args + tolerance_km loaded from cross_border_tolerances.json)
+  hazard_baseline_source: norway (Nordic Arctic proximity — highest sibling)
+
+# ── Refresh trail closure ───────────────────────────────────────────────
+
+refresh_trail:
+  authored_at_utc: 20260717T144500Z
+  authored_by: ikenga-ssi-foundation
+  supersedes: none (first Icelandic v4.23 audit doc)
+  next_review_at: post_step_2_fetch_completion
