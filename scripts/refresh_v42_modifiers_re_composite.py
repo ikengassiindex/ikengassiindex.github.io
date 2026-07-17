@@ -151,6 +151,22 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # per 10th Basic Electricity Plan; smaller-scale than Ireland Moneypoint or Germany
     # Ruhr; Korea Just Transition Fund KRW 500B / €340M via Ministry of Employment)
     "korea":        {"flood": 0.55, "wildfire": 0.20, "winter": 0.50, "adapt": 0.75, "compound": 0.55, "just": 0.25},
+    # New Zealand (Wave 3 P27 — FIRST Southern Hemisphere Wave 3 event; RICHEST 29-EDB
+    # multi-DSO cohort-wide; Convention #78 §4bis.5 Layer 3 5th enforcement Auckland
+    # metropolitan Vector vs Counties Energy split; Cook Strait HVDC Inter-Island link
+    # domestic) — MOD flood (Pacific pluvial + Auckland urban 2023 Anniversary Weekend +
+    # Canterbury river 2021 Westport + Nelson Aug 2022 + Marlborough Aug 2022) + MOD-HIGH
+    # wildfire (Canterbury dry east — 2017 Port Hills + 2019 Nelson Pigeon Valley +
+    # 2020 Ohau + Alpine Fault-adjacent fuel loads) + MOD winter (Southern Alps + South
+    # Island snowfall + Wellington gales + Cook Strait storm gusts) + MOD-HIGH adapt
+    # (Zero Carbon Act 2019 statutory 2050 net-zero + NZ ETS 2008 first non-EU cap-and-trade
+    # + Climate Change Commission binding + Emissions Reduction Plan 2022) + MOD-HIGH
+    # compound (Alpine Fault seismic + Wellington Fault + Wairarapa Fault + storm compounds
+    # + volcanic Taupo Zone + Kaikoura 2016 M7.8) + LOW-MOD just (slower coal transition
+    # Huntly retained + Southland Tiwai smelter closure/preserve ambiguity + Taranaki
+    # oil-gas 2018 exploration ban + Just Transitions Unit within MBIE; Zealand Just
+    # Transition Fund NZ$500M targeted Taranaki+Southland)
+    "new-zealand":  {"flood": 0.60, "wildfire": 0.30, "winter": 0.40, "adapt": 0.75, "compound": 0.60, "just": 0.30},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }

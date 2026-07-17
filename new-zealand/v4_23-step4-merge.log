@@ -1,0 +1,35 @@
+2026-07-17 18:42:04,035 INFO __main__: Fetching OSM NZ (subs + lines one-shot; single-query pattern)...
+2026-07-17 18:42:04,036 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Cache hit: cb533ff6e3169042.json (473792 bytes)
+2026-07-17 18:42:04,042 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Cache hit: f5ff8ef66ba483e1.json (8629 bytes)
+2026-07-17 18:42:04,042 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Overpass POST https://overpass-api.de/api/interpreter (attempt 1/4)
+2026-07-17 18:42:11,451 WARNING scripts.pipeline.ingestion.new_zealand.osm_overpass: Overpass 504 gateway; trying next endpoint after 5s
+2026-07-17 18:42:16,453 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Overpass POST https://overpass.kumi.systems/api/interpreter (attempt 1/4)
+2026-07-17 18:44:16,595 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Parsed 1620 substations from OSM Overpass
+2026-07-17 18:44:16,628 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Cache hit: 61af19ab3cfbd9b4.json (79650652 bytes)
+2026-07-17 18:44:18,441 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Parsed 82522 lines from OSM Overpass
+2026-07-17 18:44:42,749 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Owner enrichment: 1164 direct OSM (246 alias-normalised) + 352 Transpower_TSO + 0 KiwiRail + 0 NZAS + 0 captive + 104 §4bis5_Auckland (5th enforcement) + 0 Canterbury_soft + 0 region_DSO
+2026-07-17 18:44:42,749 INFO scripts.pipeline.ingestion.new_zealand.osm_overpass: Discipline #41: Discipline #41 OK — 1620 substations + 82510 lines (ratio 50.93).
+2026-07-17 18:44:42,775 INFO __main__: OSM ingestion: 1620 substations + 82510 lines + SHA-256 ba5ad0c08bf7ccff193b62f9e1985324888658945d49085e8079ce858eb0ddc9
+2026-07-17 18:44:42,775 INFO __main__: Loading /Users/cedricberard/ikengassiindex.github.io/new-zealand/ssi-data.json ...
+2026-07-17 18:44:42,797 INFO __main__:   existing: 1558 substations
+2026-07-17 18:44:42,797 INFO __main__: Loading /Users/cedricberard/ikengassiindex.github.io/new-zealand/grid-geo.json ...
+2026-07-17 18:44:42,806 INFO __main__:   existing: 1686 lines
+2026-07-17 18:44:42,817 INFO __main__: Substation merge: 1589 enriched + 0 voltage-filled + 31 net-new + 10 xcheck findings
+2026-07-17 18:44:42,817 INFO __main__: Step 4b retroactive attribution: 0 subs closed via 7-layer multi-DSO resolver
+2026-07-17 19:09:09,015 INFO __main__: Line merge: 74693 appended + 7817 deduped (existing tier match)
+2026-07-17 19:09:09,078 INFO __main__: Wrote /Users/cedricberard/ikengassiindex.github.io/new-zealand/ssi-data.json (4.0 MB, 1589 substations)
+2026-07-17 19:09:09,782 INFO __main__: Wrote /Users/cedricberard/ikengassiindex.github.io/new-zealand/grid-geo.json (44.1 MB, 76379 lines)
+2026-07-17 19:09:09,799 INFO __main__: Wrote voltage cross-validation report: /Users/cedricberard/ikengassiindex.github.io/new-zealand/v4_23-voltage-cross-validation.json (10 findings across 1589 matched pairs)
+
+Merge stats:
+  enriched: 1589
+  voltage_filled: 0
+  net_new_substations: 31
+  voltage_xcheck_findings: 10
+  step_4b_retroactive_attribution: 0
+  final_substation_count: 1589
+  lines_appended: 74693
+  lines_deduped: 7817
+  final_line_count: 76379
+  raw_sha256: ba5ad0c08bf7ccff193b62f9e1985324888658945d49085e8079ce858eb0ddc9
+  raw_bytes_fetched: 482421
