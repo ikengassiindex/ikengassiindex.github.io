@@ -1,0 +1,289 @@
+# Greece v4.23 Ingestion Audit — Step 1 Pre-flight Source Discovery
+# ==================================================================
+# Task: #313 (WAVE3-Step1 Greece)
+# Date: 17 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Wave 3 Priority: 22 (FIRST Wave 3 country — SMALLEST of Wave 3 queue at
+#                     556 subs baseline; SIMPLEST architecturally — SINGLE
+#                     national DSO DEDDIE/HEDNO with NO Layer 3 geofence
+#                     needed per Convention #78 §4bis.5)
+# Status: READY_FOR_STEP_2_FETCH
+
+schema_version: v4_23-ingestion-audit-preflight-1
+country_slug: greece
+country_iso2: GR
+country_iso3: GRC
+
+# ── Baseline state (as of pre-fetch snapshot 17 July 2026) ───────────────
+
+baseline_state:
+  ssi_data_substations: 556
+  grid_geo_lines: TBD_at_step_2         # populated post-fetch
+  voltage_coverage_pct: TBD             # audit at Step 2 fetch time
+  region_coverage_pct: 100.0            # 13/13 NUTS-2 periférkiés populated in baseline
+  owner_coverage_pct: TBD               # baseline audit at Step 2
+  bounds_features: 14                   # 14 multi-region polygons (mainland + island clusters + Attika + Crete + Aegean + Ionian)
+  min_fleet_pin: 500                    # KB §56 fleet-floor (Wave 3 P22 smallest cohort context; verify Phase 2A recalibration status)
+
+# ── Data source primary — OSM Overpass API ──────────────────────────────
+
+primary_source:
+  source_id: GR-C1-osm-overpass
+  publisher: OpenStreetMap contributors via Overpass API
+  licence: ODbL (Open Database License) — attribution required
+  endpoint_primary: https://overpass-api.de/api/interpreter
+  endpoint_fallback: https://overpass.kumi.systems/api/interpreter
+  expected_query_scope: >
+    3 element-type queries for substations (way + node + relation) + 1
+    combined query for lines (power=line + cable + minor_line). Area
+    header: area["ISO3166-1"="GR"]->.gr
+  expected_yield:
+    substations_way: 1500-3500           # Greek density ~30-40% of Central European per-capita
+    substations_node: 500-1500
+    substations_relation: 10-30
+    lines: 6000-18000                    # Balkan-Mediterranean line-density profile (lower than Central Europe due to island coverage)
+    line_ratio_pre_merge: 3.5-5.0        # Balkans-adjusted average
+    total_raw_bytes: ~15-40 MB           # Small fetch (below Slovakia P19 scale)
+  expected_scale_context: >
+    Greece is SMALLEST Wave 3 cohort (556 subs baseline). Expected 3-8×
+    increase to ~2000-4500 net-new substations. FIRST Wave 3 country
+    — resets smallest-first cadence pattern post-Poland (LARGEST Wave 2).
+    Architecturally SIMPLEST post-Convention-#78-BINDING: single
+    national DSO + straightforward TSO/DSO partition + no complex
+    Layer 3 geofence needed (unlike Warsaw metro Poland or Prague
+    metro Czechia). Estimated ~4-6 min sandbox fetch (safely within
+    timeout).
+
+# ── Grid architecture — SINGLE national DSO makes attribution trivial ───
+
+grid_architecture:
+  tso_transmission:
+    operator_id: ADMIE-IPTO
+    operator_names_aliases:
+      - "ADMIE"                                  # Latin transliteration
+      - "ΑΔΜΗΕ"                                  # Greek script
+      - "IPTO"                                   # English acronym
+      - "Independent Power Transmission Operator"
+      - "ΑΝΕΞΑΡΤΗΤΟΣ ΔΙΑΧΕΙΡΙΣΤΗΣ ΜΕΤΑΦΟΡΑΣ ΗΛΕΚΤΡΙΚΗΣ ΕΝΕΡΓΕΙΑΣ"
+      - "ADMIE Holding SA"
+    voltage_thresholds:
+      backbone_kv: 400                            # 400 kV EHV (Continental European sync)
+      high_voltage_kv: 150                        # 150 kV HV mainland
+      subtransmission_kv: 66                      # 66 kV subtransmission (some regions)
+    tso_threshold_rule: "≥66 kV → ADMIE/IPTO"     # SIMPLE — all HV+ to national TSO
+    established: 2011                             # Unbundled from PPC ownership
+    pre_2011_operator: DEI (Public Power Corporation)
+    predecessor_alias_generation: 1               # Single rebrand generation (unlike Poland's multi-generation cascade)
+
+  dso_distribution:
+    operator_id: DEDDIE-HEDNO
+    operator_names_aliases:
+      - "DEDDIE"                                  # Latin transliteration
+      - "ΔΕΔΔΗΕ"                                  # Greek script
+      - "HEDNO"                                   # English acronym
+      - "Hellenic Electricity Distribution Network Operator"
+      - "ΔΙΑΧΕΙΡΙΣΤΗΣ ΕΛΛΗΝΙΚΟΥ ΔΙΚΤΥΟΥ ΔΙΑΝΟΜΗΣ ΗΛΕΚΤΡΙΚΗΣ ΕΝΕΡΓΕΙΑΣ"
+      - "HEDNO SA"
+      - "DEDDIE SA"
+      - "ΔΕΔΔΗΕ ΑΕ"
+    voltage_thresholds:
+      mv_kv: 20                                   # 20 kV medium voltage MV
+      lv_v: [230, 400]                            # 230/400 V low voltage LV
+    dso_threshold_rule: "< 66 kV → DEDDIE/HEDNO"  # SIMPLE — all sub-transmission to national DSO
+    established: 2012                             # Unbundled from PPC/DEI
+    pre_2012_operator: DEI (PPC Distribution branch)
+    predecessor_alias_generation: 1               # Same rebrand event as ADMIE (2011-2012 grid unbundling)
+    coverage: "National — SINGLE DSO covers all mainland + interconnected islands"
+    architectural_note: >
+      Greece has SINGLE national DSO (unlike Poland's 4-DSO partition or
+      even Czechia's E.ON+ČEZ split). NO Convention #78 §4bis.5 Layer 3
+      geofence needed — the DSO territory is the entire country. Owner
+      attribution simplifies to: voltage-class + single-DSO default.
+
+  private_captives_estimated:
+    - "Aluminium of Greece SA (Distomo alumina/aluminium plant)"
+    - "Hellenic Petroleum (ELPE) refineries — Aspropyrgos + Elefsina + Thessaloniki"
+    - "Larco (Ferronickel Larymna) — historic captive"
+    - "PPC/DEI generation captives at Ptolemaida/Kozani lignite complex"
+    - "Corinth Pipeworks (Thisvi steel)"
+    - "Hellenic Sugar Industry (Serres + Xanthi)"
+    - "OSE (Hellenic Railways — 25 kV AC / 750 V DC traction)"
+    - "Attiko Metro (Athens metro traction — 750 V DC)"
+    - "STASY (Athens tram + electric trolleybus — 600 V DC)"
+
+  island_grid_topology:
+    interconnected_islands_2020_2024:
+      - Crete (via ADMIE 150 kV HVAC + 500 kV HVDC Ariadne 2021)
+      - Cyclades cluster (2018 interconnection)
+      - Northern Aegean (Lesvos, Chios — 2022 interconnection)
+      - Dodecanese partial (Kalymnos, Kos)
+    remaining_isolated_micro_grids:
+      - Ionian small islands (Kythira, Antikythira)
+      - Small Dodecanese (Astypalaia — became green pilot 2020)
+      - Small Cyclades (Anafi, Amorgos partial)
+    architectural_relevance: >
+      Isolated micro-grids do not affect Convention #78 attribution (still
+      DEDDIE-owned) but may have distinct voltage tags in OSM (e.g. 6.6 kV
+      distribution on some small islands). Verify at Step 2 fetch.
+
+# ── Convention #78 BINDING 4th enforcement (post-Poland cumulative) ──────
+
+convention_78_binding_4th_enforcement:
+  enforcement_number: 4
+  cumulative_6_country_hits_pre_greece: 20406
+    # Latvia 1 + Estonia 20 + Latvia 143 + Slovakia 615 + Czechia 5178 + Poland 14449 = 20406
+  expected_greece_alias_hits: 800-2500
+    # LOWER than Poland (14449) or Czechia (5178) due to smaller fleet + simpler alias structure
+    # Greek script transliteration dominant class; single-generation rebrand simplifies
+  cumulative_7_country_hits_post_greece: 21206-22906
+  cadence_precedent_ratio_post_greece: 2120-2290× above 10-instance BINDING threshold
+  status_signal: "Convention #78 BINDING continues cohort-wide adoption — 4th enforcement"
+
+  alias_class_distribution_estimated:
+    greek_script: HIGH                           # ΑΔΜΗΕ / ΔΕΔΔΗΕ / ΔΕΗ / ΑΕ suffix — dominant class
+    latin_transliteration: HIGH                  # ADMIE / DEDDIE / IPTO / HEDNO / DEI — parallel entries
+    english_acronym: MODERATE                    # IPTO + HEDNO English variants
+    legal_form_variants:                         # ΑΕ / SA / Α.Ε. / Anonymos Etaireia variants
+      - "ΑΕ"
+      - "Α.Ε."
+      - "SA"
+      - "S.A."
+      - "Anonymos Etaireia"
+    typographic_quotes: LOW                      # Greek typography rarely uses quoted names
+    diacritics_class: MODERATE                   # Greek accented letters (τόνος + διαλυτικά)
+    predecessor_rebrand_alias_classes:
+      dei_ppc_pre_2011_pre_2012_rebrand: HIGH    # DEI/ΔΕΗ predecessor to both ADMIE + DEDDIE
+      pre_unbundling_integrated_utility: MODERATE # Some old substations tagged with "DEI" or "Public Power Corporation"
+    conventional_alias_note: >
+      Greece's Convention #78 empirical scope is SIMPLER than Poland's
+      because (a) single-generation rebrand event (2011-2012 unbundling)
+      vs Poland's 4-generation cascade; (b) single national DSO vs
+      Poland's 4-DSO partition. Multi-script (Greek + Latin) is the
+      dominant alias-normalisation challenge; predecessor tracking is
+      shallow (single generation depth).
+
+# ── Convention #78 §4bis.4 two-phase workflow status ────────────────────
+
+convention_78_4bis_4_two_phase_workflow:
+  phase_1_l1_ingestion: PENDING_STEP_2_FETCH
+  phase_2_l2_l3_l4_rescore: DEFERRED_POST_STEP_4
+  visibly_honest_degradation_marker: >
+    Net-new subs will carry Convention #56 neutral defaults (Re_raw=1.0,
+    Re_norm=0.0) post-merge. Phase 4c refresh via
+    scripts/refresh_v42_modifiers_re_composite.py will populate v4.2
+    modifier chain + Re composite. Greece requires
+    _COUNTRY_HAZARD_BASELINES entry — see recommendation below.
+
+  hazard_baseline_recommendation:
+    country_slug: greece
+    flood: 0.50    # Moderate — river-basin flooding + Attica flash-flood (2017 Mandra + 2023 Storm Daniel devastation)
+    wildfire: 0.85 # HIGH — 2018 Mati + 2021 Evia + 2023 Rhodes + Alexandroupoli megafires
+    winter: 0.35   # LOW-MODERATE — Northern Greece + mountains; Attica mild
+    adapt: 0.50    # MODERATE — mid-tier ND-GAIN readiness (post-2009 fiscal crisis)
+    compound: 0.60 # MODERATE-HIGH — 2023 Storm Daniel + 2018 Kineta + 2021 Attica multi-hazard events
+    just: 0.55     # MODERATE — Just-Transition Fund €277M allocation (Western Macedonia + Peloponnese lignite phase-out)
+    source_citations:
+      flood: "JRC EU-Flood-Atlas 2024 + EL Meteo state agency + Ymittos+Kifisos basin studies"
+      wildfire: "Copernicus EFFIS 2023 + Institute of Mediterranean Forest Ecosystems (Athens)"
+      winter: "ECMWF ERA5 GR 1980-2024 + KEROSS avalanche registry Northern Greece"
+      adapt: "ND-GAIN 2024 Greece 66/181 (moderate readiness)"
+      compound: "IPCC AR6 Ch 12 Mediterranean compound events + Copernicus C3S GR case studies"
+      just: "EC Just-Transition Fund GR 2021-2027 €277M allocation + Western Macedonia PGDIT master plan"
+
+# ── NUTS-2/NUTS-3 territorial map ────────────────────────────────────────
+
+territorial_map:
+  nuts_2_periferikes:
+    # 13 Greek NUTS-2 regions (periférkiés)
+    EL30: "Attiki (Attica) — Athens metropolitan area"
+    EL41: "Voreio Aigaio (North Aegean)"
+    EL42: "Notio Aigaio (South Aegean)"
+    EL43: "Kriti (Crete)"
+    EL51: "Anatoliki Makedonia + Thraki (East Macedonia + Thrace)"
+    EL52: "Kentriki Makedonia (Central Macedonia) — Thessaloniki"
+    EL53: "Dytiki Makedonia (West Macedonia) — lignite basin"
+    EL54: "Ipeiros (Epirus)"
+    EL61: "Thessalia (Thessaly)"
+    EL62: "Ionia Nisia (Ionian Islands)"
+    EL63: "Dytiki Ellada (West Greece)"
+    EL64: "Sterea Ellada (Central Greece)"
+    EL65: "Peloponnisos (Peloponnese)"
+  nuts_3_count: 52                    # 52 regional units (perifereiakes enotites)
+  osm_ref_nuts_3_density: HYPOTHESIS  # Verify at Step 2 fetch — Poland taught us NUTS-3 tag density is EMPIRICAL PER COUNTRY
+
+# ── Convention #78 §4bis.5 Layer 3 geofence — NOT NEEDED ────────────────
+
+convention_78_4bis_5_layer_3_geofence:
+  status: NOT_REQUIRED
+  rationale: >
+    Greece has SINGLE national DSO (DEDDIE/HEDNO). No sub-national DSO
+    territorial partition exists. Layer 3 lat/lon geofence pattern
+    (introduced Prague metro Czechia + refined Warsaw metro Poland
+    Innogy Stoen) applies ONLY where multiple DSOs partition the
+    territory. Greece post-2012 unbundling consolidated all distribution
+    under a single operator. Cumulative post-Greece cohort will still
+    show 3 Layer 3 §4bis.5 enforcements (Prague + Warsaw narrow +
+    reserved for future multi-DSO countries).
+
+# ── Cross-border filter (Discipline #36) preflight ──────────────────────
+
+cross_border_filter:
+  bounds_json_features: 14                       # 14 multi-region polygons (mainland + island clusters)
+  bbox_envelope:
+    lat_min: 34.815
+    lat_max: 41.750
+    lon_min: 19.626
+    lon_max: 28.240
+  tolerance_km: 0.1                              # Default 100m cadastral
+  mode_class: MODE_2                             # Multi-polygon with island coverage — similar to Norway/NZ tolerance context
+  greece_specific_considerations:
+    - "14 disjoint polygons (mainland Peloponnese + Crete + Aegean archipelagos)"
+    - "Turkish border in Thrace — verify eastern border precision"
+    - "Albanian + North Macedonian + Bulgarian northern borders"
+    - "Aegean maritime borders with Turkey — some contested EEZ but land polygons well-defined"
+    - "Expected pre-filter substation drift LOW (<2%) per prior cohort experience"
+
+# ── Sequence 2 workflow — smallest-first Wave 3 cadence ─────────────────
+
+wave_3_smallest_first_sequence:
+  step_1_preflight: THIS_DOCUMENT (Task #313)
+  step_2_operator_local_fetch: PENDING (Task #314 candidate)
+    # Operator local OSM Overpass fetch — ~4-6 min wall-clock estimate
+    # Residential IP for reliability; sandbox size fine for smaller Greek scope
+  step_3_l1_connector: PENDING
+    # scripts/pipeline/ingestion/greece/osm_overpass.py + _base.py
+    # Reuse czechia canonical pattern (single-DSO territorial map + apply_bounds_filter)
+    # ~600-800 LOC (SIMPLER than Poland's 900 LOC due to single-DSO)
+  step_4_merge_execution: PENDING
+    # Delta audit vs 556 baseline; expected 3-8× increase
+    # Meta trail records Convention #78 4th enforcement + Convention #56 preservation
+  step_5_doc_cascade: PENDING
+    # Update CLAUDE.md tagline + edition-config.json + landing index.html
+    # Editorial Calendar + REPORTS_FRAMING_KB cross-ref + Convention #78 cumulative ledger update
+
+wave_3_p22_position_signals:
+  first_wave_3_country: TRUE                     # Resets smallest-first cadence post-Poland LARGEST
+  simplest_architecture: TRUE                    # Single-DSO makes attribution trivial
+  first_greek_language_country: TRUE             # First Greek-script Convention #78 empirical instance
+  first_mediterranean_country_wave_3: TRUE       # Balkans/Mediterranean geopolitical cluster entry
+  eu_member: TRUE                                # EU-27 acquis (relevant for R7 SFDR PAI framework alignment)
+  oecd_member: TRUE                              # OECD accession 1961
+  eurozone: TRUE                                 # Eurozone since 2001
+
+# ── Precedent references ────────────────────────────────────────────────
+
+precedent_references:
+  ingestion_pattern_source: czechia (single-DSO/multi-DSO transition; small-medium fetch)
+  l1_connector_source: czechia (single-DSO simplification precedent)
+  merge_script_source: czechia (proven at scale)
+  bounds_filter_source: canada (keyword-only args + tolerance_km loaded from cross_border_tolerances.json)
+  # NOTE: reuse the Canada _base.py canonical pattern per Poland hotfix (Task #288)
+
+# ── Refresh trail closure ───────────────────────────────────────────────
+
+refresh_trail:
+  authored_at_utc: 20260717T000000Z
+  authored_by: ikenga-ssi-foundation
+  supersedes: none (first Greek v4.23 audit doc)
+  next_review_at: post_step_2_fetch_completion

@@ -113,6 +113,9 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     "australia":    {"flood": 0.50, "wildfire": 0.90, "winter": 0.20, "adapt": 0.70, "compound": 0.60, "just": 0.50},
     "colombia":     {"flood": 0.65, "wildfire": 0.55, "winter": 0.10, "adapt": 0.40, "compound": 0.55, "just": 0.50},
     "estonia":      {"flood": 0.45, "wildfire": 0.20, "winter": 0.80, "adapt": 0.65, "compound": 0.30, "just": 0.55},
+    # Wave 3 P22 Greece (17 July 2026) — HIGH wildfire (2018 Mati + 2023 Rhodes megafires)
+    # + MODERATE-HIGH compound (2023 Storm Daniel) + MODERATE just (€277M JTF Western Macedonia)
+    "greece":       {"flood": 0.50, "wildfire": 0.85, "winter": 0.35, "adapt": 0.50, "compound": 0.60, "just": 0.55},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
