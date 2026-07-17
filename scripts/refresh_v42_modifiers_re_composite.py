@@ -130,6 +130,14 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # landslide + avalanche) + LOW just (90%+ carbon-free electricity via hydro +
     # nuclear; NOT EU JTF eligible — non-EU member; domestic just-transition minimal)
     "switzerland":  {"flood": 0.55, "wildfire": 0.30, "winter": 0.75, "adapt": 0.85, "compound": 0.60, "just": 0.25},
+    # Wave 3 P25 Ireland (17 July 2026) — HIGH flood (2015-2016 major flooding + Atlantic
+    # storms + River Shannon basin; OPW flood atlas) + LOW-MOD wildfire (sparse forestry;
+    # 2018 gorse fires exception; Coillte + EFFIS 2024) + MOD winter (Atlantic storms
+    # Ophelia 2017 + Emma 2018; Met Éireann storm registry) + HIGH adapt (ND-GAIN 15/181;
+    # Climate Action Plan 2024 statutory net-zero 2050) + MOD-HIGH compound (Atlantic
+    # storm + inland flooding + wind gust clusters) + MOD just (Moneypoint 915 MW closure
+    # 2025 + EU JTF €68M Midlands region — Bord na Móna peat transition + Moneypoint coal)
+    "ireland":      {"flood": 0.65, "wildfire": 0.15, "winter": 0.55, "adapt": 0.75, "compound": 0.60, "just": 0.45},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
