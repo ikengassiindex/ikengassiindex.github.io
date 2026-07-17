@@ -1,0 +1,217 @@
+# Greece v4.23 Ingestion Audit — Step 4 Merge Execution + Delta Audit
+# ====================================================================
+# Task: #316 (WAVE3-Step4 Greece)
+# Date: 17 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Wave 3 Priority: 22 (FIRST Wave 3 country — smallest-first cadence
+#                     resets post-Poland LARGEST)
+# Status: MERGE_COMPLETE — Convention #56 partial fetch surfaced, Step 4b
+#         retroactive attribution rescued to 100% owner coverage
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: greece
+country_iso2: GR
+country_iso3: GRC
+supersedes: v4_23-ingestion-audit-greece-preflight.yaml (Task #313)
+
+# ── Empirical fetch outcome ──────────────────────────────────────────────
+
+fetch_outcome:
+  overpass_endpoints_attempted: 3     # overpass-api.de + kumi.systems + private.coffee
+  overpass_504_gateway_events: 5      # kumi.systems 504 x2 + overpass-api.de 504 x2 + overpass-api.de timeout x1
+  overpass_way_query_status: TIMEOUT_convention_56_partial
+    # ⚠ Critical empirical finding: OSM way substation query hit read timeout
+    # under Overpass gateway congestion window (14:06-14:12 UTC 17 July 2026).
+    # Convention #56 partial-fetch degradation preserved. 23 substations
+    # total parsed (node + relation only). Way query would typically yield
+    # 1500-3500 subs per preflight expected yield — Greek OSM way count
+    # SUSPECTED lower than Central European density due to lower OSM
+    # contributor coverage post-2010 austerity + Mediterranean rural
+    # dispersion.
+  successful_endpoint_for_lines: overpass.private.coffee
+  raw_bytes_fetched: 5809
+  raw_sha256: c5cfc300929b3db38e74afdb5cf823be414ec5c53eda74891269a9e2021a780f
+
+  osm_yield:
+    substations_total: 23                     # ⚠ Way query timeout — node + relation only
+    lines_total: 1924
+    line_ratio: 83.7                          # 1924/23 — anomalous; lines exhaustive but sub-way missing
+    expected_vs_empirical_delta: >
+      Preflight expected 2000-5000 subs post-merge. Empirical: 576.
+      12% of expected yield — dominated by baseline preservation + retroactive
+      attribution rather than net-new OSM ingestion. Convention #56 partial
+      fetch outcome documented; Step 4b retroactive rescue closed 100% owner
+      coverage gap regardless.
+
+# ── Substation merge outcome ─────────────────────────────────────────────
+
+substation_merge:
+  baseline_subs: 556
+  osm_subs_parsed: 23
+  enriched_via_osm_match: 3                   # 500m proximity match — small due to way-query timeout
+  voltage_filled_via_osm: 0
+  net_new_from_osm: 20                        # LOW — expected 1500-3500 from preflight
+  voltage_xcheck_findings: 0                  # 0 tier mismatches
+  final_substation_count: 576                 # 556 + 20 = 576 (baseline preservation + small OSM delta)
+
+  step_4b_retroactive_attribution:            # 🏆 SAVED THE DAY — 100% coverage restored
+    subs_closed: 553                          # ALL baseline subs previously without owner
+    breakdown:
+      region_jurisdiction_fallback_ADMIE_TSO: 459           # 83.0% of retroactive
+      region_jurisdiction_fallback_DEDDIE_DSO_voltage_default: 81   # 14.6%
+      region_jurisdiction_fallback_DEDDIE_DSO: 13            # 2.4%
+    architectural_note: >
+      Convention #78 §4bis.5 Layer 3 geofence NOT needed (single national DSO
+      confirmed empirically). Voltage-class × single-DSO resolver attributes
+      100% of baseline subs without OSM match. Costa Rica Priority 13 pattern
+      generalises cleanly to Greek architecture — SIMPLEST retroactive
+      attribution cohort-wide post-Convention-#78-BINDING.
+
+# ── Owner distribution — final state (576 subs) ─────────────────────────
+
+owner_distribution_final:
+  distinct_owners: 6
+  attribution_coverage_pct: 100.0             # 🏆 ZERO unattributed subs
+  breakdown:
+    "ADMIE (IPTO)": 461                       # 80.0% — DOMINANT class
+    "DEDDIE (HEDNO)": 111                     # 19.3% — SUBORDINATE class
+    "ΣΤΑ.ΣΥ.": 1                              # Athens tram/trolleybus — Greek script direct
+    "ΣΤΑΣΥ": 1                                # Alternative Greek spelling — direct
+    "Η.Σ.Α.Π.": 1                             # Athens metro predecessor — Greek script
+    "STASY (Athens Tram + Electric Trolleybus)": 1  # alias-normalised
+
+  empirical_surprise: >
+    🚨 UNEXPECTED — ADMIE_TSO dominates 80% vs DEDDIE_DSO 19.3%. This
+    INVERTS the typical DSO-dominant distribution (Central Europe DSO
+    typically 65-95%). Two hypotheses to investigate at Step 5:
+      (a) Greek OSM sub baseline biased toward HV/EHV backbone (400/150/66
+          kV) with LV/MV distribution grid under-represented in baseline.
+          The 66 kV subtransmission tier (which Greek architecture assigns
+          to ADMIE) may inflate TSO count vs Central European comparison
+          where 110 kV DSO is the equivalent tier.
+      (b) DEDDIE MV distribution grid (20 kV + 400/230 V) sparsely captured
+          in baseline SSI Foundation data — most subs at baseline were
+          transmission substations, not MV distribution transformer nodes.
+    Hypothesis (a) is architecturally correct (66 kV subtransmission is
+    Greek TSO by design); hypothesis (b) reflects baseline coverage gap
+    that OSM way query would have partially closed had fetch succeeded.
+
+# ── Convention #78 BINDING 4th enforcement empirical results ────────────
+
+convention_78_binding_4th_enforcement_results:
+  alias_normalised_hits_at_fetch: 5           # ⚠ LOW — expected 800-2500 due to way-query timeout
+  raw_alias_hits_visible_in_owner_distribution:
+    stasy_athens_tram_normalised: 1           # ΣΤΑ.ΣΥ. / STASY multi-script variant
+    direct_normalised_hits_at_fetch_5:
+      - "ΑΔΜΗΕ → ADMIE (IPTO)"                # Greek script — TSO
+      - "Alias hits deferred to Step 5 refetch (way query recovery)"
+
+  cumulative_ledger:
+    pre_greece: 20406                         # Latvia 1 + Estonia 20 + Latvia 143 + Slovakia 615 + Czechia 5178 + Poland 14449
+    post_greece: 20411                        # +5 (partial fetch — small)
+    post_greece_ratio_above_binding_threshold: 2041.1x
+    status_signal: >
+      Convention #78 BINDING 4th enforcement empirically validated but
+      alias-hit count below preflight forecast due to Convention #56
+      partial-fetch degradation (Overpass 504 timing). Cumulative
+      ledger continues to compound above BINDING threshold at 2,041×
+      — enforcement threshold structurally safe. Way-query recovery
+      pass at Step 5 would push Greek instance count to preflight
+      forecast (~800-2500 hits).
+
+# ── Convention #78 §4bis.5 Layer 3 geofence status ──────────────────────
+
+convention_78_4bis_5_layer_3_geofence:
+  status: NOT_REQUIRED_CONFIRMED_EMPIRICALLY
+  cumulative_enforcement_count_post_greece: 3  # Prague CZ + Warsaw PL narrow-carve-out + reserved
+  rationale_validation: >
+    Preflight prediction confirmed: single national DSO makes §4bis.5
+    Layer 3 lat/lon geofence trivially unnecessary. Voltage-class
+    resolver + DEDDIE default handled all retroactive attribution
+    cases via simple threshold logic. No sub-national DSO territorial
+    partition exists to require geofence refinement.
+
+# ── Line merge outcome ───────────────────────────────────────────────────
+
+line_merge:
+  baseline_lines: 1420
+  osm_lines_parsed: 1924
+  lines_dropped_outside_polygon: 69           # Discipline #36 cross-border filter — 5km tolerance
+  lines_appended: 355                         # Net-new
+  lines_deduped: 1500                         # Dedupe via midpoint 100m + voltage ±20%
+  final_line_count: 1775                      # 1420 + 355 = 1775
+  line_substation_ratio_post_merge: 3.08      # 1775/576 — anomalous low ratio due to sub under-count
+  discipline_36_dropped:
+    substations: 0
+    lines: 69                                 # 3.6% of OSM lines outside Greek polygon (Turkish + Balkan borders)
+
+# ── Voltage cross-validation ─────────────────────────────────────────────
+
+voltage_xcheck:
+  matched_pairs_evaluated: 3                  # LOW due to sub-way timeout
+  voltage_tier_mismatches: 0
+  voltage_tier_mismatch_rate_pct: 0.0
+  file: greece/v4_23-voltage-cross-validation.json
+
+# ── File sizes (Task #125 90 MB sentinel) ────────────────────────────────
+
+file_sizes_post_merge:
+  ssi_data_json_mb: 1.5                       # Well under 90 MB sentinel
+  grid_geo_json_mb: 1.1
+  sentinel_task_125_status: SAFE               # 45x below threshold
+
+# ── Empirical follow-ons + operator decisions ────────────────────────────
+
+follow_ons:
+  bug_report_1:
+    severity: LOW
+    class: audit-sidecar-wrong-directory
+    description: >
+      canada _base.py::emit_audit_sidecar hardcodes 'canada' in output path.
+      Greek fetch audit sidecar landed at:
+        scripts/pipeline/data/canada/v4_23-ingestion-audit-canada-gr-c1-osm-overpass.yaml
+      Should be at:
+        scripts/pipeline/data/greece/v4_23-ingestion-audit-greece-gr-c1-osm-overpass.yaml
+      Fix: extend emit_audit_sidecar to accept country_slug parameter,
+      or override in each country's _base.py wrapper. Preserves audit
+      trail routing per country.
+    priority: post-Wave-3-P22-Step-5
+    action_owner: sandbox
+
+  operator_decision_needed_1:
+    question: >
+      OSM way substation query timeout limited fetch to 23 subs vs preflight
+      expected 1500-3500. Options:
+        (a) ACCEPT — proceed with 576 sub final count. Step 4b retroactive
+            attribution achieved 100% owner coverage. Greek OSM way sub density
+            may genuinely be lower than Central European baseline (post-2010
+            austerity + Mediterranean rural OSM contributor density).
+        (b) RETRY — clear scripts/pipeline/ingestion/greece/cache/ and re-run
+            fetch. Fresh Overpass window post-14:12 UTC should complete the
+            way query. Expected: 1500-3500 net-new subs added.
+      Precedent: Poland Wave 2 P21 had similar Overpass 504 timing issue on
+      first attempt; operator retried and got full 25,517 net-new subs.
+    recommendation: OPTION_B_RETRY
+      # Rationale: preflight forecast of 2000-5000 total sub count aligned
+      # with Greek EU-27 population + grid size; 576 final count leaves
+      # 70-90% of expected v4.23 refresh delta on the table. Retry
+      # deferred outside sandbox window per operator capacity budget.
+
+# ── Sequence 2 workflow ready state ──────────────────────────────────────
+
+wave_3_step_5_ready:
+  status: READY_PENDING_OPERATOR_RETRY_DECISION
+  next_step_5_actions:
+    - "Commit 12 canonical refresh (ssi-data.json + grid-geo.json + audit YAML)"
+    - "R7 Phase 4c v4.2 modifier chain + Re composite refresh via scripts/refresh_v42_modifiers_re_composite.py greece"
+    - "Doc cascade: CLAUDE.md tagline + intelligence/edition-config.json bump + landing index.html Wave 3 first-country milestone"
+    - "Convention #78 BINDING cumulative ledger update (pending way-query recovery pass empirical count)"
+
+# ── Refresh trail closure ────────────────────────────────────────────────
+
+refresh_trail:
+  authored_at_utc: 20260717T121441Z
+  authored_by: ikenga-ssi-foundation
+  supersedes: v4_23-ingestion-audit-greece-preflight.yaml
+  next_review_at: post_operator_step_5_or_retry_decision
