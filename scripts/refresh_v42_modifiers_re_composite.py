@@ -138,6 +138,19 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # storm + inland flooding + wind gust clusters) + MOD just (Moneypoint 915 MW closure
     # 2025 + EU JTF €68M Midlands region — Bord na Móna peat transition + Moneypoint coal)
     "ireland":      {"flood": 0.65, "wildfire": 0.15, "winter": 0.55, "adapt": 0.75, "compound": 0.60, "just": 0.45},
+    # Korea (Wave 3 P26 — FIRST Asian Wave 3 event; KEPCO monopoly + KR-ISOLATED grid) —
+    # MOD-HIGH flood (East Asian monsoon typhoon exposure — Typhoon Rusa 2002 + Maemi 2003
+    # + Yeongdeungpo urban flooding 2011 + Sacheon flash flood 2020 + Hinnamnor 2022) +
+    # LOW-MOD wildfire (Gangwon peninsula concentration — Gangneung 2019 + Uljin/Samcheok
+    # 2022 + Andong 2024; MOD-HIGH regional but low national average) + MOD winter
+    # (Siberian monsoon cold snaps + Yeongdong region heavy snow — Gangwon peninsula) +
+    # MOD-HIGH adapt (K-Green New Deal 2020 + Carbon Neutrality Act 2021 statutory 2050 +
+    # 2030 NDC -40% vs 2018 baseline + K-Taxonomy 2022) + MOD compound (multi-hazard
+    # typhoon+flood+landslide clusters common August-September) + LOW-MOD just (post-
+    # industrial coal transition in Chungnam/Gyeongbuk — 6 coal units retiring 2025-2032
+    # per 10th Basic Electricity Plan; smaller-scale than Ireland Moneypoint or Germany
+    # Ruhr; Korea Just Transition Fund KRW 500B / €340M via Ministry of Employment)
+    "korea":        {"flood": 0.55, "wildfire": 0.20, "winter": 0.50, "adapt": 0.75, "compound": 0.55, "just": 0.25},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
