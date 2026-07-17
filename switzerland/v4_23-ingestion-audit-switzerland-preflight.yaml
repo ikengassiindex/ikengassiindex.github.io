@@ -1,0 +1,448 @@
+# Switzerland v4.23 Ingestion Audit — Step 1 Pre-flight Source Discovery
+# =========================================================================
+# Task: #325 (WAVE3-Step1 Switzerland)
+# Date: 17 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Wave 3 Priority: 24 (THIRD Wave 3 country post-Iceland; smallest of
+#                     remaining Wave 3 queue at 947 baseline subs;
+#                     first FEDERAL cohort country; first NON-EU-member
+#                     cohort country; first 4-LANGUAGE cohort country)
+# Status: READY_FOR_STEP_2_FETCH
+
+schema_version: v4_23-ingestion-audit-preflight-1
+country_slug: switzerland
+country_iso2: CH
+country_iso3: CHE
+
+# ── Baseline state (as of pre-fetch snapshot 17 July 2026) ───────────────
+
+baseline_state:
+  ssi_data_substations: 947
+  grid_geo_lines: 625                         # Line ratio 0.66 SIGNIFICANTLY LOW; canonical under-populated
+    # empirical baseline audit: 625 lines / 947 subs = 0.66 (vs Nordic 1.5-2.5 healthy band)
+    # → line densification expected to be MAJOR contribution of Wave 3 P24 refresh
+  voltage_coverage_pct: 99.9                  # 946/947 have voltage (1 LV outlier)
+    # 636 MV (16-50 kV) + 163 HV (110 kV) + 117 EHV-220 + 30 EHV-380 (Swissgrid backbone) + 1 LV
+  region_coverage_pct: 100.0                  # 26/26 cantons populated
+  owner_coverage_pct: 0.0                     # ⚡ ZERO baseline — same signature as Czechia/Poland/Iceland
+  bounds_features: 26                         # 26 canton polygons
+  min_fleet_pin: 900                          # KB §56 fleet-floor (Switzerland 947 baseline; +5% headroom)
+  re_norm_coverage_pct: 94.8                  # 898/947 populated; 49 subs need Phase 4c refresh
+    # (empirical iceland-precedent: baseline coverage assumptions from preflight not always
+    # accurate — 5.5% latent gap discovered post-Iceland, similar signature here)
+
+# ── Data source primary — OSM Overpass API ──────────────────────────────
+
+primary_source:
+  source_id: CH-C1-osm-overpass
+  publisher: OpenStreetMap contributors via Overpass API
+  licence: ODbL (Open Database License) — attribution required
+  endpoint_primary: https://overpass-api.de/api/interpreter
+  endpoint_fallback: https://overpass.kumi.systems/api/interpreter
+  endpoint_second_fallback: https://overpass.private.coffee/api/interpreter
+  expected_query_scope: >
+    3 element-type queries for substations (way + node + relation) + 1
+    combined query for lines (power=line + cable + minor_line). Area
+    header: area["ISO3166-1"="CH"]->.ch
+  expected_yield:
+    substations_way: 800-2000                 # High OSM density (Central European contributor cohort)
+    substations_node: 400-1000
+    substations_relation: 10-25
+    lines: 3000-8000                          # LARGE gap vs baseline 625 (line densification MAJOR gain)
+    line_ratio_pre_merge: 3.0-5.0             # Central European transmission density
+    total_raw_bytes: ~15-40 MB                # 3-6× Iceland fetch scale
+  expected_scale_context: >
+    Switzerland is THIRD Wave 3 cohort at 947 baseline subs. Expected
+    2-4× increase to ~1,900-3,800 net-new substations. Line densification
+    expected to be MATERIAL (baseline 625 lines is significantly under
+    Central European transmission density; expected 4-10× line growth
+    to ~2,500-6,000 final line count). Central European OSM contributor
+    density is HIGH (vs Nordic-Arctic Iceland sparsity) — single-query
+    per element type expected to succeed reliably. Estimated ~5-10 min
+    sandbox fetch. 504 gateway timeouts less likely than Iceland/Greek
+    Nordic-Arctic/Mediterranean sparsity but possible on line-query
+    (largest payload) — Convention #56 partial-fetch preservation ready.
+
+# ── Grid architecture — Swissgrid federal TSO + 5+600 DSOs ──────────────
+
+grid_architecture:
+  tso_transmission:
+    operator_id: SWISSGRID
+    operator_names_aliases:
+      - "Swissgrid"                             # German (Federal common name)
+      - "Swissgrid AG"                          # With legal form
+      - "Swissgrid ag"
+      - "SWISSGRID"
+      - "Swissgrid SA"                          # French legal form
+      - "Swissgrid SpA"                         # Italian legal form
+    voltage_thresholds:
+      backbone_kv: 380                          # 380 kV backbone (30 subs)
+      high_voltage_kv: 220                      # 220 kV EHV (117 subs)
+      subtransmission_kv: 150                   # Occasional 150 kV interfacings
+    tso_threshold_rule: "≥220 kV → SWISSGRID"    # Simple threshold; 150 kV boundary case
+    established: 2006                           # BFE unbundled per EU 3rd Package via bilateral agreement
+    unbundling_completed: 2009                  # Full asset transfer
+    grid_synchronous: TRUE                      # UCTE/Continental Europe synchronous area
+    grid_frequency_hz: 50
+    cross_border_interconnectors: 41            # HIGHEST cohort-wide count (bilateral EU + Italy + Austria + France + Germany)
+    note: >
+      Swissgrid is HIGHEST-connectivity TSO cohort-wide with 41
+      cross-border interconnectors to DE + FR + IT + AT. First
+      non-EU-member cohort TSO — operates under bilateral EU relationship
+      via BFE oversight (not EEA membership). CH ISO code + bilateral
+      framework distinguishes Switzerland from cohort EEA members.
+
+  dso_distribution:
+    architectural_note: >
+      Switzerland has ~600 DSOs cohort-wide — LARGEST DSO fragmentation
+      in cohort. 5 major DSOs cover ~60-70% of population; remaining
+      ~30-40% served by hundreds of small municipal utilities
+      (Elektrizitätswerke). Convention #78 §4bis.5 Layer 3 geofence
+      LIKELY REQUIRED for Zürich metro (EWZ + Axpo Grid cohabitation)
+      + Geneva metro (SIG + Romande Energie cohabitation) —
+      analogous to Warsaw Innogy Stoen carve-out pattern.
+
+    axpo_grid:
+      operator_id: AXPO_GRID
+      operator_names_aliases:
+        - "Axpo Grid"
+        - "Axpo Grid AG"
+        - "Axpo"
+        - "Axpo AG"                             # Parent Axpo Holding
+        - "Axpo Holding"
+        - "Axpo Holding AG"
+        - "AXPO"
+      territory: >
+        Aargau + Zürich + Schaffhausen + Thurgau + parts of Zug + Bern
+      share_estimated: ~15%                     # Largest DSO by connection count in Deutschschweiz
+      predecessor: NOK (Nordostschweizerische Kraftwerke) — pre-2001 rebrand
+
+    bkw_netzservice:
+      operator_id: BKW
+      operator_names_aliases:
+        - "BKW"
+        - "BKW AG"
+        - "BKW Netzservice"
+        - "BKW Netzservice AG"
+        - "BKW Energie AG"
+        - "Bernische Kraftwerke"                 # Legacy full name
+        - "Bernische Kraftwerke AG"
+      territory: >
+        Bern (canton) + Jura + parts of Neuchâtel + Solothurn + Freiburg
+      share_estimated: ~12%
+      predecessor: Bernische Kraftwerke AG — pre-2013 rebrand to BKW
+
+    ckw:
+      operator_id: CKW
+      operator_names_aliases:
+        - "CKW"
+        - "CKW AG"
+        - "Centralschweizerische Kraftwerke"     # German full form
+        - "Centralschweizerische Kraftwerke AG"
+      territory: >
+        Zentralschweiz — Luzern + Nidwalden + Obwalden + Uri + Schwyz +
+        parts of Aargau
+      share_estimated: ~8%
+      predecessor: None (established 1894 — no rebrand)
+
+    groupe_e:
+      operator_id: GROUPE_E
+      operator_names_aliases:
+        - "Groupe E"                             # French primary
+        - "Groupe E SA"
+        - "Groupe E s.a."                        # Lowercase legal form
+        - "Groupe-E"                             # Hyphenated variant
+      territory: >
+        Fribourg + Neuchâtel + parts of Vaud + Bern (French-speaking region)
+      share_estimated: ~10%
+      predecessor: EEF (Entreprises Électriques Fribourgeoises) — pre-2006 rebrand
+
+    romande_energie:
+      operator_id: ROMANDE_ENERGIE
+      operator_names_aliases:
+        - "Romande Energie"                      # French primary
+        - "Romande Energie SA"
+        - "Romande Énergie"                      # With accent (rare)
+        - "Romande Energie s.a."
+      territory: >
+        Vaud + parts of Fribourg + Valais + Geneva outskirts
+      share_estimated: ~10%
+      predecessor: EOS (Énergie Ouest Suisse) — pre-2007 merger
+
+    ewz_zurich:
+      operator_id: EWZ
+      operator_names_aliases:
+        - "EWZ"
+        - "ewz"
+        - "Elektrizitätswerk der Stadt Zürich"   # German full name
+        - "Elektrizitätswerk Zürich"
+        - "EWZ Zürich"
+      territory: >
+        Zürich Stadt (city proper — MUNICIPAL DSO, NOT cantonal)
+      share_estimated: ~4%
+      layer_3_geofence_candidate: TRUE           # Zürich metro carve-out from Axpo Grid
+
+    sig_geneva:
+      operator_id: SIG
+      operator_names_aliases:
+        - "SIG"
+        - "sig"
+        - "Services Industriels de Genève"       # French full name
+      territory: >
+        Genève (canton — mixed municipal + cantonal governance)
+      share_estimated: ~4%
+      layer_3_geofence_candidate: TRUE           # Geneva metro carve-out from Romande Energie
+
+    ies_lausanne:
+      operator_id: SIL
+      operator_names_aliases:
+        - "SIL"
+        - "SI-L"
+        - "Services Industriels de Lausanne"
+        - "Lausanne SI"
+      territory: >
+        Lausanne (city proper — municipal DSO)
+      share_estimated: ~2%
+      layer_3_geofence_candidate: TRUE           # Lausanne metro carve-out from Romande Energie
+
+    aet_ticino:
+      operator_id: AET
+      operator_names_aliases:
+        - "AET"                                  # Italian primary
+        - "Azienda Elettrica Ticinese"           # Italian full name
+        - "Azienda Elettrica Ticinese SA"
+        - "AET SA"
+        - "AET SpA"                              # Italian legal form variant
+      territory: >
+        Ticino (Italian-speaking canton)
+      share_estimated: ~3%
+      predecessor: None
+
+    rhaetische_werke_gr:
+      operator_id: RHAETISCHE
+      operator_names_aliases:
+        - "Rätia Energie"                        # German name
+        - "Rätia Energie AG"
+        - "Ratia Energie"                        # ASCII variant
+        - "Repower"                               # 2007 rebrand of Rätia Energie
+        - "Repower AG"
+      territory: >
+        Graubünden (multi-language canton — German + Italian + Romansh)
+      share_estimated: ~2%
+      predecessor: Rätia Energie AG — 2007 rebrand to Repower
+
+  private_captives_estimated:
+    - "SBB (Swiss Federal Railways — 16.7 Hz electric traction infrastructure)"
+    - "CFF (French: Chemins de fer fédéraux — SBB French name)"
+    - "FFS (Italian: Ferrovie federali svizzere — SBB Italian name)"
+    - "Alpiq (Generation subsidiary — Alpiq Holding AG post-2009 unbundling)"
+    - "Axpo Solutions (Generation subsidiary)"
+    - "Kernkraftwerk Gösgen (Nuclear plant — 4 shareholders)"
+    - "Kernkraftwerk Leibstadt (Nuclear plant — 5 shareholders)"
+    - "CERN (particle physics research campus — Geneva)"
+    - "EPFL/ETH university campuses (Lausanne + Zürich)"
+    - "Pharmaceutical captives (Roche + Novartis Basel-Stadt)"
+    - "Precision manufacturing captives (Neuchâtel/Jura watchmaking valley)"
+
+  grid_topology_notes:
+    federal_multi_canton_architecture: TRUE     # 26 cantons with independent energy policies
+    non_eu_member: TRUE                          # EFTA + EEA MEMBER: EFTA yes, EEA NO (bilateral)
+    highest_dso_fragmentation_cohort_wide: TRUE  # ~600 DSOs
+    cross_border_interconnector_hub: TRUE        # 41 interconnectors HIGHEST cohort-wide
+    isolated_grid: FALSE                         # Fully synchronised with UCTE Continental Europe
+    hydro_generation_share_pct: ~57              # Alpine hydropower dominant
+    nuclear_generation_share_pct: ~32            # 4 reactors (Beznau I+II + Gösgen + Leibstadt)
+    thermal_share_pct: ~2
+    renewable_new_share_pct: ~9                  # Solar + wind + biomass growth
+    net_import_export: NET_IMPORTER              # ~10-15% net winter import from FR/DE
+
+# ── Convention #78 BINDING 6th enforcement (post-Iceland cumulative) ────
+
+convention_78_binding_6th_enforcement:
+  enforcement_number: 6
+  cumulative_8_country_hits_pre_switzerland: 20518
+    # Latvia 1 + Estonia 20 + Latvia (first) 143 + Slovakia 615 + Czechia 5178
+    # + Poland 14449 + Greece 108 + Iceland 4
+  expected_switzerland_alias_hits: 500-2000
+    # HIGHER than Iceland (4) or Greek (108) due to:
+    # (a) 4-language cohabitation (German/French/Italian/Romansh operator= tag drift)
+    # (b) Multiple predecessor rebrand cascades (NOK → Axpo Grid, Bernische Kraftwerke → BKW,
+    #     EEF → Groupe E, EOS → Romande Energie, Rätia Energie → Repower)
+    # (c) High OSM contributor density in Central Europe (vs Nordic sparsity)
+    # (d) Legal-form variant richness (AG/SA/SpA cross-language)
+  cumulative_9_country_hits_post_switzerland: 21018-22518
+  cadence_precedent_ratio_post_switzerland: 2101-2251x above 10-instance BINDING threshold
+  status_signal: "Convention #78 BINDING continues cohort-wide adoption — 6th enforcement"
+
+  alias_class_distribution_estimated:
+    multi_language_script_cohabitation: HIGH    # 🆕 NEW class cohort-wide
+      # German + French + Italian + Romansh operator= tag drift on 5 major DSOs + 600 municipal
+      # First Wave 3 cohort 4-language country (Iceland was Icelandic-only; Greek was Greek-only)
+    legal_form_variants:                         # Trilingual coexistence
+      - "AG"                                     # Aktiengesellschaft (German)
+      - "SA"                                     # Société anonyme (French)
+      - "s.a."                                   # Lowercase variant
+      - "SpA"                                    # Società per azioni (Italian)
+      - "AG "                                    # With trailing space
+      - "SA "
+    diacritics_class: MODERATE                   # German ä ö ü ß + French é è à + Italian à è ì ò ù
+    predecessor_rebrand_alias_classes:
+      nok_axpo_grid_pre_2001: HIGH               # 25-year legacy — some OSM tags may retain NOK
+      bkw_bernische_kraftwerke_pre_2013: MODERATE # 13-year legacy
+      eef_groupe_e_pre_2006: MODERATE            # 20-year legacy
+      eos_romande_energie_pre_2007: MODERATE     # 19-year legacy
+      raetia_energie_repower_pre_2007: LOW       # Small canton (Graubünden)
+    romansh_class: RARE                          # <5% Graubünden — mainly Rait/Electricitad forms
+
+  new_sub_convention_candidate_status:
+    scope: >
+      Multi-language script cohabitation (German + French + Italian +
+      Romansh) is a NEW alias class cohort-wide. First Wave 3 4-language
+      country. Empirical validation of trilingual/quadrilingual legal-
+      form variants (AG/SA/SpA) will inform future multi-language
+      cohort countries (Belgium if re-audited, Luxembourg NL/DE/FR/LU,
+      etc.). Sub-convention candidate: multi-language alias-normalisation
+      pattern — post-Switzerland empirical instance count TBD.
+
+# ── Convention #78 §4bis.4 two-phase workflow status ────────────────────
+
+convention_78_4bis_4_two_phase_workflow:
+  phase_1_l1_ingestion: PENDING_STEP_2_FETCH
+  phase_2_l2_l3_l4_rescore: DEFERRED_POST_STEP_4
+  visibly_honest_degradation_marker: >
+    Net-new subs will carry Convention #56 neutral defaults post-merge.
+    Phase 4c refresh via scripts/refresh_v42_modifiers_re_composite.py
+    will populate v4.2 modifier chain + Re composite. Switzerland
+    requires _COUNTRY_HAZARD_BASELINES entry — see recommendation below.
+
+  hazard_baseline_recommendation:
+    country_slug: switzerland
+    flood: 0.55                                  # MODERATE — Alpine flooding + Rhine + Aare river basins
+    wildfire: 0.30                               # LOW-MODERATE — Ticino + Valais Föhn-wind-driven fires
+    winter: 0.75                                 # HIGH — Alpine avalanches + winter storms + ice
+    adapt: 0.85                                  # VERY HIGH — ND-GAIN 5/181 (top-tier readiness cohort)
+    compound: 0.60                               # MODERATE-HIGH — Alpine multi-hazard clusters (flood + landslide + avalanche)
+    just: 0.25                                   # LOW — 90%+ carbon-free electricity (hydro + nuclear); minimal fossil transition
+    source_citations:
+      flood: "BAFU (Bundesamt für Umwelt) flood atlas + Rhine-Aare basin risk registry + IPCC AR6"
+      wildfire: "WSL (Swiss Federal Research Institute) fire atlas + Copernicus EFFIS 2024 Ticino/Valais"
+      winter: "MeteoSchweiz + SLF (WSL Institut für Schnee- und Lawinenforschung) avalanche registry"
+      adapt: "ND-GAIN 2024 Switzerland 5/181 (TOP-TIER readiness — 4th globally after Norway/Iceland/Denmark)"
+      compound: "IPCC AR6 Alpine chapter + BAFU natural-hazard registry + 2022-2024 Alpine multi-hazard events"
+      just: "EU JTF eligibility: Switzerland NOT ELIGIBLE (non-EU member); domestic just-transition minimal (90%+ carbon-free electricity)"
+
+# ── NUTS-2/NUTS-3 territorial map ────────────────────────────────────────
+
+territorial_map:
+  nuts_2_regions:
+    CH01: "Région lémanique (Vaud + Valais + Genève)"
+    CH02: "Espace Mittelland (Bern + Freiburg + Solothurn + Neuchâtel + Jura)"
+    CH03: "Nordwestschweiz (Basel-Stadt + Basel-Landschaft + Aargau)"
+    CH04: "Zürich"
+    CH05: "Ostschweiz (Glarus + Schaffhausen + Appenzell IR + AR + St. Gallen + Graubünden + Thurgau)"
+    CH06: "Zentralschweiz (Luzern + Uri + Schwyz + Obwalden + Nidwalden + Zug)"
+    CH07: "Ticino"
+  nuts_3_cantons: 26                             # 1:1 mapping with Swiss cantons
+  osm_ref_nuts_3_density: HYPOTHESIS              # Verify at Step 2 fetch (Wave 2/3 precedent — NUTS-3 tags empirical per country)
+
+# ── Convention #78 §4bis.5 Layer 3 geofence — LIKELY REQUIRED ────────────
+
+convention_78_4bis_5_layer_3_geofence:
+  status: LIKELY_REQUIRED_2_METRO_CARVE_OUTS
+  target_regions:
+    - Zürich Stadt (EWZ vs Axpo Grid cohabitation)
+    - Genève (SIG vs Romande Energie cohabitation)
+    - Lausanne (SIL vs Romande Energie cohabitation — smaller carve-out)
+  layer_3_geofence_bboxes:
+    zurich_metro: [47.32, 47.44, 8.45, 8.62]     # EWZ carve-out from Axpo Grid
+    geneva_metro: [46.15, 46.28, 6.05, 6.20]     # SIG carve-out from Romande Energie
+    lausanne_metro: [46.51, 46.55, 6.58, 6.68]   # SIL carve-out from Romande Energie
+  rationale: >
+    Switzerland has 3 major metro-DSO carve-outs analogous to Warsaw
+    Innogy Stoen narrow carve-out pattern (Convention #78 §4bis.5 3rd
+    enforcement pending). Zürich (EWZ) + Geneva (SIG) + Lausanne (SIL)
+    operate as municipal DSOs within cantonal DSO territories (Axpo Grid
+    + Romande Energie). Voltage-class Layer 1 (Swissgrid ≥220 kV)
+    disambiguates TSO cleanly; but distribution-tier requires Layer 3
+    geofence for metro-vs-cantonal DSO attribution.
+  cumulative_enforcement_count_post_switzerland: 4-5    # If all 3 metro carve-outs triggered
+    # Currently 2 (Prague CZ + Warsaw PL). Switzerland could add 2-3 (Zürich + Geneva + optional Lausanne)
+  fallback_if_not_triggered: 2                    # Prague + Warsaw preserved
+
+# ── Cross-border filter (Discipline #36) preflight ──────────────────────
+
+cross_border_filter:
+  bounds_json_features: 26                       # 26 canton polygons (1 per canton)
+  bbox_envelope:
+    lat_min: 45.82                               # Southernmost — Chiasso (Ticino/Italian border)
+    lat_max: 47.81                               # Northernmost — Bargen (Schaffhausen/German border)
+    lon_min: 5.96                                # Westernmost — Geneva canton (French border)
+    lon_max: 10.49                               # Easternmost — Müstair (Graubünden/Italian border)
+  tolerance_km: 0.5                              # PROPOSED — 5× standard tolerance for Alpine terrain simplification
+    # (Alpine border regions have complex ridge-line coastal borders; recommend moderate tolerance)
+  mode_class: MODE_2_ALPINE_BORDER               # 41 cross-border interconnectors — high border density
+  switzerland_specific_considerations:
+    - "Switzerland has 41 cross-border interconnectors — HIGHEST cohort-wide"
+    - "1739 km international border (~4× Iceland/Greek coastline)"
+    - "Alpine ridge-line borders with FR/DE/IT/AT/LI"
+    - "Small enclaves (Büsingen DE + Campione d'Italia IT) inside Swiss territory"
+    - "Cross-border substations at every interconnector — 41 legitimate near-border cases"
+    - "Expected drop rate: 0.5-2% (higher than Iceland's 0.45% due to border complexity)"
+
+# ── Sequence 2 workflow — smallest-first Wave 3 cadence ─────────────────
+
+wave_3_smallest_first_sequence:
+  step_1_preflight: THIS_DOCUMENT (Task #325)
+  step_2_operator_local_fetch: PENDING (Task #326 candidate)
+  step_3_l1_connector: PENDING
+    # scripts/pipeline/ingestion/switzerland/{__init__,_base,osm_overpass,merge_into_ssi_data}.py
+    # LARGEST L1 connector suite Wave 3 (multi-language alias map + 3 Layer 3 metro carve-outs)
+    # ~1500-2000 LOC (more than Iceland 1745 due to multi-language + multi-metro)
+  step_4_merge_execution: PENDING
+  step_5_doc_cascade: PENDING
+
+wave_3_p24_position_signals:
+  third_wave_3_country: TRUE                     # Post Greece P22 + Iceland P23
+  first_federal_multi_canton_architecture: TRUE  # 26 cantons independent energy policies
+  first_non_eu_member_wave_3_country: TRUE       # EFTA yes, EEA NO — bilateral EU relationship
+  first_4_language_cohort_country: TRUE          # German + French + Italian + Romansh
+  first_multi_metro_carve_out_country: TRUE      # 3 metro DSO carve-outs (Zürich + Geneva + Lausanne)
+  largest_dso_fragmentation_cohort: TRUE         # ~600 DSOs
+  highest_cross_border_interconnector_count: TRUE  # 41 interconnectors
+  eea_member: FALSE                              # Unique cohort position — EFTA + bilateral EU
+  oecd_member: TRUE
+  eurozone: FALSE                                # CHF (Swiss franc)
+  isolated_grid: FALSE                           # UCTE synchronous — extensive cross-border
+
+# ── Precedent references ────────────────────────────────────────────────
+
+precedent_references:
+  ingestion_pattern_source: iceland (Wave 3 P23 multi-DSO precedent) + czechia (Wave 2 3-way Layer 3)
+  l1_connector_source: iceland (5-way Layer 3 → 3-way Layer 3 metro carve-outs)
+  merge_script_source: iceland (Wave 3 canonical latest)
+  bounds_filter_source: canada (keyword-only args + tolerance_km loaded from cross_border_tolerances.json)
+  hazard_baseline_source: austria (Alpine sibling with similar hazard profile)
+  multi_language_alias_source: NEW (first cohort 4-language country — precedent for future multi-language cohort)
+
+# ── Post-Iceland empirical hypothesis validation ─────────────────────────
+
+post_iceland_hypothesis:
+  baseline_re_norm_gap: >
+    Iceland P23 discovered 5.5% latent baseline gap (37 subs on Convention
+    #56 neutral defaults despite preflight assumption of 100% coverage).
+    Switzerland baseline audit shows similar signature: 94.8% Re_norm
+    coverage → 5.2% latent gap (49 subs). Phase 4c refresh will address
+    BOTH net-new subs + latent baseline gap in single pass.
+  discovery_generalisation: >
+    Baseline coverage assumptions from preflight audits are NOT always
+    accurate. Phase 4c refresh serves DUAL purpose (net-new + latent
+    baseline gap closure). Documented cohort-wide finding.
+
+# ── Refresh trail closure ───────────────────────────────────────────────
+
+refresh_trail:
+  authored_at_utc: 20260717T140000Z
+  authored_by: ikenga-ssi-foundation
+  supersedes: none (first Swiss v4.23 audit doc)
+  next_review_at: post_step_2_fetch_completion
