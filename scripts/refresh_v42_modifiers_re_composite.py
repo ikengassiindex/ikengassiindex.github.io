@@ -122,6 +122,14 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # wind + winter clusters; 2021-2023 Reykjanes eruptions) + LOW just (already 100%
     # renewable; €0 JTF eligible — no coal to transition)
     "iceland":      {"flood": 0.30, "wildfire": 0.05, "winter": 0.90, "adapt": 0.75, "compound": 0.55, "just": 0.20},
+    # Wave 3 P24 Switzerland (17 July 2026) — MOD flood (Rhine/Aare basins + Alpine
+    # flooding) + LOW-MOD wildfire (Ticino/Valais Föhn winds; Copernicus EFFIS 2024)
+    # + HIGH winter (Alpine avalanches + storms; SLF/MeteoSchweiz registry) + VERY HIGH
+    # adapt (ND-GAIN 5/181 — TOP-TIER readiness cohort-wide; 5th globally after Norway/
+    # Iceland/Denmark) + MOD-HIGH compound (Alpine multi-hazard clusters — flood +
+    # landslide + avalanche) + LOW just (90%+ carbon-free electricity via hydro +
+    # nuclear; NOT EU JTF eligible — non-EU member; domestic just-transition minimal)
+    "switzerland":  {"flood": 0.55, "wildfire": 0.30, "winter": 0.75, "adapt": 0.85, "compound": 0.60, "just": 0.25},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }

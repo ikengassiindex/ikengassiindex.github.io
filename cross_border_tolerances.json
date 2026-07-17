@@ -31,6 +31,10 @@
     "iceland": {
       "boundary_tolerance_km": 5.0,
       "rationale": "Heavily indented fjord coastline (Westfjords + Eastfjords) + Vestmannaeyjar (Westman Islands) offshore offset + Grímsey Arctic Circle offshore island + volcanic geothermal remote-siting; bounds.json 8-polygon statistical-region file with simplified coastal edges. Wave 3 P23 preflight tolerance set at 5 km per Greenland/NZ/Denmark/Norway coastline-tolerance precedent (sibling Nordic islands). Iceland is fully-isolated grid (no submarine interconnector to Europe) — no cross-border legitimate substations exist; tolerance is purely for coastline precision + offshore-island offset absorption. Expected pre-filter substation drift <1% pre-fetch; audit at Step 4 merge time."
+    },
+    "switzerland": {
+      "boundary_tolerance_km": 0.5,
+      "rationale": "Alpine ridge-line borders with FR/DE/IT/AT/LI (1739 km international border ~4× Nordic-island coastline scale); bounds.json 26-polygon canton-partition file with simplified Alpine mountain-ridge boundaries. Switzerland has 41 cross-border interconnectors — HIGHEST cohort-wide — meaning legitimate near-border TSO substations exist at every interconnector. Tolerance set at 0.5 km (5× cadastral default) to absorb Alpine terrain simplification without dropping legitimate Swissgrid cross-border substations. Enclaves (Büsingen DE inside Schaffhausen + Campione d'Italia IT inside Ticino) preserve their host-country attribution architecturally — Swiss bounds polygon excludes them. Expected pre-filter substation drift 0.5-2% pre-fetch (higher than Iceland's 0.45% due to Alpine border complexity + high cross-border density); audit at Step 4 merge time."
     }
   },
   "_phase_2_note": "Mode 3 territorial gaps (Canadian Arctic, UK Northern Ireland, French DOM-TOM, Chilean Patagonian islands) and pure Mode 1 cases (Canada US-side, UK European-side mis-coords, France Spanish-side, Chile Argentinian-side, Norway Swedish-side) are handled by scripts/remediate_cross_border.py substation removal rather than tolerance — see MODE_2_3_FOLLOWON_PLAN.md."
