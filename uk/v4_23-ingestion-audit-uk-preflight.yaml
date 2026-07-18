@@ -1,0 +1,469 @@
+# SSI Index v4.23 — UK P31 Wave 4 Pre-flight Source Discovery
+# ============================================================
+# 🎉 WAVE 4 P31 = FIRST v4.23 ENHANCEMENT EXTENSION COUNTRY 🎉
+# ============================================================
+# Wave 4 Priority 31 — FIRST of 9 remaining countries needing v4.23
+# OSM Overpass enhancement pass for cohort-wide consistency.
+# UK selected as first Wave 4 country: LOWEST cohort-wide baseline
+# line count 807 (comparable Norway 154,728; enhancement urgency HIGH).
+#
+# Wave 4 architectural correction from Wave 3 Turkey schema-bug:
+# - Wave 3 Turkey merger emitted WRONG schema (GeoJSON FeatureCollection
+#   with empty coordinates) — hotfixed Commit 33
+# - Wave 4+ mergers MUST emit canonical compact `{s, l, a}` schema
+#   from the start
+# - OSM Overpass query hints upgraded: `out center` for way substations
+#   + `out geom` for lines to properly resolve node coordinates
+# - Substation ID assignment + line endpoint (ss/se) matching + adjacency
+#   graph construction from the compact schema layer
+#
+# Convention #7 Data-Layer Anchoring: documented-proxy discipline preserved
+# Convention #56: visibly-honest degradation preserved
+# Convention #60: non-commercial provenance (OSM ODbL + National Grid ESO
+#   public + Ofgem RIIO-ED2 public + NIE Networks public)
+# Convention #78 BINDING 13TH ENFORCEMENT: English + Welsh (Cymraeg) +
+#   Scots Gaelic (Gàidhlig) + Irish (Gaeilge NI) + Cornish (Kernewek)
+#   5-language enforcement candidate
+# Convention #78 §4bis.5 Layer 3 9TH ENFORCEMENT: London metropolitan
+#   UK Power Networks (UKPN London Power Networks) geofence candidate
+# Discipline #36: cross-border filter tolerance 3.0 km (NEW uk entry —
+#   post-Brexit 7 subsea HVDC/AC interconnector precision + Northern
+#   Ireland land border + Scottish Highland coastline + island archipelago)
+# Discipline #41: line-substation parity [1.5-5.0] healthy band target
+#
+# Authored: 2026-07-18 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ============================================================
+
+country_code: gb  # ISO 3166-1 alpha-2 (uk is not-quite-canonical)
+country_name: United Kingdom
+country_name_en: United Kingdom
+country_name_cy: Y Deyrnas Unedig  # Welsh
+country_name_gd: An Rìoghachd Aonaichte  # Scots Gaelic
+country_name_ga: An Ríocht Aontaithe  # Irish
+country_name_kw: An Rywvaneth Unys  # Cornish
+country_slug: uk  # canonical folder name (per intelligence/countries.json)
+wave: 4  # NEW WAVE — Wave 3 was terminal at 30/39
+priority: P31
+smallest_first_rank: 1  # of 9 remaining Wave 4 candidates (LOWEST line count 807)
+scope: WAVE_4_FIRST_v4_23_ENHANCEMENT_EXTENSION_COUNTRY_LOWEST_LINE_COUNT_COHORT_WIDE
+
+# ---------------------------------------------------------------
+# Wave 4 corrected architecture requirements (post-Turkey schema-bug)
+# ---------------------------------------------------------------
+wave_4_architecture_requirements:
+  merger_schema_target: canonical_compact_s_l_a_dict_matches_all_38_other_countries
+  osm_overpass_query_hints:
+    substations: out center  # returns way centroid inline
+    lines: out geom          # returns polyline inline
+  merger_operations_required:
+    - substation_id_assignment  # integer 10-digit format matching UK convention 5000000000+
+    - line_id_assignment        # integer 30000000+ format matching UK convention
+    - polyline_conversion_to_compact_p_array  # [[lon, lat], ...] format
+    - line_endpoint_ss_se_matching  # string IDs matching UK convention (quoted)
+    - adjacency_graph_construction  # optional; UK baseline has empty a dict
+  ss_se_type: string  # UK convention (Finland used int); match target schema
+  do_not_reuse_turkey_merger_pattern: true  # Turkey merger produced empty GeoJSON features
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: uk/ssi-data.json
+  ssi_data_schema: wrapped  # {"substations": [...]} not flat-list
+  substation_count: 2551  # baseline
+  grid_geo_json_path: uk/grid-geo.json
+  grid_geo_schema: compact_s_l_a  # canonical
+  s_dict_count: 2551
+  l_list_count: 807  # LOWEST cohort-wide (Norway 154,728 = 192× UK)
+  a_dict_count: 0  # empty adjacency (UK convention — do not populate)
+  substation_id_format: integer_10_digit_50000000xx
+  line_id_format: integer_30000000+
+  ss_se_type_in_baseline: string  # e.g. '5000000028'
+  voltage_distribution_expected:
+    "400.0": EHV_BACKBONE  # National Grid GB backbone
+    "275.0": SCOTTISH_EHV  # Scottish backbone tier
+    "132.0": SUBTRANSMISSION  # traditional UK subtransmission
+    "66.0": MV_DISTRIBUTION
+    "33.0": MV_DISTRIBUTION
+    "11.0": LV_DISTRIBUTION
+  bbox:
+    lon_min: -8.65  # Rockall (westernmost UK territory)
+    lon_max: 1.76   # Great Yarmouth easternmost mainland
+    lat_min: 49.87  # Isles of Scilly southernmost
+    lat_max: 60.86  # Shetland Muckle Flugga northernmost
+  bounds_json_features: 232  # RICHEST cohort-wide per-county granularity
+
+# ---------------------------------------------------------------
+# Architectural signatures — post-Brexit unique
+# ---------------------------------------------------------------
+architectural_signatures:
+  first_wave_4_country_v4_23_enhancement_extension: true
+  post_brexit_non_entso_e_synchronous_since_january_2020: true
+  gb_ni_dual_market_architecture: true  # GB = National Grid ESO; NI = SONI/I-SEM
+  ni_i_sem_cross_border_with_eirgrid_roi: true  # I-SEM Single Electricity Market 2018
+  # Interconnector portfolio (7 subsea + Ireland pending)
+  interconnectors_seven_subsea_plus_pending:
+    - name: IFA (Interconnexion France-Angleterre)
+      capacity_mw: 2000
+      operator: National Grid + RTE
+      technology: HVDC 270 kV
+      landing_uk: Sellindge Kent
+      landing_partner: Bonningues-lès-Calais France
+      commissioned: 1986
+    - name: IFA2
+      capacity_mw: 1000
+      operator: National Grid + RTE
+      technology: HVDC 320 kV
+      landing_uk: Fareham Hampshire
+      landing_partner: Tourbe France
+      commissioned: 2021
+    - name: BritNed
+      capacity_mw: 1000
+      operator: National Grid + TenneT
+      technology: HVDC 450 kV
+      landing_uk: Grain Kent
+      landing_partner: Maasvlakte Netherlands
+      commissioned: 2011
+    - name: Nemo Link
+      capacity_mw: 1000
+      operator: National Grid + Elia
+      technology: HVDC 400 kV
+      landing_uk: Richborough Kent
+      landing_partner: Herdersbrug Belgium
+      commissioned: 2019
+    - name: North Sea Link (NSL)
+      capacity_mw: 1400
+      operator: National Grid + Statnett
+      technology: HVDC 525 kV (WORLD'S LONGEST subsea HVDC 720 km)
+      landing_uk: Blyth Northumberland
+      landing_partner: Kvilldal Norway
+      commissioned: 2021
+    - name: ElecLink
+      capacity_mw: 1000
+      operator: Getlink (Eurotunnel)
+      technology: HVDC 320 kV via Channel Tunnel service tunnel
+      landing_uk: Folkestone Kent
+      landing_partner: Coquelles France
+      commissioned: 2022
+      unique: FIRST_land_based_interconnector_via_channel_tunnel
+    - name: Viking Link
+      capacity_mw: 1400
+      operator: National Grid + Energinet
+      technology: HVDC 525 kV
+      landing_uk: Bicker Fen Lincolnshire
+      landing_partner: Revsing Denmark
+      commissioned: 2023
+      unique: LONGEST_interconnector_at_time_of_commissioning
+    - name: Greenlink (PENDING 2024)
+      capacity_mw: 500
+      operator: Greenlink Interconnector
+      technology: HVDC
+      landing_uk: Freshwater West Pembrokeshire Wales
+      landing_partner: Great Island Wexford Ireland
+      commissioned: 2024
+      unique: FIRST_UK_Ireland_HVDC_interconnector
+  # Nuclear generation portfolio (Layer 4b generation carve-outs)
+  nuclear_generation_9_operational_plus_construction:
+    - Sizewell B (Suffolk) — PWR 1198 MW, only remaining PWR
+    - Hinkley Point B (Somerset) — closed 2022
+    - Hinkley Point C (Somerset) — EPR × 2 = 3260 MW UNDER CONSTRUCTION
+    - Sizewell C (Suffolk) — EPR × 2 = 3260 MW APPROVED
+    - Heysham 1+2 (Lancashire) — AGR × 4 = 2380 MW
+    - Hartlepool (County Durham) — AGR × 2 = 1210 MW
+    - Torness (East Lothian Scotland) — AGR × 2 = 1250 MW
+    - Dungeness B (Kent) — AGR × 2 closed 2021
+  # Offshore wind (LARGEST global by capacity ~14 GW deployed)
+  offshore_wind_largest_global: true
+  dogger_bank_worlds_largest_planned: true  # 3600 MW planned
+  # RICHEST cohort-wide island archipelago
+  island_archipelago:
+    - Shetland (61°N — northernmost; separate grid until SHE-T HVDC 2024)
+    - Orkney
+    - Outer Hebrides (Western Isles — Stornoway Lewis+Harris)
+    - Inner Hebrides (Skye Mull Islay)
+    - Isle of Man (Crown Dependency — separate jurisdiction; Manx Utilities)
+    - Channel Islands (Crown Dependencies — Jersey/Guernsey/Alderney/Sark; separate)
+    - Isles of Scilly (Cornwall archipelago)
+    - Isle of Wight
+    - Anglesey (Ynys Môn Wales)
+  # Northern Ireland unique features
+  northern_ireland_separate_grid_i_sem_market_with_roi: true
+  northern_ireland_land_border_with_republic_of_ireland: true
+  northern_ireland_six_counties_pre_included_via_bounds_json: true
+  # Grid frequency (50 Hz all UK)
+  # Voltage tiers unique to UK
+  scottish_275kv_backbone_distinct_from_english_400kv: true  # legacy CEGB era
+  132kv_uk_specific_subtransmission_tier: true  # inherited from pre-1990 UK
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING alias map projection
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 13  # after TR 12th (post-DECADE-MILESTONE)
+  script_class: ENGLISH_PLUS_WELSH_PLUS_SCOTS_GAELIC_PLUS_IRISH_PLUS_CORNISH_5_LANGUAGE
+  scripts_supported:
+    - English  # ~85% expected — Latin alphabet
+    - Welsh (Cymraeg)  # ~5% — Latin + circumflex accents (ŵ ŷ â ê î ô û) + double letters (dd ll rh)
+    - Scots Gaelic (Gàidhlig)  # ~2% — Latin + grave accents (à è ì ò ù)
+    - Irish (Gaeilge — Northern Ireland recognized minority)  # ~1% — Latin + fada acute (á é í ó ú)
+    - Cornish (Kernewek)  # ~1% — Latin (revived 2003 recognized)
+    - International English variants  # ~6% — direct OSM tagging
+  primary_operators:
+    # ═══ Great Britain Transmission ═══
+    national_grid_eso:
+      # Electricity System Operator — Great Britain (post-2019 unbundling)
+      english: [National Grid ESO, National Grid Electricity System Operator, NGESO, ESO]
+      role: GB_ELECTRICITY_SYSTEM_OPERATOR_TSO
+      voltage_scope: [400, 275]
+      ownership: DESNZ 100% government (nationalized January 2024)
+      note: 2024 nationalization — moved from National Grid plc to public ownership as Great Britain Electricity System Operator
+    national_grid_electricity_transmission:
+      english: [National Grid Electricity Transmission, NGET, National Grid ET, National Grid plc]
+      role: GB_ELECTRICITY_TRANSMISSION_OWNER  # separate from ESO post-2019
+      voltage_scope: [400, 275]
+      note: Transmission asset owner (England + Wales); Scotland transmission owned by SPT + SHET
+    scottish_power_transmission:
+      english: [Scottish Power Transmission, SPT, ScottishPower Transmission]
+      role: SCOTTISH_TRANSMISSION_OWNER_SOUTHERN
+      voltage_scope: [400, 275]
+      coverage: Central + Southern Scotland
+    scottish_hydro_electric_transmission:
+      english: [Scottish Hydro Electric Transmission, SHE-T, SHET, Scottish and Southern Electricity Networks Transmission, SSEN Transmission]
+      gaelic: [Còmhdhail Dealanach Uisge Alba]
+      role: SCOTTISH_TRANSMISSION_OWNER_NORTHERN
+      voltage_scope: [400, 275]
+      coverage: Northern Scotland (incl. Shetland HVDC 2024)
+    # ═══ Great Britain DNO groups (6 groups holding 14 licence areas) ═══
+    ukpn:
+      english: [UK Power Networks, UKPN, EDF Energy Networks]
+      role: DNO_LONDON_SOUTH_EAST_EAST_ENGLAND  # 3 licence areas
+      licence_areas: [London Power Networks, Eastern Power Networks, South Eastern Power Networks]
+      coverage: London + South East England + East of England
+      customers_millions: 8.3  # LARGEST DNO by customers
+      ownership: Cheung Kong Infrastructure + Power Assets Holdings (Li Ka-shing)
+      convention_78_4bis_5_9th_enforcement: LONDON_METROPOLITAN_geofence_candidate
+    nged:
+      english: [National Grid Electricity Distribution, NGED, National Grid ED]
+      predecessors: [Western Power Distribution, WPD, WPD Midlands, WPD South Wales, WPD South West, PPL Global]
+      welsh: [Dosbarthu Trydan Grid Cenedlaethol]  # Welsh — National Grid Electricity Distribution
+      role: DNO_MIDLANDS_SOUTH_WEST_SOUTH_WALES  # 4 licence areas
+      licence_areas: [East Midlands, West Midlands, South Wales, South West]
+      coverage: Midlands + South West England + South Wales
+      customers_millions: 8.0
+      ownership: National Grid plc (acquired from PPL 2021)
+      note: WPD → NGED rebrand June 2022 following National Grid acquisition
+    spen:
+      english: [SP Energy Networks, SPEN, ScottishPower Energy Networks, Scottish Power Networks]
+      gaelic: [Lìonraidhean Cumhachd Alba]
+      role: DNO_CENTRAL_SOUTHERN_SCOTLAND_PLUS_MANWEB  # 2 licence areas
+      licence_areas: [SP Distribution (Central+Southern Scotland), SP Manweb (Merseyside+Cheshire+North Wales)]
+      coverage: Central+Southern Scotland + Merseyside + North Wales
+      customers_millions: 3.5
+      ownership: Iberdrola SA (Spanish parent)
+    ssen:
+      english: [Scottish and Southern Electricity Networks, SSEN, SSEN Distribution, SSE Networks]
+      gaelic: [Lìonraidhean Dealanach Alba is a Deas]
+      role: DNO_NORTHERN_SCOTLAND_SOUTHERN_ENGLAND  # 2 licence areas
+      licence_areas: [SSEN Northern (Northern Scotland), SSEN Southern (Southern England)]
+      coverage: Northern Scotland (incl. Highlands + Islands) + Southern England (Hampshire+Berkshire+Oxfordshire)
+      customers_millions: 3.9
+      ownership: SSE plc + OMERS + Global Infrastructure Partners
+    enw:
+      english: [Electricity North West, ENW, Electricity North West Limited]
+      role: DNO_NORTH_WEST_ENGLAND  # 1 licence area
+      licence_areas: [North West Distribution]
+      coverage: North West England (Manchester + Cumbria + Lancashire)
+      customers_millions: 2.4
+      ownership: Cheung Kong Infrastructure + Power Assets Holdings
+    npg:
+      english: [Northern Powergrid, NPG, Northern Electric]
+      role: DNO_NORTH_EAST_YORKSHIRE  # 2 licence areas
+      licence_areas: [Northern (North East), Yorkshire (Yorkshire+Humberside)]
+      coverage: North East England + Yorkshire + Humberside
+      customers_millions: 3.9
+      ownership: Berkshire Hathaway Energy
+    # ═══ Northern Ireland (separate market I-SEM with ROI) ═══
+    soni:
+      english: [SONI, System Operator for Northern Ireland, SONI Ltd]
+      irish: [Feidhmeoir Chóras do Thuaisceart Éireann]
+      role: NORTHERN_IRELAND_TSO_SYSTEM_OPERATOR
+      voltage_scope: [275, 110]  # NI backbone tier
+      ownership: EirGrid plc (part of I-SEM cross-border with ROI)
+    nie_networks:
+      english: [NIE Networks, Northern Ireland Electricity Networks, NIE, Northern Ireland Electricity]
+      irish: [Líonraí Leictreachais Thuaisceart Éireann]
+      role: NORTHERN_IRELAND_DNO_TNO_COMBINED
+      voltage_scope: [110, 33, 11]
+      coverage: All Northern Ireland (6 counties)
+      customers_millions: 0.9
+      ownership: ESB Group (Republic of Ireland Electricity Supply Board)
+      note: RARE cross-border ownership — ROI state-owned ESB owns NI DNO+TNO since 2010
+    # ═══ Crown Dependencies (separate jurisdictions) ═══
+    manx_utilities:
+      english: [Manx Utilities, Manx Electricity Authority, MEA]
+      role: ISLE_OF_MAN_CROWN_DEPENDENCY_UTILITY
+      coverage: Isle of Man (Crown Dependency; not part of UK)
+      note: Interconnected to England via Isle of Man to England Interconnector (Blackpool)
+    jersey_electricity:
+      english: [Jersey Electricity, Jersey Electricity Company, JEC]
+      french: [Compagnie de l'Électricité de Jersey]
+      role: JERSEY_CROWN_DEPENDENCY_UTILITY
+      coverage: Jersey (Crown Dependency)
+    guernsey_electricity:
+      english: [Guernsey Electricity, Guernsey Electricity Limited, GEL]
+      role: GUERNSEY_CROWN_DEPENDENCY_UTILITY
+      coverage: Guernsey + Alderney + Sark + Herm (Crown Dependencies)
+    # ═══ Rail traction (Layer 4b) ═══
+    network_rail_traction:
+      english: [Network Rail, Network Rail Infrastructure Limited, Network Rail Traction Power]
+      role: RAIL_TRACTION_25KV_AC_OVERHEAD
+      note: Great Western Main Line + East Coast Main Line + West Coast Main Line + Elizabeth Line 25 kV AC; Southern network 750 V DC third rail
+    tfl_underground:
+      english: [Transport for London, TfL, London Underground, Elizabeth Line]
+      role: LONDON_UNDERGROUND_TRACTION
+      note: 630 V DC 4-rail + 25 kV AC Elizabeth Line
+    # ═══ Nuclear generation operators (Layer 4b carve-out) ═══
+    edf_energy:
+      english: [EDF Energy, EDF Energy Generation, EDF Energy UK]
+      french: [Électricité de France UK]
+      role: NUCLEAR_GENERATION_UK_FLEET_PLUS_HINKLEY_C_SIZEWELL_C
+      note: Owns/operates all 8 UK nuclear plants + building Hinkley Point C + Sizewell C
+    urenco:
+      english: [Urenco, Urenco UK, Urenco Capenhurst]
+      role: NUCLEAR_FUEL_ENRICHMENT_CAPENHURST
+    # ═══ Cross-border interconnector consortiums ═══
+    ifa_consortium:
+      english: [IFA, Interconnexion France-Angleterre, IFA1, National Grid Interconnectors]
+      french: [Interconnexion France-Angleterre]
+      role: HVDC_INTERCONNECTOR_UK_FRANCE_1986
+    getlink_eleclink:
+      english: [Getlink, Eurotunnel, ElecLink, Getlink SE]
+      french: [Getlink SE, Eurotunnel]
+      role: CHANNEL_TUNNEL_HVDC_INTERCONNECTOR_2022
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 9TH ENFORCEMENT candidate — London
+# ---------------------------------------------------------------
+convention_78_4bis_5_london_geofence:
+  cohort_wide_enforcement_number: 9  # candidate (post-Istanbul 8th at Turkey P30)
+  geofence_architecture: single_UKPN_London_Power_Networks
+  cumulative_enforcement_roster_pre_uk:
+    1: Prague CZ (Czechia P20)
+    2: Warsaw PL (Poland P21)
+    3: EWZ Zurich CH (Switzerland P24)
+    4: SIG Geneva CH (Switzerland P24)
+    5: Auckland NZ (New Zealand P27)
+    6: Copenhagen DK (Denmark P28)
+    7: Helsinki FI (Finland P29)
+    8: Istanbul TR (Turkey P30)
+  candidate: London UK (UK P31 candidate — subject to geofence density)
+  london_metropolitan_context: |
+    London metropolitan area is LARGEST UK urban concentration
+    (~9M population; ~14% of UK population; ~20% of UK electricity
+    demand). Post-privatization 1990 → 2013 East, South East, and
+    London licence areas consolidated under UK Power Networks (UKPN)
+    ownership. UKPN London Power Networks (LPN) alone covers ~2.4M
+    customers within Greater London Authority boundary.
+  geofence_bboxes_candidate:
+    ukpn_london_power_networks:
+      lat: [51.28, 51.72]  # Greater London Authority approx
+      lon: [-0.51, 0.34]
+      operator_canonical: UKPN LPN
+      customers_millions: 2.4
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border tolerance
+# ---------------------------------------------------------------
+discipline_36_tolerance:
+  boundary_tolerance_km: 3.0  # NEW uk entry via post-Brexit interconnector precedent
+  entry_added_to: cross_border_tolerances.json
+  rationale_summary: |
+    Post-Brexit 2020 non-ENTSO-E synchronous + 7 subsea HVDC/AC
+    interconnectors (IFA + IFA2 + BritNed + Nemo Link + North Sea Link
+    + ElecLink + Viking Link) + Greenlink 2024 landing + Northern
+    Ireland land border with ROI + I-SEM cross-border + Scottish
+    Highland coastline + island archipelago (Shetland + Orkney +
+    Hebrides + Isle of Man + Channel Islands + Isles of Scilly).
+    Tolerance 3.0 km intermediate between Alpine Switzerland 0.5 km
+    and Aegean-archipelago Nordic 5.0 km.
+  expected_drops_estimate:
+    subs: 30_80  # 1.0-3.0% of 2551 baseline
+    lines: 15_45  # some interconnector landings + island offset
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity target
+# ---------------------------------------------------------------
+discipline_41_parity_target:
+  target_ratio_min: 1.5
+  target_ratio_max: 5.0
+  baseline_pre_enhancement: 0.32  # 807 / 2551 = SEVERELY BELOW healthy band (LOWEST cohort-wide)
+  anticipated_signature: MOVES_INTO_HEALTHY_BAND_post_enhancement
+  rationale: |
+    UK's baseline 0.32 ratio is SEVERELY BELOW healthy band [1.5-5.0]
+    (lowest cohort-wide). Post-Wave-4 enhancement anticipated to add
+    ~4,000-10,000 net-new lines (based on OSM UK line density) bringing
+    ratio into healthy band 2.0-4.5. Enhancement PRIMARY GOAL — v4.23
+    line coverage completion for UK is the highest-priority workstream item.
+
+# ---------------------------------------------------------------
+# Anticipated architectural first-instances via UK P31 closure
+# ---------------------------------------------------------------
+architectural_first_instances_anticipated:
+  1: 🎉 FIRST Wave 4 v4.23 enhancement extension country
+  2: FIRST post-Brexit non-ENTSO-E synchronous v4.23 enhancement
+  3: FIRST cohort-wide dual-market architecture (GB National Grid ESO + NI I-SEM SONI)
+  4: Convention #78 BINDING 13TH cohort-wide enforcement (English + Welsh + Scots Gaelic + Irish + Cornish 5-language)
+  5: Convention #78 §4bis.5 Layer 3 9TH cohort-wide enforcement (London UKPN LPN geofence candidate)
+  6: RICHEST cohort-wide interconnector portfolio (7 subsea + 1 land + 1 pending Ireland)
+  7: RICHEST cohort-wide island archipelago (Shetland + Orkney + Hebrides + IoM + Channel Islands + Scilly)
+  8: FIRST Crown Dependency separate jurisdiction handling (IoM + CI as distinct utilities)
+  9: WORLDS LONGEST subsea HVDC (North Sea Link 720 km) preserved cross-border
+  10: WORLDS FIRST land-based Channel Tunnel HVDC (ElecLink 2022) preserved cross-border
+  11: LARGEST global offshore wind capacity (~14 GW deployed) + Dogger Bank 3600 MW WORLD LARGEST planned
+  12: FIRST separate Voltage backbone tier signature (Scottish 275 kV + English 400 kV historical)
+  13: FIRST cohort-wide corrected compact-schema-emitting merger architecture (Wave 4 baseline)
+  14: FIRST cohort-wide 232-polygon per-county bounds.json (RICHEST granularity — inherited Discipline #36 Mode-3 remediation)
+  15: HIGHEST cohort-wide Layer 4 adapt baseline 0.85 (Climate Change Act 2008 statutory Net-Zero 2050 + world-leading offshore wind)
+
+# ---------------------------------------------------------------
+# Cumulative Wave 4 progression projection at UK P31 closure
+# ---------------------------------------------------------------
+cumulative_wave_4_projection_at_uk_closure:
+  countries_terminally_complete: 1  # UK P31 first
+  wave_4_progression_pct: 11.1  # 1/9 remaining
+  canonical_cohort_completion_pct_post_uk: 79.5  # 31/39 (30 post-Wave-3 + 1 UK)
+  convention_78_binding_enforcements: 13  # 12 + UK
+  convention_78_alias_ledger_projected: 21600_22200  # +200-800 UK alias hits
+  convention_78_4bis_5_layer_3_enforcements: 9  # +UK London 9th candidate
+  remaining_wave_4_candidates_post_uk: 8
+  next_countries: [sweden, spain, italy, japan, portugal, france, germany, us]
+
+# ---------------------------------------------------------------
+# Layer 4 hazard baselines projection (v4.2 modifier chain)
+# ---------------------------------------------------------------
+layer_4_hazard_baselines:
+  R6c_flood: 0.60  # MOD — Thames Barrier + 2007+2015 major floods + climate projections
+  R6d_wildfire: 0.20  # LOW — temperate maritime climate; heathland fires occasional
+  R6e_winter: 0.45  # MOD — Beast from East 2010+2018; mild coastal baseline
+  R8_adapt: 0.85  # HIGHEST cohort-wide — Climate Change Act 2008 + Net-Zero 2050 statutory + LARGEST global offshore wind
+  R9_compound: 0.60  # MOD — post-Brexit + NI I-SEM + coastal+storm compounds
+  R10_just: 0.65  # HIGH — Scotland Just Transition Commission + North Sea O&G decommission + 4.5M fuel poverty
+  cohort_wide_signatures:
+    adapt_highest: UK 0.85 (Climate Change Act 2008 world-first Net-Zero statutory)
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 2 Operator local OSM Overpass fetch (with `out center` + `out geom` hints)
+handoff_command_step_2: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.uk.osm_overpass 2>&1 \
+    | tee uk/v4_23-osm-overpass.log
+
+anticipated_step_2_pattern: |
+  UK OSM fetch anticipated to be manageable size (mid-scale — 244,376 km²
+  vs Turkey 780,000 km² vs Finland 338,000 km²). Anticipate 1-2 partial-
+  fetch 504 retry cycles per Nordic precedent. UK OSM community is
+  mature (post-decade GB grid tagging discipline); expected line count
+  ~4,000-10,000 pre-filter (5-13× baseline 807).

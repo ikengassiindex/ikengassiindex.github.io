@@ -221,6 +221,31 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # Southeast Anatolian development gap + Kurdish region infrastructure invest
     # + refugee-integration Gaziantep/Şanlıurfa 4M Syrians largest global cohort)
     "turkey":       {"flood": 0.50, "wildfire": 0.75, "winter": 0.55, "adapt": 0.40, "compound": 0.75, "just": 0.70},
+    # UK P31 (WAVE 4 P31 — LOWEST cohort-wide baseline line count 807 = highest
+    # enhancement priority; post-Brexit 2020 non-ENTSO-E synchronous):
+    # MOD flood (2007 Yorkshire+Gloucestershire floods £3B damage + 2015 Cumbria
+    # Storm Desmond + Thames Barrier 200+ closures 1982-2024 + Somerset Levels
+    # 2013-14 + climate change UK-CIP18 projections; London Thames Estuary +
+    # Yorkshire+East Anglia clay river basins highest risk) + LOW wildfire
+    # (temperate maritime climate; heathland fires occasional but limited scale
+    # vs Mediterranean; 2022 heatwave 40°C London+East Anglia unprecedented +
+    # peat fires Saddleworth Moor 2018 + Scottish Highland occasional) + MOD
+    # winter (mild coastal Atlantic + Scottish Highland severe -20°C rare;
+    # 2010+2018 "Beast from the East" cold snaps grid stress + North Sea storm
+    # surges + snow load rare English mainland) + HIGH adapt (Climate Change
+    # Act 2008 statutory Net-Zero 2050 + Committee on Climate Change CCC 2050
+    # Path + Ofgem RIIO-ED2 £22B DNO resilience upgrades + National Grid ESO
+    # Future Energy Scenarios + world-leading offshore wind ~14GW deployment
+    # LARGEST global) + MOD compound (post-Brexit interconnector complexity +
+    # 7 subsea HVDC/AC + Northern Ireland I-SEM cross-border coordination +
+    # coastal flooding+storm compound scenarios + London Thames Estuary Barrier
+    # capacity vs sea-level rise 2050+) + HIGH just (2019 Just Transition
+    # Commission Scotland + North Sea oil & gas decommissioning workforce +
+    # Aberdeen/Grangemouth/Teesside transitions + coal decommissioning
+    # completed 2024 + Grenfell Tower 2017 building safety just-transition
+    # legacy + 2020s cost-of-living energy crisis fuel poverty support 4.5M
+    # UK households in fuel poverty pre-2022 crisis + Warm Homes Discount)
+    "uk":           {"flood": 0.60, "wildfire": 0.20, "winter": 0.45, "adapt": 0.85, "compound": 0.60, "just": 0.65},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
