@@ -183,6 +183,23 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # transition + Aalborg cement decarbonization + Just Transition Fund €90M targeted
     # Nordjylland+Syddanmark)
     "denmark":      {"flood": 0.55, "wildfire": 0.10, "winter": 0.40, "adapt": 0.85, "compound": 0.45, "just": 0.55},
+    # Finland (Wave 3 P29 — Nordic cluster extension post-Denmark; Convention #78 BINDING
+    # 11th enforcement post-DECADE-MILESTONE; Convention #78 §4bis.5 Layer 3 7th enforcement
+    # Helsinki metropolitan Helen Sähköverkko vs Vantaan Energia 3-way split; Fingrid TSO
+    # single zone + 6 major DSOs + Åland Swedish autonomous + Olkiluoto/Loviisa nuclear +
+    # 4 HVDC interconnectors EstLink 1+2 + FennoSkan 1+2) — MOD-LOW flood (spring snowmelt
+    # Kokemäenjoki + Vantaa + coastal Baltic + climate change increasing precipitation
+    # variability) + MOD wildfire (boreal forest — 2018 summer + 2021 Lappi peatland +
+    # ND-GAIN projection northern warming 2× global) + HIGHEST cohort-wide winter
+    # (Arctic Circle + snow load + ice/rime buildup on transmission + polar night wind
+    # stress + Lappi extreme cold snaps -40°C + Kilpisjärvi extreme sub-Arctic) + HIGH
+    # adapt (Climate Act 2015 statutory carbon neutrality 2035 = SECOND Nordic after
+    # Denmark's 2050 + Fingrid resilience upgrades + energy diversification post-2022
+    # Russia disconnect) + MOD compound (winter storm+snow-load compounds + occasional
+    # ice storms transmission risk) + MOD just (peat phaseout 2030 + coal transition
+    # Vaasa/Helsinki/Naantali + Just Transition Fund €165M peat regions +
+    # forestry adaptation Lappi/Kainuu)
+    "finland":      {"flood": 0.35, "wildfire": 0.35, "winter": 0.65, "adapt": 0.80, "compound": 0.45, "just": 0.50},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
