@@ -1298,9 +1298,28 @@ if (!hasNested) {
 
     // Load data
     const basePath = options.basePath || '';
+    // Convention #80 candidate — grid-geo automatic sharding for GitHub 100 MB per-file limit.
+    // If manifest carries `sharded: true` + `l_shards[]`, fetch shards in parallel
+    // and concatenate into virtual `l`. Countries under 90 MB stay single-file.
+    async function loadGridGeo() {
+      const manifest = await fetch(basePath + 'grid-geo.json?v=602').then(r => r.json());
+      if (!manifest.sharded || !Array.isArray(manifest.l_shards)) {
+        return manifest;  // Single-file case — return as-is
+      }
+      // Sharded — fetch all shards in parallel
+      const shardArrays = await Promise.all(
+        manifest.l_shards.map(sh =>
+          fetch(basePath + sh.path + '?v=602').then(r => r.json())
+        )
+      );
+      // Concatenate into virtual inline `l`
+      manifest.l = [].concat(...shardArrays);
+      console.log(`SSI Map: loaded sharded grid-geo — ${manifest.l_shards.length} shards, ${manifest.l.length} lines total`);
+      return manifest;
+    }
     // bounds.json is optional — countries without an admin-polygon file get a 404 and a silent no-op
     Promise.all([
-      fetch(basePath + 'grid-geo.json?v=602').then(r => r.json()),
+      loadGridGeo(),
       fetch(basePath + 'ssi-data.json?v=602').then(r => r.json()),
       fetch(basePath + 'bounds.json?v=602').then(r => r.ok ? r.json() : null).catch(() => null)
     ]).then(([geo, ssi, bounds]) => {
