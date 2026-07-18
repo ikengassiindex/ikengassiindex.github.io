@@ -33,10 +33,57 @@ schema_version: v4_23-ingestion-audit-closure-1
 country_slug: turkey
 wave: 3
 priority: P30
-scope: COHORT_COMPLETION_MILESTONE_TERMINAL
-closure_status: TERMINAL_COHORT_COMPLETION
-cohort_completion_milestone: true
-canonical_cohort_completion_pct: 100.0  # 🎉 39/39 v4.23 canonical cohort
+scope: WAVE_3_TERMINAL_partial_line_enhancement_with_schema_bug_hotfix
+closure_status: WAVE_3_TERMINAL_wave_4_needed_for_true_cohort_completion
+cohort_completion_milestone: false  # CORRECTED — earlier framing was premature
+canonical_cohort_completion_pct: 76.9  # 30/39 v4.23 enhancement (9 countries remain for Wave 4)
+wave_4_scope_identified_post_closure:
+  countries_remaining: 9
+  list: [uk, sweden, spain, italy, japan, portugal, france, germany, us]
+  smallest_first_rank_1_uk_lowest_lines: 807  # cohort-wide lowest → highest enhancement priority
+
+# ⚠⚠⚠ SCHEMA CORRUPTION BUG + HOTFIX ⚠⚠⚠
+# =====================================================================
+# Turkey merge_into_ssi_data.py first-run emitted grid-geo.json in
+# WRONG schema — added standard GeoJSON FeatureCollection with 21,283
+# empty-coordinate features layered on top of the canonical compact
+# {s, l, a} schema.
+#
+# Empirical audit surfaced 2026-07-18 post-Commit-32 when operator
+# asked "have we covered all countries for substations + power line
+# additional ingestion?" — cohort-wide line audit revealed:
+# - 38 countries use canonical compact {s, l, a} schema
+# - Turkey uniquely showed MIXED SCHEMA (compact + GeoJSON overlay)
+# - All 21,283 GeoJSON features had EMPTY coordinates (worthless)
+#
+# Hotfix applied 2026-07-18 (this Commit 33):
+# - Removed `type` + `features` keys from turkey/grid-geo.json
+# - Preserved canonical `{s: 4092 subs, l: 8061 lines, a: 4083 adj}`
+# - File size: 4.83 MB → 1.28 MB (empty-features overhead removed)
+#
+# Turkey's substation enrichment (ssi-data.json +82 net-new) is
+# preserved and valid. Turkey's line enhancement is DEFERRED —
+# baseline 8,061 lines retained, but no line net-new added.
+#
+# Turkey therefore joins the Wave 4 candidate list for proper
+# line enhancement via a corrected merger emitting compact schema.
+schema_corruption_bug_and_hotfix:
+  bug_class: geojson_schema_emitted_instead_of_compact_s_l_a
+  bug_surface_area: turkey/grid-geo.json only (isolated to Wave 3 P30)
+  bug_impact:
+    substations_correctly_enriched_ssi_data: true  # +82 net-new valid
+    lines_added_worthless: 21283  # all empty coordinates
+    baseline_lines_preserved: 8061  # untouched
+  hotfix_applied_utc: 2026-07-18T14:15:00Z
+  hotfix_action: Removed `type` + `features` keys; preserved compact `{s, l, a}` schema
+  hotfix_result: Turkey grid-geo.json now matches canonical schema across all 39 countries
+  source_code_warning_added_to_merger: true  # merge_into_ssi_data.py docstring banner
+  turkey_line_enhancement_status: DEFERRED_to_wave_4_with_corrected_merger
+  cohort_wide_generalisation_lesson: |
+    Wave 4+ merger authoring must design compact schema emission from
+    the start. Requires: OSM way node coord resolution (Overpass `out
+    geom` hint or 2-pass node lookup) + substation ID assignment +
+    line endpoint (ss/se) matching + adjacency graph construction.
 
 # ---------------------------------------------------------------
 # Executive summary — COHORT COMPLETION MILESTONE

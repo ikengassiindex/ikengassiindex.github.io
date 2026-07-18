@@ -1,8 +1,43 @@
 """Turkey P30 merge into ssi-data.json + grid-geo.json.
 
-🎉 COHORT COMPLETION MILESTONE 🎉
+⚠⚠⚠ SCHEMA BUG — DO NOT RE-RUN WITHOUT FIX ⚠⚠⚠
+======================================================================
+This merge script (Wave 3 P30 Turkey initial version) contains a schema
+emission bug for grid-geo.json:
+
+- CORRECT canonical schema (used by all 38 other countries):
+    {"s": {osm_id: {x, y, n, v}},
+     "l": [{i, p: [[lon,lat],...], kv, ss, se}, ...],
+     "a": {sub_id: [connected_sub_ids]}}
+
+- WRONG schema this merger EMITTED (Wave 3 P30 first-run bug):
+    Standard GeoJSON FeatureCollection with type + features array,
+    features had EMPTY coordinates (no geometry data at all)
+
+Hotfix applied 2026-07-18 (Commit 33): stripped the corrupted GeoJSON
+layer from turkey/grid-geo.json, restored canonical compact schema.
+Baseline lines (8,061) + subs (4,092) + adjacency (4,083) intact.
+
+Wave 4+ merge scripts (starting with UK P31) must emit compact
+{s, l, o} schema from the start, with proper OSM way node coord
+resolution (out geom or 2-pass) + substation ID assignment + adjacency
+graph construction. Do NOT reuse this Turkey merger as a template
+without the schema fix.
+
+To properly re-enhance Turkey in a future workstream, either:
+(a) Move Turkey to Wave 4 with a corrected merger emitting compact
+    schema, OR
+(b) Rewrite this merger in place to emit compact schema, then re-run
+    against cached OSM data (turkey/_osm_cache/*.json still valid).
+======================================================================
+
+🎉 COHORT COMPLETION MILESTONE 🎉  (SUBSTATION side complete;
+line-side enhancement DEFERRED pending merger fix)
 Wave 3 Priority 30 = LAST v4.23 refresh candidate.
-Post-Turkey closure: 39/39 canonical cohort empirical completion.
+Post-Turkey closure: 30/39 v4.23 enhancement pass complete.
+Wave 4 (9 countries: UK + Sweden + Spain + Italy + Japan + Portugal
++ France + Germany + US) still needed for true 39/39 cohort-wide
+consistency.
 
 Merges OSM Overpass fetch (substations + lines) into Turkey's baseline
 ssi-data.json + grid-geo.json canonicals with:
