@@ -1,0 +1,409 @@
+# SSI Index v4.23 — Denmark P28 Wave 3 Pre-flight Source Discovery
+# ================================================================
+# Convention #7 Data-Layer Anchoring: documented-proxy discipline
+# Convention #56: visibly-honest degradation preserved via partial-fetch
+# Convention #60: non-commercial provenance (OSM ODbL + Energinet SOE +
+#   Dansk Energi ENA public)
+# Convention #78 BINDING: Danish + English + minimal German Schleswig
+#   cohabitation 10th cohort-wide enforcement candidate — DECADE MILESTONE
+# Convention #78 §4bis.5 Layer 3 geofence: EXPECTED 6th enforcement
+#   (Copenhagen metro Radius Elnet vs regional Cerius/N1 boundary)
+# Discipline #36: cross-border filter tolerance 5.0 km (existing DK
+#   entry from Mode 2 remediation — coastal storm surge + offshore wind
+#   + cross-border interconnectors precedent)
+# Discipline #41: line-substation parity [1.5-5.0] healthy band target
+#
+# Authored: 2026-07-17 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================================
+
+country_code: dk
+country_name: Denmark
+country_name_da: Danmark  # Danish native
+wave: 3
+priority: P28
+smallest_first_rank: 7  # of 11 remaining Wave 3 candidates
+scope: FIRST_NORDIC_OFFSHORE_WIND_WAVE_3_EVENT
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: denmark/ssi-data.json
+  substation_count: 2433  # LARGER than initially projected (~800 estimate)
+  region_count: 5  # 5 post-2007 admin regions (Hovedstaden/Syddanmark/Midtjylland/Sjælland/Nordjylland)
+  voltage_distribution:
+    "10.0": 1335  # dominant MV distribution
+    "60.0": 503   # Danish-specific sub-transmission tier
+    "50.0": 199   # sub-transmission
+    "20.0": 143   # MV distribution
+    "150.0": 75   # regional transmission (Zealand + Jutland)
+    "132.0": 74   # regional transmission (Jutland historical)
+    "15.0": 40    # MV distribution
+    "400.0": 30   # EHV backbone (Cross-Sønderjylland + interconnectors)
+    "30.0": 20    # sub-transmission
+    "350.0": 2    # HVDC (Kriegers Flak + Kontek terminals)
+  owner_attribution:
+    untagged: 2433  # 100% — CLEAN SLATE PATTERN (Ireland/NZ analog)
+  total_attributed_pct: 0.0
+  tso_zone_split:
+    DK1: 1432  # Jutland + Funen (Continental Europe synchronous)
+    DK2: 1001  # Zealand + Bornholm + islands (Nordic synchronous)
+  bbox:
+    lon_min: 8.1163
+    lon_max: 15.1362  # Bornholm eastern Baltic
+    lat_min: 54.5972
+    lat_max: 57.7353
+  bounds_json_features: 5
+
+# ---------------------------------------------------------------
+# Architectural signatures
+# ---------------------------------------------------------------
+architectural_signatures:
+  first_nordic_offshore_wind_wave_3: true  # Horns Rev I/II/III + Anholt + Kriegers Flak
+  wind_55pct_electricity_2024: true  # Denmark leads global wind penetration
+  net_zero_2050_statutory_first_country: true  # 1990 Climate Act original + 2020 Climate Act 70%/1990 by 2030
+  dk1_dk2_bidding_zone_split: true  # continental europe + nordic synchronous split at Great Belt
+  400_150_132_60_50_multi_tier_transmission: true  # unique 5-tier transmission signature
+  post_2007_admin_reform_5_regions: true  # was 14 counties + 273 municipalities pre-2007
+  cross_border_multi_interconnector_wave_3: true  # Skagerrak 4× HVDC Norway + Kontek HVDC Germany + Öresund AC/HVDC Sweden + Kriegers Flak HVDC Germany
+  bornholm_islands_baltic_isolated: true  # Bornholm partially isolated on DK2 zone
+  faroe_greenland_pre_excluded: true  # Faroe Islands + Greenland separate country entries in ssi-index
+  convention_78_binding_10th_decade_milestone_candidate: true
+  clean_slate_baseline_pattern: true  # 100% untagged — Ireland/NZ analog
+  layer_3_admin_expected_active: true  # 5 populated regions
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING alias map (100-entry projection)
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 10  # 🎉 DECADE MILESTONE 🎉 after 9-country cumulative
+  script_class: DANISH_PLUS_ENGLISH_PLUS_MINIMAL_GERMAN_SCHLESWIG
+  scripts_supported:
+    - Danish  # ~85% expected — æ ø å diacritics
+    - English  # ~10%
+    - German_Schleswig  # ~5% — southern Jutland border region (former Sønderjylland/Schleswig-Holstein)
+  primary_operators:
+    energinet:
+      # State-owned TSO — established 2005 via merger of Eltra + Elkraft System + Gastra
+      english: [Energinet, Energinet Denmark, Energinet.dk]
+      danish: [Energinet Danmark, Energinet A/S]
+      legal_form: [A/S]  # aktieselskab — Danish corporation
+      role: SINGLE_NATIONAL_TSO
+      voltage_scope: [400, 150, 132]  # Danish transmission tiers
+      ownership: State-owned SOE (Ministry of Climate, Energy and Utilities)
+    # Predecessors (pre-2005 unbundling)
+    eltra:
+      english: [Eltra, Eltra System, Eltra Amba]
+      role: LEGACY_TSO_JUTLAND_FUNEN  # DK1 predecessor
+    elkraft:
+      english: [Elkraft, Elkraft System]
+      role: LEGACY_TSO_ZEALAND  # DK2 predecessor
+    # ── 4 MAJOR REGIONAL DSOs (post-2010 unbundling + mergers) ──
+    radius:
+      english: [Radius, Radius Elnet, Radius Elnet A/S]
+      danish: [Radius Elnet]
+      role: METROPOLITAN_DSO
+      coverage: Copenhagen + Frederiksberg + North Zealand + Bornholm
+      customer_count_pct: 1.1M  # 25% of DK
+      ownership: Ørsted A/S subsidiary (since 2015; Ørsted was formerly DONG Energy)
+      # Predecessors
+      predecessors: [DONG Energy Distribution, DONG Elnet, Københavns Energi, KE Transmission]
+    cerius:
+      english: [Cerius, Cerius A/S]
+      role: REGIONAL_DSO_ZEALAND_CENTRAL
+      coverage: Zealand central + south (Roskilde + Sorø + Vordingborg)
+      customer_count_pct: 400k  # 9% of DK
+      ownership: Andel (formerly SEAS-NVE) since 2020 rebrand
+      predecessors: [SEAS-NVE, SEAS Distribution, NVE Elnet]
+    n1:
+      english: [N1, N1 A/S]
+      danish: [N1 Elnet, N1 Netværk]
+      role: REGIONAL_DSO_JUTLAND_MAJOR
+      coverage: Central + North Jutland (Aarhus + Aalborg + Herning + Randers)
+      customer_count_pct: 700k  # 15% of DK
+      ownership: Norlys Holding A/S (2019 merger — NRGi + Nordvest + Verdo + others)
+      predecessors: [NRGi Elnet, Nordvest Elforsyning, Verdo Randers, ELRO, Galten Elværk]
+    trefor:
+      english: [Trefor, TREFOR El-net, TREFOR Elnet]
+      danish: [TREFOR El-net A/S]
+      role: REGIONAL_DSO_EAST_JUTLAND_FYN
+      coverage: East Jutland (Vejle + Kolding + Fredericia + Middelfart + Odense Fyn/Funen)
+      customer_count_pct: 350k  # 8% of DK
+      ownership: EWII (European Water & Infrastructure Investments) since 2016 rebrand
+      predecessors: [TRE-FOR, Fredericia Kommune Energi, Kolding Elforsyning]
+    # ── 3 MINOR DSOs (regional coverage) ──
+    aura:
+      english: [AURA, AURA El-net]
+      danish: [AURA El-Net]
+      role: REGIONAL_DSO_EAST_JUTLAND
+      coverage: Aarhus surroundings
+      predecessors: [NRGi Aarhus, Aura El]
+    konstant:
+      english: [Konstant, Konstant Net]
+      role: MINOR_DSO_EAST_JUTLAND
+      coverage: Silkeborg + Skanderborg
+      predecessors: [ELRO, Galten Elværk]
+    dinel:
+      english: [Dinel, Dinel A/S]
+      role: MINOR_DSO_AARHUS_METRO
+      coverage: Aarhus metropolitan
+    # ── Offshore wind farm operators (industrial-scale generation, NOT DSO) ──
+    orsted:
+      english: [Ørsted, Orsted, Ørsted A/S, DONG Energy]
+      danish: [Ørsted]
+      role: OFFSHORE_WIND_GENERATION
+      note: Owns Horns Rev I+II+III + Anholt + Kriegers Flak DK-side. NOT DSO — grid=Energinet TSO
+    vattenfall_wind_dk:
+      english: [Vattenfall, Vattenfall Wind Denmark, Vattenfall Vind]
+      role: OFFSHORE_WIND_GENERATION
+      note: Owns Horns Rev III + Kriegers Flak partial. NOT DSO
+    european_energy:
+      english: [European Energy, European Energy A/S]
+      role: RENEWABLE_GENERATION
+      note: Danish renewable developer — NOT DSO
+    # ── KiwiRail-analog rail traction ──
+    banedanmark:
+      english: [Banedanmark, Rail Net Denmark]
+      danish: [Banedanmark]
+      role: RAIL_TRACTION_INFRASTRUCTURE
+      voltage_scope: [25]  # 25 kV AC (Copenhagen + Elektrificeret main lines)
+      predecessors: [DSB Banedivision]
+    dsb:
+      english: [DSB, Danske Statsbaner]
+      danish: [DSB, Danske Statsbaner A/S]
+      role: RAIL_OPERATOR
+    # ── Industrial captives ──
+    novo_nordisk:
+      english: [Novo Nordisk, Novo Nordisk A/S]
+      role: INDUSTRIAL_CAPTIVE
+      coverage: Kalundborg + Bagsværd pharma manufacturing CHP
+    aab:
+      english: [AAB, Arla Foods]
+      danish: [Arla Foods amba]
+      role: INDUSTRIAL_CAPTIVE
+      coverage: Dairy processing CHP multi-region
+    mærsk:
+      english: [Mærsk, Maersk, A.P. Moller Maersk]
+      danish: [A.P. Møller — Mærsk]
+      role: INDUSTRIAL_CAPTIVE_ENERGY
+      coverage: Nordsøolie (North Sea oil-gas historical)
+  legal_form_suffixes:
+    a_s: [A/S, "A.S.", Aktieselskab]  # corporation
+    aps: [ApS, "Aps"]  # anpartsselskab — private ltd
+    amba: [AmbA, a.m.b.a., andelselskab med begrænset ansvar]  # cooperative ltd
+    fmba: [FmbA, forening med begrænset ansvar]  # association ltd
+    ivs: [IvS]  # entrepreneur company (discontinued 2019)
+  danish_diacritics_normalized: true  # æ ø å NFC composition
+  binding_threshold_hits_projection: 40-120  # Danish + English + minimal German cohabitation
+  binding_threshold_actual_TBD_step_4: null
+
+# ---------------------------------------------------------------
+# Voltage-class × multi-DSO resolver
+# ---------------------------------------------------------------
+voltage_class_dso_resolver:
+  pattern: MULTI_LAYER_TSO_PLUS_METRO_GEOFENCE_PLUS_REGIONAL_DSO
+  layers:
+    - name: Energinet TSO threshold
+      condition: voltage_kv >= 132
+      attribution: Energinet
+      priority: 1
+      note: Danish transmission tiers 400/150/132 kV all Energinet TSO
+    - name: HVDC interconnector terminals
+      condition: voltage_kv in [350, 275] AND name matches ['Skagerrak', 'Kriegers Flak', 'Kontek', 'Öresund', 'Konti-Skan']
+      attribution: Energinet HVDC
+      priority: 2
+    - name: Offshore wind terminals (name-match)
+      condition: name matches ['Horns Rev', 'Anholt', 'Kriegers Flak', 'Vesterhav', 'Rødsand', 'Nysted', 'Middelgrunden']
+      attribution: <offshore operator or Energinet>
+      priority: 3
+      note: Offshore wind farm substations — direct OSM tag usually captures operator
+    - name: Banedanmark rail traction (25 kV AC)
+      condition: voltage_kv == 25 AND name contains rail_context
+      attribution: Banedanmark
+      priority: 4
+    - name: Copenhagen §4bis.5 geofence (Radius Elnet metropolitan)
+      condition: region == 'Hovedstaden' AND voltage_kv < 132
+      sub_layers:
+        - condition: lat >= 55.55 AND lat <= 55.80 AND lon >= 12.30 AND lon <= 12.70
+          attribution: Radius Elnet
+          note: Copenhagen city + Frederiksberg metropolitan geofence
+        - condition: fallback (Hovedstaden region catch-all)
+          attribution: Radius Elnet
+          note: Radius covers entire Hovedstaden region + Bornholm
+      priority: 5
+    - name: Zealand → Cerius
+      condition: region in ['Sjælland'] AND voltage_kv < 132
+      attribution: Cerius
+      priority: 6
+    - name: Jutland major (Nordjylland + Midtjylland) → N1
+      condition: region in ['Nordjylland', 'Midtjylland'] AND voltage_kv < 132
+      attribution: N1
+      priority: 7
+      note: Requires soft-boundary Layer 3 sub-cascade for AURA + Konstant + Dinel Aarhus metropolitan carve-outs
+    - name: Southern Jutland + Fyn → Trefor
+      condition: region == 'Syddanmark' AND voltage_kv < 132
+      attribution: Trefor
+      priority: 8
+    - name: Energinet catch-all (safety net)
+      condition: fallback
+      attribution: Energinet
+      priority: 9  # LAYER 6 CATCH-ALL
+
+# ---------------------------------------------------------------
+# Region → dominant DSO map (5 admin regions × 4 major DSOs + 3 minor)
+# ---------------------------------------------------------------
+region_to_dso_map:
+  Hovedstaden: Radius Elnet    # Copenhagen + Frederiksberg + North Zealand
+  Sjælland: Cerius             # Central+South Zealand
+  Nordjylland: N1              # North Jutland (Aalborg)
+  Midtjylland: N1              # Central Jutland (Aarhus)
+  Syddanmark: Trefor           # South Jutland + Funen
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 geofence assessment
+# ---------------------------------------------------------------
+layer_3_geofence:
+  enforcement_needed: true  # 6TH COHORT-WIDE ENFORCEMENT EXPECTED
+  rationale: |
+    Hovedstaden region (808 subs — LARGEST region) requires
+    metropolitan geofence to disambiguate Copenhagen city core
+    from suburbs. Radius Elnet is dominant DSO across entire
+    Hovedstaden region PLUS Bornholm. Metropolitan geofence
+    ensures Copenhagen CBD attribution regardless of alternative
+    regional DSOs (rare).
+
+    Cumulative Convention #78 §4bis.5 enforcement expected to grow
+    to 6:
+    - Prague CZ (Czechia P20)
+    - Warsaw PL (Poland P21)
+    - EWZ Zurich CH (Switzerland P24)
+    - SIG Geneva CH (Switzerland P24)
+    - Auckland NZ (New Zealand P27)
+    - NEW: Copenhagen DK (Denmark P28)
+
+    Alternative consideration: Aarhus metro (AURA vs N1 boundary)
+    could warrant additional geofence at Layer 3 sub-cascade if
+    empirical evidence shows DSO ambiguity. Keeping metropolitan
+    geofence to Copenhagen only for empirical parsimony; extend
+    retroactively if Step 4 shows Aarhus attribution ambiguity.
+  proposed_enforcement:
+    copenhagen_radius_geofence:
+      lat_min: 55.55
+      lat_max: 55.80
+      lon_min: 12.30
+      lon_max: 12.70
+      attribution: Radius Elnet
+      note: Copenhagen + Frederiksberg metropolitan core
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border filter (EXISTING DK ENTRY)
+# ---------------------------------------------------------------
+discipline_36:
+  boundary_tolerance_km: 5.0  # existing entry from Mode 2 remediation
+  existing_tolerance_source: cross_border_tolerances.json
+  rationale_existing: |
+    Coastal + offshore-wind territorial-waters allowance. 105 of
+    123 audit outliers within 5 km coastline tolerance. Remaining
+    18 outliers between 5-34 km include offshore wind transformer
+    platforms (Anholt Havmøllepark in Kattegat, Horns Rev North
+    Sea). Offshore wind platforms are legitimate Danish substations
+    in Danish EEZ; explicit allowance pending bounds.json maritime
+    polygon extension in Phase 2.
+  cross_border_interconnectors: 4  # Skagerrak Norway + Kontek Germany + Öresund Sweden + Kriegers Flak Germany
+  interconnector_terminals_expected_preserved:
+    - Skagerrak DC × 4 (Norway)
+    - Kontek HVDC (Germany)
+    - Kriegers Flak HVDC (Germany + Sweden)
+    - Öresund AC (Sweden)
+    - Konti-Skan HVDC legacy (Sweden — decommissioned but historical infrastructure)
+  faroe_greenland_pre_excluded: true  # separate country entries in ssi-index
+  expected_pre_filter_drift_pct: 1.0  # LOW (existing tolerance validated)
+
+# ---------------------------------------------------------------
+# Discipline #41 line parity target
+# ---------------------------------------------------------------
+discipline_41:
+  target_ratio_range: [1.5, 5.0]  # Healthy band
+  baseline_line_count: null  # to be captured from grid-geo.json at Step 4
+  projection: |
+    Denmark transmission grid: ~7,000 km Energinet 400/150/132 kV
+    Denmark distribution grid: ~150,000 km MV/LV across ~50 DSOs
+    Baseline captures MV/LV (10 kV dominant); OSM captures full
+    distribution. Expected line-substation ratio HEALTHY-to-
+    ELEVATED (3-15×) — between Nordic-analog (Iceland/Korea 3.30)
+    and Ireland/NZ 46+ ELEVATED depending on OSM community MV/LV
+    tagging completeness.
+
+# ---------------------------------------------------------------
+# Data sources (OSM Overpass + Energinet + Dansk Energi ENA public)
+# ---------------------------------------------------------------
+data_sources:
+  primary:
+    - name: OpenStreetMap
+      endpoint_pool:
+        - overpass-api.de
+        - kumi.systems
+        - private.coffee
+      query_type: substations + power lines
+      license: ODbL
+      convention_60_compliant: true
+  cross_reference:
+    - name: Energinet Annual Report 2024
+      url: https://en.energinet.dk/
+      purpose: TSO backbone verification (400/150/132 kV + 4 HVDC interconnectors)
+      convention_60_compliant: true  # State-Owned Enterprise
+    - name: Dansk Energi ENA (Electricity Network Association)
+      url: https://www.danskenergi.dk/
+      purpose: DSO registry + regional coverage cross-check
+      convention_60_compliant: true  # Public industry association
+    - name: Danmarks Statistik
+      url: https://www.dst.dk/
+      purpose: 5 regions + 98 municipalities boundary + demographic context
+      convention_60_compliant: true  # Public statistics agency
+    - name: Klima- Energi- og Forsyningsministeriet
+      url: https://kefm.dk/
+      purpose: Climate Act 2020 + Net Zero 2050 statutory context
+      convention_60_compliant: true
+
+# ---------------------------------------------------------------
+# Convention #56 hazard baselines (Phase 4c prep)
+# ---------------------------------------------------------------
+convention_56_hazard_baselines:
+  flood: 0.55        # Coastal storm surge (Sankt Jakobstormen 2013 + Bodil 2013 + Malik 2022) + North Sea storms
+  wildfire: 0.10     # LOW — moist maritime climate; occasional heath fires
+  winter: 0.40       # MOD — Baltic storm gusts + occasional cold snaps + snow load
+  adapt: 0.85        # HIGHEST cohort-wide — Denmark = world's first Net Zero 2050 statutory (Climate Act 2020) + wind 55% electricity 2024 + Ministry of Climate structural + green transition frontrunner
+  compound: 0.45     # Storm + coastal flood clusters + wind curtailment cascades
+  just: 0.55         # MOD-HIGH — coal phaseout 2030 + Esbjerg oil transition + Aalborg cement decarbonization + Just Transition Fund €90M
+  sources:
+    - JRC EU-Flood-Atlas (coastal + fluvial North Sea + Kattegat)
+    - Copernicus (wildfire monitoring — LOW baseline)
+    - ECMWF ERA5 (winter storm gust climatology)
+    - ND-GAIN adaptation index (Denmark rank ~1/181, 2024 — GLOBAL LEADER)
+    - IPCC AR6 Europe chapter (Baltic + North Sea storm projection)
+    - Danish Climate Act 2020 statutory Net Zero 2050
+    - Just-Transition Fund €90M Danish allocation (Esbjerg + Aalborg + coal)
+    - DMI (Danish Meteorological Institute) storm climatology
+
+# ---------------------------------------------------------------
+# Empirical projection (Step 4 forecast)
+# ---------------------------------------------------------------
+step_4_projection:
+  raw_fetch_estimate: 2500-4000  # Larger given multi-DSO + MV/LV capture
+  post_filter_estimate: 2490-3990
+  net_new_estimate: 100-500  # Moderate given already-captured baseline MV
+  net_new_pct_estimate: 4-20
+  convention_78_hits_estimate: 40-120  # Danish + English + minimal German
+  line_growth_estimate: 5-20x  # Multi-DSO distribution capture
+  step_4b_retroactive_attribution_estimate: 2400-2500  # 2433 baseline untagged → mostly region-mapped
+  step_4b_class_diversity_estimate: 8-12  # 4 major DSOs + minor + Energinet + Banedanmark
+
+# ---------------------------------------------------------------
+# Next steps
+# ---------------------------------------------------------------
+next_step: Step 2 — Operator local OSM Overpass fetch (residential IP)
+handoff_command: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.denmark.osm_overpass 2>&1 \
+    | tee denmark/v4_23-osm-overpass.log

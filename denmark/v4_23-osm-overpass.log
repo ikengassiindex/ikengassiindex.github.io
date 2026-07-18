@@ -1,0 +1,44 @@
+2026-07-17 22:50:35,794 INFO __main__: Overpass POST https://overpass-api.de/api/interpreter (attempt 1/4)
+2026-07-17 22:50:44,942 INFO __main__: Overpass POST https://overpass-api.de/api/interpreter (attempt 1/4)
+2026-07-17 22:51:01,226 INFO __main__: Overpass POST https://overpass-api.de/api/interpreter (attempt 1/4)
+2026-07-17 22:51:18,480 INFO __main__: Parsed 7988 substations from OSM Overpass
+2026-07-17 22:51:18,481 INFO __main__: Overpass POST https://overpass-api.de/api/interpreter (attempt 1/4)
+2026-07-17 22:51:26,561 WARNING __main__: Overpass 429 rate-limited; backing off 30s (attempt 1)
+2026-07-17 22:51:56,566 INFO __main__: Overpass POST https://overpass-api.de/api/interpreter (attempt 2/4)
+2026-07-17 22:52:16,459 INFO __main__: Parsed 5460 lines from OSM Overpass
+2026-07-17 22:52:18,498 INFO __main__: Owner enrichment: 5803 direct OSM (165 alias-normalised) + 1539 Energinet_TSO + 0 Banedanmark + 12 offshore_wind + 615 §4bis5_Copenhagen (6th enforcement) + 0 captive + 0 region_DSO
+2026-07-17 22:52:18,498 INFO __main__: Discipline #41: Discipline #41 OK — 7969 substations + 5374 lines (ratio 0.67).
+2026-07-17 22:52:18,502 INFO scripts.pipeline.ingestion.denmark._base: Wrote audit sidecar /Users/cedricberard/ikengassiindex.github.io/scripts/pipeline/data/denmark/v4_23-ingestion-audit-denmark--osm-overpass.yaml (1961 bytes)
+
+DK-C1-osm-overpass fetch complete
+  substations:        7,969
+  transmission_lines: 5,374
+  raw_bytes_fetched:  3,431,433
+  raw_sha256:         7bb57d049ad222fab4ef20d2bbb5e04cc2baece38ffd253d59015402cfe63717
+  audit_sidecar:      /Users/cedricberard/ikengassiindex.github.io/scripts/pipeline/data/denmark/v4_23-ingestion-audit-denmark--osm-overpass.yaml
+  Owner-provenance distribution:
+     5638  osm_operator_tag_direct
+     1455  region_jurisdiction_layer_6_Energinet_catch_all_default
+      615  region_jurisdiction_layer_3_4bis5_6th_enforcement_Radius_via_Copenhagen_geofence
+      165  osm_operator_tag_direct_alias_normalised
+       84  region_jurisdiction_layer_1_Energinet_TSO_threshold_ge_132kv
+       12  region_jurisdiction_layer_3a_offshore_wind_name_match
+  Distinct operators: 103
+  Top 15 operators:
+     4909  Nexel
+     1623  Energinet
+      669  Radius Elnet
+      109  Better Energy A/S
+       84  N1
+       81  Vores Elnet
+       54  Cerius
+       45  Flow Elnet
+       35  Better Energy Stevning P/S
+       26  Banedanmark
+       24  Vores Elnet A/S
+       24  CPH
+       17  EnergiMidt
+       15  N1-legacy (Verdo Randers pre-2019 Norlys merger)
+       15  European Energy (Renewable Generation — grid=Energinet)
+  ⚠ Discipline #36 — dropped 19 substations + 86 lines outside Denmark polygon (5.0 km coastal + offshore wind territorial-waters + 4 HVDC interconnector precision tolerance).
+  ⚠ Owner enrichment: 5803/7969 direct OSM operator= tag (72.8%; of these 165 alias-normalised incl. Danish (Energinet / Radius Elnet / Cerius / N1 / Trefor + æ ø å diacritics) + English (offshore wind Ørsted/Vattenfall generation NOT DSO — routed to Energinet) + minimal German Schleswig + predecessor rebrands (DONG→Ørsted 2017 + SEAS-NVE→Cerius 2020 + Eltra+Elkraft→Energinet 2005 + TRE-FOR→Trefor 2011+EWII 2016 + Norlys 2019 merger NRGi+Nordvest+Verdo+ELRO+Galten→N1) per Convention #78 BINDING 10th DECADE MILESTONE); 1539 Energinet_TSO + 0 Banedanmark + 12 offshore_wind + 615 §4bis5_Copenhagen_6TH_ENFORCEMENT + 0 industrial_captive + 0 region_DSO (27.2%).

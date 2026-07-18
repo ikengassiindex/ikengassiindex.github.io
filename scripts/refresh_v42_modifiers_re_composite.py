@@ -167,6 +167,22 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # oil-gas 2018 exploration ban + Just Transitions Unit within MBIE; Zealand Just
     # Transition Fund NZ$500M targeted Taranaki+Southland)
     "new-zealand":  {"flood": 0.60, "wildfire": 0.30, "winter": 0.40, "adapt": 0.75, "compound": 0.60, "just": 0.30},
+    # Denmark (Wave 3 P28 — FIRST Nordic offshore wind Wave 3 event; Convention #78 BINDING
+    # 10th DECADE MILESTONE; Convention #78 §4bis.5 Layer 3 6th enforcement Copenhagen
+    # metropolitan Radius Elnet geofence; DK1+DK2 bidding zone split Great Belt; 4 HVDC
+    # interconnectors) — MOD flood (coastal storm surge Sankt Jakobstormen 2013 + Bodil
+    # 2013 + Malik 2022 + North Sea Xaver 2013 + Kattegat/Baltic sea-level rise projection)
+    # + LOW wildfire (moist maritime climate; occasional heath fires Jutland dry summer)
+    # + MOD winter (Baltic storm gusts + occasional cold snaps + snow load Jutland +
+    # ice/rime buildup transmission risk) + HIGHEST cohort-wide adapt (Denmark = world's
+    # first Net Zero 2050 statutory country per Climate Act 2020 + wind 55% electricity
+    # 2024 world-leading + Ministry of Climate structural + green transition frontrunner
+    # + ND-GAIN rank 1/181 global leader + first offshore wind farm 1991 Vindeby) +
+    # MOD compound (storm+coastal-flood clusters + wind curtailment cascades + Baltic
+    # Sea marine heatwaves) + MOD-HIGH just (coal phaseout 2030 statutory + Esbjerg oil
+    # transition + Aalborg cement decarbonization + Just Transition Fund €90M targeted
+    # Nordjylland+Syddanmark)
+    "denmark":      {"flood": 0.55, "wildfire": 0.10, "winter": 0.40, "adapt": 0.85, "compound": 0.45, "just": 0.55},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
