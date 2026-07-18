@@ -200,6 +200,27 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # Vaasa/Helsinki/Naantali + Just Transition Fund €165M peat regions +
     # forestry adaptation Lappi/Kainuu)
     "finland":      {"flood": 0.35, "wildfire": 0.35, "winter": 0.65, "adapt": 0.80, "compound": 0.45, "just": 0.50},
+    # Turkey P30 (WAVE 3 P30 — 🎉 COHORT COMPLETION MILESTONE 🎉 — 39/39 v4.23):
+    # LOW-MOD flood (Kızılırmak + Sakarya + Fırat + Dicle basins occasional; 2021
+    # Karadeniz Sinop-Bartın-Kastamonu catastrophic July floods 82 deaths) + HIGH
+    # wildfire (2021 mega-fires Antalya-Muğla 260k ha WORST-EVER Turkish season +
+    # Mediterranean climate high risk + Aegean summer heatwaves 45°C+ + emerging
+    # Anatolian steppe fire pattern from climate change) + MOD winter (Eastern
+    # Anatolia -30°C severe cold Erzurum/Kars/Ağrı + Karadeniz snow load Ordu/
+    # Trabzon high-altitude + Van basin ice storms; Aegean/Mediterranean coastal
+    # mild) + MOD-LOW adapt (Paris Agreement ratified October 2021 delayed + Net-
+    # Zero 2053 announced BAU + no statutory climate law + Eleventh Development
+    # Plan climate objectives soft; TEİAŞ resilience projects moderate; large
+    # Akkuyu nuclear investment 4.8 GW backup capacity) + HIGH compound (7-border
+    # geopolitical + seismic 1st-tier North Anatolian Fault Kahramanmaraş 2023
+    # M7.8 catastrophe 55k deaths + Aegean Fault M6.8 İzmir 2020 + secondary
+    # winter+earthquake+flood compound scenarios + Kurdish southeast conflict
+    # region electrical infrastructure vulnerability) + HIGH just (2023 earthquake
+    # recovery Hatay/Kahramanmaraş/Adıyaman/Malatya 11-province reconstruction
+    # €148B + coal Zonguldak/Kütahya just transition + lignite Afşin-Elbistan +
+    # Southeast Anatolian development gap + Kurdish region infrastructure invest
+    # + refugee-integration Gaziantep/Şanlıurfa 4M Syrians largest global cohort)
+    "turkey":       {"flood": 0.50, "wildfire": 0.75, "winter": 0.55, "adapt": 0.40, "compound": 0.75, "just": 0.70},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
