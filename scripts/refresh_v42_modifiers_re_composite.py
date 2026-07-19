@@ -246,6 +246,30 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # legacy + 2020s cost-of-living energy crisis fuel poverty support 4.5M
     # UK households in fuel poverty pre-2022 crisis + Warm Homes Discount)
     "uk":           {"flood": 0.60, "wildfire": 0.20, "winter": 0.45, "adapt": 0.85, "compound": 0.60, "just": 0.65},
+    # Sweden P32 (WAVE 4 P32 — Nordic cluster completion; 5-of-5 Nordics
+    # v4.23-enhanced):
+    # LOW-MOD flood (Vänern + Vättern + Mälaren lakes spring snowmelt +
+    # Göta älv 2000+2006 major floods + climate change increased extreme
+    # precipitation south + Skåne coastal storm surges Baltic) + MOD wildfire
+    # (2018 Sweden mega-fires 25,000 ha WORST in 100 years Ängra-Trängslet +
+    # 2019+2022 heat drought fires + climate-driven boreal fire regime shift +
+    # Norrland taiga vulnerability + Sami reindeer pasture) + HIGH winter
+    # (Arctic circle Norrland Kiruna/Luleå -40°C sustained + Lapland extreme
+    # cold + heavy snow load transmission + ice storms Norrland + Baltic ice
+    # coastal grid) + HIGH adapt (Climate Act 2018 statutory Net-Zero 2045
+    # world-first climate framework + Miljömål Sveriges klimatramverk +
+    # Fossilfritt Sverige industry pledge + world-leading Norrbotten green
+    # steel transformation SSAB/H2 Green Steel/Hybrit/Vattenfall + Fossil-Free
+    # Aviation) + MOD compound (Nordic synchronous grid + 6 HVDC subsea +
+    # long Norwegian land border + Baltic geopolitical Russia/Ukraine post-
+    # 2022 + Sami rights + Arctic climate compound) + MOD-HIGH just (Sami
+    # Parliament Sametinget 1993 statutory + Northern Sami/Southern Sami/
+    # Meänkieli/Finnish minority language rights 1999/2009 + Norrbotten
+    # green industrial transition workforce Kiruna/Gällivare/Luleå + Kiruna
+    # town relocation 2015-2035 mine expansion + coal phase-out 2020 first
+    # OECD + Ringhals nuclear phase-out 2020 Just Transition + Sami reindeer
+    # grazing rights vs wind/mining conflicts)
+    "sweden":       {"flood": 0.30, "wildfire": 0.35, "winter": 0.75, "adapt": 0.80, "compound": 0.45, "just": 0.55},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
