@@ -299,6 +299,42 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # statutory Miranda do Douro concelho + Açores autonomia 1976 +
     # Madeira autonomia 1976 + green hydrogen H2Sines cluster)
     "portugal":     {"flood": 0.55, "wildfire": 0.90, "winter": 0.15, "adapt": 0.55, "compound": 0.70, "just": 0.45},
+    # Italy P34 (WAVE 4 P34 — 4th Wave 4 country; Portugal P33 bi-directional
+    # Option B inheritance):
+    # MOD-HIGH flood (2023 Emilia-Romagna floods €8.9bn 17 dead + 2011 Genoa
+    # floods 6 dead Bisagno river + 2013 Sardegna Cyclone Cleopatra 18 dead +
+    # 2018 Vaia storm Alto Adige/Trentino massive forest damage + Venice acqua
+    # alta MOSE barrier 2020+ + Po river seasonal + Tevere + Arno Florence 1966
+    # flood historical baseline + climate-driven Mediterranean cyclogenesis
+    # intensification + Apennine flash floods + Ligurian Riviera cliff coast) +
+    # MOD-HIGH wildfire (2007 Peloponnese-parallel Sardegna wildfires + 2017
+    # Vesuvio + Sicilia summer wildfires annual + Sardegna 2013 Sanluri 2021
+    # Montiferru 20,000 ha WORST Sardegna wildfire + eucalyptus + Mediterranean
+    # maquis fire regime + climate-driven summer heatwave intensification +
+    # LESS catastrophic than Portugal 0.90 due to Alpine + Apennine mountain
+    # rainfall) + MOD winter (Alpine Aosta+Piemonte+Alto Adige+Trentino sustained
+    # sub-zero + Dolomiti heavy snow load transmission + Po Valley Milano
+    # winter fog + Apennine cold snap 2012 + 2018 Buran cold snap Sicilia snow
+    # historical but Mediterranean overall MODERATE not Nordic sustained) +
+    # MOD-HIGH adapt (PNIEC 2019 Piano Nazionale Integrato Energia Clima + Legge
+    # 121/2020 climate framework + Ministry of Ecological Transition MASE +
+    # PNRR Piano Nazionale di Ripresa e Resilienza €200bn EU recovery fund +
+    # Roadmap 2050 decarbonization + Superbonus 110% energy retrofit + first
+    # Mediterranean OECD offshore wind Beleolico Taranto 2022) + MOD-HIGH
+    # compound (earthquake+flood+drought+wildfire compound signature UNIQUELY
+    # intense — Italy is 6th most seismic OECD + L'Aquila 2009 M6.3 309 dead +
+    # Amatrice 2016 M6.0 299 dead + Norcia 2016 M6.5 + Emilia 2012 M5.9 27 dead
+    # + Genoa Morandi bridge collapse 2018 compound infrastructure vulnerability
+    # + Etna+Stromboli+Vesuvio active volcanism + 2023 Emilia-Romagna floods
+    # compound with Apennine landslides + Alpine glacier retreat compound with
+    # winter storms) + MOD just (Mezzogiorno structural depopulation ~1% /
+    # decade + Calabria + Basilicata + Molise rural desertification + coal
+    # phase-out Brindisi Cerano + Civitavecchia Torvaldaliga Nord 2025 target +
+    # Taranto ILVA steel just-transition longstanding + Sardegna Portovesme
+    # aluminium transition + Alpine glacier community adaptation Val d'Aosta +
+    # Alto Adige/Trentino German-speaking + Slovenian Trieste + Ladin +
+    # Friulian + Sardinian minority language protections)
+    "italy":        {"flood": 0.55, "wildfire": 0.65, "winter": 0.30, "adapt": 0.60, "compound": 0.60, "just": 0.55},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }

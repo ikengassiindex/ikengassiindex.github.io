@@ -1,0 +1,512 @@
+# SSI Index v4.23 — Italy P34 Wave 4 Pre-flight
+# ================================================
+# 🇮🇹 WAVE 4 P34 = FOURTH Wave 4 country 🇮🇹
+# Portugal P33 bi-directional Option B pattern INHERITED.
+# Convention #78 BINDING 16TH ENFORCEMENT (Italian + English +
+# German South Tyrol + French Aosta Valley + Slovenian Trieste +
+# Ladin + Friulian + Sardinian 8-language).
+#
+# 6-of-9 remaining Wave 4 candidates after UK P31 + Sweden P32 +
+# Portugal P33 + Italy P34 (this closure):
+#   Italy P34 THIS closure
+#   Japan P35
+#   Spain P36
+#   France P37
+#   Germany P38
+#   US P39
+#
+# Italy architectural distinctiveness:
+#   - Post-2021 Terna 7-zone bidding architecture (NORD + CNOR +
+#     CSUD + SUD + CALA + SICI + SARD) with SICI + SARD as distinct
+#     island bidding zones
+#   - Milan §4bis.5 11TH ENFORCEMENT candidate (A2A + Unareti +
+#     E-Distribuzione multi-DSO metropolitan)
+#   - 8-language Convention #78 BINDING (highest cohort-wide)
+#   - 6th most seismic OECD (L'Aquila 2009 + Amatrice 2016 +
+#     Norcia 2016 + Emilia 2012 major earthquakes)
+#   - Etna + Stromboli + Vesuvio active volcanism
+#   - Sardegna SAPEI 500 kV subsea HVDC to Lazio 1,000 MW +
+#     SACOI to Corsica cross-border
+#   - Sicilia Sorgente-Rizziconi 500 kV subsea HVDC to Calabria
+#   - Malta HVDC subsea 200 MW
+#   - Ligurian + Adriatic + Ionian + Tyrrhenian coastlines +
+#     Aeolian + Egadi + Pelagie + Tremiti + Ischia + Capri +
+#     Elba + Ponza + Ustica minor islands
+#
+# Authored: 2026-07-19 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================
+
+country_code: it
+country_name: Italy
+country_name_it: Italia
+country_name_de: Italien  # South Tyrol
+country_name_fr: Italie  # Aosta Valley
+country_name_sl: Italija  # Trieste
+country_name_lld: Talia  # Ladin
+country_name_fur: Italie  # Friulian
+country_name_sc: Italia  # Sardinian
+country_name_en: Italy
+country_slug: italy
+wave: 4
+priority: P34
+smallest_first_rank: 4  # of 9 Wave 4 candidates
+scope: WAVE_4_MEDITERRANEAN_MV_INHERITANCE_FROM_PORTUGAL_P33_BI_DIRECTIONAL
+
+# ---------------------------------------------------------------
+# Wave 4 architecture requirements (Portugal P33 bi-directional inheritance)
+# ---------------------------------------------------------------
+wave_4_architecture_requirements:
+  merger_schema_target: canonical_compact_s_l_a
+  osm_overpass_query_hints:
+    substations: out center
+    lines: out geom
+  portugal_p33_bi_directional_option_b_inheritance:
+    lines_side_sweden_p32_inheritance:
+      include_power_minor_line: true
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        minor_line: 20.0  # rural MV distribution wooden-pole
+        cable_no_voltage: 20.0  # underground urban MV
+        line_no_voltage: 132.0  # ITALIAN subtransmission (60/132 kV mixed)
+        # NOTE: Italy uses 132 kV mainland subtransmission (Terna) +
+        # 60 kV regional. 132 kV more common than 60 kV.
+      compact_flag: _vi
+    subs_side_portugal_p33_extension:
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        substation_transmission: 220.0  # Terna national TSO backbone
+        substation_distribution: 20.0  # E-Distribuzione MV distribution
+        substation_minor_distribution: 15.0  # E-Distribuzione MV rural
+        substation_traction: 25.0  # RFI Rete Ferroviaria Italiana rail
+        power_substation_generic: 20.0  # E-Distribuzione MV default (85% market)
+      compact_flag: _vi
+  merger_operations_required:
+    - substation_id_assignment
+    - line_id_assignment
+    - polyline_conversion_to_compact_p_array
+    - line_endpoint_ss_se_matching_string_ids
+    - adjacency_graph_construction
+    - grid_based_spatial_index_for_large_N_merges
+    - bbox_split_fallback_if_single_bbox_fails
+  compact_schema_write: via_scripts_pipeline_utils_grid_geo_sharding_write_grid_geo
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: italy/ssi-data.json
+  ssi_data_schema: wrapped
+  substation_count: 4293
+  grid_geo_json_path: italy/grid-geo.json
+  grid_geo_schema: compact_s_l_a
+  s_dict_count: 4293
+  l_list_count: 14221
+  a_dict_count: 4293
+  line_substation_parity_baseline: 3.31  # HEALTHY_BAND ✓
+  parity_signature_baseline: HEALTHY_BAND_PRE_ENHANCEMENT
+  substation_growth_potential: MAJOR  # Only 4,293 subs for 60M pop = severely under-represented
+  voltage_distribution_expected:
+    "400.0": TERNA_EHV_BACKBONE  # national EHV
+    "220.0": TERNA_TRANSMISSION  # legacy transmission
+    "132.0": TERNA_SUBTRANSMISSION  # regional 132 kV Italian dominant subT
+    "60.0": TERNA_REGIONAL  # regional 60 kV (less common)
+    "20.0": E_DISTRIBUZIONE_MV
+    "15.0": E_DISTRIBUZIONE_MV_RURAL
+    "10.0": E_DISTRIBUZIONE_LV
+  bbox_mainland_only:
+    lat_min: 35.49  # Lampedusa Pelagie
+    lat_max: 47.09  # Vetta d'Italia border Austria
+    lon_min: 6.63   # Monte Bianco / Val d'Aosta
+    lon_max: 18.52  # Otranto Puglia
+  bbox_note: Includes Sicilia + Sardegna within main bbox
+  bounds_json_features: 20  # mainland + Sicilia + Sardegna + 17 minor islands
+
+# ---------------------------------------------------------------
+# Architectural signatures — Post-2021 Terna 7-zone + island HVDC
+# ---------------------------------------------------------------
+architectural_signatures:
+  post_2021_terna_7_zone_bidding: true
+  # NORD: Piemonte + Valle d'Aosta + Lombardia + Liguria + Emilia-Romagna + Veneto + Trentino-Alto Adige + Friuli-Venezia Giulia
+  # CNOR: Toscana + Umbria + Marche
+  # CSUD: Lazio + Abruzzo + Campania
+  # SUD: Puglia + Basilicata + Molise
+  # CALA: Calabria (split from SUD in 2021)
+  # SICI: Sicilia (island-scale)
+  # SARD: Sardegna (island-scale)
+  terna_national_tso_state_controlled: true
+  e_distribuzione_dominant_mainland_dso_85pct: true  # former Enel Distribuzione
+  regional_metropolitan_dsos_15pct:
+    acea: Rome + Latium
+    a2a: Milan + Brescia
+    iren: Turin + Genoa + Trieste + Reggio Emilia
+    hera: Bologna + Modena + Ravenna + Rimini
+    unareti: Milan (former A2A Reti Elettriche subsidiary)
+    agsm_aim: Verona + Vicenza
+    deval: Aosta Valley
+    edyna: South Tyrol/Alto Adige (German-speaking)
+  sicilia_sorgente_rizziconi_500kv_subsea_hvdc: 1500  # MW to Calabria
+  sardegna_sapei_500kv_subsea_hvdc: 1000  # MW to Lazio
+  sardegna_sacoi_300kv_hvdc_corsica: 300  # MW to Corsica cross-border
+  malta_hvdc_subsea: 200  # MW HVDC first Italy-Malta interconnection 2015
+  cross_border_400kv_ac_interconnectors:
+    france_val_daosta: true  # 400 kV
+    switzerland_airolo_piottino: true  # 400 kV
+    switzerland_ticino_piedmont: true
+    austria_lienz_south_tyrol: true  # 220 kV
+    slovenia_divaca_trieste: true  # 400 kV
+    greece_otranto_hvdc: 500  # kV HVDC subsea to Corfu-Kylini
+  minor_islands_electricity: true
+  aeolian_egadi_pelagie_tremiti_ischia_capri_elba_ponza_ustica: true
+  6th_most_seismic_oecd: true
+  # Major earthquakes with grid impact
+  laquila_2009_m63: true  # 309 dead
+  emilia_2012_m59: true  # 27 dead
+  amatrice_2016_m60: true  # 299 dead
+  norcia_2016_m65: true
+  ischia_2017_m35: true
+  # Active volcanism
+  etna_active_volcano_sicilia: true
+  stromboli_vulcano_aeolian_islands: true
+  vesuvio_dormant_volcano_campania: true
+  # Climate + flooding
+  emilia_romagna_2023_floods_89bn_17_dead: true
+  genoa_2011_bisagno_floods: true
+  sardegna_2013_cyclone_cleopatra: true
+  vaia_storm_2018_alto_adige_trentino: true
+  venice_acqua_alta_mose_barrier_2020: true
+  # PNIEC + PNRR climate framework
+  pniec_2019_piano_nazionale_integrato_energia_clima: true
+  legge_121_2020_climate_framework: true
+  mase_ministero_ambiente_sicurezza_energetica: true
+  pnrr_recovery_fund_200bn_eu: true
+  # Mediterranean offshore wind first
+  beleolico_taranto_2022_first_mediterranean_oecd_offshore_wind: true
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 16TH ENFORCEMENT scoping (8-LANGUAGE)
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 16
+  script_class: ITALIAN_PLUS_ENGLISH_PLUS_GERMAN_SOUTH_TYROL_PLUS_FRENCH_AOSTA_PLUS_SLOVENIAN_TRIESTE_PLUS_LADIN_PLUS_FRIULIAN_PLUS_SARDINIAN_8_LANGUAGE
+  cohort_wide_signature: HIGHEST_LANGUAGE_COUNT_COHORT_WIDE  # 8 languages
+  scripts_supported:
+    - Italian  # ~92% expected — Latin + à è é ì ò ù diacritics
+    - English  # ~5% — international OSM tagging
+    - German  # ~2% — South Tyrol/Alto Adige statutory bilingualism since 1972
+    - French  # ~0.5% — Aosta Valley statutory bilingualism since 1948
+    - Slovenian  # ~0.3% — Trieste/Gorizia protected minority since 1954/2001
+    - Ladin  # ~<0.1% — Dolomites 5 vallées recognized minority (Val Gardena/Val Badia/Fassa/Livinallongo/Cortina)
+    - Friulian  # ~<0.1% — Friuli region recognized minority (~600k speakers)
+    - Sardinian  # ~<0.1% — Sardegna recognized minority (~1M speakers)
+  primary_operators:
+    terna:
+      italian: [Terna, Terna S.p.A., Terna Rete Elettrica Nazionale, Terna SpA]
+      english: [Terna, Italian National Grid, Italian Transmission System Operator]
+      german: [Terna, Italienisches Nationales Stromnetz]  # South Tyrol
+      french: [Terna, Réseau Électrique National Italien]  # Aosta Valley
+      slovenian: [Terna, Italijansko nacionalno omrežje]  # Trieste
+      role: NATIONAL_TSO_STATE_CONTROLLED
+      voltage_scope: [400, 220, 132]
+      ownership: State + private (Cassa Depositi e Prestiti ~30%)
+    e_distribuzione:
+      italian: [E-Distribuzione, e-distribuzione, Enel Distribuzione, E-Distribuzione S.p.A.]
+      english: [E-Distribuzione, Enel Distribution]
+      role: DOMINANT_MAINLAND_DSO_85PCT
+      predecessor_rebrand: Enel Distribuzione → E-Distribuzione 2016
+      coverage: Mainland Italy ~85% market share
+      customers_millions: 31.6
+      ownership: Enel Group subsidiary
+    # ═══ Regional metropolitan DSOs (15% residual) ═══
+    acea:
+      italian: [ACEA, Acea Distribuzione, ACEA Distribuzione, ACEA S.p.A., areti]
+      english: [ACEA, Rome Electricity Distribution]
+      role: ROME_METROPOLITAN_DSO
+      coverage: Rome + Lazio metropolitan
+      customers_millions: 1.6
+      ownership: Comune di Roma (~51%) + private
+      convention_78_4bis_5_12th_enforcement_candidate: ROME_metropolitan_geofence
+    a2a:
+      italian: [A2A, A2A Reti Elettriche, A2A S.p.A., Unareti]
+      english: [A2A, Milan/Brescia Utility]
+      german: [A2A]  # Brescia region
+      role: MILAN_BRESCIA_METROPOLITAN_DSO
+      coverage: Milan + Brescia + Bergamo
+      customers_millions: 1.1
+      ownership: Comuni di Milano+Brescia (~55%) + private
+      convention_78_4bis_5_11th_enforcement_candidate: MILAN_metropolitan_geofence
+    unareti:
+      italian: [Unareti, Unareti S.p.A., Unareti Distribuzione]
+      english: [Unareti, Milan Distribution]
+      role: MILAN_METROPOLITAN_DSO_SUBSIDIARY
+      predecessor: A2A Reti Elettriche → Unareti 2017 spinoff
+      coverage: Milan + Cremona + Bergamo
+      ownership: A2A subsidiary
+      convention_78_4bis_5_11th_enforcement_candidate: MILAN_metropolitan_geofence
+    iren:
+      italian: [Iren, IREN, Iren S.p.A., IRETI, Iren Rete Elettrica]
+      english: [Iren, Turin/Genoa Utility]
+      french: [Iren, Iren Vallée d'Aoste]  # Aosta cross-border
+      role: TURIN_GENOA_TRIESTE_MULTI_DSO
+      coverage: Turin + Genoa + Trieste + Reggio Emilia + Parma
+      customers_millions: 1.0
+      ownership: Comuni di Torino+Genova+Reggio+Parma (~50%) + private
+    hera:
+      italian: [Hera, Hera S.p.A., Hera Distribuzione, Inrete]
+      english: [Hera, Emilia-Romagna Utility]
+      role: BOLOGNA_METROPOLITAN_DSO
+      coverage: Bologna + Modena + Ravenna + Rimini + Ferrara
+      customers_millions: 0.8
+      ownership: Comuni Emilia-Romagna (~55%) + private
+    agsm_aim:
+      italian: [AGSM, AGSM AIM, AGSM-AIM, AIM Vicenza, AGSM Verona]
+      english: [AGSM, Verona Utility]
+      role: VERONA_VICENZA_MUNICIPAL_DSO
+      coverage: Verona + Vicenza + Legnago
+      ownership: Comuni di Verona+Vicenza majority
+    deval:
+      italian: [Deval, Deval S.p.A., Deval Distribuzione]
+      english: [Deval, Aosta Valley Electricity]
+      french: [Deval, Deval Vallée d'Aoste]  # Aosta Valley statutory
+      role: AOSTA_VALLEY_REGIONAL_DSO
+      coverage: Aosta Valley regional autonomy
+      ownership: Regione Autonoma Valle d'Aosta majority
+    edyna:
+      italian: [Edyna, Edyna S.r.l., Alperia]  # Alperia parent
+      english: [Edyna, South Tyrol Electricity]
+      german: [Edyna, Alperia, Alperia Fiber, Edyna GmbH, Südtirol Netz]  # South Tyrol statutory
+      role: SOUTH_TYROL_ALTO_ADIGE_REGIONAL_DSO
+      coverage: South Tyrol/Alto Adige (autonomous German-speaking province)
+      ownership: Provincia autonoma di Bolzano + Comuni majority
+    # ═══ Rail traction 3 kV DC + 25 kV AC (Layer 4c) ═══
+    rfi:
+      italian: [RFI, Rete Ferroviaria Italiana, RFI S.p.A., Ferrovie dello Stato, FS Italiane]
+      english: [RFI, Italian Rail Infrastructure, Italian State Railways, FS]
+      german: [RFI, Italienische Eisenbahn]  # South Tyrol Bolzano-Brenner
+      role: RAIL_TRACTION_3KV_DC_25KV_AC
+      note: 3 kV DC classic + 25 kV AC 50 Hz TAV high-speed (Milano-Napoli+ Torino-Salerno + Milano-Venezia)
+    atm_milano:
+      italian: [ATM, ATM Milano, Azienda Trasporti Milanesi]
+      role: RAIL_METRO_MILANO_1500V_DC
+    atac_roma:
+      italian: [ATAC, ATAC Roma, ATAC S.p.A.]
+      role: RAIL_METRO_ROMA_1500V_DC
+    # ═══ Renewable generation (Layer 4b) ═══
+    enel_green_power:
+      italian: [Enel Green Power, EGP]
+      english: [Enel Green Power, EGP]
+      role: GEN_RENEWABLE
+    erg_renew:
+      italian: [ERG Renew, ERG]
+      role: GEN_RENEWABLE
+    edison:
+      italian: [Edison, Edison Renewables, Edison S.p.A.]
+      english: [Edison]
+      role: GEN_ENERGY_MULTIPLE
+    a2a_renewables:
+      italian: [A2A Renewables]
+      role: GEN_RENEWABLE_MULTIPLE
+    # ═══ HVDC + AC interconnector consortiums ═══
+    sapei_hvdc:
+      italian: [SAPEI, SAPEI HVDC]
+      english: [SAPEI]
+      role: HVDC_SARDEGNA_LAZIO_2011_1000MW_500KV
+    sorgente_rizziconi:
+      italian: [Sorgente-Rizziconi, Sicilia-Calabria]
+      role: HVDC_SICILIA_CALABRIA_2016_1500MW_500KV
+    sacoi:
+      italian: [SACOI, SACOI HVDC]
+      english: [SACOI]
+      role: HVDC_SARDEGNA_CORSICA_ITALY_FRANCE
+    malta_italy_hvdc:
+      italian: [Malta Interconnector, Malta-Italy HVDC]
+      role: HVDC_MALTA_2015_200MW
+    # ═══ Cross-border partner TSOs (route to Terna) ═══
+    rte_france:
+      french: [RTE, Réseau de Transport d'Électricité]
+      english: [RTE, French TSO]
+      role: FRENCH_TSO_via_val_daosta
+      route_to: Terna
+    swissgrid:
+      german: [Swissgrid, Swissgrid AG]
+      italian: [Swissgrid, Swissgrid Italia]
+      french: [Swissgrid]
+      english: [Swissgrid, Swiss TSO]
+      role: SWISS_TSO_via_airolo_piottino_ticino
+      route_to: Terna
+    apg_austria:
+      german: [APG, Austrian Power Grid, APG AG]
+      italian: [APG]
+      english: [APG, Austrian TSO]
+      role: AUSTRIAN_TSO_via_lienz_south_tyrol
+      route_to: Terna
+    eles_slovenia:
+      slovenian: [ELES, ELES d.o.o., Elektro-Slovenija]
+      italian: [ELES]
+      english: [ELES, Slovenian TSO]
+      role: SLOVENIAN_TSO_via_divaca_trieste
+      route_to: Terna
+    admie_greece:
+      italian: [ADMIE, IPTO]
+      english: [ADMIE, IPTO, Greek TSO]
+      role: GREEK_TSO_via_otranto_hvdc
+      route_to: Terna
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 11TH ENFORCEMENT candidate — Milan
+# ---------------------------------------------------------------
+convention_78_4bis_5_milan_geofence:
+  cohort_wide_enforcement_number: 11  # candidate
+  geofence_architecture: 2_way_metropolitan_split
+  cumulative_enforcement_roster_pre_italy:
+    1: Prague CZ (P20)
+    2: Warsaw PL (P21)
+    3: EWZ Zurich CH (P24)
+    4: SIG Geneva CH (P24)
+    5: Auckland NZ (P27)
+    6: Copenhagen DK (P28 — 615)
+    7: Helsinki FI (P29 — 446)
+    8: Istanbul TR (P30 — 178)
+    9: London UK (P31 — 1994 LARGEST)
+    10: Stockholm SE (P32 — 24)
+  candidate: Milan IT (P34 — 2-way A2A/Unareti + E-Distribuzione)
+  milan_context: |
+    Milan metropolitan area (~3.2M population + 8M Città
+    Metropolitana). Two-way DSO split: (a) A2A/Unareti (former A2A
+    Reti Elettriche, 2017 spinoff subsidiary) — Milan inner city
+    core + former A2A municipal legacy; (b) E-Distribuzione — outer
+    suburbs + Milan wider metropolitan. Comparable to Rome ACEA
+    (candidate for future Rome §4bis.5 12th enforcement).
+  geofence_bboxes:
+    a2a_unareti_milan:
+      lat: [45.35, 45.60]
+      lon: [9.05, 9.30]
+      operator_canonical: A2A/Unareti Milan
+      customers_millions: 1.1
+    e_distribuzione_milan_metropolitan:
+      lat: [45.30, 45.65]
+      lon: [8.90, 9.40]
+      operator_canonical: E-Distribuzione Milan
+      customers_millions: 1.0
+  anticipated_hits: 400_1200  # comparable to Helsinki 446 or London 1,994
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 12TH ENFORCEMENT candidate — Rome
+# ---------------------------------------------------------------
+convention_78_4bis_5_rome_geofence:
+  cohort_wide_enforcement_number: 12  # candidate
+  geofence_architecture: 2_way_metropolitan_split
+  candidate: Rome IT (P34 — 2-way ACEA + E-Distribuzione)
+  rome_context: |
+    Rome metropolitan area (~2.8M population). Two-way DSO split:
+    (a) ACEA (~1.6M customers) — Rome inner + immediate suburbs
+    (Comune di Roma); (b) E-Distribuzione — outer Lazio metropolitan
+    (Rieti + Frosinone + Viterbo + Latina + Ostia).
+  geofence_bboxes:
+    acea_rome:
+      lat: [41.75, 42.00]
+      lon: [12.35, 12.65]
+      operator_canonical: ACEA Rome
+      customers_millions: 1.6
+    e_distribuzione_rome_lazio:
+      lat: [41.60, 42.10]
+      lon: [12.20, 12.90]
+      operator_canonical: E-Distribuzione Rome/Lazio
+      customers_millions: 1.4
+  anticipated_hits: 300_900
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border tolerance
+# ---------------------------------------------------------------
+discipline_36_tolerance:
+  boundary_tolerance_km: 5.0
+  entry_added_to: cross_border_tolerances.json
+  rationale_summary: |
+    5.0 km tolerance — Mediterranean coastline complexity + Alpine
+    ridge complexity + island archipelago precision. Comparable to
+    Turkey P30 5.0 km + Sweden P32 4.0 km + Portugal P33 6.0 km.
+    Italy sits between UK 3.0 (compact island) and Portugal 6.0
+    (dual mid-Atlantic archipelagos).
+  expected_drops_estimate:
+    subs: 50_150
+    lines: 30_100
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity target
+# ---------------------------------------------------------------
+discipline_41_parity_target:
+  baseline_pre_enhancement: 3.31  # HEALTHY_BAND ✓
+  target_ratio_min: 1.5
+  target_ratio_max: 5.0
+  anticipated_signature_post_option_b_bi_directional: HEALTHY_BAND_STAYS_STABLE
+  rationale: |
+    Italy baseline 3.31 already HEALTHY_BAND — bi-directional Option B
+    inheritance will grow BOTH subs + lines proportionally, keeping
+    parity in the healthy range 2-4. Different pattern from Portugal
+    which needed massive line recovery. Italy is under-represented
+    at 4,293 subs for 60M pop; expect major sub growth via
+    substation=* + power=substation inference.
+
+# ---------------------------------------------------------------
+# Anticipated architectural first-instances via Italy P34 closure
+# ---------------------------------------------------------------
+architectural_first_instances_anticipated:
+  1: 🇮🇹 FIRST Mediterranean Wave 4 country enhancement
+  2: 🌍 HIGHEST cohort-wide 8-language Convention #78 BINDING enforcement (Italian + English + German + French + Slovenian + Ladin + Friulian + Sardinian)
+  3: Convention #78 §4bis.5 11TH enforcement candidate (Milan 2-way A2A/Unareti + E-Distribuzione)
+  4: Convention #78 §4bis.5 12TH enforcement candidate (Rome 2-way ACEA + E-Distribuzione)
+  5: Post-2021 Terna 7-zone bidding architecture FIRST cohort-wide representation
+  6: 3 subsea HVDC island interconnectors preserved (SAPEI + Sorgente-Rizziconi + Malta)
+  7: FIRST Alpine + Mediterranean + Adriatic dual coastline pattern
+  8: FIRST cohort-wide 6th most seismic OECD Layer 4 R9 compound signature
+  9: FIRST cohort-wide Mediterranean OECD offshore wind (Beleolico Taranto 2022)
+  10: Portugal P33 bi-directional Option B pattern FIRST inheritance beyond Iberian (Mediterranean scale)
+  11: Milan §4bis.5 first Italian metropolitan geofence
+  12: Rome §4bis.5 second Italian metropolitan geofence (candidate)
+
+# ---------------------------------------------------------------
+# Cumulative Wave 4 progression projection at Italy closure
+# ---------------------------------------------------------------
+cumulative_wave_4_projection_at_italy_closure:
+  countries_terminally_complete: 4  # UK + Sweden + Portugal + Italy
+  wave_4_progression_pct: 44.4  # 4/9
+  canonical_cohort_completion_pct: 87.2  # 34/39
+  convention_78_binding_enforcements: 16
+  convention_78_alias_ledger_projected: 55000_65000  # +15k-25k IT alias hits (Enel dominance)
+  convention_78_4bis_5_layer_3_enforcements: 12  # Milan 11th + Rome 12th
+  nordic_cluster_completion: TERMINAL_COMPLETE_5_OF_5  # from Sweden P32
+  iberian_cluster_progress: 1_of_2  # Portugal + future Spain P36
+  mediterranean_cluster_started: 1_of_1  # Italy first Mediterranean OECD
+  remaining_wave_4_candidates: 5  # japan + spain + france + germany + us
+  next_smallest_first: japan_p35_or_spain_p36
+
+# ---------------------------------------------------------------
+# Layer 4 hazard baselines
+# ---------------------------------------------------------------
+layer_4_hazard_baselines:
+  R6c_flood: 0.55  # MOD-HIGH 2023 Emilia-Romagna €8.9bn + 2011 Genoa + 2013 Sardegna + Venice MOSE + Alpine glacier retreat
+  R6d_wildfire: 0.65  # MOD-HIGH Sicilia + Sardegna 2021 Montiferru + Mediterranean maquis fire regime (below Portugal 0.90)
+  R6e_winter: 0.30  # MOD Alpine Dolomiti sustained sub-zero + Po Valley Milano winter fog + Apennine (Mediterranean mild overall)
+  R8_adapt: 0.60  # MOD-HIGH PNIEC 2019 + PNRR €200bn + first Mediterranean OECD offshore wind Beleolico 2022
+  R9_compound: 0.60  # MOD-HIGH earthquake+flood+drought+wildfire compound uniquely intense — 6th most seismic OECD + Etna+Vesuvio+Stromboli active volcanism
+  R10_just: 0.55  # MOD Mezzogiorno depopulation + coal Brindisi/Civitavecchia 2025 + Taranto ILVA + 8-language minority protections
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 2 Operator local OSM Overpass fetch
+handoff_command_step_2: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.italy.osm_overpass 2>&1 \
+    | tee italy/v4_23-osm-overpass.log
+
+anticipated_step_2_pattern: |
+  Italy mainland 301k km² area (comparable to UK 244k km²). Larger
+  than Portugal 92k km² but smaller than Sweden 447k km². Bbox-split
+  strongly recommended for line query — likely 7-zone split aligned
+  with post-2021 Terna bidding zones (NORD + CNOR + CSUD + SUD + CALA
+  + SICI + SARD). Portugal P33 bi-directional Option B pattern
+  INHERITED — expect major sub growth (from 4,293 baseline to
+  20k-40k post-fetch given Italy is severely under-represented in
+  OSM subs pre-Wave-4). Line growth to 60k-120k projected.
+  Grid-geo projected 60-100 MB — MAY trigger Convention #80 sharding.
