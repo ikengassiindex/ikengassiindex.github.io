@@ -270,6 +270,35 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # OECD + Ringhals nuclear phase-out 2020 Just Transition + Sami reindeer
     # grazing rights vs wind/mining conflicts)
     "sweden":       {"flood": 0.30, "wildfire": 0.35, "winter": 0.75, "adapt": 0.80, "compound": 0.45, "just": 0.55},
+    # Portugal P33 (WAVE 4 P33 — 3rd Wave 4 country; Iberian wooden-pole rural
+    # MV inheritance from Sweden P32 Option B pattern):
+    # MOD-HIGH flood (Atlantic coast + Tejo/Douro/Mondego estuary flooding +
+    # 2010 Madeira flash floods 47 dead + Ria Formosa lagoons + Alentejo
+    # winter rains + climate-driven Atlantic storm intensification) +
+    # HIGHEST-COHORT-WIDE wildfire (2017 Pedrógão Grande 66 dead ARGUABLY
+    # WORST European wildfire disaster + 2003 August megafires 5% of Portuguese
+    # territory burned + 2017 October wildfires 45 dead + annual dry-season
+    # wildfire crisis + Portugal has HIGHEST wildfire mortality per capita in
+    # OECD 2000-2020 + eucalyptus monoculture 20% forest cover fire-load +
+    # Serra da Estrela + Alentejo + Alto Douro + Trás-os-Montes + Beira
+    # Interior chronic wildfire) + LOW winter (Mediterranean/Atlantic mild
+    # climate; occasional Serra da Estrela mountain snow + rare Coimbra
+    # frost; NO Arctic + no sustained sub-zero) + MOD adapt (Roteiro para a
+    # Neutralidade Carbónica 2050 RNC2050 statutory 2019 + PNEC 2030 Plano
+    # Nacional Energia e Clima + first-Europe coal phase-out 2021 Pego + Sines
+    # 2 years ahead of schedule + Aliança para o Sistema Elétrico
+    # Descarbonizado + Fundo Ambiental) + HIGH compound (drought+heat+
+    # wildfire compound signature UNIQUELY intense in Portugal + 2017
+    # +2022 mega-heatwave-driven wildfire events + Atlantic storm compound
+    # + Iberian synchronous grid Spanish coupling + Açores + Madeira
+    # islanded grids compound isolation + PT-ES 400 kV interconnector
+    # +MIBEL market coupling) + MOD-HIGH just (Alentejo depopulation 2%
+    # /decade + interior rural desertification Trás-os-Montes/Beira +
+    # Pedrógão Grande just-transition legacy 2017 + Pego + Sines coal
+    # community transitions 2021 + Mirandese minority language 1999
+    # statutory Miranda do Douro concelho + Açores autonomia 1976 +
+    # Madeira autonomia 1976 + green hydrogen H2Sines cluster)
+    "portugal":     {"flood": 0.55, "wildfire": 0.90, "winter": 0.15, "adapt": 0.55, "compound": 0.70, "just": 0.45},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }

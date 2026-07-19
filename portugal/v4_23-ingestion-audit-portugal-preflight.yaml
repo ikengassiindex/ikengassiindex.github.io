@@ -1,0 +1,355 @@
+# SSI Index v4.23 — Portugal P33 Wave 4 Pre-flight
+# ================================================
+# 🇵🇹 WAVE 4 P33 = THIRD Wave 4 country 🇵🇹
+# Iberian wooden-pole rural MV inheritance from Sweden P32 Option B.
+# Convention #78 BINDING 15th enforcement (Portuguese + English +
+# Mirandese minority-language + Spanish cross-border reads).
+#
+# 5-of-9 remaining Wave 4 candidates after UK P31 + Sweden P32:
+#   Portugal P33 THIS closure
+#   Italy P34
+#   Japan P35
+#   Spain P36
+#   France P37
+#   Germany P38
+#   US P39
+#
+# Portugal architectural distinctiveness:
+#   - HIGHEST cohort-wide wildfire baseline (R6d = 0.90) — 2017
+#     Pedrógão Grande + annual wildfire crisis
+#   - First-Europe coal phase-out 2021 (Pego + Sines 2 years early)
+#   - Iberian synchronous grid + MIBEL market coupling with Spain
+#   - Açores + Madeira archipelago ISLANDED grids (EDA + EEM
+#     autonomous DSOs, NO subsea HVDC to continental)
+#   - E-REDES ~99% mainland DSO market share (single-DSO monopoly)
+#   - Mirandese minority language (~15,000 speakers) statutory 1999
+#
+# Authored: 2026-07-19 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================
+
+country_code: pt
+country_name: Portugal
+country_name_pt: Portugal
+country_name_mwl: Pertual  # Mirandese
+country_name_es: Portugal
+country_name_en: Portugal
+country_slug: portugal
+wave: 4
+priority: P33
+smallest_first_rank: 3  # of 9 Wave 4 candidates (after UK P31 + Sweden P32)
+scope: WAVE_4_IBERIAN_MV_INHERITANCE_FROM_SWEDEN_P32_OPTION_B
+
+# ---------------------------------------------------------------
+# Wave 4 architecture requirements (Sweden P32 Option B inheritance)
+# ---------------------------------------------------------------
+wave_4_architecture_requirements:
+  merger_schema_target: canonical_compact_s_l_a
+  osm_overpass_query_hints:
+    substations: out center
+    lines: out geom
+  sweden_p32_option_b_inheritance:
+    include_power_minor_line: true  # NORDIC pattern; MUST inherit
+    accept_no_voltage_with_inference: true  # NORDIC pattern; MUST inherit
+    voltage_inference_defaults_kv:
+      minor_line: 20.0  # rural MV distribution wooden-pole
+      cable_no_voltage: 20.0  # underground urban MV
+      line_no_voltage: 60.0  # PORTUGAL SPECIFIC subtransmission
+      # NOTE: Portugal uses 60 kV for regional subtransmission
+      # rather than Nordic 130 kV. Sweden 130 default overridden.
+    compact_flag: _vi
+  merger_operations_required:
+    - substation_id_assignment
+    - line_id_assignment
+    - polyline_conversion_to_compact_p_array
+    - line_endpoint_ss_se_matching_string_ids
+    - adjacency_graph_construction
+    - grid_based_spatial_index_for_large_N_merges
+    - bbox_split_fallback_if_single_bbox_fails
+  compact_schema_write: via_scripts_pipeline_utils_grid_geo_sharding_write_grid_geo
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: portugal/ssi-data.json
+  ssi_data_schema: wrapped
+  substation_count: 10066
+  grid_geo_json_path: portugal/grid-geo.json
+  grid_geo_schema: compact_s_l_a
+  s_dict_count: 10191
+  l_list_count: 11043
+  a_dict_count: 1688
+  line_substation_parity_baseline: 1.10  # BELOW_HEALTHY_BAND — needs Option B
+  parity_signature_baseline: BELOW_HEALTHY_BAND_SWEDEN_OPTION_B_INHERITANCE_TARGET
+  voltage_distribution_expected:
+    "400.0": REN_EHV_BACKBONE  # continental Portugal EHV
+    "220.0": REN_TRANSMISSION  # legacy transmission backbone
+    "150.0": REN_REGIONAL  # regional transmission
+    "60.0": E_REDES_SUBTRANSMISSION  # regional distribution HV
+    "30.0": E_REDES_MV_DISTRIBUTION
+    "15.0": E_REDES_MV_DISTRIBUTION
+    "10.0": E_REDES_LV_DISTRIBUTION
+  bbox_continental:
+    lat_min: 36.96  # Cabo de São Vicente Algarve
+    lat_max: 42.15  # Rio Minho Galicia border
+    lon_min: -9.51  # Cabo da Roca westernmost continental
+    lon_max: -6.19  # Barrancos Alentejo Spanish border
+  bbox_azores:
+    lat_min: 36.9  # Santa Maria
+    lat_max: 39.7  # Corvo northernmost
+    lon_min: -31.3  # Corvo/Flores westernmost
+    lon_max: -25.0  # Santa Maria eastern
+  bbox_madeira:
+    lat_min: 32.4  # Ilhas Selvagens south
+    lat_max: 33.1  # Porto Santo north
+    lon_min: -17.3  # Madeira west
+    lon_max: -16.3  # Porto Santo east
+  bounds_json_features: 20  # includes continental + Açores + Madeira
+
+# ---------------------------------------------------------------
+# Architectural signatures — Iberian synchronous + islanded archipelago
+# ---------------------------------------------------------------
+architectural_signatures:
+  iberian_synchronous_grid_via_ren_ree: true
+  mibel_market_coupling_spain_since_2007: true
+  single_bidding_zone_pt: true  # unified national
+  five_plus_cross_border_interconnectors_spain_400kv_ac:
+    falagueira_cedillo_400kv: true
+    aldeadavila_pocinho_400kv: true
+    alto_lindoso_cartelle_400kv: true
+    puebla_de_guzman_tavira_400kv: true
+    alqueva_balboa_400kv: true
+  azores_islanded_9_populated_islands:
+    operator: EDA Electricidade dos Açores
+    subsea_hvdc_to_continental: false  # ISLANDED
+    special_carve_out_required: true
+  madeira_islanded_archipelago:
+    operator: EEM Empresa de Electricidade da Madeira
+    subsea_hvdc_to_continental: false  # ISLANDED
+    special_carve_out_required: true
+  ren_sole_national_tso: true
+  e_redes_dominant_mainland_dso_99pct: true  # former EDP Distribuição
+  first_europe_coal_phase_out_2021:
+    pego_2021: true  # 2 years ahead of schedule
+    sines_2021: true  # 2 years ahead of schedule
+    architectural_significance: HIGHEST_COHORT_WIDE_ADAPT_signature_candidate
+  atlantic_coastline_900km_continental: true
+  ria_formosa_lagoons_algarve: true
+  tejo_douro_mondego_estuaries: true
+  costa_vicentina_alentejo_cliffs: true
+  serra_da_estrela_mountain_range: true
+  eucalyptus_monoculture_20pct_forest_fire_load: true
+  # Mirandese language rights
+  mirandese_minority_language_1999_statutory: true  # Miranda do Douro concelho
+  miranda_do_douro_concelho_statutory_lang: true
+  # Coal community transitions
+  pego_just_transition_2021: true
+  sines_just_transition_2021: true
+  green_h2_sines_cluster_2024: true
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 15TH ENFORCEMENT scoping
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 15
+  script_class: PORTUGUESE_PLUS_MIRANDESE_PLUS_SPANISH_CROSS_BORDER_PLUS_ENGLISH_4_LANGUAGE
+  scripts_supported:
+    - Portuguese  # ~90% expected — Latin + ã õ ç à á â diacritics
+    - English  # ~7% — international OSM tagging
+    - Spanish  # ~2% — cross-border operator strings at Iberian interconnectors
+    - Mirandese  # ~<1% — Miranda do Douro concelho statutory minority
+  primary_operators:
+    ren:
+      portuguese: [REN, Redes Energéticas Nacionais, REN - Redes Energéticas Nacionais, REN SGPS]
+      english: [REN, Portuguese National Grid, Portuguese Transmission System Operator, REN Portugal]
+      spanish: [REN, Redes Energéticas Nacionales Portugal]
+      role: NATIONAL_TSO_STATE_MAJORITY_OWNED
+      voltage_scope: [400, 220, 150]
+      ownership: State minority + private (spun off from EDP 1994)
+    e_redes:
+      portuguese: [E-REDES, EDP Distribuição, EDP-D, E-REDES SA, EDP Distribuição de Energia]
+      english: [E-REDES, EDP Distribution, EDP-D]
+      role: DOMINANT_MAINLAND_DSO_99PCT
+      predecessor_rebrand: EDP Distribuição → E-REDES 2021
+      coverage: Continental Portugal ~99% mainland market share
+      customers_millions: 6.1
+      ownership: EDP (Energias de Portugal) subsidiary
+    eda_acores:
+      portuguese: [EDA, Electricidade dos Açores, EDA - Electricidade dos Açores]
+      english: [EDA, Azores Electricity]
+      role: AZORES_ISLANDED_DSO_9_POPULATED_ISLANDS
+      ownership: Regional autonomous government majority
+    eem_madeira:
+      portuguese: [EEM, Empresa de Electricidade da Madeira, EEM - Empresa de Electricidade da Madeira]
+      english: [EEM, Madeira Electricity]
+      role: MADEIRA_ISLANDED_DSO
+      ownership: Regional autonomous government majority
+    # ═══ Small municipal DSOs (residual ~1% market share) ═══
+    ledena:
+      portuguese: [Coop. Eléctrica do Vale d'Este, Ledena]
+      role: MUNICIPAL_DSO_MINHO
+    ceve:
+      portuguese: [CEVE, Coop. Eléctrica do Vale d'Este]
+      role: MUNICIPAL_DSO_MINHO
+    # ═══ Rail traction (Layer 4c) ═══
+    infraestruturas_de_portugal:
+      portuguese: [Infraestruturas de Portugal, IP, IP Ferrovia, REFER]  # REFER pre-2015 merger
+      english: [Portuguese Rail Infrastructure]
+      role: RAIL_TRACTION_25KV_AC
+      note: 25 kV 50 Hz AC electrified backbone Lisboa-Porto + Norte + Alentejo + Beira Alta
+    metropolitano_lisboa:
+      portuguese: [Metropolitano de Lisboa, Metro Lisboa, ML]
+      role: RAIL_METRO_750V_DC
+      note: Lisboa metro 750 V DC third rail
+    metro_do_porto:
+      portuguese: [Metro do Porto, Metro Porto]
+      role: RAIL_METRO_LIGHT_750V
+      note: Porto light metro 750 V DC overhead
+    # ═══ Renewable generation (Layer 4b) ═══
+    edp_renovaveis:
+      portuguese: [EDP Renováveis, EDPR]
+      english: [EDP Renewables]
+      role: GEN_RENEWABLE_WIND_PV
+    iberdrola_portugal:
+      portuguese: [Iberdrola Portugal]
+      spanish: [Iberdrola]
+      role: GEN_RENEWABLE_CROSS_BORDER
+    # ═══ HVDC + AC interconnector consortium ═══
+    ren_ree_iberian_consortium:
+      portuguese: [REN-REE, REN + REE, Interconexão Ibérica]
+      spanish: [REE, Red Eléctrica de España]
+      english: [Spanish TSO, Iberian Interconnection]
+      role: IBERIAN_INTERCONNECTOR
+      route_to: REN
+    # ═══ Cross-border partner operators (route to REN) ═══
+    ree:
+      spanish: [REE, Red Eléctrica de España, Red Eléctrica]
+      english: [REE, Spanish National Grid, Spanish TSO]
+      role: SPANISH_TSO_via_iberian_synchronous
+      route_to: REN
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 — NOT REQUIRED for Portugal
+# ---------------------------------------------------------------
+convention_78_4bis_5_layer_3_geofence:
+  required: false
+  rationale: |
+    Portugal is a SINGLE-DSO jurisdiction (E-REDES ~99% mainland market
+    share). No metropolitan 2-way DSO split exists. Lisboa + Porto +
+    Coimbra + Braga + Faro + Setúbal all serviced by E-REDES exclusively.
+    Açores + Madeira are separate ISLANDED DSOs (EDA + EEM) but these
+    are archipelago-wide not metropolitan geofences — resolved via bbox
+    layer, not §4bis.5 layer.
+
+    Compare to:
+    - Convention #78 §4bis.5 9th London UK: 4-way TSO+DNO/UKPN/SPEN/NPG
+    - Convention #78 §4bis.5 10th Stockholm SE: 2-way Ellevio+Vattenfall
+    - Portugal: NO Layer 3 geofence needed (architectural simplification
+      via single-DSO monopoly + islanded archipelago separation)
+
+  cumulative_enforcement_roster_pre_portugal:
+    1: Prague CZ (P20)
+    2: Warsaw PL (P21)
+    3: EWZ Zurich CH (P24)
+    4: SIG Geneva CH (P24)
+    5: Auckland NZ (P27)
+    6: Copenhagen DK (P28 — 615)
+    7: Helsinki FI (P29 — 446)
+    8: Istanbul TR (P30 — 178)
+    9: London UK (P31 — 1994 LARGEST)
+    10: Stockholm SE (P32 — 24)
+  portugal_signature: SINGLE_DSO_ARCHITECTURAL_SIMPLIFICATION_NO_4BIS_5_LAYER
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border tolerance
+# ---------------------------------------------------------------
+discipline_36_tolerance:
+  boundary_tolerance_km: 6.0
+  entry_added_to: cross_border_tolerances.json
+  rationale_summary: |
+    Highest Wave 4 tolerance (6.0 km) — 60× cadastral default. Justified
+    by: (a) 900 km continental Atlantic coastline complexity (Ria Formosa
+    + Sado + Tejo + Douro estuaries + Costa Vicentina cliffs); (b)
+    Açores 9-island archipelago 1,400 km mid-Atlantic offshore extension;
+    (c) Madeira archipelago + Selvagens islands ~1,000 km sub-tropical
+    Atlantic; (d) 5 400 kV AC cross-border interconnectors with Spain
+    at strategic positions along 1,214 km land border.
+  expected_drops_estimate:
+    subs: 100_300
+    lines: 50_150
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity target
+# ---------------------------------------------------------------
+discipline_41_parity_target:
+  baseline_pre_enhancement: 1.10  # BELOW_HEALTHY_BAND already
+  target_ratio_min: 1.5
+  target_ratio_max: 5.0
+  anticipated_signature_post_sweden_option_b_inheritance: HEALTHY_BAND
+  rationale: |
+    Portugal baseline parity 1.10 is BELOW_HEALTHY_BAND (below 1.5
+    threshold) — indicates baseline was already sub-heavy topology
+    with insufficient line coverage. Sweden P32 Option B inheritance
+    (minor_line + no-voltage inference) MUST substantially grow line
+    coverage. Post-Option-B target ratio 2-4 HEALTHY_BAND ✓.
+
+# ---------------------------------------------------------------
+# Anticipated architectural first-instances via Portugal P33 closure
+# ---------------------------------------------------------------
+architectural_first_instances_anticipated:
+  1: 🇵🇹 FIRST Iberian Wave 4 country enhancement
+  2: HIGHEST cohort-wide wildfire Layer 4 baseline (R6d = 0.90)
+  3: Sweden P32 Option B pattern FIRST inheritance beyond Nordic cluster
+  4: FIRST Mirandese minority language (~15,000 speakers) enforcement
+  5: FIRST cohort-wide first-Europe coal phase-out 2021 (Pego + Sines)
+  6: FIRST single-DSO monopoly architectural simplification (E-REDES 99%)
+  7: FIRST Iberian synchronous grid + MIBEL market coupling architecture
+  8: FIRST islanded archipelago dual pattern (Açores + Madeira via bounds)
+  9: Convention #78 BINDING 15th cohort-wide enforcement (Portuguese + Mirandese + Spanish + English)
+  10: 5 400 kV AC cross-border interconnectors preservation
+  11: HIGHEST cohort-wide compound R9 signature via wildfire+drought+heat convergence (0.70)
+
+# ---------------------------------------------------------------
+# Cumulative Wave 4 progression projection at Portugal closure
+# ---------------------------------------------------------------
+cumulative_wave_4_projection_at_portugal_closure:
+  countries_terminally_complete: 3  # UK + Sweden + Portugal
+  wave_4_progression_pct: 33.3  # 3/9
+  canonical_cohort_completion_pct: 84.6  # 33/39
+  convention_78_binding_enforcements: 15
+  convention_78_alias_ledger_projected: 32000_33500  # +1500-2500 PT alias hits
+  convention_78_4bis_5_layer_3_enforcements: 10  # unchanged (Portugal single-DSO)
+  nordic_cluster_completion: TERMINAL_COMPLETE_5_OF_5  # from Sweden P32
+  iberian_cluster_started: 1_of_2  # Portugal + future Spain P36
+  remaining_wave_4_candidates: 6  # italy + japan + spain + france + germany + us
+  next_smallest_first: italy_p34
+
+# ---------------------------------------------------------------
+# Layer 4 hazard baselines
+# ---------------------------------------------------------------
+layer_4_hazard_baselines:
+  R6c_flood: 0.55  # MOD-HIGH Atlantic + Tejo/Douro/Mondego estuaries + 2010 Madeira flash floods
+  R6d_wildfire: 0.90  # 🚨 HIGHEST cohort-wide — 2017 Pedrógão Grande + annual crisis
+  R6e_winter: 0.15  # LOW Mediterranean/Atlantic mild climate
+  R8_adapt: 0.55  # MOD RNC2050 + first-Europe coal phase-out 2021
+  R9_compound: 0.70  # HIGH drought+heat+wildfire compound signature
+  R10_just: 0.45  # MOD Alentejo depopulation + coal community transitions
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 2 Operator local OSM Overpass fetch
+handoff_command_step_2: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.portugal.osm_overpass 2>&1 \
+    | tee portugal/v4_23-osm-overpass.log
+
+anticipated_step_2_pattern: |
+  Portugal continental 92k km² area (5× smaller than Sweden) —
+  single-bbox subs query should succeed cleanly. Açores + Madeira
+  handled via additional bbox zones. Lines: continental-only single-
+  bbox with Sweden P32 Option B extended query (power=line + cable +
+  minor_line + out geom). Continental grid-geo projected 30-50 MB
+  well under Convention #80 90 MB threshold. Expected raw line
+  elements 25k-45k reflecting Iberian wooden-pole rural MV density.
