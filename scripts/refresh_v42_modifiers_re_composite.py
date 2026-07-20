@@ -335,6 +335,46 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # Alto Adige/Trentino German-speaking + Slovenian Trieste + Ladin +
     # Friulian + Sardinian minority language protections)
     "italy":        {"flood": 0.55, "wildfire": 0.65, "winter": 0.30, "adapt": 0.60, "compound": 0.60, "just": 0.55},
+    # Japan P35 (WAVE 4 P35 — 5th Wave 4 country; Portugal P33 bi-directional
+    # Option B inheritance; UNIQUE cohort-wide islanded grid architecture with
+    # 50/60 Hz frequency split):
+    # HIGH flood (2018 July West Japan floods 200+ dead + 2019 Typhoon Hagibis
+    # Kanto flooding + 2020 July Kumamoto floods + 2023 Hokuriku July floods +
+    # Kanto Great Flood 1947 historical baseline + climate-driven typhoon
+    # intensification + Sanriku coast tsunami compound with typhoons + Sea of
+    # Japan winter storms + Tokyo Bay + Osaka Bay sea-level rise + MOE Climate
+    # Change Adaptation Plan 2020) + LOW-MOD wildfire (Japan has SMALL wildfire
+    # scale despite forest coverage 67% — humid climate + monsoon rainfall +
+    # rapid response networks; 2017 Kesennuma post-tsunami rebuild area +
+    # occasional Kyushu Kirishima + Aso volcanic-adjacent fires but limited
+    # scale vs Mediterranean or California) + HIGH winter (Hokkaido Asahikawa
+    # -30°C sustained + Niigata heavy snow load transmission worst-in-world +
+    # Aomori/Akita/Yamagata Tohoku heavy snow + Nagano Alps + Toyama Kurobe
+    # + 2018 Hokuriku snow crisis + climate-driven Japan Sea sea-effect snow
+    # intensification) + MOD adapt (Green Growth Strategy 2020 Japan Net-Zero
+    # 2050 pledge Oct 2020 + 6th Strategic Energy Plan 2021 + METI + MOE
+    # Basic Plan for Climate Change Adaptation 2018 + GX Basic Policy 2023
+    # Green Transformation ¥150tn 10-year plan + FIT solar boom 2012-2020 +
+    # offshore wind Round 3 auctions 2023) + 🚨 HIGHEST-COHORT-WIDE compound
+    # (EARTHQUAKE+TSUNAMI+VOLCANO+TYPHOON+NUCLEAR compound signature UNIQUELY
+    # extreme cohort-wide: Great East Japan Earthquake 3/11/2011 M9.0 +
+    # tsunami 40m + Fukushima nuclear meltdown compound EVENT is canonical
+    # cohort-wide + Kobe 1995 M6.9 6,434 dead + Kumamoto 2016 M7.0 + Noto
+    # Peninsula 2024 M7.6 + 111 active volcanoes including Sakurajima +
+    # Aso + Fuji + Ontake 2014 eruption + typhoon season annual + Nankai
+    # Trough megaquake 30-year 70% probability M8-9 + Tokai megaquake
+    # anticipated + Mount Fuji eruption Tokyo compound risk + Japan is
+    # world's most seismically active country) + MOD-HIGH just (Ainu
+    # People Promotion Act 2019 statutory recognition of Ainu indigenous
+    # people Hokkaido + Utari/Ainu place-name preservation + Ryukyuan/
+    # Okinawan cultural distinct recognition + Okinawa US military base
+    # tensions + Hokkaido depopulation Yubari town collapse 2007 iconic +
+    # Fukushima Just Transition post-2011 nuclear evacuation + Zainichi
+    # Korean minority + Zainichi Chinese minority + Nikkei Brazilian
+    # returnees + hikikomori social withdrawal 1.5M + aged-society peak
+    # 29% over-65 + regional depopulation acceleration + shūkatsu/karoshi
+    # workplace transition)
+    "japan":        {"flood": 0.75, "wildfire": 0.20, "winter": 0.65, "adapt": 0.55, "compound": 0.85, "just": 0.55},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
