@@ -475,6 +475,49 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # Berlin municipal-energy re-nationalisation vote 2013 + Hamburg
     # grid re-municipalisation 2014)
     "germany":      {"flood": 0.60, "wildfire": 0.45, "winter": 0.50, "adapt": 0.70, "compound": 0.60, "just": 0.65},
+    # US P39 Wave 4 baselines — 🇺🇸 9th Wave 4 country + 🏆 FINAL TERMINAL
+    # closure at 39/39 = 100% cohort-wide.
+    # R6c_flood 0.70 (Katrina 2005 New Orleans + Sandy 2012 NYC subway +
+    # Harvey 2017 Houston + Ida 2021 Louisiana + Ian 2022 Florida + Ivan +
+    # Rita + Matthew + Michael + massive Gulf Coast + Atlantic hurricane
+    # exposure + Mississippi River basin + Missouri + Midwest tornadoes +
+    # 100-yr floodplains California)
+    # R6d_wildfire 0.80 🏆 SECOND cohort-wide (below Portugal 0.90) —
+    # California Camp Fire 2018 deadliest US wildfire 85 deaths $16.5B +
+    # Dixie Fire 2021 largest single California fire $1B + Colorado
+    # Marshall Fire 2021 + Oregon Bootleg 2021 + Maui Lahaina 2023 100+
+    # deaths $5.5B + accelerating WUI expansion + California drought +
+    # Pacific Northwest smoke pollution multi-state annual
+    # R6e_winter 0.75 🏆 SECOND cohort-wide (below Norway 0.85) — Texas Uri
+    # February 2021 deep freeze $200B+ damage 246 deaths grid+gas+water
+    # triple cascade + Northeast blizzards frequent + Alaska Arctic +
+    # Great Lakes lake-effect + polar vortex January 2019 + December 2022
+    # Buffalo blizzard 47 deaths + Nor'easter frequency
+    # R8_adapt 0.55 (federal-state divergence extreme — IRA 2022 Inflation
+    # Reduction Act $369B largest climate law in history + EPA power
+    # plant rules + 100% clean energy targets CA 2045+NY 2040+WA 2045+HI
+    # 2045+15 more states with RPS>50%; but TX no state climate policy
+    # + coal-state resistance + Trump 2024 election likely federal reversal
+    # + no federal climate law like EU + ~60% fossil generation continent-
+    # wide + nuclear ambiguous 93 operating reactors declining 2029-2050)
+    # R9_compound 0.75 🏆 HIGHEST cohort-wide alongside Japan 0.85 —
+    # Katrina 2005 archetypal compound cascade (Cat 5 hurricane + storm
+    # surge + levee failure + drowning + toxic Superfund site releases +
+    # fossil fuel infrastructure failure + power outage + population
+    # displacement 500k+ deaths 1,833) + Ida 2021 identical Louisiana
+    # pattern + Ian 2022 Florida statewide + Uri 2021 Texas triple-cascade
+    # freeze+gas+water+power + Sandy 2012 NYC subway flooding + Maui 2023
+    # fire+utility Hawaiian Electric grid failure + multiple annual events
+    # R10_just 0.60 (Puerto Rico Hurricane Maria 2017 ~3,000 deaths
+    # federal-territorial inequity + Cancer Alley Louisiana Baton Rouge to
+    # New Orleans petrochemical + Navajo Nation coal transition + Diné
+    # coal-mine closures + Appalachia coal-town collapse Kentucky+West
+    # Virginia + Rio Grande Valley colonias unincorporated + Native
+    # American reservations tribal-federal-state boundary + Flint water
+    # crisis 2014-2016 + Jackson Mississippi water crisis 2022 + high
+    # wealth income inequality + rural-urban divide + climate migration
+    # Louisiana coast + Alaska Kivalina relocation)
+    "us":           {"flood": 0.70, "wildfire": 0.80, "winter": 0.75, "adapt": 0.55, "compound": 0.75, "just": 0.60},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
