@@ -375,6 +375,39 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # 29% over-65 + regional depopulation acceleration + shūkatsu/karoshi
     # workplace transition)
     "japan":        {"flood": 0.75, "wildfire": 0.20, "winter": 0.65, "adapt": 0.55, "compound": 0.85, "just": 0.55},
+    # Spain P36 (WAVE 4 P36 — 6th Wave 4 country; Iberian sibling to Portugal
+    # P33 with direct bi-directional Option B pattern inheritance):
+    # MOD-HIGH flood (2024 DANA Valencia floods Oct-Nov 220+ dead LARGEST
+    # European flood disaster since 1997 + 1997 Biescas floods 87 dead + Ebro
+    # river annual + Guadalquivir Sevilla + Segura Murcia + Mediterranean
+    # cyclogenesis DANA weather system Spain-specific + Balearic Islands
+    # coastal storms + Cantabrian coast winter storms + climate-driven
+    # Mediterranean intensification) + HIGH wildfire (2022 Zamora Sierra
+    # de la Culebra 60,000 ha Spain's largest 2022 + 2023 Tenerife Canarias
+    # wildfire 15,000 ha + 2017 Doñana wildfire + annual Mediterranean summer
+    # + Extremadura + Galicia eucalyptus fire load + Andalucía Sierra Nevada
+    # ecological fires + climate drought+heat drives extreme fire behavior;
+    # BELOW Portugal 0.90 due to slightly less catastrophic mortality history
+    # but above Italy 0.65) + LOW winter (Mediterranean mild climate + Pyrenees
+    # limited transmission grid density + occasional Meseta Central cold
+    # snap; NO Nordic sustained cold; comparable to Portugal 0.15) + MOD-HIGH
+    # adapt (PNIEC 2020-2030 Plan Nacional Integrado Energía Clima + Ley
+    # Cambio Climático 2021/7 statutory + Fondo Nacional Sostenibilidad
+    # + first-Europe offshore floating wind auctions 2023 SAITEC/PLOCAN +
+    # peninsular renewables leader 50%+ renewable electricity 2024 + Chira-
+    # Soria pumped hydro Gran Canaria + REPowerEU Spain solar champion +
+    # H2 hydrogen valley Aragón) + MOD compound (DANA + drought + wildfire
+    # compound signature significant + Doñana ecological compound + Iberian
+    # synchronous grid coupling + Balearic/Canary/Ceuta+Melilla island-
+    # exclave compound isolation risk; below Portugal 0.70 due to less
+    # concentrated wildfire compound intensity but above Italy 0.60) + MOD
+    # just (2021 coal phase-out COMPLETE Andalucía+Asturias+León mining
+    # community Just Transition + Almeria greenhouse worker migrant labor
+    # + Andalucía structural depopulation España vaciada + Extremadura
+    # rural depopulation + regional autonomies constitutional framework +
+    # Catalan+Basque+Galician+Aranese co-official minority language
+    # protections + Ceuta+Melilla enclave social integration)
+    "spain":        {"flood": 0.55, "wildfire": 0.75, "winter": 0.20, "adapt": 0.60, "compound": 0.55, "just": 0.55},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
