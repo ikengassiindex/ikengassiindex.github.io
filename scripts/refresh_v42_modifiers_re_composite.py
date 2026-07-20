@@ -445,6 +445,36 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # regional language recognition + French language protection Toubon
     # 1994 + gilets jaunes rural France vs metropolitan tension)
     "france":       {"flood": 0.55, "wildfire": 0.55, "winter": 0.30, "adapt": 0.65, "compound": 0.55, "just": 0.60},
+    # Germany P38 Wave 4 baselines — 🇩🇪 8th Wave 4 country enhancement
+    # R6c_flood 0.60 (Ahrtal 2021 flood 134 deaths €33B damage + 2013 Elbe
+    # + 2002 Elbe historical major floods + Rhine basin flooding recurrent
+    # + Oder + Weser + Ems large-basin exposure)
+    # R6d_wildfire 0.45 (Brandenburg pine forest fires 2018-2019 largest
+    # postwar + Sachsen Bohemian Switzerland 2022 + Mecklenburg Kablow +
+    # low-mountain Harz fires + dry summers 2018-2022 pattern)
+    # R6e_winter 0.50 (Alpine Bayern southern winters + Baltic north cold
+    # snaps + inland continental cold periods + Winterstürme Kyrill 2007
+    # Xynthia 2010 Sabine 2020 + snow load + ice storm exposure)
+    # R8_adapt 0.70 🏆 HIGHEST-COHORT-WIDE (Energiewende since 2000 +
+    # nuclear phase-out complete April 2023 + Kohleausstieg 2038 coal
+    # phase-out law + Klimaschutzgesetz 2019 amended 2021 climate-neutral
+    # 2045 (5 yr more ambitious than France 2050) + Nationaler
+    # Wasserstoffrat 2020 Hydrogen Strategy + Gebäudeenergiegesetz GEG
+    # 2020 buildings act + BEHG CO2 pricing 2021 + renewable electricity
+    # 52% share 2023 empirical + LEAG Lausitz coal region transformation
+    # + Ruhr deindustrialisation + 4-country stakeholder governance
+    # federated Bundesländer transition)
+    # R9_compound 0.60 (Ahrtal 2021 flood-blackout-wildfire triple compound
+    # cascade + summer 2022 heat+drought+wildfire simultaneous + Winter
+    # 2021 gas crisis compound with cold wave)
+    # R10_just 0.65 (Kohleausstieg 2038 20 GW lignite phaseout Lausitz +
+    # Ruhr + Mitteldeutsches Revier justice-transition €40B + strong IG
+    # BCE/verdi labor unions + AfD rise as populism response + Sorbian
+    # minority Lusatia + Danish minority Nordschleswig + Frisian +
+    # East-West income gap 30 yr post-Wende + Bavarian sovereignty +
+    # Berlin municipal-energy re-nationalisation vote 2013 + Hamburg
+    # grid re-municipalisation 2014)
+    "germany":      {"flood": 0.60, "wildfire": 0.45, "winter": 0.50, "adapt": 0.70, "compound": 0.60, "just": 0.65},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }
