@@ -1,0 +1,505 @@
+# SSI Index v4.23 — France P37 Wave 4 Pre-flight
+# ================================================
+# 🇫🇷 WAVE 4 P37 = SEVENTH Wave 4 country 🇫🇷
+# Portugal P33 bi-directional Option B pattern INHERITED.
+# Convention #78 BINDING 19TH ENFORCEMENT (French + English +
+# Corsican + Breton + Basque + Alsatian + Catalan + Occitan
+# 8-language — potentially TIES Italy).
+#
+# 2-of-9 remaining Wave 4 candidates after France:
+#   France P37 THIS closure
+#   Germany P38
+#   US P39
+#
+# France architectural distinctiveness:
+#   - RTE state-controlled TSO + Enedis ~95% dominant DSO (like
+#     Portugal E-REDES pattern)
+#   - ~150 small regional ELDs ~5% (ES Strasbourg + UEM Metz +
+#     SICAE cooperatives + Gérédis + GEG + Sallanches + Vialis +
+#     others)
+#   - DOM/COM overseas territories globally distributed (Guadeloupe
+#     + Martinique + Guyane + Réunion + Mayotte + Saint-Pierre-et-
+#     Miquelon + Nouvelle-Calédonie + Polynésie française + Wallis-
+#     et-Futuna + TAAF)
+#   - Corsica ISLANDED via SACOI to Sardinia + mainland Italy
+#   - Nuclear leadership 70% electricity generation
+#   - LARGEST cohort-wide bounds.json file (101 features: 96 metro
+#     départements + Corsica + 5 DOM)
+#   - Cross-border interconnectors: UK 3× HVDC + Belgium + Germany
+#     + Switzerland + Italy Val d'Aosta + Spain INELFE
+#
+# Likely NO §4bis.5 (Enedis ~95% single-DSO simplification like
+# Portugal P33 and Japan P35 pattern) — Strasbourg (ES) + Metz (UEM)
+# are small regional ELDs, not metro DSO splits comparable to
+# Milan/Rome/Madrid multi-DSO patterns.
+#
+# Authored: 2026-07-20 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================
+
+country_code: fr
+country_name: France
+country_name_fr: France
+country_name_co: Francia  # Corsican
+country_name_br: Frañs  # Breton
+country_name_eu: Frantzia  # Basque
+country_name_als: Frànkrich  # Alsatian
+country_name_ca: França  # Catalan (Pyrénées-Orientales)
+country_name_oc: França  # Occitan
+country_name_en: France
+country_slug: france
+wave: 4
+priority: P37
+smallest_first_rank: 7  # of 9 Wave 4 candidates
+scope: WAVE_4_MAINLAND_DOM_TOM_MV_INHERITANCE_FROM_PORTUGAL_P33_BI_DIRECTIONAL
+
+# ---------------------------------------------------------------
+# Wave 4 architecture requirements (Portugal P33 bi-directional inheritance)
+# ---------------------------------------------------------------
+wave_4_architecture_requirements:
+  merger_schema_target: canonical_compact_s_l_a
+  osm_overpass_query_hints:
+    substations: out center
+    lines: out geom
+  portugal_p33_bi_directional_option_b_inheritance:
+    lines_side_sweden_p32_inheritance:
+      include_power_minor_line: true
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        minor_line: 20.0  # French MV standard (matches Italy+Spain)
+        cable_no_voltage: 20.0
+        line_no_voltage: 63.0  # French subT standard (vs Italy 132, Portugal 60, Spain 66, Japan 66)
+    subs_side_portugal_p33_extension:
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        substation_transmission: 225.0  # French HV standard (unique — between Italy 220 and Japan 275)
+        substation_distribution: 20.0  # Enedis MV standard
+        substation_minor_distribution: 15.0  # Enedis MV rural
+        substation_traction: 1.5  # SNCF 1.5 kV DC classic + 25 kV AC 50 Hz TGV
+        power_substation_generic: 20.0  # Enedis MV default (~95% market)
+  merger_operations_required:
+    - substation_id_assignment
+    - line_id_assignment
+    - polyline_conversion_to_compact_p_array
+    - line_endpoint_ss_se_matching_string_ids
+    - adjacency_graph_construction
+    - grid_based_spatial_index_for_large_N_merges
+    - bbox_split_fallback_if_single_bbox_fails
+  compact_schema_write: via_scripts_pipeline_utils_grid_geo_sharding_write_grid_geo
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: france/ssi-data.json
+  ssi_data_schema: wrapped
+  substation_count: 7378
+  grid_geo_json_path: france/grid-geo.json
+  grid_geo_schema: compact_s_l_a
+  s_dict_count: 7378
+  l_list_count: 40031
+  a_dict_count: 4272
+  line_substation_parity_baseline: 5.43  # SLIGHTLY_ABOVE_HEALTHY_BAND sub-poor line-rich
+  parity_signature_baseline: SLIGHTLY_ABOVE_HEALTHY_BAND_SUB_POOR_LINE_RICH
+  substation_growth_potential: MAJOR  # Only 7,378 subs for 68M pop = 108 subs/M pop
+  voltage_distribution_expected:
+    "400.0": RTE_EHV_BACKBONE  # 400 kV national EHV
+    "225.0": RTE_HV_TRANSMISSION  # 225 kV French HV standard (UNIQUE)
+    "150.0": RTE_REGIONAL  # 150 kV regional (some legacy)
+    "90.0": RTE_SUBTRANSMISSION_HIGH  # 90 kV subT
+    "63.0": RTE_SUBTRANSMISSION_STANDARD  # 63 kV French subT dominant
+    "45.0": ENEDIS_HV_DISTRIBUTION
+    "20.0": ENEDIS_MV_STANDARD  # Enedis MV standard (~95%)
+    "15.0": ENEDIS_MV_RURAL
+  bbox_mainland_only:
+    lat_min: 41.30  # Corsica south
+    lat_max: 51.10  # Dunkerque north
+    lon_min: -5.15  # Pointe de Corsen Brittany
+    lon_max: 9.60   # Alsace east
+  bbox_note: Includes Corsica within main bbox
+  bbox_dom_territories:
+    guadeloupe: {lat: [15.83, 16.52], lon: [-61.85, -61.00]}
+    martinique: {lat: [14.38, 14.88], lon: [-61.25, -60.80]}
+    guyane_francaise: {lat: [2.10, 5.80], lon: [-54.60, -51.60]}
+    reunion: {lat: [-21.40, -20.85], lon: [55.20, 55.85]}
+    mayotte: {lat: [-13.05, -12.60], lon: [45.00, 45.30]}
+    saint_pierre_miquelon: {lat: [46.75, 47.15], lon: [-56.45, -56.10]}
+  bounds_json_features: 101  # 🏆 LARGEST cohort-wide (96 métro dépts + Corsica + 5 DOM)
+
+# ---------------------------------------------------------------
+# Architectural signatures — Enedis dominance + DOM/COM overseas
+# ---------------------------------------------------------------
+architectural_signatures:
+  rte_state_controlled_tso_2000_unbundling: true  # spun off from EDF 2000
+  enedis_dominant_mainland_dso_95pct: true  # formerly ERDF pre-2016 rebrand
+  small_regional_elds_150_5pct_market_share: true
+  metropolitan_france_552k_km2: true
+  corsica_islanded_via_sacoi_sardinia_italy: true
+  dom_overseas_territories:
+    guadeloupe_islanded: true  # EDF SEI
+    martinique_islanded: true  # EDF SEI
+    guyane_francaise_islanded_south_america: true  # EDF SEI
+    reunion_islanded_indian_ocean: true  # EDF SEI
+    mayotte_islanded_indian_ocean: true  # EDM (Électricité de Mayotte)
+    saint_pierre_miquelon_islanded_north_atlantic: true  # EDF SEI
+  com_overseas_territories:
+    saint_martin_saint_barthelemy_caribbean: true  # COM (Collectivité)
+    nouvelle_caledonie_pacific_sui_generis: true  # Enercal
+    polynesie_francaise_pacific: true  # EDT-Engie
+    wallis_futuna_pacific: true  # EEWF
+    terres_australes_antarctiques_taaf: true  # research-station only
+  cross_border_400kv_ac:
+    belgium: true
+    germany: true
+    switzerland: true
+    italy_val_daosta: true
+    spain_hendaye_larrun_ac: true
+  cross_border_hvdc:
+    uk_ifa_2000mw: true
+    uk_ifa2_1000mw: true
+    uk_eleclink_1000mw: true
+    spain_inelfe_2000mw_2015: true
+  nuclear_leadership_70pct_electricity: true  # world highest share
+  nuclear_reactors_2024: 56
+  epr2_plan_2022_announcement: 6  # new EPRs announced
+  fessenheim_closed_2020: true
+  coal_phase_out_2022_statutory: true
+  first_europe_offshore_wind_commercial:
+    saint_nazaire_2022_480mw: true
+    fecamp_2023: true
+    yeu_noirmoutier_2024: true
+  # Regional languages
+  corsican_official_corsica: true
+  breton_recognized_bretagne: true
+  basque_recognized_pyrenees_atlantiques: true
+  alsatian_recognized_alsace: true
+  catalan_recognized_pyrenees_orientales: true
+  occitan_recognized_multiple_departments: true
+  # Political-social markers
+  gilets_jaunes_2018_2019_carbon_tax_legacy: true
+  toubon_law_1994_french_language_protection: true
+  fessenheim_just_transition_2020: true
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 19TH ENFORCEMENT scoping (8-LANGUAGE)
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 19
+  script_class: FRENCH_PLUS_ENGLISH_PLUS_CORSICAN_PLUS_BRETON_PLUS_BASQUE_PLUS_ALSATIAN_PLUS_CATALAN_PLUS_OCCITAN_8_LANGUAGE
+  cohort_wide_signature: TIES_ITALY_HIGHEST_LANGUAGE_COUNT_8_LANGUAGES  # French + English + 6 regional minorities
+  scripts_supported:
+    - French (Français)  # ~94% expected — Latin + à â ç é è ê ë î ï ô ù û ÿ
+    - English  # ~5% — international OSM tagging
+    - Corsican (Corsu)  # ~<0.5% — Corsica recognized
+    - Breton (Brezhoneg)  # ~<0.5% — Bretagne recognized ~200k speakers
+    - Basque (Euskara)  # ~<0.5% — Pyrénées-Atlantiques minority
+    - Alsatian (Elsässisch)  # ~<0.5% — Alsace Germanic dialect
+    - Catalan (Català)  # ~<0.5% — Pyrénées-Orientales minority
+    - Occitan (Occitan/Provençal)  # ~<0.5% — Southern France varieties
+  primary_operators:
+    rte:
+      french: [RTE, Réseau de Transport d'Électricité, RTE Réseau de Transport]
+      english: [RTE, French National Grid, French Transmission System Operator, French TSO]
+      role: NATIONAL_TSO_STATE_CONTROLLED
+      voltage_scope: [400, 225, 150, 90, 63]
+      ownership: State (via EDF ~50% + CDC + private) post-2000 unbundling
+    enedis:
+      french: [Enedis, Enedis SA, ERDF, Électricité Réseau Distribution France]
+      english: [Enedis, French Distribution System Operator, ERDF]
+      role: DOMINANT_MAINLAND_DSO_95PCT
+      predecessor_rebrand: ERDF → Enedis 2016
+      coverage: Metropolitan France mainland ~95%
+      customers_millions: 38.0
+      ownership: EDF Group subsidiary (state-controlled)
+    # ═══ Regional ELDs (Entreprises Locales de Distribution) ~5% market ═══
+    es_strasbourg:
+      french: [ES, Électricité de Strasbourg, ÉS Strasbourg, ES Réseaux]
+      alsatian: [ES, Elektrizität Straßburg]
+      german: [ES Straßburg, Elektrizität Straßburg]
+      english: [ES Strasbourg, Strasbourg Electricity]
+      role: ALSATIAN_REGIONAL_DSO_UNIQUE_WWI_WWII_LEGACY
+      coverage: Bas-Rhin (Alsace) 484 communes
+      customers: 500000
+      ownership: EDF (~90%) + private
+    uem_metz:
+      french: [UEM, Usine d'Électricité de Metz, UEM Metz]
+      english: [UEM Metz, Metz Electricity Works]
+      role: MOSELLE_REGIONAL_DSO
+      coverage: Metz + surrounding Moselle communes
+      customers: 155000
+      ownership: Ville de Metz + private
+    sicae:
+      french: [SICAE, Société d'Intérêt Collectif Agricole d'Électricité, SICAE-OISE, SICAE Somme-Cambrésis]
+      english: [SICAE Cooperative]
+      role: COOPERATIVE_ELDS_AISNE_OISE_SOMME_ARDENNES
+      coverage: Rural cooperatives Northern France
+      customers: 90000
+    geredis_deux_sevres:
+      french: [Gérédis, Gérédis Deux-Sèvres]
+      english: [Gérédis Deux-Sèvres]
+      role: DEUX_SEVRES_REGIONAL_DSO
+      coverage: Deux-Sèvres department
+      customers: 140000
+    geg_grenoble:
+      french: [GEG, Gaz Électricité de Grenoble, Régie Grenobloise, GEG-ENeR]
+      english: [GEG Grenoble, Grenoble Municipal Utility]
+      role: GRENOBLE_MUNICIPAL_DSO
+      coverage: Grenoble metropolitan
+      customers: 100000
+    sallanches:
+      french: [Sallanches, Régie Sallanches]
+      role: HAUTE_SAVOIE_ALPINE_MUNICIPAL_DSO
+    vialis_colmar:
+      french: [Vialis, ELD Vialis, Colmar Vialis]
+      alsatian: [Vialis Colmar]
+      role: COLMAR_ALSATIAN_MUNICIPAL_DSO
+    # ═══ EDF SEI — Systèmes Énergétiques Insulaires (islanded DOM) ═══
+    edf_sei:
+      french: [EDF SEI, Systèmes Énergétiques Insulaires, EDF Systèmes Énergétiques Insulaires]
+      english: [EDF SEI, EDF Islanded Energy Systems]
+      role: ISLANDED_DOM_TERRITORIES_MULTIPLE
+      coverage: Guadeloupe + Martinique + Guyane française + Réunion + Saint-Pierre-et-Miquelon
+    edm_mayotte:
+      french: [EDM, Électricité de Mayotte, EDM Mayotte]
+      english: [EDM, Mayotte Electricity]
+      role: MAYOTTE_ISLANDED_DSO
+    enercal:
+      french: [Enercal, Enercal Nouvelle-Calédonie]
+      english: [Enercal, New Caledonia Electricity]
+      role: NEW_CALEDONIA_COM_ISLANDED_DSO
+    edt_engie:
+      french: [EDT-Engie, EDT Polynésie, Électricité de Tahiti]
+      english: [EDT-Engie, Tahiti Electricity]
+      role: POLYNESIA_COM_ISLANDED_DSO
+    eewf:
+      french: [EEWF, Électricité et Eau de Wallis et Futuna]
+      english: [EEWF, Wallis-Futuna Electricity and Water]
+      role: WALLIS_FUTUNA_COM_ISLANDED_DSO
+    # ═══ SNCF Rail traction 1.5 kV DC classic + 25 kV AC TGV ═══
+    sncf_reseau:
+      french: [SNCF Réseau, SNCF, Réseau Ferré de France, RFF, SNCF Voyageurs]
+      english: [SNCF Réseau, French Rail Infrastructure, RFF]
+      role: RAIL_TRACTION_1_5KV_DC_25KV_AC_TGV
+      note: 1.5 kV DC classic + 25 kV AC 50 Hz TGV (LGV Sud-Est + LGV Atlantique + LGV Nord + LGV Est + LGV Rhin-Rhône + LGV Méditerranée + LGV BPL)
+    ratp:
+      french: [RATP, Régie Autonome des Transports Parisiens]
+      english: [RATP, Paris Autonomous Transport Authority]
+      role: RAIL_METRO_PARIS
+    # ═══ Renewable generation (Layer 4b) ═══
+    edf_renouvelables:
+      french: [EDF Renouvelables, EDF EN]
+      english: [EDF Renewables]
+      role: GEN_RENEWABLE_MULTIPLE
+    engie:
+      french: [Engie, Engie France, Gaz de France]  # GDF Suez → Engie 2015
+      english: [Engie]
+      role: GEN_MULTIPLE
+    total_energies:
+      french: [TotalEnergies, TotalEnergies France, Total]
+      english: [TotalEnergies]
+      role: GEN_MULTIPLE
+    # ═══ Nuclear operators (Layer 4b, France = nuclear leader) ═══
+    edf_nuclear:
+      french: [EDF, Électricité de France, EDF Nucléaire]
+      english: [EDF, EDF Nuclear]
+      role: GEN_NUCLEAR_DOMINANT
+      note: 56 reactors + 6 EPR2 planned (2022 announcement)
+    orano:
+      french: [Orano, Orano Cycle, Areva NC]  # Areva → Orano 2018
+      english: [Orano, Orano Fuel Cycle]
+      role: NUCLEAR_FUEL_CYCLE_MULTIPLE
+    # ═══ HVDC + AC interconnector consortiums ═══
+    ifa_uk:
+      french: [IFA, Interconnexion France-Angleterre]
+      english: [IFA, France-UK Interconnection]
+      role: HVDC_UK_2000MW_1986
+    ifa2_uk:
+      french: [IFA2, Interconnexion France-Angleterre 2]
+      english: [IFA2, France-UK Interconnection 2]
+      role: HVDC_UK_1000MW_2021
+    eleclink_uk:
+      french: [ElecLink, ElecLink Interconnexion]
+      english: [ElecLink]
+      role: HVDC_UK_1000MW_2022_CHANNEL_TUNNEL
+    inelfe_spain:
+      french: [INELFE, Interconnexion France-Espagne, Baixas-Santa Llogaia]
+      spanish: [INELFE]
+      catalan: [INELFE, Interconnexió França-Espanya]
+      english: [INELFE, France-Spain Interconnection]
+      role: HVDC_SPAIN_2000MW_2015
+    # ═══ Cross-border partner TSOs (route to RTE) ═══
+    elia_belgium:
+      french: [Elia, Elia Belgique]
+      dutch: [Elia, Elia België]
+      english: [Elia, Belgian TSO]
+      role: BELGIAN_TSO_via_400kv_ac
+      route_to: RTE
+    amprion_50hertz_tennet_transnetbw_germany:
+      german: [Amprion, 50Hertz, TenneT, TransnetBW]
+      french: [Amprion, 50Hertz, TenneT, TransnetBW]
+      english: [Amprion, 50Hertz, TenneT, TransnetBW, German TSOs]
+      role: GERMAN_TSOS_via_400kv_ac
+      route_to: RTE
+    swissgrid_switzerland:
+      german: [Swissgrid, Swissgrid AG]
+      french: [Swissgrid, Réseau Suisse]
+      italian: [Swissgrid]
+      english: [Swissgrid, Swiss TSO]
+      role: SWISS_TSO_via_400kv_ac
+      route_to: RTE
+    terna_italy:
+      italian: [Terna, Terna S.p.A.]
+      french: [Terna]
+      english: [Terna, Italian TSO]
+      role: ITALIAN_TSO_via_val_daosta_400kv
+      route_to: RTE
+    ree_spain:
+      spanish: [REE, Red Eléctrica de España, Redeia]
+      french: [REE]
+      english: [REE, Spanish TSO]
+      role: SPANISH_TSO_via_hendaye_larrun_inelfe
+      route_to: RTE
+    nesog_uk:
+      english: [NESO, National Energy System Operator, National Grid ESO]
+      french: [NESO, National Grid]
+      role: UK_ESO_via_ifa_ifa2_eleclink
+      route_to: RTE
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 — NOT REQUIRED for France
+# ---------------------------------------------------------------
+convention_78_4bis_5_layer_3_geofence:
+  required: false
+  architectural_simplification: enedis_dominant_dso_95pct_mainland_monopoly_pattern
+  sibling_pattern_to:
+    portugal_p33: E-REDES 99% single-DSO
+    japan_p35: 9-regional-utility non-overlapping monopoly
+  cohort_wide_signature: THIRD_WAVE_4_COUNTRY_WITHOUT_4BIS_5_via_ENEDIS_DOMINANCE
+  rationale: |
+    France is REGIONAL-DOMINANT-DSO jurisdiction — Enedis holds ~95%
+    mainland market share, with ~150 small regional ELDs (~5%) that
+    are NON-OVERLAPPING territorial entities (not metro splits).
+
+    Paris → Enedis only (no metropolitan multi-DSO split like Milan
+    A2A+E-Distribuzione or Rome ACEA+E-Distribuzione or Madrid
+    Naturgy+Iberdrola).
+
+    Strasbourg → ES Strasbourg (regional ELD) covers Bas-Rhin only,
+    NOT a Paris-analog metro split. Metz → UEM similar. These are
+    small regional monopolies within Enedis's dominant territory,
+    resolved via voltage class or fallback default DSO layer, not
+    §4bis.5.
+
+  cumulative_enforcement_roster_pre_france:
+    1: Prague CZ (P20)
+    2: Warsaw PL (P21)
+    3: EWZ Zurich CH (P24)
+    4: SIG Geneva CH (P24)
+    5: Auckland NZ (P27)
+    6: Copenhagen DK (P28 — 615)
+    7: Helsinki FI (P29 — 446)
+    8: Istanbul TR (P30 — 178)
+    9: London UK (P31 — 1994 LARGEST)
+    10: Stockholm SE (P32 — 24)
+    11: Milan IT (P34 — 350)
+    12: Rome IT (P34 — 131)
+    13: Madrid ES (P36 — 139)
+  france_signature: ENEDIS_DOMINANT_ARCHITECTURAL_SIMPLIFICATION_NO_4BIS_5
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border tolerance
+# ---------------------------------------------------------------
+discipline_36_tolerance:
+  boundary_tolerance_km: 6.0
+  entry_added_to: cross_border_tolerances.json
+  rationale_summary: |
+    6.0 km tolerance MATCHES Portugal + Japan + UK — French DOM/COM
+    territories globally distributed (Caribbean + Indian Ocean +
+    Pacific) MORE extreme than Portuguese Açores+Madeira; Corsica
+    offshore precision + Alpine complexity + Pyrenees + Atlantic
+    Cantabria+Vendée + Mediterranean coast + Manche/Normandy.
+  expected_drops_estimate:
+    subs: 100_300
+    lines: 50_150
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity target
+# ---------------------------------------------------------------
+discipline_41_parity_target:
+  baseline_pre_enhancement: 5.43  # slightly ABOVE_HEALTHY_BAND sub-poor line-rich
+  target_ratio_min: 1.5
+  target_ratio_max: 5.0
+  anticipated_signature_post_option_b_bi_directional: HEALTHY_BAND_via_MAJOR_SUB_GROWTH
+  rationale: |
+    France baseline 5.43 slightly ABOVE_HEALTHY_BAND — sub-poor +
+    line-rich pattern like Spain (baseline 6.65). Wave 4 bi-directional
+    Option B inheritance should MASSIVELY grow subs (from 7,378 to
+    30k-50k+ via Portugal P33 subs pattern application), bringing
+    parity DOWN to 1.5-3.0 HEALTHY_BAND. Mirror-image recovery to
+    Portugal's line-side recovery pattern, similar to Spain P36.
+
+# ---------------------------------------------------------------
+# Anticipated architectural first-instances via France P37 closure
+# ---------------------------------------------------------------
+architectural_first_instances_anticipated:
+  1: 🇫🇷 FIRST Franco-metropolitan Wave 4 country enhancement
+  2: 🌍 TIES ITALY 8-language Convention #78 BINDING enforcement HIGHEST cohort-wide (French + English + Corsican + Breton + Basque + Alsatian + Catalan + Occitan)
+  3: 🏆 LARGEST cohort-wide bounds.json file (101 features: 96 métro dépts + Corsica + 5 DOM)
+  4: THIRD regional-dominant-DSO simplification (NO §4bis.5, sibling to Portugal + Japan)
+  5: FIRST cohort-wide DOM/COM globally-distributed overseas territory capture (Caribbean + Indian Ocean + Pacific + South America)
+  6: FIRST cohort-wide EDF SEI Systèmes Énergétiques Insulaires islanded architecture
+  7: FIRST cohort-wide nuclear leadership signature (70% electricity, 56 reactors, 6 EPR2 planned)
+  8: 3 UK HVDC interconnectors preserved (IFA 2000 MW + IFA2 1000 MW + ElecLink 1000 MW)
+  9: FIRST cohort-wide first-Europe offshore wind commercial (Saint-Nazaire 2022 480 MW)
+  10: Portugal P33 bi-directional Option B pattern FIRST Franco-metropolitan inheritance
+  11: 150+ small regional ELDs cataloged (ES Strasbourg + UEM Metz + SICAE + Gérédis + GEG + Sallanches + Vialis + others)
+  12: Corsica ISLANDED via SACOI HVDC to Sardinia+Italy preserved
+  13: 5 DOM territories captured (Guadeloupe + Martinique + Guyane + Réunion + Mayotte + Saint-Pierre-et-Miquelon)
+
+# ---------------------------------------------------------------
+# Cumulative Wave 4 progression projection at France closure
+# ---------------------------------------------------------------
+cumulative_wave_4_projection_at_france_closure:
+  countries_terminally_complete: 7  # UK + Sweden + Portugal + Italy + Japan + Spain + France
+  wave_4_progression_pct: 77.8  # 7/9
+  canonical_cohort_completion_pct: 94.9  # 37/39
+  convention_78_binding_enforcements: 19
+  convention_78_alias_ledger_projected: 65000_75000  # +10k-20k FR alias hits (Enedis + regional ELDs)
+  convention_78_4bis_5_layer_3_enforcements: 13  # UNCHANGED (France Enedis-dominant NO §4bis.5)
+  nordic_cluster_completion: TERMINAL_COMPLETE_5_OF_5
+  iberian_cluster_completion: TERMINAL_COMPLETE_2_OF_2
+  mediterranean_cluster_progress: 2_of_3  # Italy + France (also Mediterranean)
+  pacific_cluster_progress: 1_of_1  # Japan (+ future France Nouvelle-Calédonie/Polynésie COM but small)
+  option_b_pattern_bi_directional_validated_scales: NORDIC + IBERIAN×2 + MEDITERRANEAN + PACIFIC + FRANCO_METRO
+  remaining_wave_4_candidates: 2  # germany + us
+  next_smallest_first: germany_p38
+
+# ---------------------------------------------------------------
+# Layer 4 hazard baselines
+# ---------------------------------------------------------------
+layer_4_hazard_baselines:
+  R6c_flood: 0.55  # MOD-HIGH 2020 Alex + 2018 Aude + 2016 Seine + 2010 Xynthia
+  R6d_wildfire: 0.55  # MOD 2022 Landes-Gironde + 2003 Provence + Corsica annual
+  R6e_winter: 0.30  # MOD Alps + Vosges + Massif Central (Mediterranean+Atlantic mild)
+  R8_adapt: 0.65  # MOD-HIGH SNBC 2020 + Loi Climat 2021 + nuclear leadership + first-Europe offshore Saint-Nazaire 2022
+  R9_compound: 0.55  # MOD 2003 heatwave 15k dead + wildfire+drought+heat compound
+  R10_just: 0.60  # MOD-HIGH Fessenheim + coal 2022 + Gilets Jaunes + 6 regional languages + DOM/COM autonomies
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 2 Operator local OSM Overpass fetch
+handoff_command_step_2: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.france.osm_overpass 2>&1 \
+    | tee france/v4_23-osm-overpass.log
+
+anticipated_step_2_pattern: |
+  France mainland 552k km² area (larger than Spain 493k km²). Bbox-split
+  strongly recommended: 5 mainland zones (North + Center + South +
+  West Bretagne + East Alsace-Lorraine-Alpes) + Corsica + 5 DOM
+  territories. Portugal P33 bi-directional Option B pattern INHERITED
+  — expect MAJOR sub growth from 7,378 baseline to 35k-55k post-fetch.
+  Line count already 40,031 — additional growth 40k-70k projected.
+  Grid-geo projected 60-90 MB — may approach Convention #80 sharding
+  threshold at Spain/Italy scale.

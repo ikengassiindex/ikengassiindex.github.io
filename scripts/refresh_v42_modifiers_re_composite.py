@@ -408,6 +408,43 @@ _COUNTRY_HAZARD_BASELINES: dict[str, dict[str, float]] = {
     # Catalan+Basque+Galician+Aranese co-official minority language
     # protections + Ceuta+Melilla enclave social integration)
     "spain":        {"flood": 0.55, "wildfire": 0.75, "winter": 0.20, "adapt": 0.60, "compound": 0.55, "just": 0.55},
+    # France P37 (WAVE 4 P37 — 7th Wave 4 country; Portugal P33 bi-directional
+    # Option B pattern inherited; RTE + Enedis dominant DSO architecture):
+    # MOD-HIGH flood (2016 Seine crue centennial + 2018 Aude floods 15 dead +
+    # 2020 Alpes-Maritimes Storm Alex 8+ dead + 2020 October Storm Alex Roya
+    # Valley infrastructure catastrophic + 2022 Marseille+ Corsica floods +
+    # Atlantic Vendée+Bretagne Xynthia 2010 storm surge 47 dead + Rhône
+    # seasonal + Loire+Seine+Garonne+Rhin regularly + climate-driven
+    # Mediterranean cyclogenesis intensification + Alpine glacier meltwater
+    # + DOM territories tropical cyclone Guadeloupe+Martinique+Réunion) +
+    # MOD wildfire (2022 Landes+Gironde+Bordeaux wildfires 30,000 ha
+    # Landes-de-Gascogne pine plantation + 2003 Provence + 2017 Cannes-
+    # Marseille + Corsica summer annual + Pyrénées-Orientales; below Portugal
+    # 0.90 due to less catastrophic mortality history but comparable to
+    # Italy 0.65 pattern) + MOD winter (Alps Chamonix+Chamrousse+Bourg-Saint-
+    # Maurice sustained + Vosges + Massif Central + Jura + Pyrenees; MODERATE
+    # continental with sustained sub-zero in Alpine areas; below Japan 0.65
+    # + Sweden 0.75 due to Mediterranean+Atlantic tempering) + MOD-HIGH adapt
+    # (SNBC Stratégie Nationale Bas-Carbone 2020 + Loi Climat et Résilience
+    # 2021 statutory + nuclear leadership 70% electricity + first-Europe
+    # offshore wind commercial Saint-Nazaire 2022 480 MW + Fessenheim NPP
+    # closure 2020 + coal phase-out 2022 statutory + Fit-for-55 SFEC 2024 +
+    # France Relance €100bn recovery + Plan Nucléaire 6 EPR2 announcement
+    # 2022 + Nouvelle-Aquitaine H2 hydrogen valley + first-Europe corporate
+    # PPA scaling 2023) + MOD compound (2003 heatwave 15,000+ dead LARGEST
+    # European natural disaster mortality post-WWII + wildfire+drought+heat
+    # compound + Storm Alex 2020 compound infrastructure Alps + Fukushima-
+    # parallel Fessenheim NPP safety review compound + climate-driven
+    # extreme events; below Japan 0.85 + Portugal 0.70) + MOD-HIGH just
+    # (Fessenheim nuclear community Just Transition 2020 + coal phase-out
+    # 2022 Cordemais+Émile-Huchet+Le Havre communities + nuclear industry
+    # workforce Cattenom+Bugey+Cruas + Gilets Jaunes carbon tax 2018-2019
+    # legacy + Corsican independence political + Basque+Breton+Alsatian+
+    # Catalan+Occitan regional identity + DOM/COM autonomy tensions
+    # Nouvelle-Calédonie referendum + Guyane space center Kourou + 6+
+    # regional language recognition + French language protection Toubon
+    # 1994 + gilets jaunes rural France vs metropolitan tension)
+    "france":       {"flood": 0.55, "wildfire": 0.55, "winter": 0.30, "adapt": 0.65, "compound": 0.55, "just": 0.60},
     # Default fallback for uncatalogued countries (median first-order)
     "_default":     {"flood": 0.50, "wildfire": 0.35, "winter": 0.45, "adapt": 0.55, "compound": 0.40, "just": 0.50},
 }

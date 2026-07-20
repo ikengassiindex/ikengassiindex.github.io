@@ -90,3 +90,18 @@ pipeline-report-*.json
 # NOT source of truth; content-hashed by cache_path_for(query) per Convention #78)
 scripts/pipeline/ingestion/data/
 scripts/pipeline/data/*/_osm_cache/
+
+# Wave 4 v4.23 per-country OSM Overpass raw cache dirs (Sweden P32 +
+# Portugal P33 + Italy P34 + Japan P35 + Spain P36 + France P37 + Germany
+# P38 + US P39 pattern). Files are regenerable via:
+#   python -m scripts.pipeline.ingestion.<country>.osm_overpass
+# NEVER committed — sibling countries already have _cache/ untracked;
+# France P37 got caught by `git add -A france/` and hit GitHub 100 MB
+# hard limit on overpass-lines-raw.json (216 MB).
+*/_cache/
+
+# Wave 4 v4.23 per-country ingestion log files. Local audit-trail
+# artifacts only. Sibling countries have these untracked already.
+*/v4_23-osm-overpass.log
+*/v4_23-merge.log
+*/v4_23-phase-4c-refresh.log
