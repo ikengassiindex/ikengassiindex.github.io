@@ -65,10 +65,16 @@
       },
       getVariables: function (d) {
         return [
-          ['I1', 'Snow/Ice IRI', '—', 'ESRS E1-9: Financial effects from physical risks', (d.components && d.components.I) ? 'ready' : 'gap'],
-          ['I2', 'Tree-fall IRI', '—', 'TCFD Strategy (b): Physical risk impact', (d.components && d.components.I) ? 'ready' : 'gap'],
-          ['I3', 'Heat-wave IRI', '—', 'EU Taxonomy Annex A: Heat stress', (d.components && d.components.I) ? 'ready' : 'gap'],
-          ['I5', 'Thermal stress', '—', 'ESRS E1-4: Climate mitigation targets', (d.components && d.components.I) ? 'ready' : 'gap'],
+          // IRI display wired to canonical fields (Phase A-ESG audit, 21 Jul 2026):
+          //   I1/I2/I3 → climate_trajectory.I{1,2,3}_trajectory (ERA5-derived per-metric projections)
+          //   I5 → components.I (I-component aggregate; no standalone thermal-stress scalar
+          //        currently emitted at substation resolution — flagged 'partial' per Convention #56
+          //        visibly-honest degradation until pipeline adds explicit I5_iri emission).
+          //   Values ≥ 1.0 indicate worsening projected exposure; < 1.0 indicates improving.
+          ['I1', 'Snow/Ice IRI', (d.climate_trajectory && d.climate_trajectory.I1_trajectory != null) ? d.climate_trajectory.I1_trajectory.toFixed(3) : '—', 'ESRS E1-9: Financial effects from physical risks', (d.climate_trajectory && d.climate_trajectory.I1_trajectory != null) ? 'ready' : 'gap'],
+          ['I2', 'Tree-fall IRI', (d.climate_trajectory && d.climate_trajectory.I2_trajectory != null) ? d.climate_trajectory.I2_trajectory.toFixed(3) : '—', 'TCFD Strategy (b): Physical risk impact', (d.climate_trajectory && d.climate_trajectory.I2_trajectory != null) ? 'ready' : 'gap'],
+          ['I3', 'Heat-wave IRI', (d.climate_trajectory && d.climate_trajectory.I3_trajectory != null) ? d.climate_trajectory.I3_trajectory.toFixed(3) : '—', 'EU Taxonomy Annex A: Heat stress', (d.climate_trajectory && d.climate_trajectory.I3_trajectory != null) ? 'ready' : 'gap'],
+          ['I5', 'Thermal stress (I aggregate)', (d.components && d.components.I != null) ? d.components.I.toFixed(3) : '—', 'ESRS E1-4: Climate mitigation targets', (d.components && d.components.I != null) ? 'partial' : 'gap'],
           ['R2', 'Climate trajectory', (d.markov && d.markov.p_crit_20yr !== undefined ? (d.markov.p_crit_20yr * 100).toFixed(1) + '% (20yr)' : 'N/A'), 'TCFD Strategy (c): Scenario analysis', (d.markov && d.markov.p_crit_20yr !== undefined) ? 'ready' : 'gap'],
           ['R6b', 'Seismic PGA', ((d.seismic && d.seismic.pga_g) || '—') + 'g', 'EU Taxonomy Annex A: Geophysical hazards', (d.seismic && d.seismic.pga_g) ? 'ready' : 'gap'],
           ['Markov', 'p_critical_10yr', (d.markov && d.markov.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—'), 'TCFD Risk Management: Risk identification', d.markov ? 'ready' : 'gap'],
