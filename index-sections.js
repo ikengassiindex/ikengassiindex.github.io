@@ -175,6 +175,12 @@
     H.setText('scale-dp', fmtScale(dp));
     H.setText('scale-subs', n.toLocaleString('en-US') + ' substation risk scores · ' +
       hv.toLocaleString('en-US') + ' HV · ' + mv.toLocaleString('en-US') + ' MV');
+    // Total power-line kilometrage — sourced from SSI_CANONICAL_LITERALS
+    // (baked at build time from grid-geo.json haversine sum over l[].p polylines).
+    // Falls back to em-dash when the canonical is missing so degradation stays honest.
+    var gridKm = (window.SSI_CANONICAL_LITERALS &&
+                  window.SSI_CANONICAL_LITERALS['fleet.grid_lines_km']) || '—';
+    H.setText('scale-lines', gridKm);
     H.setText('scale-leaves', String(vars));
   });
 
