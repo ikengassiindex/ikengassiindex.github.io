@@ -71,6 +71,45 @@
       desc: 'Sparse activity, agricultural land — lower VoLL' }
   ];
 
+  /* ── §B.2 Economic Impact — E-component percentile buckets
+       (Discipline #45 candidate, 21 July 2026).
+
+       Prior architecture: §B.2 segmented on modifiers.R3_C_mult with fixed
+       thresholds (0.97 / 1.00 / 1.05). This broke cohort-wide for 8 Wave 4
+       countries (Italy · Japan · Portugal · Spain · Sweden · Germany · France
+       · US, ~590K subs) whose L3 pipeline emits a fleet-uniform national R3
+       anchor (e.g. Italy 0.891 across all 51,910 subs) → 100% Light/Rural
+       always. Backend fix queued as Task #445.
+
+       Frontend fix (this constant + §B.2 tier-iteration loop below):
+       segment on components.E — the CVIESTR-primary Economic axis — which
+       carries per-substation variance in every country (Italy: 1902 unique
+       E values, cohort-uniform range [0.245, 0.455]). Percentile-based
+       buckets self-normalize across data-quality tiers: Capital ≥ P90,
+       Industrial P75–P90, Commercial P50–P75, Rural < P50 → stable
+       10/15/25/50 distribution by construction. Cross-country VoLL bands
+       (currency-localised in country configs) remain indicative.
+
+       Country configs may override the percentile splits below by setting
+       `thresholds.e_buckets` — same schema as r3_buckets but with
+       pctile_lower / pctile_upper instead of lower / upper. ────────────── */
+  var DEFAULT_E_BUCKETS = [
+    { label: 'Capital-Intensive / High-Consequence', icon: '🏭', pctile_lower: 0.90, pctile_upper: null, voll_range: '€15–30/kWh', color: '#941914',
+      desc: 'Substations serving highest-value economic activity — pharma / chemicals / data centres / financial districts / heavy industry' },
+    { label: 'Industrial / Medium-Large Enterprise', icon: '🔧', pctile_lower: 0.75, pctile_upper: 0.90, voll_range: '€8–15/kWh', color: '#aa4234',
+      desc: 'Industrial belt — significant continuity requirements' },
+    { label: 'Commercial / SME-Dense', icon: '🏪', pctile_lower: 0.50, pctile_upper: 0.75, voll_range: '€3–8/kWh', color: '#b8863a',
+      desc: 'Service economy, retail, urban commercial districts — moderate individual impact' },
+    { label: 'Light / Agricultural / Rural', icon: '🌾', pctile_lower: 0.0, pctile_upper: 0.50, voll_range: '€1–3/kWh', color: '#5d8563',
+      desc: 'Sparse activity, agricultural land — lower VoLL' }
+  ];
+
+  function eBucketsFromConfig(cfg) {
+    var t = cfg && cfg.thresholds;
+    if (t && Array.isArray(t.e_buckets) && t.e_buckets.length) return t.e_buckets;
+    return DEFAULT_E_BUCKETS;
+  }
+
   /* ── Universal SSI-ENN topic registry (20 monthly topics, Layers 1–5).
        Identical across countries — universal architectural narrative. ── */
   var ENN_TOPICS = [
@@ -420,16 +459,54 @@
       'Across the full fleet, ' + cyberCounts.HIGH + ' substations (' + Safe.pct(cyberCounts.HIGH / n * 100, 1) + ') carry a HIGH cyber-exposure classification, ' +
       'while ' + cyberCounts.LOW + ' (' + Safe.pct(cyberCounts.LOW / n * 100, 1) + ') are in the LOW tier.');
 
-    // B.2 Economic Impact by Business Fabric — config-driven tier ladder
-    var tiers = r3BucketsFromConfig(ctx.config);
+    // B.2 Economic Impact by Business Fabric — E-component percentile ladder
+    // (Discipline #45 candidate, 21 July 2026: switched segmentation from
+    //  modifiers.R3_C_mult → components.E; R3 is fleet-uniform for 8 Wave 4
+    //  countries → 100% Light/Rural. E has per-sub variance in every country.)
+    var tiers = eBucketsFromConfig(ctx.config);
+
+    // Precompute per-country E-value cuts from sorted fleet E values.
+    // Country configs may still ship legacy r3_buckets with .lower/.upper;
+    // we honour BOTH the new .pctile_* schema (default) AND the legacy
+    // .lower/.upper schema (interpreted as absolute R3 values, kept for
+    // Wave 1-3 countries with per-sub R3 variance who already have working
+    // country-config-tuned thresholds).
+    var eSorted = fleet
+      .map(function (s) { return Safe.get(s, 'components.E'); })
+      .filter(function (v) { return typeof v === 'number'; })
+      .sort(function (a, b) { return a - b; });
+    var nE = eSorted.length;
+    function eAtPctile(p) {
+      if (!nE) return null;
+      if (p <= 0) return -Infinity;
+      if (p >= 1) return Infinity;
+      var idx = Math.min(nE - 1, Math.max(0, Math.floor(p * nE)));
+      return eSorted[idx];
+    }
+    var useEPercentile = tiers.some(function (t) { return typeof t.pctile_lower === 'number' || typeof t.pctile_upper === 'number'; });
+
     var tiersHTML = '';
     tiers.forEach(function (tier) {
-      var lower = (typeof tier.lower === 'number') ? tier.lower : 0;
-      var upper = (tier.upper == null) ? Infinity : tier.upper;
-      var subs = fleet.filter(function (s) {
-        var v = Safe.get(s, 'modifiers.R3_C_mult');
-        return typeof v === 'number' && v >= lower && v < upper;
-      });
+      var subs;
+      if (useEPercentile && nE > 0) {
+        // NEW path — components.E percentile filter
+        var pLo = (typeof tier.pctile_lower === 'number') ? tier.pctile_lower : 0;
+        var pHi = (tier.pctile_upper == null) ? 1 : tier.pctile_upper;
+        var eLo = eAtPctile(pLo);
+        var eHi = (pHi >= 1) ? Infinity : eAtPctile(pHi);
+        subs = fleet.filter(function (s) {
+          var v = Safe.get(s, 'components.E');
+          return typeof v === 'number' && v >= eLo && v < eHi;
+        });
+      } else {
+        // LEGACY path — modifiers.R3_C_mult filter (Wave 1-3 country configs)
+        var lower = (typeof tier.lower === 'number') ? tier.lower : 0;
+        var upper = (tier.upper == null) ? Infinity : tier.upper;
+        subs = fleet.filter(function (s) {
+          var v = Safe.get(s, 'modifiers.R3_C_mult');
+          return typeof v === 'number' && v >= lower && v < upper;
+        });
+      }
       var nTier = subs.length;
       var highCrit = subs.filter(function (s) { return s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme'; }).length;
       var avgR = nTier ? subs.reduce(function (a, s) { return a + Safe.num(s.R_median, 0); }, 0) / nTier : 0;
@@ -464,34 +541,46 @@
     });
     H.setHTML('b2-tiers', tiersHTML);
 
-    // VoLL note
+    // VoLL note — top-tier filter must match B.2 iteration above (E-percentile or legacy R3)
     var topTier = tiers[0];
-    var topLower = (topTier && typeof topTier.lower === 'number') ? topTier.lower : 1.05;
-    var totalHCHR = fleet.filter(function (s) {
+    var topLower_R3 = (topTier && typeof topTier.lower === 'number') ? topTier.lower : 1.05;
+    var topPctileLower = (topTier && typeof topTier.pctile_lower === 'number') ? topTier.pctile_lower : 0.90;
+    var topLower_E = (useEPercentile && nE > 0) ? eAtPctile(topPctileLower) : null;
+    function inTopTier(s) {
+      if (useEPercentile && nE > 0) {
+        var e = Safe.get(s, 'components.E');
+        return typeof e === 'number' && e >= topLower_E;
+      }
       var v = s.modifiers && s.modifiers.R3_C_mult;
-      return v >= topLower && (s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme');
+      return typeof v === 'number' && v >= topLower_R3;
+    }
+    var totalHCHR = fleet.filter(function (s) {
+      return inTopTier(s) && (s.classification === 'High' || s.classification === 'Critical' || s.classification === 'Extreme');
     }).length;
+    // Preserve legacy narrative-token placeholders for country-config overrides:
+    // {topLower} carries whichever signal drove the tiering (E-value or R3-value).
+    var topLower = (useEPercentile && nE > 0) ? topLower_E : topLower_R3;
     // KR S31 hotfix #6: country-config override for B.2 VoLL note (currency localization)
     // Placeholders supported: {totalHCHR}, {topLower}
     var vollNoteOverride = (ctx.config && ctx.config.b2_voll_note) ? ctx.config.b2_voll_note : null;
     if (vollNoteOverride) {
       vollNoteOverride = vollNoteOverride
         .replace(/\{totalHCHR\}/g, totalHCHR)
-        .replace(/\{topLower\}/g, topLower.toFixed(2));
+        .replace(/\{topLower\}/g, (typeof topLower === 'number' ? topLower.toFixed(3) : '—'));
       H.setHTML('b2-voll-note', vollNoteOverride);
     } else {
+      var signalLabel = (useEPercentile && nE > 0)
+        ? 'top-decile Economic component (E ≥ ' + topLower_E.toFixed(3) + ', P' + Math.round(topPctileLower * 100) + '+)'
+        : 'R3 consequence multiplier (R3 ≥ ' + topLower_R3.toFixed(2) + ')';
       H.setHTML('b2-voll-note',
         '<strong>Value of Lost Load (VoLL) context:</strong> ACER\'s 2023 estimate places average VoLL at €13.1/kWh for industrial customers ' +
-        'and €3.2/kWh for residential. The SSI\'s R3 consequence multiplier allows us to identify which substations serve the most economically ' +
-        'exposed territories. <strong>' + totalHCHR + ' substations</strong> combine capital-intensive economic fabric (R3 ≥ ' + topLower.toFixed(2) + ') with ' +
+        'and €3.2/kWh for residential. The SSI\'s Economic component (CVIESTR·E) segments substations by the economic value they serve. ' +
+        '<strong>' + totalHCHR + ' substations</strong> combine capital-intensive economic fabric (' + signalLabel + ') with ' +
         'High, Critical, or Extreme risk classification — representing the highest VoLL-weighted exposure in the fleet.');
     }
 
-    // B.2 Narrative
-    var topTierSubs = fleet.filter(function (s) {
-      var v = s.modifiers && s.modifiers.R3_C_mult;
-      return v >= topLower;
-    });
+    // B.2 Narrative — top-tier filter must match B.2 iteration + VoLL-note
+    var topTierSubs = fleet.filter(inTopTier);
     var topRegMap = {};
     topTierSubs.forEach(function (s) { topRegMap[s.region] = (topRegMap[s.region] || 0) + 1; });
     var topEconRegions = Object.keys(topRegMap).map(function (r) { return { name: r, n: topRegMap[r] }; })
