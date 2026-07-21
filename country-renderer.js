@@ -226,11 +226,39 @@
     var dataUrl = base + 'ssi-data.json?v=' + CACHE_BUSTER;
     var configUrl = base + '../intelligence/country-configs/' + country + '.json?v=' + CACHE_BUSTER;
 
-    Promise.all([
-      fetch(dataUrl).then(function (r) {
+    // Convention #79 candidate — ssi-data automatic sharding for GitHub 100 MB per-file limit.
+    // If manifest carries `sharded: true` + `substations_shards[]`, fetch shards in parallel
+    // and concatenate into virtual `substations`. Countries under 90 MB stay single-file.
+    function loadSsiData() {
+      return fetch(dataUrl).then(function (r) {
         if (!r.ok) throw new Error('ssi-data.json HTTP ' + r.status);
         return r.json();
-      }),
+      }).then(function (manifest) {
+        if (!manifest.sharded || !Array.isArray(manifest.substations_shards)) {
+          return manifest;  // Single-file case
+        }
+        // Sharded — fetch all substations shards in parallel + concatenate
+        return Promise.all(
+          manifest.substations_shards.map(function (sh) {
+            return fetch(base + sh.path + '?v=' + CACHE_BUSTER).then(function (r) {
+              if (!r.ok) throw new Error(sh.path + ' HTTP ' + r.status);
+              return r.json();
+            });
+          })
+        ).then(function (shardArrays) {
+          manifest.substations = [].concat.apply([], shardArrays);
+          if (typeof console !== 'undefined' && console.log) {
+            console.log('[CountryRenderer] loaded sharded ssi-data — ' +
+              manifest.substations_shards.length + ' shards, ' +
+              manifest.substations.length + ' substations total');
+          }
+          return manifest;
+        });
+      });
+    }
+
+    Promise.all([
+      loadSsiData(),
       // Country config is OPTIONAL — pages still work without one (renderer
       // applies sane defaults). 404 → null, no error propagated.
       fetch(configUrl).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),

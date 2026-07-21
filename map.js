@@ -1318,9 +1318,28 @@ if (!hasNested) {
       return manifest;
     }
     // bounds.json is optional — countries without an admin-polygon file get a 404 and a silent no-op
+    // Convention #79 candidate — ssi-data automatic sharding for GitHub 100 MB per-file limit.
+    // If manifest carries `sharded: true` + `substations_shards[]`, fetch shards in parallel
+    // and concatenate into virtual `substations`. Countries under 90 MB stay single-file.
+    async function loadSsiData() {
+      const manifest = await fetch(basePath + 'ssi-data.json?v=602').then(r => r.json());
+      if (!manifest.sharded || !Array.isArray(manifest.substations_shards)) {
+        return manifest;  // Single-file case — return as-is
+      }
+      // Sharded — fetch all substations shards in parallel
+      const shardArrays = await Promise.all(
+        manifest.substations_shards.map(sh =>
+          fetch(basePath + sh.path + '?v=602').then(r => r.json())
+        )
+      );
+      // Concatenate into virtual inline `substations`
+      manifest.substations = [].concat(...shardArrays);
+      console.log(`SSI Map: loaded sharded ssi-data — ${manifest.substations_shards.length} shards, ${manifest.substations.length} substations total`);
+      return manifest;
+    }
     Promise.all([
       loadGridGeo(),
-      fetch(basePath + 'ssi-data.json?v=602').then(r => r.json()),
+      loadSsiData(),
       fetch(basePath + 'bounds.json?v=602').then(r => r.ok ? r.json() : null).catch(() => null)
     ]).then(([geo, ssi, bounds]) => {
       GEO = geo;
