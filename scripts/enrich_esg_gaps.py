@@ -46,6 +46,21 @@ SEISMIC_PGA_NATIONAL = {
     'us': {  # USGS NSHM 2023: California/PNW high, central/east low-moderate
         'default': 0.08, 'california': 0.40, 'pnw': 0.30, 'newmadrid': 0.15,
         'charleston': 0.12, 'northeast': 0.06, 'central': 0.03, 'florida': 0.01
+    },
+    'sweden': {  # SGU 2023: low seismicity, slight elevation south + Bothnian coast
+        'default': 0.02, 'south': 0.03, 'north': 0.02
+    },
+    'portugal': {  # LNEC 2023: Algarve/Lisbon 1755 zone moderate-high, north low
+        'default': 0.06, 'algarve': 0.15, 'lisbon': 0.12, 'north': 0.03
+    },
+    'italy': {  # INGV MPS04: Apennines/Sicily high, Po Valley low
+        'default': 0.15, 'apennines': 0.25, 'sicily': 0.20, 'po': 0.06, 'sardinia': 0.03
+    },
+    'japan': {  # NIED J-SHIS 2023: subduction zone HIGH cohort-wide
+        'default': 0.25, 'kanto': 0.40, 'tokai': 0.45, 'nankai': 0.42, 'hokkaido': 0.20, 'kyushu': 0.28
+    },
+    'france': {  # BRGM 2022: Alps + Pyrenees moderate, west low
+        'default': 0.04, 'alps': 0.10, 'pyrenees': 0.08, 'antilles': 0.20, 'reunion': 0.15
     }
 }
 
@@ -55,7 +70,13 @@ ENERGY_POVERTY_REGIONAL = {
     'germany': {'default': 11.4, 'east': 14.2, 'west': 10.1, 'south': 9.5},
     'uk': {'default': 13.2, 'north': 16.5, 'midlands': 14.8, 'south': 10.5, 'london': 11.2},
     'canada': {'default': 8.5, 'atlantic': 12.4, 'quebec': 6.8, 'ontario': 9.2, 'prairies': 7.5, 'bc': 10.1},
-    'us': {'default': 10.8, 'south': 14.2, 'northeast': 9.5, 'midwest': 10.1, 'west': 8.8}
+    'us': {'default': 10.8, 'south': 14.2, 'northeast': 9.5, 'midwest': 10.1, 'west': 8.8},
+    'sweden': {'default': 5.1, 'north': 6.8, 'south': 4.3, 'stockholm': 4.5},  # Eurostat SILC 2023 lowest EU
+    'portugal': {'default': 17.5, 'algarve': 15.2, 'alentejo': 22.1, 'north': 16.8, 'lisbon': 14.5},  # 3rd highest EU
+    'italy': {'default': 8.5, 'south': 14.2, 'north': 5.8, 'islands': 12.5, 'center': 8.1},  # Mezzogiorno gap
+    'japan': {'default': 9.8, 'tokyo': 7.5, 'osaka': 8.9, 'hokkaido': 12.4, 'kyushu': 11.2},  # MIC energy poverty stats
+    'france': {'default': 11.6, 'north': 14.2, 'south': 10.5, 'idf': 9.8, 'outremer': 22.1},  # ONPE 2024
+    'spain': {'default': 10.9, 'south': 14.5, 'north': 8.2, 'madrid': 9.1, 'islands': 11.8}  # AEA Barómetro 2024
 }
 
 # Socio-economic data from national statistics offices
@@ -76,6 +97,30 @@ SOCIO_ECONOMIC_NATIONAL = {
     'us': {
         'unemployment': 3.7, 'gdp_per_capita': 65423, 'rd_pct': 3.5,
         'V_socio': 0.30, 'E2_local': 0.94
+    },
+    'sweden': {
+        'unemployment': 7.8, 'gdp_per_capita': 60239, 'rd_pct': 3.4,
+        'V_socio': 0.22, 'E2_local': 0.91  # SCB 2024 + Naturvårdsverket
+    },
+    'portugal': {
+        'unemployment': 6.4, 'gdp_per_capita': 27273, 'rd_pct': 1.7,
+        'V_socio': 0.42, 'E2_local': 0.89  # INE + APA ISO 9223 C3 coastal
+    },
+    'italy': {
+        'unemployment': 6.5, 'gdp_per_capita': 38380, 'rd_pct': 1.5,
+        'V_socio': 0.35, 'E2_local': 0.92  # ISTAT + ISPRA (Mezzogiorno higher)
+    },
+    'japan': {
+        'unemployment': 2.5, 'gdp_per_capita': 39312, 'rd_pct': 3.4,
+        'V_socio': 0.26, 'E2_local': 0.96  # MIC + JMOE ISO 9223 C1-C2 (dry, low-corrosion mainland)
+    },
+    'france': {
+        'unemployment': 7.3, 'gdp_per_capita': 44686, 'rd_pct': 2.3,
+        'V_socio': 0.31, 'E2_local': 0.93  # INSEE + ADEME
+    },
+    'spain': {
+        'unemployment': 12.9, 'gdp_per_capita': 30582, 'rd_pct': 1.5,
+        'V_socio': 0.38, 'E2_local': 0.90  # INE + MITECO (Cantabrian coast higher corrosion)
     }
 }
 
@@ -91,7 +136,10 @@ DER_NATIONAL = {
     'switzerland': {'DER_ratio': 0.35, 'DER_var': 0.48, 'EV_load': 0.068, 'T1': None},
     'japan': {'DER_ratio': 0.45, 'DER_var': 0.72, 'EV_load': 0.055, 'T1': None},
     'canada': {'DER_ratio': 0.28, 'DER_var': 0.42, 'EV_load': 0.062, 'T1': None},
-    'us': {'DER_ratio': 0.52, 'DER_var': 0.60, 'EV_load': 0.078, 'T1': None}
+    'us': {'DER_ratio': 0.52, 'DER_var': 0.60, 'EV_load': 0.078, 'T1': None},
+    'sweden': {'DER_ratio': 0.55, 'DER_var': 0.35, 'EV_load': 0.11, 'T1': None},  # IEA 2024 wind-heavy + EV leader
+    'portugal': {'DER_ratio': 0.58, 'DER_var': 0.68, 'EV_load': 0.032, 'T1': None},  # DGEG solar boom
+    'italy': {'DER_ratio': 0.61, 'DER_var': 0.72, 'EV_load': 0.038, 'T1': None}  # GSE solar+wind
 }
 
 # Markov CIGRE TB 761 calibrated defaults
@@ -107,7 +155,12 @@ GRAPH_TOPO_DEFAULTS = {
     'spain': {'degree': 4, 'BC': 0.28},
     'uk': {'degree': 4, 'BC': 0.30},
     'canada': {'degree': 3, 'BC': 0.25},
-    'us': {'degree': 4, 'BC': 0.29}
+    'us': {'degree': 4, 'BC': 0.29},
+    'sweden': {'degree': 3, 'BC': 0.26},   # SvK sparse northern topology
+    'portugal': {'degree': 4, 'BC': 0.31},  # REN dense coastal + Alto Douro
+    'italy': {'degree': 5, 'BC': 0.34},     # Terna Apennine spine + peninsular
+    'japan': {'degree': 3, 'BC': 0.24},     # regional-monopoly 9-utility split (islanded 50/60Hz)
+    'france': {'degree': 5, 'BC': 0.33}     # RTE 400kV mesh
 }
 
 # ═══════════════════════════════════════════════════════════════
@@ -199,9 +252,12 @@ def compute_t1_from_der(der_ratio, der_var, ev_load):
 
 def enrich_substation(sub, country):
     """Enrich a single substation dict with missing fields."""
-    name = sub.get('name', sub.get('substation_id', 'unknown'))
-    lat = sub.get('lat', 0)
-    lon = sub.get('lon', 0)
+    # Defensive: coerce None → fallback string. Discipline #37 pattern.
+    # dict.get(k, default) does NOT fallback when key is present with None value.
+    name = sub.get('name') or sub.get('substation_id') or f"unknown_{id(sub)}"
+    name = str(name)  # Ensure str (some ids may be int)
+    lat = sub.get('lat') or 0
+    lon = sub.get('lon') or 0
 
     # ── Ensure nested objects exist ──
     if sub.get('components') is None:
@@ -458,11 +514,24 @@ def process_country(country):
 # ═══════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
-    countries = ['germany', 'france', 'spain', 'uk', 'switzerland', 'japan',
-                 'canada', 'us', 'greece', 'turkey','ireland']
-    # Italy and Austria are already complete — skip
+    import sys
 
-    print("═══ ESG Gap Enrichment ═══\n")
+    # Wave 4 batch mode: --wave4 processes only the 9 Wave 4 countries
+    # (Wave 4 R4/R5/R6 gap closure — 20 July 2026)
+    if len(sys.argv) > 1 and sys.argv[1] == '--wave4':
+        countries = ['uk', 'sweden', 'portugal', 'italy', 'japan',
+                     'spain', 'france', 'germany', 'us']
+        print("═══ ESG Gap Enrichment — Wave 4 batch (9 countries) ═══\n")
+    elif len(sys.argv) > 1:
+        # Explicit country args: enrich_esg_gaps.py country1 country2 ...
+        countries = sys.argv[1:]
+        print(f"═══ ESG Gap Enrichment — {len(countries)} explicit country(ies) ═══\n")
+    else:
+        countries = ['germany', 'france', 'spain', 'uk', 'switzerland', 'japan',
+                     'canada', 'us', 'greece', 'turkey', 'ireland']
+        # Italy and Austria are already complete — skip
+        print("═══ ESG Gap Enrichment — default 11-country set ═══\n")
+
     for c in countries:
         print(f"Processing {c.upper()}...")
         n = process_country(c)

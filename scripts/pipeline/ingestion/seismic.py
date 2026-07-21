@@ -798,7 +798,12 @@ def overlay_seismic_pga(country, grid_points=None, method="bilinear"):
         pgas = [r["pga_g"] for r in results]
         zones = {}
         for r in results:
-            z = r["zone"]
+            # Defensive: coerce zone to int (some pre-Wave-4 canonicals stored zone as str;
+            # sorted() on mixed str/int would raise '<' not supported. Discipline #37 pattern.)
+            try:
+                z = int(r["zone"]) if r["zone"] is not None else 4
+            except (ValueError, TypeError):
+                z = 4  # fallback
             zones[z] = zones.get(z, 0) + 1
         logger.info(f"  PGA range: {min(pgas):.4f}g – {max(pgas):.4f}g")
         logger.info(f"  Zone distribution: {dict(sorted(zones.items()))}")

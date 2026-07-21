@@ -471,13 +471,15 @@ def overlay_socioeconomic(country, province_data=None):
     matched = 0
 
     for idx, sub in enumerate(subs):
-        province = sub.get("province", "")
+        # Defensive: sub.get("province", "") returns None when key exists with None value.
+        # Use `or ""` idiom to coerce None → empty string (Discipline #37 pattern).
+        province = sub.get("province") or ""
 
-        # Try exact match first
-        prov_data = province_data.get(province)
+        # Try exact match first (skip if province is empty)
+        prov_data = province_data.get(province) if province else None
 
         # Try partial match (handle variations like "Reggio di Calabria" vs "Reggio Calabria")
-        if not prov_data:
+        if not prov_data and province:
             for key in province_data:
                 if key.lower() in province.lower() or province.lower() in key.lower():
                     prov_data = province_data[key]
