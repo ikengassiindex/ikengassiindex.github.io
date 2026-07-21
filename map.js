@@ -1260,15 +1260,32 @@ if (!hasNested) {
     if (zoomIn) zoomIn.onclick = () => { view.scale = Math.min(50, view.scale * 1.4); requestDraw(); };
     if (zoomOut) zoomOut.onclick = () => { view.scale = Math.max(0.5, view.scale / 1.4); requestDraw(); };
     if (zoomFit) {
-      // Compute country center from substation data
+      // Compute country center from substation data.
+      // 21 July 2026: single-pass min/max loop replaces Math.min(...lons) +
+      // Math.max(...lons) spread — the spread operator passes every array
+      // element as a separate function argument, which hits V8's max-args
+      // limit (~65-125k depending on build) and throws RangeError: Maximum
+      // call stack size exceeded. Germany (187,714 subs) + France (195,569)
+      // consistently tripped this, surfacing as "Failed to load map data"
+      // via the outer .catch() at line 1576. Loop is O(n), branchless-safe,
+      // and works for any fleet size.
       var fitCx = 10.4, fitCy = 51.2; // Germany default
       if (GEO && GEO.s) {
         var subVals = Object.values(GEO.s);
-        if (subVals.length > 0) {
-          var lats = subVals.map(s => s.y);
-          var lons = subVals.map(s => s.x);
-          fitCx = (Math.min(...lons) + Math.max(...lons)) / 2;
-          fitCy = (Math.min(...lats) + Math.max(...lats)) / 2;
+        var n = subVals.length;
+        if (n > 0) {
+          var minLon = Infinity, maxLon = -Infinity;
+          var minLat = Infinity, maxLat = -Infinity;
+          for (var i = 0; i < n; i++) {
+            var _s = subVals[i];
+            var lx = _s.x, ly = _s.y;
+            if (lx < minLon) minLon = lx;
+            if (lx > maxLon) maxLon = lx;
+            if (ly < minLat) minLat = ly;
+            if (ly > maxLat) maxLat = ly;
+          }
+          fitCx = (minLon + maxLon) / 2;
+          fitCy = (minLat + maxLat) / 2;
         }
       }
       zoomFit.onclick = () => { view.cx = fitCx; view.cy = fitCy; view.scale = 1; requestDraw(); };
