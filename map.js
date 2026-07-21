@@ -1302,14 +1302,14 @@ if (!hasNested) {
     // If manifest carries `sharded: true` + `l_shards[]`, fetch shards in parallel
     // and concatenate into virtual `l`. Countries under 90 MB stay single-file.
     async function loadGridGeo() {
-      const manifest = await fetch(basePath + 'grid-geo.json?v=602').then(r => r.json());
+      const manifest = await fetch(basePath + 'grid-geo.json?v=703').then(r => r.json());
       if (!manifest.sharded || !Array.isArray(manifest.l_shards)) {
         return manifest;  // Single-file case — return as-is
       }
       // Sharded — fetch all shards in parallel
       const shardArrays = await Promise.all(
         manifest.l_shards.map(sh =>
-          fetch(basePath + sh.path + '?v=602').then(r => r.json())
+          fetch(basePath + sh.path + '?v=703').then(r => r.json())
         )
       );
       // Concatenate into virtual inline `l`
@@ -1322,14 +1322,14 @@ if (!hasNested) {
     // If manifest carries `sharded: true` + `substations_shards[]`, fetch shards in parallel
     // and concatenate into virtual `substations`. Countries under 90 MB stay single-file.
     async function loadSsiData() {
-      const manifest = await fetch(basePath + 'ssi-data.json?v=602').then(r => r.json());
+      const manifest = await fetch(basePath + 'ssi-data.json?v=703').then(r => r.json());
       if (!manifest.sharded || !Array.isArray(manifest.substations_shards)) {
         return manifest;  // Single-file case — return as-is
       }
       // Sharded — fetch all substations shards in parallel
       const shardArrays = await Promise.all(
         manifest.substations_shards.map(sh =>
-          fetch(basePath + sh.path + '?v=602').then(r => r.json())
+          fetch(basePath + sh.path + '?v=703').then(r => r.json())
         )
       );
       // Concatenate into virtual inline `substations`
@@ -1340,7 +1340,7 @@ if (!hasNested) {
     Promise.all([
       loadGridGeo(),
       loadSsiData(),
-      fetch(basePath + 'bounds.json?v=602').then(r => r.ok ? r.json() : null).catch(() => null)
+      fetch(basePath + 'bounds.json?v=703').then(r => r.ok ? r.json() : null).catch(() => null)
     ]).then(([geo, ssi, bounds]) => {
       GEO = geo;
       SSI = ssi;
