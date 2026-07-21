@@ -1,10 +1,46 @@
-# Convention #78 BINDING — 2-Country Empirical Enforcement Audit
+# Convention #78 BINDING — Post-BINDING Empirical Enforcement Audit
 
-**Audit date:** 16 July 2026
+**Audit date:** 16 July 2026 (initial) · 21 July 2026 (Denmark P28 addendum)
 **Methodology pin:** SSI Index v4.2
 **Workstream:** v4.23 owner-attribution enrichment
 **Author:** ikenga-ssi-foundation
-**Status:** BINDING sub-convention validated at 2-country empirical instance count
+**Status:** BINDING sub-convention empirically reinforced at 4-country post-BINDING enforcement scale (Slovakia + Czechia + Poland + Denmark)
+
+---
+
+## 0bis. Denmark P28 addendum — 4th post-BINDING enforcement (21 July 2026)
+
+**Task #352 CLOSED (Commit 46 `2561a8ea` PUSHED)** — Denmark P28 alias-map extension lands 32 new alias entries across 5 operator families empirically surfaced during Denmark P28 closure YAML `alias_map_extension_CRITICAL` finding (5,244 / 5,803 = 90.4% missed alias-normalisation at DK OSM ingest pre-extension). This is the **4th empirical post-BINDING enforcement instance** in the v4.23 workstream (after SK P19 + CZ P20 + PL P21).
+
+**Denmark P28 alias empirical outcome:**
+
+| Operator family | Aliases added | Subs consolidated | % of Denmark cohort |
+|---|---:|---:|---:|
+| Nexel (Radius Elnet subsidiary — Zealand) | 5 | **2,374** | **49.2%** |
+| Better Energy + Stevning P/S (Renewable) | 6 | 144 | 3.0% |
+| Vores Elnet (Fyn cooperative DSO) | 5 | 99 | 2.1% |
+| Flow Elnet + EnergiMidt-legacy (Central Jutland) | 12 | 48 | 1.0% |
+| Copenhagen Airport (Industrial Captive Aviation) | 7 | 10 | 0.2% |
+| **Total** | **32** | **2,675** | **55.5%** |
+
+**Distinct-operator consolidation**: Denmark 103 (pre-extension) → **85 (post-extension)** = -17.5% via retroactive normalisation across 4,822 Denmark subs.
+
+**Post-BINDING cumulative empirical instance count updated:**
+
+| Country | Priority | Hits | Method |
+|---|---|---:|---|
+| Lithuania | P16 | 1 | pre-BINDING (Baltic Trio 1) |
+| Estonia | P17 | 20 | pre-BINDING (Baltic Trio 2) |
+| Latvia | P18 | 143 | **BINDING promotion** (Baltic Trio 3) |
+| Slovakia | P19 | 615 | 1st post-BINDING enforcement (Visegrád 1/3) |
+| Czechia | P20 | 5,178 | 2nd post-BINDING enforcement (Visegrád 2/3) |
+| Poland | P21 | 14,449 | 3rd post-BINDING enforcement (Visegrád 3/3) |
+| Denmark | P28 | **2,675** (retroactive) | **4th post-BINDING enforcement** |
+| **Cumulative** | | **23,081** | **2,308.1× above Convention #76 5-10 cadence threshold** |
+
+**Architectural finding — retroactive normalisation via post-closure alias extension**: Denmark is the FIRST cohort-country where Convention #78 alias extension was applied RETROACTIVELY (not at Step 3 connector authoring time). Pattern codifies a NEW sub-convention: when Step 5 closure YAML surfaces `alias_map_extension_CRITICAL` findings (>90% missed alias-normalisation rate), the retroactive normalisation via post-hoc `normalise_owner_alias()` pass over the existing `ssi-data.json` is the canonical closure path. Preserves Convention #56 visibly-honest degradation (subs where owner already canonical are unchanged). Generalises to any future country where post-closure audit surfaces high missed-alias rates.
+
+**Cross-references**: Denmark P28 closure YAML `v4_23-ingestion-audit-denmark-closure.yaml` line 173-180 (alias_map_extension_CRITICAL finding); scripts/pipeline/ingestion/denmark/_base.py::`_DNSP_ALIAS_MAP` extended entries; Commit 46 `2561a8ea` PUSHED. Task #352 (pre-existing pending since 17 July 2026 Denmark P28 closure) CLOSED.
 
 ---
 
