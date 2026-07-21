@@ -257,6 +257,64 @@ _DNSP_ALIAS_MAP = {
     "european energy": "European Energy (Renewable Generation — grid=Energinet)",
     "european energy a/s": "European Energy (Renewable Generation — grid=Energinet)",
 
+    # ── Nexel A/S (Zealand — Radius Elnet subsidiary structure) ──────────
+    # Empirical: LARGEST unmapped cohort-wide event during Denmark P28 —
+    # 4,909 subs = 61.6% of OSM fetch tagged "Nexel". Nexel is a Radius
+    # Elnet subsidiary structure covering specific Zealand municipalities.
+    # Per Denmark P28 closure YAML alias_map_extension_CRITICAL finding.
+    "nexel": "Nexel (Radius Elnet subsidiary — Zealand)",
+    "Nexel": "Nexel (Radius Elnet subsidiary — Zealand)",
+    "nexel a/s": "Nexel (Radius Elnet subsidiary — Zealand)",
+    "nexel as": "Nexel (Radius Elnet subsidiary — Zealand)",
+    "NEXEL": "Nexel (Radius Elnet subsidiary — Zealand)",
+
+    # ── Vores Elnet A/S (Fyn/Funen cooperative DSO) ──────────────────────
+    # 105 subs empirical Denmark P28. Cooperative DSO on Fyn (Funen island)
+    # distinct from Trefor Elnet coverage.
+    "vores elnet": "Vores Elnet (Fyn cooperative DSO)",
+    "Vores Elnet": "Vores Elnet (Fyn cooperative DSO)",
+    "vores elnet a/s": "Vores Elnet (Fyn cooperative DSO)",
+    "vores elnet as": "Vores Elnet (Fyn cooperative DSO)",
+    "vores": "Vores Elnet (Fyn cooperative DSO)",
+
+    # ── Flow Elnet A/S (Central Jutland — EnergiMidt 2020 rebrand) ───────
+    # 45 subs Flow + 17 subs EnergiMidt legacy = 62 subs total (Silkeborg
+    # + Herning + Skanderborg). EnergiMidt rebranded to Flow Elnet 2020.
+    "flow elnet": "Flow Elnet (Central Jutland — Silkeborg/Herning)",
+    "Flow Elnet": "Flow Elnet (Central Jutland — Silkeborg/Herning)",
+    "flow elnet a/s": "Flow Elnet (Central Jutland — Silkeborg/Herning)",
+    "flow elnet as": "Flow Elnet (Central Jutland — Silkeborg/Herning)",
+    "flow": "Flow Elnet (Central Jutland — Silkeborg/Herning)",
+    # Predecessor: EnergiMidt → Flow Elnet 2020 rebrand
+    "energimidt": "Flow Elnet-legacy (EnergiMidt pre-2020 rebrand)",
+    "EnergiMidt": "Flow Elnet-legacy (EnergiMidt pre-2020 rebrand)",
+    "energimidt a/s": "Flow Elnet-legacy (EnergiMidt pre-2020 rebrand)",
+    "energimidt as": "Flow Elnet-legacy (EnergiMidt pre-2020 rebrand)",
+    "energi midt": "Flow Elnet-legacy (EnergiMidt pre-2020 rebrand)",
+    "energi-midt": "Flow Elnet-legacy (EnergiMidt pre-2020 rebrand)",
+
+    # ── Better Energy A/S + Stevning P/S (Renewable developer) ───────────
+    # 144 subs empirical Denmark P28. Solar/wind renewable developer —
+    # generation NOT DSO. Grid ownership routes back to relevant DSO
+    # (Radius/Cerius/N1/Trefor depending on location).
+    "better energy": "Better Energy (Renewable Generation — grid=DSO by location)",
+    "better energy a/s": "Better Energy (Renewable Generation — grid=DSO by location)",
+    "better energy as": "Better Energy (Renewable Generation — grid=DSO by location)",
+    "stevning": "Better Energy (Stevning P/S subsidiary)",
+    "stevning p/s": "Better Energy (Stevning P/S subsidiary)",
+    "stevning ps": "Better Energy (Stevning P/S subsidiary)",
+
+    # ── CPH (Copenhagen Airport — Industrial Captive) ────────────────────
+    # 24 subs empirical Denmark P28. Copenhagen Airport (Københavns
+    # Lufthavne A/S) industrial captive — airport infrastructure MV grid.
+    "cph": "Copenhagen Airport (Industrial Captive — Aviation MV Grid)",
+    "CPH": "Copenhagen Airport (Industrial Captive — Aviation MV Grid)",
+    "københavns lufthavne": "Copenhagen Airport (Industrial Captive — Aviation MV Grid)",
+    "kobenhavns lufthavne": "Copenhagen Airport (Industrial Captive — Aviation MV Grid)",
+    "copenhagen airport": "Copenhagen Airport (Industrial Captive — Aviation MV Grid)",
+    "cph a/s": "Copenhagen Airport (Industrial Captive — Aviation MV Grid)",
+    "kastrup lufthavn": "Copenhagen Airport (Industrial Captive — Aviation MV Grid)",
+
     # ── Industrial captives ──────────────────────────────────────────────
     "novo nordisk": "Novo Nordisk (Industrial Captive — Pharma CHP)",
     "novo nordisk a/s": "Novo Nordisk (Industrial Captive — Pharma CHP)",
