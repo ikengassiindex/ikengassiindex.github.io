@@ -81,7 +81,7 @@
           ['Markov', 'p_critical_20yr', (d.markov && d.markov.p_critical_20yr !== undefined ? (d.markov.p_critical_20yr * 100).toFixed(1) + '%' : '—'), 'ESRS E1-9: Time horizons', (d.markov && d.markov.p_critical_20yr === 0) ? 'partial' : 'ready']
         ];
       },
-      validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. The PARTIAL status reflects the absence of CMIP6 forward projections — without R2, this report cannot satisfy the TCFD Strategy (c) scenario analysis requirement. All other inputs are production-grade with institutional provenance.'
+      validity: 'IRI metrics are computed from ERA5 reanalysis (31 km, hourly, 1940–present) using IEEE C57.91 thermal loading curves. Markov 5-state degradation is calibrated from CIGRE Technical Brochure 761 (2019) condition assessment data. Forward-looking projections use the CMIP6 SSP2-4.5 5-model ensemble (ACCESS-CM2, CNRM-CM6-1, EC-Earth3, GFDL-ESM4, MRI-ESM2-0), baseline 2000–2020 vs future 2030–2050, feeding the substation-level climate_trajectory (I1/I2/I3) fields for 32 of 39 countries. Any PARTIAL status now reflects country-specific gaps: 7 Wave 2-3 countries (Australia, Chile, Colombia, Costa Rica, Iceland, Ireland, Israel) await the next L2 climate pass; 8 Wave 4 countries emit fleet-uniform trajectories pending the per-substation bilinear interpolation regression fix (methodology follow-on, sister to R3_C_mult uniformity). All other inputs are production-grade with institutional provenance.'
     },
     {
       id: 'report-2', num: '2', title: 'Grid Equity & Social Vulnerability',
@@ -352,7 +352,16 @@
     ['IEEE C57.91 Thermal Model', 'IEEE', 'Standard', 'N/A', 'Published', 'R1'],
     ['CIGRE TB 761 Markov', 'CIGRE', '2019', 'N/A', 'Published', 'R1, R3'],
     ['ISO 9223 Corrosion', 'ISO', '2012', 'N/A', 'Published', 'R5'],
-    ['CMIP6 SSP2-4.5 Projections', 'Copernicus CDS', '—', 'Not ingested', 'CC-BY-4.0', 'R1 (blocked)', true]
+    // 21 July 2026: CMIP6 R1 status update (Discipline #46 candidate — data-source
+    // status rows MUST reflect empirical truth). Cross-cutting 5-model ensemble
+    // (ACCESS-CM2 + CNRM-CM6-1 + EC-Earth3 + GFDL-ESM4 + MRI-ESM2-0) SSP2-4.5
+    // baseline 2000-2020 / future 2030-2050 is live for 32/39 countries via
+    // scripts/pipeline/data/cross-cutting/cmip6_ssp245_deltas.csv (18,990 grid
+    // points). Substation records carry climate_trajectory.{I1,I2,I3}_trajectory.
+    // Known follow-ons: (i) 7 Wave 2-3 countries missing trajectory (Task #448);
+    // (ii) 8 Wave 4 countries emit fleet-uniform trajectories from failed per-
+    // substation interpolation (Task #449, sister to R3_C_mult Task #445).
+    ['CMIP6 SSP2-4.5 Projections', 'Copernicus CDS', '2024', 'v4.2 5-model ensemble', 'CC-BY-4.0', 'R1']
   ];
 
   /* ── Helper: compute 7-axis ESG readiness scores (R1..R7) ─────────────────
