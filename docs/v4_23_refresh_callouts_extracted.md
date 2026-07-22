@@ -52,6 +52,50 @@ Audit trail: [preflight](../netherlands/v4_23-ingestion-audit-netherlands-prefli
 
 ---
 
+## Priority 1-5 gap-closure cycle — Jun-Jul 2026 (originating v4.23 workstream)
+
+> Extracted from country landing pages 22 Jul 2026. These are the ORIGINAL five countries in the `v4_23-gap-audit-2026-07/` workstream — Priority 1 Canada + Priority 2 Norway + Priority 3 Mexico + Priority 4 Austria + Priority 5 Greenland. The Wave 2 batch above (Australia + Belgium + Chile + Hungary + Netherlands) followed as the second cohort.
+
+### 🇨🇦 Canada (Priority 1)
+
+**v4.23 data refresh (13 July 2026):** +1,227 substations via NRCan Atlas + CanVec Res_MGT + NACEI + Yukon Energy + Nova Scotia NSTDB federated multi-source ingest. Full auditability chain in the merge audit YAML — provenance-classed per Convention #56 visibly-honest degradation.
+
+Audit trail: [preflight](../canada/v4_23-ingestion-audit-canada-preflight.yaml) · [merge](../canada/v4_23-ingestion-audit-canada-merge.yaml).
+
+---
+
+### 🇳🇴 Norway (Priority 2)
+
+**v4.23 data refresh (13 July 2026):** +271 substations via NVE Nettanlegg WFS with reverse Discipline #41 line-carries-spenning → endpoint-substation-inherits pattern. Full auditability chain in the merge audit YAML — provenance-classed per Convention #56 visibly-honest degradation.
+
+Audit trail: [merge](../norway/v4_23-ingestion-audit-norway-merge.yaml).
+
+---
+
+### 🇲🇽 Mexico (Priority 3)
+
+**v4.23 data refresh (13 July 2026):** +649 substations via OSM Overpass + CFE-monopoly fallback with industrial self-generation exceptions. Full auditability chain in the merge audit YAML — provenance-classed per Convention #56 visibly-honest degradation.
+
+Audit trail: [merge](../mexico/v4_23-ingestion-audit-mexico-merge.yaml).
+
+---
+
+### 🇦🇹 Austria (Priority 4)
+
+**v4.23 data refresh (13 July 2026):** +13,979 substations +30,132 lines via OSM Overpass (fragmented multi-utility — 9+ distinct DSOs including APG TSO + Wiener Netze + 7 Bundesland utilities + ÖBB railway traction). Full auditability chain in the merge audit YAML — provenance-classed per Convention #56 visibly-honest degradation.
+
+Audit trail: [merge](../austria/v4_23-ingestion-audit-austria-merge.yaml).
+
+---
+
+### 🇬🇱 Greenland (Priority 5)
+
+**v4.23 data refresh (13 July 2026):** +6 substations +3 lines via OSM Overpass + PURE MONOPOLY Nukissiorfiit fallback (100% concentration confirmed empirically). Full auditability chain in the merge audit YAML — provenance-classed per Convention #56 visibly-honest degradation.
+
+Audit trail: [merge](../greenland/v4_23-ingestion-audit-greenland-merge.yaml).
+
+---
+
 ## Cohort-wide highlights (extracted from callouts)
 
 | Metric | Best cohort-wide | Country |
