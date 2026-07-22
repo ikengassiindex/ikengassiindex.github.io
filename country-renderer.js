@@ -24,7 +24,7 @@
 (function () {
   'use strict';
 
-  var CACHE_BUSTER = '703';  // bump when any of the data/config schemas change
+  var CACHE_BUSTER = '20260722-rbase-fix';  // bump when any of the data/config schemas change
                              // v703 (21 Jul 2026) — Wave 4 TERMINAL + Convention #79
                              // ssi-data sharding release; forces fresh manifest
                              // + shard fetches after Commit 45 ad9adfc5.

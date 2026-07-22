@@ -309,7 +309,7 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
         logger.info(f"[{slug}] --dry-run: NOT writing ssi-data.json")
     else:
         logger.info(f"[{slug}] writing ssi-data.json (may re-shard if > {SSI_DATA_SHARD_THRESHOLD_MB} MB)...")
-        write_ssi_data(path, data, country_slug=slug)
+        write_ssi_data(data, path)
         logger.info(f"[{slug}] saved.")
 
     return result
