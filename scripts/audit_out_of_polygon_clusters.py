@@ -156,6 +156,18 @@ NEIGHBOR_BBOXES: Dict[str, List[Tuple[str, Tuple[float, float, float, float]]]] 
         ("Madeira offshore", (-17.5, 32.0, -16.0, 33.5)),
         ("Morocco (N coast)", (-7.0, 34.5, -1.0, 36.5)),
     ],
+    "uk": [
+        ("Ireland",         (-10.6, 51.4, -5.4, 55.5)),
+        ("France (N coast)", (-4.8, 48.5, 4.9, 51.1)),
+        ("Belgium",         (2.5, 49.4, 6.5, 51.5)),
+        ("Netherlands",     (3.3, 50.7, 7.3, 53.6)),
+        ("Norway (SW)",     (4.5, 57.9, 8.0, 62.0)),
+        ("North Sea offshore", (0.0, 51.0, 8.0, 61.0)),
+        ("Irish Sea offshore", (-6.5, 51.5, -3.0, 55.0)),
+        ("English Channel offshore", (-6.0, 49.0, 2.0, 51.0)),
+        ("Atlantic offshore (W)", (-14.0, 49.0, -8.0, 60.0)),
+        ("Faroes offshore", (-8.0, 61.0, -5.0, 63.0)),
+    ],
     # Additional countries as needed — extendable
 }
 
@@ -210,22 +222,53 @@ def load_bounds_polygon(country_slug: str):
 
 
 def load_ssi_data_substations(country_slug: str) -> List[dict]:
-    """Load ssi-data.json (handles Convention #79 sharded format)."""
+    """Load ssi-data.json (handles Convention #79 sharded format).
+
+    Manifest schema (empirically verified 24 July 2026):
+      {
+        "sharded": true,
+        "substations_shards": [
+          {"path": "ssi-data-substations-01.json", "count": N, "size_mb": M},
+          ...
+        ],
+        ... other keys ...
+      }
+
+    Fallback back-compat: also handles legacy `"shards"` key name.
+    Also handles non-sharded ssi-data.json with inline `"substations": [...]`.
+    """
     ssi_path = REPO_ROOT / country_slug / "ssi-data.json"
     with open(ssi_path) as f:
         data = json.load(f)
 
-    # Sharded format check
+    # Convention #79 sharded format detection
     if data.get("sharded"):
         subs = []
-        for shard_ref in data.get("shards", []):
-            shard_path = REPO_ROOT / country_slug / shard_ref["file"]
+        # Try canonical key first, then legacy alternate
+        shard_list = data.get("substations_shards") or data.get("shards") or []
+        for shard_ref in shard_list:
+            # Shard ref may be dict {"path": "..."} or bare string "..."
+            if isinstance(shard_ref, dict):
+                shard_filename = shard_ref.get("path") or shard_ref.get("file")
+            else:
+                shard_filename = shard_ref
+            if not shard_filename:
+                continue
+            shard_path = REPO_ROOT / country_slug / shard_filename
+            if not shard_path.exists():
+                print(f"  WARNING: shard file not found: {shard_path}")
+                continue
             with open(shard_path) as f:
                 shard = json.load(f)
-            subs.extend(shard.get("substations", []))
+            # Shard payload may be {"substations": [...]} OR a bare list
+            if isinstance(shard, list):
+                subs.extend(shard)
+            elif isinstance(shard, dict):
+                subs.extend(shard.get("substations", []))
         return subs
 
-    return data.get("substations", [])
+    # Non-sharded — inline substations list
+    return data.get("substations", []) or []
 
 
 def classify_out_of_polygon(
