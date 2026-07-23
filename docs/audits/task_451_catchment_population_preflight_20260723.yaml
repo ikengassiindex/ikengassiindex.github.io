@@ -1,0 +1,358 @@
+# Task #451 — Catchment population field pre-flight audit
+# =========================================================
+# Task: #451 (R2 Defect Class 2 — Catchment population)
+# Date: 23 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2 (post Task #461/462/463 per-country normalisation)
+# Status: OPERATOR_DECISION_REQUIRED (Path A / B / C selected)
+# Operator selection (23 Jul 2026): Path A — real GHSL Population Grid pipeline
+# Next step: Step 2 GHSL source acquisition + verification (this file's follow-on)
+
+schema_version: v4_23-cross-cutting-audit-preflight-1
+workstream: R2_grid_equity_catchment_population
+scope: cohort-wide  # 39 countries
+
+# ── Reframing the task scope ─────────────────────────────────────────────
+
+reframing:
+  original_task_description: |
+    "R2 Defect Class 2 — Catchment population field missing (9 countries)"
+    Original scope estimate: 9 countries need field wired.
+    Original engineering estimate: 5-8 engineer-days for GHSL spatial-join pipeline.
+
+  empirical_pre_flight_finding: |
+    Field name is `socio_economic.population` (NOT `catchment_population`).
+    Empirical audit reveals the honest picture is OPPOSITE to task description:
+      - 30 countries have SYNTHETIC values written by scripts/score-country.py
+        line 195 via deterministic-variance generator
+      - 9 countries (austria + 8 Wave 4: france/germany/italy/japan/portugal/
+        spain/sweden/us) legitimately have None — these are the countries
+        score-country.py was NEVER run against, so they're Convention #56
+        visibly-honest defaults
+    The 30 "populated" countries have data that shouldn't be trusted for LP-DD
+    purposes. This is the pre-existing Wave 4 per-substation interpolation
+    regression pattern (Task #117/#159/#450 D2 class) manifesting at the
+    R2 Grid Equity axis.
+
+  reframed_scope:
+    what_task_actually_is: |
+      Retire synthetic-population generator + build proper real-data spatial
+      join pipeline + retroactively rescore 30 currently-synthetic countries
+      + wire 9 currently-None countries with same real-data source.
+    engineering_estimate_revised: |
+      Path A execution: 5-8 engineer-days (as originally estimated) — but
+      scope is 39 countries rescore, not 9. The delta is that 30 countries
+      currently-populated must ALSO be rescored to retire synthetic values.
+
+# ── Empirical current-state ──────────────────────────────────────────────
+
+current_state:
+  field_name_in_ssi_data: socio_economic.population
+  field_type: integer (nullable per Convention #56 visibly-honest)
+
+  populated_countries_synthetic: 30
+  populated_countries_synthetic_list:
+    - australia
+    - belgium
+    - canada
+    - chile
+    - colombia
+    - costa-rica
+    - czechia
+    - denmark
+    - estonia
+    - finland
+    - greece
+    - greenland
+    - hungary
+    - iceland
+    - ireland
+    - israel
+    - korea
+    - latvia
+    - lithuania
+    - luxembourg
+    - mexico
+    - netherlands
+    - new-zealand
+    - norway
+    - poland
+    - slovakia
+    - slovenia
+    - switzerland
+    - turkey
+    - uk
+
+  unpopulated_countries_convention_56: 9
+  unpopulated_countries_list:
+    - austria
+    - france
+    - germany
+    - italy
+    - japan
+    - portugal
+    - spain
+    - sweden
+    - us
+
+  # Coverage rate for the 30 currently-synthetic countries varies wildly
+  # because scripts/score-country.py appears to have been run inconsistently
+  coverage_rate_samples:
+    norway: 95.6%           # 5,842 / 6,113 subs have population
+    canada: 83.9%           # 6,399 / 7,626 subs
+    turkey: 98.0%           # 4,001 / 4,083 subs
+    belgium: 18.3%          # 1,219 / 6,651 subs
+    luxembourg: 12.3%       # 89 / 723 subs
+    poland: 8.1%            # 2,247 / 27,764 subs
+
+# ── Root cause of synthetic values ───────────────────────────────────────
+
+synthetic_generator_root_cause:
+  source_file: scripts/score-country.py
+  line_number: 195
+  code_snippet: |
+    'population': int(det_var(seed+'pop', ref.get('pop_density',50)*25, 0.40)),
+  mechanism: |
+    Deterministic-variance function `det_var(seed, base, pct)` (line 85)
+    generates synthetic values from a per-country `pop_density` reference
+    multiplied by 25 with 40% variance. The `seed` argument makes values
+    reproducible per substation but the values are NOT sourced from
+    real population data.
+
+  convention_56_violation: |
+    Convention #56 visibly-honest degradation requires that unpopulated
+    fields surface as None or `[N/A]` markers, not as fabricated values.
+    The synthetic-population generator violates this by producing
+    data-shaped values that look real to downstream consumers
+    (esg-sections.js R2 report + LP-DD deliverables) but aren't.
+
+  scope_context: |
+    Sister to the pre-existing Wave 4 per-substation interpolation
+    regression class (Task #117/#159/#450 D2 modifier drift). Same
+    architectural anti-pattern applied at the R2 Grid Equity axis rather
+    than R6c_flood/R7_cyber axis. Task #450 SYSTEMIC parent closed 23 Jul
+    2026 documenting this class; this Task #451 pre-flight extends the
+    inventory to R2 axis.
+
+  pipeline_gap: |
+    scripts/pipeline/ingestion/socioeconomic.py::overlay_socioeconomic()
+    line 452+ constructs the socio_economic dict but explicitly does NOT
+    include population field. The socioeconomic cache
+    (scripts/pipeline/.cache/socioeconomic_*.json) carries
+    gdp_per_capita + unemployment_rate + elderly_pct + ep_rate +
+    migration_score — but NO population key. So the modern pipeline
+    doesn't emit population at all; the values in ssi-data.json come from
+    the legacy score-country.py script that appears to have been run
+    inconsistently across countries.
+
+# ── Three-path decision matrix ───────────────────────────────────────────
+
+decision_matrix:
+  path_A_real_data:
+    name: Retire synthetic + build GHSL Population Grid spatial-join pipeline
+    steps:
+      - Retire scripts/score-country.py population line 195
+      - Source GHSL Population Grid raster (EC JRC open license, 100m resolution)
+      - Build scripts/pipeline/enrichment/catchment_population.py utility
+      - Author spatial-join with configurable radius (default 5km per methodology)
+      - Apply per-substation across all 39 countries
+      - Retroactively rescore 30 currently-synthetic countries + 9 currently-None
+      - Author sentinel scripts/tests/test_catchment_population_coverage.py
+      - Update esg-sections.js R2 audit validity paragraph with post-fix state
+      - Doc cascade to CLAUDE.md + Foundation KB
+    engineering_estimate: 5-8 engineer-days
+    convention_56_posture: FULLY COMPLIANT — real data from public canonical
+    lp_dd_defensibility: HIGH — GHSL is EC JRC-anchored open license
+    convention_7_alignment: YES — GHSL is the archetypal Data-Layer Anchoring documented-proxy
+    downside: dedicated engineering sprint, multi-session
+    upside: methodologically correct; retires legacy synthetic-generator class
+    operator_recommendation: THIS ONE
+
+  path_B_extend_synthetic:
+    name: Extend synthetic generator to 9 missing countries for consistency
+    steps:
+      - Add 9 missing countries to score-country.py country reference table
+      - Re-run score-country.py against 9 countries
+    engineering_estimate: 2-3 hours
+    convention_56_posture: VIOLATION — perpetuates fabricated-data-shape anti-pattern
+    lp_dd_defensibility: LOW — LP-DD reviewer notices any careful cross-check
+    downside: technical debt masquerading as progress; expands surface of Convention #56 violation
+    upside: (none material)
+    operator_recommendation: DO NOT PURSUE
+
+  path_C_retire_to_none:
+    name: Retire 30 synthetic countries to None + document as pending-L4-wiring
+    steps:
+      - Author scripts/task_451_retire_synthetic_population.py idempotent script
+      - Set socio_economic.population = None for all 30 currently-synthetic countries
+      - Update esg-sections.js R2 audit validity paragraph to reflect post-retirement state
+      - Doc cascade minimal (methodology.html tooltip)
+    engineering_estimate: 1 hour
+    convention_56_posture: FULLY COMPLIANT — visibly-honest gap surfaced consistently
+    lp_dd_defensibility: MEDIUM — honest empty state readable as "field pending L4 wiring"
+    downside: temporarily degrades R2 reports for 30 currently-populated countries
+    upside: clean interim state; zero technical debt; fast to ship
+    operator_recommendation: INTERIM state if Path A pushed to Q4 2026
+
+  operator_selection:
+    selected_path: A
+    selection_date: 2026-07-23
+    selection_rationale: |
+      Methodologically correct + LP-DD defensible + aligns with Convention #7
+      Data-Layer Anchoring pattern. Full engineering sprint accepted; Path C
+      not chosen because operator prefers real-data build rather than clean-
+      then-defer.
+
+# ── Path A execution roadmap (multi-session) ─────────────────────────────
+
+path_a_roadmap:
+  step_1_preflight:
+    status: DONE (this file)
+    deliverable: Pre-flight audit YAML with 3-path decision matrix + operator selection
+
+  step_2_source_verification:
+    status: NEXT (this session — Step 2 kicks off after pre-flight commit)
+    task: |
+      Verify GHSL Population Grid canonical:
+      - URL live check: https://ghsl.jrc.ec.europa.eu/download.php
+      - License verification (CC-BY 4.0 expected — publicly documented open license)
+      - Resolution + coverage confirmation (100m recommended; global coverage)
+      - Vintage confirmation (latest release 2023 or 2024 expected)
+      - Download sample tile for methodology validation
+      - Foundation methodology alignment check (what is the "catchment radius"?)
+
+  step_3_utility_scaffold:
+    status: pending
+    task: |
+      Author scripts/pipeline/enrichment/catchment_population.py skeleton:
+      - Load GHSL raster via rasterio
+      - Per-substation spatial join with configurable radius (default 5km)
+      - Emit socio_economic.population per substation
+      - Convention #56 visibly-honest fallback (None if no raster coverage)
+      - Batch mode + single-country mode + dry-run mode
+
+  step_4_cohort_application:
+    status: pending
+    task: |
+      Apply utility across all 39 countries via scripts/pipeline/data/countries.json SoT.
+      Retroactively rescore 30 currently-synthetic countries (retires legacy score-country.py).
+      Wire 9 currently-None countries (austria + 8 Wave 4).
+
+  step_5_sentinel_and_doc_cascade:
+    status: pending
+    task: |
+      - Author tests/test_catchment_population_coverage.py sentinel
+      - Update esg-sections.js R2 audit validity paragraph
+      - Retire scripts/score-country.py line 195 with tombstone comment
+      - CLAUDE.md addendum + Foundation KB REPORTS_FRAMING_KB.md Discipline candidate
+
+  step_6_commit_and_push:
+    status: pending
+    task: |
+      - Commit chain across 39 countries + code + doc cascade
+      - Push + deploy verification
+      - Update Task #451 to completed
+
+# ── Cross-references ─────────────────────────────────────────────────────
+
+related_tasks:
+  parent: Task #450 SYSTEMIC — Wave 4 per-substation interpolation regression (CLOSED)
+  siblings:
+    - Task #452 (migration_score similar structure — SAME PIPELINE GAP CLASS)
+    - Task #453 (partial socio_economic coverage — Luxembourg + Slovenia special-case)
+  ancestors:
+    - Task #117 / #159 (D2 modifier drift class, R7_cyber deferred per operator constraint)
+    - Task #447 (R2 Grid Equity SSI Variables audit — the audit paragraph in esg-sections.js line 125 that motivated this task)
+
+conventions_invoked:
+  - Convention #56 visibly-honest degradation (parent rule)
+  - Convention #7 Data-Layer Anchoring documented-proxy (GHSL is the archetypal example)
+  - Convention #78 BINDING 3-class channel-reuse mesh (Path A execution establishes channel for future R2 axis fills)
+  - Convention #79 candidate ssi-data sharding (may re-trigger for large countries post-rescore)
+
+disciplines_touched:
+  - Discipline #40 — 5-band Extreme + reclassify-vs-rescore (Path A step 4 is a full rescore, not reclassify)
+  - Discipline #46 candidate — Per-country empirical normalisation (upstream complete; downstream re-rescore may re-anchor P5/P95)
+
+
+# ── Step 2 source verification result (23 Jul 2026, appended post-authoring) ─
+
+step_2_source_verification_result:
+  verified_date: 2026-07-23
+  status: SOURCE_CONFIRMED_LIVE_AND_ELIGIBLE
+  canonical_url: https://human-settlement.emergency.copernicus.eu/download.php?ds=pop
+  publisher: European Commission Joint Research Centre (JRC) / Copernicus Emergency Management Service
+  license: |
+    "© European Union, 1995-2025. Reuse of this data is authorised with
+    proper acknowledgment of the source."
+    Attribution-required open license.
+    Compatible with:
+      - Convention #60 (Ikenga IS the ESG provider — GHSL is public non-commercial data)
+      - Convention #7 Data-Layer Anchoring documented-proxy pattern
+      - Convention #56 visibly-honest degradation (raster missing pixels → None, not synthetic fill)
+  release: v1.2 built on GHS-SMOD R2023A dataset (release date 10 Jun 2026)
+  companion_products:
+    - GHS-UCDB R2024A (Urban Centre Database, released 5 Nov 2024)
+    - GHS-SMOD R2023A (Settlement Model)
+  coordinate_systems:
+    - Mollweide equal-area (EPSG:54009) — recommended for area-based spatial join
+    - WGS84 (EPSG:4326) — alternative if project-side reprojection preferred
+  native_resolution: 3 arc-sec (~100m at equator)
+  available_aggregations:
+    - 30 arc-sec (~1km)  # RECOMMENDED for 5km catchment radius (~78 pixels per catchment)
+    - 3 arc-min (~5km)
+    - 30 arc-min (~55km)
+  epochs_available: 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030
+  recommended_epoch: E2025  # aligns with v4.2 cohort baseline year
+  coverage: GLOBAL (all 39 SSI cohort countries covered by construction)
+  file_format: GeoTIFF (rasterio-readable via Python)
+  tile_scheme: Mollweide 100m tiles or single-file per epoch/resolution
+  citation_pattern: |
+    Schiavina M., Freire S., Rubinyi S., Marín-Herrera M.A., MacManus K. (2025):
+    GHS-POP R2023A - GHS population grid multitemporal (1975-2030). European
+    Commission, Joint Research Centre (JRC). doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE
+
+# ── Path A remaining steps (multi-session engineering scope) ──────────────
+
+path_a_remaining_scope_reality:
+  step_2_status: COMPLETE (source verified)
+  step_3_status: NEXT (utility authoring — dedicated session)
+  step_3_scope: |
+    Author scripts/pipeline/enrichment/catchment_population.py:
+      - GHSL raster loader (rasterio) with lazy per-tile fetch
+      - Coordinate transformation (WGS84 substation lat/lon → Mollweide)
+      - Per-substation buffer creation (default 5km circular)
+      - Zonal sum of GHS-POP pixels intersecting buffer
+      - Convention #56 fallback (raster gap → None per Discipline #37)
+      - Batch mode (all 39 countries via intelligence/countries.json)
+      - Single-country mode (per-slug positional arg)
+      - --dry-run + --diagnose-only + --force-rewrite flags
+      - Per-run audit YAML emission
+    Deliverable: scaffolded utility + docstring + argparse CLI + smoke test
+    Estimated: 1-2 engineer-days
+  step_4_status: pending step_3
+  step_4_scope: |
+    Cohort-wide rescore application:
+      - Download GHSL E2025 30-arc-sec raster (~500 MB compressed)
+      - Verify raster loads via rasterio + Mollweide reprojection
+      - Apply utility to 39 countries in dependency order (small first)
+      - Retroactive rescore for 30 currently-synthetic countries
+      - Wire for 9 currently-None countries (austria + 8 Wave 4)
+      - Per-country audit reports + validation gates
+      - Coverage sentinel: expect ≥95% per country (Convention #56 gap tolerance)
+    Estimated: 2-3 engineer-days including debug + verification
+  step_5_status: pending step_4
+  step_5_scope: |
+    Sentinel authoring + esg-sections.js R2 audit paragraph update + score-country.py
+    line 195 retirement with tombstone + CLAUDE.md addendum + Foundation KB Discipline
+    candidate registration. Estimated: 1 engineer-day.
+  step_6_status: pending step_5
+  step_6_scope: |
+    Commit chain + push + deploy verification + Task #451 closure.
+    Estimated: 0.5 engineer-day.
+  total_remaining: 4.5-6.5 engineer-days (steps 3-6)
+  cumulative_path_a: |
+    Step 1 pre-flight + Step 2 source verification COMPLETE this session (23 Jul 2026).
+    Remaining engineering: 4.5-6.5 engineer-days across dedicated future sessions.
+    Recommendation: Schedule Step 3 utility-authoring session (1-2 days),
+    then Step 4 execution session (2-3 days), then Step 5-6 closure (1.5 days total).
