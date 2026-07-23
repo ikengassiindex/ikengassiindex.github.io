@@ -194,6 +194,85 @@ Convention #56 fallbacks concentrated in remote/offshore substations: US 781 (Al
 - Task #453 — R2 Defect Class 4, major partial `socio_economic` coverage on Luxembourg (12%) / Slovenia (16%) / Colombia (51%) / Lithuania (50%). Failed spatial joins upstream; requires per-country diagnosis.
 - REPORTS_FRAMING_KB.md §8bis Discipline candidate registration for "GHSL-anchored per-substation demographic enrichment" — Task #451 Step 5e (queued).
 
+### Phase 2F — Per-substation migration_score via Niva 2023 raster enrichment (23 July 2026, Task #452)
+
+**Problem this closed.** R2 Grid Equity SSI Variables audit (Task #447) surfaced that `socio_economic.migration_score` — driving ESRS S2 community-impact and R2 axis scoring — was: (a) None for 19 countries (never populated); (b) fleet-uniform 0.5 national scalar fallback for 8 Wave 4 majors (france/germany/us/portugal/spain/sweden/japan/australia, plus italy at fleet-uniform -5.0 miscoding, austria at fleet-uniform 0.5 in 95% of subs) — the Task #450 SYSTEMIC signature at R2; (c) genuine per-substation distributions preserved intact for 8-10 countries (norway 742 unique / denmark 590 / lithuania 332 / ireland 25 / mexico 18 / new-zealand 67 / greece 13 / poland 16 / turkey 7). Cohort pre-Task-#452 state: 641k / 796k populated (~80.5%) but ~640k of that were fleet-uniform fallback stubs (Task #450 SYSTEMIC), not real per-substation values. Modern pipeline (`scripts/pipeline/ingestion/socioeconomic.py`) already emits `migration_score` from Eurostat NUTS-3 CSVs (27 EU countries) + agency regional CSVs + OECD national CSVs — but falls back to 0.5 national scalar for Wave 4 majors when per-substation NUTS-3 join fails.
+
+**Sibling to Task #451 (catchment_population) with structurally different mechanics.** Migration is a FLOW (rate over time period), not a STOCK (integer count). Task #452 uses:
+
+- **Different raster**: Niva et al. 2023 20-yr sum net-migration (Nature Human Behaviour 7:2023-2037, DOI 10.1038/s41562-023-01689-4; dataset DOI 10.5281/zenodo.7997134; CC BY 4.0), 5 arc-min (~10 km) resolution, EPSG:4326 (WGS84) — SIMPLER than GHSL Mollweide (no reprojection).
+- **Different sampling**: single-point pixel value at (lat, lon) rather than 5 km zonal-sum buffer (flow rates don't sum meaningfully; author-recommended "aggregate over larger area" pattern satisfied by 10 km pixel size itself).
+- **New range mapping step**: raw persons/1000/20yr → [0, 1] score via `0.5 + 0.5 · tanh(x / K)` with K=200 (Niva Fig 2 empirical moderate-magnitude anchor). raw=0 → 0.5 neutral; raw=+200 → 0.881 in-migration; raw=-200 → 0.119 out-migration. tanh saturates smoothly at extremes without letting outliers dominate.
+- **No synthetic generator to retire**: score-country.py never emitted migration_score. Pure additive enrichment (no tombstone step).
+- **NARROW-plus-fleet-uniform-override scope** (Gate A rev2 sign-off): fills Nones AND overrides fleet-uniform fallback distributions (detection: `n_unique==1 AND n_populated>100` — the Task #450 SYSTEMIC signature). Preserves genuine per-substation distributions untouched.
+
+**Four-deliverable closure (Steps 3-5b).**
+
+- **Utility.** New `scripts/pipeline/enrichment/migration_score.py` (~430 LOC) — reads Niva 20-yr sum GeoTIFF, samples pixel at (lat, lon), maps raw → [0, 1] via tanh(x/200), writes to `sub['socio_economic']['migration_score']`. Auto-detects fleet-uniform fallback distributions via `is_fleet_uniform_fallback()` helper — countries matching the Task #450 SYSTEMIC signature get their populated subs overridden with Niva per-substation values. Genuine real distributions preserved untouched. Convention #56 fallback: pixel NoData / outside raster → None. Per-sub audit trail `_migration_score_source = "NIVA_2023_20YR_SUM_v4_2_task_452"`. Convention #79 sharding preserved via `read_ssi_data`/`write_ssi_data`.
+
+- **Fleet-uniform detection helper.** `is_fleet_uniform_fallback(substations, threshold=100)` — detects the Task #450 SYSTEMIC signature: single unique populated value across > 100 subs. Triggers override of the country's populated subs with real Niva values. Preserves: (a) real distributions (>1 unique value); (b) all-None countries (no populated at all); (c) small countries (< 100 subs where 1 unique could be genuine).
+
+- **Regression sentinel.** New `tests/test_migration_score_niva.py` (~450 LOC, 113 test cases + 2 expected skips) pins six architectural invariants: (1) UTILITY CONSTANT LOCK — `MAPPING_CONSTANT_K==200.0`, `AUDIT_TRAIL_VALUE`, `AUDIT_TRAIL_KEY`, `CRS_WGS84`; (2) MAPPING FORMULA — canonical anchor points + symmetry around zero + saturation in [0, 1] + None/NaN handling; (3) FLEET-UNIFORM DETECTION — six synthetic test cases (Spain-like uniform / Italy-like negative uniform / Norway-like real / all-None / small country / Mexico-like 18 unique / Australia-like mixed); (4) COHORT SoT — 39 slugs + preserved-country list consistency; (5) VALUE INVARIANT — every Task-#452-written sub carries value in [0, 1] (marker-gated to exempt preserved out-of-range distributions per Task #450 SYSTEMIC scope); (6) REAL-DISTRIBUTION PRESERVATION — 9 preserved countries (norway/mexico/turkey/denmark/new-zealand/ireland/greece/lithuania/poland) each retain at least `PRESERVED_MIN_UNMARKED_POPULATED[slug]` populated substations WITHOUT the Task #452 marker.
+
+- **esg-sections.js R2 audit paragraph** — cite Niva provenance, cohort coverage, fleet-uniform override closure, preserved distributions, deferred Task #450 semantic-drift issues. Add Niva 2023 row to ITALY_FALLBACK_SOURCES data-source block.
+
+**Empirical outcome.** Cohort-wide apply (Step 4d, 23 Jul 2026):
+
+| Metric | Value |
+|---|---:|
+| Countries enriched | 39 of 39 |
+| Total substations | 796,121 |
+| Real Niva values written | 773,265 (97.13%) |
+| Convention #56 legitimate None | 1,358 (0.17%) |
+| Preserved distributions (skipped) | 21,498 (2.70%) |
+| Fleet-uniform countries overridden | 10 (france / germany / us / italy / spain / portugal / sweden / australia / austria / japan) |
+| Fleet-uniform subs overwritten | 622,493 |
+| Cohort wall-clock (apply) | 71 s |
+| Sentinel status | 113/113 GREEN + 2 expected skips |
+
+Convention #56 fallbacks concentrated in remote/offshore substations: US 691, Canada 210, France 139, UK 121, Germany 70, Italy 55, Spain 17, Australia 15, Sweden 12, Turkey 0, Poland 6, Portugal 5, Japan 4, Finland 4, Norway 0. Same geographic distribution pattern as Task #451 GHSL fallbacks (offshore islands, Arctic remote, Aleutians, Pacific territories).
+
+Fleet-uniform override caught the **austria surprise** — my empirical pre-scan classified austria as "PARTIAL 95%" but the 13,979 populated subs were all a single value (fleet-uniform fallback); utility correctly detected + overrode. Also caught the **italy `-5.0` miscoding** — pre-Task-#452 italy carried fleet-uniform -5.0 (Task #450 SYSTEMIC signature with wrong percent-scale unit); post-Task-#452 all 51,910 italy subs carry real Niva-derived values in [0, 1].
+
+**Preserved genuine distributions (real per-substation values untouched):**
+
+| Country | Pre-Task-#452 populated | Post-#452 unmarked-populated | Signature |
+|---|---:|---:|---|
+| norway | 6,113 (100%) | 6,113 | 742 unique, [0.01, 0.98] real distribution |
+| mexico | 3,085 (100%) | 3,085 | 18 unique, [-5, +8] percent-scale (Task #450 semantic-drift) |
+| turkey | 4,001 (98%) | 4,001 | 7 unique real distribution |
+| denmark | 2,433 (50%) | 2,433 | 590 unique, [-0.02, +0.04] tiny-scale (Task #450 semantic-drift) |
+| new-zealand | 1,558 (98%) | 1,558 | 67 unique, [-0.39, +0.33] real distribution |
+| ireland | 994 (78%) | 994 | 25 unique, [-0.12, +0.78] real distribution |
+| greece | 556 (77%) | 556 | 13 unique real distribution |
+| lithuania | 505 (10%) | 505 | 332 unique, [0.16, 0.99] real distribution |
+| poland | 2,247 (8%) | 2,247 | 16 unique real distribution |
+
+Cross-country comparability post-Task-#452:
+- BEFORE: `migration_score` was a mix of fleet-uniform stubs (0.5 for 8 majors + -5.0 for italy) + genuine distributions (10 countries) + Nones (19 countries) — no meaningful cross-country comparison possible.
+- AFTER: 30 countries carry real Niva-derived values in [0, 1] with meaningful per-substation variation; 9 countries carry pre-existing genuine distributions in their native ranges (Task #450 SYSTEMIC will normalize these separately).
+
+**Convention preservation matrix.**
+
+- **#7** Data-Layer Anchoring documented-proxy — Niva 2023 is publisher-cited (Nature Human Behaviour + Aalto University + Wittgenstein Centre) + product-versioned (20-yr sum 2000-2019) + coordinate-system-declared (EPSG:4326 WGS84) + resolution-declared (5 arc-min ~10 km at equator). Documented-proxy pattern per Task #451 GHSL sibling.
+- **#56** Visibly-honest degradation — raster-gap substations receive None (not fabricated); fleet-uniform fallback detected + overridden (not silently accepted); pre-Task-#452 out-of-range values preserved for Task #450 SYSTEMIC scope (not silently rescaled).
+- **#60** Ikenga IS the ESG provider — Niva 2023 is peer-reviewed academic publication under CC BY 4.0 open license (Nature Human Behaviour). Non-commercial by construction.
+- **#79** ssi-data sharding preserved — utility uses `read_ssi_data`/`write_ssi_data`; large countries auto-shard on write.
+
+**Authoritative sources for Phase 2F closure.**
+
+- `scripts/pipeline/enrichment/migration_score.py` — Utility with fleet-uniform detection
+- `tests/test_migration_score_niva.py` — Regression sentinel (113 tests + 2 expected skips)
+- `docs/audits/task_452_migration_score_preflight_20260723.yaml` — Pre-flight audit YAML + Gate A rev2 sign-off log
+- `esg-sections.js` R2 validity paragraph + data-source fallback — Frontend narrative
+- Audit reports at `~/migration_score_audit_2026072*.json` (per-run consolidated)
+
+**Follow-ons flagged for future closure.**
+
+- Task #450 SYSTEMIC — Denmark tiny-scale [-0.02, +0.04] + Mexico percent-scale [-5, +8] semantic drift. Task #452 preserved these values per NARROW+fleet-uniform-override scope; normalization to [0, 1] is Task #450 scope. Same class as V_socio / EP_rate / GDP / unemployment fleet-uniform issues.
+- Task #453 — R2 Defect Class 4, major partial `socio_economic` coverage on Luxembourg (12%) / Slovenia (16%) / Colombia (51%) / Lithuania (50%). Failed spatial joins upstream; requires per-country diagnosis. Task #452 filled Lithuania's Nones but the underlying partial-coverage issue remains.
+- REPORTS_FRAMING_KB.md §8bis Discipline #47 candidate EXTENSION — from "GHSL-anchored per-substation demographic enrichment" to "Open-license global raster enrichment for per-substation demographic variables" citing both Task #451 (GHSL population, stock) and Task #452 (Niva migration, flow) as siblings under one architectural discipline — Task #452 Step 5d (queued).
+
 ### v4.23 gap-closure forward-reference — substation + line coupling invariant (25 June 2026)
 
 The v4.23 gap-audit (`Report Production/02-v4_23-gap-audit-2026-07/`) identifies 10,260–17,025 additional substations across five countries (Canada, Norway, Mexico, Austria, Greenland) where public regulator sources are not yet in the ingestion chain. Engineering scope: **77-99 engineer-days** including paired transmission-line ingestion. Priority sequencing: Canada Q3 2026 (standalone workstream, 25-32 days); Norway + Mexico Q4 2026 (batched, 28-35 days); Austria + Greenland Q1 2027 (batched with Wave 2 cohort expansion, 21-29 days).
