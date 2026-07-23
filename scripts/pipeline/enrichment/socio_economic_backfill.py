@@ -509,10 +509,24 @@ POLYGON_COUNTRY_CONFIGS = {
         "sub_id_prefix_pattern": "JP_v43_",
         "expected_admin_codes": None,   # 47 prefectures validated at pilot time
     },
-    # Italy BLOCKED — missing scripts/pipeline/data/italy/eurostat_nuts3_socioeconomic.csv
-    # AND scripts/pipeline/data/italy/agency_regional_socioeconomic.csv. Requires operator-
-    # sourced ISTAT NUTS-3 data scaffolding (110 provinces / 21 regions IT111..ITH1). Once
-    # CSV lands, add italy entry mirroring france/germany/spain pattern.
+    # Italy — CSV TEMPLATE LANDED 24 Jul 2026 (follow-on queue Item 5).
+    # 107 NUTS-3 codes per Eurostat NUTS 2024 v2 (Italy 107 provinces:
+    # ITC1 Piemonte 8 + ITC2 Aosta 1 + ITC3 Liguria 4 + ITC4 Lombardia 12 +
+    # ITH1 Bolzano 1 + ITH2 Trento 1 + ITH3 Veneto 7 + ITH4 FVG 4 +
+    # ITH5 Emilia-Romagna 9 + ITI1 Toscana 10 + ITI2 Umbria 2 + ITI3 Marche 5 +
+    # ITI4 Lazio 5 + ITF1 Abruzzo 4 + ITF2 Molise 2 + ITF3 Campania 5 +
+    # ITF4 Puglia 6 + ITF5 Basilicata 2 + ITF6 Calabria 5 + ITG1 Sicilia 9 +
+    # ITG2 Sardegna 5). Values are ISTAT 2023 CN + LFS 2024 anchor with
+    # regional-gradient scaffolding + TODO_ISTAT_YYYY provenance markers.
+    "italy": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "IT"},
+        "polygon_admin_column": "NUTS_ID",   # emits ITC11..ITG29 (107 codes)
+        "csv_relpath": "scripts/pipeline/data/italy/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "IT_v43_",
+        "expected_admin_codes": None,   # 107 NUTS-3 codes validated at pilot time
+    },
     #
     # ═════════════════════════════════════════════════════════════════════
     # Task #454c — Greenland micro-scope (24 Jul 2026 later same day)

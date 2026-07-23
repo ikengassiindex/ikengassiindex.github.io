@@ -138,13 +138,22 @@ TASK_454C_COUNTRIES = ("greenland",)
 # regional datasets (nama_10r_3gdp + lfst_r_lfu3rt + demo_r_pjangrp3 + ilc_mdes01).
 TASK_454B_COUNTRIES = ("greece",)
 
-# Full 24-country target cohort (Task #453 + Task #454 + Task #501 + Task #454c + Task #454b)
+# Task #501 Italy follow-on (24 Jul 2026 later same day) — 51,910 v43 subs
+# via Eurostat NUTS-3 shapefile (already downloaded) + operator-scaffolded
+# CSV with 107 NUTS-3 codes + ISTAT 2023 CN + LFS 2024 anchor with regional
+# gradient + TODO_ISTAT_YYYY provenance markers. Italy was the only
+# Task #501 blocker at first-apply pass; template scaffold pattern mirrors
+# Greece Task #454b fastest-path recipe.
+TASK_501_ITALY_COUNTRIES = ("italy",)
+
+# Full 25-country target cohort (Task #453 + Task #454 + Task #501 + Task #454c + Task #454b + Task #501-Italy)
 TARGET_COUNTRIES = (
     TASK_453_COUNTRIES
     + TASK_454_COUNTRIES
     + TASK_501_COUNTRIES
     + TASK_454C_COUNTRIES
     + TASK_454B_COUNTRIES
+    + TASK_501_ITALY_COUNTRIES
 )
 
 # Expected admin code sets for cohort data invariant
@@ -320,7 +329,7 @@ class TestUtilityConstantLock:
             f"per merge-not-replace BINDING contract."
         )
 
-    def test_polygon_country_configs_locked_to_24_countries(self):
+    def test_polygon_country_configs_locked_to_25_countries(self):
         from pipeline.enrichment import socio_economic_backfill as sb
         assert set(sb.POLYGON_COUNTRY_CONFIGS.keys()) == set(TARGET_COUNTRIES), (
             f"POLYGON_COUNTRY_CONFIGS drift: expected {sorted(TARGET_COUNTRIES)}, "
