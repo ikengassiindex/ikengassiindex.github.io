@@ -513,6 +513,25 @@ POLYGON_COUNTRY_CONFIGS = {
     # AND scripts/pipeline/data/italy/agency_regional_socioeconomic.csv. Requires operator-
     # sourced ISTAT NUTS-3 data scaffolding (110 provinces / 21 regions IT111..ITH1). Once
     # CSV lands, add italy entry mirroring france/germany/spain pattern.
+    #
+    # ═════════════════════════════════════════════════════════════════════
+    # Task #454c — Greenland micro-scope (24 Jul 2026 later same day)
+    # 6 v43 subs @ ~69.2°N clustered in NW Greenland (Avannaata region).
+    # CSV has 5 municipalities with distinct per-region data (GDP €32k-€53k,
+    # 66% spread) → polygon join produces meaningful per-region V_socio vs
+    # current national scalar. Small scope but non-zero methodological value.
+    # ═════════════════════════════════════════════════════════════════════
+    "greenland": {
+        "polygon_path": "~/gadm41_GRL_shp/gadm41_GRL_1.shp",
+        "polygon_filter": {},
+        "polygon_admin_column": "NAME_1",     # emits 5 municipality names
+        "polygon_admin_normalise": False,
+        "csv_relpath": "scripts/pipeline/data/greenland/agency_regional_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "csv_lookup_aliases": {},              # GADM NAME_1 matches CSV directly; populate empirically if pilot surfaces mismatches
+        "sub_id_prefix_pattern": "GL_v43_",
+        "expected_admin_codes": None,          # 5 municipalities validated at pilot time
+    },
 }
 
 

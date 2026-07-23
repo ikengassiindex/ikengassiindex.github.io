@@ -127,8 +127,14 @@ TASK_501_COUNTRIES = (
     # italy BLOCKED — needs operator-sourced ISTAT NUTS-3 CSV
 )
 
-# Full 22-country target cohort (Task #453 + Task #454 + Task #501)
-TARGET_COUNTRIES = TASK_453_COUNTRIES + TASK_454_COUNTRIES + TASK_501_COUNTRIES
+# Task #454c Greenland micro-scope (24 Jul 2026 later same day) — 6 v43 subs
+# via GADM 4.1 5-municipality admin1 shapefile.
+TASK_454C_COUNTRIES = ("greenland",)
+
+# Full 23-country target cohort (Task #453 + Task #454 + Task #501 + Task #454c)
+TARGET_COUNTRIES = (
+    TASK_453_COUNTRIES + TASK_454_COUNTRIES + TASK_501_COUNTRIES + TASK_454C_COUNTRIES
+)
 
 # Expected admin code sets for cohort data invariant
 EXPECTED_ADMIN_CODES = {
@@ -303,7 +309,7 @@ class TestUtilityConstantLock:
             f"per merge-not-replace BINDING contract."
         )
 
-    def test_polygon_country_configs_locked_to_22_countries(self):
+    def test_polygon_country_configs_locked_to_23_countries(self):
         from pipeline.enrichment import socio_economic_backfill as sb
         assert set(sb.POLYGON_COUNTRY_CONFIGS.keys()) == set(TARGET_COUNTRIES), (
             f"POLYGON_COUNTRY_CONFIGS drift: expected {sorted(TARGET_COUNTRIES)}, "
