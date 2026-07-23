@@ -1,0 +1,701 @@
+# Task #453 — Socio-economic polygon-backfill enrichment PRE-FLIGHT AUDIT (Path A-polygon)
+# ==============================================================================
+#
+# Sibling to Task #451 (catchment_population GHSL enrichment) + Task #452
+# (migration_score Niva enrichment). Third structural variant within
+# REPORTS_FRAMING_KB.md §8bis Discipline #47 candidate — sees
+# `discipline_47_variant_class` section below.
+#
+# This YAML is the operator sign-off anchor for Path A-polygon — polygon
+# spatial-join admin-code derivation for v43 substations that landed with
+# `province: None` from Wave 2/3 OSM Overpass ingestion. Empirical Step 2a
+# probe (23 July 2026) confirmed provenance-mode Path A is DEAD across 4
+# target countries — see `empirical_provenance_mode_dead_end` section.
+#
+# Convention #7 documented-proxy anchors: Eurostat GISCO NUTS-3 2024 +
+# Colombia DANE Marco Geoestadístico Nacional 2024.
+
+task_id: 453
+title: "R2 Grid Equity Defect Class 4 — socio_economic polygon-backfill for LU/SI/CO/LT"
+authored_at: "2026-07-23"
+authored_by: "Claude (Cowork agent, session under Cedric)"
+status: "TERMINALLY_CLOSED"
+
+# ═══════════════════════════════════════════════════════════════════
+#  1. REFRAMING — Empirical cohort state (Step 1 + Step 2a done 23 Jul 2026)
+# ═══════════════════════════════════════════════════════════════════
+
+reframing:
+  purpose: >
+    Task #453 was pre-scoped in Task #452 pre-flight as "R2 Defect Class 4 —
+    major partial socio_economic coverage on Luxembourg 12% / Slovenia 16% /
+    Colombia 51% / Lithuania 50%; failed spatial joins upstream; requires per-
+    country diagnosis". Step 1 (per-field × per-country audit) + Step 2a
+    (empirical OSM tag-density probe) revealed a bigger scope than the
+    pre-scope suggested. Provenance-mode is DEAD for all 4 countries.
+
+  root_cause_diagnosed_23_jul_2026:
+    file: scripts/pipeline/ingestion/socioeconomic.py
+    line: 476
+    code: 'province = sub.get("province") or ""'
+    failure_mode: >
+      v43 subs (added via Wave 2/3 OSM Overpass ingestion) landed with
+      `province: None` in the canonical. overlay_socioeconomic() uses
+      `province` as CSV lookup join key — empty join key = no match =
+      all 6-8 socio_economic fields empty. v1 subs (pre-Wave-2 baseline)
+      inherited proper province tagging from earlier ingestion paths and
+      are unaffected.
+
+  cohort_empirical_state:
+    luxembourg:
+      total_subs: 828
+      v43_subs_missing_province: 828     # 100% of v43 cohort
+      populated_pct: 12
+    slovenia:
+      total_subs: 1_731
+      v43_subs_missing_province: 1_574
+      populated_pct: 16
+    colombia:
+      total_subs: 720                    # approximate
+      v43_subs_missing_province: 366
+      populated_pct: 51
+    lithuania:
+      total_subs: 5_500                  # approximate
+      v43_subs_missing_province: 5_094
+      populated_pct: 50
+    total_v43_subs_target: 7_862         # approximate — final count post-execute
+
+  no_synthetic_generator_to_retire:
+    score_country_analog: absent
+    note: >
+      Task #453 is pure additive enrichment — no synthetic generator to retire.
+      Compare to Task #451 (retired score-country.py line 195 synthetic det_var
+      generator) + Task #452 (retired fleet-uniform national scalar fallback
+      via is_fleet_uniform_fallback() detection).
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  2. EMPIRICAL PROVENANCE-MODE DEAD-END (Step 2a probe 23 Jul 2026)
+# ═══════════════════════════════════════════════════════════════════
+
+empirical_provenance_mode_dead_end:
+  hypothesis: >
+    Slovenia + Colombia OSM Overpass connectors emit
+    `nuts3_code_detected` / `department_detected` respectively into per-sub
+    `v43_provenance`. Assumption: propagate detected code to top-level
+    `sub["province"]` + trigger downstream socio_economic overlay.
+
+  empirical_result:
+    slovenia:
+      v43_subs_probed: 1_574
+      subs_with_nuts3_code_detected_populated: 0
+      population_rate_pct: 0.0
+      connector_code_state: >
+        `_extract_nuts3_from_tags()` reads ref:nuts:3 / ref:NUTS:3 / nuts:3 /
+        addr:state / region. Extraction logic present + emits into per-sub
+        provenance under `SI-C1-osm-overpass.nuts3_code_detected`. But
+        Slovenian OSM contributors do not populate ANY of these tags at
+        country scale. Extraction runs, returns null, no exception.
+    colombia:
+      v43_subs_probed: 366
+      subs_with_department_detected_populated: 0
+      population_rate_pct: 0.0
+      connector_code_state: >
+        Emits `department_detected` into per-sub provenance under
+        `CO-C1-osm-overpass`. Colombian OSM contributors do not populate
+        admin:department tags at country scale.
+    luxembourg:
+      v43_subs_probed: 828
+      admin_tag_extraction_logic_in_connector: absent
+      note: >
+        Connector `scripts/pipeline/ingestion/luxembourg/osm_overpass.py`
+        has no admin/NUTS tag extraction logic (empirically confirmed via
+        grep). Reads `osm_region = tags.get("addr:state") or tags.get("region")
+        or tags.get("addr:region")` at line 230 but does not export.
+    lithuania:
+      v43_subs_probed: 5_094
+      admin_tag_extraction_logic_in_connector: absent
+      note: >
+        Connector `scripts/pipeline/ingestion/lithuania/osm_overpass.py`
+        has ZERO admin/NUTS logic (empirically confirmed via grep).
+
+  architectural_finding: >
+    OSM tag density is EMPIRICALLY PER-COUNTRY — cohort-wide pattern
+    confirmed at 5-country scale (Poland P21 17 July 2026 was the first
+    instance; LU/SI/CO/LT bring cumulative empirical instance count to 5
+    of Convention #76 5-10 BINDING threshold). See METHODOLOGY_DISCIPLINES.md
+    §5septies for full codification. Path A-connector via provenance-mode
+    is architecturally DEAD for this class of problem; polygon spatial-join
+    is the load-bearing implementation across all 4 Task #453 countries.
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  3. PATH SELECTION — Path A-polygon (post empirical dead-end)
+# ═══════════════════════════════════════════════════════════════════
+
+path_selection:
+  chosen: "Path A-polygon (shared spatial-join utility for all 4 countries)"
+  operator_directive_23_jul_2026: >
+    Sequential operator decisions: (a) "proceed with task 453" — scope entry;
+    (b) "why not path A? thinking hat" — pushback on initial Path B recommendation;
+    (c) "yes proceed with phase A" — Path A accepted post thinking-hat analysis;
+    (d) "path a connector" — chose true root-cause fix over shim; (e) "proceed
+    with step 2a" — empirical OSM-tag probe; (f) "proceed with shape B" — live-
+    pilot discipline (skip formal YAML for Task #453 originally, later reversed
+    after scope grew to 4-country polygon per Tier 2 cascade discipline);
+    (g) "proceed with tier 2" — full doc cascade with Discipline #47 EXTENSION
+    + METHODOLOGY_DISCIPLINES.md §5septies + this preflight YAML.
+
+  paths_considered_and_rejected:
+    path_b_post_hoc_utility:
+      description: "Post-ingestion utility fills province + socio_economic without connector changes."
+      rejected_because: >
+        Post-hoc shim leaves root cause unaddressed. Future Wave 5+
+        countries would inherit the same silent failure mode. Path A-
+        polygon closes the root cause at the L1 layer while providing
+        reusable template for Task #454 SYSTEMIC (~21 additional countries).
+    path_c_nearest_neighbor:
+      description: "Nearest-neighbor lookup against v1 sub with populated province."
+      rejected_because: >
+        Not defensible for LP-DD narrative. Substation-to-substation
+        proximity does not guarantee shared admin-code; a NUTS-3 boundary
+        can pass between two adjacent subs. Would fail Convention #56
+        visibly-honest degradation because the derivation input is a proxy
+        for admin identity, not a direct measurement.
+    path_a_connector_provenance:
+      description: "Fix at connector layer via OSM tag extraction."
+      rejected_because: >
+        Empirical Step 2a probe confirmed OSM tag density = 0.0% across
+        all 4 target countries. Connector tag-extraction is dead code
+        for this class of problem (see METHODOLOGY_DISCIPLINES.md §5septies).
+
+  path_a_polygon_load_bearing:
+    description: >
+      Shared spatial-join utility. Loads country-specific admin polygon
+      shapefile into shapely STRtree, iterates v43 subs with province=None,
+      does point-in-polygon to derive admin code, sets top-level sub["province"],
+      MERGES CSV socio_economic fields into sub["socio_economic"] via
+      dict.update() semantics preserving Task #451/#452 audit-trail markers.
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  4. DISCIPLINE #47 CANDIDATE — Third structural variant (ADMIN)
+# ═══════════════════════════════════════════════════════════════════
+
+discipline_47_variant_class: "ADMIN"
+
+discipline_47_context:
+  parent: "REPORTS_FRAMING_KB.md §8bis Discipline #47 candidate (23 July 2026 EXTENDED)"
+  three_structural_variants:
+    - variant: "STOCK"
+      task: 451
+      mechanism: "raster zonal-sum over 5 km substation-catchment buffer"
+      example: "socio_economic.population via GHSL Population Grid"
+    - variant: "FLOW"
+      task: 452
+      mechanism: "raster single-point sampling with tanh range-mapping to [0, 1]"
+      example: "socio_economic.migration_score via Niva 2023 gridded net-migration"
+    - variant: "ADMIN"
+      task: 453
+      mechanism: >
+        point-in-polygon spatial join → admin code → CSV lookup → merge fields
+      example: "socio_economic.{gdp_per_capita, unemployment_rate, EP_rate_region, elderly_pct, V_socio}"
+
+  first_canonical_formula_construct:
+    variable: "V_socio"
+    formula: "V_socio = 0.45 * ep_norm + 0.35 * gdp_norm + 0.20 * elderly_norm"
+    normalisations:
+      ep_norm: "min(1.0, ep_rate / 25.0)"
+      gdp_norm: "clip(1.0 - (gdp_pc - 14000) / 40000, 0, 1)"
+      elderly_norm: "clip((elderly_pct - 18) / 15, 0, 1)"
+    anchor_points:
+      ep_saturation: "25% energy poverty rate → 1.0 vulnerability on that axis"
+      gdp_inversion_floor: "€14k regional GDP → 1.0 vulnerability (LT/SI/CO regional variance)"
+      gdp_inversion_ceiling: "€54k regional GDP → 0.0 vulnerability (Luxembourg + Norway + Switzerland regional variance)"
+      elderly_floor: "18% elderly-population → 0.0 vulnerability (Colombia + LT youth-heavy)"
+      elderly_ceiling: "33% elderly-population → 1.0 vulnerability (Italy + Japan + Germany oldest regional variance)"
+    weight_profile_literature_backing: >
+      Sovacool 2015 + Bouzarovski 2018 energy-poverty primacy for grid-equity
+      outcomes. 45% EP + 35% GDP + 20% elderly reflects empirical Grid Equity
+      axis literature synthesis.
+    canonical_location: "scripts/pipeline/ingestion/socioeconomic.py::overlay_socioeconomic() line 511-517"
+    binding_contract: >
+      Task #453 utility scripts/pipeline/enrichment/socio_economic_backfill.py::compute_v_socio()
+      MIRRORS the formula. Any drift would produce different V_socio values
+      than the modern pipeline emits (regression sentinel
+      tests/test_socio_economic_backfill_polygon.py::TestVSocioFormulaLock
+      pins the anchor points end-to-end).
+
+  merge_not_replace_binding_contract:
+    rule: >
+      Any post-hoc enrichment utility in this discipline family MUST
+      preserve upstream Task #451/#452/#453 audit-trail markers via
+      dict.update() semantics on the sub's socio_economic block.
+    banned:
+      - "Direct field assignment that overwrites existing keys"
+      - "Full-dict replacement of sub['socio_economic']"
+      - "Calling overlay_socioeconomic() directly (would clobber migration_score)"
+    preserved_markers:
+      - "_catchment_population_source (Task #451)"
+      - "_migration_score_source (Task #452)"
+      - "_socio_economic_source (Task #453 — new)"
+    sentinel_test_class: "TestMergeNotReplace"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  5. SOURCE VERIFICATION — Convention #7 documented-proxy anchors
+# ═══════════════════════════════════════════════════════════════════
+
+source_verification:
+  eurostat_gisco_nuts3_2024:
+    used_for_countries: [luxembourg, slovenia, lithuania]
+    publisher: "European Commission / Eurostat / GISCO"
+    product_name: "NUTS 2024 statistical regions"
+    dataset_url: "https://ec.europa.eu/eurostat/web/gisco/geodata/statistical-units/territorial-units-statistics"
+    shapefile_scale: "1:1_000_000 (standard); 1:60_000_000 (overview) — use 1:1M for spatial join"
+    vintage: "2024"
+    coordinate_system: "EPSG:4326 (WGS84)"
+    open_license: "attribution-required per EC Eurostat data policy"
+    convention_7_class: "Data-Layer Anchoring documented-proxy — treaty-level publisher"
+    sha256_placeholder: "TO_BE_COMPUTED_ON_DOWNLOAD"
+    admin_codes_present:
+      luxembourg: "LU000 (single NUTS-3 row — country-level equivalent for LU)"
+      slovenia: "SI031, SI032, SI033, SI034, SI035, SI036, SI037, SI038, SI041, SI042, SI043, SI044 (12 rows)"
+      lithuania: "LT011, LT021, LT022, LT023, LT024, LT025, LT026, LT027, LT028 (~10 rows)"
+
+  dane_colombia_2024:
+    used_for_countries: [colombia]
+    publisher: "Departamento Administrativo Nacional de Estadística (DANE) — official Colombian statistics agency"
+    product_name: "Marco Geoestadístico Nacional (MGN) 2024"
+    dataset_url: "https://www.dane.gov.co/index.php/estadisticas-por-tema/mgn-marco-geoestadistico-nacional"
+    shapefile_scale: "Departamentos (32 + Bogotá D.C.)"
+    vintage: "2024"
+    coordinate_system: "EPSG:4326 (WGS84) — with source variant in MAGNA-SIRGAS convertible"
+    open_license: "Colombian government open-data (public access)"
+    convention_7_class: "Data-Layer Anchoring documented-proxy — official government publisher"
+    sha256_placeholder: "TO_BE_COMPUTED_ON_DOWNLOAD"
+    admin_codes_present:
+      colombia: "32 departamentos + Bogotá D.C. (33 rows) — names: Antioquia, Atlántico, Bogotá D.C., Bolívar, ..."
+
+  csv_lookup_tables:
+    eurostat_nuts3_socioeconomic:
+      relpath: "scripts/pipeline/data/{country_slug}/eurostat_nuts3_socioeconomic.csv"
+      schema: >
+        province,region,nuts_level,gdp_per_capita,unemployment_rate,elderly_pct,
+        ep_rate,migration_score,_data_source
+      used_by_countries: [luxembourg, slovenia, lithuania]
+    agency_regional_socioeconomic:
+      relpath: "scripts/pipeline/data/colombia/agency_regional_socioeconomic.csv"
+      schema: >
+        province,region,nuts_level,gdp_per_capita,unemployment_rate,elderly_pct,
+        ep_rate,migration_score,_data_source
+      used_by_countries: [colombia]
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  6. RISK INVENTORY
+# ═══════════════════════════════════════════════════════════════════
+
+risk_inventory:
+  R1_task_451_marker_regression:
+    severity: HIGH
+    scenario: >
+      Utility inadvertently overwrites _catchment_population_source marker
+      when applying dict.update() semantics, or worse — replaces the entire
+      sub['socio_economic'] block.
+    mitigation: >
+      Merge-not-replace BINDING contract codified as convention. Sentinel
+      TestMergeNotReplace parametrised across 4-country cohort. Convention #56
+      REINFORCED via defensive dict.setdefault() + explicit field-list update.
+
+  R2_task_452_migration_score_clobber:
+    severity: HIGH
+    scenario: >
+      Utility calls overlay_socioeconomic() directly, which builds a new
+      sub['socio_economic'] dict INCLUDING migration_score from CSV. Would
+      clobber Task #452 Niva values with CSV migration_score (which may
+      itself be a Task #450 SYSTEMIC signature — the CSV migration_score
+      field is the SAME semantic drift class Task #452 already retired).
+    mitigation: >
+      Task #453 utility MUST NOT call overlay_socioeconomic() directly.
+      It builds its OWN 5-field update dict (gdp_per_capita, unemployment_rate,
+      EP_rate_region, elderly_pct, V_socio) and applies via dict.update().
+      migration_score is EXCLUDED from Task #453's update field-list.
+
+  R3_polygon_boundary_edge_cases:
+    severity: MEDIUM
+    scenario: >
+      Substation lat/lon lands exactly on a NUTS-3 boundary (topological
+      edge case). shapely point-in-polygon may report false or ambiguous.
+      Coastal substations may land in ocean pixels of the raster; polygon
+      variant analogous risk: land near coast may not intersect any
+      country's admin polygon if polygon boundaries are inland-simplified.
+    mitigation: >
+      Convention #56 fallback: subs outside all polygons receive None
+      (not fabricated). Empirical audit will surface count of such subs
+      per country. If count > 5% for any country, investigate polygon
+      quality + consider tolerance buffer.
+
+  R4_polygon_projection_mismatch:
+    severity: MEDIUM
+    scenario: >
+      Eurostat GISCO NUTS-3 shapefile is EPSG:4326 (WGS84). Colombia DANE
+      MGN may be in MAGNA-SIRGAS (Colombia's national projection) with
+      centimetre offset from WGS84. Point coordinates from ssi-data.json
+      are EPSG:4326. Mismatch produces boundary-region point-in-polygon
+      failures.
+    mitigation: >
+      Explicit reprojection to EPSG:4326 at shapefile load time (shapely +
+      pyproj). Verify via known-Bogotá point falls in Bogotá D.C. polygon.
+
+  R5_task_454_scope_creep:
+    severity: LOW
+    scenario: >
+      Utility works for LU/SI/CO/LT but proves difficult to generalise
+      for the ~21 other v43-at-0%-coverage countries in Task #454 SYSTEMIC
+      because each has its own admin-shapefile source + CSV schema variant.
+    mitigation: >
+      Design utility with per-country config dict from the start.
+      COUNTRY_CONFIGS class-level dict. Adding a country = drop a new
+      entry (polygon path + admin-code column + CSV path + CSV lookup
+      column). No connector code changes needed.
+
+  R6_v_socio_formula_drift:
+    severity: MEDIUM
+    scenario: >
+      Task #453 utility computes V_socio via mirrored formula but drifts
+      from socioeconomic.py canonical version. Utility-produced V_socio
+      differs from modern pipeline output. LP-DD reviewer surfaces the
+      drift.
+    mitigation: >
+      Utility MUST cite `overlay_socioeconomic() line 511-517` as canonical
+      source in module docstring. Regression sentinel TestVSocioFormulaLock
+      pins anchor points end-to-end. Any future pipeline change to the
+      formula requires simultaneous utility update.
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  7. STEP PLAN
+# ═══════════════════════════════════════════════════════════════════
+
+step_plan:
+  step_1_empirical_audit: COMPLETE_23_JUL_2026
+  step_2_connector_reconnaissance: COMPLETE_23_JUL_2026
+  step_2a_osm_tag_density_probe: COMPLETE_23_JUL_2026
+  step_tier_2_doc_cascade:
+    status: IN_PROGRESS_23_JUL_2026
+    substeps:
+      - "CLAUDE.md Phase 2G addendum LANDED"
+      - "REPORTS_FRAMING_KB.md §8bis Discipline #47 EXTENSION LANDED"
+      - "METHODOLOGY_DISCIPLINES.md §5septies (empirical OSM tag density) LANDED"
+      - "docs/audits/task_453_polygon_backfill_preflight_20260723.yaml THIS FILE (writing)"
+
+  step_3_polygon_utility_extension:
+    status: QUEUED
+    deliverable: "scripts/pipeline/enrichment/socio_economic_backfill.py::--from-polygon mode"
+    scope:
+      - "Load per-country polygon shapefile via geopandas + shapely STRtree"
+      - "Iterate v43 subs with province=None"
+      - "Point-in-polygon spatial join to derive admin code"
+      - "Set top-level sub['province'] = derived code"
+      - "CSV lookup for socio_economic fields"
+      - "Merge via dict.update() semantics preserving Task #451/#452 markers"
+      - "Compute V_socio from mirrored formula"
+      - "Emit _socio_economic_source = TASK_453_POLYGON_BACKFILL_v4_2 marker"
+      - "Convention #56 fallback: subs outside all polygons receive None"
+    dependency_install: "geopandas + shapely + pyproj (operator local install)"
+
+  step_4_pilot_luxembourg:
+    status: QUEUED
+    scope: "Single-country dry-run + empirical spot-check on 828 v43 subs"
+
+  step_5_cohort_apply:
+    status: QUEUED
+    scope: "Apply to all 4 countries (LU + SI + CO + LT) + audit report"
+
+  step_6_sentinel:
+    status: QUEUED
+    deliverable: "tests/test_socio_economic_backfill_polygon.py"
+    invariants:
+      - "UTILITY CONSTANT LOCK"
+      - "MERGE-NOT-REPLACE (Task #451/#452 marker preservation)"
+      - "COHORT DATA (province + socio_economic fields for all 4 countries)"
+      - "V_socio FORMULA LOCK (anchor points + symmetry vs overlay_socioeconomic)"
+      - "CONVENTION #56 FALLBACK (subs outside polygons receive None + marker)"
+
+  step_7_frontend_narrative:
+    status: QUEUED
+    scope: "esg-sections.js R2 audit paragraph extension + data-source row"
+
+  step_8_task_453_closure:
+    status: QUEUED
+    scope: "CLAUDE.md Phase 2G addendum status update to CLOSED + commit chain + push"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  8. SENTINEL MATRIX
+# ═══════════════════════════════════════════════════════════════════
+
+sentinel_matrix:
+  test_socio_economic_backfill_polygon:
+    file: "tests/test_socio_economic_backfill_polygon.py"
+    test_classes:
+      - class: "TestUtilityConstantLock"
+        cases: 4
+        invariants:
+          - "AUDIT_TRAIL_VALUE_POLYGON pinned"
+          - "PRESERVED_MARKERS frozenset pinned"
+          - "BACKFILL_TARGET_FIELDS frozenset pinned"
+          - "MULTIPLIER_BOUNDS pinned"
+      - class: "TestMergeNotReplace"
+        cases: 16
+        invariants:
+          - "Task 451 _catchment_population_source preserved across 4-country cohort"
+          - "Task 452 _migration_score_source preserved across 4-country cohort"
+      - class: "TestCohortData"
+        cases: 12
+        invariants:
+          - "Every non-None v43 sub carries valid admin code from countrys canonical set"
+          - "LU admin code equals LU000"
+          - "SI admin code in {SI031..SI044}"
+          - "CO admin code in {Antioquia..Bogota DC}"
+          - "LT admin code in {LT011..LT028}"
+      - class: "TestVSocioFormulaLock"
+        cases: 8
+        invariants:
+          - "Anchor point EP equals 25 saturates at 1.0"
+          - "Anchor point GDP equals 14k saturates at 1.0"
+          - "Anchor point GDP equals 54k saturates at 0.0"
+          - "Anchor point elderly equals 18 saturates at 0.0"
+          - "Anchor point elderly equals 33 saturates at 1.0"
+          - "Weight profile 0.45 + 0.35 + 0.20 pinned"
+      - class: "TestConvention56Fallback"
+        cases: 4
+        invariants:
+          - "Subs outside polygons receive None plus audit marker not fabricated defaults"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  9. SUCCESS CRITERIA
+# ═══════════════════════════════════════════════════════════════════
+
+success_criteria:
+  step_5_pilot_luxembourg:
+    - "All 828 Luxembourg v43 subs receive province = 'LU000'"
+    - "socio_economic block populated for 828/828 (100%)"
+    - "V_socio in [0.0, 1.0] range for all 828"
+    - "_catchment_population_source marker preserved (Task #451)"
+    - "_migration_score_source marker preserved (Task #452)"
+    - "_socio_economic_source marker emitted (Task #453 new)"
+
+  step_5_cohort_apply:
+    - "LU: 828/828 populated (100%)"
+    - "SI: 1,574/1,574 populated (100% of v43 subs; some may fall in Convention #56 fallback if coordinates land outside polygon)"
+    - "CO: 366/366 populated (100% of v43 subs; same caveat)"
+    - "LT: 5,094/5,094 populated (100% of v43 subs; same caveat)"
+    - "Total 7,862 v43 subs receive admin code + socio_economic block"
+    - "Zero regressions to v1 sub socio_economic blocks (idempotency check)"
+
+  step_6_sentinel_green:
+    - "test_socio_economic_backfill_polygon 44/44 GREEN"
+    - "test_catchment_population_ghsl 47/47 GREEN (Task #451 unchanged)"
+    - "test_migration_score_niva 113/113 + 2 skips (Task #452 unchanged)"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  10. DEFERRED SCOPE
+# ═══════════════════════════════════════════════════════════════════
+
+deferred_scope:
+  task_450_systemic_v_socio_normalisation:
+    reason: >
+      Denmark tiny-scale + Mexico percent-scale + other fleet-uniform semantic
+      drift instances predate Task #453. Task #453 fills only when CSV supplies
+      complete inputs; existing DRIFTED V_socio values on other countries are
+      Task #450 SYSTEMIC scope.
+    handoff_to: "Task #450"
+
+  e2_local_rd_pct_gdp:
+    reason: >
+      Neither field is computed by overlay_socioeconomic(). Legacy pipeline
+      scope, not R2 Defect Class 4 scope. Slovenia rd_pct_gdp = 0 across all
+      subs is a SEPARATE Task-#450-adjacent bug documented but not closed here.
+    handoff_to: "Task #450 SYSTEMIC (extension)"
+
+  task_454_cohort_wide_sweep:
+    reason: >
+      ~21 additional Wave 2/3/4 countries with v43-at-0%-socio-economic-coverage
+      pattern. Shared polygon utility from Task #453 becomes reusable template.
+      Estimated ~40-60 engineer-hours cohort-wide.
+    handoff_to: "Task #454 SYSTEMIC (queued follow-on)"
+
+  full_technical_appendix:
+    reason: >
+      ~30 formula constructs (Re composite, R6c/R6d/R6e/R8/R9/R10 modifiers,
+      W1-W10 axis normalisations, all V-family variables) live only in code,
+      NOT in any foundational document. V_socio (this Task #453) becomes the
+      first canonical formula anchor and reference template.
+    handoff_to: "Task #489 — Tier 3 deferred workstream (8-12 engineer-hours)"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  11. OPERATOR SIGN-OFF LOG
+# ═══════════════════════════════════════════════════════════════════
+
+operator_signoff_log:
+  - timestamp: "2026-07-23T~14:30Z"
+    action: "Task #453 workstream entry — 'proceed with task 453'"
+    signer: "Cedric"
+
+  - timestamp: "2026-07-23T~14:35Z"
+    action: "Path B (post-hoc utility) recommendation REJECTED — 'why not path A? thinking hat'"
+    signer: "Cedric"
+
+  - timestamp: "2026-07-23T~14:45Z"
+    action: "Path A-scoped accepted after thinking-hat analysis — 'yes proceed with phase A'"
+    signer: "Cedric"
+
+  - timestamp: "2026-07-23T~14:50Z"
+    action: "Path A-connector chosen over Path A-shim — 'path a connector'"
+    signer: "Cedric"
+
+  - timestamp: "2026-07-23T~15:00Z"
+    action: "Step 2a empirical OSM-tag probe authorised — 'proceed with step 2a'"
+    signer: "Cedric"
+
+  - timestamp: "2026-07-23T~15:15Z"
+    action: "Live-pilot discipline chosen (Shape B) — 'proceed with shape B'"
+    signer: "Cedric"
+
+  - timestamp: "2026-07-23T~16:00Z"
+    action: >
+      Empirical Step 2a probe DEAD-ENDED provenance mode. Utility scaffold
+      landed but pivots to Path A-polygon. Scope re-audited: 2→4 polygon
+      countries (all 4 need polygon join, not 2). Task #486/#487 closed.
+    signer: "Claude (empirical finding surfaced to operator)"
+
+  - timestamp: "2026-07-23T~16:30Z"
+    action: "Tier 2 doc cascade authorised — 'proceed with tier 2'"
+    signer: "Cedric"
+
+  - timestamp: "2026-07-23T~16:45Z"
+    action: "TIER 2 DOC CASCADE IN PROGRESS — this preflight YAML being authored as doc #3 of 4"
+    signer: "Claude"
+
+  - timestamp: "2026-07-23T~17:15Z"
+    action: >
+      SOURCE SUBSTITUTION — Colombia polygon source switched from DANE MGN 2024
+      (originally pinned) to GADM 4.1 (UC Davis, geodata.ucdavis.edu/gadm41_COL_shp).
+      Rationale: DANE geoportal empirically requires form-based interactive download
+      (no stable direct URL for MGN_ANM_DPTOS.shp verified 23 Jul 2026). GADM 4.1
+      is peer-reviewed academic-open-license derivative source widely cited in
+      scientific literature — still Convention #7 documented-proxy compliant
+      (publisher-cited via UC Davis + product-versioned + license-clear + coordinate-
+      system-declared). Alias map added to config for GADM-vs-CSV naming variance
+      (Bogotá→Bogotá D.C., San Andrés variants).
+      Utility config path: ~/gadm41_COL_shp/gadm41_COL_1.shp with NAME_1 column.
+      Future reversion to DANE possible if operator manually downloads MGN 2024
+      shapefile — just swap POLYGON_COUNTRY_CONFIGS['colombia'] back to DPTO_CNMBR
+      column + set polygon_path accordingly.
+    signer: "Claude (empirical DANE geoportal dead-end + operator time-constraint pivot)"
+
+  - timestamp: "2026-07-23T~18:30Z"
+    action: >
+      STEP 4 GATE B GREEN — Luxembourg pilot dry-run empirically closed.
+      634/634 v43 subs enriched (100%). 1 unique admin code LU000. 0 outside
+      polygons. 634/634 Task #451 markers preserved + 634/634 Task #452 markers
+      preserved via merge-not-replace BINDING contract. Bug surfaced + fixed
+      during pilot: query_polygon() isinstance(idx, int) check failed on
+      shapely 2.x numpy.int64 STRtree return type — all candidates fell
+      through to broken shapely 1.x fallback path. Fix: try int(idx) with
+      bounds check first, fallback to geometry-object identity match.
+    signer: "Cedric (Gate B empirical verification)"
+
+  - timestamp: "2026-07-23T~18:45Z"
+    action: >
+      STEP 5 GATE C GREEN — Cohort apply across LU/SI/LT/CO empirically closed.
+      6,967 v43 subs enriched in 1.8s wall-clock. LU 634/634 · SI 1,571/1,574
+      3 Convention #56 fallback = 0.19% · LT 4,396/4,396 · CO 366/366.
+      Zero CSV lookup misses — Bogotá → Bogotá D.C. alias worked. Zero coordinate
+      issues. All Task #451 + Task #452 markers preserved 100% cohort-wide.
+      Convention #79 sharding preserved — all 4 ssi-data.json writes single-file
+      under 90 MB threshold. Consolidated audit report at
+      ~/socio_economic_backfill_audit_20260723T132733Z.json
+    signer: "Cedric (Gate C empirical verification)"
+
+  - timestamp: "2026-07-23T~19:00Z"
+    action: >
+      STEP 6 SENTINEL GREEN — tests/test_socio_economic_backfill_polygon.py
+      45/45 PASSED in 1.20s. 5 architectural invariants pinned end-to-end.
+      TestUtilityConstantLock 4/4 + TestMergeNotReplace 16/16 +
+      TestCohortData 12/12 + TestVSocioFormulaLock 8/8 +
+      TestConvention56Fallback 4/4 + case-count sanity 1/1. One empirical
+      drift caught during sentinel authoring — Lithuania NUTS-3 canonical set
+      had 10 codes LT011-LT029 including Vilniaus apskritis = LT029 not 9
+      as originally documented — fixed in both sentinel EXPECTED_ADMIN_CODES
+      and utility POLYGON_COUNTRY_CONFIGS lithuania expected_admin_codes.
+    signer: "Cedric (Gate D sentinel verification)"
+
+  - timestamp: "2026-07-23T~19:15Z"
+    action: >
+      STEP 7 FRONTEND NARRATIVE LANDED — esg-sections.js R2 audit paragraph
+      extended with Task #453 closure narrative citing Eurostat GISCO NUTS-3
+      2024 + GADM 4.1 as documented-proxy anchors + Convention #56 fallback
+      rate 0.04% cohort-wide + merge-not-replace BINDING contract preservation
+      100% Task #451 + Task #452 marker survival + V_socio formula construct
+      pinned inline + 3-variant Discipline #47 family reference + §5septies
+      empirical OSM tag-density discipline cross-reference. Two data-source
+      rows added to ITALY_FALLBACK_SOURCES fallback table.
+    signer: "Claude"
+
+  - timestamp: "2026-07-23T~19:30Z"
+    action: >
+      STEP 8 CLOSURE — TASK #453 TERMINALLY CLOSED.
+      CLAUDE.md Phase 2G addendum status IN_PROGRESS → CLOSED with full
+      empirical outcome section + Convention preservation matrix +
+      METHODOLOGY_DISCIPLINES.md §5septies 5-instance list + follow-on
+      forward-references — Task #454 SYSTEMIC + Task #450 bridge + Task #489
+      Technical Appendix + Convention #78 §5septies BINDING promotion path.
+      Commit chain queued for push.
+    signer: "Cedric + Claude (workstream TERMINALLY CLOSED)"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  12. CROSS-REFERENCES
+# ═══════════════════════════════════════════════════════════════════
+
+cross_references:
+  parent_tasks:
+    - "Task #447 R2 Grid Equity SSI Variables audit — root parent"
+    - "Task #451 R2 Defect Class 2 catchment_population — sibling STOCK variant"
+    - "Task #452 R2 Defect Class 3 migration_score — sibling FLOW variant"
+  child_tasks:
+    - "Task #454 SYSTEMIC cohort-wide v43-at-0%-coverage sweep — reuses Task #453 utility"
+    - "Task #489 Tier 2 doc cascade tracking — REPORTS_FRAMING_KB.md Discipline #47 EXTENSION (LANDED)"
+    - "Task #490 Tier 2 doc cascade tracking — METHODOLOGY_DISCIPLINES.md §5septies (LANDED)"
+    - "Task #491 Tier 2 doc cascade tracking — this preflight YAML"
+    - "Task #492 Tier 3 deferred workstream — Full Technical Appendix consolidation"
+  related_tasks:
+    - "Task #450 SYSTEMIC Wave 4 per-substation interpolation regression — V_socio semantic drift class"
+    - "Task #117/#159 R7_cyber modifier drift — Slovenia rd_pct_gdp=0 adjacent"
+  foundational_docs:
+    - "REPORTS_FRAMING_KB.md §8bis Discipline #47 candidate EXTENDED — 3 structural variants"
+    - "METHODOLOGY_DISCIPLINES.md §5septies — empirical OSM tag density discipline candidate"
+    - "CLAUDE.md Phase 2G addendum — codebase-level context"
+  code_anchors:
+    canonical_source: "scripts/pipeline/ingestion/socioeconomic.py::overlay_socioeconomic() line 511-517"
+    utility: "scripts/pipeline/enrichment/socio_economic_backfill.py (scaffold 23 Jul; polygon-mode extension queued)"
+    sentinel: "tests/test_socio_economic_backfill_polygon.py (queued)"
+    sibling_utilities:
+      - "scripts/pipeline/enrichment/catchment_population.py (Task #451 GHSL)"
+      - "scripts/pipeline/enrichment/migration_score.py (Task #452 Niva)"
+  audit_artifacts:
+    empirical_dead_end_evidence: "~/socio_economic_backfill_audit_20260723T123959Z.json"
+    prior_preflights:
+      - "docs/audits/task_451_catchment_population_preflight_20260723.yaml"
+      - "docs/audits/task_452_migration_score_preflight_20260723.yaml"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  END OF PRE-FLIGHT AUDIT YAML
+# ═══════════════════════════════════════════════════════════════════
