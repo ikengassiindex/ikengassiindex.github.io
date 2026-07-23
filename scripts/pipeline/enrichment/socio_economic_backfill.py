@@ -525,6 +525,11 @@ POLYGON_COUNTRY_CONFIGS = {
             "Hyogo": "Hyōgo",
             # Alternate transliteration
             "Gumma": "Gunma",
+            # GADM 4.1 typo — literally "Naoasaki" in NAME_1 for Nagasaki
+            # (empirically surfaced 24 July 2026: 68 v43 subs derived
+            # 'Naoasaki' from polygon spatial-join → csv_lookup_miss;
+            # CSV correctly has 'Nagasaki'). Report upstream to GADM.
+            "Naoasaki": "Nagasaki",
         },
         "sub_id_prefix_pattern": "JP_v43_",
         "expected_admin_codes": None,   # 47 prefectures validated at pilot time
@@ -1014,6 +1019,7 @@ def enrich_country_from_polygon(
     n_csv_lookup_miss = 0
     n_written = 0
     detected_codes: Dict[str, int] = {}   # code → count
+    csv_lookup_miss_codes: Dict[str, int] = {}   # code that missed CSV lookup → count
     task_451_markers_preserved = 0
     task_452_markers_preserved = 0
 
@@ -1096,6 +1102,7 @@ def enrich_country_from_polygon(
             row = csv_lookup.get(code.upper()) or csv_lookup.get(code.lower())
         if not row:
             n_csv_lookup_miss += 1
+            csv_lookup_miss_codes[code] = csv_lookup_miss_codes.get(code, 0) + 1
             continue
 
         # ── Merge fields — dict.update semantics preserves markers ────
@@ -1156,6 +1163,9 @@ def enrich_country_from_polygon(
         "unique_detected_codes": len(detected_codes),
         "detected_codes_distribution": dict(sorted(
             detected_codes.items(), key=lambda kv: -kv[1]
+        )[:20]),
+        "csv_lookup_miss_codes_distribution": dict(sorted(
+            csv_lookup_miss_codes.items(), key=lambda kv: -kv[1]
         )[:20]),
         "task_451_markers_preserved": task_451_markers_preserved,
         "task_452_markers_preserved": task_452_markers_preserved,
@@ -1254,6 +1264,9 @@ def _print_report(audit: Dict[str, Any]) -> None:
         if audit.get("detected_codes_distribution"):
             print(f"  Code distribution (top): "
                   f"{list(audit['detected_codes_distribution'].items())[:5]}")
+        if audit.get("csv_lookup_miss_codes_distribution"):
+            print(f"  CSV-lookup-miss codes (top): "
+                  f"{list(audit['csv_lookup_miss_codes_distribution'].items())[:10]}")
         print(f"  Task #451 markers preserved: {audit['task_451_markers_preserved']:,}")
         print(f"  Task #452 markers preserved: {audit['task_452_markers_preserved']:,}")
         print(f"  Polygon source: {Path(audit['polygon_source_path']).name} "
