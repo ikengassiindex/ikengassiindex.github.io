@@ -114,7 +114,8 @@ window.SSI_CANONICAL_LITERALS = {
       <div class="method-step-num">7</div>
       <div class="method-step-content">
         <h3>Classify</h3>
-        <p>Five bands (v4.2): Low (0.00&ndash;0.25), Medium (0.25&ndash;0.50), High (0.50&ndash;0.75), Critical (0.75&ndash;1.00), Extreme (1.00&ndash;1.30). Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
+        <!-- task-463-band-normalisation-doc-cascade (23 Jul 2026) — per-country P5/P95 normalisation per Task #461/462; classification field is now within-country ranked. -->
+ <p>Five bands (v4.2, per-country ranked): Low, Medium, High, Critical, Extreme. Classification is normalised per country using P5/P95 anchors of R_median &mdash; &ldquo;Critical&rdquo; means &ldquo;top-15% risk ranking within this country&rdquo; rather than an absolute cross-country threshold. Absolute R_median remains stored per substation (tooltip + intelligence panel) for LP-DD auditability. Alert flags trigger when any single component exceeds its P95 fleet threshold.</p>
       </div>
     </div>
   </div>
@@ -330,23 +331,23 @@ window.SSI_CANONICAL_LITERALS = {
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:4px">
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
-        <div style="font-size:12px;color:var(--band-low);margin:4px 0">0.00 &ndash; 0.25</div>
+        <div style="font-size:12px;color:var(--band-low);margin:4px 0">Bottom ~22%</div>
         <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
-        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">0.25 &ndash; 0.50</div>
+        <div style="font-size:12px;color:var(--band-medium);margin:4px 0">Next ~28%</div>
         <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
-        <div style="font-size:12px;color:var(--band-high);margin:4px 0">0.50 &ndash; 0.75</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Investment priority</div>
+        <div style="font-size:12px;color:var(--band-high);margin:4px 0">Middle ~28%</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Above average</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
-        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">0.75 &ndash; 1.00</div>
-        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Urgent intervention</div>
+        <div style="font-size:12px;color:var(--band-critical);margin:4px 0">Next ~15%</div>
+        <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Investment priority</div>
       </div>
       <div style="text-align:center;padding:16px 12px;border-radius:var(--radius-sm);background:var(--band-extreme-bg)">
         <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-extreme)">Extreme</div>
