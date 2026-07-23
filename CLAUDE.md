@@ -347,7 +347,7 @@ Convention preservation matrix (empirically verified):
 
 **Architectural finding surfaced by this closure (retired from queued to landed).**
 
-**METHODOLOGY_DISCIPLINES.md §5septies (Empirical OSM tag density is per-country) — codified as candidate discipline at 5 empirical instances toward Convention #76 5-10 BINDING threshold:**
+**METHODOLOGY_DISCIPLINES.md §5septies (Empirical OSM tag density is per-country) — codified as candidate discipline at 5 empirical instances toward Convention #76 5-10 BINDING threshold at Task #453 close 23 July 2026 (promoted to BINDING 24 July 2026 post Task #454 SYSTEMIC cohort saturation at 16/5-10 — see Phase 2H addendum below):**
 
 1. Poland P21 (17 July 2026) — `ref:nuts:3` 0.0% populated at country scale, 74-code territorial map DEAD CODE
 2. Luxembourg (23 July 2026) — no admin tags in OSM at country scale
@@ -370,7 +370,7 @@ Codified consequence: connector-level tag extraction is legitimate defensive-cod
 - Task #454 SYSTEMIC — cohort-wide v43-at-0%-socio-economic-coverage sweep across ~21 additional Wave 2/3/4 countries. Shared polygon utility from Task #453 becomes reusable template. Same Discipline #47 ADMIN variant + Convention #7 documented-proxy pattern applies per country; estimated ~40-60 engineer-hours cohort-wide.
 - Task #450 SYSTEMIC bridge — V_socio deferred to Task #450 normalisation for pre-existing drifted values (Denmark tiny-scale + Mexico percent-scale + other fleet-uniform semantic drift instances). Task #453 fills only when CSV supplies complete inputs. E2_local + rd_pct_gdp remain unfilled by Task #453 (legacy pipeline scope, not R2 Defect Class 4 scope). Slovenia rd_pct_gdp = 0 across all subs is a separate Task-#450-adjacent bug documented but not closed here.
 - Task #489 (Tier 3 deferred) — Full Technical Appendix workstream consolidating ~30 formula constructs (Re composite, R6c/R6d/R6e/R8/R9/R10 modifiers, W1-W10 axis normalisations, all V-family variables) into new `FORMULA_TECHNICAL_APPENDIX.md`. V_socio (this Task #453) is the first canonical formula anchor and reference template. Estimated 8-12 engineer-hours.
-- Convention #78 §5septies BINDING promotion — accumulates as Task #454 candidates add new empirical instances of OSM-tag-density dead-ends. Currently 5 of 5-10 BINDING threshold.
+- Convention #78 §5septies BINDING promotion — accumulates as Task #454 candidates add new empirical instances of OSM-tag-density dead-ends. Currently 5 of 5-10 BINDING threshold at Task #453 close. **PROMOTED TO BINDING 24 July 2026** via Task #454 SYSTEMIC cohort saturation at 16/5-10 empirical instances (see Phase 2H addendum below).
 
 ### Phase 2H — Task #454 SYSTEMIC cohort-wide extension (24 July 2026, Task #454 CLOSED)
 
@@ -411,7 +411,7 @@ Wall-clock: ~15s cumulative (10 EU countries Round 1 + Switzerland/Canada Round 
 - Task #454c — Greenland micro-scope (6 v43 subs; nominal effort).
 - Task #450 SYSTEMIC bridge — V_socio semantic-scale normalization for Denmark tiny-scale [-0.02,+0.04] + Mexico percent-scale [-5,+8] pre-existing drifted values. Same class as V_socio / EP_rate fleet-uniform issues (documented in Task #452 preflight YAML deferred_scope).
 - Task #489 (Tier 3, TaskID #492) — Full FORMULA_TECHNICAL_APPENDIX.md workstream consolidating ~30 formula constructs. V_socio (Task #453) + admin-code derivation (Task #454) become reference templates for Discipline #47 documentation.
-- Convention #78 §5septies BINDING promotion — post-Task-#454 empirical instance count at 16/5-10 (well above threshold); methodology-version event queued.
+- Convention #78 §5septies **BINDING promotion LANDED 24 July 2026** — post-Task-#454 empirical instance count at 16/5-10 (well above threshold). METHODOLOGY_DISCIPLINES.md §5septies title + status paragraph updated candidate → BINDING; enforcement corollary codified at connector-authoring layer (Step 2 empirical OSM-tag-population probe hard-required for Wave 5+ non-OECD onboardings; below 30% → polygon spatial-join fallback proposed; below 90% → tag-extraction defensive-when-present + polygon join load-bearing).
 
 ### Phase 2I — Task #450 SYSTEMIC bridge — migration_score semantic-scale normalization (24 July 2026)
 
