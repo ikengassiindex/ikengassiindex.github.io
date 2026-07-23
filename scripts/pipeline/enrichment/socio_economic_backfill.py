@@ -532,6 +532,27 @@ POLYGON_COUNTRY_CONFIGS = {
         "sub_id_prefix_pattern": "GL_v43_",
         "expected_admin_codes": None,          # 5 municipalities validated at pilot time
     },
+    # ═════════════════════════════════════════════════════════════════════
+    # Task #454b Greece — CSV template landed 24 Jul 2026 (later same day)
+    # Empirical scope: 163 v43 subs · 100% no-province · 100% no-gdp.
+    # CSV template scaffolded with 52 NUTS-3 codes (Eurostat NUTS 2024 v2)
+    # + Greek national-average defaults + TODO_ELSTAT_YYYY provenance
+    # markers. Operator to refine values via ELSTAT (Hellenic Statistical
+    # Authority) or Eurostat regional datasets (nama_10r_3gdp GDP +
+    # lfst_r_lfu3rt unemployment + demo_r_pjangrp3 elderly + ilc_mdes01
+    # EU-SILC energy-poverty NUTS-2 imputed to NUTS-3). Utility works
+    # immediately with template defaults; refinement is progressive.
+    # Reuses Eurostat GISCO NUTS-3 2024 shapefile (already downloaded).
+    # ═════════════════════════════════════════════════════════════════════
+    "greece": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "EL"},
+        "polygon_admin_column": "NUTS_ID",   # emits EL301..EL653 (52 codes)
+        "csv_relpath": "scripts/pipeline/data/greece/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "GR_v43_",
+        "expected_admin_codes": None,   # 52 NUTS-3 codes validated at pilot time
+    },
 }
 
 
