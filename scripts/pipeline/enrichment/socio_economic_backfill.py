@@ -528,7 +528,23 @@ POLYGON_COUNTRY_CONFIGS = {
         "polygon_admin_normalise": False,
         "csv_relpath": "scripts/pipeline/data/greenland/agency_regional_socioeconomic.csv",
         "csv_lookup_column": "province",
-        "csv_lookup_aliases": {},              # GADM NAME_1 matches CSV directly; populate empirically if pilot surfaces mismatches
+        # GADM 4.1 (vintage 2022) uses PRE-2018 Greenland admin structure:
+        # - Kujalleq → Kommune Kujalleq (short → long form)
+        # - Sermersooq → Kommuneqarfik Sermersooq
+        # - Qeqqata → Qeqqata Kommunia
+        # - Qaasuitsup → RETIRED 2018 (split into Avannaata + Qeqertalik).
+        #   Approximation: subs at ~69°N Ilulissat area belong to modern
+        #   Avannaata Kommunia; subs at ~65-68°N west coast → Qeqertalik.
+        #   Given GADM vintage precedes the split, map Qaasuitsup → Avannaata
+        #   (most Task #451/#454c v43 subs cluster at ~69.2°N = Ilulissat area).
+        # - "Northeast Greenland National Par" → uninhabited national park;
+        #   no CSV entry → falls through as Convention #56 n_csv_lookup_miss.
+        "csv_lookup_aliases": {
+            "Kujalleq": "Kommune Kujalleq",
+            "Sermersooq": "Kommuneqarfik Sermersooq",
+            "Qeqqata": "Qeqqata Kommunia",
+            "Qaasuitsup": "Avannaata Kommunia",  # pre-2018 → post-2018 approx
+        },
         "sub_id_prefix_pattern": "GL_v43_",
         "expected_admin_codes": None,          # 5 municipalities validated at pilot time
     },
@@ -972,10 +988,25 @@ def enrich_country_from_polygon(
     for sub in substations:
         sid = sub.get("substation_id") or sub.get("id") or ""
 
-        # Only touch v43 subs (v1 subs already have complete socio_economic)
-        if "_v43_" not in str(sid):
+        existing_province = sub.get("province")
+        existing_se = sub.get("socio_economic") or {}
+        existing_gdp_populated = existing_se.get("gdp_per_capita") is not None
+
+        # Target-sub detection — 3 admissible classes as of Task #501 (24 Jul 2026):
+        #   Class 1: v43-marked (Task #453+#454 EU cohort — hex-hash IDs "XX_v43_...")
+        #   Class 2: Fleet-uniform candidate (Task #501 Wave 4 majors — integer IDs
+        #            with empty-string province + populated gdp_per_capita national
+        #            scalar; case-c polygon join will overwrite fleet-uniform values)
+        #   Class 3: Anything not-yet-populated (defensive — case-c handles)
+        # Skip v1 subs (pre-Wave-2 sequential IDs with fully-populated socio_economic).
+        is_v43_marked = "_v43_" in str(sid)
+        is_fleet_uniform_candidate = (not existing_province) and existing_gdp_populated
+        is_not_yet_populated = (not existing_province) and (not existing_gdp_populated)
+
+        if not (is_v43_marked or is_fleet_uniform_candidate or is_not_yet_populated):
+            # v1 sub with fully-populated socio_economic — skip fast
             continue
-        n_v43 += 1
+        n_v43 += 1  # counter name preserved for audit-log continuity
 
         # Skip logic — refined 24 Jul 2026 per Task #454 Canada surface:
         # (a) FULLY POPULATED (Task #453 idempotent no-op): province AND
@@ -984,12 +1015,10 @@ def enrich_country_from_polygon(
         #     gdp_per_capita None → bypass polygon join, use existing province
         #     as CSV lookup key (Canada v43 subs already carry valid province
         #     names matching CSV; polygon join would be redundant)
-        # (c) NOT POPULATED (Task #453 EU/CO + Task #454 EU case): province None
-        #     → run polygon spatial-join to derive it (existing logic)
-        existing_province = sub.get("province")
-        existing_se = sub.get("socio_economic") or {}
-        existing_gdp_populated = existing_se.get("gdp_per_capita") is not None
-
+        # (c) NOT POPULATED (Task #453 EU/CO + Task #454 EU case + Task #501
+        #     Wave 4 majors fleet-uniform case): province None-or-empty → run
+        #     polygon spatial-join to derive per-region admin code + CSV lookup
+        #     to overwrite fleet-uniform national scalar (Task #501 signature)
         if existing_province and existing_gdp_populated:
             # Case (a): idempotent no-op
             n_already_populated += 1
