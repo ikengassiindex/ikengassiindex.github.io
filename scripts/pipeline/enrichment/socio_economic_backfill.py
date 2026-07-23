@@ -505,7 +505,27 @@ POLYGON_COUNTRY_CONFIGS = {
         "polygon_admin_normalise": False,
         "csv_relpath": "scripts/pipeline/data/japan/agency_regional_socioeconomic.csv",
         "csv_lookup_column": "province",
-        "csv_lookup_aliases": {},  # populate as pilot surfaces mismatches
+        # Speculative romanization aliases (follow-on queue Item 4 — 280 miss subs at
+        # Task #501 apply = ~2 prefectures unmatched from 47 total). GADM 4.1 admin1
+        # empirically emits macron variants for some prefectures; CSV agency source
+        # uses ASCII romanization. First 2 pairs cover the most likely candidates
+        # (Kōchi/Kochi + Hyōgo/Hyogo); remaining pairs are defensive coverage of
+        # documented Japanese-macron transliteration ambiguities. False-positive
+        # aliases are architecturally harmless (they simply never match).
+        "csv_lookup_aliases": {
+            # Macron → ASCII
+            "Kōchi": "Kochi",
+            "Hyōgo": "Hyogo",
+            "Ōsaka": "Osaka",
+            "Kyōto": "Kyoto",
+            "Ōita": "Oita",
+            "Tōkyō": "Tokyo",
+            # ASCII → macron (reverse direction if CSV carries macrons)
+            "Kochi": "Kōchi",
+            "Hyogo": "Hyōgo",
+            # Alternate transliteration
+            "Gumma": "Gunma",
+        },
         "sub_id_prefix_pattern": "JP_v43_",
         "expected_admin_codes": None,   # 47 prefectures validated at pilot time
     },
