@@ -413,6 +413,42 @@ Wall-clock: ~15s cumulative (10 EU countries Round 1 + Switzerland/Canada Round 
 - Task #489 (Tier 3, TaskID #492) — Full FORMULA_TECHNICAL_APPENDIX.md workstream consolidating ~30 formula constructs. V_socio (Task #453) + admin-code derivation (Task #454) become reference templates for Discipline #47 documentation.
 - Convention #78 §5septies BINDING promotion — post-Task-#454 empirical instance count at 16/5-10 (well above threshold); methodology-version event queued.
 
+### Phase 2I — Task #450 SYSTEMIC bridge — migration_score semantic-scale normalization (24 July 2026)
+
+**Problem this closed.** Task #452 (23 July 2026) empirically preserved 5 countries' migration_score values that were genuine per-substation distributions (not fleet-uniform national-scalar fallback per the Task #450 SYSTEMIC signature `n_unique==1 AND n_populated>100`) despite the values falling OUTSIDE the canonical [0, 1] envelope expected by downstream methodology. Task #452's `is_fleet_uniform_fallback()` detection helper correctly identified these as "real distributions" and applied the NARROW-scope discipline (don't overwrite genuine data). But the semantic-scale drift remained: Denmark tiny negative tail `[-0.02, +1.00]` · Ireland `[-0.12, +1.00]` · New Zealand `[-0.39, +1.00]` · Greece `[-4.50, +2.50]` · Mexico percent-scale `[-5.00, +8.00]`. Total 11,492 substations across 5 countries with out-of-[0,1] migration_score.
+
+**Path A per-country min-max linear rescale (operator-selected 24 Jul 2026).** New utility `scripts/pipeline/enrichment/migration_score_semantic_normalise.py` applies `(x - min_country) / (max_country - min_country)` transform per country, preserving per-substation ranking + bringing all values into [0, 1] envelope. Utility invariants: (a) Convention #56 degenerate case (min == max) → skip country not fabricate; (b) idempotent — subs with existing Task #450 marker are skipped; (c) merge-not-replace BINDING contract — Task #451 `_catchment_population_source` + Task #452 `_migration_score_source` markers preserved; (d) audit marker `_migration_score_semantic_normalise_source: TASK_450_MIN_MAX_LINEAR_RESCALE_v4_2` set on every rescaled sub.
+
+**Empirical outcome (24 Jul 2026 cohort apply):**
+
+| Country | n_written | Task #451 preserved | Task #452 preserved | Pre range |
+|---|---:|---:|---:|---|
+| denmark | 4,821 | 4,821 (100%) | 2,388 (49.5%) | [-0.02, +1.00] |
+| ireland | 1,278 | 1,278 (100%) | 284 (22.2%) | [-0.12, +1.00] |
+| new-zealand | 1,589 | 1,589 (100%) | 31 (1.9%) | [-0.39, +1.00] |
+| greece | 719 | 719 (100%) | 163 (22.7%) | [-4.50, +2.50] |
+| mexico | 3,085 | 3,085 (100%) | 0 (0%) | [-5.00, +8.00] |
+| **Total** | **11,492** | **11,492 (100%)** | **2,866 (24.9%)** | 15% of ~76k Task #452 markers |
+
+Wall-clock: 1.5s cumulative (Denmark alone 0.70s). Post-apply cohort-wide diagnostic surfaces **0 semantic-drift instances remaining** across all 39 countries. Task #452 marker preservation percentages match pre-#450 empirical baselines exactly (utility explicit field-list update pattern preserves markers un-touched).
+
+**Trade-off codified.** Linear per-country rescale LOSES absolute-scale semantic meaning (e.g. Mexico "percent change" becomes within-country normalized rank). But PRESERVES per-substation ranking (relative order of migration_score values across a country's substations unchanged). This is the correct choice for R2 Grid Equity axis input where downstream methodology expects [0, 1] envelope and cares about relative ranking (which subs have relatively-higher migration inflow within their national context), not absolute-scale interpretation.
+
+**Convention preservation matrix.** #7 Data-Layer Anchoring (per-country min/max stat as documented-proxy anchor) · #54 Housekeeping cascade (6-touch-point applied) · #55 Verify-don't-trust (empirical diagnose-only + Greece dry-run + cohort apply + post-apply diagnose = 3-gate verification) · #56 Visibly-honest degradation (degenerate case Convention #56 skip; audit marker on every rescaled sub) · #60 Ikenga IS the ESG provider (no commercial source consumed) · #78 §5septies unchanged (Task #450 bridge is a semantic-scale-drift closure discipline, distinct from OSM-tag-density discipline) · #79 ssi-data sharding preserved throughout.
+
+**Sentinel `tests/test_migration_score_semantic_normalise.py`.** 24 cases across 5 invariant classes: `TestUtilityConstantLock` (3) + `TestEnvelopeInvariant` (5 × 1 = 5) + `TestMergeNotReplacePreservation` (5 × 2 = 10) + `TestAuditMarkerCoverage` (5 × 1 = 5) + `test_cohort_wide_no_semantic_drift_remaining` (1). All 24 GREEN in 19.37s. Cross-country invariant `test_cohort_wide_no_semantic_drift_remaining` is the load-bearing sentinel — any future data-ingestion pass that re-introduces out-of-[0,1] values fails CI at this gate.
+
+**Authoritative sources for Phase 2I closure.**
+
+- `scripts/pipeline/enrichment/migration_score_semantic_normalise.py` — Utility (Task #450 SYSTEMIC bridge)
+- `tests/test_migration_score_semantic_normalise.py` — Regression sentinel (24 cases GREEN)
+- Consolidated audit report `~/migration_score_semantic_normalise_audit_2026072*.json`
+
+**Follow-ons flagged for future closure.**
+
+- Discipline #47 sibling variant registration — REPORTS_FRAMING_KB.md §8bis extension to codify NORMALISE as fourth structural variant (STOCK Task #451 + FLOW Task #452 + ADMIN Task #453/#454 + NORMALISE Task #450). Currently 1 instance of NORMALISE (migration_score) — accumulates toward BINDING promotion threshold with any future semantic-scale-drift instances (e.g. V_socio if fleet-uniform overrides surface, EP_rate scale drift, other socio_economic fields).
+- V_socio semantic-scale audit — the original Task #450 SYSTEMIC scope also flagged V_socio drift for the 8 Wave 4 majors with fleet-uniform national scalar signature (Italy/Japan/Portugal/Spain/Sweden/Germany/France/US per Task #452 preflight `deferred_scope`). V_socio drift class distinct from migration_score drift: V_socio uses a documented [0, 1] formula (Convention #7 anchor at socioeconomic.py:511-517) that produces in-range values BY CONSTRUCTION. The 8-Wave-4-majors drift is fleet-uniform (all subs same national scalar) rather than out-of-envelope. Separate closure workstream — needs Niva-style raster or NUTS-3 polygon backfill (Task #452/#453 pattern) rather than min-max rescale (Task #450 pattern).
+
 ### v4.23 gap-closure forward-reference — substation + line coupling invariant (25 June 2026)
 
 The v4.23 gap-audit (`Report Production/02-v4_23-gap-audit-2026-07/`) identifies 10,260–17,025 additional substations across five countries (Canada, Norway, Mexico, Austria, Greenland) where public regulator sources are not yet in the ingestion chain. Engineering scope: **77-99 engineer-days** including paired transmission-line ingestion. Priority sequencing: Canada Q3 2026 (standalone workstream, 25-32 days); Norway + Mexico Q4 2026 (batched, 28-35 days); Austria + Greenland Q1 2027 (batched with Wave 2 cohort expansion, 21-29 days).
