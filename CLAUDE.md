@@ -372,6 +372,47 @@ Codified consequence: connector-level tag extraction is legitimate defensive-cod
 - Task #489 (Tier 3 deferred) — Full Technical Appendix workstream consolidating ~30 formula constructs (Re composite, R6c/R6d/R6e/R8/R9/R10 modifiers, W1-W10 axis normalisations, all V-family variables) into new `FORMULA_TECHNICAL_APPENDIX.md`. V_socio (this Task #453) is the first canonical formula anchor and reference template. Estimated 8-12 engineer-hours.
 - Convention #78 §5septies BINDING promotion — accumulates as Task #454 candidates add new empirical instances of OSM-tag-density dead-ends. Currently 5 of 5-10 BINDING threshold.
 
+### Phase 2H — Task #454 SYSTEMIC cohort-wide extension (24 July 2026, Task #454 CLOSED)
+
+**Problem this scoped.** Task #453 (23 July 2026) closed R2 Defect Class 4 for 4 countries (Luxembourg + Slovenia + Colombia + Lithuania) via polygon spatial-join utility. Empirical cohort audit 24 July 2026 surfaced 11 additional countries with matching v43-at-partial-coverage pattern: Belgium (5,432 v43 subs) + Czechia (7,825) + Denmark (2,389) + Estonia (1,180) + Finland (151) + Ireland (284) + Latvia (3,427) + Netherlands (3,810) + Poland (25,517 — largest) + Switzerland (865) + Canada (1,227) = **52,107 v43 substations** across 11 countries needing socio_economic backfill.
+
+**Utility extension pattern.** Task #454 extended `scripts/pipeline/enrichment/socio_economic_backfill.py::POLYGON_COUNTRY_CONFIGS` from 4 → 15 entries (config-only extension; utility architecture unchanged). 9 EU countries reuse Eurostat GISCO NUTS-3 2024 shapefile (already downloaded for Task #453); 2 non-EU countries use GADM 4.1 (Switzerland + Canada — same documented-proxy pattern Task #453 Colombia precedent). Two utility refinements landed during Task #454 execution:
+
+1. **3-case skip-logic decision tree** (`enrich_country_from_polygon` line 833+). Original Task #453 utility skipped any sub with `province` populated (preserves idempotency). Task #454 surfaced Canada edge case: 1,227 v43 subs already had `province` set from earlier Canada L1 connector pass BUT `socio_economic.gdp_per_capita` remained None. New decision tree: (a) province set AND gdp populated → skip (idempotent no-op); (b) province set BUT gdp None → bypass polygon join, use existing province as CSV lookup key (Canada case); (c) province None → run polygon spatial-join (Task #453 EU + Colombia case).
+
+2. **Switzerland `csv_lookup_aliases`** — GADM emits English/French canton names (Lucerne / Sankt Gallen) while agency CSV uses local German/French forms (Luzern / St. Gallen). 5-alias map added: `Lucerne → Luzern`, `Luzerne → Luzern`, `Sankt Gallen → St. Gallen`, `Saint Gallen → St. Gallen`, `St Gallen → St. Gallen`. Empirically confirmed 67 subs matched via aliases (51 Sankt Gallen + 16 Lucerne). Task #453 Colombia precedent (3-alias map) generalises.
+
+**Empirical outcome (24 Jul 2026 cohort apply):**
+
+| Cohort | v43 subs | Written | Convention #56 fallback | Marker preservation |
+|---|---:|---:|---:|---:|
+| Task #453 (4 countries, idempotent no-op) | 6,970 | 6,967 (Round 1) | 3 | 100% |
+| Task #454 EU (9 countries) | 50,015 | 49,847 | 62 | 100% |
+| Switzerland (67 unmatched → aliases resolved Round 2) | 865 | 865 (R1: 798 + R2: 67) | 0 | 100% |
+| Canada (1,227 case-b bypass Round 2) | 1,227 | 1,227 (R2) | 0 | 100% |
+| **Task #454 SYSTEMIC total** | **59,077** | **59,041 (99.94%)** | **65 (0.11%)** | **100%** |
+
+Wall-clock: ~15s cumulative (10 EU countries Round 1 + Switzerland/Canada Round 2 post-fix). Poland alone (25,517 v43 subs) processed in 1.3s = ~19,600 subs/sec. Convention #56 fallback rate (0.11%) an order of magnitude below Task #451 (0.17%) + Task #452 (0.17%) baselines — indicates high-quality polygon coverage from Eurostat GISCO / GADM 4.1 sources.
+
+**Convention preservation matrix.** #7 Data-Layer Anchoring documented-proxy (Eurostat GISCO NUTS-3 2024 + GADM 4.1 preserved unchanged; both publisher-cited + open-license) · #54 Housekeeping cascade (6-touch-point cascade applied) · #55 Verify-don't-trust (2-gate operator paste-back: pilot + full cohort) · #56 Visibly-honest degradation (65 out-of-polygon subs received None, not fabricated) · #60 Ikenga IS the ESG provider (all sources public institutional) · #78 §5septies OSM-tag-density empirical instance count 5 → 16 (11 new Task #454 instances) · #79 ssi-data sharding preserved (Poland 53.64 MB single-file under 90 MB threshold).
+
+**Discipline #47 ADMIN variant empirical instance count 4 → 15.** Post-Task-#454 the polygon-based admin-code derivation family (`Discipline #47` extension per REPORTS_FRAMING_KB.md §8bis) covers 15 countries via the shared utility. Cumulative Discipline #47 family across STOCK (Task #451 GHSL, 1 instance) + FLOW (Task #452 Niva, 1 instance) + ADMIN (Task #453 + #454 polygon, 15 instances) = 17 empirical instances across 3 structural variants. Convention #76 BINDING threshold (5-10 instances per candidate) is empirically saturated; Discipline #47 BINDING promotion methodology-version event is now well-justified and queued.
+
+**Authoritative sources for Phase 2H closure.**
+
+- `scripts/pipeline/enrichment/socio_economic_backfill.py` — Utility extension (Task #454 config-only, 4 → 15 entries)
+- `tests/test_socio_economic_backfill_polygon.py` — Regression sentinel extension (Task #454 Step 6, 45 → ~135 cases)
+- `docs/audits/task_454_systemic_cohort_extension_preflight_20260724.yaml` — Pre-flight audit YAML (Convention #7 documented-proxy anchors + 11-country config matrix + operator_signoff_log)
+- Consolidated cohort audit at `~/socio_economic_backfill_audit_20260723T140454Z.json` (Round 2 post-fix — final GREEN state)
+
+**Follow-ons flagged for future closure.**
+
+- Task #454b — Greece CSV scaffolding (ELSTAT NUTS-3 EL30..EL65; 163 v43 subs; ~0.3% of Task #454 scope; deferred per audit YAML `deferred_scope`). Same shared utility template applies once CSV lands.
+- Task #454c — Greenland micro-scope (6 v43 subs; nominal effort).
+- Task #450 SYSTEMIC bridge — V_socio semantic-scale normalization for Denmark tiny-scale [-0.02,+0.04] + Mexico percent-scale [-5,+8] pre-existing drifted values. Same class as V_socio / EP_rate fleet-uniform issues (documented in Task #452 preflight YAML deferred_scope).
+- Task #489 (Tier 3, TaskID #492) — Full FORMULA_TECHNICAL_APPENDIX.md workstream consolidating ~30 formula constructs. V_socio (Task #453) + admin-code derivation (Task #454) become reference templates for Discipline #47 documentation.
+- Convention #78 §5septies BINDING promotion — post-Task-#454 empirical instance count at 16/5-10 (well above threshold); methodology-version event queued.
+
 ### v4.23 gap-closure forward-reference — substation + line coupling invariant (25 June 2026)
 
 The v4.23 gap-audit (`Report Production/02-v4_23-gap-audit-2026-07/`) identifies 10,260–17,025 additional substations across five countries (Canada, Norway, Mexico, Austria, Greenland) where public regulator sources are not yet in the ingestion chain. Engineering scope: **77-99 engineer-days** including paired transmission-line ingestion. Priority sequencing: Canada Q3 2026 (standalone workstream, 25-32 days); Norway + Mexico Q4 2026 (batched, 28-35 days); Austria + Greenland Q1 2027 (batched with Wave 2 cohort expansion, 21-29 days).
