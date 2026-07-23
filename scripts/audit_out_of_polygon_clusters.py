@@ -161,7 +161,13 @@ NEIGHBOR_BBOXES: Dict[str, List[Tuple[str, Tuple[float, float, float, float]]]] 
 
 
 def load_bounds_polygon(country_slug: str):
-    """Load country bounds.json as shapely polygon."""
+    """Load country bounds.json as shapely polygon.
+
+    Auto-repairs invalid geometries (self-intersections, degenerate rings)
+    via .buffer(0) which is the shapely idiom for topology repair.
+    Empirically surfaced by Spain (self-intersection at -6.902,38.202
+    Extremadura/Portugal border).
+    """
     from shapely.geometry import shape as shp_shape
     from shapely.geometry import MultiPolygon, Polygon
 
@@ -179,14 +185,28 @@ def load_bounds_polygon(country_slug: str):
         for feat in bounds.get("features", []):
             geoms.append(shp_shape(feat["geometry"]))
         if len(geoms) == 1:
-            return geoms[0]
-        return MultiPolygon([g for g in geoms if isinstance(g, Polygon)])
+            geom = geoms[0]
+        else:
+            geom = MultiPolygon([g for g in geoms if isinstance(g, Polygon)])
     elif bounds.get("type") == "Feature":
-        return shp_shape(bounds["geometry"])
+        geom = shp_shape(bounds["geometry"])
     elif bounds.get("type") in ("Polygon", "MultiPolygon"):
-        return shp_shape(bounds)
+        geom = shp_shape(bounds)
     else:
         raise ValueError(f"Unrecognized bounds.json shape for {country_slug}: {bounds.get('type')}")
+
+    # Auto-repair invalid geometries via buffer(0) — shapely idiom for
+    # fixing self-intersections, sliver polygons, and degenerate rings.
+    # No-op if already valid.
+    if not geom.is_valid:
+        print(f"[{country_slug}] WARNING: bounds polygon is invalid — "
+              f"applying buffer(0) topology repair")
+        geom = geom.buffer(0)
+        if not geom.is_valid:
+            raise ValueError(f"[{country_slug}] bounds polygon repair failed — "
+                             f"still invalid after buffer(0)")
+
+    return geom
 
 
 def load_ssi_data_substations(country_slug: str) -> List[dict]:
