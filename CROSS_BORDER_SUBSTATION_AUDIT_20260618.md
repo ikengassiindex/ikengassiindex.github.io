@@ -374,3 +374,53 @@ Same enforcement structure as Discipline #36: PR-time gate + monthly auto-remedi
 - `ikengassiindex.github.io/CLAUDE.md` — Phase 2A/B/C closure block + v4.23 gap-closure forward-reference + power-lines invariant
 
 *Addendum authored 25 June 2026 as session-close discipline pass per Convention #54-equivalent housekeeping. CC BY-SA 4.0.*
+
+---
+
+## Addendum · 24 July 2026 night — Wave 4 SYSTEMIC cross-border pollution empirical closure
+
+**Scope:** Task #501 follow-on cluster diagnostic surfaced cohort-wide Wave 4 cross-border pollution across 9 majors (UK + Sweden + Portugal + Italy + Japan + Spain + France + Germany + US). Empirical evidence: **661,867 substations analyzed → 186,627 outside their national polygon (28.20% cohort-wide)**. Wave 4 OSM Overpass bboxes systematically overshot into neighbors and Discipline #36 did not run strictly at Wave 4 ingestion time.
+
+**3-class taxonomy formalized** (extends the 4-failure-mode framework above):
+- **Class A** cross-border pollution — coordinates fall inside a NEIGHBOR country. ~101,126 subs. Remediation: `remediate_cross_border.py`.
+- **Class B** bounds.json interior gap — coordinates fall inside true country territory but outside 1:1M polygon. ~50,791 subs. Remediation: bounds.json refresh (Task #516).
+- **Class C** legitimate offshore — wind farms, subsea cables, archipelagos, DOM-TOM. ~27,051 subs. Preserve.
+
+**Per-country ranked pollution** (post-Wave-4):
+
+| Country | Pct-out | Class A | Class B | Class C |
+|---|---:|---:|---:|---:|
+| Sweden | 94.79% | ~10,179 | 626 | ~354 |
+| Spain | 80.62% | ~18,330 | ~4,103 | ~1,920 |
+| US | 43.10% | ~17,000 | ~15,161 (Appalachian) | ~11,202 |
+| Italy | 35.11% | ~3,996 | ~10,292 (Sardinia/Sicily) | ~3,999 |
+| Japan | 32.09% | ~275 | ~280 | ~1,715 (archipelago) |
+| France | 24.27% | ~23,507 | ~15,452 | ~921 |
+| Germany | 15.95% | ~21,129 | ~3,401 | ~5,403 |
+| Portugal | 13.53% | ~1,743 | ~0 | ~148 |
+| UK | 12.65% | ~5,028 | ~1,476 | ~1,389 |
+
+**Discipline #36 empirical closure this session:**
+- Sweden 10,207 subs stripped (11,399 → 1,192 at 4km tolerance, 94.79% → 0%)
+- Spain 17,601 subs stripped (30,222 → 12,621 at 5km tolerance preserving Class B, 80.62% → 0%)
+- Portugal NO-OP at 2.95% (below 5% threshold)
+- **Total Class A cross-border pollution REMOVED: 27,808 subs**
+
+**Whitelist extension**: `remediate_cross_border.py::CONFIRMED_FAILURE_MODE_1` extended 5 → 12 countries with empirical evidence per country (pollution %, top cluster contributors with sample coordinates, Class A/B/C decomposition, `--tolerance-km` guidance).
+
+**Blocking finding for full cohort closure:** `check_cross_border.py` + `remediate_cross_border.py` + `refresh_country_counts.py` fail with `ZeroDivisionError` on Convention #79 sharded ssi-data (US/France/Germany/UK/Italy) because they read `data['substations']` directly which returns None on sharded manifests. Hotfix landed: shared reader utility `scripts/_ssi_data_shard_reader.py` (commit `f4999003`). Task #520 (next session) wires the 3 scripts through the utility + completes remediation on US ~17k + France ~24k + Germany ~21k = ~62k additional Class A subs to strip.
+
+**New utility deliverables (commit chain `e2ba92e6` → `f4999003`):**
+- `scripts/audit_out_of_polygon_clusters.py` — general-purpose out-of-polygon cluster diagnostic (`--all-wave4` batch mode + 9 pre-configured neighbor bbox tables + Convention #79 sharded reader + `buffer(0)` auto-repair for invalid polygons)
+- `scripts/_ssi_data_shard_reader.py` — shared Convention #79 sharded ssi-data reader (`load_ssi_data` + `load_substations` + `count_substations` + `save_ssi_data`)
+- STRtree `shapely.prepared.prep()` optimization in `socio_economic_backfill.py` → **135× US Task #501 wall-clock speedup** (983s → 7.3s)
+
+**Discipline candidates registered (for cross-repo REPORTS_FRAMING_KB §8bis promotion):**
+- **Discipline #48 candidate** — "bounds.json quality is empirically per-country" (sibling to §5septies OSM-tag density). 5 empirical instances at LOWER threshold of Convention #76 cadence.
+- **Discipline #49 candidate** — "3-class taxonomy for out-of-polygon substations" (A/B/C classification as pre-remediation gate). Sibling to Discipline #47 sibling-variant framework.
+
+**Convention #79 (ssi-data sharding) empirical BINDING advance:** 5-country empirical instance count (US + France + Germany + UK + Italy) satisfies Convention #76 5-10 LOWER SATURATION threshold. Shared reader utility now canonical.
+
+**Full closure memo:** `WAVE_4_SYSTEMIC_CROSS_BORDER_CLOSURE_20260724.md` — includes per-country empirical picture + 3-class taxonomy formalized + utility deliverables + convention accretion + Task #520 next-session workstream.
+
+*Addendum authored 24 July 2026 night as Wave 4 SYSTEMIC closure per Convention #54 housekeeping discipline. Cross-references: Convention #7 (documented-proxy — neighbor-bbox tables) · Convention #36 (BINDING — cross-border enforcement gate) · Convention #56 (visibly-honest degradation — rejected substations preserved with audit trail) · Convention #78 §5septies BINDING (empirical-per-country discipline) · Convention #79 (ssi-data sharding). CC BY-SA 4.0.*
