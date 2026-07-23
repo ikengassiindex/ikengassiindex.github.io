@@ -79,13 +79,76 @@ CONFIRMED_FAILURE_MODE_1 = {
     "norway",    # 22.54% → 10.05% post-tolerance. Remaining outliers at lat
                  # 64.6-65.0N lon 18.6-19.9E = northern Sweden. Sweden cross-
                  # border ingestion overshoot.
-    "uk",        # 19.02% — Top outliers at lat 54.76N lon 1.34E = North Sea
-                 # (likely European coast misattributed). Pure Mode 1.
-    "france",    #  6.58% — Top outliers at lat 43.15N lon -4.38W = Northern
-                 # Spain (Cantabrian coast). Spanish substations crossed border.
+    "uk",        # 19.02% (Jun 2026) → 12.65% (Jul 2026). Top outliers France
+                 # 4,132 (Channel + Kent coastline) + Ireland 896. Pure Mode 1.
+    "france",    # 6.58% (Jun 2026) → 24.27% (Jul 2026 Wave 4 REGRESSION).
+                 # Belgium 12,558 + Switzerland 3,051 + UK 2,711 + Italy 2,676
+                 # + Germany 2,090 + Spain 411 — all Wave 4 OSM overshoot.
     "chile",     # 11.87% — Top outliers at lat -50.02 lon -68.54 = Argentinian
                  # Patagonia (Santa Cruz province). Argentinian substations
                  # crossed border.
+    # ─── NEW Wave 4 additions (24 July 2026 empirical audit) ────────────
+    "sweden",    # 94.79% — CATASTROPHIC. Denmark 6,076 (Copenhagen at
+                 # 12.58E, 55.69N cluster) + Latvia 2,629 (Riga at 24.10E,
+                 # 56.96N) + Finland 484 + Norway 447 + Estonia 104 +
+                 # Lithuania 85 = ~9,825 pure Mode 1 cross-border. + Baltic
+                 # offshore 354 + 626 unclassified (may be interior-gap OR
+                 # legit). Only 594/11,399 = 5.2% actually inside Sweden.
+                 # Wave 4 OSM Overpass bbox massively overshot into Nordic +
+                 # Baltic neighbors. Empirical evidence: audit_out_of_polygon_
+                 # audit_sweden_20260723T170921Z.json.
+    "spain",     # 80.62% — CATASTROPHIC. France 13,623 (Pyrénées Atlantiques
+                 # 0.14E, 43.08N cluster) + Portugal 4,707 (western border
+                 # 8.43W, 41.50N) + smaller offshore/Med/Morocco = ~18,330
+                 # pure Mode 1 cross-border. NOTE: 4,103 UNCLASSIFIED subs
+                 # sampled at Barcelona (2.24E, 41.64N), Aragón (-2.50, 41.77),
+                 # Castilla (-4.95, 42.36) — actually inside Spain, indicating
+                 # ~13% bounds.json interior-gap (Class B, needs polygon
+                 # refresh not substation removal). Recommend running with
+                 # --tolerance-km 5 to preserve interior-gap subs while
+                 # stripping true cross-border. Wave 4 OSM overshoot.
+    "portugal",  # 13.53% — Spain 1,743 (border overshoot) + Azores/Madeira
+                 # 148 (legit offshore). Real Mode 1 cross-border ~1,743.
+                 # Mirror of Spain Portugal 4,707 overshoot — both Wave 4
+                 # Iberian ingestions overshot into each other.
+    "germany",   # 15.95% — Czechia 8,849 (border overshoot) + Austria 3,603
+                 # + France 2,634 + Netherlands 2,195 + Poland 1,305 +
+                 # Switzerland 908 + Belgium 874 + Denmark 756 + Luxembourg
+                 # 5 = ~21,129 pure Mode 1 across 9 neighbors. + Baltic Sea
+                 # 4,784 (mostly legit Nord Stream + wind farms; needs case
+                 # audit) + North Sea 619 (legit offshore) + 3,401 UNCLASSIFIED.
+                 # Wave 4 land-border overshoot into ALL neighbors.
+    "us",        # 43.10% — Mexico 8,808 (border overshoot 89.8W, 30.3N =
+                 # Louisiana/Texas coast) + Canada 8,165 (Toronto area 79.3W,
+                 # 43.7N) = ~16,973 pure Mode 1 cross-border. + North
+                 # Atlantic offshore 5,837 (legit East Coast wind farms +
+                 # subsea cables) + Pacific 3,592 (Hawaii Alaska legit) +
+                 # Gulf of Mexico 1,773 (legit offshore rigs) + 15,161
+                 # UNCLASSIFIED at Appalachian region (VA/KY/TN) —
+                 # BOUNDS.JSON QUALITY ISSUE (Class B), NOT pollution.
+                 # Recommend --tolerance-km 5 to preserve Appalachian interior
+                 # subs. Wave 4 OSM overshoot into Mexico + Canada.
+    "italy",     # 35.11% — Switzerland 1,637 (Alpine border) + France 1,018
+                 # (SE Riviera) + Austria 732 (South Tyrol) + Slovenia 337 +
+                 # Malta 227 + Croatia 39 + Vatican 6 = ~3,996 pure Mode 1
+                 # cross-border. BUT 10,292 Tyrrhenian Sea + 1,192 Adriatic
+                 # + 996 Ligurian + 545 Ionian = 13,025 offshore subs which
+                 # are Sardinia + Sicily coordinates being EXCLUDED from
+                 # mainland-only bounds.json. This is BOUNDS.JSON QUALITY
+                 # (Class B, ~63% of Italy's outside-polygon), NOT pollution.
+                 # Recommend bounds.json refresh to include Sardinia + Sicily
+                 # + minor islands BEFORE remediation, else strip legitimate
+                 # island substations.
+    "japan",     # 32.09% — Russia 261 (Sakhalin/Kuriles border overshoot) +
+                 # Korea 14 = ~275 pure Mode 1. But 1,715 offshore subs (Sea
+                 # of Japan 1,346 + Pacific 136 + East China Sea 118 +
+                 # Philippine Sea 115) — mix of legitimate archipelago
+                 # (Kii Peninsula 280 UNCLASSIFIED) and coastal subs whose
+                 # coordinates fall in sea per 1:1M polygon. NEEDS CAREFUL
+                 # REVIEW — Japan is mostly Class B (bounds quality) + Class
+                 # C (legit offshore), only ~4% Class A. Run with high
+                 # tolerance (--tolerance-km 10) OR skip remediation and
+                 # only refresh bounds.json.
 }
 
 # Countries to NEVER auto-remediate via this script (handled by tolerance
