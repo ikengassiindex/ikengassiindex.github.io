@@ -105,6 +105,7 @@ try:
     import geopandas as gpd  # type: ignore
     from shapely.geometry import Point  # type: ignore
     from shapely.strtree import STRtree  # type: ignore
+    from shapely.prepared import prep as _shp_prep  # type: ignore
     _HAS_POLYGON_DEPS = True
 except ImportError:
     _HAS_POLYGON_DEPS = False
@@ -883,12 +884,19 @@ def load_polygon_index(
         admin_codes.append(code_str)
 
     tree = STRtree(geometries)
+    # Precompile prepared geometries for fast repeat point-in-polygon queries.
+    # shapely.prepared.prep() is 10-100× faster on complex polygons (US Alaska
+    # Aleutian archipelago, Norway fjords) for repeated .contains() calls.
+    # Deferred-queue Item 5 (US 983s → expected ~100-300s) — perf fix without
+    # accuracy loss (prepared.contains == unprepared.contains by contract).
+    prepared_geoms = [_shp_prep(g) for g in geometries]
     log.info(f"STRtree built with {len(geometries)} polygons; "
              f"admin codes sample: {admin_codes[:5]}")
 
     return {
         "tree": tree,
         "geometries": geometries,
+        "prepared_geometries": prepared_geoms,   # NEW — perf optimization
         "admin_codes": admin_codes,
         "crs": "EPSG:4326",
         "n_polygons": len(geometries),
@@ -914,6 +922,10 @@ def query_polygon(
     point = Point(lon, lat)   # shapely uses (x, y) = (lon, lat)
     candidates = poly_index["tree"].query(point)
     geometries = poly_index["geometries"]
+    # Prepared geometries land Item-5 perf optimization (10-100× faster
+    # .contains() on high-vertex polygons like Alaska Aleutians). Optional
+    # for back-compat: fall back to unprepared if absent.
+    prepared_geoms = poly_index.get("prepared_geometries")
     admin_codes = poly_index["admin_codes"]
     n_polys = len(geometries)
     for idx in candidates:
@@ -921,10 +933,14 @@ def query_polygon(
         try:
             i = int(idx)
             if 0 <= i < n_polys:
-                geom = geometries[i]
                 code = admin_codes[i]
-                if geom.contains(point):
-                    return code
+                # Use prepared geometry for containment if available
+                if prepared_geoms is not None:
+                    if prepared_geoms[i].contains(point):
+                        return code
+                else:
+                    if geometries[i].contains(point):
+                        return code
                 continue
         except (TypeError, ValueError):
             pass
