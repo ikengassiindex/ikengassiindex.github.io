@@ -152,6 +152,80 @@ def classify_confidence(R_P5, R_P95):
     return "low"
 
 
+def classify_band_normalised(R, R_P5, R_P95):
+    """Classify R_median into 5 bands using per-country P5/P95 normalisation.
+
+    Task #461 (22 July 2026): per-country normalisation for classification bands.
+    The absolute-R cutoffs [0.25, 0.50, 0.75, 1.00] collapse ~80% of substations
+    in Wave 4 countries (spain/italy/portugal/france/germany post R_base fix)
+    into 'High' because the empirical R_median distribution is compressed to
+    [0.42, 0.83] by the additive R6c_flood floor + soft_clip_upper ceiling.
+    The per-substation ranking IS present (Madrid 0.53 < Bilbao 0.61 <
+    Extremadura 0.66) but the band boundary hides it.
+
+    Normalisation: R_norm = clip((R - R_P5) / (R_P95 - R_P5), 0, 1) then
+    apply the existing 5-band cutoffs. This preserves within-country
+    ranking + Convention #56 visibly-honest degradation (R_median stored
+    unchanged for LP-DD auditability; band label semantic shifts from
+    "absolute physical risk threshold" to "within-country risk ranking":
+    Extreme = top ~5%, Critical = next ~20%, High = middle ~30%, Medium =
+    next ~30%, Low = bottom ~15% under the linear normalisation).
+
+    Convention #56 preservation:
+      - R=None → "Unclassified" (unchanged from classify_band())
+      - R_P5=None OR R_P95=None → fallback to classify_band(R) absolute cutoffs
+      - R_P5 == R_P95 (degenerate country, no distribution spread) →
+        fallback to classify_band(R) absolute cutoffs
+    """
+    if R is None:
+        return "Unclassified"
+    if R_P5 is None or R_P95 is None:
+        return classify_band(R)
+    span = R_P95 - R_P5
+    if span <= 0:  # Degenerate — no distribution spread; use absolute
+        return classify_band(R)
+    R_norm = (R - R_P5) / span
+    R_norm = max(0.0, min(1.0, R_norm))
+    return classify_band(R_norm)
+
+
+def apply_country_normalised_bands(substations):
+    """Batch-apply per-country P5/P95 normalisation to classification bands.
+
+    Task #461 (22 July 2026): mutates each substation's `classification`
+    field in-place to reflect within-country ranking rather than absolute-R
+    band. Preserves each sub's `R_median` unchanged (Convention #56 —
+    absolute score stays auditable). Also stores per-country anchors on
+    each substation as `_band_norm_R_P5` + `_band_norm_R_P95` for audit
+    trail.
+
+    Returns tuple (R_P5, R_P95, n_normalised, n_skipped) for the
+    per-country anchors + counts. Callers should also write these anchors
+    into the country's fleet_summary so downstream consumers can
+    reconstruct the normalisation without re-scanning.
+    """
+    scored = [s.get("R_median") for s in substations if s.get("R_median") is not None]
+    if not scored:
+        return (None, None, 0, len(substations))
+    scored_sorted = sorted(scored)
+    R_P5 = _percentile(scored_sorted, 0.05)
+    R_P95 = _percentile(scored_sorted, 0.95)
+    n_norm = 0
+    n_skip = 0
+    for s in substations:
+        R = s.get("R_median")
+        if R is None:
+            s["classification"] = "Unclassified"
+            n_skip += 1
+        else:
+            s["classification"] = classify_band_normalised(R, R_P5, R_P95)
+            # Audit trail per Convention #56
+            s["_band_norm_R_P5"] = round(R_P5, 4)
+            s["_band_norm_R_P95"] = round(R_P95, 4)
+            n_norm += 1
+    return (R_P5, R_P95, n_norm, n_skip)
+
+
 # ═══════════════════════════════════════════════════════════
 #  MODIFIER COMPUTATIONS
 # ═══════════════════════════════════════════════════════════

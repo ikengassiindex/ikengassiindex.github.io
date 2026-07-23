@@ -1319,14 +1319,14 @@ if (!hasNested) {
     // If manifest carries `sharded: true` + `l_shards[]`, fetch shards in parallel
     // and concatenate into virtual `l`. Countries under 90 MB stay single-file.
     async function loadGridGeo() {
-      const manifest = await fetch(basePath + 'grid-geo.json?v=20260722-rbase-fix').then(r => r.json());
+      const manifest = await fetch(basePath + 'grid-geo.json?v=20260722-band-norm').then(r => r.json());
       if (!manifest.sharded || !Array.isArray(manifest.l_shards)) {
         return manifest;  // Single-file case — return as-is
       }
       // Sharded — fetch all shards in parallel
       const shardArrays = await Promise.all(
         manifest.l_shards.map(sh =>
-          fetch(basePath + sh.path + '?v=20260722-rbase-fix').then(r => r.json())
+          fetch(basePath + sh.path + '?v=20260722-band-norm').then(r => r.json())
         )
       );
       // Concatenate into virtual inline `l`
@@ -1339,14 +1339,14 @@ if (!hasNested) {
     // If manifest carries `sharded: true` + `substations_shards[]`, fetch shards in parallel
     // and concatenate into virtual `substations`. Countries under 90 MB stay single-file.
     async function loadSsiData() {
-      const manifest = await fetch(basePath + 'ssi-data.json?v=20260722-rbase-fix').then(r => r.json());
+      const manifest = await fetch(basePath + 'ssi-data.json?v=20260722-band-norm').then(r => r.json());
       if (!manifest.sharded || !Array.isArray(manifest.substations_shards)) {
         return manifest;  // Single-file case — return as-is
       }
       // Sharded — fetch all substations shards in parallel
       const shardArrays = await Promise.all(
         manifest.substations_shards.map(sh =>
-          fetch(basePath + sh.path + '?v=20260722-rbase-fix').then(r => r.json())
+          fetch(basePath + sh.path + '?v=20260722-band-norm').then(r => r.json())
         )
       );
       // Concatenate into virtual inline `substations`
