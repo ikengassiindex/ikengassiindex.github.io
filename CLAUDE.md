@@ -146,6 +146,54 @@ Absolute R_median remains stored and displayed in tooltips + intelligence panels
 - Pre-existing intelligence.html div imbalance (199 `<div>` vs 200 `</div>` in all countries EXCEPT italy 203/203) — small structural housekeeping surfaced during Task #463 verification; non-blocking, tagged for future foundational-doc audit sweep.
 - REPORTS_FRAMING_KB.md §8bis and METHODOLOGY_DISCIPLINES.md addenda for "per-country empirical normalisation of classification bands" as a Discipline candidate — deferred to a subsequent doc-cascade session.
 
+### Phase 2E — Per-substation catchment population via GHSL enrichment (23 July 2026, Task #451)
+
+**Problem this closed.** R2 Grid Equity SSI Variables audit (Task #447) surfaced that `socio_economic.population` — the 5 km catchment population field driving ESRS S2 community-impact disclosure — was being fabricated per substation by `scripts/score-country.py` line 195 via `int(det_var(seed+'pop', ref.get('pop_density',50)*25, 0.40))` — a deterministic-variance synthetic generator using zone-density × 25 as base with ~40% CV noise. Cohort empirical scan pre-fix: 30 countries carried synthetic values, 9 countries had legitimate None. The synthetic values silently propagated through R2 scoring + esg-report frontend + LP-DD-facing summaries — a Convention #56 violation of the exact class targeted by the Wave 4 per-substation interpolation regression parent (Task #450 SYSTEMIC).
+
+**Three-deliverable closure (Steps 4-5b).**
+
+- **Utility.** New `scripts/pipeline/enrichment/catchment_population.py` (~370 LOC) — reads GHSL Population Grid (EC JRC / Copernicus Emergency Management Service, GHS-POP R2023A epoch E2025, ESRI:54009 Mollweide equal-area), reprojects each substation's (lat, lon) to Mollweide, buffers a circular 5 km catchment, sums pixel values via `rasterio.mask` zonal-sum. Convention #56 fallback: buffer outside raster / all-NoData → None (visibly-honest). Convention #79 sharding preserved via `read_ssi_data`/`write_ssi_data`. Per-sub audit trail `_catchment_population_source = "GHSL_POP_R2023A_E2025_v4_2_task_451"`. Consumer-adapter discipline: `DEFAULT_RADIUS_KM=5.0` + `AUDIT_TRAIL_VALUE` locked as module constants. CLI supports single-country + `--all-countries` + `--dry-run` + `--diagnose-only` + `--force-rewrite`.
+
+- **Synthetic generator retirement.** `scripts/score-country.py` line 195 tombstoned per Convention #56 retire-with-tombstone pattern. Prior form (`'population': int(det_var(seed+'pop', ...))`) replaced with `'population': None` + inline comment block documenting: what was retired, why (Convention #56 violation), replacement path (GHSL utility), regression sentinel path. Any future re-introduction of the synthetic call fails the sentinel below at CI-time.
+
+- **Regression sentinel.** New `tests/test_catchment_population_ghsl.py` (~230 LOC, 47 test cases) pins four invariants: (1) STATIC — no live `det_var(seed+'pop', ...)` call in `scripts/score-country.py` (regex on comment-stripped source; tombstones legal, live calls not); (2) UTILITY CONSTANT LOCK — `DEFAULT_RADIUS_KM==5.0` + `AUDIT_TRAIL_VALUE` + `AUDIT_TRAIL_KEY` unchanged; (3) COHORT SoT — `intelligence/countries.json` intact + 39 slugs; (4) COHORT DATA — parametrised across all 39 countries, for every substation with non-None `socio_economic.population`, value is int ∈ [0, 1e9] AND `_catchment_population_source` marker equals the Task #451 canonical value. Convention #79 sharding handled transparently via `read_ssi_data`.
+
+**Empirical outcome.** Cohort-wide apply (Step 4d, 23 Jul 2026):
+
+| Metric | Value |
+|---|---:|
+| Countries enriched | 39 of 39 |
+| Total substations | 796,121 |
+| Real GHSL values written | 794,797 (99.83%) |
+| Convention #56 legitimate None | 1,324 (0.17%) |
+| Synthetic values retired | 57,237 across 20 countries |
+| Cohort wall-clock (apply) | 205 s |
+| Sentinel status | 47/47 GREEN |
+
+Convention #56 fallbacks concentrated in remote/offshore substations: US 781 (Aleutians + Pacific territories), Canada 242 (Arctic), Australia 98 (outback + offshore), Norway 50 (fjords), UK 45 (offshore islands), Germany 41 (offshore wind), Chile 31 (Easter Island + Patagonia), Sweden 11, Mexico 8, France 6, New Zealand 4, Iceland 3, others 4. Synthetic-retired distribution: Norway 5,842 (95.6% of fleet), UK 2,551, Turkey 4,001 (98%), Denmark 2,433, Poland 2,247, Netherlands 1,639, New Zealand 1,558, Slovakia 1,512, Belgium 1,219, Latvia 1,219, Czechia 1,074, Ireland 994, Switzerland 947, Iceland 684, Estonia 614, Greece 556, Lithuania 505, Colombia 378, Costa Rica 169, Slovenia 157, Chile 965, Finland 3,885, Hungary 3,502, Canada 6,399, Mexico 2,436, Israel 257, Luxembourg 89, Korea 1,290, Greenland 37. Wave 4 majors (France, Germany, US, Italy, Spain, Sweden, Portugal, Austria, Japan) had zero synthetic residue — never populated in modern pipeline (socioeconomic.py doesn't emit `population`), consistent with the Task #450 SYSTEMIC parent finding.
+
+**Convention preservation matrix.**
+
+- **#7** Data-Layer Anchoring documented-proxy — GHSL is publisher-cited (EC JRC / Copernicus EMS) + product-versioned (R2023A epoch E2025) + coordinate-system-declared (ESRI:54009 Mollweide) + resolution-declared (30 arc-sec ≈ 1 km). Documented-proxy pattern per Wave 4 R4/R5/R6 institutional-data anchoring precedent.
+- **#56** Visibly-honest degradation — raster-gap substations receive None (not fabricated); score-country.py tombstoned (not silently regenerated); synthetic-generator retirement documented in-source with retire-with-tombstone pattern.
+- **#60** Ikenga IS the ESG provider — GHSL is public institutional publisher (EC JRC / Copernicus), attribution-required open license. Non-commercial by construction.
+- **#79** ssi-data sharding preserved — utility uses `read_ssi_data`/`write_ssi_data`; large countries (france/germany/uk/us/italy) auto-shard on write.
+
+**Authoritative sources for Phase 2E closure.**
+
+- `scripts/pipeline/enrichment/catchment_population.py` — Utility (Task #451 Steps 3-4)
+- `scripts/score-country.py` line 195 tombstone — Task #451 Step 5b
+- `tests/test_catchment_population_ghsl.py` — Regression sentinel (Task #451 Step 5a)
+- `docs/audits/task_451_catchment_population_preflight_20260723.yaml` — Pre-flight audit YAML (Steps 1-2)
+- `esg-sections.js` R2 validity paragraph + data-sources fallback — Frontend narrative (Task #451 Step 5c)
+- Audit reports at `~/catchment_population_audit_2026072*.json` (per-run consolidated)
+
+**Follow-ons flagged for future closure.**
+
+- Task #452 — R2 Defect Class 3, `migration_score` missing for ~20 countries. Same architectural pattern; queued as sibling to Task #451.
+- Task #453 — R2 Defect Class 4, major partial `socio_economic` coverage on Luxembourg (12%) / Slovenia (16%) / Colombia (51%) / Lithuania (50%). Failed spatial joins upstream; requires per-country diagnosis.
+- REPORTS_FRAMING_KB.md §8bis Discipline candidate registration for "GHSL-anchored per-substation demographic enrichment" — Task #451 Step 5e (queued).
+
 ### v4.23 gap-closure forward-reference — substation + line coupling invariant (25 June 2026)
 
 The v4.23 gap-audit (`Report Production/02-v4_23-gap-audit-2026-07/`) identifies 10,260–17,025 additional substations across five countries (Canada, Norway, Mexico, Austria, Greenland) where public regulator sources are not yet in the ingestion chain. Engineering scope: **77-99 engineer-days** including paired transmission-line ingestion. Priority sequencing: Canada Q3 2026 (standalone workstream, 25-32 days); Norway + Mexico Q4 2026 (batched, 28-35 days); Austria + Greenland Q1 2027 (batched with Wave 2 cohort expansion, 21-29 days).

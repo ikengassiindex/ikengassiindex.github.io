@@ -192,7 +192,18 @@ def build_substation(osm_sub, idx, config):
             'V_socio': round(max(0.1, min(0.8, det_var(seed+'vs', ref.get('v_socio',0.35), 0.20))), 2),
             'EP_rate_region': round(det_var(seed+'ep', ref.get('ep_rate',10), 0.12), 1),
             'elderly_pct': round(det_var(seed+'el', ref.get('elderly',15), 0.10), 1),
-            'population': int(det_var(seed+'pop', ref.get('pop_density',50)*25, 0.40)),
+            # Task #451 (23 Jul 2026) — RETIRED synthetic population generator per
+            # Convention #56 visibly-honest degradation. Prior form (do NOT restore):
+            #     'population': int(det_var(seed+'pop', ref.get('pop_density',50)*25, 0.40)),
+            # That line fabricated per-substation population from deterministic-variance
+            # (~40% CV around zone-density × 25) — Convention #56 violation. Real value
+            # now flows from the GHSL Population Grid enrichment utility at
+            # scripts/pipeline/enrichment/catchment_population.py which computes 5 km
+            # catchment sums per substation via Mollweide equal-area projection against
+            # EC JRC / Copernicus GHS-POP R2023A E2025 (Convention #7 documented-proxy;
+            # Convention #60 non-commercial open-license open canonical). Regression
+            # sentinel: tests/test_catchment_population_ghsl.py.
+            'population': None,
             'gdp_per_capita': int(det_var(seed+'gdp', ref.get('gdp_pc',30000), 0.15)),
             'unemployment_rate': round(det_var(seed+'ur', ref.get('unemp',5), 0.15), 1),
             'E2_local': round(det_var(seed+'e2', 1.2, 0.25), 2),
