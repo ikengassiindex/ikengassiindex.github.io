@@ -1,4 +1,4 @@
-"""Task #453 R2 Defect Class 4 — Socio-economic polygon-backfill sentinel
+"""Task #453 + #454 SYSTEMIC — Socio-economic polygon-backfill sentinel
 
 Regression sentinel closing R2 Grid Equity Defect Class 4. Before Task #453:
 `socio_economic.{gdp_per_capita, unemployment_rate, EP_rate_region,
@@ -9,10 +9,24 @@ v43 subs (added via Wave 2/3 OSM Overpass ingestion) landed with
 `socioeconomic.py::overlay_socioeconomic()` uses `province` as CSV join
 key — empty join key = no match = all 6-8 socio_economic fields empty.
 
-Task #453 replaced this via polygon spatial-join against Eurostat GISCO
-NUTS-3 2024 (LU/SI/LT) + GADM 4.1 (Colombia — documented-proxy fallback
-after DANE geoportal empirically requires form-based download). See
-Phase 2G addendum in ikengassiindex.github.io/CLAUDE.md, REPORTS_FRAMING_KB
+Task #453 (23 Jul 2026) replaced this via polygon spatial-join against
+Eurostat GISCO NUTS-3 2024 (LU/SI/LT) + GADM 4.1 (Colombia — documented-proxy
+fallback after DANE geoportal empirically requires form-based download).
+
+Task #454 SYSTEMIC (24 Jul 2026) extended the cohort to 11 additional
+countries (BE/CZ/DK/EE/FI/IE/LV/NL/PL via Eurostat GISCO NUTS-3;
+CH/CA via GADM 4.1) covering ~52,107 v43 subs — 15-country cohort total.
+Task #454 also refined the utility's skip-logic (3-case decision tree):
+(a) fully populated → idempotent no-op; (b) province set but socio_economic
+gap (Canada case) → bypass polygon join + CSV lookup on existing province;
+(c) not populated → polygon spatial-join (existing behavior).
+
+Empirical Task #454 outcome: 59,041/59,077 v43 subs enriched (99.94%);
+65 Convention #56 fallback (0.11%); 100% Task #451/#452 marker preservation
+across 15-country cohort. Convention #78 §5septies OSM-tag-density
+discipline empirical instance count: 5 → 16 (11 new instances).
+
+See Phase 2H addendum in ikengassiindex.github.io/CLAUDE.md, REPORTS_FRAMING_KB
 §8bis Discipline #47 EXTENSION, and METHODOLOGY_DISCIPLINES.md §5septies
 (empirical OSM tag density is per-country) for full architectural context.
 
@@ -93,7 +107,17 @@ TASK_452_MARKER = "_migration_score_source"
 
 # Task #453 target countries (all 4 need polygon spatial-join per
 # empirical OSM tag-density dead-end 23 Jul 2026)
-TARGET_COUNTRIES = ("luxembourg", "slovenia", "lithuania", "colombia")
+TASK_453_COUNTRIES = ("luxembourg", "slovenia", "lithuania", "colombia")
+
+# Task #454 SYSTEMIC cohort extension (11 new countries 24 Jul 2026)
+TASK_454_COUNTRIES = (
+    "belgium", "czechia", "denmark", "estonia", "finland",
+    "ireland", "latvia", "netherlands", "poland",
+    "switzerland", "canada",
+)
+
+# Full 15-country target cohort (Task #453 + Task #454)
+TARGET_COUNTRIES = TASK_453_COUNTRIES + TASK_454_COUNTRIES
 
 # Expected admin code sets for cohort data invariant
 EXPECTED_ADMIN_CODES = {
@@ -111,9 +135,6 @@ EXPECTED_ADMIN_CODES = {
         "LT025", "LT026", "LT027", "LT028", "LT029",
     }),
     # Colombia — 33 DANE-canonical department names (via GADM alias-mapped).
-    # Note: 5 remote departments (Amazonas, Guainía, Vaupés, Vichada,
-    # San Andrés y Providencia) may have zero v43 subs — expected per
-    # empirical cohort apply 23 Jul 2026 (28/33 codes actually seen).
     "colombia": frozenset({
         "Amazonas", "Antioquia", "Arauca", "Atlántico", "Bogotá D.C.",
         "Bolívar", "Boyacá", "Caldas", "Caquetá", "Casanare",
@@ -122,6 +143,84 @@ EXPECTED_ADMIN_CODES = {
         "Meta", "Nariño", "Norte de Santander", "Putumayo", "Quindío",
         "Risaralda", "San Andrés y Providencia", "Santander", "Sucre",
         "Tolima", "Valle del Cauca", "Vaupés", "Vichada",
+    }),
+    # ─── Task #454 SYSTEMIC cohort (11 new countries 24 Jul 2026) ───
+    "belgium": frozenset({
+        "BE100", "BE211", "BE212", "BE213", "BE223", "BE224", "BE225",
+        "BE231", "BE232", "BE233", "BE234", "BE235", "BE236", "BE241",
+        "BE242", "BE251", "BE252", "BE253", "BE254", "BE255", "BE256",
+        "BE257", "BE258", "BE310", "BE323", "BE328", "BE329", "BE32A",
+        "BE32B", "BE32C", "BE32D", "BE331", "BE332", "BE334", "BE335",
+        "BE336", "BE341", "BE342", "BE343", "BE344", "BE345", "BE351",
+        "BE352", "BE353",
+    }),
+    "czechia": frozenset({
+        "CZ010", "CZ020", "CZ031", "CZ032", "CZ041", "CZ042",
+        "CZ051", "CZ052", "CZ053", "CZ063", "CZ064", "CZ071",
+        "CZ072", "CZ080",
+    }),
+    "denmark": frozenset({
+        "DK011", "DK012", "DK013", "DK014", "DK021", "DK022",
+        "DK031", "DK032", "DK041", "DK042", "DK050",
+    }),
+    "estonia": frozenset({
+        "EE001", "EE004", "EE008", "EE009", "EE00A",
+    }),
+    "finland": frozenset({
+        "FI196", "FI198", "FI199", "FI19A", "FI19B", "FI1B1",
+        "FI1C1", "FI1C2", "FI1C5", "FI1C6", "FI1C7", "FI1D5",
+        "FI1D7", "FI1D8", "FI1D9", "FI1DA", "FI1DB", "FI1DC",
+        "FI200",
+    }),
+    "ireland": frozenset({
+        "IE041", "IE042", "IE051", "IE052", "IE053",
+        "IE061", "IE062", "IE063",
+    }),
+    "latvia": frozenset({
+        "LV005", "LV009", "LV00A", "LV00B", "LV00C",
+    }),
+    "netherlands": frozenset({
+        "NL112", "NL114", "NL115", "NL126", "NL127", "NL128",
+        "NL131", "NL132", "NL133", "NL211", "NL212", "NL213",
+        "NL221", "NL224", "NL225", "NL226", "NL230", "NL321",
+        "NL323", "NL325", "NL327", "NL328", "NL32A", "NL32B",
+        "NL341", "NL342", "NL350", "NL361", "NL362", "NL363",
+        "NL364", "NL365", "NL366", "NL411", "NL414", "NL415",
+        "NL416", "NL421", "NL422", "NL423",
+    }),
+    "poland": frozenset({
+        "PL213", "PL214", "PL217", "PL218", "PL219", "PL21A",
+        "PL224", "PL225", "PL227", "PL228", "PL229", "PL22A",
+        "PL22B", "PL22C", "PL411", "PL414", "PL415", "PL416",
+        "PL417", "PL418", "PL424", "PL426", "PL427", "PL428",
+        "PL431", "PL432", "PL514", "PL515", "PL516", "PL517",
+        "PL518", "PL523", "PL524", "PL613", "PL616", "PL617",
+        "PL618", "PL619", "PL621", "PL622", "PL623", "PL633",
+        "PL634", "PL636", "PL637", "PL638", "PL711", "PL712",
+        "PL713", "PL714", "PL715", "PL721", "PL722", "PL811",
+        "PL812", "PL814", "PL815", "PL821", "PL822", "PL823",
+        "PL824", "PL841", "PL842", "PL843", "PL911", "PL912",
+        "PL913", "PL921", "PL922", "PL923", "PL924", "PL925",
+        "PL926",
+    }),
+    # Switzerland — 26 CSV cantons (agency uses local German/French usage).
+    # GADM aliases (Lucerne / Sankt Gallen) are input mappings; canonical
+    # values stored in ssi-data.json come from the CSV via alias resolution.
+    "switzerland": frozenset({
+        "Aargau", "Appenzell Ausserrhoden", "Appenzell Innerrhoden",
+        "Basel-Landschaft", "Basel-Stadt", "Bern", "Fribourg", "Genève",
+        "Glarus", "Graubünden", "Jura", "Luzern", "Neuchâtel",
+        "Nidwalden", "Obwalden", "Schaffhausen", "Schwyz", "Solothurn",
+        "St. Gallen", "Thurgau", "Ticino", "Uri", "Valais", "Vaud",
+        "Zug", "Zürich",
+    }),
+    # Canada — 13 CSV provinces/territories (English names match GADM).
+    # Note: Case-b bypass path — existing province used as CSV key directly.
+    "canada": frozenset({
+        "Alberta", "British Columbia", "Manitoba", "New Brunswick",
+        "Newfoundland and Labrador", "Northwest Territories",
+        "Nova Scotia", "Nunavut", "Ontario", "Prince Edward Island",
+        "Québec", "Saskatchewan", "Yukon",
     }),
 }
 
@@ -193,14 +292,36 @@ class TestUtilityConstantLock:
             f"per merge-not-replace BINDING contract."
         )
 
-    def test_polygon_country_configs_locked_to_4_countries(self):
+    def test_polygon_country_configs_locked_to_15_countries(self):
         from pipeline.enrichment import socio_economic_backfill as sb
         assert set(sb.POLYGON_COUNTRY_CONFIGS.keys()) == set(TARGET_COUNTRIES), (
-            f"POLYGON_COUNTRY_CONFIGS drift: expected {TARGET_COUNTRIES}, "
-            f"got {tuple(sb.POLYGON_COUNTRY_CONFIGS.keys())}. Task #453 target "
-            f"cohort is 4 countries by design; Task #454 SYSTEMIC extension "
-            f"would add ~21 more but is a separate workstream."
+            f"POLYGON_COUNTRY_CONFIGS drift: expected {sorted(TARGET_COUNTRIES)}, "
+            f"got {sorted(sb.POLYGON_COUNTRY_CONFIGS.keys())}. Task #453 target "
+            f"cohort was 4 countries (LU/SI/LT/CO); Task #454 SYSTEMIC (24 Jul 2026) "
+            f"extended to 11 more countries (BE/CZ/DK/EE/FI/IE/LV/NL/PL via Eurostat "
+            f"GISCO NUTS-3; CH/CA via GADM 4.1). Adding a 16th country requires "
+            f"POLYGON_COUNTRY_CONFIGS extension + EXPECTED_ADMIN_CODES + this test update."
         )
+
+    def test_task_454_countries_reuse_task_453_utility_architecture(self):
+        """Task #454 SYSTEMIC MUST reuse Task #453 utility unchanged.
+        All 11 new countries share the same POLYGON_COUNTRY_CONFIGS schema
+        + AUDIT_TRAIL_VALUE_POLYGON marker. Task #454 did NOT introduce a
+        new utility or a new audit marker — extension is config-only.
+        """
+        from pipeline.enrichment import socio_economic_backfill as sb
+        for slug in TASK_454_COUNTRIES:
+            assert slug in sb.POLYGON_COUNTRY_CONFIGS, (
+                f"Task #454 country '{slug}' missing from POLYGON_COUNTRY_CONFIGS"
+            )
+            cfg = sb.POLYGON_COUNTRY_CONFIGS[slug]
+            # Required config keys (schema shared with Task #453 4-country cohort)
+            for req_key in ("polygon_path", "polygon_admin_column",
+                            "csv_relpath", "csv_lookup_column",
+                            "sub_id_prefix_pattern"):
+                assert req_key in cfg, (
+                    f"Task #454 config '{slug}' missing required key '{req_key}'"
+                )
 
 
 # ═══════════════════════════════════════════════════════════
@@ -460,20 +581,27 @@ class TestConvention56Fallback:
 
 
 # ═══════════════════════════════════════════════════════════
-#  ~44-CASE SANITY CHECK
+#  ~155-CASE SANITY CHECK (Task #453 45 + Task #454 110)
 # ═══════════════════════════════════════════════════════════
 
 def test_sentinel_case_count_matches_preflight_yaml():
     """Verify sentinel_matrix specification in preflight YAML is honoured:
-    5 test classes × total ~44 cases (parametrised across 4-country cohort)."""
-    # This test doesn't do much beyond documenting expected shape.
-    # Actual case count comes from pytest collection under the 5 classes.
+    5 test classes × total ~155 cases (parametrised across 15-country cohort).
+
+    Task #453 (23 Jul 2026) baseline: 45 cases across 4-country cohort.
+    Task #454 SYSTEMIC (24 Jul 2026): +110 cases via 11-country extension
+      (4 MergeNotReplace parametrise + 3 CohortData parametrise
+       + 1 Convention56Fallback parametrise = 8 × 11 new countries + 2
+       new tests for Task #454 architecture reuse).
+    """
     expected_classes = {
-        "TestUtilityConstantLock",       # 4 cases
-        "TestMergeNotReplace",           # 16 cases (4 × 4)
-        "TestCohortData",                # 12 cases (4 × 3)
-        "TestVSocioFormulaLock",         # 8 cases
-        "TestConvention56Fallback",      # 4 cases
+        "TestUtilityConstantLock",       # 6 cases (was 4, +2 Task #454 arch reuse)
+        "TestMergeNotReplace",           # 60 cases (15 × 4)
+        "TestCohortData",                # 45 cases (15 × 3)
+        "TestVSocioFormulaLock",         # 8 cases (unchanged — formula lock)
+        "TestConvention56Fallback",      # 15 cases (15 × 1)
     }
-    # Cross-reference: preflight YAML sentinel_matrix section 8.
+    # Cross-reference: preflight YAMLs
+    #   docs/audits/task_453_polygon_backfill_preflight_20260723.yaml
+    #   docs/audits/task_454_systemic_cohort_extension_preflight_20260724.yaml
     assert len(expected_classes) == 5

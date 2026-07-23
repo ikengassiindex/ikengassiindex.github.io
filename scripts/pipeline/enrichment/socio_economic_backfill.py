@@ -2,6 +2,7 @@
 """socio_economic_backfill.py — R2 Grid Equity Defect Class 4 closure
 
 Task #453 (23 July 2026) — Path A-connector implementation.
+Task #454 SYSTEMIC (24 July 2026) — cohort-wide extension (+11 countries).
 
 Retroactively backfills `socio_economic` fields on v43 OSM Overpass-added
 substations that were left with `province: None` by the ingestion pipeline.
@@ -245,6 +246,181 @@ POLYGON_COUNTRY_CONFIGS = {
         },
         "sub_id_prefix_pattern": "CO_v43_",
         "expected_admin_codes": None,   # 33 departamentos incl. Bogotá D.C.
+    },
+    # ═════════════════════════════════════════════════════════════════════
+    # Task #454 SYSTEMIC cohort (24 Jul 2026) — 11 additional countries
+    # reusing Task #453 polygon utility template. 9 EU via Eurostat GISCO
+    # NUTS-3 (single shapefile already downloaded for Task #453) + 2 non-EU
+    # via GADM 4.1 (per Task #453 Colombia precedent, ~20MB each download).
+    # ═════════════════════════════════════════════════════════════════════
+    "belgium": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "BE"},
+        "polygon_admin_column": "NUTS_ID",   # emits BE100..BE353 (44 codes)
+        "csv_relpath": "scripts/pipeline/data/belgium/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "BE_v43_",
+        "expected_admin_codes": [
+            "BE100", "BE211", "BE212", "BE213", "BE223", "BE224", "BE225",
+            "BE231", "BE232", "BE233", "BE234", "BE235", "BE236", "BE241",
+            "BE242", "BE251", "BE252", "BE253", "BE254", "BE255", "BE256",
+            "BE257", "BE258", "BE310", "BE323", "BE328", "BE329", "BE32A",
+            "BE32B", "BE32C", "BE32D", "BE331", "BE332", "BE334", "BE335",
+            "BE336", "BE341", "BE342", "BE343", "BE344", "BE345", "BE351",
+            "BE352", "BE353",
+        ],
+    },
+    "czechia": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "CZ"},
+        "polygon_admin_column": "NUTS_ID",   # emits CZ010..CZ080 (14 codes)
+        "csv_relpath": "scripts/pipeline/data/czechia/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "CZ_v43_",
+        "expected_admin_codes": [
+            "CZ010", "CZ020", "CZ031", "CZ032", "CZ041", "CZ042",
+            "CZ051", "CZ052", "CZ053", "CZ063", "CZ064", "CZ071",
+            "CZ072", "CZ080",
+        ],
+    },
+    "denmark": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "DK"},
+        "polygon_admin_column": "NUTS_ID",   # emits DK011..DK050 (11 codes)
+        "csv_relpath": "scripts/pipeline/data/denmark/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "DK_v43_",
+        "expected_admin_codes": [
+            "DK011", "DK012", "DK013", "DK014", "DK021", "DK022",
+            "DK031", "DK032", "DK041", "DK042", "DK050",
+        ],
+    },
+    "estonia": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "EE"},
+        "polygon_admin_column": "NUTS_ID",   # emits EE001..EE00A (5 codes)
+        "csv_relpath": "scripts/pipeline/data/estonia/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "EE_v43_",
+        "expected_admin_codes": [
+            "EE001", "EE004", "EE008", "EE009", "EE00A",
+        ],
+    },
+    "finland": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "FI"},
+        "polygon_admin_column": "NUTS_ID",   # emits FI196..FI200 (19 codes)
+        "csv_relpath": "scripts/pipeline/data/finland/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "FI_v43_",
+        "expected_admin_codes": [
+            "FI196", "FI198", "FI199", "FI19A", "FI19B", "FI1B1",
+            "FI1C1", "FI1C2", "FI1C5", "FI1C6", "FI1C7", "FI1D5",
+            "FI1D7", "FI1D8", "FI1D9", "FI1DA", "FI1DB", "FI1DC",
+            "FI200",
+        ],
+    },
+    "ireland": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "IE"},
+        "polygon_admin_column": "NUTS_ID",   # emits IE041..IE063 (8 codes)
+        "csv_relpath": "scripts/pipeline/data/ireland/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "IE_v43_",
+        "expected_admin_codes": [
+            "IE041", "IE042", "IE051", "IE052", "IE053",
+            "IE061", "IE062", "IE063",
+        ],
+    },
+    "latvia": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "LV"},
+        "polygon_admin_column": "NUTS_ID",   # emits LV005..LV00C (5 codes)
+        "csv_relpath": "scripts/pipeline/data/latvia/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "LV_v43_",
+        "expected_admin_codes": [
+            "LV005", "LV009", "LV00A", "LV00B", "LV00C",
+        ],
+    },
+    "netherlands": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "NL"},
+        "polygon_admin_column": "NUTS_ID",   # emits NL112..NL423 (40 codes)
+        "csv_relpath": "scripts/pipeline/data/netherlands/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "NL_v43_",
+        "expected_admin_codes": [
+            "NL112", "NL114", "NL115", "NL126", "NL127", "NL128",
+            "NL131", "NL132", "NL133", "NL211", "NL212", "NL213",
+            "NL221", "NL224", "NL225", "NL226", "NL230", "NL321",
+            "NL323", "NL325", "NL327", "NL328", "NL32A", "NL32B",
+            "NL341", "NL342", "NL350", "NL361", "NL362", "NL363",
+            "NL364", "NL365", "NL366", "NL411", "NL414", "NL415",
+            "NL416", "NL421", "NL422", "NL423",
+        ],
+    },
+    "poland": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "PL"},
+        "polygon_admin_column": "NUTS_ID",   # emits PL213..PL926 (73 codes)
+        "csv_relpath": "scripts/pipeline/data/poland/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "PL_v43_",
+        "expected_admin_codes": [
+            "PL213", "PL214", "PL217", "PL218", "PL219", "PL21A",
+            "PL224", "PL225", "PL227", "PL228", "PL229", "PL22A",
+            "PL22B", "PL22C", "PL411", "PL414", "PL415", "PL416",
+            "PL417", "PL418", "PL424", "PL426", "PL427", "PL428",
+            "PL431", "PL432", "PL514", "PL515", "PL516", "PL517",
+            "PL518", "PL523", "PL524", "PL613", "PL616", "PL617",
+            "PL618", "PL619", "PL621", "PL622", "PL623", "PL633",
+            "PL634", "PL636", "PL637", "PL638", "PL711", "PL712",
+            "PL713", "PL714", "PL715", "PL721", "PL722", "PL811",
+            "PL812", "PL814", "PL815", "PL821", "PL822", "PL823",
+            "PL824", "PL841", "PL842", "PL843", "PL911", "PL912",
+            "PL913", "PL921", "PL922", "PL923", "PL924", "PL925",
+            "PL926",
+        ],
+    },
+    # ── Non-EU (GADM 4.1 documented-proxy per Task #453 Colombia precedent) ──
+    "switzerland": {
+        # GADM 4.1 admin1 = 26 cantons. Non-EEA member; CSV canton names in
+        # German/French/Italian per Swiss federal usage. Aliases populated
+        # empirically 24 Jul 2026 after cohort apply surfaced 67 unmatched
+        # subs (16 in Luzern area, 44 in St. Gallen area, 7 border spillovers):
+        # GADM emits English/French forms for Luzern + St. Gallen.
+        "polygon_path": "~/gadm41_CHE_shp/gadm41_CHE_1.shp",
+        "polygon_filter": {},
+        "polygon_admin_column": "NAME_1",
+        "polygon_admin_normalise": False,
+        "csv_relpath": "scripts/pipeline/data/switzerland/agency_regional_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "csv_lookup_aliases": {
+            # GADM English/French → CSV German canton name (agency uses local usage)
+            "Lucerne": "Luzern",              # GADM English/French form
+            "Luzerne": "Luzern",              # possible alt spelling
+            "Sankt Gallen": "St. Gallen",     # GADM full German form (Sankt)
+            "Saint Gallen": "St. Gallen",     # GADM English form
+            "St Gallen": "St. Gallen",        # possible alt (no period)
+        },
+        "sub_id_prefix_pattern": "CH_v43_",
+        "expected_admin_codes": None,   # 26 cantons validated at pilot time
+    },
+    "canada": {
+        # GADM 4.1 admin1 = 13 provinces + territories. CSV uses province
+        # NAME (Newfoundland and Labrador, Northwest Territories, etc.) —
+        # aliases populate empirically. Convention #7 documented-proxy
+        # anchor: GADM cite is stable/vintage-locked for LP-DD defensibility.
+        "polygon_path": "~/gadm41_CAN_shp/gadm41_CAN_1.shp",
+        "polygon_filter": {},
+        "polygon_admin_column": "NAME_1",
+        "polygon_admin_normalise": False,
+        "csv_relpath": "scripts/pipeline/data/canada/agency_regional_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "csv_lookup_aliases": {},  # populate as pilot surfaces mismatches
+        "sub_id_prefix_pattern": "CA_v43_",
+        "expected_admin_codes": None,   # 13 provinces validated at pilot time
     },
 }
 
@@ -670,28 +846,48 @@ def enrich_country_from_polygon(
             continue
         n_v43 += 1
 
-        # If province is already populated (from prior run), skip
-        if sub.get("province"):
+        # Skip logic — refined 24 Jul 2026 per Task #454 Canada surface:
+        # (a) FULLY POPULATED (Task #453 idempotent no-op): province AND
+        #     gdp_per_capita both set → skip (preserves LU/SI/LT/CO idempotency)
+        # (b) PARTIALLY POPULATED (Task #454 Canada case): province set BUT
+        #     gdp_per_capita None → bypass polygon join, use existing province
+        #     as CSV lookup key (Canada v43 subs already carry valid province
+        #     names matching CSV; polygon join would be redundant)
+        # (c) NOT POPULATED (Task #453 EU/CO + Task #454 EU case): province None
+        #     → run polygon spatial-join to derive it (existing logic)
+        existing_province = sub.get("province")
+        existing_se = sub.get("socio_economic") or {}
+        existing_gdp_populated = existing_se.get("gdp_per_capita") is not None
+
+        if existing_province and existing_gdp_populated:
+            # Case (a): idempotent no-op
             n_already_populated += 1
             continue
 
-        # ── point-in-polygon query ────────────────────────────────────
-        lat = sub.get("lat") or sub.get("latitude")
-        lon = sub.get("lon") or sub.get("longitude")
-        if lat is None or lon is None:
-            n_missing_coords += 1
-            continue
+        code: Optional[str] = None
 
-        try:
-            code = query_polygon(float(lat), float(lon), poly_index)
-        except (ValueError, TypeError):
-            n_missing_coords += 1
-            continue
+        if existing_province and not existing_gdp_populated:
+            # Case (b): use existing province, bypass polygon join
+            code = str(existing_province).strip()
+        else:
+            # Case (c): derive province via polygon spatial-join
+            # ── point-in-polygon query ────────────────────────────────────
+            lat = sub.get("lat") or sub.get("latitude")
+            lon = sub.get("lon") or sub.get("longitude")
+            if lat is None or lon is None:
+                n_missing_coords += 1
+                continue
 
-        if code is None:
-            # Convention #56 visibly-honest degradation: outside all polygons
-            n_outside_polygons += 1
-            continue
+            try:
+                code = query_polygon(float(lat), float(lon), poly_index)
+            except (ValueError, TypeError):
+                n_missing_coords += 1
+                continue
+
+            if code is None:
+                # Convention #56 visibly-honest degradation: outside all polygons
+                n_outside_polygons += 1
+                continue
 
         # ── CSV lookup ─────────────────────────────────────────────────
         row = csv_lookup.get(code)
