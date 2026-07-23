@@ -325,23 +325,79 @@ def print_report(report: dict) -> None:
     print()
 
 
+WAVE4_COHORT = [
+    "uk", "sweden", "portugal", "italy", "japan",
+    "spain", "france", "germany", "us",
+]
+
+
+def _run_single(country_slug: str) -> Optional[dict]:
+    try:
+        return audit_country(country_slug)
+    except FileNotFoundError as e:
+        print(f"[{country_slug}] SKIP: {e}", file=sys.stderr)
+        return None
+    except Exception as e:  # noqa: BLE001
+        print(f"[{country_slug}] ERROR: {e}", file=sys.stderr)
+        return None
+
+
+def _print_cohort_summary(reports: List[dict]) -> None:
+    print()
+    print("═" * 80)
+    print("  WAVE 4 COHORT CROSS-BORDER POLLUTION AUDIT — SUMMARY")
+    print("═" * 80)
+    header = f"  {'Country':<12} {'Total':>8} {'Inside':>8} {'Outside':>8} {'Pct-out':>8}  Top-3 clusters"
+    print(header)
+    print("  " + "─" * 78)
+    for r in sorted(reports, key=lambda x: -x["out_of_polygon_pct"]):
+        top_3 = list(r["cluster_distribution"].items())[:3]
+        top_3_str = " · ".join(f"{lbl.split('(')[0].strip()[:14]}={cnt}" for lbl, cnt in top_3)
+        print(f"  {r['country_slug']:<12} "
+              f"{r['n_substations_total']:>8,} "
+              f"{r['n_inside_polygon']:>8,} "
+              f"{r['n_outside_polygon']:>8,} "
+              f"{r['out_of_polygon_pct']:>7}%  {top_3_str}")
+    print("═" * 80)
+
+
 def main():
     if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <country_slug>")
+        print(f"Usage: {sys.argv[0]} <country_slug|--all-wave4|--all>")
         print(f"       Available: {', '.join(sorted(NEIGHBOR_BBOXES.keys()))}")
+        print(f"       --all-wave4: batch-audit {', '.join(WAVE4_COHORT)}")
+        print(f"       --all: batch-audit every country configured in NEIGHBOR_BBOXES")
         sys.exit(1)
 
-    country_slug = sys.argv[1].lower()
+    arg = sys.argv[1].lower()
 
-    try:
-        report = audit_country(country_slug)
-    except FileNotFoundError as e:
-        print(f"ERROR: {e}", file=sys.stderr)
+    # ─── Batch mode ────────────────────────────────────────────────────
+    if arg in ("--all-wave4", "--all"):
+        cohort = WAVE4_COHORT if arg == "--all-wave4" else sorted(NEIGHBOR_BBOXES.keys())
+        reports = []
+        for country_slug in cohort:
+            print()
+            r = _run_single(country_slug)
+            if r is not None:
+                print_report(r)
+                reports.append(r)
+                out_path = Path.home() / (
+                    f"out_of_polygon_audit_{country_slug}_"
+                    f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
+                )
+                with open(out_path, "w") as f:
+                    json.dump(r, f, indent=2)
+        _print_cohort_summary(reports)
+        return
+
+    # ─── Single-country mode (legacy) ──────────────────────────────────
+    country_slug = arg
+    report = _run_single(country_slug)
+    if report is None:
         sys.exit(2)
 
     print_report(report)
 
-    # Write consolidated audit report
     out_path = Path.home() / (
         f"out_of_polygon_audit_{country_slug}_"
         f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
