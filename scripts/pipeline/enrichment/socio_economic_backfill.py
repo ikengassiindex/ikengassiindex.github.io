@@ -422,6 +422,97 @@ POLYGON_COUNTRY_CONFIGS = {
         "sub_id_prefix_pattern": "CA_v43_",
         "expected_admin_codes": None,   # 13 provinces validated at pilot time
     },
+    # ═════════════════════════════════════════════════════════════════════
+    # Task #501 — V_socio semantic-scale bridge (Wave 4 majors, 24 Jul 2026)
+    # Empirical scope: 8 Wave 4 majors with fleet-uniform national-scalar
+    # V_socio signature (FR 195,569 subs @ 0.1867 · DE 187,714 @ 0.1867 ·
+    # US 101,594 @ 0.180 · IT 51,910 @ 0.7275 · ES 30,222 @ 0.3993 ·
+    # PT 13,977 @ 0.4737 · SE 11,399 @ 0.1867 · JP 7,073 @ 0.6233) =
+    # 199,458 substations total. Case-c triggers (province=None, gdp
+    # populated at national scalar); utility polygon-joins to derive
+    # NUTS-3 code + overwrites fleet-uniform V_socio with per-region
+    # value computed from CSV lookup. Italy BLOCKED — missing ISTAT
+    # NUTS-3 CSV (analogous to Greece Task #454b block).
+    # 5 EU countries reuse Eurostat GISCO NUTS-3 2024 shapefile;
+    # 2 non-EU (US + JP) use GADM 4.1 admin1.
+    # ═════════════════════════════════════════════════════════════════════
+    "france": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "FR"},
+        "polygon_admin_column": "NUTS_ID",   # emits FR101..FRY50 (101 codes, incl. DOM/COM)
+        "csv_relpath": "scripts/pipeline/data/france/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "FR_v43_",
+        "expected_admin_codes": None,   # 101 NUTS-3 codes validated at pilot time
+    },
+    "germany": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "DE"},
+        "polygon_admin_column": "NUTS_ID",   # emits DE111..DEG0N (400 codes; largest cohort-wide)
+        "csv_relpath": "scripts/pipeline/data/germany/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "DE_v43_",
+        "expected_admin_codes": None,   # 400 NUTS-3 codes validated at pilot time
+    },
+    "spain": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "ES"},
+        "polygon_admin_column": "NUTS_ID",   # emits ES111..ES709 (59 codes incl. Canarias)
+        "csv_relpath": "scripts/pipeline/data/spain/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "ES_v43_",
+        "expected_admin_codes": None,   # 59 NUTS-3 codes validated at pilot time
+    },
+    "portugal": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "PT"},
+        "polygon_admin_column": "NUTS_ID",   # emits PT111..PT300 (26 codes incl. Açores + Madeira)
+        "csv_relpath": "scripts/pipeline/data/portugal/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "PT_v43_",
+        "expected_admin_codes": None,   # 26 NUTS-3 codes validated at pilot time
+    },
+    "sweden": {
+        "polygon_path": "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp",
+        "polygon_filter": {"LEVL_CODE": 3, "CNTR_CODE": "SE"},
+        "polygon_admin_column": "NUTS_ID",   # emits SE110..SE332 (21 codes)
+        "csv_relpath": "scripts/pipeline/data/sweden/eurostat_nuts3_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "sub_id_prefix_pattern": "SE_v43_",
+        "expected_admin_codes": None,   # 21 NUTS-3 codes validated at pilot time
+    },
+    "us": {
+        # GADM 4.1 admin1 = 50 states + DC + territories. CSV agency source
+        # uses state names as province column. GADM NAME_1 emits English
+        # state names directly. Convention #7 documented-proxy anchor.
+        "polygon_path": "~/gadm41_USA_shp/gadm41_USA_1.shp",
+        "polygon_filter": {},
+        "polygon_admin_column": "NAME_1",
+        "polygon_admin_normalise": False,
+        "csv_relpath": "scripts/pipeline/data/us/agency_regional_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "csv_lookup_aliases": {},  # populate as pilot surfaces mismatches
+        "sub_id_prefix_pattern": "US_v43_",
+        "expected_admin_codes": None,   # 50 states + DC validated at pilot time
+    },
+    "japan": {
+        # GADM 4.1 admin1 = 47 prefectures. CSV agency source uses
+        # romanized prefecture names (Aichi, Akita, Aomori, ...).
+        # GADM NAME_1 emits English romanization directly.
+        "polygon_path": "~/gadm41_JPN_shp/gadm41_JPN_1.shp",
+        "polygon_filter": {},
+        "polygon_admin_column": "NAME_1",
+        "polygon_admin_normalise": False,
+        "csv_relpath": "scripts/pipeline/data/japan/agency_regional_socioeconomic.csv",
+        "csv_lookup_column": "province",
+        "csv_lookup_aliases": {},  # populate as pilot surfaces mismatches
+        "sub_id_prefix_pattern": "JP_v43_",
+        "expected_admin_codes": None,   # 47 prefectures validated at pilot time
+    },
+    # Italy BLOCKED — missing scripts/pipeline/data/italy/eurostat_nuts3_socioeconomic.csv
+    # AND scripts/pipeline/data/italy/agency_regional_socioeconomic.csv. Requires operator-
+    # sourced ISTAT NUTS-3 data scaffolding (110 provinces / 21 regions IT111..ITH1). Once
+    # CSV lands, add italy entry mirroring france/germany/spain pattern.
 }
 
 

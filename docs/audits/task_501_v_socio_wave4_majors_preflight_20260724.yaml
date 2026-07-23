@@ -1,0 +1,235 @@
+# Task #501 — V_socio semantic-scale bridge (Wave 4 majors polygon backfill)
+# Preflight audit YAML — Convention #7 documented-proxy anchors + Gate A operator sign-off
+
+task_id: 501
+task_family: SYSTEMIC
+task_title: "V_socio semantic-scale bridge (Wave 4 majors polygon backfill)"
+parent_workstream: "R2 Grid Equity Task #450 SYSTEMIC follow-on"
+date_created: 2026-07-24
+date_scope_locked: 2026-07-24
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  EMPIRICAL SCOPE
+# ═══════════════════════════════════════════════════════════════════════════
+
+empirical_scope:
+  drift_class: "fleet_uniform_national_scalar_v_socio"
+  drift_signature: "N_UNIQUE == 1 AND N_POPULATED > 100 (per Task #452 detection helper)"
+  envelope_check: "PASS — all values in [0, 1] (distinct from Task #450 migration_score class)"
+
+  wave4_majors_affected:
+    - slug: france
+      n_subs: 195569
+      fleet_uniform_v_socio: 0.1867
+      csv_source: eurostat_nuts3
+      polygon_source: eurostat_gisco_nuts3_2024
+      nuts3_codes: 101
+    - slug: germany
+      n_subs: 187714
+      fleet_uniform_v_socio: 0.1867
+      csv_source: eurostat_nuts3
+      polygon_source: eurostat_gisco_nuts3_2024
+      nuts3_codes: 400
+      note: "LARGEST cohort-wide by NUTS-3 code count"
+    - slug: us
+      n_subs: 101594
+      fleet_uniform_v_socio: 0.1800
+      csv_source: agency_regional
+      polygon_source: gadm41_admin1
+      admin1_codes: 52
+      note: "50 states + DC + Puerto Rico"
+    - slug: italy
+      n_subs: 51910
+      fleet_uniform_v_socio: 0.7275
+      csv_source: MISSING_BLOCKER
+      polygon_source: n/a
+      status: BLOCKED
+      blocker: "operator-sourced ISTAT NUTS-3 CSV required (analogous to Task #454b Greece block)"
+    - slug: spain
+      n_subs: 30222
+      fleet_uniform_v_socio: 0.3993
+      csv_source: eurostat_nuts3
+      polygon_source: eurostat_gisco_nuts3_2024
+      nuts3_codes: 59
+    - slug: portugal
+      n_subs: 13977
+      fleet_uniform_v_socio: 0.4737
+      csv_source: eurostat_nuts3
+      polygon_source: eurostat_gisco_nuts3_2024
+      nuts3_codes: 26
+    - slug: sweden
+      n_subs: 11399
+      fleet_uniform_v_socio: 0.1867
+      csv_source: eurostat_nuts3
+      polygon_source: eurostat_gisco_nuts3_2024
+      nuts3_codes: 21
+    - slug: japan
+      n_subs: 7073
+      fleet_uniform_v_socio: 0.6233
+      csv_source: agency_regional
+      polygon_source: gadm41_admin1
+      admin1_codes: 47
+      note: "47 prefectures"
+
+  cohort_total_subs_affected: 199458
+  cohort_ready_scope: 7  # of 8 Wave 4 majors (Italy blocked)
+  cohort_ready_subs: 147548  # 199458 - 51910 (italy)
+
+  partial_fleet_uniform_flag:
+    slug: turkey
+    n_subs: 4001
+    n_unique: 6
+    range: [0.4800, 0.6025]
+    disposition: "MONITOR — not full fleet-uniform; post-2021-reform pattern; deferred to future"
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  UTILITY EXTENSION
+# ═══════════════════════════════════════════════════════════════════════════
+
+utility_extension:
+  file: scripts/pipeline/enrichment/socio_economic_backfill.py
+  action: extend_POLYGON_COUNTRY_CONFIGS
+  config_entries_before: 15  # Task #453 (4) + Task #454 (11)
+  config_entries_after: 22   # + 7 Task #501 (france/germany/spain/portugal/sweden/us/japan)
+
+  reused_architecture:
+    - Task #453 shared polygon spatial-join utility (zero refactor)
+    - Task #454 3-case skip-logic decision tree (case-c fires for Wave 4 majors: province=None, gdp populated)
+    - Task #454 csv_lookup_aliases pattern (empirically populated at pilot time for US/JP if needed)
+    - Convention #79 ssi-data sharding preserved via read_ssi_data / write_ssi_data
+    - Convention #56 visibly-honest degradation (out-of-polygon subs → None, not fabricated)
+
+  case_c_semantics:
+    trigger: "sub.get('province') is None and gdp_populated"
+    action: "polygon spatial-join derives NUTS-3 (or admin1) code + CSV lookup + dict.update overrides fleet-uniform national-scalar V_socio with per-region value"
+    v_socio_formula: "0.45*ep_norm + 0.35*gdp_norm + 0.20*elderly_norm (compute_v_socio, mirrors socioeconomic.py:511-517)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  CONVENTION #7 DOCUMENTED-PROXY ANCHORS
+# ═══════════════════════════════════════════════════════════════════════════
+
+convention_7_anchors:
+  eurostat_gisco_nuts3_2024:
+    publisher: "European Commission Eurostat"
+    product: "NUTS 2024 (GISCO Geographic Information System of the Commission)"
+    vintage: "2024"
+    crs: "EPSG:4326 (WGS84)"
+    license: "open license — attribution-required"
+    reuse_from: "Task #453 (Luxembourg + Slovenia + Lithuania) + Task #454 (9 EU countries)"
+    countries_task_501: [france, germany, spain, portugal, sweden]
+    shapefile: "~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp"
+
+  gadm_4_1_admin1:
+    publisher: "UC Davis geodata.ucdavis.edu/gadm"
+    product: "GADM Administrative Areas 4.1"
+    vintage: "2022"
+    crs: "EPSG:4326 (WGS84)"
+    license: "CC0-derivative (academic-open-license)"
+    reuse_from: "Task #453 (Colombia) + Task #454 (Switzerland + Canada)"
+    countries_task_501: [us, japan]
+    shapefiles_needed:
+      - "~/gadm41_USA_shp/gadm41_USA_1.shp"
+      - "~/gadm41_JPN_shp/gadm41_JPN_1.shp"
+
+  eurostat_nuts3_csv:
+    scope: "5 EU countries in Task #501 already have Eurostat NUTS-3 socioeconomic CSVs scaffolded"
+    files:
+      - scripts/pipeline/data/france/eurostat_nuts3_socioeconomic.csv   # 101 NUTS-3 codes
+      - scripts/pipeline/data/germany/eurostat_nuts3_socioeconomic.csv  # 400 NUTS-3 codes
+      - scripts/pipeline/data/spain/eurostat_nuts3_socioeconomic.csv    # 59 NUTS-3 codes
+      - scripts/pipeline/data/portugal/eurostat_nuts3_socioeconomic.csv # 26 NUTS-3 codes
+      - scripts/pipeline/data/sweden/eurostat_nuts3_socioeconomic.csv   # 21 NUTS-3 codes
+
+  agency_regional_csv:
+    scope: "2 non-EU countries in Task #501 have agency_regional CSVs scaffolded"
+    files:
+      - scripts/pipeline/data/us/agency_regional_socioeconomic.csv     # 52 states/regions
+      - scripts/pipeline/data/japan/agency_regional_socioeconomic.csv  # 47 prefectures
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  OPERATOR LOCAL PREP CHECKLIST
+# ═══════════════════════════════════════════════════════════════════════════
+
+operator_local_prep:
+  - name: verify_eurostat_shapefile_present
+    action: "ls ~/eurostat_gisco_nuts3_2024/NUTS_RG_01M_2024_4326.shp"
+    status: "REUSED from Task #453/#454"
+  - name: download_gadm_usa
+    action: "curl -O https://geodata.ucdavis.edu/gadm/gadm4.1/shp/gadm41_USA_shp.zip && unzip"
+    target_dir: "~/gadm41_USA_shp/"
+    approx_size: "~30MB"
+  - name: download_gadm_jpn
+    action: "curl -O https://geodata.ucdavis.edu/gadm/gadm4.1/shp/gadm41_JPN_shp.zip && unzip"
+    target_dir: "~/gadm41_JPN_shp/"
+    approx_size: "~15MB"
+  - name: pilot_dry_run_france
+    action: "python3 scripts/pipeline/enrichment/socio_economic_backfill.py --polygon-slug france --dry-run"
+    gate: "Gate B — validate polygon-shapefile CRS + CSV column names + admin-code emission before cohort apply"
+  - name: cohort_apply
+    action: "python3 scripts/pipeline/enrichment/socio_economic_backfill.py --polygon-cohort france germany spain portugal sweden us japan"
+    expected_wall_clock: "~30-60 seconds (5 EU + 2 non-EU, largest cohort at DE 400 NUTS-3 × 187,714 subs)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  BLOCKER + FOLLOW-ONS
+# ═══════════════════════════════════════════════════════════════════════════
+
+blocker_italy:
+  slug: italy
+  n_subs: 51910
+  blocker: "missing scripts/pipeline/data/italy/eurostat_nuts3_socioeconomic.csv AND agency_regional_socioeconomic.csv"
+  operator_action: "source ISTAT NUTS-3 data (110 provinces / 21 regions ITxxx) + author CSV following eurostat_nuts3_socioeconomic.csv schema"
+  once_csv_lands: "add italy entry to POLYGON_COUNTRY_CONFIGS mirroring france/germany/spain pattern + re-run cohort apply"
+  parallel_block: "Task #454b Greece — same class (missing ELSTAT NUTS-3 CSV)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  OPERATOR SIGNOFF LOG
+# ═══════════════════════════════════════════════════════════════════════════
+
+operator_signoff_log:
+  - date: 2026-07-24
+    gate: "Gate A pre-code — scope + architectural approach"
+    decision: "APPROVED per parking-lot execution directive 'proceed with parking lot items'"
+    rationale: |
+      Task #501 identified in previous session as highest-impact follow-on
+      (199,458 subs across 8 Wave 4 majors). Correct fix is Task #452/#453
+      polygon spatial-join pattern (NOT Task #450 min-max rescale which
+      would degenerate on min == max fleet-uniform). Utility already exists
+      from Task #453/#454; scope reduction = config extension only.
+
+closure_status: PREFLIGHT_COMPLETE_UTILITY_EXTENDED
+closure_metrics:
+  utility_config_entries_extended: 7
+  sentinel_target_cohort_extended: 15 → 22
+  countries_ready_for_apply: 7
+  countries_blocked: 1  # italy
+  csv_reuse: 100%  # all 7 target countries have CSV scaffolded already
+  shapefile_reuse: 71.4%  # 5 of 7 reuse Eurostat NUTS-3 (already downloaded)
+  new_downloads_required: 2  # gadm41_USA + gadm41_JPN (~45MB total)
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  CROSS-REFERENCES
+# ═══════════════════════════════════════════════════════════════════════════
+
+cross_references:
+  parent_workstream: Task #450 SYSTEMIC (R2 Grid Equity per-substation interpolation regression)
+  sibling_workstreams:
+    - Task #451 GHSL catchment_population (STOCK variant of Discipline #47)
+    - Task #452 Niva migration_score (FLOW variant)
+    - Task #453 Luxembourg + Slovenia + Colombia + Lithuania polygon backfill (ADMIN variant, 4 instances)
+    - Task #454 SYSTEMIC 11-country ADMIN extension (ADMIN variant, 15 instances cumulative)
+    - Task #450 SYSTEMIC bridge migration_score min-max rescale (NORMALISE variant, 1 instance)
+    - Task #501 THIS (V_socio Wave 4 majors polygon backfill — 16th ADMIN variant instance)
+
+  discipline_47_extension:
+    variant: ADMIN
+    empirical_instance_count_after_task_501: 22  # 15 (Task #453+#454) + 7 (Task #501)
+    variant_total_across_family: 25  # STOCK (1) + FLOW (1) + ADMIN (22) + NORMALISE (1)
+
+  conventions_preserved:
+    - "#7 Data-Layer Anchoring (Eurostat GISCO + GADM 4.1 documented-proxy)"
+    - "#54 Housekeeping cascade (6-touch-point applied)"
+    - "#55 Verify-don't-trust (operator paste-back required for cohort apply)"
+    - "#56 Visibly-honest degradation (out-of-polygon → None; fleet-uniform national-scalar preserved as audit anchor)"
+    - "#60 Ikenga IS the ESG provider (all sources public institutional)"
+    - "#78 §5septies BINDING (OSM-tag-density empirically per-country — not applicable to Wave 4 majors which had OSM tag drought at ingest time)"
+    - "#79 ssi-data sharding preserved (france/germany/us are sharded ≥90MB)"

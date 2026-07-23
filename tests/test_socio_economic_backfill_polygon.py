@@ -116,8 +116,19 @@ TASK_454_COUNTRIES = (
     "switzerland", "canada",
 )
 
-# Full 15-country target cohort (Task #453 + Task #454)
-TARGET_COUNTRIES = TASK_453_COUNTRIES + TASK_454_COUNTRIES
+# Task #501 V_socio semantic-scale bridge (Wave 4 majors, 24 Jul 2026 later same day)
+# 7 of 8 Wave 4 majors — Italy blocked (missing ISTAT NUTS-3 CSV, analogous to
+# Greece Task #454b block). Utility case-c triggers (province=None, gdp
+# populated as fleet-uniform national scalar); polygon spatial-join derives
+# NUTS-3 code + overwrites fleet-uniform V_socio with per-region CSV value.
+TASK_501_COUNTRIES = (
+    "france", "germany", "spain", "portugal", "sweden",   # 5 EU via Eurostat NUTS-3
+    "us", "japan",                                          # 2 non-EU via GADM 4.1
+    # italy BLOCKED — needs operator-sourced ISTAT NUTS-3 CSV
+)
+
+# Full 22-country target cohort (Task #453 + Task #454 + Task #501)
+TARGET_COUNTRIES = TASK_453_COUNTRIES + TASK_454_COUNTRIES + TASK_501_COUNTRIES
 
 # Expected admin code sets for cohort data invariant
 EXPECTED_ADMIN_CODES = {
@@ -292,7 +303,7 @@ class TestUtilityConstantLock:
             f"per merge-not-replace BINDING contract."
         )
 
-    def test_polygon_country_configs_locked_to_15_countries(self):
+    def test_polygon_country_configs_locked_to_22_countries(self):
         from pipeline.enrichment import socio_economic_backfill as sb
         assert set(sb.POLYGON_COUNTRY_CONFIGS.keys()) == set(TARGET_COUNTRIES), (
             f"POLYGON_COUNTRY_CONFIGS drift: expected {sorted(TARGET_COUNTRIES)}, "
