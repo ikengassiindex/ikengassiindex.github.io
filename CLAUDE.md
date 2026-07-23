@@ -270,8 +270,107 @@ Cross-country comparability post-Task-#452:
 **Follow-ons flagged for future closure.**
 
 - Task #450 SYSTEMIC — Denmark tiny-scale [-0.02, +0.04] + Mexico percent-scale [-5, +8] semantic drift. Task #452 preserved these values per NARROW+fleet-uniform-override scope; normalization to [0, 1] is Task #450 scope. Same class as V_socio / EP_rate / GDP / unemployment fleet-uniform issues.
-- Task #453 — R2 Defect Class 4, major partial `socio_economic` coverage on Luxembourg (12%) / Slovenia (16%) / Colombia (51%) / Lithuania (50%). Failed spatial joins upstream; requires per-country diagnosis. Task #452 filled Lithuania's Nones but the underlying partial-coverage issue remains.
+- Task #453 — R2 Defect Class 4, major partial `socio_economic` coverage on Luxembourg (12%) / Slovenia (16%) / Colombia (51%) / Lithuania (50%). **IN PROGRESS 23 July 2026** — see Phase 2G section below.
 - REPORTS_FRAMING_KB.md §8bis Discipline #47 candidate EXTENSION — from "GHSL-anchored per-substation demographic enrichment" to "Open-license global raster enrichment for per-substation demographic variables" citing both Task #451 (GHSL population, stock) and Task #452 (Niva migration, flow) as siblings under one architectural discipline — Task #452 Step 5d (queued).
+
+### Phase 2G — Per-substation admin-code derivation via polygon spatial-join (23 July 2026, Task #453 CLOSED)
+
+**Problem this scoped.** R2 Grid Equity SSI Variables audit (Task #447) surfaced that four Wave 2/3 countries carry major partial `socio_economic` coverage: **Luxembourg 12% populated · Slovenia 16% · Colombia 51% · Lithuania 50%**. Root cause diagnosed empirically 23 Jul 2026: v43 substations (added via Wave 2/3 OSM Overpass ingestion) landed with `province: None` in the canonical. Downstream `scripts/pipeline/ingestion/socioeconomic.py::overlay_socioeconomic()` at line 476 uses `province = sub.get("province") or ""` as the CSV lookup join key — empty join key = no match = all 6-8 socio_economic fields empty. The v1 subs (pre-Wave-2 baseline) inherited proper province tagging from earlier ingestion paths and are unaffected.
+
+**Empirical two-mode reconnaissance (23 Jul 2026, both dead-ended provenance-mode).**
+
+- **Slovenia connector recon**: `scripts/pipeline/ingestion/slovenia/osm_overpass.py` DOES have `_extract_nuts3_from_tags()` reading `ref:nuts:3` / `ref:NUTS:3` / `nuts:3` / `addr:state` / `region`; DOES emit `nuts3_code_detected` into per-sub `v43_provenance["SI-C1-osm-overpass"]`. **Empirical pilot dry-run result: 1,574 v43 subs, ALL carry `nuts3_code_detected: null` (0.0% populated).**
+- **Colombia connector recon**: `scripts/pipeline/ingestion/colombia/osm_overpass.py` DOES emit `department_detected` into per-sub provenance. **Empirical pilot dry-run result: 366 v43 subs, ALL carry `department_detected: null` (0.0% populated).**
+- **Luxembourg + Lithuania connector recon**: neither connector has admin-tag extraction logic (empirically confirmed 23 Jul 2026 via grep of connector source — 0 hits for province/NUTS logic).
+
+**🚨 Architectural finding: OSM tag density is empirically per-country — cohort-wide pattern confirmed.** The Poland P21 empirical finding (17 July 2026 — *"Polish OSM does NOT populate ref:nuts:3 tags at country scale (74-code territorial map DEAD CODE, codifies OSM tag density is EMPIRICAL PER COUNTRY architectural lesson)"*) is now empirically confirmed at 5-country scale: Poland + Luxembourg + Slovenia + Colombia + Lithuania. The connector-level tag extraction is a legitimate defensive-coding pattern (extract when present) but CANNOT be relied upon for cohort-wide admin-code derivation. Path A-connector via provenance-mode is architecturally dead for this class of problem.
+
+**Path A-polygon architectural strategy.** All 4 Task #453 countries require **polygon spatial-join** using country-specific admin polygons — same architectural family as Task #451 (GHSL raster) + Task #452 (Niva raster) but with different geometric operation: point-in-polygon instead of raster sampling. The shared utility becomes a reusable template for the ~21 other v43-at-0%-socio-economic-coverage countries queued as Task #454 (future).
+
+**Polygon source strategy per country (Convention #7 documented-proxy anchored).**
+
+- **Luxembourg + Slovenia + Lithuania** — Eurostat GISCO NUTS-3 2024 shapefile (EPSG:4326, publisher-cited EC Eurostat, open license, annual vintage). Direct join to per-country `eurostat_nuts3_socioeconomic.csv` on NUTS-3 code (LU000 / SI0xx / LT0xx).
+- **Colombia** — DANE Marco Geoestadístico Nacional 2024 departmental shapefile (official Colombian statistics-agency open-data, 32 departamentos + Bogotá D.C.). Direct join to `agency_regional_socioeconomic.csv` on department name.
+
+**Three-deliverable canonical recipe (Task #451/#452 template inheritance).**
+
+- **Utility** — `scripts/pipeline/enrichment/socio_economic_backfill.py` (scaffold landed 23 Jul 2026 as provenance-mode dead-end pilot; extending with `--from-polygon` mode next). Contract: reads per-country ssi-data.json (Convention #79 sharding preserved), loads country's polygon shapefile into shapely STRtree, iterates v43 subs with `province: None`, does point-in-polygon to derive admin code, sets top-level `sub["province"]`, MERGES CSV socio_economic fields via `dict.update()` semantics (PRESERVES Task #451 `_catchment_population_source` + Task #452 `_migration_score_source` markers by BINDING contract per Convention #56), computes V_socio from `0.45·ep_norm + 0.35·gdp_norm + 0.20·elderly_norm` formula lifted from `overlay_socioeconomic()` line 511-517, emits `_socio_economic_source = "TASK_453_POLYGON_BACKFILL_v4_2"` audit marker. Convention #56 fallback: sub outside all polygons → left None (not fabricated).
+- **Sentinel** — `tests/test_socio_economic_backfill_polygon.py` (queued) — 5 architectural invariants: (1) UTILITY CONSTANT LOCK (bounded [0.5, 2.0] multiplier envelope per NUTS-3 layer, `AUDIT_TRAIL_VALUE_POLYGON` lock, per-country polygon source identifiers); (2) MERGE-NOT-REPLACE (Task #451/#452 marker preservation across 4-country cohort — every populated `_catchment_population_source` + `_migration_score_source` survives untouched); (3) COHORT DATA (parametrised across LU + SI + CO + LT; for every non-None v43 sub `province` field is a valid admin code from the country's canonical set); (4) V_socio FORMULA LOCK (test-coverage on canonical anchor points + symmetry vs `overlay_socioeconomic()` output); (5) CONVENTION #56 FALLBACK (subs outside polygons receive None + audit marker, not fabricated defaults).
+- **Frontend narrative** — `esg-sections.js` R2 audit paragraph extension citing Eurostat GISCO + DANE provenance, cohort coverage delta (post-#453), 4-country closure of Defect Class 4, deferred Task #450 SYSTEMIC bridge (V_socio / E2_local / rd_pct_gdp remaining gaps).
+
+**Convention preservation matrix.**
+
+- **#7** Data-Layer Anchoring documented-proxy — Eurostat GISCO NUTS-3 is publisher-cited (EC Eurostat) + product-versioned (2024 vintage) + coordinate-system-declared (EPSG:4326) + open-license (attribution-required); DANE Colombia is publisher-cited (Departamento Administrativo Nacional de Estadística) + product-versioned (Marco Geoestadístico Nacional 2024) + government open-data. Documented-proxy pattern per Task #451/#452 sibling architectural class.
+- **#56** Visibly-honest degradation — provenance-mode dead-end surfaced empirically (not silently accepted); polygon-fallback substations receive None (not fabricated); Task #451/#452 markers preserved via merge-not-replace BINDING contract; V_socio field NOT set when elderly_pct missing (partial CSV coverage handling).
+- **#60** Ikenga IS the ESG provider — Eurostat GISCO + DANE are public institutional publishers (EC + Colombian government), open-license non-commercial by construction.
+- **#79** ssi-data sharding preserved — utility uses `read_ssi_data` / `write_ssi_data`; no direct JSON dumps.
+
+**Cohort audit at recon (23 Jul 2026 pre-execution).**
+
+| Country | v43 subs | Provenance-mode viability | Polygon source | CSV rows available |
+|---|---:|---|---|---:|
+| Luxembourg | 828 | ❌ no admin tags | Eurostat GISCO NUTS-3 (LU000 single row) | 1 |
+| Slovenia | 1,574 | ❌ 0/1,574 populated | Eurostat GISCO NUTS-3 (SI031–SI044) | 12 |
+| Colombia | 366 | ❌ 0/366 populated | DANE 2024 departmental | 32 |
+| Lithuania | 5,094 | ❌ no admin tags | Eurostat GISCO NUTS-3 (LT011–LT028) | ≥10 |
+
+**Follow-ons flagged for future closure.**
+
+- Task #454 SYSTEMIC — cohort-wide v43-at-0%-socio-economic-coverage sweep (~21 other countries in Wave 2/3/4 cohort with similar architectural pattern). Shared polygon utility from Task #453 becomes reusable template — same 3-deliverable recipe, different per-country shapefile + CSV pair. Estimated ~40-60 engineer-hours cohort-wide.
+- Task #450 SYSTEMIC bridge — V_socio deferred to Task #450 normalisation (Denmark tiny-scale + Mexico percent-scale + other fleet-uniform semantic drift); Task #453 fills only when CSV supplies complete inputs. E2_local + rd_pct_gdp remain unfilled by Task #453 (legacy pipeline scope, not R2 Defect Class 4 scope). Slovenia rd_pct_gdp = 0 across all subs is a SEPARATE Task-#450-adjacent bug documented but not closed here.
+- REPORTS_FRAMING_KB.md §8bis Discipline #47 extension — from *"Open-license global raster enrichment for per-substation demographic variables"* (Task #451 GHSL + Task #452 Niva) to *"Open-license spatial enrichment for per-substation admin identity + demographic variables"* — sibling geometric class (polygon-based admin-code derivation) within the same Convention #7 documented-proxy discipline. Landing per Task #453 Step 5d (queued at closure).
+- METHODOLOGY_DISCIPLINES.md — "Empirical OSM tag density is per-country" architectural discipline candidate registration. Instance 1 = Poland P21 (17 Jul); Instance 2 = Task #453 cohort of 4 (23 Jul). Convention #76 cadence toward BINDING requires 5-10 empirical instances — Task #454 candidates will accumulate toward promotion threshold.
+
+**Empirical closure (23 July 2026).**
+
+Task #453 workstream closed end-to-end via 3-deliverable canonical recipe:
+
+- **Utility** — `scripts/pipeline/enrichment/socio_economic_backfill.py` extended with `--from-polygon` mode. 4-country config uses Eurostat GISCO NUTS-3 2024 (LU/SI/LT) + GADM 4.1 admin1 (Colombia — documented-proxy fallback after DANE geoportal empirically requires form-based download). Discovered + fixed 1 shapely 2.x compatibility bug during Luxembourg pilot (numpy.int64 STRtree return-type not caught by `isinstance(idx, int)` check — pre-fix pilot: 0/634 written, post-fix: 634/634).
+- **Cohort apply** — 6,967 v43 substations enriched across all 4 countries in 1.8s wall-clock:
+
+  | Country | v43 subs | n_written | Convention #56 fallback | Unique admin codes | Markers preserved |
+  |---|---:|---:|---:|---:|---:|
+  | Luxembourg | 634 | 634 (100.0%) | 0 | 1 (LU000) | 634/634 |
+  | Slovenia | 1,574 | 1,571 (99.8%) | 3 | 12/12 (all SI0xx) | 1,571/1,571 |
+  | Lithuania | 4,396 | 4,396 (100.0%) | 0 | 10/10 (all LT0xx) | 4,396/4,396 |
+  | Colombia | 366 | 366 (100.0%) | 0 | 28/33 codes | 366/366 |
+  | **Total** | **6,970** | **6,967 (99.96%)** | **3** | | **100% preserved** |
+
+- **Sentinel** — `tests/test_socio_economic_backfill_polygon.py` 45/45 GREEN in 1.20s. 5 architectural invariants pinned (UTILITY CONSTANT LOCK + MERGE-NOT-REPLACE preservation × 4-country cohort + COHORT DATA validity × 4-country cohort + V_SOCIO FORMULA LOCK anchor points + CONVENTION #56 FALLBACK).
+
+Convention preservation matrix (empirically verified):
+
+- **#7** Data-Layer Anchoring — Eurostat GISCO 2024 shapefile (EPSG:4326, publisher-cited EC/Eurostat, open license, annual vintage) + GADM 4.1 (UC Davis, academic-open-license derivative, CC BY, coordinate-system-declared). GADM chosen over DANE MGN 2024 after empirical dead-end on DANE geoportal; substitution logged in preflight YAML operator_signoff_log at 17:15Z.
+- **#56** Visibly-honest degradation — 3 subs outside all polygons received None (not fabricated); provenance-mode dead-end surfaced empirically before pivoting to polygon-mode.
+- **#60** Ikenga IS the ESG provider — both Eurostat (EC treaty-level publisher) + GADM (UC Davis academic publisher) are institutional non-commercial.
+- **#79** ssi-data sharding preserved — all 4 country writes via `read_ssi_data`/`write_ssi_data` under 90 MB threshold.
+
+**Architectural finding surfaced by this closure (retired from queued to landed).**
+
+**METHODOLOGY_DISCIPLINES.md §5septies (Empirical OSM tag density is per-country) — codified as candidate discipline at 5 empirical instances toward Convention #76 5-10 BINDING threshold:**
+
+1. Poland P21 (17 July 2026) — `ref:nuts:3` 0.0% populated at country scale, 74-code territorial map DEAD CODE
+2. Luxembourg (23 July 2026) — no admin tags in OSM at country scale
+3. Slovenia (23 July 2026) — `nuts3_code_detected` = null across 1,574/1,574 v43 subs
+4. Colombia (23 July 2026) — `department_detected` = null across 366/366 v43 subs
+5. Lithuania (23 July 2026) — no admin tags in OSM at country scale
+
+Codified consequence: connector-level tag extraction is legitimate defensive-coding but CANNOT be relied upon for cohort-wide admin-code derivation. Polygon spatial-join is the load-bearing implementation for the ADMIN structural variant.
+
+**Authoritative sources for Phase 2G closure.**
+
+- `scripts/pipeline/enrichment/socio_economic_backfill.py` — Utility (Task #453 Step 3)
+- `tests/test_socio_economic_backfill_polygon.py` — Regression sentinel (Task #453 Step 6, 45/45 GREEN)
+- `docs/audits/task_453_polygon_backfill_preflight_20260723.yaml` — Pre-flight audit YAML (Convention #7 documented-proxy anchors + DANE→GADM substitution log + 44-case sentinel_matrix)
+- `esg-sections.js` R2 validity paragraph + ITALY_FALLBACK_SOURCES rows — Frontend narrative (Task #453 Step 7)
+- Consolidated cohort audit at `~/socio_economic_backfill_audit_20260723T132733Z.json`
+
+**Follow-ons flagged for future closure.**
+
+- Task #454 SYSTEMIC — cohort-wide v43-at-0%-socio-economic-coverage sweep across ~21 additional Wave 2/3/4 countries. Shared polygon utility from Task #453 becomes reusable template. Same Discipline #47 ADMIN variant + Convention #7 documented-proxy pattern applies per country; estimated ~40-60 engineer-hours cohort-wide.
+- Task #450 SYSTEMIC bridge — V_socio deferred to Task #450 normalisation for pre-existing drifted values (Denmark tiny-scale + Mexico percent-scale + other fleet-uniform semantic drift instances). Task #453 fills only when CSV supplies complete inputs. E2_local + rd_pct_gdp remain unfilled by Task #453 (legacy pipeline scope, not R2 Defect Class 4 scope). Slovenia rd_pct_gdp = 0 across all subs is a separate Task-#450-adjacent bug documented but not closed here.
+- Task #489 (Tier 3 deferred) — Full Technical Appendix workstream consolidating ~30 formula constructs (Re composite, R6c/R6d/R6e/R8/R9/R10 modifiers, W1-W10 axis normalisations, all V-family variables) into new `FORMULA_TECHNICAL_APPENDIX.md`. V_socio (this Task #453) is the first canonical formula anchor and reference template. Estimated 8-12 engineer-hours.
+- Convention #78 §5septies BINDING promotion — accumulates as Task #454 candidates add new empirical instances of OSM-tag-density dead-ends. Currently 5 of 5-10 BINDING threshold.
 
 ### v4.23 gap-closure forward-reference — substation + line coupling invariant (25 June 2026)
 
