@@ -167,17 +167,15 @@ def save_ssi_data(
 
     # Attempt sharded write via canonical utility if present
     try:
-        from scripts.pipeline.utils import grid_geo_sharding  # type: ignore
-        # If canonical utility handles ssi-data sharding, delegate. If not, fall through.
-        if hasattr(grid_geo_sharding, "save_ssi_data_sharded"):
-            grid_geo_sharding.save_ssi_data_sharded(
-                country_root=country_root,
-                manifest=clean_manifest,
-                substations=substations,
-                target_mb=shard_size_mb_target,
-                hard_limit_mb=shard_size_mb_hard_limit,
-            )
-            return
+        from scripts.pipeline.utils.ssi_data_sharding import write_ssi_data as _canonical_write  # type: ignore
+        clean_manifest["substations"] = substations
+        _canonical_write(
+            clean_manifest,
+            ssi_path,
+            threshold_mb=shard_size_mb_hard_limit,
+            target_shard_mb=shard_size_mb_target,
+        )
+        return
     except ImportError:
         pass
 
