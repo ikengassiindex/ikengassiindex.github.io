@@ -78,6 +78,40 @@ def get_counts(country):
     with open(current_path) as f:
         post = json.load(f)
 
+    # Task #520 fix (24 July 2026 night): Convention #79 sharded ssi-data
+    # awareness. Wave 4 large countries (US, France, Germany, UK, Italy) store
+    # substations across N shard files referenced by `substations_shards` at
+    # the top level. Legacy `data.get("substations", [])` returns [] on these
+    # manifests → voltage-tier recount collapses to 0 → replacement builder
+    # emits garbage substitutions on HTML pages. Load shards inline.
+    def _load_subs_from_manifest(data, base_dir):
+        if not data.get("sharded"):
+            return data.get("substations") or []
+        subs = []
+        shard_list = data.get("substations_shards") or data.get("shards") or []
+        for shard_ref in shard_list:
+            if isinstance(shard_ref, dict):
+                shard_filename = shard_ref.get("path") or shard_ref.get("file")
+            else:
+                shard_filename = shard_ref
+            if not shard_filename:
+                continue
+            shard_path = base_dir / shard_filename
+            if not shard_path.exists():
+                continue
+            with open(shard_path) as _f:
+                shard = json.load(_f)
+            if isinstance(shard, list):
+                subs.extend(shard)
+            elif isinstance(shard, dict):
+                subs.extend(shard.get("substations", []))
+        return subs
+
+    _pre_subs = _load_subs_from_manifest(pre, country_dir)
+    _post_subs = _load_subs_from_manifest(post, country_dir)
+    pre["substations"] = _pre_subs
+    post["substations"] = _post_subs
+
     def counts_of(data):
         meta = data.get("meta", {})
         n_hv_meta = meta.get("n_HV")
@@ -198,17 +232,27 @@ def refresh_country(country, dry_run=False):
             continue
         original = fpath.read_text()
         updated = original
+        # Task #520 fix (24 July 2026 night): substring-collision guard.
+        # Bare str.replace of "262" → "14,070" caused catastrophic damage on
+        # Austria (operator paste-back evidence: 262 appeared as "262,807" in
+        # unrelated field, was mangled to "14070,807"). Anchor each match with
+        # lookaround so digits + commas either side prevent partial-number
+        # matches — comma protects against comma-separator context, digit
+        # protects against integer-substring context.
         for s, r in repls:
-            updated = updated.replace(s, r)
-        n_changes = sum(
-            original.count(s) for s, _ in repls
-        )
+            pat = re.compile(r'(?<![\d,])' + re.escape(s) + r'(?![\d,])')
+            updated = pat.sub(r, updated)
+        # Sentinel — pattern-based counts (same lookaround guard) for report
+        _count = lambda text, needle: len(re.findall(
+            r'(?<![\d,])' + re.escape(needle) + r'(?![\d,])', text))
+        n_changes = sum(_count(original, s) for s, _ in repls)
         if updated == original:
             print(f"  {fname:<22}  unchanged")
             continue
 
         # Count number of replacements made (approximate — counts old strings)
-        actual_changes = sum(original.count(s) - updated.count(s) for s, _ in repls)
+        actual_changes = sum(
+            _count(original, s) - _count(updated, s) for s, _ in repls)
         print(f"  {fname:<22}  ~{actual_changes} replacement(s)")
         total_changes += actual_changes
 

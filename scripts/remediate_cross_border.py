@@ -415,10 +415,32 @@ def remediate(country, tolerance_km=0.1, threshold_pct=5.0, dry_run=False,
     data["fleet_summary"] = new_fleet
     data["regions"] = new_regions
 
-    with open(ssi_data_path, "w") as f:
-        json.dump(data, f, separators=(",", ":"))
-
-    print(f"  ✓ Wrote updated ssi-data.json with {len(kept)} substations")
+    # Task #520 fix (24 July 2026 night): Convention #79 sharded ssi-data
+    # awareness. Wave 4 large countries (US, France, Germany, UK, Italy) store
+    # substations across shard files. When we've just filtered ~10-100k subs,
+    # the resulting single-file could easily exceed 90 MB → GitHub push refused.
+    # Delegate to canonical write_ssi_data() which auto-shards above threshold
+    # (default 90 MB hard limit / 60 MB target per shard).
+    # Also strip the old shard-manifest keys from `data` before writing —
+    # write_ssi_data will re-emit them if resharding is needed.
+    for stale_key in ("sharded", "substations_shards", "shards"):
+        data.pop(stale_key, None)
+    try:
+        from scripts.pipeline.utils.ssi_data_sharding import write_ssi_data as _write_ssi
+        stats = _write_ssi(data, ssi_data_path)
+        if stats.get("sharded"):
+            print(f"  ✓ Wrote updated ssi-data.json manifest + "
+                  f"{stats['shard_count']} shard files (Convention #79); "
+                  f"{len(kept)} substations total")
+        else:
+            print(f"  ✓ Wrote updated ssi-data.json (single-file, "
+                  f"{stats['size_mb']:.1f} MB) with {len(kept)} substations")
+    except ImportError:
+        # Fallback — single-file write (legacy behaviour)
+        with open(ssi_data_path, "w") as f:
+            json.dump(data, f, separators=(",", ":"))
+        print(f"  ✓ Wrote updated ssi-data.json with {len(kept)} substations "
+              f"(single-file legacy path; Convention #79 sharding utility unavailable)")
     print()
 
     # Verify gate now passes

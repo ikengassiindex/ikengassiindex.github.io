@@ -158,7 +158,41 @@ def load_substations(country, repo_root=None):
         )
         data = {"substations": data}
 
-    raw_subs = data.get("substations", [])
+    # Task #520 fix (24 July 2026 night, WAVE_4_SYSTEMIC_CROSS_BORDER_CLOSURE):
+    # Convention #79 sharded ssi-data manifest support. Wave 4 large countries
+    # (US, France, Germany, UK, Italy) store substations across N shard files
+    # referenced by `substations_shards: [{path, count, size_mb}, ...]` at the
+    # top level. Legacy `data.get("substations", [])` returns [] on these
+    # manifests → downstream point-in-polygon audit silently reports 0/0 subs.
+    # Delegate to shared shard reader utility which auto-detects + concatenates.
+    if data.get("sharded"):
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(Path(repo_root)))
+            from scripts._ssi_data_shard_reader import load_substations as _load_sharded
+            raw_subs = _load_sharded(country)
+        except ImportError:
+            # Fallback — inline shard concatenation
+            raw_subs = []
+            shard_list = data.get("substations_shards") or data.get("shards") or []
+            for shard_ref in shard_list:
+                if isinstance(shard_ref, dict):
+                    shard_filename = shard_ref.get("path") or shard_ref.get("file")
+                else:
+                    shard_filename = shard_ref
+                if not shard_filename:
+                    continue
+                shard_path = Path(repo_root) / country / shard_filename
+                if not shard_path.exists():
+                    continue
+                with open(shard_path) as _f:
+                    shard = json.load(_f)
+                if isinstance(shard, list):
+                    raw_subs.extend(shard)
+                elif isinstance(shard, dict):
+                    raw_subs.extend(shard.get("substations", []))
+    else:
+        raw_subs = data.get("substations", [])
 
     # Detect compact array format and convert to dicts
     if raw_subs and isinstance(raw_subs[0], list):
