@@ -52,6 +52,90 @@ Audit trail: [preflight](../netherlands/v4_23-ingestion-audit-netherlands-prefli
 
 ---
 
+## Wave 2 continuation + Wave 3 refresh cycles — mid-July 2026
+
+> Extracted from country landing pages 24 July 2026 (Task #523). These are the follow-on Wave 2 + Wave 3 refresh cycles that landed after the initial 5-country Wave 2 batch (AU/BE/CL/HU/NL, Task #457). Five paragraph-format callouts (LU/CO/SI/CR/IL) + five span-pill callouts (EE/LV/SK/LT/CZ) consolidated here + removed from each country's `index.html` to reduce chrome.
+
+### 🇱🇺 Luxembourg
+
+**v4.23 owner enrichment landed 13 July 2026** — OSM Overpass ingestion + Creos monopoly-class fallback closed the country at 100% owner coverage (Creos 669 · Sudstroum 34 · Ville de Diekirch 11 · Ville d'Ettelbruck 2 · 5 small industrial/joint), 89 → 723 substations (+712%), 628 → 1,343 lines. Second application of Greenland monopoly-class pattern with nested municipal-DSO geofence overlay.
+
+Audit trail: [preflight](../luxembourg/v4_23-ingestion-audit-luxembourg-preflight.yaml) · [fetch](../luxembourg/v4_23-ingestion-audit-luxembourg-fetch.yaml) · [merge](../luxembourg/v4_23-ingestion-audit-luxembourg-merge.yaml).
+
+---
+
+### 🇨🇴 Colombia
+
+**v4.23 owner enrichment landed 13 July 2026** — OSM Overpass ingestion + 4-layer resolver (ISA TSO threshold ≥220 kV + department-name → DSO map + Cali metro Emcali geofence + ISA state-utility default) + baseline-department promotion in merge + Step 5 alias-retighten pass closed the country at 100% owner coverage. 381 → 744 substations (+95%), 2,278 → 2,692 lines. **55 distinct operators** — richest DSO diversity in the cohort yet — reflecting Colombia's post-1994 unbundled electricity market regulated by CREG. Attribution: ISA 321 (43%) + Enel-Codensa 93 + EPM 54 + Afinia 34 + Emcali 27 + Air-e 27 + Chec 26 + Essa 23 + EPSA 17 + EBSA 15 + Enerca 13 + Emsa 10 + 43 more. 6th application of the region-jurisdiction × voltage-class fallback pattern with the LARGEST DSO cardinality yet cohort-wide.
+
+Audit trail: [preflight](../colombia/v4_23-ingestion-audit-colombia-preflight.yaml) · [fetch](../colombia/v4_23-ingestion-audit-colombia-fetch.yaml) · [merge](../colombia/v4_23-ingestion-audit-colombia-merge.yaml).
+
+---
+
+### 🇸🇮 Slovenia
+
+**v4.23 owner enrichment landed 13 July 2026** — OSM Overpass ingestion + 4-layer resolver (ELES TSO threshold ≥110 kV + NUTS-3 map + lat/lon geofence across 5 DSO territories) closed the country at 99.7% owner coverage (Elektro Maribor 661 + Primorska 423 + Ljubljana 299 + Gorenjska 138 + Celje 122 + ELES 60 + 22 small industrial/railway), 157 → 1,731 substations (+1,003%), 4,384 → 4,510 lines. 5th application of the region-jurisdiction × voltage-class fallback pattern, with the empirically-novel Layer 3 lat/lon geofence (OSM Slovenia doesn't populate NUTS-3 tags).
+
+Audit trail: [preflight](../slovenia/v4_23-ingestion-audit-slovenia-preflight.yaml) · [fetch](../slovenia/v4_23-ingestion-audit-slovenia-fetch.yaml) · [merge](../slovenia/v4_23-ingestion-audit-slovenia-merge.yaml).
+
+---
+
+### 🇨🇷 Costa Rica
+
+**v4.23 owner enrichment landed 13 July 2026** — OSM Overpass ingestion + 3-layer monopoly-with-overlay resolver (ICE TSO threshold ≥138 kV + 7-DSO territorial geofence + ICE monopoly default) closed the country at **100% coverage across all three dimensions** (owner + voltage + region) — the FIRST cohort-country to achieve this. Attribution: ICE 138 (81.7%) + CNFL 16 (SJ metro subsidiary) + Coopesantos 6 + Coopelesca 3 + ESPH 3 + Coopeguanacaste 2 + JASEC 1 = 7 distinct operators. 3rd application of the monopoly-class pattern (after Greenland pure + Luxembourg + municipal overlay) with expanded 7-DSO nested overlay depth.
+
+Audit trail: [preflight](../costa-rica/v4_23-ingestion-audit-costa-rica-preflight.yaml) · [fetch](../costa-rica/v4_23-ingestion-audit-costa-rica-fetch.yaml) · [merge](../costa-rica/v4_23-ingestion-audit-costa-rica-merge.yaml).
+
+---
+
+### 🇮🇱 Israel
+
+**v4.23 owner enrichment landed 13 July 2026** — OSM Overpass ingestion + IEC pure-monopoly resolver (Layer 1 TSO threshold ≥161 kV + Layer 2 IEC monopoly default) closed the country at **100% coverage across all three dimensions** (owner + voltage + region) — the 2nd cohort-country to achieve this simultaneously (after Costa Rica). Attribution: IEC 256 (99.6%) + ATM 1 (preserved honestly per Convention #56) = 2 distinct operators. 3rd application of the pure-monopoly-class pattern (after Greenland Nukissiorfiit + Costa Rica ICE though CR extended with 7-DSO overlay). Novel Hebrew Unicode alias normalisation with NFC (חברת חשמל לישראל / חשמל / חברת החשמל).
+
+Audit trail: [preflight](../israel/v4_23-ingestion-audit-israel-preflight.yaml) · [fetch](../israel/v4_23-ingestion-audit-israel-fetch.yaml) · [merge](../israel/v4_23-ingestion-audit-israel-merge.yaml).
+
+---
+
+### 🇪🇪 Estonia
+
+**v4.23 owner-attribution — 100%** (Elering TSO + Elektrilevi monopoly via Eesti Energia state holding, 16 distinct operators, +192% OSM growth, Baltic Trio 2nd instance).
+
+Audit trail: [preflight](../estonia/v4_23-ingestion-audit-estonia-preflight.yaml) · [merge](../estonia/v4_23-ingestion-audit-estonia-merge.yaml).
+
+---
+
+### 🇱🇻 Latvia
+
+**v4.23 owner-attribution — 100%** (AST TSO + Sadales tīkls monopoly via Latvenergo state holding, 6 distinct operators, +281% OSM growth, Baltic Trio empirical completion + Convention #78 sub-convention BINDING promotion event).
+
+Audit trail: [preflight](../latvia/v4_23-ingestion-audit-latvia-preflight.yaml) · [merge](../latvia/v4_23-ingestion-audit-latvia-merge.yaml).
+
+---
+
+### 🇸🇰 Slovakia
+
+**v4.23 owner-attribution — 100%** (SEPS TSO + ZSD/SSD/VSD region-jurisdiction DSO partition via Layer 3 lat/lon geofence, 34 distinct operators, +0.3% OSM growth (Slovak OSM sub-sparse, line-dense), Convention #78 BINDING first-enforcement SUCCESS + NEW Layer 3 geofence sub-convention codified).
+
+Audit trail: [preflight](../slovakia/v4_23-ingestion-audit-slovakia-preflight.yaml) · [merge](../slovakia/v4_23-ingestion-audit-slovakia-merge.yaml).
+
+---
+
+### 🇱🇹 Lithuania
+
+**v4.23 owner-attribution — 100%** (Litgrid TSO + ESO monopoly via EPSO-G state holding, 8 distinct operators cohort-cleanest, +871% OSM growth).
+
+Audit trail: [preflight](../lithuania/v4_23-ingestion-audit-lithuania-preflight.yaml) · [merge](../lithuania/v4_23-ingestion-audit-lithuania-merge.yaml).
+
+---
+
+### 🇨🇿 Czechia
+
+**v4.23 owner-attribution — 100%** (ČEPS TSO + ČEZ Distribuce + EG.D + PRE distribuce Layer 3 lat/lon geofence with Prague-refined bbox per Task #262, +725% OSM growth via 5,178 alias-normalised at fetch time (SECOND-HIGHEST cohort-wide, 8.7× Slovakia; E.ON→EG.D 2021 rebrand LARGEST predecessor class), Convention #78 BINDING 2nd enforcement post-promotion SUCCESS + Layer 3 geofence sub-convention 2nd enforcement post-BINDING; Visegrád Trio 2 of 3 shipped).
+
+Audit trail: [preflight](../czechia/v4_23-ingestion-audit-czechia-preflight.yaml) · [merge](../czechia/v4_23-ingestion-audit-czechia-merge.yaml).
+
+---
+
 ## Priority 1-5 gap-closure cycle — Jun-Jul 2026 (originating v4.23 workstream)
 
 > Extracted from country landing pages 22 Jul 2026. These are the ORIGINAL five countries in the `v4_23-gap-audit-2026-07/` workstream — Priority 1 Canada + Priority 2 Norway + Priority 3 Mexico + Priority 4 Austria + Priority 5 Greenland. The Wave 2 batch above (Australia + Belgium + Chile + Hungary + Netherlands) followed as the second cohort.
