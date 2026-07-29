@@ -155,12 +155,15 @@
 
   // ------ Drawing ------
   function requestDraw() {
+    console.log('[map.js DRAWTRACE] requestDraw called, animFrame=', animFrame, 'at', new Error().stack.split('\n')[2]);
     if (!animFrame) animFrame = requestAnimationFrame(draw);
   }
 
   function draw() {
+    console.log('[map.js DRAWTRACE] draw() entered, GEO?', !!GEO, 'GEO.s size?', GEO ? Object.keys(GEO.s||{}).length : 0, 'canvas?', !!canvas, 'W=', W, 'H=', H, 'view=', view.cx, view.cy, view.scale);
     animFrame = null;
-    if (!GEO || !canvas) return;
+    if (!GEO || !canvas) { console.warn('[map.js DRAWTRACE] draw() EARLY EXIT — GEO or canvas falsy'); return; }
+    if (W === 0 || H === 0) { console.warn('[map.js DRAWTRACE] draw() proceeding with W or H = 0 — will paint nothing'); }
     ctx.clearRect(0, 0, W, H);
 
     const s = view.scale;
@@ -1190,6 +1193,7 @@ if (!hasNested) {
     const container = canvas.parentElement;
     W = container.clientWidth;
     H = container.clientHeight;
+    console.log('[map.js DRAWTRACE] resize() — container', container && container.className, 'clientW/H=', W, H, 'containerRect=', container ? container.getBoundingClientRect() : null);
     canvas.width = W * devicePixelRatio;
     canvas.height = H * devicePixelRatio;
     canvas.style.width = W + 'px';
@@ -1359,9 +1363,14 @@ if (!hasNested) {
       loadSsiData(),
       fetch(basePath + 'bounds.json?v=703').then(r => r.ok ? r.json() : null).catch(() => null)
     ]).then(([geo, ssi, bounds]) => {
+      // ── DRAWTRACE: wrap ENTIRE .then() body in try/catch so silent errors in the
+      // post-load pipeline (auto-fit / resize / wireFilters / callback) don't
+      // disappear into rAF-swallowed limbo. Re-throws so outer .catch still fires.
+      try {
       GEO = geo;
       SSI = ssi;
       BOUNDS = bounds;
+      console.log('[map.js DRAWTRACE] .then() body entered — GEO.s size=', geo ? Object.keys(geo.s || {}).length : 'no-geo', 'SSI subs=', ssi ? (ssi.substations && ssi.substations.length) : 'no-ssi', 'bounds features=', bounds && bounds.features ? bounds.features.length : 0);
       if (bounds && bounds.features) {
         console.log(`SSI Map: loaded admin bounds — ${bounds.features.length} polygons`);
       }
@@ -1590,6 +1599,10 @@ if (!hasNested) {
       }
 
       console.log(`SSI Map loaded: ${Object.keys(GEO.s).length} subs, ${GEO.l.length} lines, ${SSI.substations.length} SSI records`);
+      } catch (e) {
+        console.error('[map.js DRAWTRACE] .then() body threw:', e && e.message, 'stack:', e && e.stack);
+        throw e;  // Let outer .catch fire the generic error banner + surface to console.error
+      }
     }).catch(err => {
       console.error('Failed to load map data:', err);
       const container = canvas.parentElement;
