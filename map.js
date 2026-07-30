@@ -288,6 +288,8 @@
 
   // ------ Hit testing ------
   function hitTest(sx, sy) {
+    // Defensive: GEO can be null when data-load failed. Avoid TypeError spam on mousemove.
+    if (!GEO || !GEO.s) return null;
     const threshold = Math.max(8, 20 / view.scale);
     let bestDist = threshold;
     let bestHit = null;
@@ -1190,7 +1192,10 @@ if (!hasNested) {
 
   // ------ Resize ------
   function resize() {
+    // Defensive: canvas may be null if init failed or DOM not ready. Avoid TypeError spam.
+    if (!canvas) { console.warn('[map.js] resize() skipped — canvas is null'); return; }
     const container = canvas.parentElement;
+    if (!container) { console.warn('[map.js] resize() skipped — canvas has no parent'); return; }
     W = container.clientWidth;
     H = container.clientHeight;
     console.log('[map.js DRAWTRACE] resize() — container', container && container.className, 'clientW/H=', W, H, 'containerRect=', container ? container.getBoundingClientRect() : null);
@@ -1474,15 +1479,29 @@ if (!hasNested) {
         lineById[l.i] = l;
       }
 
-      // Compute fleet median components for radar overlay
+      // Compute fleet median components for radar overlay.
+      // Convention #56 visibly-honest degradation: unscored substations (sub.components === null)
+      // are skipped rather than crashing the whole map. This surfaced as Turkey P30 in-scope, where
+      // 82 of 4083 subs (2%) had components: null (fleet_summary.n_scored=4001) — the un-guarded
+      // sub.components[k] read threw TypeError which aborted the .then() body and left GEO=null,
+      // producing the "canvas 100% transparent + hitTest crashes on mousemove" symptom (Task #619).
       const compArrays = { C: [], V: [], I: [], E: [], S: [], T: [] };
+      let compScoredCount = 0;
       for (const sub of SSI.substations) {
+        if (!sub.components) continue;  // skip unscored subs
         for (const k of ['C', 'V', 'I', 'E', 'S', 'T']) {
-          compArrays[k].push(sub.components[k]);
+          const v = sub.components[k];
+          if (typeof v === 'number' && !isNaN(v)) compArrays[k].push(v);
         }
+        compScoredCount++;
+      }
+      const compSkipped = SSI.substations.length - compScoredCount;
+      if (compSkipped > 0) {
+        console.log(`[map.js] Fleet median: ${compScoredCount}/${SSI.substations.length} substations with components; ${compSkipped} unscored subs skipped (Convention #56 visibly-honest)`);
       }
       for (const k of ['C', 'V', 'I', 'E', 'S', 'T']) {
         const sorted = compArrays[k].slice().sort((a, b) => a - b);
+        if (sorted.length === 0) { fleetMedian[k] = 0; continue; }  // no scored subs — neutral median
         const mid = Math.floor(sorted.length / 2);
         fleetMedian[k] = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
       }
@@ -1503,7 +1522,8 @@ if (!hasNested) {
               if (la<minLat) minLat=la; if (la>maxLat) maxLat=la;
             }
           }
-          // Mode-3 territorial-outlier safeguard (Discipline #36 follow-on, 25 Jun 2026).
+          // Mode-3 territorial-outlier safeguard (Discipline #36 follow-on, 25 Jun 2026;
+          // extended Task #619, 30 Jul 2026 with per-country mainland-bbox filter).
           // bounds.json correctly includes overseas territories (Guyane française, Polynésie,
           // Chatham Islands, Tokelau, Réunion, Northern Ireland, Easter Island, Canadian Arctic
           // etc.) so the cross-border filter accepts legitimate territorial substations. But
@@ -1513,10 +1533,54 @@ if (!hasNested) {
           // class compression), fall back to substation cluster extent. France 117° → mainland
           // ~14°; NZ 357° (anti-meridian) → mainland ~12°; Chile 43° → mainland ~9°. The 35
           // non-pathological countries continue to use bounds.json extent unchanged.
+          //
+          // Per-country mainland-bbox filter (Task #619 addition): France + US + Norway have
+          // real substations sitting inside their overseas territories (Guyane 6°N/-53°W;
+          // Alaska 65°N/-150°W; Svalbard 78°N/15°E). Naive substation-cluster fallback still
+          // returns a pathological extent because the cluster INCLUDES the overseas subs.
+          // The MAINLAND_BBOXES table below filters the cluster to mainland-only for these 3
+          // countries; overseas-territory subs stay in memory + visible if the user pans to
+          // them, but they don't dominate the auto-fit viewport. Chile / Canada / Denmark /
+          // Portugal / NZ / Australia don't need this filter — they have zero substations in
+          // their overseas territories, so their cluster naturally lands on mainland.
+          const MAINLAND_BBOXES = {
+            france:   { minLat: 41.0, minLon:  -5.5, maxLat: 51.5, maxLon:   9.5 },  // Métropole (excl. DOM-TOM)
+            us:       { minLat: 24.0, minLon:-125.0, maxLat: 49.5, maxLon: -66.0 },  // CONUS (excl. Alaska + Hawaii + Guam + territories)
+            norway:   { minLat: 57.5, minLon:   4.0, maxLat: 71.5, maxLon:  32.0 }   // Fastlandet (excl. Svalbard + Jan Mayen + Bouvet)
+          };
+          // Detect country slug from the intelligence-loader script tag's data-country attribute.
+          // Falls back to '' for isolated map.html previews (no filter applied — same as before).
+          const _countryEl = document.querySelector('[data-country]');
+          const _countrySlug = (_countryEl && _countryEl.dataset && _countryEl.dataset.country) || '';
+          const _mainland = MAINLAND_BBOXES[_countrySlug];
           let subMinLon=Infinity, subMaxLon=-Infinity, subMinLat=Infinity, subMaxLat=-Infinity;
+          let _clusterInside = 0, _clusterExcluded = 0;
           for (const s of subEntries) {
+            if (_mainland) {
+              // Skip subs outside mainland bbox for cluster computation
+              if (s.x < _mainland.minLon || s.x > _mainland.maxLon ||
+                  s.y < _mainland.minLat || s.y > _mainland.maxLat) {
+                _clusterExcluded++;
+                continue;
+              }
+              _clusterInside++;
+            }
             if (s.x<subMinLon) subMinLon=s.x; if (s.x>subMaxLon) subMaxLon=s.x;
             if (s.y<subMinLat) subMinLat=s.y; if (s.y>subMaxLat) subMaxLat=s.y;
+          }
+          if (_mainland) {
+            console.log(`[map.js] Mainland-bbox filter (${_countrySlug}): ${_clusterInside} mainland subs anchor the viewport, ${_clusterExcluded} overseas-territory subs stay in memory + visible on pan (Task #619 fix)`);
+            // Defensive: if the mainland bbox somehow excluded ALL substations (misconfigured
+            // bbox or country entirely offshore), revert to whole-cluster extent so we don't
+            // divide by zero downstream.
+            if (_clusterInside === 0) {
+              console.warn(`[map.js] Mainland-bbox filter for ${_countrySlug} excluded 100% of subs — reverting to whole-cluster extent as safety fallback`);
+              subMinLon = Infinity; subMaxLon = -Infinity; subMinLat = Infinity; subMaxLat = -Infinity;
+              for (const s of subEntries) {
+                if (s.x<subMinLon) subMinLon=s.x; if (s.x>subMaxLon) subMaxLon=s.x;
+                if (s.y<subMinLat) subMinLat=s.y; if (s.y>subMaxLat) subMaxLat=s.y;
+              }
+            }
           }
           const boundsLonSpan = maxLon - minLon;
           const subsLonSpan = Math.max(0.01, subMaxLon - subMinLon);
