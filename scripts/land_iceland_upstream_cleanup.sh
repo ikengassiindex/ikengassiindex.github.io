@@ -39,7 +39,7 @@
 #
 # Usage (from a fresh terminal):
 #   cd ~/ikengassiindex.github.io
-#   export IS_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/0.22. IP agenda/SSI Index/SSI_v4_0 Iceland"
+#   export IS_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/SSI_v4_0 Iceland"
 #   export IS_REPO="$PWD"
 #   bash "$IS_WORKSPACE/land_iceland_upstream_cleanup.sh"
 # ════════════════════════════════════════════════════════════════════════════

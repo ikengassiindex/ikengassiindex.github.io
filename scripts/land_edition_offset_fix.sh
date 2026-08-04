@@ -19,7 +19,7 @@
 #
 # Usage:
 #   cd ~/ikengassiindex.github.io
-#   export S32_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/0.22. IP agenda/SSI Index"
+#   export S32_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index"
 #   export S32_REPO="$PWD"
 #   bash "$S32_WORKSPACE/SSI_v4_0 Korea/land_edition_offset_fix.sh"
 # ════════════════════════════════════════════════════════════════════════════

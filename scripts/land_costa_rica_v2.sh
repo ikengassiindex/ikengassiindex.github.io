@@ -47,7 +47,7 @@
 #
 # Usage (from a fresh terminal):
 #   cd ~/ikengassiindex.github.io
-#   export CR_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/0.22. IP agenda/SSI Index/SSI_v4_0 Costa Rica"
+#   export CR_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/SSI_v4_0 Costa Rica"
 #   export CR_REPO="$PWD"
 #   bash "$CR_WORKSPACE/land_costa_rica_v2.sh"
 # ════════════════════════════════════════════════════════════════════════════

@@ -5,7 +5,7 @@
 
 ## What this repo is
 
-This is the **public dashboard** for the SSI Index methodology, served via GitHub Pages at `https://ikengassiindex.github.io`. It is NOT the methodology development repository — that lives in `~/Library/CloudStorage/OneDrive-…/SSI Index/Report Production/` and is published as foundational documents (REPORTS_FRAMING_KB.md, About_SSI_Index.md, METHODOLOGY_DISCIPLINES.md, etc.).
+This is the **public dashboard** for the SSI Index methodology, served via GitHub Pages at `https://ikengassiindex.github.io`. It is NOT the methodology development repository — that lives in `~/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/Report Production/` (authoritative as of 4 August 2026 — the prior `OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/…` tenant is being retired) and is published as foundational documents (REPORTS_FRAMING_KB.md, About_SSI_Index.md, METHODOLOGY_DISCIPLINES.md, etc.).
 
 This repo holds **39 country folders** (austria, canada, chile, …, uk) each carrying:
 
@@ -598,7 +598,7 @@ Before pushing to `main` or merging a PR:
 | `CROSS_BORDER_SUBSTATION_AUDIT_20260618.md` | Discipline #36 origin audit | repo root |
 | `MODE_2_3_FOLLOWON_PLAN.md` | Discipline #36 second-wave plan | repo root |
 | `PR_CROSS_BORDER_GUARD.md` | Discipline #36 PR-ready notes | repo root |
-| `REPORTS_FRAMING_KB.md` §72 | Discipline #36 cross-reference from the SSI Index methodology framework | `~/Library/CloudStorage/OneDrive-…/SSI Index/Report Production/00-Framing/REPORTS_FRAMING_KB.md` (separate repo) |
+| `REPORTS_FRAMING_KB.md` §72 | Discipline #36 cross-reference from the SSI Index methodology framework | `~/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/Report Production/00-Framing/REPORTS_FRAMING_KB.md` (separate repo, Ikenga SL tenant) |
 | `PHASE_1_IMPLEMENTATION_PLAN.md` | Phase 1 PR-1+ scoring engine | repo root (canonical Phase 1 narrative) |
 | `AUDIT_v4_0_2_PRE_v4_2_FOUNDATION.md` | v4.0.2 → v4.2 audit (F-Lx-y findings) | repo root |
 | `intelligence/countries.json` | 39-country slug + first-refresh SoT (KB §57) | repo |

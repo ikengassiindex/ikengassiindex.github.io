@@ -53,7 +53,7 @@
 set -euo pipefail
 
 # Configurable paths
-WORKSPACE_DEFAULT="$HOME/Library/CloudStorage/OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/0.22. IP agenda/SSI Index/SSI_v4_0 Iceland"
+WORKSPACE_DEFAULT="$HOME/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/SSI_v4_0 Iceland"
 WORKSPACE="${ICELAND_WORKSPACE:-$WORKSPACE_DEFAULT}"
 REPO="${ICELAND_REPO:-$(cd "$(dirname "$0")/.." && pwd)}"
 

@@ -48,7 +48,7 @@
 set -euo pipefail
 
 # Configurable paths
-WORKSPACE_DEFAULT="$HOME/Library/CloudStorage/OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/0.22. IP agenda/SSI Index/SSI_v4_0 Korea"
+WORKSPACE_DEFAULT="$HOME/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/SSI_v4_0 Korea"
 WORKSPACE="${KOREA_WORKSPACE:-$WORKSPACE_DEFAULT}"
 REPO="${KOREA_REPO:-$(cd "$(dirname "$0")/.." && pwd)}"
 

@@ -58,14 +58,14 @@
 #
 # Usage:
 #   cd ~/ikengassiindex.github.io
-#   export IL_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/0.22. IP agenda/SSI Index/SSI_v4_0 Israel"
+#   export IL_WORKSPACE="/Users/cedricberard/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/SSI_v4_0 Israel"
 #   export IL_REPO="$PWD"
 #   bash "$IL_WORKSPACE/land_israel_v1.sh"
 # ════════════════════════════════════════════════════════════════════════════
 
 set -euo pipefail
 
-WORKSPACE="${IL_WORKSPACE:-/Users/cedricberard/Library/CloudStorage/OneDrive-SUN.ENCAPITALOU/Shared DR/Internal/0. General/0.22. IP agenda/SSI Index/SSI_v4_0 Israel}"
+WORKSPACE="${IL_WORKSPACE:-/Users/cedricberard/Library/CloudStorage/OneDrive-IkengaSL/Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index/SSI_v4_0 Israel}"
 REPO="${IL_REPO:-$HOME/ikengassiindex.github.io}"
 
 cd "$REPO"
