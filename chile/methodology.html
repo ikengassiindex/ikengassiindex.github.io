@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="SSI v4.2 methodology — master equation, 6 components, 11 modifiers, 101 variables, 30 data sources, 965 substations, Re composite, Monte Carlo uncertainty. Open, reproducible." data-canonical-content="page-headline">
+<meta name="description" content="SSI v4.2 methodology — master equation, 6 components, 11 modifiers, 101 variables, 30 data sources, 1,035 substations, Re composite, Monte Carlo uncertainty. Open, reproducible." data-canonical-content="page-headline">
 <meta name="theme-color" content="#941914">
 <title>SSI Index — Chile — Methodology (v4.2)</title>
 <link rel="stylesheet" href="../style.css?v=20260625-p2b2">
@@ -12,7 +12,7 @@
 <!-- W2.5 SSI_CANONICAL_LITERALS -->
 <script>/* W2.5 — Chile-literal lookup table for meta-tag content substitution. Read by country-renderer.js::fillCanonicalContentAttrs. */
 window.SSI_CANONICAL_LITERALS = {
- "fleet.total": "965",
+ "fleet.total": "1,035",
  "fleet.voltage.ehv": "370",
  "fleet.voltage.hv": "320",
  "fleet.voltage.distribution": "275",
@@ -54,13 +54,13 @@ window.SSI_CANONICAL_LITERALS = {
 
  <!-- Pipeline -->
  <div class="animate-in delay-2" style="margin-bottom:40px">
- <div class="label-xs" style="margin-bottom:13px">Processing Pipeline</div>
+ <div class="label-xs" style="margin-bottom:46px">Processing Pipeline</div>
  <div class="method-step">
  <div class="method-step-num">1</div>
  <div class="method-step-content">
  <h3>Ingest</h3>
  <p>
- 101 variables from 30 verified public data sources &mdash; CNE, Coordinador Eléctrico Nacional, Enel+CGE+Saesa+Frontel, Ministerio de Energía, INE Chile, MMA (DGA Flood Atlas flood + CONAF + EFFIS-CL wildfire), national forestry agency, national energy-research institute, ENTSO-E, Copernicus CDS / EFFIS / ERA5 Bourgouin, NASA FIRMS, EU-SILC + national household survey, OpenStreetMap, Eurostat, national system-research institute, national environment ministry, national geoportal, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly. v4.2 covers the <span data-canonical="fleet.total">965</span>-substation Chile fleet end-to-end.
+ 101 variables from 30 verified public data sources &mdash; CNE, Coordinador Eléctrico Nacional, Enel+CGE+Saesa+Frontel, Ministerio de Energía, INE Chile, MMA (DGA Flood Atlas flood + CONAF + EFFIS-CL wildfire), national forestry agency, national energy-research institute, ENTSO-E, Copernicus CDS / EFFIS / ERA5 Bourgouin, NASA FIRMS, EU-SILC + national household survey, OpenStreetMap, Eurostat, national system-research institute, national environment ministry, national geoportal, and others. Zero proprietary SCADA dependencies. Maximum ingestion frequency: weekly. v4.2 covers the <span data-canonical="fleet.total">1,035</span>-substation Chile fleet end-to-end.
  </p>
  </div>
  </div>
@@ -75,7 +75,7 @@ window.SSI_CANONICAL_LITERALS = {
  <div class="method-step-num">3</div>
  <div class="method-step-content">
  <h3>Weight</h3>
- <p>6-level hierarchical weighting across <span data-canonical="meta.n_components">6</span> components (C/V/I/E/S/T) and <span data-canonical="meta.n_metrics">20</span> metrics summing to R_base. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis (verified 12 Jun 2026 against <span data-canonical="fleet.total">965</span> Chile substations; first-order S_i indices in Validation Framework below). The v4.2 <strong style="color:var(--terracotta)">Re composite</strong> aggregate is computed separately from the modifier family and surfaces as the 7th radar axis &mdash; it is <strong>NOT</strong> part of this weighting tree.</p>
+ <p>6-level hierarchical weighting across <span data-canonical="meta.n_components">6</span> components (C/V/I/E/S/T) and <span data-canonical="meta.n_metrics">20</span> metrics summing to R_base. Continuity dominates at 0.30, followed by Infrastructure (0.25) and Saturation (0.20). Weight budget validated by Sobol sensitivity analysis (verified 12 Jun 2026 against <span data-canonical="fleet.total">1,035</span> Chile substations; first-order S_i indices in Validation Framework below). The v4.2 <strong style="color:var(--terracotta)">Re composite</strong> aggregate is computed separately from the modifier family and surfaces as the 7th radar axis &mdash; it is <strong>NOT</strong> part of this weighting tree.</p>
  </div>
  </div>
  <div class="method-step">
@@ -99,7 +99,7 @@ window.SSI_CANONICAL_LITERALS = {
  <h3>Re composite <span style="font-size:11px;color:var(--terracotta);font-weight:500">v4.2 — bounded resilience aggregate</span></h3>
  <!-- CONVENTION_7_HARDCODED_ANCHOR: Re_raw and Re_norm formula bounds [0.920, 1.787] are methodology constants derived from the multiplicative band of (R6d × R6e × R8 × R9 × R10) at modifier-tier extremes + R6c additive cliff range. Per-substation reference values now trace to canonical ssi-data.json.v4.2::substations[].Re_raw and Re_norm fields (Phase 1 closed 11 Jun 2026 via apply-v4.2-modifiers.py canonical-Re extension). low-exposure reference station: Re_raw 1.097, Re_norm 0.204. high-exposure reference station: Re_raw 1.477, Re_norm 0.642. Numbers shown match the canonical formula exactly, superseding the FC v2 §"Per-substation worked examples" hand-computed 0.198 / 0.620 (FC v2 had ~0.022 rounding error). -->
  <p>The Re composite is the bounded resilience aggregate that captures the v4.2 modifier family in a single scalar:<br>
- <code style="display:block;margin:6px 0;padding:8px;background:#f5f5f5;border-radius:4px;font-size:13px">Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00)</code>
+ <code style="display:block;margin:6px 0;padding:8px;background:#f5f5f5;border-radius:4px;font-size:46px">Re_raw = (R6d × R6e × R8 × R9 × R10) + (R6c − 1.00)</code>
  Bounds: <strong>[0.920, 1.787]</strong> (Re_raw can fall below 1.000 when R8_adapt &lt; 1.00 dominates other near-neutral factors). Normalised: <code>Re_norm = clip((Re_raw − 0.920) / (1.787 − 0.920), 0, 1)</code>. Chile fleet observed range (post-Path-B, canonical-computed from ssi-data.json.v4.2): low-exposure reference station Re_raw 1.097 / Re_norm 0.204; high-exposure reference station Re_raw 1.477 / Re_norm 0.642.</p>
  </div>
  </div>
@@ -273,7 +273,7 @@ window.SSI_CANONICAL_LITERALS = {
  <td>Regional DESI digital readiness score, smart meter penetration proxy, and HV voltage class bonus. Indicates cyber-resilience capability.
  <br><span style="font-size:10px;color:var(--warm-grey);font-style:italic;line-height:1.45">
  <strong style="font-style:normal">Note &mdash; R7 duality:</strong>
- the ESG Radar&rsquo;s seventh axis is <strong style="font-style:normal">R7 SFDR PAI Infrastructure</strong> (FC v3 §14 subsection 13.7 &ldquo;R7 &mdash; SFDR Principal Adverse Impact Statement (Infrastructure Module)&rdquo;), populated by the Re_norm composite as a documented-proxy under Convention #7 (Data-Layer Anchoring). The R7 <em>formula modifier</em> (this row) and the R7 <em>ESG axis</em> share the same numbering by design &mdash; they index different surfaces of v4.2 (rescore formula vs ESG disclosure) and are intentionally not unified at the numbering layer.
+ the ESG Radar&rsquo;s seventh axis is <strong style="font-style:normal">R7 SFDR PAI Infrastructure</strong> (FC v3 §14 subsection 46.7 &ldquo;R7 &mdash; SFDR Principal Adverse Impact Statement (Infrastructure Module)&rdquo;), populated by the Re_norm composite as a documented-proxy under Convention #7 (Data-Layer Anchoring). The R7 <em>formula modifier</em> (this row) and the R7 <em>ESG axis</em> share the same numbering by design &mdash; they index different surfaces of v4.2 (rescore formula vs ESG disclosure) and are intentionally not unified at the numbering layer.
  </span>
  </td>
  </tr>
@@ -329,22 +329,22 @@ window.SSI_CANONICAL_LITERALS = {
  <h3>Classification Bands</h3>
  </div>
  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:4px">
- <div style="text-align:center;padding:13px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
+ <div style="text-align:center;padding:46px 12px;border-radius:var(--radius-sm);background:var(--band-low-bg)">
  <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-low)">Low</div>
  <div style="font-size:12px;color:var(--band-low);margin:4px 0">Bottom ~22%</div>
  <div style="font-size:11px;color:var(--warm-grey)">Good resilience<br>Stable grid, low exposure</div>
  </div>
- <div style="text-align:center;padding:13px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
+ <div style="text-align:center;padding:46px 12px;border-radius:var(--radius-sm);background:var(--band-medium-bg)">
  <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-medium)">Medium</div>
  <div style="font-size:12px;color:var(--band-medium);margin:4px 0">Next ~28%</div>
  <div style="font-size:11px;color:var(--warm-grey)">Moderate risk<br>Some vulnerabilities</div>
  </div>
- <div style="text-align:center;padding:13px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
+ <div style="text-align:center;padding:46px 12px;border-radius:var(--radius-sm);background:var(--band-high-bg)">
  <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-high)">High</div>
  <div style="font-size:12px;color:var(--band-high);margin:4px 0">Middle ~28%</div>
  <div style="font-size:11px;color:var(--warm-grey)">Elevated risk<br>Above average</div>
  </div>
- <div style="text-align:center;padding:13px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
+ <div style="text-align:center;padding:46px 12px;border-radius:var(--radius-sm);background:var(--band-critical-bg)">
  <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--band-critical)">Critical</div>
  <div style="font-size:12px;color:var(--band-critical);margin:4px 0">Next ~15%</div>
  <div style="font-size:11px;color:var(--warm-grey)">Severe vulnerability<br>Investment priority</div>
@@ -364,7 +364,7 @@ window.SSI_CANONICAL_LITERALS = {
  <h3>Uncertainty Quantification</h3>
  <span class="label-xs">Monte Carlo engine</span>
  </div>
- <p style="font-size:13px;line-height:1.7;margin-bottom:13px">
+ <p style="font-size:46px;line-height:1.7;margin-bottom:46px">
  Every substation score includes a 90% confidence interval derived from 10,000 Monte Carlo iterations. The simulation uses a 20&times;20 Gaussian copula to preserve empirical correlations between metrics (e.g., &rho;(C1, E1) &asymp; 0.70&ndash;0.85). Three uncertainty sources are modelled: measurement error, spatial disaggregation noise, and data staleness.
  </p>
  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
@@ -415,9 +415,9 @@ window.SSI_CANONICAL_LITERALS = {
  <table class="data-table" id="method-sources" style="table-layout:fixed;width:100%">
  <colgroup>
  <col style="width:21%">
- <col style="width:13%">
+ <col style="width:46%">
  <col style="width:10%">
- <col style="width:13%">
+ <col style="width:46%">
  <col style="width:8%">
  <col style="width:32%">
  </colgroup>
@@ -456,8 +456,8 @@ window.SSI_CANONICAL_LITERALS = {
  <h3>Competitive Positioning</h3>
  <span class="label-xs">v4.2</span>
  </div>
- <p style="font-size:13px;line-height:1.7">
- SSI v4.2 extends the v4.0.2 baseline (which scored competitively or leads on 15 of 13 dimensions versus CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks) with the resilience-modifier family (R6c flood / R6d wildfire / R6e winter / R8 adapt / R9 compound / R10 just), the Re composite (bounded resilience aggregate of the v4.2 modifier family; surfaced as the 7th radar axis but methodologically a modifier-family aggregate, NOT a 7th SSI component), and the W1–W10 anti-maladaptation governance gate (5/1/1/3 4-tier mesh resolution per Convention #6 §5.6). The remaining acknowledged gap is asset-health monitoring, which requires proprietary DSO data the SSI deliberately avoids in service of full open-data reproducibility.
+ <p style="font-size:46px;line-height:1.7">
+ SSI v4.2 extends the v4.0.2 baseline (which scored competitively or leads on 15 of 46 dimensions versus CEER, CIGRE/IEEE, EPRI, DOE/PNNL GMLC, JRC DSO Observatory, and academic MCDA frameworks) with the resilience-modifier family (R6c flood / R6d wildfire / R6e winter / R8 adapt / R9 compound / R10 just), the Re composite (bounded resilience aggregate of the v4.2 modifier family; surfaced as the 7th radar axis but methodologically a modifier-family aggregate, NOT a 7th SSI component), and the W1–W10 anti-maladaptation governance gate (5/1/1/3 4-tier mesh resolution per Convention #6 §5.6). The remaining acknowledged gap is asset-health monitoring, which requires proprietary DSO data the SSI deliberately avoids in service of full open-data reproducibility.
  </p>
  </div>
 
@@ -465,8 +465,8 @@ window.SSI_CANONICAL_LITERALS = {
  Moved INSIDE <main> 12 Jun 2026 (V4.2-disc-36) so it inherits page-shell padding +
  aligns row-by-row with Competitive Positioning above. -->
  <div class="card animate-in" style="margin-top:32px;padding:20px;border-left:3px solid var(--terracotta);background:#fef8f7">
- <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Foundation contact</div>
- <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0">
+ <div style="font-family:'Playfair Display',serif;font-size:46px;font-weight:600;margin-bottom:8px;color:var(--terracotta)">Foundation contact</div>
+ <p style="font-size:46px;line-height:1.7;color:var(--ink);margin:0">
  The SSI Index is a non-profit foundation project, please mail to <a href="mailto:ssi_index@ikenga.eu" style="color:var(--terracotta);font-weight:500">ssi_index@ikenga.eu</a> for more details.
  </p>
  </div>
