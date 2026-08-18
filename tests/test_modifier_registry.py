@@ -28,11 +28,18 @@ from scripts.pipeline.scoring.modifier_registry import (
 class TestRegistryShape:
     """Tests 1-5: registry shape and self-consistency invariants."""
 
-    def test_1_registry_has_16_entries(self):
-        """Registry has exactly 16 entries (11 deployed + 5 v4.2-ready)."""
-        # 5 canonical v4.0.2 + 5 per-country adaptations + 6 v4.2-ready = 16
-        assert len(MODIFIER_REGISTRY) == 16, (
-            f"Expected 16 entries, got {len(MODIFIER_REGISTRY)}. "
+    def test_1_registry_has_17_entries(self):
+        """Registry has exactly 17 entries.
+
+        v4.24 recount (18 August 2026, GATE-A-11-REVISED hard cutover):
+        - 5 canonical v4.0.2 (R3_C_mult, R4_F_topo, R6_restoration, R6_seismic, R7_cyber-tombstoned)
+        - 1 v4.24 R7_cyber_v2 primary emit path (CRA + NIS2 register-anchored)
+        - 5 per-country adaptations (R6_volcanic, R6_drought, R6_armed_conflict, R6_typhoon, R6_chaebol)
+        - 6 v4.2-ready (R6c_flood, R6d_wildfire, R6e_winter, R8_adapt, R9_compound, R10_just)
+        = 17 total. R7_cyber v1 entry retained (with retired: True) for audit-trail readers.
+        """
+        assert len(MODIFIER_REGISTRY) == 17, (
+            f"Expected 17 entries, got {len(MODIFIER_REGISTRY)}. "
             f"Keys: {sorted(MODIFIER_REGISTRY.keys())}"
         )
 

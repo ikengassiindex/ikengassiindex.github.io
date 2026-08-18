@@ -73,12 +73,12 @@ SHARDING_THRESHOLD_MB = 90.0
 
 # Wave 4 sharded countries as of Commit 45 `ad9adfc5`. Extended as new
 # countries cross the sharding threshold (Wave 5+ additions to be appended).
-SHARDED_COUNTRIES = ("uk", "us", "france", "germany")
+SHARDED_COUNTRIES = ("uk", "us", "france", "germany", "italy", "poland")
 
 # Countries expected to stay single-file (subset — validated below by scanning).
 # Non-exhaustive; the test class walks all non-sharded countries via
 # intelligence/countries.json single-source-of-truth.
-NON_SHARDED_SAMPLE = ("sweden", "portugal", "italy", "japan", "spain")
+NON_SHARDED_SAMPLE = ("sweden", "portugal", "japan", "spain")
 
 
 # ═══════════════════════════════════════════════════════════

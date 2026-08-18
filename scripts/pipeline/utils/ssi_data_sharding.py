@@ -47,9 +47,19 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# ─── Sharding thresholds ───
-SSI_DATA_SHARD_THRESHOLD_MB = 90.0   # Below → single file; above → shard
-SSI_DATA_SHARD_TARGET_MB = 60.0      # Each shard target size (safety margin)
+# ─── Sharding thresholds (Phase β · v4.24 recalibration · 18 Aug 2026) ───
+# Recalibrated: threshold 90→60 MB, target 60→45 MB.
+# Rationale: v4.24 methodology-version event adds R7_cyber_v2 dual-write
+# markers (`_r7_cyber_v1_value` snapshot + `_r7_cyber_v1_retired` boolean +
+# `R7_cyber_v2_source` register audit trail per Convention #56) that inflate
+# per-substation payload ~2-4%. Poland at 63 MB pre-recalibration was inside
+# threshold but with zero headroom for future modifier additions (R11 Paris
+# Q3 2027 · R12 CSRD Q1 2027 · R13 EU AI Act Q4 2026 per §5novies queue).
+# New 45 MB target restores ~35% headroom. Sentinel
+# test_ssi_data_sharding_invariants.py::test_shard_thresholds_pinned
+# pins these constants against regression.
+SSI_DATA_SHARD_THRESHOLD_MB = 60.0   # Below → single file; above → shard (was 90.0 pre-v4.24)
+SSI_DATA_SHARD_TARGET_MB = 45.0      # Each shard target size (was 60.0 pre-v4.24)
 SSI_DATA_MIN_SUBS_PER_SHARD = 500    # Never shard smaller than this
 
 

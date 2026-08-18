@@ -52,16 +52,28 @@ MODIFIER_REGISTRY = {
     "R6_seismic":        {"type": "mult", "default": 1.0, "range": (1.00, 1.25),
                           "introduced": "v4.0.0",
                           "countries": "all"},
+    # ─── R7_cyber v1 → v2 HARD CUTOVER · v4.24 methodology-version event ───
+    # GATE-A-11 REVISED 18 August 2026 from dual-write (~6 months) → hard cutover at
+    # Session M+1. Rationale per operator directive: thought-leadership framing
+    # ("done before the market"), R7 v2 empirically better than v1 (CRA/NIS2 register-
+    # anchored composite > DESI/ACN scalar proxy), NIS2 already binding since Oct 2024,
+    # CRA in force since Dec 2024 — Article 14 reporting activation Sept 2026 does not
+    # gate methodology adoption. See task_1108_r7_cyber_v2_preflight_20260825.yaml
+    # operator_signoff_log row GATE-A-11-REVISED.
+    #
+    # R7_cyber (v1) — TOMBSTONED · Convention #56 retire-with-comment discipline
+    # Historical v4.0.0 → v4.23 emit path (DESI/ACN documented-proxy fleet-defensible
+    # fallback per §5quater dual-axis SFDR PAI discipline). NOT emitted in v4.24+
+    # pipeline runs. Audit trail preserved cohort-wide via:
+    #   - `_r7_cyber_v1_retired: True` marker (boolean)
+    #   - `_r7_cyber_v1_value: <last-computed float>` snapshot (per-substation)
+    # Any pipeline reader referencing "R7_cyber" post v4.24 MUST migrate to
+    # "R7_cyber_v2". Registry entry retained (with retired: True) to enable audit-
+    # trail readers and reject-with-clear-message consumer errors.
     "R7_cyber":          {"type": "mult", "default": 1.0, "range": (0.99, 1.05),
                           "introduced": "v4.0.0",
+                          "retired": "v4.24 (18 August 2026, GATE-A-11-REVISED hard cutover; superseded by R7_cyber_v2)",
                           "countries": "all"},
-    # ─── R7_cyber v1 → v2 transition (18 August 2026, Task #1102 + #1107 + #1118) ────────
-    # `R7_cyber` v1 continues to be emitted during the ~6 month dual-write transition
-    # per Gate A operator recommendation GATE-A-11 (see CRA_P1_GATE_A_DECISION_SURFACING.md).
-    # Retire-with-tombstone comment applies: any pipeline reader consuming the R7 signal
-    # SHOULD migrate to R7_cyber_v2 by 2027-Q1 (post ENISA SRP feed availability if opens).
-    # v1 audit trail preserved per Convention #56 via `_r7_cyber_v1_retired: True` +
-    # `_r7_cyber_v1_value: <last-computed>` markers on every substation post R7 v2 first apply.
     #
     # R7_cyber v2 — CRA + NIS2 regulatory-vintage composite (Task #1102 workstream)
     # Envelope at v0 preserved [0.99, 1.05] for continuity with v1 (matches R7 v1 default);

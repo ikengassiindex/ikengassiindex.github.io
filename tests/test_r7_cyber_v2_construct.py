@@ -447,11 +447,74 @@ class TestRegistryKeyParity:
         entry = MODIFIER_REGISTRY[R7V2.REGISTRY_KEY]
         assert entry["type"] == "mult", "R7_cyber v2 must be a multiplicative modifier"
 
-    def test_v1_r7_cyber_still_present_dual_write(self):
-        """GATE-A-11: R7_cyber v1 co-exists with v2 during ~6 month transition."""
+    def test_v1_r7_cyber_tombstoned_post_cutover(self):
+        """GATE-A-11-REVISED (18 August 2026): hard cutover.
+
+        R7_cyber v1 registry entry is retained for audit-trail readers but
+        MUST carry a ``retired`` field naming the v4.24 methodology-version
+        event. The registry-key still resolves so consumer errors can be
+        reported clearly ("this modifier is retired, migrate to R7_cyber_v2")
+        rather than silently returning KeyError.
+        """
         from scripts.pipeline.scoring.modifier_registry import MODIFIER_REGISTRY
         assert "R7_cyber" in MODIFIER_REGISTRY, \
-            "R7_cyber v1 must remain in registry during dual-write transition (GATE-A-11)"
+            "R7_cyber v1 registry entry must be retained for audit-trail readers"
+        entry = MODIFIER_REGISTRY["R7_cyber"]
+        assert "retired" in entry, \
+            "R7_cyber v1 must carry a 'retired' field per GATE-A-11-REVISED hard cutover"
+        assert "v4.24" in entry["retired"] or "18 August 2026" in entry["retired"], \
+            f"R7_cyber v1 'retired' field must name v4.24 methodology-version event; got {entry['retired']!r}"
+
+
+# ══════════════════════════════════════════════════════════════════
+# TestPostCutoverInvariants — v4.24 methodology-version event
+# ══════════════════════════════════════════════════════════════════
+
+
+class TestPostCutoverInvariants:
+    """Sentinel invariants for the v4.23 → v4.24 methodology-version event
+    (18 August 2026, GATE-A-11-REVISED hard cutover).
+
+    Rationale: after Phase γδε lands the R7_cyber v1 tombstone + R7_cyber_v2
+    promotion, downstream code paths + user-facing metadata MUST reflect the
+    cutover. These sentinels pin that state against regression.
+    """
+
+    def test_methodology_version_v4_24(self):
+        """versions.json must declare methodology 4.24 post-cutover."""
+        import json
+        from pathlib import Path
+        p = Path(__file__).resolve().parent.parent / "versions.json"
+        data = json.loads(p.read_text(encoding="utf-8"))
+        assert data.get("methodology") == "4.24", \
+            f"versions.json methodology field must be '4.24' post-cutover; got {data.get('methodology')!r}"
+
+    def test_edition_config_ssi_version_v4_24(self):
+        """intelligence/edition-config.json ssi_version must be '4.24' post-cutover."""
+        import json
+        from pathlib import Path
+        p = Path(__file__).resolve().parent.parent / "intelligence" / "edition-config.json"
+        data = json.loads(p.read_text(encoding="utf-8"))
+        assert data.get("ssi_version") == "4.24", \
+            f"edition-config.json ssi_version must be '4.24' post-cutover; got {data.get('ssi_version')!r}"
+
+    def test_r7_v2_is_primary_r7_modifier(self):
+        """R7_cyber_v2 is present + not marked retired; R7_cyber v1 IS retired."""
+        from scripts.pipeline.scoring.modifier_registry import MODIFIER_REGISTRY
+        v1 = MODIFIER_REGISTRY.get("R7_cyber", {})
+        v2 = MODIFIER_REGISTRY.get("R7_cyber_v2", {})
+        assert "retired" in v1, "R7_cyber v1 must be marked retired post-cutover"
+        assert "retired" not in v2, "R7_cyber_v2 must NOT be marked retired post-cutover"
+
+    def test_sharding_threshold_recalibrated_60_45(self):
+        """Convention #79 sharding threshold recalibrated 90→60 MB, target 60→45 MB."""
+        from scripts.pipeline.utils.ssi_data_sharding import (
+            SSI_DATA_SHARD_THRESHOLD_MB, SSI_DATA_SHARD_TARGET_MB,
+        )
+        assert SSI_DATA_SHARD_THRESHOLD_MB == 60.0, \
+            f"Convention #79 threshold must be 60 MB post-v4.24 recalibration; got {SSI_DATA_SHARD_THRESHOLD_MB}"
+        assert SSI_DATA_SHARD_TARGET_MB == 45.0, \
+            f"Convention #79 shard target must be 45 MB post-v4.24 recalibration; got {SSI_DATA_SHARD_TARGET_MB}"
 
 
 # ══════════════════════════════════════════════════════════════════
