@@ -55,6 +55,38 @@ MODIFIER_REGISTRY = {
     "R7_cyber":          {"type": "mult", "default": 1.0, "range": (0.99, 1.05),
                           "introduced": "v4.0.0",
                           "countries": "all"},
+    # ─── R7_cyber v1 → v2 transition (18 August 2026, Task #1102 + #1107 + #1118) ────────
+    # `R7_cyber` v1 continues to be emitted during the ~6 month dual-write transition
+    # per Gate A operator recommendation GATE-A-11 (see CRA_P1_GATE_A_DECISION_SURFACING.md).
+    # Retire-with-tombstone comment applies: any pipeline reader consuming the R7 signal
+    # SHOULD migrate to R7_cyber_v2 by 2027-Q1 (post ENISA SRP feed availability if opens).
+    # v1 audit trail preserved per Convention #56 via `_r7_cyber_v1_retired: True` +
+    # `_r7_cyber_v1_value: <last-computed>` markers on every substation post R7 v2 first apply.
+    #
+    # R7_cyber v2 — CRA + NIS2 regulatory-vintage composite (Task #1102 workstream)
+    # Envelope at v0 preserved [0.99, 1.05] for continuity with v1 (matches R7 v1 default);
+    # envelope re-calibration deferred to v1 (post ENISA SRP feed availability) → v2 (post
+    # 11 December 2027 CRA full applicability + SBOM per-vendor granularity).
+    # Path variant = Path C+D composite (entity + product, 26 EU Path C via CRA+NIS2
+    # register-read + 13-country non-EU Path D parallel constructs per D1 memo §4).
+    # Weights: w_entity = 0.55 · w_product = 0.45 (BINDING sum-to-unity invariant
+    # w_entity + w_product = 1.0 per V_socio precedent + Discipline #47 REGULATORY-VINTAGE
+    # variant sub-discipline). Anchored Ciso-Nasser 2024 + NERC E-ISAC 2022 empirical
+    # grounding — operator-response discipline dominates over vendor-vulnerability tail
+    # for grid-critical infrastructure. Resolved per Gate A GATE-A-1 + GATE-A-2 operator
+    # sign-off 18 August 2026 (Session B merge; see task_1108_r7_cyber_v2_preflight_20260825.yaml
+    # operator_signoff_log block). See:
+    #   - Report Production framing: METHODOLOGY_DISCIPLINES.md §5novies + §5decies
+    #   - Rulebook subfolder: 01-R7-Cyber-v2-CRA-Integration/CRA_P1_GATE_A_DECISION_SURFACING.md
+    #   - Formula construct draft: R7_CYBER_V2_FORMULA_CONSTRUCT_DRAFT.md (D2)
+    # First-apply implementation module `scripts/pipeline/scoring/r7_cyber_v2.py` queued P4
+    # per CRA_R7_CASCADE_PLAN_EXTENDED.md; sentinel `tests/test_r7_cyber_v2_construct.py`
+    # queued alongside. Registering the entry NOW enables downstream code paths to reference
+    # the modifier name without waiting for module authoring (Convention #56 discipline:
+    # registry entry surfaces the intent-to-emit even before emission code lands).
+    "R7_cyber_v2":       {"type": "mult", "default": 1.0, "range": (0.99, 1.05),
+                          "introduced": "v4.2 (Task #1102 CRA integration · 18 August 2026 · Path C+D composite recommended · Gate A pending)",
+                          "countries": "v4.2 cohort (26 EU via CRA + NIS2 + 13 non-EU parallel constructs per D1 memo §4)"},
 
     # ── Per-country adaptations (deployed in ssi-data.json pre-PR-3
     # ── but not yet engine-applied; PR-3 makes them live) ────────────────
