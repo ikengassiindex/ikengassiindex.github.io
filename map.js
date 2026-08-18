@@ -1583,8 +1583,18 @@ if (!hasNested) {
             }
           }
           const boundsLonSpan = maxLon - minLon;
+          const boundsLatSpan = maxLat - minLat;
           const subsLonSpan = Math.max(0.01, subMaxLon - subMinLon);
-          if (boundsLonSpan > 60 || boundsLonSpan > subsLonSpan * 2) {
+          const subsLatSpan = Math.max(0.01, subMaxLat - subMinLat);
+          // Trigger safeguard on EITHER latitude OR longitude pathology. Norway follow-on
+          // (Task #619, 30 Jul 2026): bounds.json includes Svalbard (80°N) + Bouvet Island
+          // (-54°S) → lat span 135° but lon span only 43°. Original safeguard checked only
+          // lon so it never fired for Norway; mainland-Norway compressed to sub-pixel blob.
+          // Adding lat-span check catches Norway + any future country with far-north or
+          // far-south territorial extension (e.g. Denmark's Greenland is already served by
+          // its own slug, but this makes the safeguard geometry-agnostic).
+          if (boundsLonSpan > 60 || boundsLatSpan > 60 ||
+              boundsLonSpan > subsLonSpan * 2 || boundsLatSpan > subsLatSpan * 2) {
             minLon = subMinLon; maxLon = subMaxLon;
             minLat = subMinLat; maxLat = subMaxLat;
           }
