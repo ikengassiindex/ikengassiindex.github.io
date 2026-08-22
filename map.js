@@ -2,10 +2,26 @@
 // Load countries.json config (currencies, flags, admin labels)
 (function() {
   var base = window.SSI_BASE || (window.location.pathname.match(/^\/\w+\//) ? '../' : './');
-  fetch(base + 'countries.json?v=1', {cache: 'no-store'})
-    .then(function(r) { return r.json(); })
+  // The single source of truth lives at intelligence/countries.json. This
+  // fetch previously pointed at base + 'countries.json', which does not exist
+  // at the repository root: every country page 404'd, the .catch installed an
+  // empty object, and because {} is truthy the `if (!SSI_COUNTRIES_CONFIG)`
+  // guard below never fired — so currency_symbol resolved to the terminal
+  // EUR fallback for all 39 jurisdictions, including DKK, GBP, USD, JPY and
+  // the rest. The data was present in countries.json the whole time.
+  fetch(base + 'intelligence/countries.json?v=1', {cache: 'no-store'})
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
     .then(function(cfg) { window.SSI_COUNTRIES_CONFIG = cfg; })
-    .catch(function() { window.SSI_COUNTRIES_CONFIG = {}; });
+    .catch(function(e) {
+      // Convention #56 — visibly-honest degradation. The previous version
+      // failed silently, which is what let the defect live undetected.
+      console.warn('[map.js] countries.json unavailable (' + e.message +
+                   ') — currency symbols will fall back to EUR');
+      window.SSI_COUNTRIES_CONFIG = {};
+    });
 })();
 
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -667,6 +683,43 @@
         return window.SSI_METADATA.currency_symbol;
       }
       if (!window.SSI_COUNTRIES_CONFIG) return '\u20AC'; // fallback to EUR
+      // Resolve from the page's OWN identity first. Deriving the country by
+      // parsing `substation_id` works only where the id happens to carry an
+      // ISO2 prefix: measured across the cohort it succeeds for 26 of 39 and
+      // fails for the 8 jurisdictions with purely numeric ids (France,
+      // Germany, Italy, Japan, Portugal, Spain, Sweden, US), for Greece and
+      // Turkey (hyphen-delimited, not underscore), for Costa Rica (lowercase
+      // OSM way id), for Israel (placeholder `XX_` prefix) and for the UK
+      // (prefix `UK`, ISO2 `GB` \u2014 the isoMap below is applied to the flat-dict
+      // branch only, never to the countries[] branch). The page always knows
+      // its own slug, so ask it.
+      var _cfg = window.SSI_COUNTRIES_CONFIG;
+      var _el = document.querySelector('[data-country]');
+      // Two identifiers exist for the same jurisdiction and they do not always
+      // agree: `ssi-metadata.js` carries `country:` while countries.json
+      // carries `slug`, and measured across the cohort 5 of 39 differ —
+      // costa_rica/costa-rica, new_zealand/new-zealand,
+      // united_kingdom/uk, united_states/us, and Italy which has no `country:`
+      // field at all. So collect every candidate the page can offer and match
+      // on a normalised form of slug OR name rather than trusting one.
+      var _norm = function (s) {
+        return String(s || '').toLowerCase().replace(/[\s_]+/g, '-');
+      };
+      var _cands = [
+        (window.SSIMetadata || window.SSI_METADATA || {}).country,
+        (_el && _el.dataset && _el.dataset.country) || '',
+        (window.location.pathname.split('/').filter(Boolean) || [])
+          .slice(-2, -1)[0] || ''
+      ].map(_norm).filter(Boolean);
+      if (_cands.length && _cfg.countries) {
+        var byId = _cfg.countries.filter(function (c) {
+          return _cands.indexOf(_norm(c.slug)) !== -1 ||
+                 _cands.indexOf(_norm(c.name)) !== -1;
+        })[0];
+        if (byId && (byId.currency_symbol || byId.currency)) {
+          return byId.currency_symbol || byId.currency;
+        }
+      }
       var id = ssi.substation_id || '';
       var prefix = id.substring(0, 2);
       var isoMap = {UK: 'GB'};
