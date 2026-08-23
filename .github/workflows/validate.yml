@@ -52,10 +52,20 @@ jobs:
           # first_refresh is OPTIONAL per slug — entries without one are treated
           # as 'already past' (legacy countries deployed before the gating system).
           # But every PRESENT entry must parse as YYYY-MM or YYYY-MM-DD.
+          # Underscore-prefixed keys are in-file documentation, not countries.
+          # first_refresh carries a '_comment' (added 2026-06-04 by 5d3efa6a)
+          # whose value is prose. Both assertions below iterated over it: the
+          # date check failed on the prose, so this step exited 1 on EVERY run
+          # from that day onward — and because the job stopped there, the two
+          # gates that follow (Task #125 file-size sentinel and the Discipline
+          # #36 check_cross_border.py --all --strict deploy gate) never ran at
+          # all. The absent cross-border-report.json artefact in every run log
+          # is the fingerprint. Skipping metadata keys restores all three.
           for slug, date in fr.items():
+            if slug.startswith('_'): continue
             assert re.match(r'^\d{4}-\d{2}(-\d{2})?\$', date), f'{slug}: bad first_refresh {date!r}'
           # And every key in first_refresh must be a real slug (catches typos)
-          orphans = [s for s in fr if s not in slugs]
+          orphans = [s for s in fr if not s.startswith('_') and s not in slugs]
           assert not orphans, f'first_refresh keys not in slugs[]: {orphans}'
           print(f'intelligence/countries.json: {len(slugs)} slugs · {len(fr)} first_refresh dates · all parse OK')
           "
