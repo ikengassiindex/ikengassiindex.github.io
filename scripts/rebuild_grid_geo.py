@@ -86,21 +86,30 @@ def load_substations(slug):
 
 
 def load_lines(slug, g):
+    """Every line, tagged with the file it came from.
+
+    The origin matters at write time: Convention #80 shards the geometry, and
+    a line has to go back where it was found or the manifest balloons past
+    GitHub's 100 MB limit. `None` means the manifest itself.
+    """
     L = g.get("l")
     if isinstance(L, list) and L:
-        return L
+        return [(rec, None) for rec in L]
     out = []
     for k in ("l_shards", "lines_shards", "line_shards", "shards"):
         for sh in g.get(k) or []:
             q = sh["path"] if isinstance(sh, dict) else sh
-            f = REPO / slug / Path(q).name
+            name = Path(q).name
+            f = REPO / slug / name
             if f.exists():
                 part = json.loads(f.read_text(encoding="utf-8"))
-                out += part if isinstance(part, list) else (part.get("l") or [])
+                recs = part if isinstance(part, list) else (part.get("l") or [])
+                out += [(rec, name) for rec in recs]
     if not out:
         for f in sorted((REPO / slug).glob("grid-geo-l-*.json")):
             part = json.loads(f.read_text(encoding="utf-8"))
-            out += part if isinstance(part, list) else (part.get("l") or [])
+            recs = part if isinstance(part, list) else (part.get("l") or [])
+            out += [(rec, f.name) for rec in recs]
     return out
 
 
@@ -196,7 +205,7 @@ def geolocation_gate(slug, nodes, lines):
     # Lines keep [lon, lat]; a polyline whose first pair looks like [lat, lon]
     # would put the whole conductor somewhere else entirely.
     off = 0
-    for e in lines[:5000]:
+    for e, _origin in lines[:5000]:
         p = e.get("p") or []
         if p and isinstance(p[0], list) and len(p[0]) == 2:
             lon, lat = p[0]
@@ -293,7 +302,7 @@ def rebuild(slug):
 
     adjacency = collections.defaultdict(list)
     out_lines, resolved = [], 0
-    for e in lines:
+    for e, origin in lines:
         p = e.get("p") or []
         ne = dict(e)
         a = b = None
@@ -309,7 +318,7 @@ def rebuild(slug):
             adjacency[b].append(lid)
         if a is not None and b is not None:
             resolved += 1
-        out_lines.append(ne)
+        out_lines.append((ne, origin))
 
     old_ext, new_ext = extent(old_s), extent(nodes)
     drift = None
@@ -323,13 +332,71 @@ def rebuild(slug):
             warnings.append(f"map centre moves {drift / 1000:.1f} km")
 
     return {
-        "slug": slug, "nodes": nodes, "lines": out_lines,
+        "slug": slug, "nodes": nodes, "lines_with_origin": out_lines,
         "adjacency": {k: v for k, v in adjacency.items()},
         "old_nodes": len(old_s), "new_nodes": len(nodes),
         "skipped": skipped, "lines_total": len(lines), "lines_resolved": resolved,
         "problems": problems, "warnings": warnings,
         "centre_drift_m": drift, "grid": g,
     }
+
+
+
+def write_country(slug, r):
+    """Write nodes and adjacency back, preserving the shard layout exactly.
+
+    The obvious implementation — assign `g["l"]` and dump one file — would
+    have destroyed the repository. Convention #80 shards the line geometry,
+    and concatenating it back inline gives a single `grid-geo.json` of 391 MB
+    for the US, 95 MB for France and 94 MB for Germany. GitHub rejects any
+    file over 100 MB, so the first `git push` would have failed with three
+    files already rewritten.
+
+    Lines are not changing here in any case. This cascade re-emits the node
+    set from the fleet and rebuilds the adjacency; the OSM geometry is
+    untouched. So each line record is written back to the file it came from,
+    carrying only its re-indexed `ss`/`se`, and the manifest keeps its shard
+    references.
+    """
+    out = []
+    g = r["grid"]
+    g["s"] = r["nodes"]
+    g["a"] = r["adjacency"]
+
+    by_file = collections.defaultdict(list)
+    for rec, origin in r["lines_with_origin"]:
+        by_file[origin].append(rec)
+
+    for origin, recs in sorted(by_file.items()):
+        if origin is None:              # lines live inline in the manifest
+            g["l"] = recs
+            continue
+        payload = json.loads((REPO / slug / origin).read_text(encoding="utf-8"))
+        if isinstance(payload, list):
+            payload = recs
+        else:
+            payload["l"] = recs
+        (REPO / slug / origin).write_text(
+            json.dumps(payload, separators=(",", ":"), ensure_ascii=False),
+            encoding="utf-8")
+        shard_mb = (REPO / slug / origin).stat().st_size / 1048576
+        note = (f"  — over the Convention #79 60 MB threshold" if shard_mb > 60
+                else "")
+        out.append(f"wrote {slug}/{origin} ({len(recs):,} lines, "
+                   f"{shard_mb:,.1f} MB){note}")
+
+    if "l" not in g:
+        g["l"] = []
+    path = REPO / slug / "grid-geo.json"
+    path.write_text(json.dumps(g, separators=(",", ":"), ensure_ascii=False),
+                    encoding="utf-8")
+    mb = path.stat().st_size / 1048576
+    out.append(f"wrote {slug}/grid-geo.json ({mb:,.1f} MB, "
+               f"{len(r['nodes']):,} nodes)")
+    if mb > 60:
+        out.append(f"WARNING {slug}/grid-geo.json is {mb:,.1f} MB — over the "
+                   f"Convention #79 60 MB threshold")
+    return out
 
 
 def main():
@@ -375,13 +442,8 @@ def main():
             continue
         if not a.write:
             continue
-        g = r["grid"]
-        g["s"] = r["nodes"]
-        g["l"] = r["lines"]
-        g["a"] = r["adjacency"]
-        (REPO / slug / "grid-geo.json").write_text(
-            json.dumps(g, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
-        print(f"{'':<13}  wrote {slug}/grid-geo.json")
+        for line in write_country(slug, r):
+            print(f"{'':<13}  {line}")
 
     if a.dry_run:
         print("\nDRY RUN — nothing written.")
