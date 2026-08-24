@@ -61,6 +61,33 @@ TOL_M = 300.0       # substation-to-conductor snap distance
 FANOUT = 8          # cap on pairs emitted per conductor group (see below)
 
 
+def _lines(slug, g):
+    """Lines, transparently across Convention #80 grid-geo shards.
+
+    `g["l"]` is empty for the sharded countries — France, Germany, the US —
+    which are exactly the three that matter most. Reading only `l` reported
+    them as having no geometry at all, and the tool printed a dash where it
+    should have printed a measurement.
+    """
+    L = g.get("l")
+    if isinstance(L, list) and L:
+        return L
+    out = []
+    for k in ("l_shards", "lines_shards", "line_shards", "shards"):
+        for sh in g.get(k) or []:
+            q = sh["path"] if isinstance(sh, dict) else sh
+            f = REPO / slug / Path(q).name
+            if f.exists():
+                part = json.loads(f.read_text(encoding="utf-8"))
+                out += part if isinstance(part, list) else (part.get("l") or [])
+    if out:
+        return out
+    for f in sorted((REPO / slug).glob("grid-geo-l-*.json")):
+        part = json.loads(f.read_text(encoding="utf-8"))
+        out += part if isinstance(part, list) else (part.get("l") or [])
+    return out
+
+
 def _load(slug):
     p = REPO / slug / "grid-geo.json"
     if not p.exists():
@@ -115,7 +142,7 @@ def held(slug):
     g = _load(slug)
     if not g:
         return {"slug": slug, "grid_geo": False}
-    S, L = g.get("s") or {}, g.get("l") or []
+    S, L = g.get("s") or {}, _lines(slug, g)
     A = {str(k): [str(x) for x in v] for k, v in (g.get("a") or {}).items()}
     ids, n_subs = _sub_ids(slug)
 
@@ -158,8 +185,9 @@ def recover(slug):
     g = _load(slug)
     if not g:
         return {"slug": slug, "grid_geo": False}
+    _, n_scored = _sub_ids(slug)
     S = g.get("s") or {}
-    L = [e for e in (g.get("l") or []) if e.get("p") and len(e["p"]) >= 2]
+    L = [e for e in _lines(slug, g) if e.get("p") and len(e["p"]) >= 2]
     if not S or not L:
         return {"slug": slug, "recoverable": False, "reason": "no lines or no nodes"}
 
@@ -229,12 +257,14 @@ def recover(slug):
     comps = _components(radj)
     return {
         "slug": slug, "recoverable": True,
-        "substations": len(S),
+        "substations": n_scored, "graph_nodes": len(S),
         "snapped_to_network": len(at),
         "snapped_pct": 100 * len(at) / max(len(S), 1),
+        "graph_nodes_vs_scored": len(S) - n_scored,
         "recovered_edges": len(edges),
         "connected_substations": len(deg),
-        "connected_pct": 100 * len(deg) / max(len(S), 1),
+        "connected_pct": 100 * len(deg) / max(n_scored, 1),
+        "connected_pct_of_graph_nodes": 100 * len(deg) / max(len(S), 1),
         "mean_degree": sum(deg.values()) / max(len(deg), 1),
         "components": len(comps),
         "largest_component_pct": 100 * (comps[0] if comps else 0) / max(sum(comps), 1),
@@ -257,7 +287,7 @@ def main():
 
     print(f"{'country':<13}{'subs':>8}{'geo-nodes':>10}{'a-keys':>8}{'join%':>7}"
           f"{'ss/se%':>8}{'connected now':>14}"
-          + ("   reconstructed (of geo-nodes)" if a.recover else ""))
+          + ("   reconstructed (of scored subs)" if a.recover else ""))
     out = []
     for s in slugs:
         h = held(s)
