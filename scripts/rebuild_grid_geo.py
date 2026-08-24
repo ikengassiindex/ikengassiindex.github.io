@@ -129,6 +129,26 @@ def geolocation_gate(slug, nodes, lines):
         if max(abs(y) for y in ys) > 90:
             problems.append("y exceeds ±90 — x and y look transposed")
         span_x, span_y = max(xs) - min(xs), max(ys) - min(ys)
+        # A fleet straddling the date line reads as a 355-degree span when the
+        # longitudes are compared naively. Re-measure it wrapped: shift the
+        # western lobe east by 360 and take whichever span is smaller. New
+        # Zealand is 355 degrees naive and 10 degrees wrapped — one substation
+        # in the Chathams against 1,588 on the mainland.
+        wrapped = [x + 360 if x < 0 else x for x in xs]
+        span_wrapped = max(wrapped) - min(wrapped)
+        if span_wrapped < span_x:
+            west = sum(1 for x in xs if x < 0)
+            east = len(xs) - west
+            minority, side = ((west, "west of 0°") if west <= east
+                              else (east, "east of 0°"))
+            problems.append(
+                f"fleet straddles the anti-meridian: {span_x:.0f}° naive, "
+                f"{span_wrapped:.0f}° wrapped; the smaller lobe is "
+                f"{minority:,} substation(s) {side}. map.js measures the "
+                f"cluster span naively, so its "
+                f"Mode-3 safeguard would fall back to a cluster that is itself "
+                f"pathological and the map would not render. This needs a "
+                f"decision, not a default — see the module docstring.")
         if span_x > 350 or span_y > 175:
             warnings.append(f"extent spans {span_x:.0f}° x {span_y:.0f}° — check "
                             f"the Mode-3 viewport safeguard still catches this")
@@ -183,7 +203,37 @@ def rebuild(slug):
             "v": v if isinstance(v, (int, float)) else 0,
         }
 
+    dup_same = dup_diff = dup_rows = 0
+    _seen = {}
+    for _s in subs:
+        _k = str(_s.get("substation_id"))
+        _c = (round(_s.get("lat"), 6) if isinstance(_s.get("lat"), float) else _s.get("lat"),
+              round(_s.get("lon"), 6) if isinstance(_s.get("lon"), float) else _s.get("lon"))
+        if _k in _seen:
+            dup_rows += 1
+            if _seen[_k] == _c:
+                dup_same += 1
+            else:
+                dup_diff += 1
+        else:
+            _seen[_k] = _c
+
     problems, warnings = geolocation_gate(slug, nodes, lines)
+
+    # Keying the map by substation_id deduplicates, which is right — but it
+    # must be said out loud, because the rows disappear from the map without
+    # disappearing from the fleet. Australia carries 436 ids used twice at
+    # identical coordinates (504 rows) and 2 used by genuinely different
+    # substations; Turkey carries 29. Same coordinates is a duplicate record;
+    # different coordinates is an id collision and a data defect.
+    if dup_same or dup_diff:
+        bits = []
+        if dup_same:
+            bits.append(f"{dup_rows:,} duplicate row(s) at identical coordinates")
+        if dup_diff:
+            bits.append(f"{dup_diff} id(s) shared by substations at DIFFERENT "
+                        f"coordinates")
+        warnings.append("substation_id not unique — " + "; ".join(bits))
 
     # Incidence: a line belongs to a substation when one of its ends is at it.
     bucket = collections.defaultdict(list)
