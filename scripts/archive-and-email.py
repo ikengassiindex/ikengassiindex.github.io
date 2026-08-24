@@ -348,7 +348,13 @@ def capture_pages():
     config_path = Path("intelligence/edition-config.json")
     config = json.load(open(config_path, "r", encoding="utf-8"))
     edition_key = config.get("active_edition_key") or datetime.utcnow().strftime("%Y-%m")
-    edition_num = config.get("current_edition", 0)
+    # Archive filenames are named from the capture counter, not the edition.
+    # `current_edition` is the reader-facing MONTHLY number (2026-08 = 006) and
+    # repeats within a month; `capture_seq` advances on every run, so two
+    # captures in one month cannot collide on one filename. Falls back to
+    # current_edition for configs written before the two were separated, which
+    # is how Ed001-Ed024 were named.
+    edition_num = config.get("capture_seq", config.get("current_edition", 0))
     edition_label = f"{edition_num:03d}"
     RUN_LOG["edition_key"] = edition_key
     RUN_LOG["edition_label"] = edition_label

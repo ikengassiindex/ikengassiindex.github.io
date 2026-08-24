@@ -51,12 +51,33 @@ def main():
         # Write prev key to file so workflow can read it
         Path('prev_edition_key.txt').write_text(prev_active_key)
 
-    # Increment edition
+    # ── Edition number is DERIVED from the calendar, never incremented ──
+    #
+    # This script previously did `new_ed = old_ed + 1` on every invocation,
+    # with no guard on the month. The 2nd-Thursday gate in monthly-refresh.yml
+    # only applies to scheduled runs — `workflow_dispatch` always proceeds —
+    # so every manual run bumped the edition. The archive records the damage:
+    # 11 editions in April 2026 and 8 in May against one per month due,
+    # carrying current_edition to 26 while the true monthly count was 6.
+    #
+    # Deriving from an epoch makes the number a function of the date rather
+    # than of how many times anyone pressed the button, so re-running within a
+    # month is a no-op and out-of-band edits cannot drift it.
+    epoch = config.get('edition_epoch', '2026-03')
+    ey, em = (int(x) for x in epoch.split('-'))
+    new_ed = (now.year - ey) * 12 + (now.month - em) + 1
     old_ed = config.get('current_edition', 0)
-    new_ed = old_ed + 1
     config['current_edition'] = new_ed
     new_label = f"{new_ed:03d}"
-    print(f"Edition incremented: {old_ed:03d} -> {new_label}")
+    if new_ed == old_ed:
+        print(f"Edition unchanged at {new_label} (already run this month)")
+    else:
+        print(f"Edition {old_ed:03d} -> {new_label} (derived from epoch {epoch})")
+
+    # The run counter that names archive files stays a counter — it must keep
+    # advancing so two captures in one month do not collide on one filename.
+    config['capture_seq'] = config.get('capture_seq', 0) + 1
+    print(f"Capture sequence: {config['capture_seq']:03d}")
 
     # Set active_edition_key to current month
     config['active_edition_key'] = current_key
