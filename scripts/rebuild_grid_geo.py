@@ -136,9 +136,15 @@ def geolocation_gate(slug, nodes, lines):
         # in the Chathams against 1,588 on the mainland.
         wrapped = [x + 360 if x < 0 else x for x in xs]
         span_wrapped = max(wrapped) - min(wrapped)
-        if span_wrapped < span_x:
-            west = sum(1 for x in xs if x < 0)
-            east = len(xs) - west
+        west = sum(1 for x in xs if x < 0)
+        east = len(xs) - west
+        # Both tests matter. A country wholly in one hemisphere has an
+        # identical wrapped span, and comparing two floats that should be
+        # equal is decided by the last bit — which is how Colombia and Costa
+        # Rica, entirely west of 0°, were refused for straddling a meridian
+        # they do not reach. Requiring a non-empty lobe on each side and a
+        # full degree of improvement makes the test say what it means.
+        if west and east and span_wrapped < span_x - 1.0:
             minority, side = ((west, "west of 0°") if west <= east
                               else (east, "east of 0°"))
             problems.append(
