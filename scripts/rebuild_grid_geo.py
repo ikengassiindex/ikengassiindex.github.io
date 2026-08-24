@@ -132,6 +132,64 @@ def mainland_bboxes():
     return out
 
 
+
+_PLACEHOLDER_NAME = re.compile(r"^Substation \d+$")
+
+
+def source_object_key(s):
+    """What upstream object a substation record came from.
+
+    `substation_id` is minted per row, so it cannot see that two rows describe
+    the same thing. The source key can: Germany's 168,776 rows resolve to
+    108,027 OSM objects, and the US's 97,915 to 77,592.
+    """
+    if s.get("osm_id") not in (None, ""):
+        return f"{s.get('osm_type')}/{s.get('osm_id')}"
+    for k in ("osm_feature_id", "osm_ref"):
+        if s.get(k) not in (None, ""):
+            return str(s[k])
+    vp = s.get("v43_provenance")
+    if isinstance(vp, dict):
+        for blk in vp.values():
+            if isinstance(blk, dict) and blk.get("feature_id"):
+                return str(blk["feature_id"])
+    return None
+
+
+def collapse_to_objects(subs):
+    """One node per source object, keeping the best-named row.
+
+    Verified on Germany before this was written: of 43,163 objects carrying
+    more than one row, every single one has all its rows at identical
+    coordinates. 6,792 repeat name and voltage exactly; the other 36,371 differ
+    only in a synthetic `Substation <id>` name that embeds the row's own
+    identifier. None of them is a second substation.
+
+    Rows with no source key are kept as they are — Canada is register-sourced
+    and has none, and a missing key is not evidence of a duplicate.
+    """
+    best, order, collapsed = {}, [], 0
+    for s in subs:
+        k = source_object_key(s)
+        if k is None:
+            order.append(s)
+            continue
+        if k not in best:
+            best[k] = s
+            order.append(("K", k))
+            continue
+        collapsed += 1
+        cur = best[k]
+        cur_named = bool(cur.get("name")) and not _PLACEHOLDER_NAME.match(str(cur.get("name")))
+        new_named = bool(s.get("name")) and not _PLACEHOLDER_NAME.match(str(s.get("name")))
+        if new_named and not cur_named:
+            best[k] = s
+    out = []
+    for item in order:
+        out.append(best[item[1]] if isinstance(item, tuple) else item)
+    return out, collapsed
+
+
 def metres(ax, ay, bx, by):
     return math.hypot((ax - bx) * 111320 * math.cos(math.radians((ay + by) / 2)),
                       (ay - by) * 110540)
@@ -227,12 +285,15 @@ def extent(nodes):
             (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2)
 
 
-def rebuild(slug):
+def rebuild(slug, dedupe=False):
     gpath = REPO / slug / "grid-geo.json"
     g = json.loads(gpath.read_text(encoding="utf-8")) if gpath.exists() else {}
     old_s = g.get("s") or {}
     lines = load_lines(slug, g)
     subs = load_substations(slug)
+    collapsed = 0
+    if dedupe:
+        subs, collapsed = collapse_to_objects(subs)
 
     nodes, skipped = {}, 0
     for s in subs:
@@ -335,6 +396,7 @@ def rebuild(slug):
         "slug": slug, "nodes": nodes, "lines_with_origin": out_lines,
         "adjacency": {k: v for k, v in adjacency.items()},
         "old_nodes": len(old_s), "new_nodes": len(nodes),
+        "collapsed": collapsed,
         "skipped": skipped, "lines_total": len(lines), "lines_resolved": resolved,
         "problems": problems, "warnings": warnings,
         "centre_drift_m": drift, "grid": g,
@@ -404,6 +466,8 @@ def main():
     ap.add_argument("countries", nargs="*")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--dedupe-by-object", action="store_true",
+                    help="one map node per source object, not per row")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     if not (a.write or a.dry_run):
@@ -420,7 +484,7 @@ def main():
     failed = 0
     for slug in slugs:
         try:
-            r = rebuild(slug)
+            r = rebuild(slug, dedupe=a.dedupe_by_object)
         except Exception as exc:
             print(f"{slug:<13}  ERROR {exc}")
             failed += 1
@@ -433,6 +497,9 @@ def main():
                  if r["centre_drift_m"] is not None else "—")
         print(f"{slug:<13}{r['old_nodes']:>9,}{r['new_nodes']:>9,}{d:>+9,}"
               f"{r['lines_total']:>9,}{r['lines_resolved']:>10,}{drift:>13}  {gate}")
+        if r.get("collapsed"):
+            print(f"{'':<13}  {r['collapsed']:,} row(s) collapsed onto a source "
+                  f"object already emitted")
         if r["skipped"]:
             print(f"{'':<13}  {r['skipped']:,} substation(s) had no usable "
                   f"coordinate or id and were not emitted")
