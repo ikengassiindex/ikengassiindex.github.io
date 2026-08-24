@@ -65,6 +65,7 @@ from __future__ import annotations
 import argparse
 import collections
 import json
+import re
 import math
 import sys
 from pathlib import Path
@@ -100,6 +101,25 @@ def load_lines(slug, g):
         for f in sorted((REPO / slug).glob("grid-geo-l-*.json")):
             part = json.loads(f.read_text(encoding="utf-8"))
             out += part if isinstance(part, list) else (part.get("l") or [])
+    return out
+
+
+# The renderer already solves this, and the gate should know it. map.js keeps a
+# MAINLAND_BBOXES table used ONLY to anchor the viewport: substations outside
+# the box stay in memory and remain visible on pan, they just do not drag the
+# auto-fit. France, the US and Norway have entries; New Zealand was added when
+# its fleet turned out to carry one substation in the Chathams. Reading the
+# table here rather than restating it keeps the two files from drifting apart.
+def mainland_bboxes():
+    js = (REPO / "map.js").read_text(encoding="utf-8", errors="replace")
+    m = re.search(r"const MAINLAND_BBOXES = \{(.*?)\n\s*\};", js, re.S)
+    if not m:
+        return {}
+    out = {}
+    for row in re.finditer(
+            r"'?([a-z-]+)'?:\s*\{\s*minLat:\s*(-?[\d.]+),\s*minLon:\s*(-?[\d.]+),"
+            r"\s*maxLat:\s*(-?[\d.]+),\s*maxLon:\s*(-?[\d.]+)", m.group(1)):
+        out[row.group(1)] = tuple(float(row.group(i)) for i in (2, 3, 4, 5))
     return out
 
 
@@ -144,6 +164,20 @@ def geolocation_gate(slug, nodes, lines):
         # Rica, entirely west of 0°, were refused for straddling a meridian
         # they do not reach. Requiring a non-empty lobe on each side and a
         # full degree of improvement makes the test say what it means.
+        box = mainland_bboxes().get(slug)
+        if box:
+            lo_lat, lo_lon, hi_lat, hi_lon = box
+            anchor = [n for n in nodes.values()
+                      if lo_lon <= n["x"] <= hi_lon and lo_lat <= n["y"] <= hi_lat]
+            if anchor:
+                axs = [n["x"] for n in anchor]
+                if max(axs) - min(axs) <= 60:
+                    west = east = 0        # the viewport anchor is sane
+                    warnings.append(
+                        f"{len(nodes) - len(anchor):,} substation(s) outside the "
+                        f"map.js mainland box — visible on pan, excluded from the "
+                        f"auto-fit anchor, which spans "
+                        f"{max(axs) - min(axs):.1f}°")
         if west and east and span_wrapped < span_x - 1.0:
             minority, side = ((west, "west of 0°") if west <= east
                               else (east, "east of 0°"))

@@ -1599,7 +1599,15 @@ if (!hasNested) {
           const MAINLAND_BBOXES = {
             france:   { minLat: 41.0, minLon:  -5.5, maxLat: 51.5, maxLon:   9.5 },  // Métropole (excl. DOM-TOM)
             us:       { minLat: 24.0, minLon:-125.0, maxLat: 49.5, maxLon: -66.0 },  // CONUS (excl. Alaska + Hawaii + Guam + territories)
-            norway:   { minLat: 57.5, minLon:   4.0, maxLat: 71.5, maxLon:  32.0 }   // Fastlandet (excl. Svalbard + Jan Mayen + Bouvet)
+            norway:   { minLat: 57.5, minLon:   4.0, maxLat: 71.5, maxLon:  32.0 },  // Fastlandet (excl. Svalbard + Jan Mayen + Bouvet)
+            // New Zealand joined this table on 24 Aug 2026. The comment above
+            // says NZ has zero substations in its overseas territories; that
+            // was true when written and is no longer. The fleet carries one,
+            // NZ_v43_9b053ceaa395, in the Chathams at -176.49 lon — across the
+            // anti-meridian from the two main islands. Without this entry the
+            // cluster span reads 355 degrees and the mainland compresses to a
+            // blob, which is the same failure Task #619 fixed for Norway.
+            'new-zealand': { minLat: -47.5, minLon: 166.0, maxLat: -34.0, maxLon: 179.0 }
           };
           // Detect country slug from the intelligence-loader script tag's data-country attribute.
           // Falls back to '' for isolated map.html previews (no filter applied — same as before).
