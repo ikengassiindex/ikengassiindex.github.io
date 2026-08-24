@@ -34,7 +34,8 @@ logger = logging.getLogger(__name__)
 PIPELINE_DIR = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT = PIPELINE_DIR.parent.parent
 CANADA_BOUNDS_JSON = REPO_ROOT / "canada" / "bounds.json"
-CANADA_DATA_DIR = PIPELINE_DIR / "data" / "canada"
+COUNTRY_SLUG = "canada"
+CANADA_DATA_DIR = PIPELINE_DIR / "data" / COUNTRY_SLUG
 CANADA_CACHE_DIR = CANADA_DATA_DIR / "_canvec_cache"    # raw fetch cache (SHA-256-keyed)
 
 
@@ -268,12 +269,38 @@ def assert_line_parity(
 
 
 # ── Audit sidecar (METHODOLOGY_DISCIPLINES.md §5ter) ────────────────────
+def _slug_for_source(source_id: str) -> str:
+    """Which country a fetch belongs to, read from its own source id.
+
+    Source ids are `<ISO2>-C<n>-<connector>`, so the country is stated in the
+    id itself. Reading it here rather than assuming the module's own country
+    is what stops a fetch landing in the wrong folder: Greece's
+    `GR-C1-osm-overpass` was written into `data/canada/` and labelled
+    `country_slug: canada`, which left Canada holding an audit for 461
+    substations it never ingested and Greece holding none at all.
+
+    The mapping comes from the slug list itself (KB §57), never a literal.
+    """
+    iso2 = (source_id or "").split("-")[0].strip().lower()
+    if len(iso2) != 2:
+        return COUNTRY_SLUG
+    try:
+        sot = json.loads(
+            (REPO_ROOT / "intelligence" / "countries.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return COUNTRY_SLUG
+    for c in sot.get("countries", []):
+        if str(c.get("iso2", "")).lower() == iso2:
+            return c.get("slug") or COUNTRY_SLUG
+    return COUNTRY_SLUG
+
+
 def emit_audit_sidecar(
     result: IngestionResult,
     *,
-    output_dir: Path = CANADA_DATA_DIR,
+    output_dir: Path | None = None,
     parity_findings: list[str] | None = None,
-    parent_preflight_yaml: str = "canada/v4_23-ingestion-audit-canada-preflight.yaml",
+    parent_preflight_yaml: str | None = None,
 ) -> Path:
     """Write per-source audit YAML sidecar per §5ter state-transition contract.
 
@@ -284,11 +311,17 @@ def emit_audit_sidecar(
     YAML.  Each step names the preceding step + the git commit-hash placeholder
     for the merge that landed the transition.
     """
+    country = _slug_for_source(result.source_id)
+    if output_dir is None:
+        output_dir = PIPELINE_DIR / "data" / country
+    if parent_preflight_yaml is None:
+        parent_preflight_yaml = (
+            f"{country}/v4_23-ingestion-audit-{country}-preflight.yaml")
     output_dir.mkdir(parents=True, exist_ok=True)
     slug = result.source_id.lower().replace("_", "-")
-    if slug.startswith("ca-"):
-        slug = slug[len("ca-c") + 1 :]     # strip "CA-C1-" prefix, keep tail
-    out_path = output_dir / f"v4_23-ingestion-audit-canada-{slug}.yaml"
+    if len(slug.split("-")[0]) == 2:
+        slug = slug.split("-", 2)[-1]      # strip the "<iso2>-C<n>-" prefix
+    out_path = output_dir / f"v4_23-ingestion-audit-{country}-{slug}.yaml"
 
     payload_lines = [
         "# SSI Index v4.23 workstream — Canada ingestion fetch audit",
@@ -296,7 +329,7 @@ def emit_audit_sidecar(
         f"# Parent pre-flight: {parent_preflight_yaml}",
         "",
         f"schema_version: v4_23-ingestion-audit-fetch-1",
-        f"country_slug: canada",
+        f"country_slug: {country}",
         f"source_id: {result.source_id}",
         f"fetched_at_utc: \"{result.fetched_at_utc}\"",
         f"source_url: {result.source_url or 'null'}",
