@@ -234,6 +234,36 @@ def main():
                 print(f"  ⟶ {slug}/{page} DRY-RUN ({len(html)} bytes; pass --write to commit)")
                 continue
 
+            # ── Regression guard (added 24 Aug 2026) ───────────────────
+            # The deployed pages advanced to v4.2; this generator did not.
+            # All 39 templates/configs/*.yaml still declare v4.0.2 and "95
+            # variables", and no .j2 emits the data-canonical-content hooks
+            # the live pages carry. A `--all --write` therefore REWRITES the
+            # cohort backwards: measured on turkey/index.html it restored
+            # "Turkey" over "Türkiye", 95 variables over 101, 30 sources over
+            # 31, dropped both data-canonical-content attributes, and reverted
+            # 15 v4.2 references to v4.0.2.
+            #
+            # Refusing the write is the honest behaviour: the generator is not
+            # currently authoritative for these files, and silently downgrading
+            # a page is exactly the "several writers" failure the estate is
+            # trying to end. Remove this guard only once the configs and
+            # templates are brought to v4.2 and a rebuild is byte-identical.
+            if out_path.exists():
+                current = out_path.read_text(encoding="utf-8", errors="replace")
+                regressions = []
+                if "v4.2" in current and "v4.0.2" in html and "v4.2" not in html:
+                    regressions.append("version v4.2 -> v4.0.2")
+                lost = (current.count("data-canonical-content")
+                        - html.count("data-canonical-content"))
+                if lost > 0:
+                    regressions.append(f"{lost} data-canonical-content hook(s) dropped")
+                if regressions:
+                    print(f"  ✗ {slug}/{page} REFUSED — rebuild would regress: "
+                          + "; ".join(regressions))
+                    errors += 1
+                    continue
+
             out_path.parent.mkdir(parents=True, exist_ok=True)
             out_path.write_text(html)
             written += 1
