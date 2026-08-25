@@ -46,7 +46,7 @@ def canonical_5_modifiers():
         "R4_F_topo": 1.10,
         "R6_restoration": 0.98,
         "R6_seismic": 1.08,
-        "R7_cyber": 1.01,
+        "R7_cyber_v2": 1.01,
     }
 
 
@@ -139,7 +139,7 @@ class TestItalyRegression:
         R_raw_manual *= canonical_5_modifiers["R4_F_topo"]
         R_raw_manual *= canonical_5_modifiers["R6_restoration"]
         R_raw_manual *= canonical_5_modifiers["R6_seismic"]
-        R_raw_manual *= canonical_5_modifiers["R7_cyber"]
+        R_raw_manual *= canonical_5_modifiers["R7_cyber_v2"]
         R_manual = soft_clip_upper(R_raw_manual)
         assert R_pr3 == pytest.approx(R_manual, abs=1e-9), (
             f"Italy regressed pre/post PR-3: {R_pr3} vs {R_manual} — "

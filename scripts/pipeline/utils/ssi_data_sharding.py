@@ -41,6 +41,7 @@ Date: 2026-07-21 (Wave 4 Commit 45 — 4 large countries at 109-341 MB)
 from __future__ import annotations
 
 import json
+import os
 import logging
 from pathlib import Path
 from typing import Any, Optional
@@ -91,6 +92,39 @@ def _compute_subs_per_shard(subs: list, target_shard_mb: float) -> int:
     return max(subs_per_shard, SSI_DATA_MIN_SUBS_PER_SHARD)
 
 
+def _atomic_write_text(path: Path, payload: str) -> None:
+    """Write `payload` to `path` atomically — Convention #56, M-055.
+
+    `Path.write_text` truncates the target and then streams. If the process is
+    killed mid-stream (OOM, timeout, Ctrl-C) the file is left half-written:
+    for a shard that means either invalid JSON or — worse — a *shorter but
+    still-parseable* array, which every downstream reader accepts silently.
+    That is a silent default in file form: absence read as success.
+
+    Italy lost shard 02 and desynchronised shards 01/03 exactly this way on
+    20 August 2026 during the M-054 stage-2 recovery pass.
+
+    Writing to a sibling temp file and `os.replace`-ing it means the target is
+    always either the complete previous version or the complete new one, never
+    a truncation. fsync before replace so the bytes are durable, not just
+    buffered.
+    """
+    tmp = path.with_name(path.name + ".tmp-write")
+    try:
+        with open(tmp, "w", encoding="utf-8") as fh:
+            fh.write(payload)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            if tmp.exists():
+                tmp.unlink()
+        except OSError:
+            pass
+        raise
+
+
 def write_ssi_data(
     ssi_doc: dict,
     path: Path,
@@ -120,7 +154,7 @@ def write_ssi_data(
     if total_size_mb < threshold_mb:
         # Single file — no sharding needed
         payload = json.dumps(ssi_doc, separators=(",", ":"), ensure_ascii=False)
-        path.write_text(payload)
+        _atomic_write_text(path, payload)
         cleanup_count = cleanup_stale_shards(path)
         logger.info(
             f"Wrote {path} ({total_size_mb:.2f} MB single-file — under {threshold_mb} MB threshold)"
@@ -154,7 +188,7 @@ def write_ssi_data(
         shard_path = path.parent / shard_name
         shard_payload = json.dumps(chunk, separators=(",", ":"), ensure_ascii=False)
         shard_bytes = len(shard_payload.encode("utf-8"))
-        shard_path.write_text(shard_payload)
+        _atomic_write_text(shard_path, shard_payload)
         shards_info.append({
             "path": shard_name,
             "count": len(chunk),
@@ -171,7 +205,7 @@ def write_ssi_data(
     ssi_doc["substations_shards"] = shards_info
     manifest_payload = json.dumps(ssi_doc, separators=(",", ":"), ensure_ascii=False)
     manifest_size_mb = len(manifest_payload.encode("utf-8")) / 1024 / 1024
-    path.write_text(manifest_payload)
+    _atomic_write_text(path, manifest_payload)
 
     # ── Step 4: cleanup any stale shards beyond our count ──
     cleanup_count = cleanup_stale_shards(path, active_shard_count=len(shards_info))

@@ -279,11 +279,22 @@ class TestToleranceConfig:
         )
 
         cfg = json.loads(config_path.read_text())
-        assert "default_tolerance_km" in cfg, (
-            "cross_border_tolerances.json missing 'default_tolerance_km' key."
+        # Authoritative schema is '_default_tolerance_km' + 'countries', with
+        # per-country values under 'boundary_tolerance_km'. This test asserted
+        # 'default_tolerance_km' + 'per_country' until 19 August 2026 — a
+        # dialect the file never had. It was the same wrong dialect 22
+        # ingestion modules were reading, and it is why Greece ran its boundary
+        # filter at 0.1 km against a configured 5.0 km. See M-026.
+        assert "_default_tolerance_km" in cfg, (
+            "cross_border_tolerances.json missing '_default_tolerance_km'."
         )
-        assert "per_country" in cfg, (
-            "cross_border_tolerances.json missing 'per_country' key."
+        assert "countries" in cfg, (
+            "cross_border_tolerances.json missing 'countries' key."
+        )
+        assert "per_country" not in cfg, (
+            "cross_border_tolerances.json has grown a legacy 'per_country' "
+            "key. Nothing reads it; a tolerance placed there is silently "
+            "ignored."
         )
 
     @pytest.mark.unit
@@ -294,16 +305,23 @@ class TestToleranceConfig:
         need a 5km tolerance to pass the gate. If this regresses, those four
         countries will fail the gate even though their data is correct.
         """
-        cfg = json.loads((REPO_ROOT / "cross_border_tolerances.json").read_text())
-        per_country = cfg.get("per_country", {})
+        # Assert the EFFECTIVE tolerance each country actually ingests with,
+        # not the shape of the config. A config entry that no reader resolves
+        # is worth nothing — that was the whole of M-026.
+        import sys
+        if str(REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(REPO_ROOT))
+        from scripts.pipeline.utils.tolerance import resolve
 
         mode_2_countries = ["greenland", "new-zealand", "norway", "denmark"]
         for slug in mode_2_countries:
-            tol = per_country.get(slug)
+            res = resolve(slug)
+            tol = res.value_km if res.source == "config:countries" else None
             assert tol is not None, (
-                f"{slug}: tolerance missing from cross_border_tolerances.json. "
-                f"This Mode 2 country needs an explicit per-country tolerance "
-                f"(typically 5km) to pass the gate."
+                f"{slug}: no tolerance resolved from "
+                f"cross_border_tolerances.json (resolver fell back to "
+                f"{res.source!r} at {res.value_km} km). This Mode 2 country "
+                f"needs an explicit entry under 'countries' to pass the gate."
             )
             assert tol >= 1.0, (
                 f"{slug}: tolerance {tol}km too tight for a Mode 2 country "

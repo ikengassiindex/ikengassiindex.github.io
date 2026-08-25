@@ -81,6 +81,8 @@ import logging
 import unicodedata
 from pathlib import Path
 
+from ...utils.tolerance import resolve_boundary_tolerance_km
+
 # Re-export country-agnostic dataclasses from Canada _base
 from ..canada._base import (
     SubstationRecord,
@@ -590,13 +592,9 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     + Greenland pre-excluded via bounds.json (separate country entries
     in ssi-index)."""
     if tolerance_km is None:
-        try:
-            tol_cfg = json.loads(DK_TOLERANCE_JSON.read_text(encoding="utf-8"))
-            tolerance_km = float(
-                tol_cfg.get("countries", {}).get("denmark", {}).get("boundary_tolerance_km", 5.0)
-            )
-        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
-            tolerance_km = 5.0
+        tolerance_km = resolve_boundary_tolerance_km(
+            "denmark", module_fallback=5.0
+        )
     return _apply_bounds_generic(
         records, country_slug="denmark", tolerance_km=tolerance_km
     )

@@ -13,6 +13,8 @@ import json
 import logging
 from pathlib import Path
 
+from ...utils.tolerance import resolve_boundary_tolerance_km
+
 # Re-export the country-agnostic dataclasses from Canada _base
 from ..canada._base import (
     SubstationRecord,
@@ -42,13 +44,9 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     No fjord/coastline complexity — 100m tolerance adequate.
     """
     if tolerance_km is None:
-        try:
-            tol_cfg = json.loads(AUSTRIA_TOLERANCE_JSON.read_text(encoding="utf-8"))
-            tolerance_km = float(
-                tol_cfg.get("per_country", {}).get("austria", {}).get("tolerance_km", 0.1)
-            )
-        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
-            tolerance_km = 0.1
+        tolerance_km = resolve_boundary_tolerance_km(
+            "austria", module_fallback=0.1
+        )
     return _apply_bounds_generic(
         records, country_slug="austria", tolerance_km=tolerance_km
     )

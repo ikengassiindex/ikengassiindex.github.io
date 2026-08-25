@@ -14,6 +14,8 @@ import json
 import logging
 from pathlib import Path
 
+from ...utils.tolerance import resolve_boundary_tolerance_km
+
 # Re-export the country-agnostic dataclasses from Canada _base (single canonical
 # schema across all v4.23 workstreams so federation can operate uniformly)
 from ..canada._base import (
@@ -45,13 +47,9 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     length 3,145 km is longest single-border in v4.23 but 100m is adequate.
     """
     if tolerance_km is None:
-        try:
-            tol_cfg = json.loads(MEXICO_TOLERANCE_JSON.read_text(encoding="utf-8"))
-            tolerance_km = float(
-                tol_cfg.get("per_country", {}).get("mexico", {}).get("tolerance_km", 0.1)
-            )
-        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
-            tolerance_km = 0.1
+        tolerance_km = resolve_boundary_tolerance_km(
+            "mexico", module_fallback=0.1
+        )
     return _apply_bounds_generic(
         records, country_slug="mexico", tolerance_km=tolerance_km
     )

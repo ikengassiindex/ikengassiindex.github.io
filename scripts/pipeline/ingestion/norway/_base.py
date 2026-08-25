@@ -15,6 +15,8 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ...utils.tolerance import resolve_boundary_tolerance_km
+
 # Re-export the country-agnostic dataclasses from Canada _base (single canonical
 # schema across all v4.23 workstreams so federation can operate uniformly)
 from ..canada._base import (
@@ -45,13 +47,9 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     (fjord + coastline simplification per Discipline #36 second-wave remediation).
     """
     if tolerance_km is None:
-        try:
-            tol_cfg = json.loads(NORWAY_TOLERANCE_JSON.read_text(encoding="utf-8"))
-            tolerance_km = float(
-                tol_cfg.get("per_country", {}).get("norway", {}).get("tolerance_km", 5.0)
-            )
-        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
-            tolerance_km = 5.0
+        tolerance_km = resolve_boundary_tolerance_km(
+            "norway", module_fallback=5.0
+        )
     return _apply_bounds_generic(
         records, country_slug="norway", tolerance_km=tolerance_km
     )

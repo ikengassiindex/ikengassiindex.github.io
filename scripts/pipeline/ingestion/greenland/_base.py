@@ -15,6 +15,8 @@ import json
 import logging
 from pathlib import Path
 
+from ...utils.tolerance import resolve_boundary_tolerance_km
+
 # Re-export the country-agnostic dataclasses from Canada _base (single canonical
 # schema across all v4.23 workstreams so federation can operate uniformly)
 from ..canada._base import (
@@ -49,13 +51,9 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     density.
     """
     if tolerance_km is None:
-        try:
-            tol_cfg = json.loads(GREENLAND_TOLERANCE_JSON.read_text(encoding="utf-8"))
-            tolerance_km = float(
-                tol_cfg.get("per_country", {}).get("greenland", {}).get("tolerance_km", 5.0)
-            )
-        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
-            tolerance_km = 5.0
+        tolerance_km = resolve_boundary_tolerance_km(
+            "greenland", module_fallback=5.0
+        )
     return _apply_bounds_generic(
         records, country_slug="greenland", tolerance_km=tolerance_km
     )

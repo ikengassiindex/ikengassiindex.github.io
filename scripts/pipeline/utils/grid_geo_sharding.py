@@ -35,6 +35,7 @@ import json
 import logging
 import math
 from pathlib import Path
+from scripts.pipeline.utils.ssi_data_sharding import _atomic_write_text  # M-055 atomic writes
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -103,7 +104,7 @@ def write_grid_geo(
     if total_size_mb < threshold_mb:
         # Single file — no sharding needed
         payload = json.dumps(grid_doc, separators=(",", ":"), ensure_ascii=False)
-        path.write_text(payload)
+        _atomic_write_text(path, payload)
         # Clean up any previous shards that may exist
         cleanup_count = cleanup_stale_shards(path)
         logger.info(
@@ -138,7 +139,7 @@ def write_grid_geo(
         shard_path = path.parent / shard_name
         shard_payload = json.dumps(chunk, separators=(",", ":"), ensure_ascii=False)
         shard_bytes = len(shard_payload.encode("utf-8"))
-        shard_path.write_text(shard_payload)
+        _atomic_write_text(shard_path, shard_payload)
         shards_info.append({
             "path": shard_name,
             "count": len(chunk),
@@ -155,7 +156,7 @@ def write_grid_geo(
     grid_doc["l_shards"] = shards_info
     manifest_payload = json.dumps(grid_doc, separators=(",", ":"), ensure_ascii=False)
     manifest_size_mb = len(manifest_payload.encode("utf-8")) / 1024 / 1024
-    path.write_text(manifest_payload)
+    _atomic_write_text(path, manifest_payload)
 
     # ── Step 4: cleanup any stale shards beyond our count ──
     cleanup_count = cleanup_stale_shards(path, active_shard_count=len(shards_info))

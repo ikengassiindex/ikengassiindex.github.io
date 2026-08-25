@@ -27,9 +27,12 @@ Cross-reference: PHASE_1_IMPLEMENTATION_PLAN.md PR-7 §"Acceptance gates"
 
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import pytest
+
+from ._ssi_test_support import load_ssi_data
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = REPO_ROOT / "scripts"
@@ -57,6 +60,40 @@ _ADAPTATION_COHORT = {
 _LARGE_SHIFT_PCT = 0.10              # |Δ R_median| > 10% counts as "large"
 _LARGE_SHIFT_MAX_FRACTION = 0.05      # ≤ 5% of substations may have large shifts
 
+#: Minimum share of the smaller fleet that must match on substation_id for the
+#: comparison to mean anything.
+#:
+#: Until 19 August 2026 this test skipped when NO ids matched. That inverted
+#: the gate: japan, portugal, spain and sweden all passed precisely because
+#: their identity keys had been fully re-issued and there was nothing left to
+#: compare. Sweden went 3,872 -> 1,192 substations, a 69% fleet loss, and the
+#: acceptance gate reported green. A gate that succeeds on the absence of
+#: evidence is worse than no gate, because it is read as assurance.
+#:
+#: A genuinely absent baseline still skips (the file isn't there). A baseline
+#: that exists but cannot be matched now FAILS, because that is a real and
+#: actionable condition: either the ids were re-issued, or the fleet was
+#: replaced. Both need a human.
+#: Cross-reference: modification-log M-028.
+_MIN_ID_OVERLAP_FRACTION = 0.50
+
+#: How far the baseline snapshot may lag the live file before the comparison
+#: stops being an acceptance test.
+#:
+#: This gate is meant to compare the state immediately BEFORE a refresh with
+#: the state immediately AFTER it. The snapshots on disk are dated 4 June 2026
+#: and the live files 18 August — eleven weeks and several methodology releases
+#: apart. Comparing across that gap does not measure a refresh; it measures
+#: cumulative drift, and it fails at 63-100% on 29 countries no matter how
+#: sound the latest refresh was.
+#:
+#: A stale baseline SKIPS: the gate genuinely cannot assess anything, and a
+#: skip says so without claiming success. A baseline that exists and is fresh
+#: but cannot be matched by id still FAILS — see _MIN_ID_OVERLAP_FRACTION —
+#: because that is an event, not an absence.
+#: Cross-reference: modification-log M-028.
+_MAX_BASELINE_LAG_DAYS = 21
+
 
 # ═══════════════════════════════════════════════════════════
 #  Per-country fixture
@@ -79,9 +116,13 @@ def pre_post_data(country):
             f"{country}/ssi-data.json.pre-pr7-backup absent — run "
             f"scripts/backfill_provenance.py first to create the snapshot"
         )
+    # The POST side must be shard-resolved: for the six Convention #79
+    # countries a plain json.load yields no substations, which this gate would
+    # otherwise read as "the entire fleet vanished" and report as an identity
+    # break. The PRE side is a pre-sharding snapshot and is always inline.
     return (
         json.loads(pre_fp.read_text(encoding="utf-8")),
-        json.loads(post_fp.read_text(encoding="utf-8")),
+        load_ssi_data(country, REPO_ROOT),
     )
 
 
@@ -94,6 +135,61 @@ def _substations_by_id(data):
             for s in subs if s}
 
 
+def _generated_date(doc, fp):
+    """Best-effort vintage of a snapshot: meta.generated, else file mtime."""
+    raw = (doc.get("meta") or {}).get("generated") or (doc.get("meta") or {}).get("timestamp")
+    if isinstance(raw, str):
+        for fmt in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ"):
+            try:
+                return datetime.strptime(raw[:len(fmt) + 2].rstrip("Z"), fmt).date()
+            except ValueError:
+                continue
+    return datetime.fromtimestamp(fp.stat().st_mtime).date()
+
+
+def _skip_if_baseline_stale(country, pre, post):
+    """Skip when the snapshot is too old to constitute a refresh baseline."""
+    pre_fp = REPO_ROOT / country / "ssi-data.json.pre-pr7-backup"
+    post_fp = REPO_ROOT / country / "ssi-data.json"
+    pre_date = _generated_date(pre, pre_fp)
+    post_date = _generated_date(post, post_fp)
+    lag = (post_date - pre_date).days
+    if lag > _MAX_BASELINE_LAG_DAYS:
+        pytest.skip(
+            f"{country}: baseline is {lag} days stale "
+            f"({pre_date} vs {post_date}), beyond the "
+            f"{_MAX_BASELINE_LAG_DAYS}-day limit. This gate compares a refresh "
+            f"against the state that preceded it; across {lag} days it is "
+            f"measuring cumulative methodology drift instead. Re-baseline "
+            f"after the cohort rescore."
+        )
+
+
+def _assert_baseline_comparable(country, pre_by_id, post_by_id, common):
+    """Fail — do not skip — when the two snapshots cannot be compared.
+
+    See _MIN_ID_OVERLAP_FRACTION for why this is an assertion rather than a
+    skip. The message reports the fleet sizes as well as the overlap, because
+    a large fleet-size delta alongside zero overlap is the signature of a
+    wholesale replacement rather than an incremental refresh.
+    """
+    n_pre, n_post = len(pre_by_id), len(post_by_id)
+    smaller = min(n_pre, n_post)
+    if smaller == 0:
+        pytest.skip(f"{country}: one of the snapshots has no substations")
+    overlap = len(common) / smaller
+    assert overlap >= _MIN_ID_OVERLAP_FRACTION, (
+        f"{country}: BASELINE NOT COMPARABLE — only {len(common)} "
+        f"substation_ids are common to the pre ({n_pre}) and post ({n_post}) "
+        f"snapshots, i.e. {overlap * 100:.1f}% of the smaller fleet, below "
+        f"the {_MIN_ID_OVERLAP_FRACTION * 100:.0f}% floor. The score-shift "
+        f"gate cannot say anything about this country. Either the identity "
+        f"key was re-issued (Convention #56 break) or the fleet was replaced "
+        f"— both need investigating before this gate means anything. "
+        f"Fleet delta: {n_post - n_pre:+d} ({(n_post - n_pre) / n_pre * 100:+.1f}%)."
+    )
+
+
 # ═══════════════════════════════════════════════════════════
 #  Test 1 — Score-shift bound (universal across 39 countries)
 # ═══════════════════════════════════════════════════════════
@@ -103,14 +199,12 @@ class TestScoreShiftBound:
 
     def test_large_shifts_below_5_percent_fraction(self, country, pre_post_data):
         pre, post = pre_post_data
+        _skip_if_baseline_stale(country, pre, post)
         pre_by_id = _substations_by_id(pre)
         post_by_id = _substations_by_id(post)
         # Match on common ids only
         common = set(pre_by_id) & set(post_by_id)
-        if not common:
-            pytest.skip(
-                f"{country}: no common substation_ids between pre and post snapshots"
-            )
+        _assert_baseline_comparable(country, pre_by_id, post_by_id, common)
         large_shifts = 0
         for sid in common:
             pre_r = pre_by_id[sid].get("R_median")
@@ -156,13 +250,13 @@ class TestAdaptationCohortShift:
         if not post_fp.exists():
             pytest.skip(f"{cohort_country}: ssi-data.json absent")
         pre = json.loads(pre_fp.read_text(encoding="utf-8"))
-        post = json.loads(post_fp.read_text(encoding="utf-8"))
+        post = load_ssi_data(cohort_country, REPO_ROOT)
 
         pre_by_id = _substations_by_id(pre)
         post_by_id = _substations_by_id(post)
         common = set(pre_by_id) & set(post_by_id)
-        if not common:
-            pytest.skip(f"{cohort_country}: no common ids")
+        _assert_baseline_comparable(cohort_country, pre_by_id, post_by_id, common)
+        _skip_if_baseline_stale(cohort_country, pre, post)
 
         # Compute mean R_median pre + post; under backfill-only mode the
         # provenance fields populate but R_median is preserved, so the mean
@@ -202,7 +296,10 @@ class TestProvenancePopulated:
         fp = REPO_ROOT / country / "ssi-data.json"
         if not fp.exists():
             pytest.skip(f"{country}/ssi-data.json absent")
-        data = json.loads(fp.read_text(encoding="utf-8"))
+        # Shard-resolved: a plain json.load returns no substations for the six
+        # Convention #79 countries, and this test would then skip on
+        # "has no substations" — checking provenance on nothing.
+        data = load_ssi_data(country, REPO_ROOT)
         subs = data.get("substations", [])
         if isinstance(subs, dict):
             subs = list(subs.values())

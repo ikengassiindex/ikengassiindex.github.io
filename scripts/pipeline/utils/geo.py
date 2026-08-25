@@ -273,34 +273,26 @@ DEFAULT_BOUNDARY_TOLERANCE_KM = 0.1  # 100 m
 
 
 def load_country_tolerance(country, repo_root=None):
-    """
-    Load the country-specific boundary tolerance from cross_border_tolerances.json
-    at the repo root. Returns DEFAULT_BOUNDARY_TOLERANCE_KM if no override
-    exists for this country.
+    """Load the country-specific boundary tolerance.
 
-    The config file is methodology-transparent — every country's tolerance
-    is declared explicitly with rationale. See cross_border_tolerances.json
-    at the repo root.
+    Thin delegate to :mod:`scripts.pipeline.utils.tolerance`, which is the
+    single reader of ``cross_border_tolerances.json``. Kept as a named
+    function because the audit and remediation scripts call it by this name.
+
+    Before 19 August 2026 this function and the 30 ingestion modules read the
+    same config through independent code paths, and the ingestion side used a
+    key that did not exist. Audit reported Greece CLEAN at 5.0 km while
+    ingestion ran it at 0.1 km. One reader now — see M-026.
     """
-    if repo_root is None:
-        from ..config import REPO_ROOT
-        repo_root = REPO_ROOT
-    config_path = Path(repo_root) / "cross_border_tolerances.json"
-    if not config_path.exists():
-        return DEFAULT_BOUNDARY_TOLERANCE_KM
-    try:
-        with open(config_path) as f:
-            cfg = json.load(f)
-        countries = cfg.get("countries", {})
-        if country in countries:
-            return float(countries[country].get(
-                "boundary_tolerance_km", DEFAULT_BOUNDARY_TOLERANCE_KM
-            ))
-        return float(cfg.get("_default_tolerance_km", DEFAULT_BOUNDARY_TOLERANCE_KM))
-    except Exception as e:
-        logger.warning(f"Failed to read cross_border_tolerances.json: {e}; "
-                       f"using default {DEFAULT_BOUNDARY_TOLERANCE_KM}km")
-        return DEFAULT_BOUNDARY_TOLERANCE_KM
+    from .tolerance import resolve_boundary_tolerance_km
+    config_path = None
+    if repo_root is not None:
+        config_path = Path(repo_root) / "cross_border_tolerances.json"
+    return resolve_boundary_tolerance_km(
+        country,
+        module_fallback=None,
+        config_path=config_path,
+    )
 
 
 def load_country_polygon(country, repo_root=None, heal_topology=True):

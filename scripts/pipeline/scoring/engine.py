@@ -118,10 +118,41 @@ def soft_clip(x, lo=0.0, hi=1.0):
 
 
 def soft_clip_upper(R_raw):
-    """Overflow compression for R > 1.0."""
-    if R_raw <= 1.0:
-        return R_raw
-    return 1.0 - 1 / (1 + math.exp(20 * (R_raw - 1.05)))
+    """Saturating compression of the multiplicative chain at 1.0.
+
+    M-006 fix (v4.24, 19 August 2026). The prior implementation was
+
+        return 1.0 - 1 / (1 + math.exp(20 * (R_raw - 1.05)))
+
+    which is DISCONTINUOUS at the threshold: f(1.0) = 1.0 but
+    f(1.0+eps) = 0.2689 — a 0.731 drop — and it does not recover to
+    its pre-threshold value until R_raw ~ 1.24. The consequence was a
+    non-monotonic score: substations with MORE multiplicative stress
+    were assigned LOWER R_median, and were banded milder, than less
+    stressed peers. Empirically 2,087 substations (1.48% of the
+    directly-measurable cohort) were mis-banded, all downward.
+
+    The intended behaviour is recoverable from the band table. BANDS
+    caps Extreme at 1.30; R6c_flood is the sole additive modifier with
+    range [1.00, 1.30], so add_sum <= 0.30. Saturating the
+    multiplicative part at exactly 1.0 therefore yields
+
+        max R_final = 1.0 + 0.30 = 1.30
+
+    which is the band ceiling to four decimals. The BANDS comment says
+    the same in prose: the Extreme band is "the additive-R6c_flood
+    overflow zone where soft_clip_upper multiplicative saturation
+    combines with flood-driven additive push".
+
+    Continuous, monotone non-decreasing, and bounded above by 1.0.
+    Substations above the threshold tie at 1.0 before add_sum; the
+    pre-saturation ordering remains recoverable from the stored
+    R_base_median and modifiers dict.
+
+    Convention #56: no silent default — values at or below the
+    threshold pass through unchanged.
+    """
+    return min(R_raw, 1.0)
 
 
 def classify_band(R):
@@ -292,7 +323,87 @@ def compute_r6_restoration(CAIDI_local, CAIDI_med):
 # ═══════════════════════════════════════════════════════════
 
 def compute_r_base(components):
-    """Compute R_base from pre-normalised component scores."""
+    """Compute R_base from pre-normalised component scores.
+
+    Returns None when no component data is present — Convention #56.
+
+    ── Why this returns None rather than 0.0 (19 August 2026, M-046/M-049) ──
+    Until today this function read `components.get(comp, 0)`, so a substation
+    that had been ingested but never enriched — `components == {}` — scored
+    R_base = 0.0 silently. Zero is the MOST resilient end of the scale, so
+    those records published as reassuring rather than as unknown. 78,505
+    substations (10.9% of the cohort, across 27 countries) were in that state,
+    48,588 of them rendering as "Low" risk.
+
+    Convention #56 (METHODOLOGY_CASCADE_PLAYBOOK v0.3 §3.4, and
+    METHODOLOGY_DISCIPLINES §1.4): "never silently default; never hide
+    degradation" — "degraded / missing fields carry None with a `_source`
+    marker rather than silent defaults." A 0.50 fleet-median imputation would
+    breach the same rule; the discipline's object is the silence, not the
+    value. METHODOLOGY_DISCIPLINES §5quinquies puts it directly: "for every
+    `.get(k, default)` call, examine whether the default silently masks a
+    missing field that should be surfaced explicitly."
+
+    The rest of this module was already compliant — `classify_band(None)`
+    returns "Unclassified", and `compute_fleet_summary` filters None out of the
+    statistics and reports `n_scored`, `n_unclassified_pre_l3` and
+    `_stats_pending_l3_rescore`. This one function contradicted them.
+
+    SUPERSEDED 20 August 2026 (M-061): a partially-populated dict is no longer
+    scored "on what it has". That rule was written when nothing could produce
+    components incrementally, so the only real case was all-or-nothing. Once
+    ingestion/components.py existed, partial vectors became reachable — and
+    scoring one counts every unmeasured letter as zero risk. See the missing-
+    letter guard below.
+
+    ── The zero-vector case (20 August 2026, M-057) ──
+    The M-046 guard above tests for *absence*. 145 records survived it by
+    carrying a components dict that was present, complete, and entirely 0.0 —
+    canada 137, turkey 6, plus two with a single component at 3e-4. They
+    produced R_base = 0.0, a Monte Carlo with CI_width exactly 0.0, and a
+    published "Low" classification: the identical fabricated output the guard
+    exists to prevent, reached through a populated dict instead of an empty one.
+
+    An all-zero component vector is not an observation. The six components are
+    P5/P95-normalised, so simultaneous exact zeros on all six would mean one
+    substation sat at the fleet floor of continuity, voltage, infrastructure,
+    economic, saturation AND transition at once — and the zero-width confidence
+    interval proves the Monte Carlo had nothing to perturb. It is the empty dict
+    wearing a costume, and it is refused on the same grounds.
+
+    Deliberately no numeric threshold here. "All six exactly zero" is a
+    structural fact about the vector; "R_base below 1e-4" would be an invented
+    cut-off, which is the branch Discipline #50 warns against taking.
+    """
+    if not components:
+        return None
+    if not any(comp in components for comp in COMPONENT_WEIGHTS):
+        return None
+    present = [components[c] for c in COMPONENT_WEIGHTS if c in components]
+    if present and all(isinstance(v, (int, float)) and v == 0.0 for v in present):
+        return None      # M-057 — zero vector is indistinguishable from absence
+
+    # ── Incomplete vectors do not score (20 August 2026, M-061) ──
+    # The old contract scored a partial dict "on what it has", treating an
+    # absent letter as 0.0 inside the weighted sum. That is a silent default
+    # wearing a permissive docstring: a record with only I and E present would
+    # publish R_base = 0.25·I + 0.10·E, understating by the 0.65 of weight that
+    # was never measured — and because R is a RISK score, understating means
+    # publishing "safer than we know". Identical in shape and direction to
+    # M-046.
+    #
+    # This became live the moment a component-builder stage existed
+    # (ingestion/components.py), because that stage necessarily produces
+    # letters incrementally as sources arrive.
+    #
+    # Verified no-op on the cohort at the time of the change: all 175,264
+    # component vectors across all 39 countries carried the full CVIEST set,
+    # and zero partial vectors were scored. This closes the door before anyone
+    # walks through it, rather than after.
+    missing = [c for c in COMPONENT_WEIGHTS if c not in components]
+    if missing:
+        return None
+
     R_base = 0
     for comp, weight in COMPONENT_WEIGHTS.items():
         R_base += weight * (components.get(comp, 0))
@@ -466,16 +577,17 @@ def _derive_metric_values_from_components(components, metrics=None, intra=None):
 def _soft_clip_upper_vectorized(R_raw):
     """
     Vectorized soft_clip_upper. Identical math to the scalar form
-    (line ~96) but applied element-wise to a numpy array.
+    but applied element-wise to a numpy array.
 
-    For R_raw <= 1.0: identity.
-    For R_raw > 1.0: 1.0 - 1/(1 + exp(20 * (R_raw - 1.05)))
+    M-006 fix (v4.24, 19 August 2026): saturate at 1.0. MUST stay
+    byte-equivalent in behaviour to the scalar `soft_clip_upper` —
+    this is the function the Monte Carlo path actually consumes, so
+    a divergence here silently changes published scores while the
+    scalar form tests clean.
+
+    For R_raw <= 1.0: identity.  For R_raw > 1.0: 1.0.
     """
-    return np.where(
-        R_raw <= 1.0,
-        R_raw,
-        1.0 - 1.0 / (1.0 + np.exp(20.0 * (R_raw - 1.05)))
-    )
+    return np.minimum(R_raw, 1.0)
 
 
 # Cache the Cholesky decomposition + weight vector at module import.
@@ -647,6 +759,38 @@ def score_substation(sub, seismic_update=None, climate_update=None, socio_update
 
     # R_base (unchanged unless components updated)
     R_base = compute_r_base(components)
+
+    # Convention #56 — a substation with no component data is UNSCOREABLE.
+    # Surface it as such rather than manufacturing a number from the modifier
+    # chain alone. With R_base = 0 the master equation collapses to
+    # Sum(add_i - 1.0), i.e. the flood term by itself, with zero contribution
+    # from criticality, vulnerability, infrastructure, exposure, socio-economics
+    # or trajectory — the six things the index exists to measure.
+    # See M-046 / M-049; the terminal state is prescribed by
+    # METHODOLOGY_DISCIPLINES.md line 257.
+    if R_base is None:
+        for field in ("R_base_median", "R_median", "R_P5", "R_P95", "CI_width",
+                      "skewness", "P_critical", "R_unclipped", "modifier_impact",
+                      "modifier_pct", "confidence_tier", "fleet_percentile"):
+            updated[field] = None
+        updated["classification"] = classify_band(None)   # "Unclassified"
+        mult_product, add_sum = compute_modifier_terms(modifiers)
+        updated["mult_product"] = round(mult_product, 4)
+        updated["add_sum"] = round(add_sum, 4)
+        updated["modifier_impacts"] = per_modifier_impacts(modifiers)
+        updated["_stats_pending_l3_rescore"] = True
+        _missing = [c for c in COMPONENT_WEIGHTS if c not in (components or {})]
+        updated["_unscoreable_reason"] = (
+            (f"components incomplete — missing {','.join(_missing)}. "
+             if (components and _missing) else
+             "components empty or absent — ") +
+            "no R_base can be computed. Convention #56: surfaced as "
+            "Unclassified rather than defaulted. A partial vector is not "
+            "scored on what it has: the unmeasured weight would be counted as "
+            "zero risk (M-046 / M-061)."
+        )
+        return updated
+
     updated["R_base_median"] = round(R_base, 4)
 
     # R_median with updated modifiers
@@ -692,8 +836,28 @@ def score_substation(sub, seismic_update=None, climate_update=None, socio_update
 #  FLEET-LEVEL ANALYTICS
 # ═══════════════════════════════════════════════════════════
 
-def compute_fleet_summary(substations):
+def compute_fleet_summary(substations, previous=None):
     """Compute fleet-level statistics from scored substations.
+
+    ── Provenance preservation (20 August 2026, M-065) ──
+    `previous` is the fleet_summary being replaced. Any key on it beginning
+    with "_" that this function does not itself compute is carried forward.
+
+    Why: this function rebuilds fleet_summary from scratch, and until today
+    that silently destroyed `_band_normalisation` — the record stating that
+    Task #461 per-country normalisation had been applied and with which
+    anchors. Running `python -m scripts.pipeline.run czechia` erased it while
+    leaving every `classification` value in its normalised form, so the data
+    was transformed and the explanation was gone. A reader — or a gate — then
+    sees normalised labels with nothing to justify them, which is exactly how
+    the M-064 check reported czechia at 100% drift immediately after a
+    pipeline run that changed no score.
+
+    Convention #56 is usually read as "don't hide missing data". This is the
+    same rule from the other side: don't discard the marker that explains
+    present data. An underscore-prefixed key in fleet_summary is provenance by
+    convention, so preservation is the default and dropping one has to be
+    deliberate.
 
     Classes B/C fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3):
     Substations with R_median=None are legitimate pre-L3 state (Convention #56
@@ -748,14 +912,47 @@ def compute_fleet_summary(substations):
             "_stats_pending_l3_rescore": True,
         })
 
-    return summary
+    _result = summary
+    if previous:
+        for _k, _v in previous.items():
+            if _k.startswith('_') and _k not in _result:
+                _result[_k] = _v
+    return _result
 
 
 def compute_regional_summary(substations):
-    """Compute per-region aggregated statistics."""
+    """Compute per-region aggregated statistics.
+
+    ── The phantom-region defect (20 August 2026, M-062) ──
+    This function used to read `s.get("region", "Unknown")`, manufacturing an
+    "Unknown" region for records whose region key was absent. `validate_schema`
+    counts actual regional membership with `rcode = s.get('region'); if rcode:`
+    — i.e. it excludes falsy regions entirely. So the rollup declared a region
+    the validator could never match, and the gate failed with
+
+        REGIONAL-CONSISTENCY: region Unknown declares substation_count=17
+        but actual=0
+
+    Worse, the default only fired when the key was *missing*. Records carrying
+    `"region": None` — key present, value null — fell into a separate `None`
+    bucket, so the two representations of "we don't know" produced two
+    different phantom regions.
+
+    A substation with no region belongs to no region. It is still counted in
+    the fleet summary, which is where fleet totals belong. Manufacturing a
+    bucket to hold it is a silent default (Discipline #50) that puts a number
+    in the rollup with nothing behind it.
+
+    The count of excluded records is returned to the caller rather than
+    swallowed — see `n_no_region` on the result — so the omission is visible.
+    """
     regions = {}
+    n_no_region = 0
     for s in substations:
-        r = s.get("region", "Unknown")
+        r = s.get("region")
+        if not r:
+            n_no_region += 1
+            continue
         if r not in regions:
             regions[r] = []
         regions[r].append(s)
@@ -802,10 +999,19 @@ def compute_regional_summary(substations):
         summaries.append(entry)
 
     # Sort: regions with numeric median_R descending, then unclassified regions last
-    return sorted(
+    out = sorted(
         summaries,
         key=lambda x: (x["median_R"] is None, -(x["median_R"] or 0.0)),
     )
+    if n_no_region:
+        # Visible, not swallowed (Convention #56). Attached to the list rather
+        # than injected as a fake region, so no consumer mistakes it for one.
+        logger.info(
+            f"compute_regional_summary: {n_no_region:,} substation(s) carry no "
+            f"region and are excluded from the rollup; they remain counted in "
+            f"the fleet summary"
+        )
+    return out
 
 
 # ═══════════════════════════════════════════════════════════

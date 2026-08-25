@@ -29,6 +29,8 @@ Plus:
 
 **v4.2** (current). Peer-reviewed anchor: *Journal of Infrastructure Preservation and Resilience* v16 (doi:10.1186/s43065-026-00193-z); *Environmental Research: Energy* companion bound. Per-country canonicals at the v4.2 + v4.0.2 (legacy) versions are committed; v4.0.2 backups live at `{slug}/_v4.0.2.backup/` per Convention #56 (visibly-honest degradation — old versions preserved for audit, not silently overwritten).
 
+> **Declared live methodology version: v4.24** (operator decision, 19 August 2026). `versions.json` + `intelligence/edition-config.json` are the release source of truth. ⚠️ Per-country `meta.version` is still stale (25 countries say `4.0.2`, 13 say nothing) — bump it at the next cohort rescore, **not before**: stamping a version the data was never scored under is the defect class Discipline #50 exists to prevent. The v4.2 Zenodo DOI remains the correct *citable* version for already-published deliverables.
+
 ## Live deployment
 
 GitHub Pages auto-deploys `main` HEAD within ~30-90 seconds of any push. There is no staging environment — `main` IS production. The validate.yml CI workflow gates every PR + push touching `*/ssi-data.json` or `*/grid-geo.json` to prevent broken data from landing.
@@ -537,9 +539,198 @@ if missing or val is None:
 
 Multiple workflows can push to `main` concurrently (intelligence + ESG monthly refresh + manual dispatches). Each push step does `git pull --rebase --autostash origin main` with 3 attempts, falling back to `merge -X ours` if the rebase conflicts (the cron's enrichment + edition bump always wins over a competing external push). The `concurrency: monthly-refresh-main` block at workflow level prevents same-workflow race.
 
+### Discipline #50 — No score without an input: the silent-default prohibition (NEW · 19 August 2026 · M-046 / M-049)
+
+> ⚠️ **Numbering note.** #48 and #49 were both already claimed twice over when this was written (#48 = cross-tree cascade *and* per-country bounds.json quality; #49 = out-of-polygon 3-class taxonomy). #37/#38/#39 are likewise double-allocated between `METHODOLOGY_DISCIPLINES.md` and `REPORTS_FRAMING_KB.md`. **Before claiming a Discipline number, grep every tree.** The estate has no central allocator — see `SSI_DOCUMENT_PRECEDENCE_REGISTER.md`.
+
+**This is the most expensive defect the index has shipped. Read this before touching the scoring
+engine, the enrichment pipeline, or any `.get(key, default)` in a scoring path.**
+
+#### What happened
+
+`compute_r_base()` read `components.get(comp, 0)`. Every `merge_into_ssi_data.py` writes
+`"components": {}` at ingest. So a substation that was ingested but never enriched still scored:
+
+```
+R_final = soft_clip_upper(0.0 × Π mult) + Σ (add_i − 1.0)  =  Σ (add_i − 1.0)
+```
+
+— the flood additive term alone, with **zero** contribution from criticality, vulnerability,
+infrastructure, exposure, socio-economics or trajectory. The six things the index exists to
+measure contributed nothing, and the record published a plausible number anyway.
+
+**78,505 substations — 10.9% of the cohort, across 27 countries.** Poland 91.9% of its fleet,
+Austria 95.0%, Czechia 87.9%. Published as Low 48,588 / Medium 23,145 / High 3,453 /
+Critical 3,310 / Extreme 9.
+
+Because R is a *risk* score, `R_base = 0.0` is the **most resilient** end of the scale. The defect
+was not merely unsupported — it was biased in the reassuring direction, cohort-wide.
+
+#### Why every guard missed it
+
+- `validate_schema.py` checked band-vs-R_median consistency. The bands were consistent — with a
+  fabricated R_median. **The failure is silent from a validator perspective.**
+- Discipline #17 checks presence-of-field. `components` was present. It was `{}`.
+- The G5 sentinel checked `R_median` was finite. It was.
+- `classify_band()`, `compute_fleet_summary()`, `n_unclassified_pre_l3` and
+  `_stats_pending_l3_rescore` were **already correct** and had been since 16 July. One function
+  contradicted all of them.
+
+#### The rule
+
+> Convention #56: *"never silently default; never hide degradation"* — *"degraded / missing fields
+> carry None with a `_source` marker rather than silent defaults."*
+> — `METHODOLOGY_CASCADE_PLAYBOOK.md` v0.3 §3.4, `METHODOLOGY_DISCIPLINES.md` §1.4
+
+**A missing input must never be replaced by a number. Not 0.0. Not 0.5. Not a fleet median.**
+The v4.0.2 reference implementation imputed 0.50; that is *also* non-compliant under the current
+discipline, because the object of the rule is the silence, not the value. If you find yourself
+choosing what number to substitute, you have already taken the wrong branch.
+
+**The compliant terminal state**, prescribed by `METHODOLOGY_DISCIPLINES.md` line 257:
+
+```
+R_median = None  →  classify_band(None) == "Unclassified"
+                 →  filtered out of compute_fleet_summary statistics
+                 →  counted in n_unclassified_pre_l3
+                 →  _stats_pending_l3_rescore set when nothing is scored
+```
+
+This state is explicitly legitimate: *"R_median = None (legitimate visibly-honest degradation
+marker when substation exists on grid but scoring inputs incomplete)"*.
+
+#### ❌ BANNED
+
+```python
+R_base = sum(w * components.get(comp, 0) for comp, w in COMPONENT_WEIGHTS.items())
+value  = record.get("field", 0.0)          # in any scoring path
+value  = record.get("field") or DEFAULT    # `or` also swallows 0.0 and ""
+```
+
+#### ✅ REQUIRED
+
+```python
+def compute_r_base(components):
+    if not components:
+        return None
+    if not any(comp in components for comp in COMPONENT_WEIGHTS):
+        return None
+    return sum(w * components.get(comp, 0) for comp, w in COMPONENT_WEIGHTS.items())
+```
+
+and at the call site, refuse to score rather than manufacture:
+
+```python
+if R_base is None:
+    for f in (...MC output fields...):
+        updated[f] = None
+    updated["classification"] = classify_band(None)
+    updated["_stats_pending_l3_rescore"] = True
+    updated["_unscoreable_reason"] = "components empty — Convention #56"
+    return updated
+```
+
+#### The zero-vector corollary (20 August 2026 · M-057)
+
+The guard above tests for **absence**. 145 records survived it by carrying a components dict that
+was present, complete, and entirely `0.0` — and published `R_base_median 0.0`, `CI_width 0.0`,
+`classification "Low"`, `confidence_tier "high"`. Identical fabricated output, reached through a
+populated dict instead of an empty one.
+
+```python
+# ❌ still fabricates
+{"C": 0.0, "V": 0.0, "I": 0.0, "E": 0.0, "S": 0.0, "T": 0.0}
+```
+
+`compute_r_base` now returns `None` when **every present component is exactly zero**. Note what the
+guard is *not*: there is no `R_base < epsilon` test. "All present components are exactly 0.0" is a
+structural fact about the vector; a numeric floor would be a constant somebody picked, which is the
+branch this Discipline exists to close. Partial dicts still score on what they have — the
+all-or-nothing case is the one that was fabricating.
+
+**And note how it was found: by a sentinel, not by inspection.** The three M-046 detections are
+independent on purpose. Detection 1 (empty dict) reported fully clean; detections 2 and 3 kept
+firing. A single-detection sentinel would have declared victory. When you write a guard, write more
+than one way of catching the same defect.
+
+#### The stale-score corollary (20 August 2026 · M-058)
+
+The three detections above test *symptoms*: empty components, `R_base_median == 0.0`, zero Monte
+Carlo spread. All three reported the UK clean while **26,069 substations — 91% of its scored
+fleet — published the identical `R_median = 0.0855`, classified "Low", on top of real, varied
+components.**
+
+They had been scored while `components` was empty (so `R_final` collapsed to the per-country
+constant `Σ(add_i − 1.0)`), and a later enrichment pass populated `components` **without
+triggering the rescore §5bis Criterion 2 requires.** The score is a fossil; the inputs beneath it
+are real.
+
+```python
+# ❌ the record disagrees with itself
+"R_base_median": 0.0,
+"R_median": 0.0855, "R_P5": 0.0855, "R_P95": 0.0855, "CI_width": 0.2064,   # CI ≠ P95−P5
+"components": {"C": 0.4456, "V": 0.2506, ...}                              # weights to ~0.335
+```
+
+**The rule: if you change an input, rescore. Not later, not at the next cohort run — the write
+that changes `components` owns the rescore.** A pipeline stage that enriches without rescoring
+leaves every downstream reader quoting a number computed from data that no longer exists.
+
+Detection 4 (`TestStoredScoreMatchesStoredComponents`) is the generalisation the other three are
+special cases of:
+
+```python
+round(compute_r_base(components), 4) == stored R_base_median
+```
+
+Both sides are 4-decimal quantities — exact at the stored precision, not a tolerance. **Never fix
+a failure here by adjusting the stored `R_base_median` to agree.** That makes the record
+self-consistent and still wrong. Rescore if the inputs are real; retire to Unclassified if they
+are not.
+
+**19,815 of the 26,069 were published a band lower than the evidence supports.** Like M-046, the
+defect was biased in the reassuring direction — and it covered most of a G7 fleet.
+
+#### The generalised check
+
+`METHODOLOGY_DISCIPLINES.md` §5quinquies states it exactly:
+
+> *"for every `.get(k, default)` call, examine whether the default silently masks a missing field
+> that should be surfaced explicitly."*
+
+Grep for `.get(` with a numeric default anywhere in `scripts/pipeline/scoring/` or
+`scripts/pipeline/enrichment/` and justify each one. A default is acceptable only where the
+absent value is genuinely neutral **and** its absence is recorded — a modifier defaulting to
+`1.00` is fine; an *input* defaulting to a number is not.
+
+#### Sentinel
+
+`tests/test_m046_component_backed_scores.py` — three independent detections (empty components with
+a score; `R_base_median == 0.0` with a score; `CI_width == 0.0`, since a 10,000-draw Monte Carlo
+cannot produce zero spread from real inputs). `MAX_ALLOWED = 0`.
+
+**Do not xfail this test.** Sweden's 69% fleet loss sat inside an xfail for a month with a
+mitigation note describing a remedy that could not have worked (M-044). If a burn-down is needed,
+lower `MAX_ALLOWED` deliberately and leave the history visible.
+
+#### Related failures from the same session, all the same shape
+
+| Ref | Defect | Shape |
+|---|---|---|
+| M-026 | 22 ingestion modules read a config key that did not exist; Greece ran its boundary filter at 0.1 km against a configured 5.0 km | silent fallback to a hardcoded literal |
+| M-030 | `validate_schema.py` read a sharded manifest, saw 0 substations, and **passed** | absence read as success |
+| M-034 | Sweden lost 2,709 real substations to a voltage-tag requirement; the commit reported "+204.5%" | two defects masking each other |
+| M-039 | `socio_economic_backfill.py` stored the raw GADM province, never the alias-resolved canonical | code contradicting its own docstring |
+| M-044 | Sweden's fleet-floor gate fired correctly — *"Refuse to publish"* — and was xfailed | a correct refusal overruled |
+
+**The common signature: a guard reports success because it had nothing to look at.** When a check
+passes, confirm it actually examined data. An empty set satisfies every universal quantifier.
+
+---
+
 ### Convention #56 — Visibly-honest degradation (inherited from the SSI Index methodology framework)
 
-When a value cannot be sourced from a public regulatory canonical, the methodology surfaces `[N/A]` markers + degradation reasons rather than silent defaults. The v4.0.2 → v4.2 promotion preserves `_v4.0.2.backup/` per country so older deliverables remain auditable. Applies cohort-wide: ingestion failures surface as visible gaps, not silent zeros.
+When a value cannot be sourced from a public regulatory canonical, the methodology surfaces `[N/A]` markers + degradation reasons rather than silent defaults. **This applies to the scoring engine itself, not only to ingestion** — see Discipline #50 above, where `compute_r_base()` defaulted a missing component to `0.0` and published 78,505 fabricated scores while this paragraph was already in force. The v4.0.2 → v4.2 promotion preserves `_v4.0.2.backup/` per country so older deliverables remain auditable. Applies cohort-wide: ingestion failures surface as visible gaps, not silent zeros.
 
 ## Quick reference — running the tooling
 
@@ -624,6 +815,21 @@ Before pushing to `main` or merging a PR:
 - [ ] If you touched `*/ssi-data.json` or `*/grid-geo.json`: confirm `validate.yml` is green on the PR
 - [ ] If you added a new country: confirm pytest discovers the new slug via `intelligence/countries.json`
 - [ ] If you changed methodology version: bump `versions.json` + the v4.0.2-style backup pattern per Convention #56
+- [ ] If you touched a scoring or enrichment path: every `.get(key, default)` with a **numeric** default is justified in the diff, or removed (Discipline #50)
+- [ ] `pytest tests/test_m046_component_backed_scores.py` → green, and **not** xfailed
+- [ ] If a gate newly passes: confirm it examined non-empty data — an empty set satisfies every universal quantifier (M-030)
+- [ ] If you are about to xfail a failing gate: record why the mitigation actually works. A correct refusal silenced by a wrong mitigation note cost a month (M-044)
+- [ ] `pytest tests/test_precedence_register_freshness.py` → green (set `SSI_PRECEDENCE_REGISTER` in CI; a **skip is not a pass**)
+- [ ] If you changed a methodology document, a Convention, a Discipline number or a scoring behaviour: update `SSI_DOCUMENT_PRECEDENCE_REGISTER.md` §2/§3/§4 **in the same commit** (§7.1 rule 2)
+- [ ] New Discipline number? Claim it in `METHODOLOGY_DISCIPLINES.md` first, starting at **#54**, after grepping every tree
+- [ ] If you wrote a large JSON payload from a script: it went through `_atomic_write_text` (temp + `fsync` + `os.replace`), never `Path.write_text`. An interrupted `write_text` leaves a **shorter-but-parseable** shard that every concatenating reader accepts silently (M-055)
+- [ ] `pytest tests/test_shard_write_integrity.py tests/test_component_donor_uniqueness.py` → green. Neither may be xfailed
+- [ ] If you changed any scoring **input** (components, modifiers, socio_economic): the same change rescored the record. Enrichment without a rescore leaves a fossil score over live inputs (M-058, §5bis Criterion 2)
+- [ ] Amending a gate? It must catch something the old one could not — state what, in the diff. An amendment that only makes red go green is a relaxation (register §5.10/§5.11)
+- [ ] Rebuilding a summary or rollup? Carry forward the `_`-prefixed provenance keys you did not compute. Deleting the marker that explains present data is Convention #56 from the other side (M-065)
+- [ ] Before trusting a gate's silence, check the thing it claims to check **directly** at least once. 24 phantom regions sat inside a rollup gate that structurally could not see them (M-062)
+- [ ] A gate is failing and you believe the gate is wrong? Check the precedence register §1 first. If a rank-2 source contradicts it, amend the gate **and get it sanctioned** — silently amending a red gate is M-044. If not, the gate is right
+- [ ] If you ran a data-recovery or backfill pass: the donor/source guard is **cross-invocation** — it reads the markers already on disk, not just a set local to this run. One source record may support exactly one target record (M-056)
 
 ## Companion documents
 
@@ -637,6 +843,10 @@ Before pushing to `main` or merging a PR:
 | `PHASE_1_IMPLEMENTATION_PLAN.md` | Phase 1 PR-1+ scoring engine | repo root (canonical Phase 1 narrative) |
 | `AUDIT_v4_0_2_PRE_v4_2_FOUNDATION.md` | v4.0.2 → v4.2 audit (F-Lx-y findings) | repo root |
 | `intelligence/countries.json` | 39-country slug + first-refresh SoT (KB §57) | repo |
+| `SSI_DOCUMENT_PRECEDENCE_REGISTER.md` | **Which document wins when two disagree** — read before citing any methodology text | `…/0.22. IP agenda/SSI Index/` (Ikenga SL tenant) |
+| `SSI_FOUNDATIONAL_DOCS_ALIGNMENT_20260819.md` | Version audit of every foundational lineage | same folder |
+| `SSI_METRIC_IMPLEMENTATION_DISCLOSURE_v1.md` | What each of the 20 metrics **actually** computes — binding companion to the Complete Formula Construct | same folder |
+| `SSI_MODIFICATION_LOG_20260819.md` | Live remediation log, M-001 … M-056 — extended in place, never superseded | same folder |
 
 ## Contact
 

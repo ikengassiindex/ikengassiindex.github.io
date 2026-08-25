@@ -197,6 +197,21 @@ def compute_modifier_terms(modifiers):
             logger.warning("Unknown modifier '%s' in substation; skipping", name)
             continue
 
+        # M-001 fix (v4.24, 19 August 2026) — retired modifiers are excluded
+        # from the product. A retired entry is kept in the registry so audit
+        # readers can still resolve the name (Convention #56 retire-with-
+        # tombstone), and the value is kept on the substation so the frontend
+        # and the audit trail can still read it — but it MUST NOT contribute
+        # to R_median. Without this guard, a v1/v2 sibling pair present on the
+        # same substation is multiplied twice: empirically 31,247 substations
+        # carried both R7_cyber and R7_cyber_v2 and were double-counted.
+        if spec.get("retired"):
+            logger.debug(
+                "Modifier '%s' is retired (%s); excluded from the product",
+                name, spec["retired"],
+            )
+            continue
+
         lo, hi = spec["range"]
         # Clip to declared range as a safety net against upstream emission errors.
         # See F-L1-10 + F-L4-1 findings; range enforcement is now centralized here.
@@ -249,6 +264,7 @@ def per_modifier_impacts(modifiers):
         name: round(value - 1.0, 4)
         for name, value in modifiers.items()
         if name in MODIFIER_REGISTRY
+        and not MODIFIER_REGISTRY[name].get("retired")
     }
 
 

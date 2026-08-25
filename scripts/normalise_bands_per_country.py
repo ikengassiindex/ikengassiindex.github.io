@@ -72,6 +72,14 @@ from scripts.pipeline.utils.ssi_data_sharding import (  # type: ignore
     read_ssi_data,
     write_ssi_data,
 )
+# M-004 fix (19 August 2026): single source of truth for the Task #461-aware
+# fleet_summary rebuild. compute_fleet_summary() re-derives bands from ABSOLUTE
+# R_median, which silently reverts the per-country normalisation this script
+# has just applied — the console reported the normalised distribution while the
+# file received the absolute one, on all 39 countries.
+from scripts.refresh_fleet_summary import (  # type: ignore
+    _recompute_fleet_summary_task_461_aware,
+)
 
 # ── countries covered by R_base fix commit 06a83c98 ────────────────────
 WAVE4_POST_RBASE_FIX = [
@@ -146,7 +154,7 @@ def process_country(slug: str, *, dry_run: bool, diagnose_only: bool) -> dict:
 
     # ── refresh fleet_summary + regional_summary ──────────────────────
     log.info(f"[{slug}] refreshing fleet_summary + regional_summary...")
-    fleet = compute_fleet_summary(substations)
+    fleet = _recompute_fleet_summary_task_461_aware(substations)
     fleet["_band_normalisation"] = {
         "applied": True,
         "method": "per_country_P5_P95_linear",

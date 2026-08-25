@@ -1113,6 +1113,30 @@ def enrich_country_from_polygon(
             aliased = aliases.get(code)
             if aliased:
                 row = csv_lookup.get(aliased)
+                if row:
+                    # Convention #78 — the CANONICAL name is what gets stored.
+                    #
+                    # Until 19 August 2026 the alias was used only to find the
+                    # CSV row and `code` kept the raw GADM input form, so
+                    # switzerland/ssi-data.json shipped 16 "Lucerne" and 51
+                    # "Sankt Gallen" where the canonical cantons are "Luzern"
+                    # and "St. Gallen". The admin-code gate flagged it; the
+                    # module docstring had claimed alias resolution all along.
+                    #
+                    # Guard: a bidirectional map (japan carries both
+                    # "Kōchi"→"Kochi" and "Kochi"→"Kōchi") has no canonical
+                    # side. Rewriting on such a map would make the stored value
+                    # depend on whichever form GADM happened to emit, so leave
+                    # the input form alone and say so.
+                    if aliases.get(aliased) in (None, aliased):
+                        code = aliased
+                    else:
+                        log.warning(
+                            "[%s] alias map is bidirectional for %r <-> %r; "
+                            "province left as the GADM input form. Give the "
+                            "pair a single canonical direction to fix this.",
+                            slug, code, aliased,
+                        )
         if not row:
             # Try case-normalised fallback (defensive)
             row = csv_lookup.get(code.upper()) or csv_lookup.get(code.lower())
