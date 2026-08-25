@@ -53,6 +53,8 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
     if not data_path.exists():
         raise FileNotFoundError(f"No ssi-data.json at {data_path}")
 
+    from scripts._ssi_data_shard_reader import load_ssi_data, save_ssi_data
+
     with open(data_path) as f:
         data = json.load(f)
 
@@ -67,7 +69,18 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
         )
         data = {"substations": data}
 
-    raw_subs = data["substations"]
+    # Convention #79 — a sharded country carries `substations_shards`, not
+    # `substations`. Reading the key directly raised KeyError and left
+    # france, germany, italy, poland, uk and us unscored. Task #520 class.
+    if data.get("sharded"):
+        data, raw_subs, is_sharded = load_ssi_data(country)
+        logger.info(
+            f"Country {country} is Convention #79 sharded; loaded "
+            f"{len(raw_subs):,} substations across the shard manifest"
+        )
+    else:
+        raw_subs = data["substations"]
+        is_sharded = False
 
     # Handle compact array format (sub_fields mapping)
     if raw_subs and isinstance(raw_subs[0], list):
@@ -213,8 +226,11 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
 
     # Write
     if not dry_run:
-        with open(data_path, "w") as f:
-            json.dump(data, f, separators=(",", ":"))
+        if is_sharded:
+            save_ssi_data(country, data, updated_subs, force_sharded=True)
+        else:
+            with open(data_path, "w") as f:
+                json.dump(data, f, separators=(",", ":"))
         logger.info(f"Wrote updated ssi-data.json for {country} ({len(updated_subs)} substations)")
     else:
         logger.info(f"[DRY RUN] Would write {country}/ssi-data.json")
