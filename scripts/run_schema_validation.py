@@ -39,6 +39,33 @@ def load_validator(name):
     schema = json.load(open(SCHEMA_DIR / name))
     return Draft202012Validator(schema)
 
+def _substation_validator():
+    """Validator for a single substation record, resolved out of the ssi-data schema.
+
+    Convention #79 moved the five largest countries (france, germany, us, uk,
+    italy) from an inline `substations` array to a `substations_shards`
+    manifest naming sibling files. The root schema alone cannot follow that
+    indirection, so before this existed the validator reported one error —
+    "'substations' is a required property" — and stopped. The consequence was
+    not one error, it was zero coverage: ~470,000 substations in the cohort's
+    biggest countries were never schema-checked at all. This resolves the
+    shards so they are.
+    """
+    schema = json.load(open(SCHEMA_DIR / 'ssi-data.schema.json'))
+    sub_schema = dict(schema['$defs']['substation'])
+    sub_schema['$defs'] = schema['$defs']          # keep #/$defs/... refs resolvable
+    return Draft202012Validator(sub_schema)
+
+
+def _shard_paths(data, filepath):
+    """Sibling shard files named by a Convention #79 manifest, in order."""
+    out = []
+    for entry in data.get('substations_shards') or []:
+        rel = entry['path'] if isinstance(entry, dict) else entry
+        out.append(filepath.parent / Path(rel).name)
+    return out
+
+
 def check(validator, filepath, max_errors=2):
     """Return None if file missing, list of error messages otherwise (empty = pass)."""
     if not filepath.exists():
@@ -48,10 +75,36 @@ def check(validator, filepath, max_errors=2):
     except Exception as e:
         return [f'JSON-PARSE: {e}']
     errors = sorted(validator.iter_errors(data), key=lambda e: list(e.absolute_path))
-    return [
+    msgs = [
         '/' + '/'.join(str(p) for p in e.absolute_path) + ': ' + e.message[:120]
         for e in errors[:max_errors]
     ]
+
+    # Convention #79 — descend into the shards the manifest names.
+    if isinstance(data, dict) and data.get('substations_shards'):
+        sub_v = _substation_validator()
+        for shard in _shard_paths(data, filepath):
+            if len(msgs) >= max_errors:
+                break
+            if not shard.exists():
+                msgs.append(f'/substations_shards: missing shard file {shard.name}')
+                continue
+            try:
+                part = json.loads(shard.read_text())
+            except Exception as e:
+                msgs.append(f'/{shard.name}: JSON-PARSE: {e}')
+                continue
+            records = part if isinstance(part, list) else (part.get('substations') or [])
+            for i, rec in enumerate(records):
+                if len(msgs) >= max_errors:
+                    break
+                for e in sub_v.iter_errors(rec):
+                    msgs.append(
+                        f'/{shard.name}/{i}/' + '/'.join(str(p) for p in e.absolute_path)
+                        + ': ' + e.message[:120]
+                    )
+                    break        # one error per record is enough to fail it
+    return msgs
 
 def main():
     strict = '--strict' in sys.argv

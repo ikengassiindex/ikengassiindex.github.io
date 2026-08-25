@@ -4,7 +4,11 @@
   "title": "SSI Index — ssi-data.json (canonical schema, v4.0.2)",
   "description": "Per-country SSI scoring output. Top-level fleet summary + array of substation records. Canonical sub-schema captures the COMMON CORE across all 39 SoT countries; country-specific extensions are permitted via additionalProperties (e.g. Baltic trio's richer R3_tier / R6c_flood modifiers, Mexico/Denmark/Greenland's degradation-model Markov variant). Renderer code must use defensive optional-chaining for fields outside the core (KB §64.3 anti-pattern A1). PR-5 (audit memo 2026-06-08): $id pinned with v4.0.2 path segment; new substation fields mult_product / add_sum / modifier_impacts declared as OPTIONAL during the Phase 1 transition (promotion to required scheduled for PR-7 post daily-routine refresh).",
   "type": "object",
-  "required": ["meta", "fleet_summary", "regions", "substations"],
+  "required": ["meta", "fleet_summary", "regions"],
+  "anyOf": [
+    { "required": ["substations"] },
+    { "required": ["substations_shards"] }
+  ],
   "additionalProperties": true,
   "properties": {
     "meta": {
@@ -51,6 +55,29 @@
       "description": "Per-region rollup. Most countries use array; some legacy use dict.",
       "minItems": 0
     },
+    "sharded": {
+      "type": "boolean",
+      "description": "Convention #79 — true when substations live in substations_shards[] rather than inline."
+    },
+    "substations_shards": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Convention #79 shard manifest. Each entry names a sibling file holding a substation array; run_schema_validation.py resolves each shard and validates its records against #/$defs/substation.",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+              "path": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 },
+              "size_mb": { "type": "number", "minimum": 0 }
+            }
+          }
+        ]
+      }
+    },
     "substations": {
       "type": "array",
       "minItems": 0,
@@ -66,7 +93,7 @@
       "properties": {
         "substation_id": {"type": ["string", "integer"]},
         "internal_id": {"type": ["string", "integer"]},
-        "name": {"type": "string"},
+        "name": {"type": ["string", "null"], "description": "OSM name where present. Explicitly null on unnamed substations (UK 25,624, Turkey 25); most countries omit the key instead. Both are Convention #56 honest — an unnamed substation is not given one."},
         "lat": {"type": "number"},
         "lon": {"type": "number"},
         "voltage_kv": {"type": ["number", "null"], "description": "May be null when source OSM voltage tag missing (Czechia, Luxembourg)"},
