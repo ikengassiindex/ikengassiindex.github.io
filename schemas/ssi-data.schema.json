@@ -171,12 +171,13 @@
         "p_crit_10yr": {"type": "number", "minimum": 0, "maximum": 1},
         "corrosion_class": {"type": "string", "enum": ["C1", "C2", "C3", "C4", "C5", "CX"]},
         "steady_state": {
-          "description": "Stationary distribution over [Healthy, Aging, Degraded, Critical]. Two representations observed: array [0.3, 0.3, 0.2, 0.2] (most countries) OR dict {'Good':0.3,'Acceptable':0.3,'Degraded':0.2,'Critical':0.2} (Mexico). Renderers must accept both.",
+          "description": "Stationary distribution over the degradation chain. Three sanctioned representations: 4-element array over [Healthy, Aging, Degraded, Critical] (37 countries); dict {'Good','Acceptable','Degraded','Critical'} (Mexico); 5-element array (Colombia only, 378 substations, present since the v4.0.2 baseline) \u2014 an operator-sanctioned 5-state variant whose ordering was verified against risk_score (corr -0.70 healthy end, +0.67 degraded end). Renderers must accept all three. Costa Rica's string form is NOT sanctioned: an unmigrated v4.0.2 vintage, meant to fail this gate.",
           "oneOf": [
-            {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number", "minimum": 0, "maximum": 1}},
+            {"type": "array", "minItems": 4, "maxItems": 5, "items": {"type": "number", "minimum": 0, "maximum": 1}},
             {"type": "object", "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}}
           ]
         },
+        "P5": {"type": "number", "minimum": 0, "maximum": 1, "description": "Fifth-state probability of the Colombia 5-state variant; equals steady_state[4]. Not a percentile \u2014 unrelated to the R_P5 Monte Carlo field."},
         "stationary_critical": {"type": "number", "minimum": 0, "maximum": 1, "description": "Alias for steady_state[3] (Baltic + Mexico schema)"}
       }
     }
