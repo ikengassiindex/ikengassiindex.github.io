@@ -10,7 +10,6 @@ Usage:
   python -m scripts.pipeline.run italy --dry-run          # Preview without writing
   python -m scripts.pipeline.run italy --skip-rescore     # Fast mode (no Monte Carlo)
   python -m scripts.pipeline.run italy --seismic-only     # Only seismic ingestion
-  python -m scripts.pipeline.run italy --components-only  # Only the component builder (M-061)
 """
 
 import argparse
@@ -29,14 +28,13 @@ from scripts.pipeline.config import COUNTRIES, REPO_ROOT
 from scripts.pipeline.ingestion.seismic import overlay_seismic_pga
 from scripts.pipeline.ingestion.climate import compute_iri_forward
 from scripts.pipeline.ingestion.socioeconomic import overlay_socioeconomic
-from scripts.pipeline.ingestion.components import build_component_metrics
 from scripts.pipeline.enrichment.merge import merge_and_rescore, generate_diff_report
 
 logger = logging.getLogger("ssi.pipeline")
 
 
 def run_pipeline(country, skip_seismic=False, skip_climate=False, skip_socio=False,
-                 skip_components=False, rescore=True, dry_run=False):
+                 rescore=True, dry_run=False):
     """
     Run the full pipeline for a single country.
 
@@ -77,7 +75,7 @@ def run_pipeline(country, skip_seismic=False, skip_climate=False, skip_socio=Fal
             logger.error(f"        Climate ingestion failed: {e}")
 
     if not skip_socio:
-        logger.info(f"  [3/4] Socio-economic overlay...")
+        logger.info(f"  [3/3] Socio-economic overlay...")
         try:
             socio_results = overlay_socioeconomic(country)
             if socio_results:
@@ -86,25 +84,6 @@ def run_pipeline(country, skip_seismic=False, skip_climate=False, skip_socio=Fal
                 logger.info(f"        → {len(socio_results)} substations, {matched} matched")
         except Exception as e:
             logger.error(f"        Socio-economic ingestion failed: {e}")
-
-    # ── [4/4] Component builder (M-061, 20 August 2026) ──
-    # The stage that was missing. The three above all write into the MODIFIER
-    # chain; none of them produced the component vector `compute_r_base`
-    # actually consumes, which is why 88.4% of the cohort was Unclassified.
-    # This emits a component letter only when every metric feeding it is
-    # present — see ingestion/components.py for why a partial letter would be
-    # M-046 all over again.
-    if not skip_components:
-        logger.info(f"  [4/4] Component builder...")
-        try:
-            component_results = build_component_metrics(country, dry_run=dry_run)
-            if component_results:
-                em = component_results.get("emitted", {})
-                logger.info(f"        → {component_results.get('metrics_attached', 0):,} "
-                            f"substations carry metrics; components emitted: "
-                            f"{ {k: v for k, v in em.items() if v} or 'none — vector incomplete'}")
-        except Exception as e:
-            logger.error(f"        Component builder failed: {e}")
 
     # ── Phase 2: Merge & Rescore ──
     logger.info("Phase 2: Merge & Rescore")
@@ -194,10 +173,6 @@ Examples:
     parser.add_argument("--seismic-only", action="store_true", help="Only run seismic ingestion")
     parser.add_argument("--climate-only", action="store_true", help="Only run climate ingestion")
     parser.add_argument("--socio-only", action="store_true", help="Only run socio-economic ingestion")
-    parser.add_argument("--components-only", action="store_true",
-                        help="Only run the component builder (M-061)")
-    parser.add_argument("--skip-components", action="store_true",
-                        help="Skip the component builder stage")
     parser.add_argument("--output-report", type=str, help="Write JSON report to file")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose logging")
 
@@ -225,12 +200,9 @@ Examples:
             parser.error(f"Unknown country: {c}. Valid: {', '.join(COUNTRIES)}")
 
     # Determine what to skip
-    _only = (args.seismic_only or args.climate_only or args.socio_only
-             or args.components_only)
-    skip_seismic = _only and not args.seismic_only
-    skip_climate = _only and not args.climate_only
-    skip_socio = _only and not args.socio_only
-    skip_components = args.skip_components or (_only and not args.components_only)
+    skip_seismic = args.climate_only or args.socio_only
+    skip_climate = args.seismic_only or args.socio_only
+    skip_socio = args.seismic_only or args.climate_only
 
     # Run
     all_stats = {}
@@ -241,7 +213,6 @@ Examples:
             stats = run_pipeline(
                 country,
                 skip_seismic=skip_seismic,
-                skip_components=skip_components,
                 skip_climate=skip_climate,
                 skip_socio=skip_socio,
                 rescore=not args.skip_rescore,

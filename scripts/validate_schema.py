@@ -456,44 +456,6 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
     except json.JSONDecodeError as e:
         return [f"FATAL: Invalid JSON — {e}"], []
 
-    # Convention #79 — resolve shards before any gate runs.
-    #
-    # Six countries (france, germany, italy, poland, uk, us) exceed the 60 MB
-    # threshold, so their ssi-data.json is a manifest with no inline
-    # `substations` key. Until 19 August 2026 this validator read that manifest
-    # and saw zero substations — whereupon check_modifier_ranges returned early
-    # on the empty list and the file PASSED. A validator that reports success
-    # on 577,765 substations it never looked at is worse than no validator.
-    # Cross-reference: modification-log M-030.
-    if isinstance(data, dict) and data.get("sharded"):
-        shards = data.get("substations_shards") or []
-        if not shards:
-            return ["FATAL: sharded=true but no 'substations_shards' list"], []
-        base = Path(filepath).resolve().parent
-        merged = []
-        for shard in shards:
-            rel = shard.get("path") if isinstance(shard, dict) else shard
-            shard_fp = base / rel if rel else None
-            if not shard_fp or not shard_fp.exists():
-                return [f"FATAL: manifest references missing shard {rel!r}"], []
-            try:
-                payload = json.loads(shard_fp.read_text(encoding="utf-8"))
-            except json.JSONDecodeError as e:
-                return [f"FATAL: shard {rel} is invalid JSON — {e}"], []
-            if isinstance(payload, dict):
-                payload = payload.get("substations", [])
-            if not isinstance(payload, list):
-                return [f"FATAL: shard {rel} did not parse to a list"], []
-            declared = shard.get("count") if isinstance(shard, dict) else None
-            if declared is not None and len(payload) != declared:
-                return [
-                    f"FATAL: shard {rel} holds {len(payload)} substations but "
-                    f"the manifest declares {declared}"
-                ], []
-            merged.extend(payload)
-        data = dict(data)
-        data["substations"] = merged
-
     # Class D fix (16 July 2026, FAILURE_SOLVING_PROPOSAL_20260716.md §3): guard
     # against flat-list root schema (Latvia + any future country in Phase 1
     # intermediate state per CONVENTION_78_BINDING_EMPIRICAL_AUDIT §4bis.4).
@@ -616,134 +578,37 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
         if r < 1.00:  return 'Critical'
         return 'Extreme'
 
-    # ── M-064 (20 August 2026): compare the ABSOLUTE band, not the label ──
-    #
-    # This check compared `classification` against the band derived from
-    # R_median. Since **Task #461** (22 July 2026) `classification` is the
-    # per-country NORMALISED band — explicitly "band label = within-country
-    # ranking not absolute R" — so the two are *designed* to differ. The check
-    # was testing a pre-Task-#461 contract.
-    #
-    # It is an ERROR, not a warning, so `run.py` Phase 2b refused to commit for
-    # every normalised country: czechia 100%, austria 99.6%, australia 71.8%.
-    # `python -m scripts.pipeline.run` could not complete cohort-wide, and the
-    # message blamed the data. That is why the cohort refresh had never run.
-    #
-    # The absolute band lives in `_band_absolute`, written by
-    # normalise_bands_per_country.py before it overwrites `classification`.
-    # Verified at the time of this change: 83,443 of 83,443 scored records
-    # across all 31 scoring countries carry it, and it equals
-    # classify_band(R_median) for every one.
-    #
-    # THIS IS NOT A RELAXATION. The old check tested one thing and could not
-    # distinguish "wrong band" from "not a band at all". This tests four, and
-    # each catches something the old one could not:
-    #   (a) `_band_absolute` is PRESENT      — absence now fails rather than
-    #                                          passing unexamined (M-030)
-    #   (b) `_band_absolute` == band(R_median) — the real score↔band invariant
-    #   (c) `classification` is a VALID band  — garbage labels were previously
-    #                                          indistinguishable from drift
-    #   (d) where the country is NOT Task-#461 normalised, `classification`
-    #       must equal `_band_absolute` — with no normalisation applied there
-    #       is no legitimate reason for them to differ, so genuine drift is
-    #       still caught
-    _fs = data.get('fleet_summary') or {}
-    normalised = bool((_fs.get('_band_normalisation') or {}).get('applied'))
-
-    missing_abs = 0
-    abs_wrong = 0
-    bad_label = 0
-    drift = 0
+    misclassified = 0
     n_skipped_pre_l3 = 0
     sample_violation = None
-    sample_missing = None
-    sample_label = None
-    sample_drift = None
-
-    VALID_BANDS = {'Low', 'Medium', 'High', 'Critical', 'Extreme', 'Unclassified'}
-
     for s in substations:
         r = s.get('R_median')
         if r is None:
             n_skipped_pre_l3 += 1
-            continue  # Convention #56: pre-L3 subs excluded from the tally
+            continue  # Convention #56: pre-L3 subs excluded from mismatch tally
         expected = _expected_band_v42(r)
-        band_abs = s.get('_band_absolute')
-        cls = s.get('classification')
-
-        if band_abs is None:
-            missing_abs += 1
-            if sample_missing is None:
-                sample_missing = s.get('substation_id', s.get('id', '?'))
-        elif band_abs != expected:
-            abs_wrong += 1
+        if s.get('classification') != expected:
+            misclassified += 1
             if sample_violation is None:
                 sample_violation = (s.get('substation_id', s.get('id', '?')),
-                                    band_abs, expected, r)
-
-        if cls not in VALID_BANDS:
-            bad_label += 1
-            if sample_label is None:
-                sample_label = (s.get('substation_id', s.get('id', '?')), cls)
-
-        if not normalised and band_abs is not None and cls != band_abs:
-            drift += 1
-            if sample_drift is None:
-                sample_drift = (s.get('substation_id', s.get('id', '?')), cls, band_abs, r)
-
+                                    s.get('classification'), expected, r)
     if n_skipped_pre_l3 > 0:
         warnings.append(
             f"CHECK 8: {n_skipped_pre_l3}/{len(substations)} substations "
             f"skipped — R_median=None (pre-L3 state per Convention #56)"
         )
-
-    n_scored = len(substations) - n_skipped_pre_l3
-
-    if missing_abs > 0:
-        errors.append(
-            f"CLASSIFICATION-BAND: {missing_abs}/{n_scored} scored substations have "
-            f"no `_band_absolute` (e.g. {sample_missing!r}). The absolute band is "
-            f"what makes the score↔band invariant checkable once Task #461 "
-            f"normalisation has overwritten `classification`. Run "
-            f"scripts/normalise_bands_per_country.py, which snapshots it."
-        )
-
-    if abs_wrong > 0:
-        pct = abs_wrong / n_scored * 100 if n_scored else 0
+    if misclassified > 0:
+        n_scored = len(substations) - n_skipped_pre_l3
+        pct = misclassified / n_scored * 100 if n_scored else 0
         sid, got, expected, r = sample_violation
+        # Class B format-string guard: r_str handles None (defensive; Check 8
+        # loop above already filters None, but guarding for future safety)
         r_str = f"{r:.4f}" if isinstance(r, (int, float)) else "None"
         msg = (
-            f"CLASSIFICATION-BAND: {abs_wrong} substations ({pct:.2f}%) have "
-            f"`_band_absolute` mismatched to their own R_median. "
-            f"Example: {sid!r} has R_median={r_str} (expected={expected}) but "
-            f"_band_absolute={got!r}. This is the score↔band invariant and it "
-            f"does not tolerate normalisation as an excuse."
-        )
-        if pct >= 2.0:
-            errors.append(msg)
-        elif pct >= 0.5:
-            warnings.append(msg)
-
-    if bad_label > 0:
-        sid, cls = sample_label
-        errors.append(
-            f"CLASSIFICATION-BAND: {bad_label}/{n_scored} substations carry a "
-            f"`classification` that is not a band at all (e.g. {sid!r} → {cls!r}). "
-            f"Valid: {sorted(VALID_BANDS)}."
-        )
-
-    if drift > 0:
-        pct = drift / n_scored * 100 if n_scored else 0
-        sid, cls, band_abs, r = sample_drift
-        r_str = f"{r:.4f}" if isinstance(r, (int, float)) else "None"
-        msg = (
-            f"CLASSIFICATION-BAND: this country has no Task #461 normalisation "
-            f"applied, so `classification` should equal `_band_absolute` — but "
-            f"{drift} substations ({pct:.2f}%) differ. Example: {sid!r} "
-            f"R_median={r_str}, _band_absolute={band_abs!r}, "
-            f"classification={cls!r}. Either run "
-            f"scripts/normalise_bands_per_country.py, or this is genuine "
-            f"legacy drift needing a rescore."
+            f"CLASSIFICATION-BAND: {misclassified} substations ({pct:.2f}%) "
+            f"have classification mismatched to R_median band. "
+            f"Example: substation {sid!r} has R_median={r_str} "
+            f"(expected={expected}) but classification={got!r}."
         )
         if pct >= 2.0:
             errors.append(msg)

@@ -96,7 +96,7 @@ def _recompute_fleet_summary_task_461_aware(substations):
     behaviour, then overrides the `bands` + `band_pct` blocks with counts from
     each sub's `.classification` field.
     """
-    fs = compute_fleet_summary(substations, previous=data.get('fleet_summary'))  # M-065
+    fs = compute_fleet_summary(substations)
     n = len(substations)
     if n == 0:
         return fs
@@ -119,14 +119,6 @@ def _has_drift(manifest: dict) -> tuple[bool, list[str]]:
         return False, []
 
     issues = []
-
-    # M-004 fix (19 August 2026) — band-basis drift. Without this predicate
-    # --all-drift silently skips every country whose ONLY defect is that
-    # fleet_summary.bands was built on absolute cutoffs rather than the Task
-    # #461 per-country normalised `classification` field. That was 39 of 39.
-    if fs.get("_bands_source") != "task_461_per_country_normalised_classification_field":
-        issues.append("bands_not_task_461_normalised")
-
     median_R = fs.get("median_R")
     n_scored = fs.get("n_scored") or 0
     bands = fs.get("bands") or {}

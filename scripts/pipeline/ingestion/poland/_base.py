@@ -92,8 +92,6 @@ import logging
 import unicodedata
 from pathlib import Path
 
-from ...utils.tolerance import resolve_boundary_tolerance_km
-
 # Re-export country-agnostic dataclasses from Canada _base
 from ..canada._base import (
     SubstationRecord,
@@ -501,9 +499,13 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     is keyword-only (`country_slug` + `tolerance_km`), NOT positional path args.
     """
     if tolerance_km is None:
-        tolerance_km = resolve_boundary_tolerance_km(
-            "poland", module_fallback=0.1
-        )
+        try:
+            tol_cfg = json.loads(POLAND_TOLERANCE_JSON.read_text(encoding="utf-8"))
+            tolerance_km = float(
+                tol_cfg.get("per_country", {}).get("poland", {}).get("tolerance_km", 0.1)
+            )
+        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+            tolerance_km = 0.1
     return _apply_bounds_generic(
         records, country_slug="poland", tolerance_km=tolerance_km
     )

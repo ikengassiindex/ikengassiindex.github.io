@@ -69,13 +69,7 @@ class TestModifierTypes:
 # ═══════════════════════════════════════════════════════════
 
 class TestSoftClipUpper:
-    """soft_clip_upper saturates R > 1.0 at 1.0; PR-3 chain must invoke it.
-
-    M-006 (19 Aug 2026): the logistic form was replaced by min(R, 1.0) —
-    the logistic was discontinuous at the threshold and inverted the
-    ranking above it. These tests compare against soft_clip_upper itself,
-    so they hold across the change.
-    """
+    """soft_clip_upper compresses R > 1.0 via logistic; PR-3 chain must invoke it."""
 
     def test_6_high_modifier_triggers_soft_clip(self):
         """R_base=0.95, R3_C_mult=1.40 → R_raw = 1.33 → must be compressed below R_raw."""

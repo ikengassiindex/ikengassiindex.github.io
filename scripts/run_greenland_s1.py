@@ -306,7 +306,7 @@ def main():
     data["substations"] = scored
 
     # Fleet summary
-    data["fleet_summary"] = compute_fleet_summary(scored, previous=data.get("fleet_summary"))  # M-065
+    data["fleet_summary"] = compute_fleet_summary(scored)
     data["fleet_summary"]["data_status"] = "OFFICIAL — Session 1 2026-04 (early bring-forward from 2026-07)"
     data["fleet_summary"]["session_label"] = "Edition 001 · Session 1 · 2026-04"
     data["fleet_summary"]["mc_iterations_per_substation"] = 1000

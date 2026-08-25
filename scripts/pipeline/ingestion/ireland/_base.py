@@ -54,8 +54,6 @@ import logging
 import unicodedata
 from pathlib import Path
 
-from ...utils.tolerance import resolve_boundary_tolerance_km
-
 # Re-export country-agnostic dataclasses from Canada _base
 from ..canada._base import (
     SubstationRecord,
@@ -324,9 +322,13 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     border (~500 km) is pre-excluded via bounds.json 26-county
     Republic-only polygon."""
     if tolerance_km is None:
-        tolerance_km = resolve_boundary_tolerance_km(
-            "ireland", module_fallback=1.0
-        )
+        try:
+            tol_cfg = json.loads(IRELAND_TOLERANCE_JSON.read_text(encoding="utf-8"))
+            tolerance_km = float(
+                tol_cfg.get("countries", {}).get("ireland", {}).get("boundary_tolerance_km", 1.0)
+            )
+        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+            tolerance_km = 1.0
     return _apply_bounds_generic(
         records, country_slug="ireland", tolerance_km=tolerance_km
     )

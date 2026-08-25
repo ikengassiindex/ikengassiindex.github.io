@@ -97,8 +97,6 @@ import logging
 import unicodedata
 from pathlib import Path
 
-from ...utils.tolerance import resolve_boundary_tolerance_km
-
 # Re-export country-agnostic dataclasses from Canada _base
 from ..canada._base import (
     SubstationRecord,
@@ -685,9 +683,13 @@ def apply_bounds_filter(records, *, tolerance_km: float | None = None):
     near-border cases); tolerance absorbs Alpine terrain simplification
     without dropping legitimate cross-border TSO substations."""
     if tolerance_km is None:
-        tolerance_km = resolve_boundary_tolerance_km(
-            "switzerland", module_fallback=0.5
-        )
+        try:
+            tol_cfg = json.loads(SWITZERLAND_TOLERANCE_JSON.read_text(encoding="utf-8"))
+            tolerance_km = float(
+                tol_cfg.get("countries", {}).get("switzerland", {}).get("boundary_tolerance_km", 0.5)
+            )
+        except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+            tolerance_km = 0.5
     return _apply_bounds_generic(
         records, country_slug="switzerland", tolerance_km=tolerance_km
     )

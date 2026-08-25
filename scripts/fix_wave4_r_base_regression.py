@@ -276,7 +276,7 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
     # Refresh fleet_summary + regions[].bands
     logger.info(f"[{slug}] refreshing fleet_summary + regional bands...")
     data["substations"] = subs
-    data["fleet_summary"] = compute_fleet_summary(subs, previous=data.get("fleet_summary"))  # M-065
+    data["fleet_summary"] = compute_fleet_summary(subs)
     if "regions" in data and isinstance(data["regions"], list):
         data["regions"] = compute_regional_summary(subs)
 

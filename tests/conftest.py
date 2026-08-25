@@ -23,21 +23,6 @@ if str(REPO_ROOT) not in sys.path:
 #  SAMPLE SUBSTATION FIXTURES
 # ═══════════════════════════════════════════════════════════
 
-# ═══════════════════════════════════════════════════════════
-#  R7 CUTOVER NOTE (v4.24, 19 August 2026 — M-001 / M-031)
-# ═══════════════════════════════════════════════════════════
-#  These fixtures previously carried "R7_cyber" (v1). Under the
-#  GATE-A-11-REVISED hard cutover, R7_cyber v1 is marked retired in the
-#  registry and M-001 excludes retired modifiers from the multiplicative
-#  product — R7_cyber_v2 SUBSTITUTES it, it does not supplement it.
-#  A fixture still keyed "R7_cyber" therefore contributes nothing, and any
-#  expectation multiplying its value in is asserting pre-cutover arithmetic.
-#  The numeric values are preserved verbatim so the arithmetic assertions
-#  built on them stay meaningful; only the key changed.
-#  Fixtures that deliberately exercise v1 retirement semantics live in
-#  tests/test_r7_cyber_v2_construct.py and are NOT migrated.
-# ═══════════════════════════════════════════════════════════
-
 @pytest.fixture
 def canonical_modifiers():
     """Canonical 5-modifier dict (v4.0.2 baseline)."""
@@ -46,7 +31,7 @@ def canonical_modifiers():
         "R4_F_topo": 1.10,
         "R6_restoration": 0.98,
         "R6_seismic": 1.08,
-        "R7_cyber_v2": 1.01,
+        "R7_cyber": 1.01,
     }
 
 
@@ -60,7 +45,7 @@ def korea_modifiers():
         "R6_seismic": 1.02,
         "R6_typhoon": 1.08,
         "R6_chaebol": 1.06,
-        "R7_cyber_v2": 1.015,
+        "R7_cyber": 1.015,
     }
 
 
@@ -75,7 +60,7 @@ def colombia_modifiers():
         "R6_volcanic": 1.12,
         "R6_drought": 1.08,
         "R6_armed_conflict": 1.04,
-        "R7_cyber_v2": 1.005,
+        "R7_cyber": 1.005,
     }
 
 
@@ -86,7 +71,7 @@ def v4_2_modifiers():
         "R3_C_mult": 1.00,
         "R4_F_topo": 1.05,
         "R6_seismic": 1.05,
-        "R7_cyber_v2": 1.00,
+        "R7_cyber": 1.00,
         "R6c_flood": 1.15,  # additive: contributes +0.15 outside soft_clip
         "R6d_wildfire": 1.10,
         "R6e_winter": 1.05,
@@ -107,7 +92,7 @@ def out_of_range_modifiers():
     """Modifier values outside their declared range — clipped at apply time."""
     return {
         "R3_C_mult": 2.0,  # above 1.50 — should clip to 1.50
-        "R7_cyber_v2": 0.90,  # below 0.99 — should clip to 0.99
+        "R7_cyber": 0.90,  # below 0.99 — should clip to 0.99
     }
 
 

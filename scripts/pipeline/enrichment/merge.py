@@ -161,8 +161,7 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
 
     # Recompute fleet and regional summaries
     data["substations"] = updated_subs
-    data["fleet_summary"] = compute_fleet_summary(
-        updated_subs, previous=data.get("fleet_summary"))  # M-065: keep provenance
+    data["fleet_summary"] = compute_fleet_summary(updated_subs)
     data["regions"] = compute_regional_summary(updated_subs)
 
     # Update metadata

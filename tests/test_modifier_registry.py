@@ -103,10 +103,7 @@ class TestComputeModifierTerms:
     def test_9_out_of_range_clipped_to_range_hi(self, out_of_range_modifiers):
         """Out-of-range values are clipped to range bounds before applying."""
         mult, add = compute_modifier_terms(out_of_range_modifiers)
-        # R3_C_mult=2.0 clips to 1.50; R7_cyber_v2=0.90 clips to its 0.99 floor.
-        # v2 is the live low-side clip vehicle post-cutover (M-031) — v1 is
-        # retired and excluded from the product entirely, so it cannot be used
-        # to exercise clipping.
+        # R3_C_mult=2.0 should clip to 1.50, R7_cyber=0.90 should clip to 0.99
         expected_mult = 1.50 * 0.99
         assert mult == pytest.approx(expected_mult), (
             f"Expected clipped mult={expected_mult}, got {mult}"

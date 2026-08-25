@@ -24,8 +24,6 @@ import time
 import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
-
-from ...utils.tolerance import resolve_boundary_tolerance_km
 from typing import Any, Iterable, Optional
 
 logger = logging.getLogger(__name__)
@@ -582,8 +580,16 @@ def load_bounds_polygon() -> Optional[Any]:
 
 
 def load_tolerance_km() -> float:
-    """Load turkey tolerance via the single resolver (configured 5.0 km)."""
-    return resolve_boundary_tolerance_km(COUNTRY_SLUG, module_fallback=5.0)
+    """Load turkey tolerance from cross_border_tolerances.json (5.0 km)."""
+    tolerance_path = REPO_ROOT / "cross_border_tolerances.json"
+    try:
+        data = json.loads(tolerance_path.read_text())
+        return data.get("countries", {}).get(COUNTRY_SLUG, {}).get(
+            "boundary_tolerance_km", data.get("_default_tolerance_km", 0.1)
+        )
+    except Exception as exc:
+        logger.warning(f"Failed to load tolerance: {exc}; defaulting to 5.0 km")
+        return 5.0
 
 
 def apply_bounds_filter(

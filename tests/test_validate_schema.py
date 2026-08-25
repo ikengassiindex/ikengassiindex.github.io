@@ -260,20 +260,9 @@ class TestPipelinePhase2b:
             f"Italy ssi-data.json failed PR-5 validator gates: {errors}. "
             f"Italy is the canonical reference — failure here means PR-5 broke the gate logic."
         )
-        # The PR-3 provenance warning is expected (legacy data, refresh queued
-        # for PR-7). So are the pre-L3 notices: since M-046/M-053, Italy's fleet
-        # is entirely Unclassified pending the cohort rescore, and CHECK 7 /
-        # CHECK 8 report that state deliberately — validate_schema.py emits them
-        # as the Convention #56 disclosure, not as faults ("R_median=None
-        # (pre-L3 state per Convention #56)"). Treating the validator's own
-        # honest degradation notice as an unexpected warning would make the
-        # visibly-honest path the failing one, which is backwards.
-        #
-        # Note this test's real assertion is `errors == []`, and that passes.
-        # Only the warning allowlist was stale.
-        EXPECTED = ("PR-3 PROVENANCE", "pre-L3 state", "all pre-L3 state")
-        non_provenance = [w for w in warnings
-                          if not any(tag in w for tag in EXPECTED)]
+        # The PR-3 provenance warning is expected (legacy data, refresh queued for PR-7)
+        # but no other warnings should fire on the canonical Italy data
+        non_provenance = [w for w in warnings if "PR-3 PROVENANCE" not in w]
         assert non_provenance == [], (
             f"Italy emits unexpected warnings beyond the documented PR-3 provenance gap: "
             f"{non_provenance}"

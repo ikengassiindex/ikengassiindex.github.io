@@ -472,16 +472,7 @@ class TestCohortData:
         subs = _v43_subs_with_task_453_marker(slug)
         if not subs:
             pytest.skip(f"[{slug}] no enriched subs — utility not yet run")
-        expected = EXPECTED_ADMIN_CODES.get(slug)
-        if expected is None:
-            pytest.skip(
-                f"[{slug}] no canonical admin-code set defined yet. "
-                f"EXPECTED_ADMIN_CODES covers "
-                f"{len(EXPECTED_ADMIN_CODES)} of the parameterised slugs; "
-                f"this one needs its set authored before the gate can run. "
-                f"Skipping keeps the gap visible without reporting it as a "
-                f"data fault (it was raising KeyError)."
-            )
+        expected = EXPECTED_ADMIN_CODES[slug]
         provinces_seen = {s.get("province") for s in subs}
         unexpected = provinces_seen - expected
         assert not unexpected, (
