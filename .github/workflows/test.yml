@@ -55,14 +55,21 @@ jobs:
         run: |
           python -c "import numpy as np; print(f'numpy {np.__version__} ok')"
 
+      # The registry's entry COUNT is pinned by tests/test_modifier_registry.py,
+      # which is the file people edit when a modifier lands. Asserting it here
+      # too created a second copy that nobody updated: it sat at 16 while the
+      # registry went to 17 (R7_cyber_v2, Phase 2J, 18 Aug 2026), and because
+      # this step runs before pytest it blocked the entire suite for a week.
+      # KB §57 single-source-of-truth, applied to a constant. Keep the import
+      # check — failing fast on an ImportError is worth the ten seconds.
       - name: Verify modifier registry import
         run: |
           python -c "
           from scripts.pipeline.scoring.modifier_registry import (
               MODIFIER_REGISTRY, compute_modifier_terms, per_modifier_impacts
           )
-          assert len(MODIFIER_REGISTRY) == 16, f'Expected 16 entries, got {len(MODIFIER_REGISTRY)}'
-          print(f'MODIFIER_REGISTRY: {len(MODIFIER_REGISTRY)} entries')
+          assert MODIFIER_REGISTRY, 'MODIFIER_REGISTRY is empty'
+          print(f'MODIFIER_REGISTRY: {len(MODIFIER_REGISTRY)} entries (count pinned by tests/test_modifier_registry.py)')
           "
 
       - name: Run pytest

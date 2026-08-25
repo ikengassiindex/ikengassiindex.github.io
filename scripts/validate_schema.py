@@ -469,6 +469,43 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
         )
         data = {"substations": data}
 
+    # Convention #79 — a sharded country carries `substations_shards`, a
+    # manifest naming sibling files, and no inline `substations` array.
+    # Without this the validator emitted "Missing top-level key: substations"
+    # then "No substations found" and returned early, which read like two
+    # errors but was zero coverage: france, germany, italy, poland, uk and us
+    # — roughly 527,000 substations — were never validated at all.
+    # Task #520 defect class. Resolved here, beside the flat-list guard, so
+    # both non-canonical storage shapes are normalised before any check runs.
+    if isinstance(data, dict) and data.get("substations_shards") and "substations" not in data:
+        _shard_subs = []
+        _missing = []
+        for _entry in data["substations_shards"]:
+            _rel = _entry["path"] if isinstance(_entry, dict) else _entry
+            _shard = Path(filepath).parent / Path(_rel).name
+            if not _shard.exists():
+                _missing.append(_shard.name)
+                continue
+            try:
+                _part = json.loads(_shard.read_text())
+            except json.JSONDecodeError as _e:
+                errors.append(f"Shard {_shard.name} invalid JSON — {_e}")
+                continue
+            _shard_subs.extend(_part if isinstance(_part, list)
+                               else (_part.get("substations") or []))
+        if _missing:
+            # Convention #56 — a manifest naming a file that is not there is a
+            # hard error, not a silently shorter fleet.
+            errors.append(
+                f"Shard manifest names {len(_missing)} missing file(s): "
+                + ", ".join(_missing[:5])
+            )
+        data["substations"] = _shard_subs
+        warnings.append(
+            f"Convention #79 sharded storage — validated {len(_shard_subs):,} "
+            f"substations across {len(data['substations_shards'])} shard files"
+        )
+
     # ─── Check 1: top-level keys ──
     for key in ['meta', 'fleet_summary', 'regions', 'substations']:
         if key not in data:

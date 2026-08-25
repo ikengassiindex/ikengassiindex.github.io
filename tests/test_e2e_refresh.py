@@ -52,11 +52,34 @@ def country(request):
 
 @pytest.fixture(scope="module")
 def country_data(country):
-    """Load <country>/ssi-data.json once per country (module-scoped)."""
+    """Load <country>/ssi-data.json once per country (module-scoped).
+
+    Convention #79 — france, germany, italy, poland, uk and us store their
+    substations in `substations_shards`, a manifest naming sibling files,
+    rather than an inline `substations` array. Every gate below reads
+    country_data.get("substations", []), so the shards are resolved here and
+    the flat list is materialised under the canonical key. Before this, G2
+    failed outright on those six and every per-substation gate silently
+    measured an empty list. Task #520 defect class.
+    """
     fp = REPO_ROOT / country / "ssi-data.json"
     if not fp.exists():
         pytest.skip(f"{country}/ssi-data.json absent in this checkout")
-    return json.loads(fp.read_text(encoding="utf-8"))
+    data = json.loads(fp.read_text(encoding="utf-8"))
+
+    if isinstance(data, dict) and data.get("substations_shards"):
+        subs = []
+        for entry in data["substations_shards"]:
+            rel = entry["path"] if isinstance(entry, dict) else entry
+            shard = fp.parent / Path(rel).name
+            if not shard.exists():
+                continue
+            part = json.loads(shard.read_text(encoding="utf-8"))
+            subs.extend(part if isinstance(part, list)
+                        else (part.get("substations") or []))
+        data["substations"] = subs
+
+    return data
 
 
 # ═══════════════════════════════════════════════════════════
