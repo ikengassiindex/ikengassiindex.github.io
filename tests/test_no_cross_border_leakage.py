@@ -279,11 +279,28 @@ class TestToleranceConfig:
         )
 
         cfg = json.loads(config_path.read_text())
-        assert "default_tolerance_km" in cfg, (
-            "cross_border_tolerances.json missing 'default_tolerance_km' key."
+
+        # Key names follow scripts/pipeline/utils/geo.py::load_country_tolerance,
+        # which is the production reader and therefore the authority on this
+        # file's shape: it reads cfg["countries"][slug]["boundary_tolerance_km"]
+        # and falls back to cfg["_default_tolerance_km"]. This test previously
+        # asserted "default_tolerance_km" and "per_country" — neither key has
+        # ever existed in the file, so it had never passed.
+        assert "_default_tolerance_km" in cfg, (
+            "cross_border_tolerances.json missing '_default_tolerance_km' key. "
+            "geo.load_country_tolerance() falls back to this when a country has "
+            "no explicit entry."
         )
-        assert "per_country" in cfg, (
-            "cross_border_tolerances.json missing 'per_country' key."
+        assert isinstance(cfg["_default_tolerance_km"], (int, float)), (
+            f"_default_tolerance_km must be numeric, got "
+            f"{type(cfg['_default_tolerance_km']).__name__}"
+        )
+        assert "countries" in cfg, (
+            "cross_border_tolerances.json missing 'countries' key — the "
+            "per-country tolerance map geo.load_country_tolerance() reads."
+        )
+        assert isinstance(cfg["countries"], dict), (
+            f"'countries' must be a mapping, got {type(cfg['countries']).__name__}"
         )
 
     @pytest.mark.unit
@@ -294,19 +311,42 @@ class TestToleranceConfig:
         need a 5km tolerance to pass the gate. If this regresses, those four
         countries will fail the gate even though their data is correct.
         """
+        from scripts.pipeline.utils.geo import load_country_tolerance
+
         cfg = json.loads((REPO_ROOT / "cross_border_tolerances.json").read_text())
-        per_country = cfg.get("per_country", {})
+        countries = cfg.get("countries", {})
 
         mode_2_countries = ["greenland", "new-zealand", "norway", "denmark"]
         for slug in mode_2_countries:
-            tol = per_country.get(slug)
-            assert tol is not None, (
+            entry = countries.get(slug)
+            assert entry is not None, (
                 f"{slug}: tolerance missing from cross_border_tolerances.json. "
                 f"This Mode 2 country needs an explicit per-country tolerance "
                 f"(typically 5km) to pass the gate."
+            )
+            tol = entry.get("boundary_tolerance_km")
+            assert isinstance(tol, (int, float)), (
+                f"{slug}: boundary_tolerance_km missing or non-numeric in its "
+                f"config entry (got {tol!r}). Each entry is a dict carrying the "
+                f"tolerance plus its rationale, not a bare number."
             )
             assert tol >= 1.0, (
                 f"{slug}: tolerance {tol}km too tight for a Mode 2 country "
                 f"(coastline-precision). The 18 June 2026 audit calibrated "
                 f"5km for these four; tightening below ~1km will false-fire."
+            )
+
+            # Config and reader must agree. Nothing asserted this before, which
+            # is how the key-name mismatch above survived: a test can read keys
+            # the code never reads and tell you nothing about whether the gate
+            # is actually configured. If either side is renamed, this fails
+            # immediately and names both values — rather than the gate silently
+            # falling back to the 100 m default and false-firing on four
+            # countries whose data is correct.
+            effective = load_country_tolerance(slug, repo_root=REPO_ROOT)
+            assert effective == tol, (
+                f"{slug}: cross_border_tolerances.json declares "
+                f"{tol}km but geo.load_country_tolerance() returns {effective}km. "
+                f"The config and its reader have diverged — the gate is not "
+                f"using the tolerance the methodology documents."
             )
