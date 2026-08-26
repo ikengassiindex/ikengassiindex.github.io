@@ -192,8 +192,23 @@ class TestG4ValidatorPasses:
 #  G5 — No NaN / Inf / negative R_median
 # ═══════════════════════════════════════════════════════════
 
+# Phase 2A (25 June 2026) — v4.2 master equation ceiling.
+# R_final = soft_clip_upper(R_base x prod(mult_i)) + sum(add_i - 1.0):
+# the clip caps the multiplicative chain at 1.00, additive R6c_flood adds
+# up to 0.30 on top. Mirrors scripts/validate_schema.py Check-7.
+R_MEDIAN_MAX = 1.30
+
+
 class TestG5RMedianFinite:
-    """Every substation must have a finite, non-negative R_median in [0, 1]."""
+    """Every substation must have a finite R_median in [0, 1.30].
+
+    Phase 2A (25 June 2026) widened the v4.2 range from [0, 1] to [0, 1.30]:
+    soft_clip_upper caps the multiplicative chain at 1.00 and the ADDITIVE
+    R6c_flood layers on top with range [1.00, 1.30]. The Extreme band exists
+    to hold exactly that region. scripts/validate_schema.py Check-7 was
+    updated at the time; this gate was not, and had been failing 13 countries
+    on values the methodology permits.
+    """
 
     def test_g5_r_median_finite_and_in_range(self, country, country_data):
         subs = country_data.get("substations", [])
@@ -204,10 +219,26 @@ class TestG5RMedianFinite:
         bad_finite = 0
         bad_range = 0
         bad_sample = None
+        unscored = 0
+        mislabelled = 0
+        mislabelled_sample = None
         for s in subs:
             r = s.get("R_median")
             if r is None:
-                bad_finite += 1
+                # Convention #56 / Discipline #37 — a substation on the grid
+                # whose scoring inputs are incomplete carries R_median=None
+                # and classification "Unclassified". That is the honest state
+                # the methodology asks for, not a defect, and engine
+                # .classify_band(None) and validate_schema Check-8 both treat
+                # it as such. What IS a defect is an unscored substation
+                # wearing a real band, because that reaches the public page
+                # as a risk rating nothing computed.
+                unscored += 1
+                if s.get("classification") != "Unclassified":
+                    mislabelled += 1
+                    if mislabelled_sample is None:
+                        mislabelled_sample = (s.get("substation_id", "?"),
+                                              s.get("classification"))
                 continue
             try:
                 rf = float(r)
@@ -218,20 +249,30 @@ class TestG5RMedianFinite:
                 bad_finite += 1
                 if bad_sample is None:
                     bad_sample = (s.get("substation_id", "?"), r)
-            elif rf < 0.0 or rf > 1.0:
+            elif rf < 0.0 or rf > R_MEDIAN_MAX:
                 bad_range += 1
                 if bad_sample is None:
                     bad_sample = (s.get("substation_id", "?"), r)
         assert bad_finite == 0, (
-            f"{country} has {bad_finite} substations with NaN/Inf/None R_median. "
+            f"{country} has {bad_finite} substations with NaN/Inf R_median. "
             f"Example: {bad_sample}"
         )
-        # Bound tolerance: allow up to 0.5% of substations to drift very
-        # slightly out of [0,1] (boundary rounding artefacts); above that fail
-        bad_pct = bad_range / len(subs) * 100
-        assert bad_pct <= 0.5, (
-            f"{country} has {bad_range} substations ({bad_pct:.2f}%) "
-            f"with R_median outside [0,1]. Example: {bad_sample}"
+        assert mislabelled == 0, (
+            f"{country} has {mislabelled} unscored substations "
+            f"(R_median=None) carrying a band other than 'Unclassified'. "
+            f"Example: {mislabelled_sample}. Convention #56 requires the "
+            f"absence of a score to be visible, not dressed as one."
+        )
+        # No tolerance. The old 0.5% allowance existed to absorb boundary
+        # rounding around 1.0 — but 1.0 was never the ceiling. Against the
+        # real ceiling, an out-of-range value is not a rounding artefact:
+        # R_median > 1.30 cannot be produced by the master equation, so one
+        # occurrence is a genuine defect. Measured on the full cohort
+        # (718,371 scored substations, 25 Aug 2026): 1,379 above 1.00,
+        # zero above 1.30.
+        assert bad_range == 0, (
+            f"{country} has {bad_range} substations with R_median outside "
+            f"[0, {R_MEDIAN_MAX}]. Example: {bad_sample}"
         )
 
 
