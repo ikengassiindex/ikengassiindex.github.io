@@ -80,6 +80,7 @@ Pre-flight audit:
 """
 from __future__ import annotations
 
+import csv
 import json
 import sys
 from pathlib import Path
@@ -158,6 +159,40 @@ TARGET_COUNTRIES = (
 
 # Expected admin code sets for cohort data invariant
 EXPECTED_ADMIN_CODES = {
+    # Greece — 52 NUTS-3 codes, Eurostat NUTS 2024 v2, as carried by
+    # scripts/pipeline/data/greece/eurostat_nuts3_socioeconomic.csv (the table
+    # the polygon backfill joins against, hence the authority here). Greece's
+    # enriched substations use 37 of the 52; the unused 15 are regions with no
+    # substation in the cohort, which is expected, not a gap.
+    "greece": frozenset({
+        "EL301", "EL302", "EL303", "EL304", "EL305", "EL306", "EL307",
+        "EL411", "EL412", "EL413", "EL421", "EL422",
+        "EL431", "EL432", "EL433", "EL434",
+        "EL511", "EL512", "EL513", "EL514", "EL515",
+        "EL521", "EL522", "EL523", "EL524", "EL525", "EL526", "EL527",
+        "EL531", "EL532", "EL533", "EL541", "EL542", "EL543",
+        "EL611", "EL612", "EL613", "EL621", "EL622", "EL623", "EL624",
+        "EL631", "EL632", "EL633", "EL641", "EL642", "EL643", "EL644", "EL645",
+        "EL651", "EL652", "EL653",
+    }),
+    # Greenland — the 5 post-2018 municipalities named in
+    # scripts/pipeline/data/greenland/agency_regional_socioeconomic.csv.
+    #
+    # EXPECTED TO FAIL until the data is corrected. The 6 polygon-enriched
+    # substations carry province="Qaasuitsup", a municipality abolished in the
+    # 2018 reform that split it into Avannaata and Qeqertalik. GADM 4.1
+    # (vintage 2022) still ships the pre-reform division — POLYGON_COUNTRY_
+    # CONFIGS["greenland"] says so in its own comment — and an alias resolves
+    # the CSV lookup correctly, so those substations hold Avannaata Kommunia's
+    # real figures. Only the resolved name was never written back.
+    #
+    # The fix is in the backfill utility (store the alias-resolved canonical
+    # name), not in this set. Loosening it to accept "Qaasuitsup" would pin an
+    # abolished administrative unit into the cohort's vocabulary.
+    "greenland": frozenset({
+        "Kommune Kujalleq", "Kommuneqarfik Sermersooq", "Qeqqata Kommunia",
+        "Avannaata Kommunia", "Kommune Qeqertalik",
+    }),
     "luxembourg": frozenset({"LU000"}),
     "slovenia": frozenset({
         "SI031", "SI032", "SI033", "SI034", "SI035", "SI036",
@@ -290,14 +325,56 @@ def _load_ssi_data(slug: str) -> dict:
         return json.loads(ssi_path.read_text())
 
 
-def _v43_subs_with_task_453_marker(slug: str) -> list:
-    """Return list of v43 subs enriched by Task #453 (carry the audit marker)."""
+def _admin_codes_from_csv(slug: str) -> frozenset:
+    """Canonical admin set for a polygon-cohort country, read from the CSV the
+    backfill joins against.
+
+    Not circular: the CSV is the backfill's INPUT, not its output. Requiring
+    every enriched province to appear in the join table catches a polygon
+    source emitting names the CSV cannot match — which is precisely the
+    greenland / switzerland / japan defect.
+
+    Used only where EXPECTED_ADMIN_CODES has no explicit entry. Literals stay
+    for vocabularies that encode intent beyond the CSV (colombia's DANE names
+    are alias-mapped from GADM; greenland's set deliberately omits the
+    abolished "Qaasuitsup"). For germany's 400 NUTS-3 codes a literal would
+    only be a second copy free to drift from the first.
+    """
+    from pipeline.enrichment import socio_economic_backfill as sb
+
+    cfg = sb.POLYGON_COUNTRY_CONFIGS[slug]
+    col = cfg["csv_lookup_column"]
+    with open(REPO_ROOT / cfg["csv_relpath"], encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    return frozenset(r[col] for r in rows if r.get(col))
+
+
+def _expected_admin_codes(slug: str) -> frozenset:
+    """Explicit set where declared, otherwise the join table."""
+    declared = EXPECTED_ADMIN_CODES.get(slug)
+    return declared if declared else _admin_codes_from_csv(slug)
+
+
+def _subs_with_task_453_marker(slug: str) -> list:
+    """Every substation enriched by the Task #453/#454 polygon backfill.
+
+    Selected by the audit marker alone. This previously also required
+    "_v43_" in substation_id — a proxy for "added by Wave 2/3 OSM ingestion"
+    that holds for the four countries Task #453 shipped with and fails for
+    every Wave 4 major, which use numeric ids (france 1000000000, spain
+    9000000005, sweden 5000001776, against greenland's GL_v43_c55ad8c6b797).
+
+    The consequence was not a wrong answer but no answer: france, germany,
+    italy, japan, portugal, spain, sweden and us returned [], so all five
+    gates below skipped them — 470,000+ enriched substations, france alone
+    174,883, none examined. The marker is what the backfill writes and is
+    definitive; the id scheme is incidental.
+    """
     data = _load_ssi_data(slug)
     subs = data.get("substations", [])
     return [
         s for s in subs
-        if "_v43_" in str(s.get("substation_id", ""))
-        and (s.get("socio_economic") or {}).get(AUDIT_TRAIL_KEY) == AUDIT_TRAIL_VALUE_POLYGON
+        if (s.get("socio_economic") or {}).get(AUDIT_TRAIL_KEY) == AUDIT_TRAIL_VALUE_POLYGON
     ]
 
 
@@ -327,6 +404,33 @@ class TestUtilityConstantLock:
             f"PRESERVED_MARKERS drift: expected {expected}, got "
             f"{sb.PRESERVED_MARKERS}. Task #451/#452 markers MUST be listed "
             f"per merge-not-replace BINDING contract."
+        )
+
+    def test_expected_admin_codes_covers_target_cohort(self):
+        """Every country in the polygon cohort must declare a canonical admin set.
+
+        test_polygon_country_configs_locked_to_25_countries already states the
+        rule in its failure message — adding a country requires extending
+        POLYGON_COUNTRY_CONFIGS, EXPECTED_ADMIN_CODES and that test. Nothing
+        asserted the middle one, so when greece (Task #454b) and greenland
+        (Task #454c) were added, their province gate raised a bare KeyError
+        instead of reporting a missing canonical set. A gate that crashes and
+        a gate that passes are equally uninformative; this makes the omission
+        say what it is.
+        """
+        unresolved = []
+        for slug in TARGET_COUNTRIES:
+            try:
+                if not _expected_admin_codes(slug):
+                    unresolved.append(f"{slug} (empty set)")
+            except Exception as exc:
+                unresolved.append(f"{slug} ({type(exc).__name__}: {exc})")
+        assert not unresolved, (
+            f"No canonical admin set resolvable for: {unresolved}. Each "
+            f"polygon-cohort country needs either an explicit EXPECTED_ADMIN_CODES "
+            f"entry or a readable csv_relpath/csv_lookup_column in "
+            f"POLYGON_COUNTRY_CONFIGS — otherwise "
+            f"test_province_values_in_expected_admin_code_set cannot check it."
         )
 
     def test_polygon_country_configs_locked_to_25_countries(self):
@@ -377,9 +481,9 @@ class TestMergeNotReplace:
     def test_task_451_marker_preserved_where_task_453_wrote(self, slug):
         """Every Task-#453-enriched sub with pre-existing Task #451 marker
         MUST still carry that marker post-Task-#453."""
-        subs = _v43_subs_with_task_453_marker(slug)
+        subs = _subs_with_task_453_marker(slug)
         if not subs:
-            pytest.skip(f"[{slug}] no Task #453-enriched subs found (utility not yet run)")
+            pytest.skip(f"[{slug}] no substation carries the Task #453 polygon marker")
         n_task_451_present = sum(
             1 for s in subs
             if (s.get("socio_economic") or {}).get(TASK_451_MARKER)
@@ -396,9 +500,9 @@ class TestMergeNotReplace:
     def test_task_452_marker_preserved_where_task_453_wrote(self, slug):
         """Every Task-#453-enriched sub with pre-existing Task #452 marker
         MUST still carry that marker post-Task-#453."""
-        subs = _v43_subs_with_task_453_marker(slug)
+        subs = _subs_with_task_453_marker(slug)
         if not subs:
-            pytest.skip(f"[{slug}] no Task #453-enriched subs found (utility not yet run)")
+            pytest.skip(f"[{slug}] no substation carries the Task #453 polygon marker")
         n_task_452_present = sum(
             1 for s in subs
             if (s.get("socio_economic") or {}).get(TASK_452_MARKER)
@@ -421,7 +525,7 @@ class TestMergeNotReplace:
             and (s.get("socio_economic") or {}).get("gdp_per_capita") is not None
         ]
         if not v43_with_socio:
-            pytest.skip(f"[{slug}] no v43 subs with populated socio_economic — utility not yet run")
+            pytest.skip(f"[{slug}] no \"_v43_\"-id substations with populated socio_economic. This gate needs an id-based signal independent of the marker it verifies, so it can only cover countries whose ids carry that token — not the numeric-id Wave 4 majors.")
         n_marker = sum(
             1 for s in v43_with_socio
             if (s.get("socio_economic") or {}).get(AUDIT_TRAIL_KEY) == AUDIT_TRAIL_VALUE_POLYGON
@@ -455,9 +559,9 @@ class TestCohortData:
     @pytest.mark.parametrize("slug", TARGET_COUNTRIES)
     def test_enriched_subs_have_province_populated(self, slug):
         """Every Task-#453-enriched sub carries a non-None top-level province."""
-        subs = _v43_subs_with_task_453_marker(slug)
+        subs = _subs_with_task_453_marker(slug)
         if not subs:
-            pytest.skip(f"[{slug}] no enriched subs — utility not yet run")
+            pytest.skip(f"[{slug}] no substation carries the Task #453 polygon marker")
         n_with_province = sum(1 for s in subs if s.get("province"))
         assert n_with_province == len(subs), (
             f"[{slug}] {n_with_province}/{len(subs)} enriched subs have "
@@ -469,10 +573,10 @@ class TestCohortData:
     def test_province_values_in_expected_admin_code_set(self, slug):
         """Every Task-#453-enriched sub's province MUST be in the country's
         canonical admin code set."""
-        subs = _v43_subs_with_task_453_marker(slug)
+        subs = _subs_with_task_453_marker(slug)
         if not subs:
-            pytest.skip(f"[{slug}] no enriched subs — utility not yet run")
-        expected = EXPECTED_ADMIN_CODES[slug]
+            pytest.skip(f"[{slug}] no substation carries the Task #453 polygon marker")
+        expected = _expected_admin_codes(slug)
         provinces_seen = {s.get("province") for s in subs}
         unexpected = provinces_seen - expected
         assert not unexpected, (
@@ -485,9 +589,9 @@ class TestCohortData:
         """Every Task-#453-enriched sub carries the 4 core socio_economic
         fields (gdp_per_capita, unemployment_rate, EP_rate_region,
         elderly_pct) — V_socio may be None if elderly_pct missing from CSV."""
-        subs = _v43_subs_with_task_453_marker(slug)
+        subs = _subs_with_task_453_marker(slug)
         if not subs:
-            pytest.skip(f"[{slug}] no enriched subs — utility not yet run")
+            pytest.skip(f"[{slug}] no substation carries the Task #453 polygon marker")
         required = ("gdp_per_capita", "unemployment_rate", "EP_rate_region")
         for field in required:
             n_present = sum(
