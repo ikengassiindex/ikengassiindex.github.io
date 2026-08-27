@@ -24,7 +24,17 @@
 (function () {
   'use strict';
 
-  var CACHE_BUSTER = '20260722-band-norm';  // bump when any of the data/config schemas change
+  // Stamp for the per-country data fetches. It has to be bumped by hand:
+  // one constant serves 39 countries' files, so it cannot carry a
+  // per-file hash the way the HTML stamps do.
+  //
+  // Worth knowing before investing in it: GitHub Pages serves every file
+  // with Cache-Control: max-age=600 and an ETag (measured 27 Aug 2026), so
+  // a browser revalidates after ten minutes regardless of this string. It
+  // had been frozen at 20260722-band-norm for five weeks with no reader
+  // impact. Bump it when convenient; do not build machinery around it
+  // unless a long-TTL CDN is ever put in front of the site.
+  var CACHE_BUSTER = '20260827-footer-from-source';  // bump when any of the data/config schemas change
                              // v703 (21 Jul 2026) — Wave 4 TERMINAL + Convention #79
                              // ssi-data sharding release; forces fresh manifest
                              // + shard fetches after Commit 45 ad9adfc5.
