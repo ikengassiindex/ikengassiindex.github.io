@@ -174,14 +174,24 @@ def expected(p):
 
 unexpected = [p for p in written if not expected(p)]
 
+# Staging is decided by what the chain OWNS, not by what this run happened to
+# write. sweden's canonical was modified by the restore and the pipeline before
+# the wrapper started; building the git add line from `written` alone left it
+# out, and the line would have committed the pages without the data.
+stage_set = sorted(p for p in AFTER if expected(p))
+found_not_ours = sorted(p for p in preexisting if not expected(p))
+
 print(f"  all four green")
 print(f"\n  written by this run : {len(written)} file(s)")
 if preexisting:
     print(f"  already modified    : {len(preexisting)} file(s), untouched by this run")
     for p in preexisting[:8]:
-        print(f"                        {p}")
+        own = "" if expected(p) else "   <-- not part of this country's chain"
+        print(f"                        {p}{own}")
     if len(preexisting) > 8:
         print(f"                        ... and {len(preexisting) - 8} more")
+    if found_not_ours:
+        print(f"  {len(found_not_ours)} of those are NOT staged by the line below — check them.")
 if unexpected:
     print(f"\n  UNEXPECTED — the chain does not write these. Do not commit them")
     print(f"  without knowing why they changed:")
@@ -189,15 +199,18 @@ if unexpected:
         print(f"                        {p}")
 
 if not written:
-    print(f"\n  Nothing was written. {SLUG} was already deduplicated and every")
-    print(f"  derived figure already matched its source — the run was a no-op.")
+    print(f"\n  Nothing was written by this run. {SLUG} was already deduplicated")
+    print(f"  and every derived figure already matched its source.")
     print(f"  Check `git log -1 -- {SLUG}/ssi-data.json` and the audit trail")
     print(f"  before concluding anything is wrong.")
-    raise SystemExit(0)
+    if not stage_set:
+        raise SystemExit(0)
+    print(f"\n  There are still {len(stage_set)} changed file(s) this country's chain")
+    print(f"  owns — staged below so they are not left behind.")
 
-data = [p for p in written if p.startswith(SLUG + "/")]
-shared = [p for p in written if p in ("nav.js", "index.html")]
-pages = len([p for p in written if p.endswith(".html") and p != "index.html"])
+data = [p for p in stage_set if p.startswith(SLUG + "/")]
+shared = [p for p in stage_set if p in ("nav.js", "index.html")]
+pages = len([p for p in stage_set if p.endswith(".html") and p != "index.html"])
 print(f"\n      {len(data)} {SLUG} data file(s) · {len(shared)} shared · {pages} page(s)")
 print(f"\n  Review, then commit. Explicit paths, not `git add -A` — the tooling")
 print(f"  lives in scripts/ now, and -A would sweep a tooling edit into a data")
