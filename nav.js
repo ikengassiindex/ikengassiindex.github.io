@@ -127,7 +127,7 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'portugal': '95 variables \u00B7 28 sources \u00B7 13,564 substations (1,444 EHV \u2265220 kV \u00B7 52 HV 110\u2013220 kV \u00B7 12,068 distribution-tier) \u00B7 78,971 power lines across 7 regions',
   'slovakia': '95 variables \u00B7 1,517 substations (39 EHV \u2265220 kV \u00B7 955 HV 110\u2013220 kV \u00B7 523 distribution-tier) \u00B7 20,188 power lines across 8 regions',
   'slovenia': '95 variables \u00B7 30+ sources \u00B7 1,731 substations (20 EHV \u2265220 kV \u00B7 2 HV 110\u2013220 kV \u00B7 1,709 distribution-tier) \u00B7 4,510 power lines across 12 NUTS-3 statistical regions \u00B7 212 ob\u010Dine (LAU) \u00B7 ELES TSO + 5 Elektro DSOs under SODO',
-  'spain': '95 variables \u00B7 30 sources \u00B7 12,621 substations (1,037 EHV \u2265220 kV \u00B7 1,044 HV 110\u2013220 kV \u00B7 10,540 distribution-tier) \u00B7 96,761 power lines across 17 regions',
+  'spain': '95 variables \u00B7 30 sources \u00B7 12,438 substations (1,028 EHV \u2265220 kV \u00B7 1,043 HV 110\u2013220 kV \u00B7 10,367 distribution-tier) \u00B7 96,761 power lines across 17 regions',
   'sweden': '95 variables \u00B7 1,192 substations (237 EHV \u2265220 kV \u00B7 540 HV 110\u2013220 kV \u00B7 415 distribution-tier) \u00B7 15,421 power lines across 21 regions',
   'switzerland': '95 variables \u00B7 25 sources \u00B7 1,812 substations (158 EHV \u2265220 kV \u00B7 200 HV 110\u2013220 kV \u00B7 1,454 distribution-tier) \u00B7 8,657 power lines across 26 Cantons',
   'turkey': '95 variables \u00B7 30 sources \u00B7 4,031 substations (1,120 EHV \u2265220 kV \u00B7 1 HV 110\u2013220 kV \u00B7 2,910 distribution-tier) \u00B7 8,061 power lines across 7 regions',
