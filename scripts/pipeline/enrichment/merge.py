@@ -33,6 +33,20 @@ logger = logging.getLogger(__name__)
 #  MERGE ENGINE
 # ═══════════════════════════════════════════════════════════
 
+
+def _methodology_version(default="4.2"):
+    """Methodology version from versions.json, the SoT. Falls back visibly
+    rather than asserting a version the repo does not claim."""
+    try:
+        import json as _json
+        from pathlib import Path as _Path
+        p = _Path(__file__).resolve().parents[3] / "versions.json"
+        v = _json.loads(p.read_text()).get("methodology")
+        return v if v else default
+    except Exception:
+        return default
+
+
 def merge_and_rescore(country, seismic_results=None, climate_results=None,
                       socio_results=None, rescore=True, dry_run=False):
     """
@@ -183,7 +197,12 @@ def merge_and_rescore(country, seismic_results=None, climate_results=None,
     if "meta" not in data:
         data["meta"] = {}
     data["meta"]["generated"] = datetime.now().strftime("%Y-%m-%d")
-    data["meta"]["generator"] = "SSI v4.0.2 Pipeline (automated enrichment)"
+    # versions.json is the single source of truth for the methodology version.
+    # This line used to hardcode "SSI v4.0.2 Pipeline", which stamped every
+    # country's output with a methodology several versions stale on every run.
+    # Reading the SoT rather than substituting a fresher constant, because a
+    # constant is what caused it.
+    data["meta"]["generator"] = f"SSI v{_methodology_version()} Pipeline (automated enrichment)"
     data["meta"]["enrichment_run"] = {
         "timestamp": datetime.now().isoformat(),
         "seismic_updates": stats["seismic_updates"],

@@ -141,10 +141,29 @@ def classify_band(R):
 
 
 def classify_confidence(R_P5, R_P95):
-    """Classify confidence tier from CI width."""
+    """Classify confidence tier from CI width.
+
+    A zero-width interval means no Monte Carlo ran, not that the estimate is
+    precise. Before the guard below, `ci <= 0.10` caught it and returned
+    "high": about 78,500 substations were published as high-confidence on the
+    strength of a simulation that never happened — 13,979 of austria's 14,720
+    among them.
+
+    Measured across eight countries, every degenerate record has a CI of
+    exactly 0.0 and the narrowest real 10,000-iteration interval is 0.042, so
+    the two populations do not overlap and the guard cannot catch a genuine
+    estimate.
+
+    Returns None where there is no basis for a tier. None is what every
+    connector writes at ingestion, and it is the peer of "Unclassified" from
+    classify_band — Convention #56, visibly honest rather than silently
+    defaulted.
+    """
     if R_P5 is None or R_P95 is None:
-        return "medium"
+        return None
     ci = R_P95 - R_P5
+    if ci <= 1e-9:
+        return None
     if ci <= 0.10:
         return "high"
     elif ci <= 0.25:
