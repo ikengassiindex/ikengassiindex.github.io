@@ -49,6 +49,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install jsonschema==4.26.0
 
+      # Every check below carries `if: always()`. GitHub Actions stops a job
+      # at the first failing step, and schema validation has been failing on
+      # real data defects — so nav sync, inline-JS parse and cache-buster
+      # verification produced no result at all for as long as that was true.
+      # Four correct checks, silently inert. The job still fails if any step
+      # fails; they simply all get to run and report first.
       - name: Run schema validation (strict — fails build on any error)
         run: python3 scripts/run_schema_validation.py --strict
 
@@ -64,18 +70,23 @@ jobs:
       # reported but do not gate: they are an open data decision, and a
       # permanently red check is one people learn to ignore.
       - name: Page/data agreement
+        if: always()
         run: python3 scripts/check_page_data_agreement.py --all --strict
 
       - name: Verify nav.js auto-section in sync with countries.json
+        if: always()
         run: python3 scripts/generate_nav_data.py --check
 
       - name: Set up Node.js (for inline JS parse-check)
+        if: always()
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Parse-check every inline <script> in country HTML pages (Phase 1.7)
+        if: always()
         run: python3 scripts/check_inline_js_parse.py --strict
 
       - name: Verify ?v= cache-busters match git-hash of target files (Phase 1.8)
+        if: always()
         run: python3 scripts/bump_cache_busters.py --check
