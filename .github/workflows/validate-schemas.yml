@@ -19,6 +19,7 @@ on:
       - 'intelligence/countries.json'
       - 'schemas/**'
       - 'scripts/run_schema_validation.py'
+      - 'scripts/check_page_data_agreement.py'
       - 'scripts/generate_nav_data.py'
       - 'scripts/check_inline_js_parse.py'
       - 'nav.js'
@@ -50,6 +51,20 @@ jobs:
 
       - name: Run schema validation (strict — fails build on any error)
         run: python3 scripts/run_schema_validation.py --strict
+
+      # Every published figure carries a data-canonical attribute naming
+      # what it claims to be. Nothing compared those claims to the data
+      # until 27 August 2026, when 253 of 443 disagreed — france's map
+      # tooltip read 0 against 175,660, and japan's six non-index pages
+      # had shown a two-generations-stale 5,981 through every remediation
+      # this year.
+      #
+      # --strict fails on page figures that disagree with their source.
+      # The twelve config-vs-data administrative-tier findings are
+      # reported but do not gate: they are an open data decision, and a
+      # permanently red check is one people learn to ignore.
+      - name: Page/data agreement
+        run: python3 scripts/check_page_data_agreement.py --all --strict
 
       - name: Verify nav.js auto-section in sync with countries.json
         run: python3 scripts/generate_nav_data.py --check
