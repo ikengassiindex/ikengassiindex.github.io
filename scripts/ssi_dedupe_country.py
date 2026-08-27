@@ -4,6 +4,17 @@ ssi_dedupe_country.py — deduplicate one country and leave every check green.
 
     python3 scripts/ssi_dedupe_country.py spain              # dry run, writes nothing
     python3 scripts/ssi_dedupe_country.py spain --apply
+    python3 scripts/ssi_dedupe_country.py spain --apply --dirty-ok
+
+--apply refuses to start when the working tree already has modifications. A
+data commit should carry one country's dedupe and its four consequences and
+nothing else. --dirty-ok overrides, and the pre-existing files are then
+reported separately from the ones this run wrote.
+
+The closing summary counts only what this run changed. It used to count the
+whole working tree, which on 27 August 2026 reported "277 files changed" for a
+run that wrote almost nothing — the tree was already carrying an earlier
+apply — and cost twenty minutes to unpick.
 
 Run from the repo root of ikengassiindex.github.io. This file and its three
 siblings — ssi_dedupe_substations.py, ssi_refresh_canonical_figures.py,
@@ -57,11 +68,41 @@ args = [a for a in sys.argv[1:]]
 APPLY = "--apply" in args
 slugs = [a for a in args if not a.startswith("-")]
 if len(slugs) != 1:
-    sys.exit(f"usage: python3 {pathlib.Path(__file__).name} <country> [--apply]")
+    sys.exit(f"usage: python3 scripts/{pathlib.Path(__file__).name} "
+             f"<country> [--apply] [--dirty-ok]")
 SLUG = slugs[0]
 
 if not (ROOT / SLUG / "ssi-data.json").exists():
     sys.exit(f"ABORT: {SLUG}/ssi-data.json not found — check the slug.")
+
+
+def tree_state():
+    """{path: status} for everything git considers changed. Taken before and
+    after, so this run can report what IT wrote rather than what it found."""
+    r = subprocess.run(["git", "status", "--porcelain"],
+                       capture_output=True, text=True)
+    out = {}
+    for line in r.stdout.splitlines():
+        if len(line) > 3:
+            out[line[3:].strip().strip('"')] = line[:2].strip()
+    return out
+
+
+BEFORE = tree_state()
+
+if APPLY and BEFORE and "--dirty-ok" not in args:
+    print(f"\nABORT: {len(BEFORE)} file(s) already modified before this run.\n")
+    for p in sorted(BEFORE)[:12]:
+        print(f"    {BEFORE[p]:<3} {p}")
+    if len(BEFORE) > 12:
+        print(f"    ... and {len(BEFORE) - 12} more")
+    print("\n  A data commit should carry one country's dedupe and its four")
+    print("  consequences, nothing else. Commit or stash the above first.")
+    print("\n  On 27 August 2026 a tree in exactly this state made a no-op run")
+    print("  look like a 277-file change, and cost twenty minutes to unpick.")
+    print("\n  If these changes genuinely belong with this dedupe, re-run with")
+    print("  --dirty-ok and they will be reported separately.")
+    sys.exit(2)
 
 DEDUPE = HERE / "ssi_dedupe_substations.py"
 FIGURES = HERE / "ssi_refresh_canonical_figures.py"
@@ -119,13 +160,49 @@ if fails:
     print(f"  {fails} check(s) FAILING — do not commit. Read the output above.")
     sys.exit(1)
 
-changed = subprocess.run(["git", "status", "--short"], capture_output=True, text=True)
-n = len([l for l in changed.stdout.splitlines() if l and not l.startswith("??")])
-print(f"  all four green · {n} files changed")
+AFTER = tree_state()
+written = sorted(set(AFTER) - set(BEFORE))
+preexisting = sorted(set(BEFORE) & set(AFTER))
+
+# What the five steps are entitled to touch. Anything else is worth a look
+# before it goes into a commit describing a dedupe.
+def expected(p):
+    return (p.startswith(f"{SLUG}/ssi-data.json")
+            or p.startswith(f"{SLUG}/grid-geo.json")
+            or p in ("nav.js", "index.html")
+            or (p.endswith(".html") and "/" in p))
+
+unexpected = [p for p in written if not expected(p)]
+
+print(f"  all four green")
+print(f"\n  written by this run : {len(written)} file(s)")
+if preexisting:
+    print(f"  already modified    : {len(preexisting)} file(s), untouched by this run")
+    for p in preexisting[:8]:
+        print(f"                        {p}")
+    if len(preexisting) > 8:
+        print(f"                        ... and {len(preexisting) - 8} more")
+if unexpected:
+    print(f"\n  UNEXPECTED — the chain does not write these. Do not commit them")
+    print(f"  without knowing why they changed:")
+    for p in unexpected:
+        print(f"                        {p}")
+
+if not written:
+    print(f"\n  Nothing was written. {SLUG} was already deduplicated and every")
+    print(f"  derived figure already matched its source — the run was a no-op.")
+    print(f"  Check `git log -1 -- {SLUG}/ssi-data.json` and the audit trail")
+    print(f"  before concluding anything is wrong.")
+    raise SystemExit(0)
+
+data = [p for p in written if p.startswith(SLUG + "/")]
+shared = [p for p in written if p in ("nav.js", "index.html")]
+pages = len([p for p in written if p.endswith(".html") and p != "index.html"])
+print(f"\n      {len(data)} {SLUG} data file(s) · {len(shared)} shared · {pages} page(s)")
 print(f"\n  Review, then commit. Explicit paths, not `git add -A` — the tooling")
-print(f"  now lives in scripts/, so -A would sweep an unrelated tooling edit")
-print(f"  into a data commit:")
-print(f"\n      git add {SLUG}/ssi-data.json {SLUG}/grid-geo.json nav.js index.html '*/*.html'")
+print(f"  lives in scripts/ now, and -A would sweep a tooling edit into a data")
+print(f"  commit:")
+print(f"\n      git add {' '.join(data + shared)} '*/*.html'")
 print(f"      git status --short | grep -v '^M ' | head")
 print(f"\n  The second line should print nothing — anything it prints is unstaged")
 print(f"  and wants explaining before the commit.")
