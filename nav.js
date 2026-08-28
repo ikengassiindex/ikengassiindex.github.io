@@ -106,7 +106,7 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'estonia': '95 variables \u00B7 28 sources \u00B7 1,794 substations (22 EHV \u2265220 kV \u00B7 149 HV 110\u2013220 kV \u00B7 1,623 distribution-tier) \u00B7 5,753 power lines across 15 Maakond \u00B7 79 Omavalitsus',
   'finland': '95 variables \u00B7 3,939 substations (93 EHV \u2265220 kV \u00B7 3,766 HV 110\u2013220 kV \u00B7 80 distribution-tier) \u00B7 23,601 power lines across 19 regions',
   'france': '95 variables \u00B7 35 sources \u00B7 175,660 substations (47,384 EHV \u2265220 kV \u00B7 72 HV 110\u2013220 kV \u00B7 128,204 distribution-tier) \u00B7 274,201 power lines across 13 R\u00E9gions',
-  'germany': '95 variables \u00B7 35 sources \u00B7 168,776 substations (6,149 EHV \u2265220 kV \u00B7 6,964 HV 110\u2013220 kV \u00B7 155,663 distribution-tier) \u00B7 262,134 power lines across 16 Bundesl\u00E4nder',
+  'germany': '95 variables \u00B7 35 sources \u00B7 108,016 substations (4,463 EHV \u2265220 kV \u00B7 4,735 HV 110\u2013220 kV \u00B7 98,818 distribution-tier) \u00B7 262,134 power lines across 16 Bundesl\u00E4nder',
   'greece': '95 variables \u00B7 30 sources \u00B7 719 substations (65 EHV \u2265220 kV \u00B7 422 HV 110\u2013220 kV \u00B7 232 distribution-tier) \u00B7 1,775 power lines across 13 Periphereies',
   'greenland': '95 variables \u00B7 25 sources \u00B7 43 substations (0 EHV \u2265220 kV \u00B7 0 HV 110\u2013220 kV \u00B7 43 distribution-tier) \u00B7 128 power lines across 5 Kommuner \u00B7 Pituffik excluded',
   'hungary': '95 variables \u00B7 3,507 substations (65 EHV \u2265220 kV \u00B7 307 HV 110\u2013220 kV \u00B7 3,135 distribution-tier) \u00B7 32,278 power lines across 20 regions',
