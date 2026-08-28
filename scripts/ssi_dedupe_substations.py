@@ -142,7 +142,18 @@ def write_country(slug, root, parts, survivors, drop, merges):
     before.
     """
     sys.path.insert(0, str(REPO / "scripts"))
-    from pipeline.scoring.engine import compute_fleet_summary, compute_regional_summary
+    sys.path.insert(0, str(REPO))
+    from pipeline.scoring.engine import compute_regional_summary
+    # NOT engine.compute_fleet_summary. That one recounts bands with
+    # classify_band(R_median) — the absolute cutoffs Task #461 replaced — so
+    # calling it here reverts Phase 2D for the published figure while every
+    # substation keeps its normalised `classification`. The map then colours
+    # from one and the page header quotes the other. It did exactly that to
+    # us, germany, sweden and japan. refresh_fleet_summary already holds the
+    # correct routine; import it rather than restate it, so the two cannot
+    # drift apart.
+    from scripts.refresh_fleet_summary import (
+        _recompute_fleet_summary_task_461_aware as compute_fleet_summary)
 
     # Pre-remediation snapshot, in the name scripts/refresh_country_counts.py
     # already looks for. That script derives the page-text "before" figure by
@@ -162,7 +173,12 @@ def write_country(slug, root, parts, survivors, drop, merges):
     old_fs = root.get("fleet_summary") or {}
     preserved = {k: v for k, v in old_fs.items() if k.startswith("_")}
     fs = compute_fleet_summary(survivors)
-    fs.update(preserved)          # M-065's intent, without depending on M-065
+    # Preserved keys FILL GAPS; they never overwrite what the rebuild computed.
+    # The old order let a stale `_bands_source` survive on top of freshly
+    # rebuilt counts, which is how germany's manifest came to stamp
+    # "task_461_per_country_normalised" over bands that were not normalised.
+    # An untrue provenance claim is worse than an absent one.
+    fs = {**preserved, **fs}
     root["fleet_summary"] = fs
 
     regions = compute_regional_summary(survivors)

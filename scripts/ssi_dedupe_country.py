@@ -115,6 +115,7 @@ NAVGEN = ROOT / "scripts" / "generate_nav_data.py"
 BUMP = ROOT / "scripts" / "bump_cache_busters.py"
 AGREE = ROOT / "scripts" / "check_page_data_agreement.py"
 PARSE = ROOT / "scripts" / "check_inline_js_parse.py"
+BANDS = ROOT / "scripts" / "check_bands_match_classification.py"
 
 
 def run(label, cmd, tail=6, fatal=True):
@@ -148,12 +149,18 @@ run("5/5  reset the landing-page map tooltips", [str(LANDING), "--apply"], tail=
 
 # ── verification: the same four checks CI runs ──
 print("\n\033[1m" + "=" * 62 + "\033[0m")
-print("\033[1mverification — the four checks validate-schemas.yml runs\033[0m")
+print("\033[1mverification — the four checks CI runs, plus bands-vs-data\033[0m")
 fails = 0
 fails += run("  cache-busters", [str(BUMP), "--check"], tail=1, fatal=False)
 fails += run("  nav.js in sync", [str(NAVGEN), "--check"], tail=1, fatal=False)
 fails += run("  page/data agreement", [str(AGREE), "--all", "--strict"], tail=3, fatal=False)
 fails += run("  inline JS parse", [str(PARSE), "--strict"], tail=2, fatal=False)
+# Fifth gate, added 28 Aug 2026. The four above all passed on a us dedupe that
+# published Low 0.0% over substations that were 22.6% Low, because every one of
+# them compares the page to the manifest or the manifest to itself. This one
+# compares the manifest to the substations.
+fails += run("  bands match the data", [str(BANDS), SLUG, "--strict"],
+             tail=8, fatal=False)
 
 print("\n" + "=" * 62)
 if fails:
@@ -193,7 +200,7 @@ unexpected = [p for p in written if not expected(p)]
 stage_set = sorted(p for p in AFTER if expected(p))
 found_not_ours = sorted(p for p in preexisting if not expected(p))
 
-print(f"  all four green")
+print(f"  all five green")
 print(f"\n  written by this run : {len(written)} file(s)")
 if preexisting:
     print(f"  already modified    : {len(preexisting)} file(s), untouched by this run")
