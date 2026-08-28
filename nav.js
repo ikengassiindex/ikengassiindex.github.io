@@ -132,7 +132,7 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'switzerland': '95 variables \u00B7 25 sources \u00B7 1,812 substations (158 EHV \u2265220 kV \u00B7 200 HV 110\u2013220 kV \u00B7 1,454 distribution-tier) \u00B7 8,657 power lines across 26 Cantons',
   'turkey': '95 variables \u00B7 30 sources \u00B7 4,031 substations (1,120 EHV \u2265220 kV \u00B7 1 HV 110\u2013220 kV \u00B7 2,910 distribution-tier) \u00B7 8,061 power lines across 7 regions',
   'uk': '95 variables \u00B7 59,744 substations (766 EHV \u2265220 kV \u00B7 1,979 HV 110\u2013220 kV \u00B7 56,999 distribution-tier) \u00B7 190,235 power lines across 12 regions',
-  'us': '95 variables \u00B7 40 sources \u00B7 97,915 substations (9,183 EHV \u2265220 kV \u00B7 31,285 HV 110\u2013220 kV \u00B7 57,447 distribution-tier) \u00B7 875,933 power lines across 52 states'
+  'us': '95 variables \u00B7 40 sources \u00B7 73,859 substations (7,107 EHV \u2265220 kV \u00B7 23,112 HV 110\u2013220 kV \u00B7 43,640 distribution-tier) \u00B7 875,933 power lines across 52 states'
 };
 // <<< END AUTO-GENERATED
 
