@@ -727,11 +727,16 @@ def compute_fleet_summary(substations):
     # Phase 2B-1 (25 June 2026): 4-band → 5-band with Extreme
     # Classes B/C fix: Unclassified band absorbs pre-L3 None R_median subs
     bands = {"Low": 0, "Medium": 0, "High": 0, "Critical": 0, "Extreme": 0, "Unclassified": 0}
-    conf = {"high": 0, "medium": 0, "low": 0}
+    # "Unclassified" mirrors the bands dict above. classify_confidence returns
+    # None where no Monte Carlo ran, and the return value is used as a key here
+    # — without this, the function raises KeyError on the first substation with
+    # equal percentiles, which is 632,270 records cohort-wide.
+    conf = {"high": 0, "medium": 0, "low": 0, "Unclassified": 0}
 
     for s in substations:
         bands[classify_band(s.get("R_median"))] += 1
-        conf[classify_confidence(s.get("R_P5"), s.get("R_P95"))] += 1
+        _tier = classify_confidence(s.get("R_P5"), s.get("R_P95"))
+        conf["Unclassified" if _tier is None else _tier] += 1
 
     # Convention #56: statistics computed on subs with numeric R_median only
     scored_R_vals = sorted(

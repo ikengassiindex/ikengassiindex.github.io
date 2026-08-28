@@ -76,3 +76,35 @@ def test_the_old_behaviour_is_genuinely_gone():
     """The specific regression: a zero-width interval must never again return
     the string that 78,638 records were published with."""
     assert classify_confidence(0.6, 0.6) != "high"
+
+
+class TestTheConsumersSurviveIt:
+    """The guard changed a return type, and the damage from that lands in the
+    callers, not the function. The isolation tests above all passed while
+    compute_fleet_summary raised KeyError on 632,270 records, because it uses
+    the tier as a dict key. These call a consumer."""
+
+    def _fleet(self):
+        from scripts.pipeline.scoring.engine import compute_fleet_summary
+        return compute_fleet_summary([
+            # real simulation
+            {"R_median": 0.50, "R_P5": 0.45, "R_P95": 0.58, "components": {"C": 0.4}},
+            # zero-width: no simulation ran
+            {"R_median": 0.30, "R_P5": 0.30, "R_P95": 0.30, "components": {}},
+            # percentiles never computed
+            {"R_median": None, "components": {}},
+        ])
+
+    def test_a_zero_width_record_does_not_raise(self):
+        assert self._fleet()  # KeyError: None before the fix
+
+    def test_absent_tiers_are_counted_not_dropped(self):
+        c = self._fleet()["confidence_tiers"]
+        assert sum(c.values()) == 3, f"a substation went missing from the tally: {c}"
+        assert c["Unclassified"] == 2
+        assert c["medium"] == 1
+
+    def test_the_three_real_tiers_still_exist(self):
+        # map.js and remediate_cross_border.py both read these by name.
+        for k in ("high", "medium", "low"):
+            assert k in self._fleet()["confidence_tiers"]
