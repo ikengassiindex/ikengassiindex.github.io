@@ -138,13 +138,34 @@ def count_substations(country_slug: str) -> int:
     return len(data.get("substations") or [])
 
 
+
+# Convention #79's thresholds have one home: the canonical sharding module.
+# This file used to keep its own copy — 60.0 target / 90.0 hard limit — which
+# were the correct values when it was written on 24 July 2026 and stale from
+# the 18 August v4.24 recalibration onward. Because they were passed down as
+# explicit arguments they silently overrode the corrected defaults, and on
+# 27 August they re-sharded six countries at the old sizes, leaving poland
+# single-file at 62.40 MB against its own 60 MB threshold.
+#
+# Importing rather than re-copying: a second copy is exactly what failed.
+def _shard_thresholds():
+    try:
+        from scripts.pipeline.utils.ssi_data_sharding import (
+            SSI_DATA_SHARD_THRESHOLD_MB, SSI_DATA_SHARD_TARGET_MB)
+        return SSI_DATA_SHARD_TARGET_MB, SSI_DATA_SHARD_THRESHOLD_MB
+    except ImportError:
+        # Visible fallback at the post-v4.24 values rather than a silent
+        # reversion to the pre-v4.24 pair.
+        return 45.0, 60.0
+
+
 def save_ssi_data(
     country_slug: str,
     manifest: Dict[str, Any],
     substations: List[dict],
     force_sharded: bool = False,
-    shard_size_mb_target: float = 60.0,
-    shard_size_mb_hard_limit: float = 90.0,
+    shard_size_mb_target: float = None,
+    shard_size_mb_hard_limit: float = None,
 ) -> None:
     """Save country's ssi-data.json — sharded or single-file per Convention #79.
 
@@ -156,6 +177,12 @@ def save_ssi_data(
     Preserves all top-level manifest keys other than 'substations' /
     'substations_shards' / 'sharded' (those are managed by this function).
     """
+    _t, _h = _shard_thresholds()
+    if shard_size_mb_target is None:
+        shard_size_mb_target = _t
+    if shard_size_mb_hard_limit is None:
+        shard_size_mb_hard_limit = _h
+
     ssi_path = _country_dir(country_slug) / "ssi-data.json"
     country_root = _country_dir(country_slug)
 
