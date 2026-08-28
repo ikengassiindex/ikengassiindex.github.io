@@ -113,7 +113,7 @@ var SSI_COUNTRY_STATS_DEFAULT = {
   'iceland': '95 variables \u00B7 685 substations (21 EHV \u2265220 kV \u00B7 261 HV 110\u2013220 kV \u00B7 403 distribution-tier) \u00B7 1,566 power lines across 8 regions',
   'ireland': '95 variables \u00B7 30 sources \u00B7 1,278 substations (58 EHV \u2265220 kV \u00B7 268 HV 110\u2013220 kV \u00B7 952 distribution-tier) \u00B7 59,129 power lines across 26 Counties \u00B7 4 Provinces',
   'israel': '95 variables \u00B7 257 substations (18 EHV \u2265220 kV \u00B7 239 HV 110\u2013220 kV \u00B7 0 distribution-tier) \u00B7 6,363 power lines across 6 regions',
-  'italy': '95 variables \u00B7 30 sources \u00B7 47,906 substations (1,606 EHV \u2265220 kV \u00B7 4,382 HV 110\u2013220 kV \u00B7 41,918 distribution-tier) \u00B7 94,407 power lines across 20 regions',
+  'italy': '95 variables \u00B7 30 sources \u00B7 41,662 substations (1,187 EHV \u2265220 kV \u00B7 3,802 HV 110\u2013220 kV \u00B7 36,673 distribution-tier) \u00B7 94,407 power lines across 20 regions',
   'japan': '95 variables \u00B7 30+ sources \u00B7 6,168 substations (459 EHV \u2265220 kV \u00B7 578 HV 110\u2013220 kV \u00B7 5,131 distribution-tier) \u00B7 43,328 power lines across 10 EPCO territories',
   'korea': '95 variables \u00B7 1,291 substations (191 EHV \u2265220 kV \u00B7 755 HV 110\u2013220 kV \u00B7 345 distribution-tier) \u00B7 4,245 power lines across 17 regions',
   'latvia': '95 variables \u00B7 28 sources \u00B7 4,646 substations (21 EHV \u2265220 kV \u00B7 133 HV 110\u2013220 kV \u00B7 4,492 distribution-tier) \u00B7 18,000 power lines across 6 NUTS-3 regions \u00B7 43 novadi (post-2021 reform)',
