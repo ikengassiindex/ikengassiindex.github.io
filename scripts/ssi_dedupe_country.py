@@ -167,8 +167,20 @@ preexisting = sorted(set(BEFORE) & set(AFTER))
 # What the five steps are entitled to touch. Anything else is worth a look
 # before it goes into a commit describing a dedupe.
 def expected(p):
-    return (p.startswith(f"{SLUG}/ssi-data.json")
-            or p.startswith(f"{SLUG}/grid-geo.json")
+    """What this country's chain is entitled to have changed.
+
+    Decided by location, not by filename — a country's chain writes inside
+    that country's directory, plus the two shared files and the cohort's HTML
+    pages. The previous version listed name prefixes and missed
+    germany/ssi-data-substations-*.json entirely, because a shard does not
+    start with "germany/ssi-data.json". It printed a git add line without the
+    nine shards, which would have committed a manifest claiming 108,016
+    substations over shard files still holding 168,776.
+
+    Anything a future step adds inside the country directory is covered by
+    construction. Guessing filename shapes is what failed.
+    """
+    return (p.startswith(SLUG + "/")
             or p in ("nav.js", "index.html")
             or (p.endswith(".html") and "/" in p))
 
@@ -215,7 +227,7 @@ print(f"\n      {len(data)} {SLUG} data file(s) · {len(shared)} shared · {page
 print(f"\n  Review, then commit. Explicit paths, not `git add -A` — the tooling")
 print(f"  lives in scripts/ now, and -A would sweep a tooling edit into a data")
 print(f"  commit:")
-print(f"\n      git add {' '.join(data + shared)} '*/*.html'")
-print(f"      git status --short | grep -v '^M ' | head")
+print(f"\n      git add -A -- '{SLUG}/*' {' '.join(shared)} '*/*.html'")
+print(f"      git status --short | grep -v '^M \\|^D \\|^A ' | head")
 print(f"\n  The second line should print nothing — anything it prints is unstaged")
 print(f"  and wants explaining before the commit.")
