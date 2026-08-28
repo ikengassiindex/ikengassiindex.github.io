@@ -112,3 +112,57 @@ class TestTheGuard:
         with pytest.raises(SystemExit):
             _assert_ids_are_not_collisions("nowhere",
                                            [WODONGA_A, WODONGA_B, third])
+
+
+class TestAnAbsentIdIsItsOwnCase:
+    """turkey, 28 August 2026. 30 unscored ingestion stubs with no
+    substation_id — osm_id and coordinates but no R_median, published as
+    Unclassified per Convention #56. They share the key None, so the collapse
+    would have kept one and deleted 29. The census saw 1, because it groups by
+    coordinate and these are scattered."""
+
+    def _stubs(self, n=30):
+        return [{"substation_id": None, "name": None, "voltage_kv": 34.5,
+                 "lat": 41.0 + i / 1000.0, "lon": 28.2 + i / 1000.0,
+                 "osm_id": 6590958200 + i, "R_median": None,
+                 "classification": "Unclassified"} for i in range(n)]
+
+    def test_it_aborts(self, capsys):
+        with pytest.raises(SystemExit) as e:
+            _assert_ids_are_not_collisions("turkey", self._stubs())
+        assert e.value.code == 3
+        assert "no substation_id" in capsys.readouterr().out
+
+    def test_the_count_is_reported_not_the_first_eight(self, capsys):
+        with pytest.raises(SystemExit):
+            _assert_ids_are_not_collisions("turkey", self._stubs())
+        out = capsys.readouterr().out
+        assert "30 substation(s) with no substation_id" in out
+        assert "delete the other 29" in out
+
+    def test_empty_string_counts_as_absent(self):
+        with pytest.raises(SystemExit):
+            _assert_ids_are_not_collisions("nowhere", [
+                {"substation_id": "", "name": "A", "voltage_kv": 1.0,
+                 "lat": 1.0, "lon": 1.0},
+                {"substation_id": "", "name": "B", "voltage_kv": 2.0,
+                 "lat": 2.0, "lon": 2.0},
+            ])
+
+    def test_one_idless_record_still_aborts(self):
+        """One is not harmless. It has no identity, every downstream join
+        keys on the id, and a second one arriving later would silently take
+        it with them."""
+        with pytest.raises(SystemExit):
+            _assert_ids_are_not_collisions("nowhere", [
+                {"substation_id": None, "name": "Lonely", "voltage_kv": 1.0,
+                 "lat": 1.0, "lon": 1.0},
+                {"substation_id": "REAL", "name": "Fine", "voltage_kv": 1.0,
+                 "lat": 2.0, "lon": 2.0},
+            ])
+
+    def test_a_clean_country_is_still_silent(self):
+        _assert_ids_are_not_collisions("nowhere", [
+            {"substation_id": "A", "name": "One", "voltage_kv": 110.0,
+             "lat": 50.0, "lon": 5.0},
+        ])

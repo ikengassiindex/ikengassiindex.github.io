@@ -173,6 +173,29 @@ def _assert_ids_are_not_collisions(slug, substations):
     in the pipeline keys on substation_id; a country whose ids are not unique
     is not ready to be deduplicated.
     """
+    # An absent id is its own case. turkey carries 30 unscored ingestion stubs
+    # with no substation_id — an osm_id, coordinates, no R_median, published
+    # as "Unclassified" per Convention #56. They share the key None, so the
+    # collapse would keep one and delete 29 real records. They are not
+    # duplicates of each other and the remedy is ids, not deduplication.
+    missing = [x for x in substations
+               if x.get("substation_id") in (None, "", "null")]
+    if missing:
+        print(f"\n  ABORT: {slug} has {len(missing)} substation(s) with no "
+              f"substation_id.\n")
+        for x in missing[:8]:
+            print(f"       {str(x.get('name')):<32} {x.get('voltage_kv')} kV"
+                  f"   ({x.get('lat')}, {x.get('lon')})"
+                  f"   osm={x.get('osm_id')}   R={x.get('R_median')}")
+        if len(missing) > 8:
+            print(f"       ... and {len(missing) - 8} more")
+        print()
+        print("  These share the key None, so the collapse would keep one and")
+        print(f"  delete the other {len(missing) - 1}. They are not duplicates")
+        print("  of each other — they are separate places that never received")
+        print("  an id. Give them ids, then re-run. Nothing has been written.")
+        sys.exit(3)
+
     groups = {}
     for sub in substations:
         groups.setdefault(str(sub.get("substation_id")), []).append(sub)
@@ -359,6 +382,13 @@ def main():
 
         root, parts = load_ssi(slug)
         before = sum(len(s) for _, s, _ in parts)
+
+        # Before the row is printed, not after it is agreed. This used to be
+        # reached only from write_country, which runs under --apply, so a dry
+        # run would print `turkey 30` and the refusal came later. A dry run is
+        # the step where numbers are agreed; it has to be the step that
+        # refuses.
+        _assert_ids_are_not_collisions(slug, [x for _, s_, _ in parts for x in s_])
 
         # Class A repeats one id, so removing "the other" ids is not enough —
         # collapse any id appearing more than once down to a single record.
