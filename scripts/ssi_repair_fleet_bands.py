@@ -26,9 +26,19 @@ already published.
 
 WHAT THIS WRITES — AND WHY IT IS SMALLER THAN IT LOOKS
 ------------------------------------------------------
-Only `fleet_summary` and `regions`, inside each country's ssi-data.json
-manifest. Not one substation record changes: no R_median, no R_P5, no
-classification. This corrects a tally, not a judgement.
+Only `fleet_summary`, inside each country's ssi-data.json manifest. Not one
+substation record changes: no R_median, no R_P5, no classification. This
+corrects a tally, not a judgement.
+
+`regions` is not rebuilt either, though an earlier version of this script did.
+compute_regional_summary bands each region with classify_band(R_median) — the
+same absolute-cutoff blindness this script exists to repair, one level down —
+so recomputing would reintroduce the defect regionally. It also moves figures
+unrelated to band counts: on austria's Kärnten it takes median_R from 0.3649 to
+0.7135, and pct_high from 56.1 to 91.5 because the stored value is single-band
+while today's code makes pct_high cumulative from High. Those divergences are
+real and want their own examination, not a silent rewrite inside a commit about
+a missing band key.
 
 That distinction is why this does NOT go through refresh_fleet_summary.py,
 even though refresh_fleet_summary holds the correct band routine and this
@@ -48,14 +58,17 @@ whole — with the same substation list it was read with, and only if it is
 still comfortably under the sharding threshold. If it is not, this refuses
 rather than quietly re-shaping the country.
 
-WHAT THIS DELIBERATELY DOES NOT TOUCH
--------------------------------------
-26 other countries publish a `bands` dict with no Extreme key at all, so their
-Extreme substations are counted nowhere and their percentages sum to under 100
-— france 95.0% (8,713 substations uncounted), italy 95.0% (2,408), uk 94.8%
-(3,094). Different defect, older, two-thirds of the cohort. It deserves its
-own decision and its own commit rather than arriving as a side effect of this
-one.
+THE SECOND POPULATION
+---------------------
+Passing country names runs it on them instead of the default four. That is how
+the other 26 were repaired: countries whose `bands` dict predates Phase 2B's
+fifth band (25 June 2026) and has no Extreme key at all, so their Extreme
+substations are counted nowhere and their percentages sum to under 100 —
+france 95.0% with 8,713 uncounted, uk 94.8% with 3,094, italy 95.0% with
+2,408, 15,102 substations across the 26.
+
+That case is purely additive: no country's existing four percentages move by
+so much as a tenth of a point. The missing band simply stops being missing.
 
 A SECOND THING WORTH KNOWING, ALSO NOT FIXED HERE
 -------------------------------------------------
@@ -80,9 +93,10 @@ if not (ROOT / "intelligence" / "countries.json").exists():
 APPLY = "--apply" in sys.argv
 named = [a for a in sys.argv[1:] if not a.startswith("-")]
 
-# The four measured as REDISTRIBUTED on 28 Aug 2026 — band counts summing
-# correctly to the fleet size while roughly half the fleet sits in the wrong
-# band. Not the 26 whose only fault is a missing Extreme key.
+# The default is the four measured as REDISTRIBUTED on 28 Aug 2026 — band
+# counts summing correctly to the fleet size while roughly half the fleet sits
+# in the wrong band. Name countries explicitly for the other population, whose
+# fault is a missing Extreme key.
 COUNTRIES = named or ["us", "germany", "japan", "sweden"]
 
 NAVGEN = ROOT / "scripts" / "generate_nav_data.py"
@@ -100,7 +114,6 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 from scripts.refresh_fleet_summary import (          # noqa: E402
     _recompute_fleet_summary_task_461_aware as recompute_fs)
-from scripts.pipeline.scoring.engine import compute_regional_summary  # noqa: E402
 from scripts.pipeline.utils.ssi_data_sharding import (  # noqa: E402
     SSI_DATA_SHARD_THRESHOLD_MB)
 
@@ -158,31 +171,45 @@ def pct(bands, n):
 print(f"\n  {'APPLY' if APPLY else 'DRY RUN'} — {', '.join(COUNTRIES)}")
 print(f"\n  {'country':<12}{'n':>9}   band counts")
 
-planned = []
+if APPLY:
+    print("\n\033[1m1/5  rewrite fleet_summary, manifests only\033[0m")
+
+# One country at a time, loaded and released. The first version of this script
+# planned all countries up front and held every fleet in memory at once; that
+# is fine for four and not for twenty-six, where france alone is 175,660
+# records and the set is over 400,000. Streaming also means a failure part-way
+# leaves the countries already done in a correct state rather than none.
 for slug in COUNTRIES:
     man, subs, sharded = load(slug)
     n = len(subs)
     old = (man.get("fleet_summary") or {}).get("bands") or {}
     new_fs = recompute_fs(subs)
-    regions = compute_regional_summary(subs)
-    print(f"  {slug:<12}{n:>9,}   before {pct(old, n)}")
-    print(f"  {'':<12}{'':>9}   after  {pct(new_fs['bands'], n)}")
-    planned.append((slug, man, subs, sharded, new_fs, regions))
 
-if not APPLY:
-    print("\n  dry run — nothing written.")
-    print("  Re-run with --apply once the `after` rows are agreed.")
-    sys.exit(0)
+    if not APPLY:
+        print(f"  {slug:<12}{n:>9,}   before {pct(old, n)}")
+        print(f"  {'':<12}{'':>9}   after  {pct(new_fs['bands'], n)}")
+        uncounted = n - sum(old.values())
+        if uncounted:
+            print(f"  {'':<12}{'':>9}   {uncounted:,} substations are currently "
+                  f"counted in no band at all")
+        del man, subs, new_fs
+        continue
 
-print("\n\033[1m1/5  rewrite fleet_summary and regions, manifests only\033[0m")
-for slug, man, subs, sharded, new_fs, regions in planned:
     old_fs = man.get("fleet_summary") or {}
     # Preserved keys fill gaps only. A stale `_bands_source` must never sit on
     # top of freshly rebuilt counts — that is how germany came to stamp
     # "task_461_per_country_normalised" over bands that were not normalised.
     preserved = {k: v for k, v in old_fs.items() if k.startswith("_")}
     man["fleet_summary"] = {**preserved, **new_fs}
-    man["regions"] = list(regions.values()) if isinstance(regions, dict) else regions
+    # `regions` is deliberately NOT rebuilt. compute_regional_summary bands each
+    # region with classify_band(R_median) — the same absolute-cutoff blindness
+    # that produced the defect this script repairs, one level down. Recomputing
+    # would reintroduce it regionally. It also moves figures that have nothing
+    # to do with band counts: on austria's Kärnten it takes median_R from 0.3649
+    # to 0.7135 and pct_high from 56.1 to 91.5, the latter because the stored
+    # value is single-band and today's code makes pct_high cumulative from High.
+    # Those are real divergences and they deserve their own examination, not a
+    # silent rewrite inside a commit about a missing band key.
 
     path = ROOT / slug / "ssi-data.json"
     if sharded:
@@ -190,8 +217,9 @@ for slug, man, subs, sharded, new_fs, regions in planned:
         # is opened for writing, so the country is not re-packed.
         payload = json.dumps(man, separators=(",", ":"))
         path.write_text(payload)
-        print(f"   {slug:<10} manifest only, {len(man['substations_shards'])} shards "
-              f"left untouched ({len(payload) / 1024:.1f} KB)")
+        print(f"   {slug:<13} manifest only, {len(man['substations_shards'])} shards "
+              f"untouched · {pct(old, n).get('Low', 0)}% Low -> "
+              f"{pct(new_fs['bands'], n)['Low']}%")
     else:
         man["substations"] = subs
         payload = json.dumps(man, separators=(",", ":"))
@@ -200,10 +228,17 @@ for slug, man, subs, sharded, new_fs, regions in planned:
             sys.exit(f"\nABORT: {slug} would be written at {size_mb:.1f} MB, at or over "
                      f"Convention #79's {SSI_DATA_SHARD_THRESHOLD_MB} MB threshold.\n"
                      f"  This script writes files whole and does not shard. Run it\n"
-                     f"  through the sharding write path instead, deliberately.")
+                     f"  through the sharding write path instead, deliberately.\n"
+                     f"  Countries before {slug} in the list have already been written.")
         path.write_text(payload)
-        print(f"   {slug:<10} single file, {size_mb:.2f} MB, "
+        print(f"   {slug:<13} single file, {size_mb:.2f} MB, "
               f"{len(subs):,} substations rewritten unchanged")
+    del man, subs, new_fs, payload
+
+if not APPLY:
+    print("\n  dry run — nothing written.")
+    print("  Re-run with --apply once the `after` rows are agreed.")
+    sys.exit(0)
 
 run("2/5  regenerate nav.js from the new data", [str(NAVGEN)], tail=2)
 run("3/5  re-hash cache-busters", [str(BUMP)], tail=2)
