@@ -87,6 +87,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import importlib.util
+import math
 import json
 import os
 import sys
@@ -133,6 +134,76 @@ def load_ssi(slug: str):
     return d, [(p, d.get("substations") or [], "wrapped")]
 
 
+def _same_facility(a, b, metres=50.0):
+    """Do two records under one substation_id describe one facility?
+
+    Same name, same voltage, and close enough that the difference is
+    coordinate jitter from separate ingestion runs rather than two sites.
+
+    Wodonga Terminal Station appears twice in australia 8 m apart with an
+    identical name, voltage and R_median — a real duplicate that fails a byte
+    comparison only in the fifth decimal of its coordinates. It must collapse.
+    Buronga substation (330 kV) and Buronga Switching Station (220 kV) share
+    an id 218 m apart. It must not.
+    """
+    if (a.get("name") or "") != (b.get("name") or ""):
+        return False
+    if a.get("voltage_kv") != b.get("voltage_kv"):
+        return False
+    try:
+        lat1, lon1 = float(a["lat"]), float(a["lon"])
+        lat2, lon2 = float(b["lat"]), float(b["lon"])
+    except (KeyError, TypeError, ValueError):
+        return False           # no coordinates to compare: do not assume
+    dy = (lat1 - lat2) * 111_320.0
+    dx = (lon1 - lon2) * 111_320.0 * math.cos(math.radians(lat1))
+    return math.hypot(dx, dy) <= metres
+
+
+def _assert_ids_are_not_collisions(slug, substations):
+    """Refuse to collapse a repeated id that covers two different facilities.
+
+    write_country discards any id it has already seen, keeping whichever
+    record came first in file order. That is correct for a substation stored
+    twice and catastrophic for an id collision: it deletes a real asset and
+    reports it as a duplicate removed. The grid-geo delta moves by one, well
+    inside tolerance, so nothing downstream notices.
+
+    Aborting is the right response rather than skipping the group. Every join
+    in the pipeline keys on substation_id; a country whose ids are not unique
+    is not ready to be deduplicated.
+    """
+    groups = {}
+    for sub in substations:
+        groups.setdefault(str(sub.get("substation_id")), []).append(sub)
+
+    collisions = []
+    for sid, g in groups.items():
+        if len(g) < 2:
+            continue
+        if not all(_same_facility(g[0], other) for other in g[1:]):
+            collisions.append((sid, g))
+
+    if not collisions:
+        return
+
+    print(f"\n  ABORT: {slug} has {len(collisions)} substation_id "
+          f"collision(s) — one id, more than one facility.\n")
+    for sid, g in collisions:
+        print(f"    {sid}")
+        for x in g:
+            print(f"       {str(x.get('name')):<38} {x.get('voltage_kv')} kV"
+                  f"   ({x.get('lat')}, {x.get('lon')})   R={x.get('R_median')}")
+        print()
+    print("  These are not duplicates. The collapse keeps whichever record")
+    print("  comes first in file order and deletes the rest, so running this")
+    print("  would remove a real substation and count it as a duplicate.")
+    print()
+    print("  Give the second facility an id of its own, then re-run. Nothing")
+    print("  has been written.")
+    sys.exit(3)
+
+
 def write_country(slug, root, parts, survivors, drop, merges):
     """Write survivors back, rebuild aggregates, update grid-geo adjacency.
 
@@ -141,6 +212,9 @@ def write_country(slug, root, parts, survivors, drop, merges):
     fleet_summary and regions, which is a mistake this codebase has made
     before.
     """
+    _assert_ids_are_not_collisions(
+        slug, [x for _, subs_, _ in parts for x in subs_])
+
     sys.path.insert(0, str(REPO / "scripts"))
     sys.path.insert(0, str(REPO))
     from pipeline.scoring.engine import compute_regional_summary
