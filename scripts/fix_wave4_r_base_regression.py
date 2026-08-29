@@ -93,6 +93,7 @@ from scripts.pipeline.scoring.engine import (  # noqa: E402
     compute_r_base,
     compute_r_median,
     classify_band,
+    apply_country_normalised_bands,
     classify_confidence,
     compute_fleet_summary,
     compute_regional_summary,
@@ -232,8 +233,26 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
     logger.info(f"[{slug}] rescoring ({'FAST deterministic' if fast else 'FULL MC 10K'})...")
     t_score_start = time.time()
     from_to_transitions = {}
+    # Task #461: the band a record ends up with is decided AFTER the whole
+    # country is rescored, because the cutoffs are per-country percentiles of
+    # the new R_median distribution. So the old classes are captured here and
+    # the transitions computed once normalisation has run — not per record
+    # against an intermediate absolute band.
+    old_classes = [s.get("classification", "Unclassified") for s in subs]
+    _blind_skipped = 0
     for i, sub in enumerate(subs):
-        old_class = sub.get("classification", "Unclassified")
+        # Convention #56. A record with no components has nothing to derive a
+        # score from. Rescoring it anyway yields R_base = 0 and therefore
+        # R_median = add_sum — the flood modifier alone — which is a real
+        # number, so the record acquires a band it has no basis for. That is
+        # the BANDED_BLIND defect (5fefb9ac), and turkey's dry run showed the
+        # repair creating 30 fresh instances of it. Leave them exactly as
+        # found; what to do with a blind substation is a decision, not a
+        # rescore.
+        _comps = sub.get("components") or {}
+        if not any(isinstance(v, (int, float)) for v in _comps.values()):
+            _blind_skipped += 1
+            continue
         if fast:
             # Deterministic path: recompute R_base + R_median analytically
             components = sub.get("components", {})
@@ -254,10 +273,6 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
             subs[i] = updated
             sub = updated
 
-        new_class = sub.get("classification", "Unclassified")
-        key = (old_class, new_class)
-        from_to_transitions[key] = from_to_transitions.get(key, 0) + 1
-
         # Progress
         if (i + 1) % 10000 == 0:
             elapsed = time.time() - t_score_start
@@ -268,6 +283,40 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
     scoring_seconds = time.time() - t_score_start
     logger.info(f"[{slug}] rescored {n:,} subs in {scoring_seconds:.1f}s ({n/scoring_seconds:.0f} subs/s)")
 
+    # Task #461 per-country normalisation. score_substation and the FAST path
+    # both write classify_band's ABSOLUTE band; the register is banded by
+    # within-country rank. Without this the repair would revert Task #461 for
+    # every country it touched — and silently, because fleet_summary would be
+    # rebuilt from the same absolute classes and the band gate would still
+    # agree with itself.
+    apply_country_normalised_bands(subs)
+
+    # Convention #56, tested on the property the register cares about: a band
+    # implies data behind it. The earlier form of this guard counted records
+    # with R_median None AFTER the rescore, by which point the rescore had
+    # supplied one — it measured the right property at the wrong moment and
+    # passed while 30 blind records were being banded.
+    _banded_blind = [s for s in subs
+                     if not any(isinstance(v, (int, float))
+                                for v in (s.get("components") or {}).values())
+                     and s.get("classification") not in (None, "Unclassified")]
+    if _banded_blind:
+        raise AssertionError(
+            f"{slug}: {len(_banded_blind)} substations have no components but "
+            f"carry a band — e.g. {_banded_blind[0].get('substation_id')!r} as "
+            f"{_banded_blind[0].get('classification')!r}. The repair must not "
+            f"manufacture a classification it has no data for.")
+    if _blind_skipped:
+        logger.warning(
+            "[%s] %d substations have no components and were left untouched — "
+            "not rescored, not rebanded. There is nothing to derive a score "
+            "from; see FINDING_r_base_zero_135844.md section 5.2.",
+            slug, _blind_skipped)
+
+    for old_c, sub in zip(old_classes, subs):
+        key = (old_c, sub.get("classification", "Unclassified"))
+        from_to_transitions[key] = from_to_transitions.get(key, 0) + 1
+
     # After-state
     after_rb = r_base_stats(subs)
     after_rm = r_median_stats(subs)
@@ -276,9 +325,18 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
     # Refresh fleet_summary + regions[].bands
     logger.info(f"[{slug}] refreshing fleet_summary + regional bands...")
     data["substations"] = subs
-    data["fleet_summary"] = compute_fleet_summary(subs)
+    # engine.compute_fleet_summary (engine.py:737) and
+    # compute_regional_summary (:799) both tally with classify_band, the
+    # absolute classifier. On a Task #461 country that publishes a band
+    # distribution contradicting its own map. The aware routines count the
+    # `classification` field instead — the same two this repo already switched
+    # ssi_dedupe_substations.py onto.
+    from refresh_fleet_summary import (
+        _recompute_fleet_summary_task_461_aware,
+        _recompute_regional_summary_task_461_aware)
+    data["fleet_summary"] = _recompute_fleet_summary_task_461_aware(subs)
     if "regions" in data and isinstance(data["regions"], list):
-        data["regions"] = compute_regional_summary(subs)
+        data["regions"] = _recompute_regional_summary_task_461_aware(subs)
 
     # Provenance pin
     data.setdefault("_provenance", {}).setdefault("history", []).append({
@@ -288,6 +346,7 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
         "task_ref": "Task #454 → Task #455 → Task #450 systemic closure",
         "mode": "FAST" if fast else "FULL_MC_10K",
         "n_subs": n,
+        "n_blind_skipped": _blind_skipped,
         "before": {"R_base_stats": before_rb, "R_median_stats": before_rm, "band_counts": before_bands},
         "after": {"R_base_stats": after_rb, "R_median_stats": after_rm, "band_counts": after_bands},
         "convention_refs": ["#7", "#23", "#56", "#67", "#79"],
