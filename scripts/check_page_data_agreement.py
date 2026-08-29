@@ -297,3 +297,35 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# ── meta description, the third carrier of fleet.total ──
+_META_DESC_FIGURE = re.compile(
+    r'name="description"\s+content="([^"]*)"')
+_META_DESC_COUNT = re.compile(r"([\d,]{4,})\s+substations")
+
+
+def meta_description_findings(repo, slugs, load_total):
+    """Every page whose meta description quotes a fleet size that is not the
+    fleet size.
+
+    The description is the third carrier of fleet.total, after the
+    data-canonical span and the JSON literal, and it was the one nothing
+    checked. Ten countries drifted for months with every gate green — germany
+    quoting 187,714 against a register holding 108,016, which is what its link
+    previews and search results said.
+    """
+    out = []
+    for slug in slugs:
+        total = load_total(slug)
+        if total is None:
+            continue
+        want = f"{total:,}"
+        for page in sorted((repo / slug).glob("*.html")):
+            m = _META_DESC_FIGURE.search(page.read_text(errors="replace"))
+            if not m:
+                continue
+            for found in _META_DESC_COUNT.findall(m.group(1)):
+                if found != want:
+                    out.append((slug, page.name, found, want))
+    return out

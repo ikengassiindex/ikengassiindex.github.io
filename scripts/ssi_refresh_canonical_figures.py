@@ -155,6 +155,11 @@ def truth_for(slug: str) -> dict:
     }
 
 
+# Digits immediately preceding the noun, inside a description. The noun
+# is the anchor, so a description mentioning another number keeps it.
+_META_DESC_RE = re.compile(r"([\d,]{1,})(\s+substations)")
+
+
 def fmt(n: int) -> str:
     return f"{n:,}" if n >= 1000 else str(n)
 
@@ -179,6 +184,27 @@ def rewrite(html: str, key: str, value: int) -> tuple[str, int]:
         return m.group(1) + v + m.group(3)
 
     html = re.sub(r'("' + re.escape(key) + r'":\s*")([^"]*)(")', lit_sub, html)
+
+    # Third carrier: the meta description. Invisible on the page, visible in
+    # view-source, to search engines and in every link preview. Nothing had
+    # ever refreshed it, so on 29 August 2026 ten countries were still quoting
+    # their first-written fleet — germany 187,714 against 108,016.
+    #
+    # Only fleet.total, and only the digits immediately before the word
+    # "substations". The description is prose; a blanket numeric rewrite here
+    # would be a licence to corrupt sentences.
+    if key == "fleet.total":
+        def desc_sub(m):
+            nonlocal n
+            inner = _META_DESC_RE.sub(
+                lambda d: (v + d.group(2)) if d.group(1) != v else d.group(0),
+                m.group(2))
+            if inner != m.group(2):
+                n += 1
+            return m.group(1) + inner + m.group(3)
+
+        html = re.sub(r'(name="description"\s+content=")([^"]*)(")', desc_sub, html)
+
     return html, n
 
 
