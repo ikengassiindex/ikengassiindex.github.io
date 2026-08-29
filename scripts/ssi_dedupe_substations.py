@@ -240,7 +240,14 @@ def write_country(slug, root, parts, survivors, drop, merges):
 
     sys.path.insert(0, str(REPO / "scripts"))
     sys.path.insert(0, str(REPO))
-    from pipeline.scoring.engine import compute_regional_summary
+    # NOT engine.compute_regional_summary. It tallies classify_band(R_median)
+    # per region — the absolute cutoffs Task #461 replaced — so calling it here
+    # reverts Phase 2D for the regional layer on every dedupe, one floor below
+    # where 561e2337 fixed the same thing for the fleet. Measured before this
+    # changed: 136,742 substations in the wrong regional band across 15
+    # countries, france and us with every region wrong.
+    from scripts.refresh_fleet_summary import (
+        _recompute_regional_summary_task_461_aware as compute_regional_summary)
     # NOT engine.compute_fleet_summary. That one recounts bands with
     # classify_band(R_median) — the absolute cutoffs Task #461 replaced — so
     # calling it here reverts Phase 2D for the published figure while every

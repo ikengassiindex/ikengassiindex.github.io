@@ -114,7 +114,7 @@ def main():
         slugs = sorted(d.name for d in REPO.iterdir()
                        if d.is_dir() and (d / "ssi-data.json").exists())
 
-    bad, skipped = [], []
+    bad, skipped, regional = [], [], []
     for slug in slugs:
         man, subs, err = load(slug)
         if err:
@@ -128,6 +128,33 @@ def main():
                 for b in BANDS if published.get(b, 0) != actual[b]}
         if diff:
             bad.append((slug, len(subs), diff, fs.get("_bands_source")))
+
+        # The regional layer, which this check used to ignore entirely. A
+        # country could pass on its fleet total while every one of its regions
+        # disagreed, and france did exactly that: 102 of 102 regions wrong,
+        # 89,668 substations in the wrong regional band, fleet summary green.
+        by_region = {}
+        for x in subs:
+            k = x.get("region") or "Unclassified"
+            g = by_region.setdefault(k, {b: 0 for b in BANDS})
+            b = x.get("classification")
+            g[b if b in g else "Unclassified"] += 1
+        off_regions, off_records = 0, 0
+        for entry in (man.get("regions") or []):
+            # Named `act`, not `a`: `a` is the argparse namespace in this
+            # scope, and shadowing it makes --strict raise AttributeError
+            # instead of returning an exit code.
+            act = by_region.get(entry.get("region"))
+            if act is None:
+                continue
+            pb = entry.get("bands") or {}
+            d = sum(abs(pb.get(b, 0) - act[b]) for b in BANDS) // 2
+            if d:
+                off_regions += 1
+                off_records += d
+        if off_regions:
+            regional.append((slug, off_regions, len(man.get("regions") or []),
+                             off_records))
 
     n = len(slugs) - len(skipped)
     if not bad:
@@ -152,10 +179,19 @@ def main():
         print(f"   Repair: python3 scripts/refresh_fleet_summary.py "
               f"{' '.join(s for s, *_ in bad)}")
 
+    if regional:
+        print()
+        for slug, n, total, recs in sorted(regional, key=lambda r: -r[3]):
+            print(f"   {slug}: {n} of {total} regions publish band counts their "
+                  f"own substations contradict ({recs:,} records)")
+        print(f"\n   {len(regional)} country(ies) with a regional-layer mismatch. "
+              f"Repair: python3 scripts/ssi_repair_fleet_bands.py "
+              f"{' '.join(s for s, *_ in regional)}")
+
     for slug, err in skipped:
         print(f"   SKIP {slug}: {err}")
 
-    if bad and a.strict:
+    if (bad or regional) and a.strict:
         return 1
     return 0
 

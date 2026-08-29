@@ -113,7 +113,8 @@ for p in (NAVGEN, BUMP, FIGURES, LANDING, AGREE, PARSE, BANDS):
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 from scripts.refresh_fleet_summary import (          # noqa: E402
-    _recompute_fleet_summary_task_461_aware as recompute_fs)
+    _recompute_fleet_summary_task_461_aware as recompute_fs,
+    _recompute_regional_summary_task_461_aware as recompute_regions)
 from scripts.pipeline.utils.ssi_data_sharding import (  # noqa: E402
     SSI_DATA_SHARD_THRESHOLD_MB)
 
@@ -201,7 +202,11 @@ for slug in COUNTRIES:
     # "task_461_per_country_normalised" over bands that were not normalised.
     preserved = {k: v for k, v in old_fs.items() if k.startswith("_")}
     man["fleet_summary"] = {**preserved, **new_fs}
-    # `regions` is deliberately NOT rebuilt. compute_regional_summary bands each
+    man["regions"] = recompute_regions(subs)
+    man["fleet_summary"]["n_regions"] = len(man["regions"])
+    # `regions` IS rebuilt, as of fix_step20. The note that used to sit here
+    # explained why it was not: the only available routine was
+    # compute_regional_summary, which bands each
     # region with classify_band(R_median) — the same absolute-cutoff blindness
     # that produced the defect this script repairs, one level down. Recomputing
     # would reintroduce it regionally. It also moves figures that have nothing

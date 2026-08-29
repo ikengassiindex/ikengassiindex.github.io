@@ -111,6 +111,62 @@ def _recompute_fleet_summary_task_461_aware(substations):
     return fs
 
 
+def _percentile_sorted(vals, q):
+    if not vals:
+        return None
+    k = (len(vals) - 1) * q
+    lo, hi = int(k), min(int(k) + 1, len(vals) - 1)
+    return vals[lo] + (vals[hi] - vals[lo]) * (k - lo)
+
+
+def _recompute_regional_summary_task_461_aware(substations):
+    """Per-region statistics, counting bands from each sub's `classification`.
+
+    The regional sibling of _recompute_fleet_summary_task_461_aware, and it
+    exists for the same reason. engine.compute_regional_summary tallies
+    classify_band(R_median) — the absolute cutoffs Task #461 replaced — so any
+    tool that rebuilds regions through it reverts Phase 2D one level below the
+    fleet summary, where 561e2337 had just fixed it.
+
+    Measured before this landed: 15 countries, 136,742 substations counted in
+    the wrong regional band, france and us with every single region wrong.
+
+    `pct_high` is cumulative from High per Phase 2B-1, matching engine's own
+    documented semantic. Some superseded blocks held a single-band value
+    instead — austria's Kärnten read 56.1 where this returns 91.5 — and those
+    two numbers describe different things.
+    """
+    groups = {}
+    for s in substations:
+        groups.setdefault(s.get("region") or "Unclassified", []).append(s)
+
+    out = []
+    for region, subs in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+        n = len(subs)
+        bands = {k: 0 for k in _CANONICAL_BANDS}
+        for s in subs:
+            b = s.get("classification")
+            bands[b if b in bands else "Unclassified"] += 1
+        scored = sorted(s["R_median"] for s in subs
+                        if isinstance(s.get("R_median"), (int, float)))
+        entry = {
+            "region": region,
+            "count": n,
+            "n_scored": len(scored),
+            "bands": bands,
+            "pct_critical": round(bands["Critical"] / n * 100, 1),
+            "pct_extreme": round(bands["Extreme"] / n * 100, 1),
+            "pct_high": round((bands["High"] + bands["Critical"]
+                               + bands["Extreme"]) / n * 100, 1),
+            "median_R": round(_percentile_sorted(scored, 0.50), 4) if scored else None,
+            "mean_R": round(sum(scored) / len(scored), 4) if scored else None,
+        }
+        if not scored:
+            entry["_stats_pending_l3_rescore"] = True
+        out.append(entry)
+    return out
+
+
 def _has_drift(manifest: dict) -> tuple[bool, list[str]]:
     """Return (is_drifted, list_of_issues)."""
     fs = manifest.get("fleet_summary") or {}
