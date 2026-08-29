@@ -348,7 +348,12 @@ def main() -> int:
         print("\n  dry run — nothing written. Re-run with --apply once agreed.")
         return 0
 
-    globs = " ".join(f"'{s}/*'" for s in slugs)
+    # intelligence/country-configs belongs in this line. admin.l1.count drives a
+    # region-count KPI on every country page, and this pass changes the region
+    # count — germany 16 -> 409. An earlier version of this message omitted the
+    # configs, which would have committed pages quoting a count their own config
+    # contradicts: the exact defect class this work exists to remove.
+    globs = " ".join(f"'{s}/*'" for s in slugs) + " intelligence/country-configs"
     print("\n  written. `regions` was rebuilt in the same pass and reconciles:")
     print("  each country's region counts sum to its fleet, and the regional band")
     print("  counts sum to the fleet band counts. fleet_summary.bands is untouched")
@@ -356,7 +361,14 @@ def main() -> int:
     print("\n  Do NOT run refresh_fleet_summary.py to 'finish' this: it writes")
     print("  through save_ssi_data, which re-packs the country, and it rebuilds")
     print("  regions with the absolute-cutoff bands this pass exists to avoid.")
-    print("\n  Next: the page-sync chain, then the five checks.")
+    print("\n  Next, IN THIS ORDER — data, then configs, then pages:")
+    print("    1. set admin.l1.count in intelligence/country-configs/<slug>.json")
+    print("       from len(regions) for each country written above")
+    print("    2. ssi_refresh_canonical_figures.py <slug> --apply, per country")
+    print("    3. generate_nav_data.py, then bump_cache_busters.py")
+    print("    4. ssi_refresh_landing_counts.py --apply")
+    print("  Refreshing the pages before the configs writes the OLD region count")
+    print("  into them, and the page/data check then fails on all thirteen.")
     print(f"\n      git add -A -- {globs} index.html nav.js '*/*.html'")
     return 0
 
