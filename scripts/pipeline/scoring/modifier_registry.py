@@ -150,6 +150,31 @@ MODIFIER_REGISTRY = {
 #  REGISTRY HELPERS
 # ═══════════════════════════════════════════════════════════
 
+# Retired modifiers skipped this process, keyed (name, successor_present).
+# Counted rather than logged per occurrence — see the note in
+# compute_modifier_terms.
+_RETIRED_SKIPS = {}
+
+
+def retired_skip_counts():
+    """How many times each retired modifier was skipped this process.
+
+    Returns {(name, successor_present): count}. A re-score or audit should
+    report this once at the end:
+
+        R7_cyber: skipped on 534,443 substations (successor present)
+
+    The successor_present=False entries are the ones that matter — those
+    records lost a signal and nothing replaced it.
+    """
+    return dict(_RETIRED_SKIPS)
+
+
+def reset_retired_skip_counts():
+    """Clear the tally. For tests and for callers making repeated passes."""
+    _RETIRED_SKIPS.clear()
+
+
 def compute_modifier_terms(modifiers):
     """
     Compute the multiplicative product and additive sum for a substation's
@@ -211,17 +236,30 @@ def compute_modifier_terms(modifiers):
         # acquired it on its next re-score.
         if spec.get("retired"):
             successor = spec.get("superseded_by")
-            if successor and successor not in modifiers:
-                # Convention #56: dropping a retired modifier with nothing in
-                # its place is a loss of signal, not a tidy-up. Say so rather
-                # than letting the score quietly fall. Nothing is substituted —
-                # there is no honest substitute.
-                logger.error(
-                    "Modifier '%s' is retired (%s) and its successor '%s' is "
-                    "absent from this substation; it is not applied and nothing "
-                    "replaces it.", name, spec["retired"], successor)
-            else:
-                logger.warning("Modifier '%s' is retired; not applied.", name)
+            has_succ = bool(successor and successor in modifiers)
+            # Once per process, not once per substation. This function runs per
+            # record; 534,443 of them carry R7_cyber, and logging each one
+            # buried a cohort measurement under 5,825 identical lines. The
+            # count is kept instead and exposed via retired_skip_counts(), so a
+            # caller can report the total — which is more honest than half a
+            # million repetitions, not less.
+            key = (name, has_succ)
+            _RETIRED_SKIPS[key] = _RETIRED_SKIPS.get(key, 0) + 1
+            if _RETIRED_SKIPS[key] == 1:
+                if not has_succ:
+                    # Convention #56: dropping a retired modifier with nothing
+                    # in its place is a loss of signal, not a tidy-up. Nothing
+                    # is substituted — there is no honest substitute.
+                    logger.error(
+                        "Modifier '%s' is retired (%s) and its successor '%s' "
+                        "is absent; it is not applied and nothing replaces it. "
+                        "Further occurrences counted, not logged — see "
+                        "retired_skip_counts().", name, spec["retired"], successor)
+                else:
+                    logger.warning(
+                        "Modifier '%s' is retired; not applied (superseded by "
+                        "'%s'). Further occurrences counted, not logged — see "
+                        "retired_skip_counts().", name, successor)
             continue
 
         lo, hi = spec["range"]
