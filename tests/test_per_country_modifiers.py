@@ -139,7 +139,12 @@ class TestItalyRegression:
         R_raw_manual *= canonical_5_modifiers["R4_F_topo"]
         R_raw_manual *= canonical_5_modifiers["R6_restoration"]
         R_raw_manual *= canonical_5_modifiers["R6_seismic"]
-        R_raw_manual *= canonical_5_modifiers["R7_cyber"]
+        # R7_cyber is deliberately absent. It was retired at the v4.24 hard
+        # cutover (18 August 2026) and superseded by R7_cyber_v2, so it is no
+        # longer part of the chain — compute_modifier_terms skips it. Keeping it
+        # here would assert that a retired modifier is still applied, which is
+        # the defect this suite should be catching rather than pinning.
+        # The canonical chain is four multiplicative modifiers, not five.
         R_manual = soft_clip_upper(R_raw_manual)
         assert R_pr3 == pytest.approx(R_manual, abs=1e-9), (
             f"Italy regressed pre/post PR-3: {R_pr3} vs {R_manual} — "

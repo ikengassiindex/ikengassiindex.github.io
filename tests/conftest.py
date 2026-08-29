@@ -92,7 +92,11 @@ def out_of_range_modifiers():
     """Modifier values outside their declared range — clipped at apply time."""
     return {
         "R3_C_mult": 2.0,  # above 1.50 — should clip to 1.50
-        "R7_cyber": 0.90,  # below 0.99 — should clip to 0.99
+        # Was R7_cyber=0.90 (clipping up to 0.99). R7_cyber was retired at the
+        # v4.24 hard cutover and is no longer applied, so it can no longer
+        # demonstrate clipping. R8_adapt has a live range of 0.92–1.05 and
+        # serves the same purpose: a value below range, clipped up at apply.
+        "R8_adapt": 0.90,  # below 0.92 — should clip to 0.92
     }
 
 

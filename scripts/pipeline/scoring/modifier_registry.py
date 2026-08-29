@@ -23,7 +23,10 @@ Pre-PR-3 history:
 Post-PR-3 behavior:
 - compute_r_median iterates this registry; every modifier present in the
   substation's `modifiers` dict participates in the score (within its
-  declared range). Unknown modifiers are skipped with a warning. v4.2's
+  declared range) EXCEPT those carrying `retired`, which are skipped —
+  see compute_modifier_terms. Before 29 August 2026 the flag was
+  declared but never read, and R7_cyber was applied alongside its own
+  successor. Unknown modifiers are skipped with a warning. v4.2's
   six new modifier families (R6c, R6d, R6e, R8, R9, R10) land here as
   data-only entries — no engine code changes needed.
 
@@ -73,6 +76,7 @@ MODIFIER_REGISTRY = {
     "R7_cyber":          {"type": "mult", "default": 1.0, "range": (0.99, 1.05),
                           "introduced": "v4.0.0",
                           "retired": "v4.24 (18 August 2026, GATE-A-11-REVISED hard cutover; superseded by R7_cyber_v2)",
+                          "superseded_by": "R7_cyber_v2",
                           "countries": "all"},
     #
     # R7_cyber v2 — CRA + NIS2 regulatory-vintage composite (Task #1102 workstream)
@@ -197,6 +201,29 @@ def compute_modifier_terms(modifiers):
             logger.warning("Unknown modifier '%s' in substation; skipping", name)
             continue
 
+        # A retired modifier is not part of the chain. The registry has said so
+        # since the v4.24 hard cutover — "Any pipeline reader referencing
+        # R7_cyber post v4.24 MUST migrate to R7_cyber_v2" — but this function,
+        # which is that reader, never looked at the flag. It multiplied every
+        # modifier present, so a record carrying both R7_cyber and R7_cyber_v2
+        # had the cyber modifier applied twice. Sweden's published scores carry
+        # that double-count today; every other v4.2-cohort country would have
+        # acquired it on its next re-score.
+        if spec.get("retired"):
+            successor = spec.get("superseded_by")
+            if successor and successor not in modifiers:
+                # Convention #56: dropping a retired modifier with nothing in
+                # its place is a loss of signal, not a tidy-up. Say so rather
+                # than letting the score quietly fall. Nothing is substituted —
+                # there is no honest substitute.
+                logger.error(
+                    "Modifier '%s' is retired (%s) and its successor '%s' is "
+                    "absent from this substation; it is not applied and nothing "
+                    "replaces it.", name, spec["retired"], successor)
+            else:
+                logger.warning("Modifier '%s' is retired; not applied.", name)
+            continue
+
         lo, hi = spec["range"]
         # Clip to declared range as a safety net against upstream emission errors.
         # See F-L1-10 + F-L4-1 findings; range enforcement is now centralized here.
@@ -214,6 +241,37 @@ def compute_modifier_terms(modifiers):
             continue
 
     return mult_product, add_sum
+
+
+def retired_modifiers_present(modifiers):
+    """Retired modifiers a record still carries, and whether the successor is there.
+
+    compute_modifier_terms now skips these, so this is how a gate or an audit
+    asks which records are affected without re-deriving the rule. The
+    successor_present flag separates the two cases that matter: a clean
+    migration (both present, the retired one simply ignored) from a record that
+    loses the signal entirely because nothing replaced it.
+
+    Returns:
+        {name: {"retired": str, "superseded_by": str|None,
+                "successor_present": bool}}
+
+    Examples:
+        >>> r = retired_modifiers_present({"R7_cyber": 1.02, "R7_cyber_v2": 1.03})
+        >>> r["R7_cyber"]["successor_present"]
+        True
+        >>> retired_modifiers_present({"R3_C_mult": 1.05})
+        {}
+    """
+    out = {}
+    for name in modifiers:
+        spec = MODIFIER_REGISTRY.get(name)
+        if not spec or not spec.get("retired"):
+            continue
+        succ = spec.get("superseded_by")
+        out[name] = {"retired": spec["retired"], "superseded_by": succ,
+                     "successor_present": bool(succ and succ in modifiers)}
+    return out
 
 
 def per_modifier_impacts(modifiers):
