@@ -52,15 +52,13 @@ def test_width_fires_when_ci_width_contradicts_the_endpoints():
     only(c, "WIDTH")
 
 
-def test_synthetic_fires_on_a_name_hashed_width():
-    name = "Substation 1000000000"
-    w = vary(0.22, name, 0.15)
-    # Endpoints kept consistent with w so only SYNTHETIC fires.
-    c, _ = audit([clean(name=name, R_median=0.60,
-                        R_P5=round(0.60 - w / 2, 4), R_P95=round(0.60 + w / 2, 4),
-                        CI_width=w, confidence_tier=classify_confidence(
-                            round(0.60 - w / 2, 4), round(0.60 + w / 2, 4)))])
-    only(c, "SYNTHETIC")
+# test_synthetic_fires_on_a_name_hashed_width was removed on 29 August 2026.
+# It built a record whose endpoints AGREED with the hash-derived width and
+# asserted SYNTHETIC fired. That is now the documented coincidence case — two
+# turkey records hit it with a genuine Monte Carlo width after the uk rescore —
+# and the check was narrowed to require an ORPHANED width as well as a
+# hash-match. The two tests below cover both directions of the refined rule and
+# supersede it; keeping the old assertion would have pinned the false positive.
 
 
 def test_tier_fires_on_the_hardcoded_literal():
@@ -84,3 +82,31 @@ def test_missing_fields_do_not_fire_anything():
                    "R_P95": None, "CI_width": None, "add_sum": None,
                    "confidence_tier": None}])
     only(c)
+
+
+def test_synthetic_ignores_a_real_width_that_merely_collides_with_the_hash():
+    """A hash-match is not proof of fabrication if the endpoints agree.
+
+    Two turkey records came out of the uk/canada/turkey rescore with a genuine
+    Monte Carlo width that landed on vary(0.22, name, 0.15) to four decimals.
+    Their R_P95 - R_P5 equalled that width exactly, so the interval was real.
+    What marked the fabricated population was an ORPHANED width — 0.233 stated
+    beside two equal endpoints.
+    """
+    name = "Substation 1000000000"
+    w = vary(0.22, name, 0.15)
+    p5, p95 = 0.50, round(0.50 + w, 4)
+    c, _ = audit([clean(name=name, R_median=round(p5 + w / 2, 4),
+                        R_P5=p5, R_P95=p95, CI_width=round(p95 - p5, 4),
+                        confidence_tier=classify_confidence(p5, p95))])
+    only(c)
+
+
+def test_synthetic_still_fires_on_the_orphaned_width():
+    """The 430,191-record shape: hash width, endpoints equal and unrelated."""
+    name = "Substation 1000000000"
+    w = vary(0.22, name, 0.15)
+    c, _ = audit([clean(name=name, R_P5=0.1432, R_P95=0.1432, CI_width=w,
+                        add_sum=0.99, R_median=0.612,
+                        confidence_tier="medium")])
+    assert c["SYNTHETIC"] == 1, "the real fabrication signature must still fire"

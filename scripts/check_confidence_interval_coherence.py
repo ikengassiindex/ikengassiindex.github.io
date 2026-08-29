@@ -141,7 +141,20 @@ def audit(subs):
         if None not in (p5, p95, w) and abs(w - (p95 - p5)) > WIDTH_TOL:
             hit("WIDTH")
         if _vary is not None and w is not None and name is not None:
-            if abs(_vary(0.22, name, 0.15) - w) <= EPS:
+            # A hash-match alone is not proof of fabrication. After the uk /
+            # canada / turkey rescore, two turkey records had a genuine Monte
+            # Carlo width that happened to land on vary(0.22, name, 0.15) to
+            # four decimals -- 2 collisions in 4,031 records, which is what a
+            # 4dp value in a narrow band will do. Their endpoints agreed with
+            # the width exactly, so the interval was real.
+            #
+            # What identified the fabricated population was that its width was
+            # ORPHANED: CI_width said 0.233 while R_P5 and R_P95 were equal.
+            # Requiring both conditions keeps every one of the original
+            # 430,191 and drops the coincidences.
+            orphaned = (p5 is None or p95 is None
+                        or abs(w - (p95 - p5)) > WIDTH_TOL)
+            if abs(_vary(0.22, name, 0.15) - w) <= EPS and orphaned:
                 hit("SYNTHETIC")
         if s.get("confidence_tier") != classify_confidence(p5, p95):
             hit("TIER")

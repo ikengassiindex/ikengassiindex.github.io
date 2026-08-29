@@ -191,7 +191,8 @@ def diagnose_country(slug: str) -> dict:
     }
 
 
-def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
+def fix_country(slug: str, dry_run: bool = False, fast: bool = False,
+                chunk_seconds: float = 0.0, cache_path: str = "") -> dict:
     """Recompute R_base_median + R_median + classification for every sub.
 
     Args:
@@ -239,7 +240,49 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
     # the transitions computed once normalisation has run — not per record
     # against an intermediate absolute band.
     old_classes = [s.get("classification", "Unclassified") for s in subs]
+    # Records that ALREADY carry a band with no components behind them. canada
+    # has 1,107 of these before the repair runs; cohort-wide there are 78,493
+    # (5fefb9ac). The repair neither causes nor can fix them — there is nothing
+    # to derive a score from — so the guard below must test that it did not ADD
+    # to the population, not that the population is empty. Refusing to write a
+    # legitimate repair because of a pre-existing defect it is not responsible
+    # for would block every country that has one.
+    def _blind_banded(records):
+        return [r for r in records
+                if not any(isinstance(v, (int, float))
+                           for v in (r.get("components") or {}).values())
+                and r.get("classification") not in (None, "Unclassified")]
+
+    _blind_banded_before = len(_blind_banded(subs))
+
+    # Resumable rescore. See fix_repair_tool_resumable_chunks.py: a full uk
+    # pass is ~175s and this environment reaps the process before then. The
+    # rescore is a pure function of the record, so it is done in pieces and
+    # NOTHING is written until the loop completes — an interrupted run leaves
+    # the register byte-identical to how it found it.
+    _ENGINE_FIELDS = ("R_base_median", "R_median", "R_P5", "R_P95", "CI_width",
+                      "skewness", "P_critical", "R_unclipped", "modifier_impact",
+                      "modifier_pct", "classification", "confidence_tier",
+                      "mult_product", "add_sum", "modifier_impacts")
+    _cache = {}
+    _cache_file = Path(cache_path) if cache_path else None
+    if _cache_file is not None and _cache_file.exists():
+        _raw = json.loads(_cache_file.read_text())
+        _cache = {int(k): v for k, v in _raw.get("done", {}).items()}
+        _blind_from_cache = int(_raw.get("blind_skipped", 0))
+        logger.info("[%s] resuming: %d of %d records already rescored",
+                    slug, len(_cache), n)
+    else:
+        _blind_from_cache = 0
+
+    _chunk_t0 = time.time()
+    _interrupted = False
     _blind_skipped = 0
+    # Which indices this invocation actually rescored. Inferring it afterwards
+    # from field values does not work: an unrescored uk record has
+    # R_base_median == 0.0, which is a value, so a "is it None?" test caches
+    # 59,744 stale records after a chunk that processed 41,000. Record it.
+    _rescored_now = set()
     for i, sub in enumerate(subs):
         # Convention #56. A record with no components has nothing to derive a
         # score from. Rescoring it anyway yields R_base = 0 and therefore
@@ -253,6 +296,12 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
         if not any(isinstance(v, (int, float)) for v in _comps.values()):
             _blind_skipped += 1
             continue
+        if i in _cache:
+            sub.update(_cache[i])
+            continue
+        if chunk_seconds and (time.time() - _chunk_t0) > chunk_seconds:
+            _interrupted = True
+            break
         if fast:
             # Deterministic path: recompute R_base + R_median analytically
             components = sub.get("components", {})
@@ -272,6 +321,7 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
             # score_substation returns a NEW deepcopy — replace in-place
             subs[i] = updated
             sub = updated
+        _rescored_now.add(i)
 
         # Progress
         if (i + 1) % 10000 == 0:
@@ -281,7 +331,30 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
             logger.info(f"[{slug}]   {i+1:>7,}/{n:,} ({100*(i+1)/n:.1f}%) - {rate:.0f} subs/s - ETA {eta:.0f}s")
 
     scoring_seconds = time.time() - t_score_start
-    logger.info(f"[{slug}] rescored {n:,} subs in {scoring_seconds:.1f}s ({n/scoring_seconds:.0f} subs/s)")
+    logger.info(f"[{slug}] rescored {n:,} subs in {scoring_seconds:.1f}s "
+                f"({n/max(scoring_seconds,0.001):.0f} subs/s)")
+
+    if _cache_file is not None:
+        for i2 in _rescored_now:
+            sub2 = subs[i2]
+            _cache[i2] = {k: sub2.get(k) for k in _ENGINE_FIELDS if k in sub2}
+
+    if _interrupted:
+        # Nothing is written to the register. The next invocation resumes from
+        # the cache and only the one that finishes the loop touches ssi-data.
+        _cache_file.parent.mkdir(parents=True, exist_ok=True)
+        _cache_file.write_text(json.dumps(
+            {"slug": slug, "n": n, "blind_skipped": _blind_skipped,
+             "done": {str(k): v for k, v in _cache.items()}}))
+        pct = 100.0 * len(_cache) / max(n - _blind_skipped, 1)
+        logger.info("[%s] chunk complete: %d/%d rescored (%.1f%%). "
+                    "Register NOT written. Re-invoke to continue.",
+                    slug, len(_cache), n - _blind_skipped, pct)
+        return {"slug": slug, "status": "INCOMPLETE", "n_subs": n,
+                "duration_seconds": round(time.time() - t0, 1),
+                "rescored": len(_cache),
+                "remaining": n - _blind_skipped - len(_cache),
+                "applied": False}
 
     # Task #461 per-country normalisation. score_substation and the FAST path
     # both write classify_band's ABSOLUTE band; the register is banded by
@@ -296,16 +369,23 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
     # with R_median None AFTER the rescore, by which point the rescore had
     # supplied one — it measured the right property at the wrong moment and
     # passed while 30 blind records were being banded.
-    _banded_blind = [s for s in subs
-                     if not any(isinstance(v, (int, float))
-                                for v in (s.get("components") or {}).values())
-                     and s.get("classification") not in (None, "Unclassified")]
-    if _banded_blind:
+    _banded_blind = _blind_banded(subs)
+    if len(_banded_blind) > _blind_banded_before:
         raise AssertionError(
-            f"{slug}: {len(_banded_blind)} substations have no components but "
-            f"carry a band — e.g. {_banded_blind[0].get('substation_id')!r} as "
+            f"{slug}: substations with no components carrying a band rose from "
+            f"{_blind_banded_before} to {len(_banded_blind)} — e.g. "
+            f"{_banded_blind[0].get('substation_id')!r} as "
             f"{_banded_blind[0].get('classification')!r}. The repair must not "
             f"manufacture a classification it has no data for.")
+    if _blind_banded_before:
+        # Convention #56: pre-existing, untouched, and still wrong. Say so.
+        logger.warning(
+            "[%s] %d substations already carried a band with no components "
+            "behind them before this run, and still do. The repair does not "
+            "touch them — there is nothing to derive a score from. See "
+            "FINDING_r_base_zero_135844.md section 5.2.",
+            slug, _blind_banded_before)
+    _blind_skipped = max(_blind_skipped, _blind_from_cache)
     if _blind_skipped:
         logger.warning(
             "[%s] %d substations have no components and were left untouched — "
@@ -347,6 +427,7 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
         "mode": "FAST" if fast else "FULL_MC_10K",
         "n_subs": n,
         "n_blind_skipped": _blind_skipped,
+        "n_blind_banded_pre_existing": _blind_banded_before,
         "before": {"R_base_stats": before_rb, "R_median_stats": before_rm, "band_counts": before_bands},
         "after": {"R_base_stats": after_rb, "R_median_stats": after_rm, "band_counts": after_bands},
         "convention_refs": ["#7", "#23", "#56", "#67", "#79"],
@@ -364,6 +445,9 @@ def fix_country(slug: str, dry_run: bool = False, fast: bool = False) -> dict:
         "applied": not dry_run,
     }
 
+    if _cache_file is not None and _cache_file.exists() and not dry_run:
+        _cache_file.unlink()
+        logger.info("[%s] resume cache cleared", slug)
     if dry_run:
         logger.info(f"[{slug}] --dry-run: NOT writing ssi-data.json")
     else:
@@ -380,6 +464,16 @@ def print_summary(res: dict):
         print(f"\n❌ {res['slug']}: {res['error']}")
         return
     print(f"\n─── {res['slug']} ({res['n_subs']:,} subs, {res['duration_seconds']}s) ───")
+    if res.get("status") == "INCOMPLETE":
+        # A chunk, not a run. Nothing was written; there is no before/after to
+        # report yet, and printing one would imply the register had moved.
+        done = res["rescored"]
+        left = res["remaining"]
+        total = done + left
+        print(f"  rescored {done:,} / {total:,} ({100*done/max(total,1):.1f}%) "
+              f"· {left:,} remaining")
+        print("  ⏸ CHUNK — register NOT written. Re-invoke to continue.")
+        return
     b = res["before"]
     a = res["after"]
     print(f"  R_base_median:  before={b['R_base'].get('mean'):.4f} (unique={b['R_base'].get('unique', 1)}) → after={a['R_base'].get('mean'):.4f} (unique={a['R_base'].get('unique', 1)})")
@@ -406,6 +500,10 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="Preview only; do not write ssi-data.json")
     ap.add_argument("--fast", action="store_true", help="Deterministic recompute (no Monte Carlo — 15× faster)")
     ap.add_argument("--diagnose-only", action="store_true", help="Just report R_base=0 detection; no rescore")
+    ap.add_argument("--chunk-seconds", type=float, default=0.0,
+                    help="Stop the rescore after N seconds, save progress, "
+                         "write nothing, exit 3. Re-invoke to continue.")
+    ap.add_argument("--cache", default="", help="Resume cache path")
     ap.add_argument("--force", action="store_true", help="Rescore a country even if not in BROKEN_COUNTRIES")
     args = ap.parse_args()
 
@@ -437,7 +535,9 @@ def main():
     t_start = time.time()
     for slug in targets:
         try:
-            res = fix_country(slug, dry_run=args.dry_run, fast=args.fast)
+            res = fix_country(slug, dry_run=args.dry_run, fast=args.fast,
+                              chunk_seconds=args.chunk_seconds,
+                              cache_path=args.cache)
             results.append(res)
             print_summary(res)
         except Exception as e:
