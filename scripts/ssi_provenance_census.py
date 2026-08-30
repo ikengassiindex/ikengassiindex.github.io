@@ -112,7 +112,9 @@ def load_substations(slug):
     return out
 
 
-def verdicts(s):
+def verdicts(s, sweep_hashed=frozenset()):
+    """sweep_hashed: component letters the provenance sweep found reproducible
+    from a named seed for THIS country. See HASHED_FIELD below."""
     comps = s.get("components") or {}
     name = s.get("name")
     populated = any(isinstance(v, (int, float)) for v in comps.values())
@@ -126,6 +128,32 @@ def verdicts(s):
                    if isinstance(comps.get(k), (int, float))
                    and abs(round(vary(0.35, f"{name}_{k}", 0.30), 4) - comps[k]) <= EPS)
         v_comp = "HASHED" if hits == len(KEYS) else ("PARTIAL" if hits else "MEASURED")
+        # HASHED above is EXACT REPRODUCTION of vary(0.35, name+'_'+K, 0.30) —
+        # one generator, one constant set. It cannot catch a generator whose
+        # constants we do not have. Israel's components are md5(sid+name+K)
+        # through base ~0.4992 / spread ~1.099 clipped to [0,1]; chile's vary by
+        # region. Both reproduce at r >= 0.999 in the sweep and both were
+        # called MEASURED here.
+        #
+        # A per-record affine-on-hash test was built and REJECTED: chile's
+        # records sit on no single line (median residual 4.7e-3, 49 of 965
+        # within tolerance) because the generator is parameterised per region,
+        # so the test missed a known positive AND flagged 182 chile T records
+        # the sweep clears. Per-record exactness is the wrong instrument for a
+        # per-region generator.
+        #
+        # So the field-level verdict is taken from the sweep, which measures
+        # correlation against named seeds, and is labelled apart from HASHED so
+        # the two claims are never confused:
+        #   HASHED        this record reproduces exactly, here, now
+        #   HASHED_FIELD  this record's country+component was found
+        #                 reproducible by the sweep; the record inherits it
+        if v_comp in ("MEASURED", "PARTIAL") and sweep_hashed:
+            present = {k for k in KEYS if isinstance(comps.get(k), (int, float))}
+            if present and present <= set(sweep_hashed):
+                v_comp = "HASHED_FIELD"
+            elif present & set(sweep_hashed):
+                v_comp = "PARTIAL"
 
     rb = s.get("R_base_median")
     if rb is None:
@@ -174,7 +202,7 @@ def verdicts(s):
     else:
         v_band = "BLIND"
 
-    if v_comp == "HASHED":
+    if v_comp in ("HASHED", "HASHED_FIELD"):
         v_rec = "MANUFACTURED"
     elif v_comp == "ABSENT":
         v_rec = "NO_BASIS"
@@ -197,7 +225,30 @@ def main() -> int:
     ap.add_argument("--out", default="")
     ap.add_argument("--csv", default="")
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--sweep", default="",
+                    help="SSI_PROVENANCE_SWEEP_v2.json — supplies field-level "
+                         "FABRICATED verdicts the exact test cannot reach. "
+                         "Without it the census reports only what one "
+                         "generator's constants can prove, and says so.")
     args = ap.parse_args()
+
+    sweep = {}
+    if args.sweep:
+        raw = json.loads(pathlib.Path(args.sweep).read_text())
+        for slug, blk in raw.items():
+            letters = set()
+            for path, res in (blk.get("fields") or {}).items():
+                if (path.startswith("components.")
+                        and res.get("verdict") == "FABRICATED"):
+                    letters.add(path.split(".", 1)[1])
+            if letters:
+                sweep[slug] = letters
+        print(f"  sweep loaded: {len(sweep)} countries carry a FABRICATED "
+              f"component field")
+    else:
+        print("  NO SWEEP SUPPLIED — components are tested against "
+              "vary(0.35, name+'_'+K, 0.30) only. A record fabricated by any "
+              "other generator will read MEASURED. Pass --sweep.")
 
     slugs = load_slugs() if args.all else args.slugs
     if not slugs:
@@ -217,8 +268,9 @@ def main() -> int:
             unreadable.append((slug, str(ex)))
             continue
         counts = {d: collections.Counter() for d in DIMS}
+        sweep_hashed = sweep.get(slug, frozenset())
         for s in subs:
-            v = verdicts(s)
+            v = verdicts(s, sweep_hashed)
             for d in DIMS:
                 counts[d][v[d]] += 1
             if writer:
