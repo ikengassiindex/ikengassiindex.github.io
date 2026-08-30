@@ -126,7 +126,16 @@ def numeric_paths(subs, probe=400):
                         continue
                     if isinstance(v2, (int, float)):
                         seen[f"{k}.{k2}"] += 1
-    return [p for p, n in seen.items() if n >= probe * 0.5]
+    # The denominator is the number of records ACTUALLY probed, not `probe`.
+    # With a fixed threshold of probe*0.5 = 200, any country holding fewer than
+    # 200 substations could never reach it, so EVERY field was dropped and the
+    # country returned zero fields — a silent total no-op. greenland (43) and
+    # costa-rica (169) were swept this way, and the Phase 0 census then reported
+    # costa-rica as one of only two entirely clean countries. It was not clean.
+    # It was untested. A clean verdict returned by a tool that did not look is
+    # the exact failure this sweep exists to catch.
+    probed = min(probe, len(subs))
+    return [p for p, n in seen.items() if probed and n >= probed * 0.5]
 
 
 def get(s, path):
@@ -188,6 +197,19 @@ def classify(slug, subs, path):
             # det_var's seed is sid + name, then the component letter appended.
             seeds[f"id+name+{leaf}_md5"] = (
                 [md5h(f"{s['substation_id']}{s['name']}{leaf}") for s, _ in ided],
+                [v for _, v in ided])
+            # A THIRD generator: refresh_v42_modifiers_re_composite.py:587
+            #   seed_base = f"{sid}|{name}|v42";  _det_var(f"{seed_base}|{mod}")
+            # centred on a per-country hazard constant. This produces the six
+            # v4.2 modifiers — R6c_flood, R6d_wildfire, R6e_winter, R8_adapt,
+            # R9_compound, R10_just. Its own docstring calls it a Convention #7
+            # documented proxy, so unlike vary() it does not present itself as
+            # measurement — but it is still not one, and R6c_flood is the
+            # additive term that becomes R_median outright wherever R_base = 0.
+            # The first cohort sweep did not try this seed and would have
+            # reported all six as UNESTABLISHED.
+            seeds[f"v42|{leaf}_md5"] = (
+                [md5h(f"{s['substation_id']}|{s['name']}|v42|{leaf}") for s, _ in ided],
                 [v for _, v in ided])
     ided = [(s, v) for s, v in rows if s.get("substation_id") is not None]
     if len(ided) >= 50:
