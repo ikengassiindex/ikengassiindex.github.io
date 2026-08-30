@@ -168,8 +168,16 @@ def derive(slug, subs, lines, floor):
 
     line_km = collections.Counter()
     kept = 0
+    unit_skipped = 0
     for ln in lines:
         kv = ln.get("kv")
+        # A kv above 1000 is volts, or junk. The country-level guard above
+        # catches a SYSTEMATIC failure; it cannot catch one bad record, and one
+        # bad record passes any floor. Turkey exposed this: a single line tagged
+        # 15400 would have contributed 1,005 phantom transmission km.
+        if isinstance(kv, (int, float)) and kv > 1000:
+            unit_skipped += 1
+            continue
         if not isinstance(kv, (int, float)) or kv < floor:
             continue
         kept += 1

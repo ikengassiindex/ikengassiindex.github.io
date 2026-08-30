@@ -93,10 +93,47 @@ def test_volts_masquerading_as_kv_is_refused():
 
 def test_held_countries_have_no_pin():
     pins, held = load_pins()
-    for slug in ("uk", "us", "turkey", "luxembourg", "iceland", "mexico", "greenland"):
+    for slug in ("uk", "us", "luxembourg", "iceland", "mexico", "greenland"):
         assert slug not in pins, f"{slug} must stay unpinned until decided"
         assert slug in held
-    assert len(pins) == 32
+    assert len(pins) == 33
+
+
+def test_turkey_is_pinned_only_because_its_units_were_repaired():
+    """Turkey was held at 27.3% of line records in volts. It is pinned at
+    154 kV (TEIAS transmission) now that repair_voltage_units.py has run.
+    If the units regress, the pin must not stand — this asserts the condition
+    the pin rests on, not just the pin."""
+    import importlib.util, pathlib as _p
+    root = _p.Path(__file__).resolve().parent.parent
+    spec = importlib.util.spec_from_file_location(
+        "drv", root / "scripts" / "ssi_derive_metrics_I4_I6.py")
+    drv = importlib.util.module_from_spec(spec); spec.loader.exec_module(drv)
+    pins, held = load_pins()
+    assert pins.get("turkey") == 154
+    assert "turkey" not in held
+    lines = drv.load_lines("turkey")
+    breach = sum(1 for ln in lines
+                 if isinstance(ln.get("kv"), (int, float)) and ln["kv"] > 1000)
+    assert breach / len(lines) <= drv.UNIT_BREACH_MAX, (
+        f"turkey is pinned but {breach:,} of {len(lines):,} line records are "
+        f"back in volts — the pin's precondition has regressed")
+
+
+def test_one_bad_record_cannot_add_phantom_transmission_km():
+    """The country guard catches a SYSTEMATIC unit failure. It cannot catch a
+    single record, and a single record tagged 15400 passes any floor. Turkey
+    carried exactly that: one line worth 1,005 phantom km."""
+    subs = [sub(50.0 + 0.02 * i, 5.0, f"A{i}") for i in range(30)]
+    # 200 clean lines so that ONE bad record is 0.5% — under UNIT_BREACH_MAX.
+    # The country guard must not fire here; the per-record exclusion is what is
+    # under test, and a smaller fleet would test the wrong guard.
+    clean = [line(400, [[5.0, 50.0 + 0.002 * i], [5.05, 50.0 + 0.002 * i]])
+             for i in range(200)]
+    poisoned = clean + [line(15400, [[5.0, 50.0], [9.0, 50.0]])]
+    a = derive("t", subs, clean, 132)
+    b = derive("t", subs, poisoned, 132)
+    assert a[0] == b[0], "a kv>1000 record changed I4 — it must be excluded"
 
 
 def test_a_substation_without_coordinates_is_skipped_not_defaulted():
