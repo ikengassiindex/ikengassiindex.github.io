@@ -93,10 +93,73 @@ def test_volts_masquerading_as_kv_is_refused():
 
 def test_held_countries_have_no_pin():
     pins, held = load_pins()
-    for slug in ("uk", "us", "luxembourg", "iceland", "mexico", "greenland"):
+    for slug in ("luxembourg", "iceland", "mexico", "greenland"):
         assert slug not in pins, f"{slug} must stay unpinned until decided"
         assert slug in held
-    assert len(pins) == 33
+    assert len(pins) == 35
+
+
+def test_the_uk_carries_three_floors_not_one():
+    """A single UK floor is wrong in BOTH directions, which is why it is a
+    schema case and not a judgement call: 132 counts English and Welsh
+    distribution as transmission, 275 drops Scottish and NI transmission."""
+    pins, _ = load_pins()
+    spec = pins["uk"]
+    assert isinstance(spec, dict), "uk must not collapse to a scalar floor"
+    floors = {j["id"]: j["floor"] for j in spec["jurisdictions"]}
+    assert floors == {"EW": 275, "SCO": 132, "NI": 110}
+
+
+def test_a_scalar_floor_still_behaves_exactly_as_before():
+    """35 countries carry a scalar. make_floor must not change them."""
+    import importlib.util, pathlib as _p
+    root = _p.Path(__file__).resolve().parent.parent
+    sp = importlib.util.spec_from_file_location(
+        "drv", root / "scripts" / "ssi_derive_metrics_I4_I6.py")
+    drv = importlib.util.module_from_spec(sp); sp.loader.exec_module(drv)
+    fn, label = drv.make_floor(132, [])
+    assert label == "132"
+    assert fn({"kv": 400}) == 132 and fn({}) == 132
+
+
+def test_uk_classifier_places_the_three_jurisdictions():
+    import importlib.util, pathlib as _p
+    root = _p.Path(__file__).resolve().parent.parent
+    sp = importlib.util.spec_from_file_location(
+        "drv", root / "scripts" / "ssi_derive_metrics_I4_I6.py")
+    drv = importlib.util.module_from_spec(sp); sp.loader.exec_module(drv)
+    subs = [
+        {"substation_id": "a", "region": "Highland", "lat": 57.5, "lon": -4.2},
+        {"substation_id": "b", "region": "Devon", "lat": 50.7, "lon": -3.5},
+        {"substation_id": "c", "region": "Belfast", "lat": 54.6, "lon": -5.9},
+        # no usable region — must fall through to geometry, not to a default
+        {"substation_id": "d", "region": None, "lat": 56.9, "lon": -4.0},
+    ]
+    cls = drv.uk_jurisdiction(subs)
+    assert cls == {"a": "SCO", "b": "EW", "c": "NI", "d": "SCO"}
+    spec = {"classifier": "uk_jurisdiction", "jurisdictions": [
+        {"id": "EW", "floor": 275}, {"id": "SCO", "floor": 132},
+        {"id": "NI", "floor": 110}]}
+    fn, label = drv.make_floor(spec, subs)
+    assert fn({"ss": "a"}) == 132 and fn({"ss": "b"}) == 275 and fn({"ss": "c"}) == 110
+    # a line with no known endpoint is placed by its own geometry
+    assert fn({"ss": "zz", "p": [[-4.0, 57.0], [-4.1, 57.1]]}) == 132
+    assert fn({"ss": "zz", "p": [[-1.0, 51.0], [-1.1, 51.1]]}) == 275
+
+
+def test_a_line_that_cannot_be_placed_is_skipped_not_defaulted():
+    """Convention #56 — an unplaceable line gets no floor, so it is excluded,
+    rather than silently inheriting whichever floor happens to be first."""
+    import importlib.util, pathlib as _p
+    root = _p.Path(__file__).resolve().parent.parent
+    sp = importlib.util.spec_from_file_location(
+        "drv", root / "scripts" / "ssi_derive_metrics_I4_I6.py")
+    drv = importlib.util.module_from_spec(sp); sp.loader.exec_module(drv)
+    spec = {"classifier": "uk_jurisdiction", "jurisdictions": [
+        {"id": "EW", "floor": 275}, {"id": "SCO", "floor": 132},
+        {"id": "NI", "floor": 110}]}
+    fn, _ = drv.make_floor(spec, [])
+    assert fn({"ss": "unknown"}) is None, "a line with no endpoint and no geometry must be skipped"
 
 
 def test_turkey_is_pinned_only_because_its_units_were_repaired():

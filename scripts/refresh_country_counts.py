@@ -291,6 +291,155 @@ def refresh_country(country, dry_run=False):
     return 0
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  RECOMPUTE MODE (30 August 2026)
+# ───────────────────────────────────────────────────────────────────────────
+#  The mode above propagates a count change by replacing the OLD string with
+#  the NEW one, reading the old value from a `.pre-remediate-*.backup`. That
+#  makes it unusable for 26 of 39 countries, which have no such backup — their
+#  published counts cannot be refreshed at all, and so can diverge from the
+#  register silently and indefinitely.
+#
+#  Turkey was the worked example: repairing 1,110 volt-scale voltage_kv values
+#  moved its EHV fleet from 1,120 to 136 and its HV fleet from 1 to 789 while
+#  all seven of its pages went on publishing 1,120 and 1.
+#
+#  This mode needs no backup. It recomputes the four canonical fleet counts
+#  from {country}/ssi-data.json and writes them BY ANCHOR — inside the
+#  SSI_CANONICAL_LITERALS table and inside elements carrying the matching
+#  data-canonical attribute. It never does a bare string replacement, so the
+#  Task #520 substring collision (Austria: "262" inside "262,807" mangled to
+#  "14070,807") cannot occur here by construction: the number being replaced
+#  is located by its key, not by its digits.
+#
+#  It refuses to leave a file it cannot verify: after writing, each file is
+#  re-parsed and every canonical value must equal the register, or the backup
+#  is restored and the country aborts.
+# ═══════════════════════════════════════════════════════════════════════════
+
+CANON_KEYS = ("fleet.total", "fleet.voltage.ehv", "fleet.voltage.hv",
+              "fleet.voltage.distribution")
+
+
+def _load_subs(slug):
+    man = json.loads((REPO_ROOT / slug / "ssi-data.json").read_text())
+    subs = man.get("substations")
+    if subs is None and man.get("substations_shards"):
+        subs = []
+        for e in man["substations_shards"]:
+            fp = REPO_ROOT / slug / Path(e["path"]).name
+            raw = json.loads(fp.read_text())
+            subs.extend(raw if isinstance(raw, list) else raw.get("substations", []))
+    if subs is None:
+        raise ValueError(f"{slug}: no substations and no readable shards")
+    return subs
+
+
+def counts_from_data(slug):
+    """The four canonical fleet counts, from the register.
+
+    Buckets are the ones this file has always used:
+      EHV >= 220 kV · HV 110-220 kV · distribution < 110 kV or untagged.
+    """
+    subs = _load_subs(slug)
+    num = lambda s: (isinstance(s.get("voltage_kv"), (int, float))
+                     and not isinstance(s.get("voltage_kv"), bool))
+    return {
+        "fleet.total": len(subs),
+        "fleet.voltage.ehv": sum(1 for s in subs if num(s) and s["voltage_kv"] >= 220),
+        "fleet.voltage.hv": sum(1 for s in subs
+                                if num(s) and 110 <= s["voltage_kv"] < 220),
+        "fleet.voltage.distribution": sum(1 for s in subs
+                                          if not num(s) or s["voltage_kv"] < 110),
+    }
+
+
+def _canon_in_text(text):
+    """Every canonical value the file states, as {key: {value, ...}}."""
+    found = {}
+    for k in CANON_KEYS:
+        for pat in (r'"' + re.escape(k) + r'"\s*:\s*"([\d,]+)"',
+                    r'data-canonical="' + re.escape(k) + r'"[^>]*>\s*([\d,]+)\s*<'):
+            for m in re.finditer(pat, text):
+                found.setdefault(k, set()).add(int(m.group(1).replace(",", "")))
+    return found
+
+
+def _rewrite(text, truth):
+    """Replace canonical values by anchor. Returns (new_text, n_changes)."""
+    n = 0
+    for k, v in truth.items():
+        new = fmt(v)
+
+        def _tbl(m, new=new):
+            nonlocal n
+            if m.group(1) != new:
+                n += 1
+            return f'"{m.group(0).split(chr(34))[1]}": "{new}"'
+
+        text, c1 = re.subn(
+            r'"(' + re.escape(k) + r')"(\s*:\s*)"([\d,]+)"',
+            lambda m, new=new: f'"{m.group(1)}"{m.group(2)}"{new}"', text)
+        text, c2 = re.subn(
+            r'(data-canonical="' + re.escape(k) + r'"[^>]*>)\s*[\d,]+\s*(<)',
+            lambda m, new=new: f'{m.group(1)}{new}{m.group(2)}', text)
+        n += c1 + c2
+    return text, n
+
+
+def refresh_from_data(slug, dry_run=False):
+    """Recompute the canonical counts and write them by anchor. No backup file
+    of the previous data is needed, and none is consulted."""
+    cdir = REPO_ROOT / slug
+    if not (cdir / "ssi-data.json").exists():
+        print(f"  {slug:14} no ssi-data.json — skipped")
+        return 0
+    truth = counts_from_data(slug)
+    files = [f for f in sorted(cdir.glob("*.html")) if ".backup" not in f.name]
+    files += [f for f in sorted(cdir.glob("*.js")) if ".backup" not in f.name]
+
+    stale = []
+    for f in files:
+        text = f.read_text(errors="replace")
+        for k, vals in _canon_in_text(text).items():
+            if any(v != truth[k] for v in vals):
+                stale.append(f)
+                break
+    if not stale:
+        return 0
+
+    print(f"  {slug:14} {len(stale)} file(s) stale")
+    for k in CANON_KEYS:
+        published = set()
+        for f in stale:
+            published |= _canon_in_text(f.read_text(errors="replace")).get(k, set())
+        if published and published != {truth[k]}:
+            print(f"      {k:30} {sorted(published)} -> {truth[k]:,}")
+    if dry_run:
+        return 0
+
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    for f in stale:
+        original = f.read_text(errors="replace")
+        updated, n = _rewrite(original, truth)
+        if updated == original:
+            continue
+        backup = f.with_name(f"{f.name}.pre-count-refresh-{ts}.backup")
+        shutil.copy2(f, backup)
+        f.write_text(updated)
+        # Verify, or put it back. A page left half-corrected is worse than one
+        # left alone, because the disagreement is then internal to the file.
+        check = _canon_in_text(f.read_text(errors="replace"))
+        wrong = {k: sorted(v) for k, v in check.items()
+                 if any(x != truth[k] for x in v)}
+        if wrong:
+            shutil.copy2(backup, f)
+            raise SystemExit(
+                f"{slug}/{f.name}: after rewrite the file still states {wrong} "
+                f"against {truth}. Restored from backup and aborting.")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Refresh hardcoded substation counts in country page assets.",
@@ -300,7 +449,29 @@ def main():
                         help="Process all 7 remediated countries.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Preview without writing.")
+    parser.add_argument("--from-data", action="store_true",
+                        help="Recompute counts from ssi-data.json and write "
+                             "them by anchor. Needs no pre-remediate backup, "
+                             "so it works for all 39 countries.")
+    parser.add_argument("--all", action="store_true",
+                        help="With --from-data: every country in the cohort.")
     args = parser.parse_args()
+
+    if args.from_data:
+        if args.all:
+            slugs = [c["slug"] for c in json.loads(
+                (REPO_ROOT / "intelligence" / "countries.json").read_text())["countries"]]
+        elif args.country:
+            slugs = [args.country]
+        else:
+            print("ERROR: --from-data needs a country slug or --all.", file=sys.stderr)
+            sys.exit(2)
+        print(f"\n  recomputing published counts from the register"
+              f"{' (DRY RUN)' if args.dry_run else ''}\n")
+        for c in sorted(slugs):
+            refresh_from_data(c, dry_run=args.dry_run)
+        print()
+        sys.exit(0)
 
     if args.all_remediated and args.country:
         print("ERROR: pass either a country slug OR --all-remediated.", file=sys.stderr)

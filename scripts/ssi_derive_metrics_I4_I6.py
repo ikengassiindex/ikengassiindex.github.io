@@ -157,6 +157,116 @@ def method_b_inverted(x, p5, p95):
     return method_b(p5 + p95 - x, p5, p95)
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  SUB-NATIONAL FLOORS (30 August 2026)
+# ───────────────────────────────────────────────────────────────────────────
+#  Most countries have one transmission definition. The UK has three, because
+#  it has three transmission operators under three regulatory definitions:
+#
+#      England & Wales   275 kV   National Grid Electricity Transmission
+#      Scotland          132 kV   SSEN Transmission / SP Transmission
+#      Northern Ireland  110 kV   SONI / NIE Networks
+#
+#  A single national floor is wrong in both directions, not merely imprecise:
+#  132 counts 17,783 km of English and Welsh DISTRIBUTION as transmission,
+#  while 275 drops 4,880 km of genuine Scottish and Northern Irish TRANSMISSION.
+#
+#  So a threshold entry may be an object carrying `jurisdictions` and a named
+#  `classifier`, and the floor becomes a function of the line rather than a
+#  constant. Scalar entries are untouched and behave exactly as before.
+# ═══════════════════════════════════════════════════════════════════════════
+
+_SCOT = ('aberdeen', 'angus', 'argyll', 'clackmannan', 'dumfries', 'dundee',
+         'dunbarton', 'edinburgh', 'eilean', 'falkirk', 'fife', 'glasgow',
+         'highland', 'inverclyde', 'lanarkshire', 'lothian', 'moray', 'orkney',
+         'perth', 'renfrew', 'scottish borders', 'shetland', 'stirling',
+         'kinross', 'ayrshire', 'na h-')
+_NI = ('antrim', 'ards', 'armagh', 'belfast', 'causeway', 'coleraine',
+       'craigavon', 'derry', 'londonderry', 'down', 'fermanagh', 'lisburn',
+       'magherafelt', 'mid ulster', 'moyle', 'newry', 'newtownabbey', 'omagh',
+       'strabane', 'tyrone', 'ballymena', 'ballymoney', 'banbridge',
+       'carrickfergus', 'castlereagh', 'cookstown', 'dungannon', 'larne',
+       'limavady', 'northern ireland')
+
+
+def _uk_by_name(region):
+    if not region:
+        return None
+    r = region.lower()
+    if any(h in r for h in _NI):
+        return "NI"
+    if any(h in r for h in _SCOT):
+        return "SCO"
+    return None
+
+
+def _uk_border_lat(lon):
+    """The Anglo-Scottish border, as a straight line from the Solway Firth
+    (-3.05, 54.99) to Berwick-upon-Tweed (-2.03, 55.79). The real border
+    wanders either side of this by up to ~15 km; region names take precedence
+    wherever they exist, so the line only decides cases names cannot."""
+    lo = max(-3.05, min(-2.03, lon))
+    return 54.99 + (lo + 3.05) * (55.79 - 54.99) / 1.02
+
+
+def _uk_by_geo(lat, lon):
+    if not isinstance(lat, (int, float)) or not isinstance(lon, (int, float)):
+        return None
+    if lon < -5.35 and lat < 55.30:          # north-east of the island of Ireland
+        return "NI"
+    return "SCO" if lat >= _uk_border_lat(lon) else "EW"
+
+
+def uk_jurisdiction(subs):
+    """substation_id -> jurisdiction, name first and geometry as fallback.
+
+    Cross-validated on the 6,166 substations both methods can classify:
+    6,131 agree, 35 disagree (34 Scottish-named just south of the straight-line
+    border, 1 name collision). Name wins, so the disagreements resolve the way
+    the region says. 0 substations end unclassified."""
+    out = {}
+    for s in subs:
+        sid = s.get("substation_id")
+        if sid is None:
+            continue
+        j = _uk_by_name(s.get("region")) or _uk_by_geo(s.get("lat"), s.get("lon"))
+        if j:
+            out[str(sid)] = j
+    return out
+
+
+CLASSIFIERS = {"uk_jurisdiction": uk_jurisdiction}
+
+
+def make_floor(spec, subs):
+    """Return (floor_fn, describe). floor_fn(line) -> kV floor, or None to skip.
+
+    A scalar spec returns a constant function, so every already-derived country
+    keeps byte-identical behaviour."""
+    if isinstance(spec, (int, float)):
+        return (lambda ln: spec), str(spec)
+    juris = {j["id"]: j["floor"] for j in spec["jurisdictions"]}
+    cls = CLASSIFIERS[spec["classifier"]](subs)
+    geo = _uk_by_geo if spec["classifier"] == "uk_jurisdiction" else None
+
+    def floor_fn(ln):
+        # A line belongs to the jurisdiction of an endpoint substation we know.
+        for k in ("ss", "se"):
+            j = cls.get(str(ln.get(k)))
+            if j:
+                return juris.get(j)
+        # Otherwise place it by its own midpoint. 74% of UK line records reach
+        # this path, which is why the geometric test was validated against
+        # region names before it was trusted.
+        p = ln.get("p") or []
+        if not p or geo is None:
+            return None
+        j = geo(sum(q[1] for q in p) / len(p), sum(q[0] for q in p) / len(p))
+        return juris.get(j) if j else None
+
+    return floor_fn, " / ".join(f"{j['id']} {j['floor']}" for j in spec["jurisdictions"])
+
+
 def derive(slug, subs, lines, floor):
     breach = sum(1 for ln in lines
                  if isinstance(ln.get("kv"), (int, float)) and ln["kv"] > 1000)
@@ -178,7 +288,8 @@ def derive(slug, subs, lines, floor):
         if isinstance(kv, (int, float)) and kv > 1000:
             unit_skipped += 1
             continue
-        if not isinstance(kv, (int, float)) or kv < floor:
+        f = floor(ln) if callable(floor) else floor
+        if f is None or not isinstance(kv, (int, float)) or kv < f:
             continue
         kept += 1
         p = ln.get("p") or []
@@ -238,7 +349,7 @@ def main() -> int:
         sys.exit("give country slugs or --all")
 
     print(f"\n  I4 / I6 — {AMENDMENT}\n")
-    print(f"  {'country':<14}{'floor':>6}{'lines kept':>12}{'derived':>9}"
+    print(f"  {'country':<14}{'floor':>18}{'lines kept':>12}{'derived':>9}"
           f"{'skipped':>9}{'med I4':>8}{'med I6':>8}")
     for slug in sorted(slugs):
         if slug not in pins:
@@ -248,7 +359,8 @@ def main() -> int:
         try:
             man, subs, paths = load_substations(slug)
             lines = load_lines(slug)
-            n, sk, kept, tot, a4, a6, r4, r6 = derive(slug, subs, lines, pins[slug])
+            floor_fn, floor_label = make_floor(pins[slug], subs)
+            n, sk, kept, tot, a4, a6, r4, r6 = derive(slug, subs, lines, floor_fn)
         except Exception as ex:
             print(f"  {slug:<14}ERROR — {ex}")
             continue
@@ -256,7 +368,7 @@ def main() -> int:
         got6 = sorted(s["metrics"]["I6"] for s in subs if "metrics" in s)
         m4 = got4[len(got4) // 2] if got4 else float("nan")
         m6 = got6[len(got6) // 2] if got6 else float("nan")
-        print(f"  {slug:<14}{pins[slug]:>6}{kept:>12,}{n:>9,}{sk:>9,}"
+        print(f"  {slug:<14}{floor_label:>18}{kept:>12,}{n:>9,}{sk:>9,}"
               f"{m4:>8.3f}{m6:>8.3f}")
         if args.verbose:
             print(f"      I4 raw km  P5 {a4[0]:.1f}  P95 {a4[1]:.1f}")
@@ -265,6 +377,7 @@ def main() -> int:
             man.setdefault("meta", {}).setdefault("metric_derivations", []).append({
                 "metrics": ["I4", "I6"], "at_utc": datetime.now(timezone.utc).isoformat(),
                 "amendment": AMENDMENT, "kv_floor": pins[slug],
+                "kv_floor_label": floor_label,
                 "lines_above_floor": kept, "lines_total": tot,
                 "n_derived": n, "n_skipped": sk,
                 "anchors": {"I4": list(a4), "I6": list(a6)}})
