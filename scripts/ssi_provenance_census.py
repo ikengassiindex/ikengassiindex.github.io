@@ -55,6 +55,9 @@ RECORD VERDICT
   NO_BASIS       components ABSENT — nothing to compute from
   MIXED          components measured but some downstream field manufactured
   MEASURED       components measured and nothing downstream manufactured
+  UNTESTABLE     components present, no name, so no generator in the tree can
+                 be tested against them. A statement about our reach, not
+                 about the record.
 
 MANUFACTURED is deliberately decided by the components alone. A record whose
 inputs are a hash of its own name cannot be rescued by any downstream field
@@ -210,7 +213,15 @@ def verdicts(s, sweep_hashed=frozenset()):
             or v_rb in ("ZEROED", "DRIFTED"):
         v_rec = "MIXED"
     elif v_comp == "UNNAMED":
-        v_rec = "MIXED"
+        # NOT "MIXED". MIXED asserts something in the record is manufactured.
+        # UNNAMED asserts only that the test could not be run: every generator
+        # in the tree seeds on the record's name, so a record without one is
+        # untestable, not tainted. Reporting untestable as partially
+        # manufactured overstates what is known — and it punishes the honest
+        # act of replacing a fabricated placeholder name with a null, which is
+        # exactly what turkey's recovery did to 2,124 records and what uk's
+        # 25,624 null-named records already sit under.
+        v_rec = "UNTESTABLE"
     else:
         v_rec = "MEASURED"
 
