@@ -27,6 +27,18 @@ the land mask and cell-resolution code already written are reused unchanged.
   I1  snow_depth                                          daily_maximum
       2m_temperature                                      daily_minimum
 
+2m_temperature daily_maximum rides along in the same request at no extra cost,
+because these boxes COVER TERRITORY THE EXISTING CACHE DOES NOT. I3 and I5 are
+at 99.68%, and the 1,975 missing substations are missing for exactly one
+reason: the cached temperature was fetched against the under-covering project
+bbox table. spain 818 (Canaries + Balearics), us 870, france 153, portugal 91
+(Azores, Madeira), uk 32, canada 5, estonia 2, new-zealand 1.
+
+Those records cannot be recovered from what is cached — they sit outside the
+grid entirely. Fetching daily-max temperature on the clustered boxes closes
+I3 and I5 to 100% as a side effect of a request that was being made anyway.
+Leaving it out would have meant a second fetch later for one variable.
+
 Years 2018-2022. Full Bourgouin freezing rain needs HOURLY precipitation and
 dewpoint and is a far larger acquisition; snow depth plus freezing-day counts is
 the tractable I1 and is what the construct actually names — the Alpine snowfall
@@ -71,9 +83,9 @@ DATASET = "derived-era5-land-daily-statistics"
 # 885 requests (3 sets x 5 years x 59 boxes); grouped it is 118, which is a
 # reasonable thing to ask someone to run.
 REQUESTS = [
-    {"tag": "dmax", "for": "I2 + I1",
+    {"tag": "dmax", "for": "I2 + I1 + I3/I5 gap",
      "variables": ["10m_u_component_of_wind", "10m_v_component_of_wind",
-                   "snow_depth"],
+                   "snow_depth", "2m_temperature"],
      "statistic": "daily_maximum"},
     {"tag": "dmin", "for": "I1",
      "variables": ["2m_temperature"],
