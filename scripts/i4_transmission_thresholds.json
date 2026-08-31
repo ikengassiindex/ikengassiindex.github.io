@@ -61,10 +61,11 @@
  },
  "_us_basis": "NERC Bulk Electric System: Transmission Elements operated at 100 kV or higher. A cited standard, not our choice; and 100 vs 115 moves only 9,842 km (1%), so the pin is insensitive to it. Excludes 69 kV (360,666 km), which NERC excludes.",
  "greenland": 60,
+ "_greenland_basis": "Held on the reasoning that 132 kV is implausible for the system. The data disagrees: 132 kV is 80.2 km, 30.3% of greenland's line-km \u2014 the Buksefjord-Nuuk hydro link \u2014 above a 60/63/66/70 kV tier of 148.1 km, with 10.5 kV town distribution below. Nukissiorfiit runs isolated town grids linked to hydro plants; the 60 kV floor captures every hydro-to-town transmission link (228.3 km, 28 records) and excludes town distribution. A 132 kV floor would leave 80 km on 12 records. Substation voltages corroborate: 3 at 63 kV, 17 at 10.5 kV.",
+ "mexico": 115,
  "_needs_pin": {
-  "luxembourg": "57.5% of line-km carries no voltage",
-  "iceland": "50.2% of line-km carries no voltage",
-  "mexico": "50.6% of line-km carries no voltage"
+  "luxembourg": "57.5% of line-km carries no voltage. TESTED against OSM 31 Aug 2026: only 116 of 797 untagged lines exist in OSM even including minor_line and cable, and NONE carries a voltage tag. Not recoverable from OSM.",
+  "iceland": "50.2% of line-km carries no voltage. TESTED against OSM 31 Aug 2026: grid-geo line ids are 1..1,427, sequential synthetic integers rather than OSM way ids, so no id join exists; OSM holds only 153 voltage-bearing lines for the whole country against 1,230 untagged register lines. Not recoverable from OSM."
  },
- "_greenland_basis": "Held on the reasoning that 132 kV is implausible for the system. The data disagrees: 132 kV is 80.2 km, 30.3% of greenland's line-km \u2014 the Buksefjord-Nuuk hydro link \u2014 above a 60/63/66/70 kV tier of 148.1 km, with 10.5 kV town distribution below. Nukissiorfiit runs isolated town grids linked to hydro plants; the 60 kV floor captures every hydro-to-town transmission link (228.3 km, 28 records) and excludes town distribution. A 132 kV floor would leave 80 km on 12 records. Substation voltages corroborate: 3 at 63 kV, 17 at 10.5 kV."
+ "_mexico_basis": "Held at 50.6% of line-km with no voltage. Recovered 8,426 line voltages from OSM by way-id join gated on geometry (both endpoints within 50 m; median agreement 0.4 m), taking the untagged share to 1.5%. The ladder is then CFE's grid \u2014 115 kV 72,852 km, 230 kV 45,063 km, 400 kV 40,327 km, 138/161 kV below, 34.5/13.8 kV distribution. CFE's Red Nacional de Transmision is 400/230/161/138/115 kV, so 115 kV is the floor."
 }
