@@ -90,6 +90,18 @@ REQUESTS = [
     {"tag": "dmin", "for": "I1",
      "variables": ["2m_temperature"],
      "statistic": "daily_minimum"},
+    # I8 (ISO 9223 corrosion) needs ANNUAL MEAN temperature and relative
+    # humidity. RH comes from mean temperature and mean dewpoint, so this set
+    # carries both. Dewpoint is also the input a full Bourgouin freezing-rain
+    # I1 would need, so one variable serves two metrics.
+    #
+    # I8's other two inputs need no fetch at all: SO2 comes from Copernicus
+    # CAMS (a separate store, reachable, own key), and the chloride term is
+    # distance-to-coast, which falls out of the ERA5 land mask already built
+    # for I3/I5 — greece measures at a median of 5 cells (~55 km) from sea.
+    {"tag": "dmean", "for": "I8",
+     "variables": ["2m_temperature", "2m_dewpoint_temperature"],
+     "statistic": "daily_mean"},
 ]
 
 
