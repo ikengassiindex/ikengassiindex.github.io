@@ -93,10 +93,10 @@ def test_volts_masquerading_as_kv_is_refused():
 
 def test_held_countries_have_no_pin():
     pins, held = load_pins()
-    for slug in ("luxembourg", "iceland", "mexico", "greenland"):
+    for slug in ("luxembourg", "iceland", "mexico"):
         assert slug not in pins, f"{slug} must stay unpinned until decided"
         assert slug in held
-    assert len(pins) == 35
+    assert len(pins) == 36
 
 
 def test_the_uk_carries_three_floors_not_one():
