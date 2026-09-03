@@ -42,7 +42,8 @@ reference point — so the constant is not a guess, it reproduces the standard's
 own anchor.
 
     I5_raw = mean daily F_AA over all cached years
-    I5     = Method B over fleet P5/P95, NOT inverted (faster ageing = more
+    I5     = Method B over THAT COUNTRY'S fleet P5/P95, NOT inverted
+             (faster ageing = more
              risk, the same direction as R)
 
 CONVENTION #7 DECLARATIONS — READ BEFORE CITING THIS

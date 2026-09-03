@@ -114,11 +114,32 @@ R6B_PARAMS = {"pga_scale": 0.50, "clip_lo": 1.00, "clip_hi": 1.25}
 # ═══════════════════════════════════════════════════════════
 
 def soft_clip(x, lo=0.0, hi=1.0):
+    """The METRIC normalisation clip. Construct section 03 names this one.
+
+    Methods A and B are both defined as N(x) = soft_clip((x - P5)/(P95 - P5)),
+    and this is that soft_clip. It is monotone, continuous and lands in
+    [lo, hi], which is what a normaliser must be.
+
+    Do not substitute soft_clip_upper here. Two derivation scripts did, and
+    the consequence is M-006's undeclared scope: 77,940 substations, 12.5 per
+    cent of the estate, normalised through an overflow compressor that is
+    discontinuous at 1.0. See FINDING_M006_rescope.md.
+    """
     return max(lo, min(hi, x))
 
 
 def soft_clip_upper(R_raw):
-    """Overflow compression for R > 1.0."""
+    """Overflow compression for R_final > 1.0. NOT a normaliser.
+
+    Its ONLY legitimate caller is the R_final assembly in this module, where
+    R_base x PI mult_i may exceed 1.0 and the v4.2 additive R6c_flood term is
+    allowed to carry the result into the Extreme band. Its contract is
+    compression above a saturation point, not mapping into [0, 1].
+
+    It is discontinuous at 1.0 by construction — 1.0000 returns 1.0000 and
+    1.0001 returns 0.2693 — which is defect M-006, repair scheduled at phase
+    zeta-0.2. Anything that needs a normaliser wants soft_clip above.
+    """
     if R_raw <= 1.0:
         return R_raw
     return 1.0 - 1 / (1 + math.exp(20 * (R_raw - 1.05)))

@@ -13,7 +13,8 @@ SSI_v4_2_Complete_Formula_Construct_Italy_v3.html, canonical anchor 22 July
 
     T  = T1                                    intra-weight 1.00
     T1 = 0.50·N(DER_ratio) + 0.30·N(DER_variability) + 0.20·N(EV_load_ratio)
-    N  = Method B: soft_clip( (x - P5) / (P95 - P5) ) over FLEET percentiles
+    N  = Method B: soft_clip( (x - P5) / (P95 - P5) ) over THAT COUNTRY'S
+         fleet percentiles, not the cohort's
     global weight of T in R_base = 0.05
 
 All three sub-metrics are already on the record, in `transition`, on 87.4% of
@@ -68,7 +69,7 @@ FC = ("SSI_v4_2_Complete_Formula_Construct_Italy_v3.html §02/§03/§04 "
       "(canonical anchor 22 July 2026, Phase G.4)")
 
 sys.path.insert(0, str(ROOT / "scripts"))
-from pipeline.scoring.engine import soft_clip_upper                  # noqa: E402
+from pipeline.scoring.engine import soft_clip                       # noqa: E402
 from enrich_esg_gaps import stable_hash                              # noqa: E402
 
 # Refuse to derive from inputs that are themselves a hash of the name.
@@ -138,7 +139,13 @@ def method_b(x, p5, p95):
     """
     if p95 is None or p5 is None or p95 <= p5:
         return None
-    return max(0.0, soft_clip_upper((x - p5) / (p95 - p5)))
+    # soft_clip, NOT soft_clip_upper. Construct section 03 defines both
+    # Method A and Method B as N(x) = soft_clip((x - P5)/(P95 - P5)) and
+    # names this function. soft_clip_upper is the R_final overflow
+    # compressor: discontinuous at 1.0, so a ratio of 1.0001 returned
+    # 0.2693 and the worst substations in the fleet published as
+    # mid-fleet. M-006, re-scoped 31 August 2026.
+    return soft_clip((x - p5) / (p95 - p5))
 
 
 def load_slugs():
@@ -172,9 +179,22 @@ def derive(subs):
               if isinstance(s.get("transition"), dict)
               and all(isinstance(s["transition"].get(k), (int, float)) for k in SUB)]
     anchors = {}
+    degenerate = []
     for k in SUB:
         vals = sorted(s["transition"][k] for s in usable)
-        anchors[k] = (percentile(vals, 0.05), percentile(vals, 0.95))
+        p5, p95 = percentile(vals, 0.05), percentile(vals, 0.95)
+        anchors[k] = (p5, p95)
+        if p5 is not None and p95 is not None and p95 <= p5:
+            degenerate.append(f"{k} ({len(set(vals))} distinct value(s) "
+                              f"across {len(vals):,} records)")
+    # Convention #56: refuse the country and say why. A sub-metric with one
+    # distinct value across a whole fleet carries no information about any
+    # substation in it, and Method B correctly declines to normalise it. The
+    # composite must not be quietly rebuilt from the two that remain — that
+    # would reweight T without disclosing it.
+    if degenerate:
+        raise ValueError("degenerate sub-metric, Method B declines: "
+                         + "; ".join(degenerate))
     derived = skipped = 0
     deltas = []
     for s in subs:
@@ -183,17 +203,23 @@ def derive(subs):
                 isinstance(t.get(k), (int, float)) for k in SUB):
             skipped += 1
             continue
-        parts = [ALPHA[k] * method_b(t[k], *anchors[k]) for k in SUB]
-        if any(p is None for p in parts):
+        # Normalise first, THEN weight. The previous form multiplied inside
+        # the comprehension, so a None from method_b raised TypeError before
+        # the guard on the next line could ever see it: the guard was written
+        # correctly and placed one line too late, and was unreachable.
+        norm = [method_b(t[k], *anchors[k]) for k in SUB]
+        if any(v is None for v in norm):
             skipped += 1
             continue
+        parts = [ALPHA[k] * v for k, v in zip(SUB, norm)]
         t1 = round(sum(parts), 4)
         comps = s.setdefault("components", {})
         old = comps.get("T")
         comps["T"] = t1
         s["_component_T_source"] = (
             f"derived per {FC}: T1 = 0.50*N(DER_ratio) + 0.30*N(DER_variability)"
-            f" + 0.20*N(EV_load_ratio), Method B over fleet P5/P95 of "
+            f" + 0.20*N(EV_load_ratio), Method B over this country's fleet"
+            f" P5/P95 of "
             f"{len(usable):,} records")
         if isinstance(old, (int, float)):
             deltas.append(t1 - old)
@@ -231,7 +257,16 @@ def main() -> int:
                   f"substation name ({detail})")
             refused.append(slug)
             continue
-        d, sk, anchors, deltas = derive(subs)
+        try:
+            d, sk, anchors, deltas = derive(subs)
+        except Exception as ex:
+            # A refusal is a result, not a crash. Before this, a degenerate
+            # sub-metric aborted the whole run on the first country that had
+            # one, so the 34 countries after it in the alphabet were never
+            # reached.
+            print(f"  {slug:<14}REFUSED — {ex}")
+            refused.append(slug)
+            continue
         tot_d += d
         tot_s += sk
         if deltas:

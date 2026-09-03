@@ -50,7 +50,9 @@ USAGE:
 
 EXIT CODES:
   0   OK — all countries below threshold (or no --strict / no findings)
-  1   Threshold exceeded in --strict mode for at least one country
+  1   In --strict mode: at least one country exceeded the threshold, OR at
+      least one country could not be evaluated at all (a gate that cannot
+      evaluate a country does not pass)
   2   Argument or environment error
 
 CI INTEGRATION:
@@ -181,6 +183,7 @@ def run_check(slugs: list[str], tolerance_km: float, threshold_pct: float,
         "threshold_pct": threshold_pct,
         "per_country": per_country,
         "violation_count": violations,
+        "skipped_count": sum(1 for r in per_country if r.get("skipped")),
     }
 
     print()
@@ -252,12 +255,27 @@ def main():
         print("ERROR: no countries to check.", file=sys.stderr)
         sys.exit(2)
 
-    violations, _report = run_check(
+    violations, report = run_check(
         slugs,
         tolerance_km=args.tolerance_km,
         threshold_pct=args.threshold,
         json_out=args.json,
     )
+
+    # A gate that cannot evaluate a country must not report a pass. Without
+    # this branch the summary reads "0 countries violating" out of 0 actually
+    # checked, and a pass by absence of evidence is indistinguishable from a
+    # pass. Skips are informational without --strict, and fatal with it.
+    skipped = report.get("skipped_count", 0)
+    if args.strict and skipped > 0:
+        print(f"FAIL: {skipped} country/countries could not be evaluated; "
+              f"--strict does not pass on unevaluated countries.",
+              file=sys.stderr)
+        for r in report["per_country"]:
+            if r.get("skipped"):
+                print(f"  - {r['country']}: {r.get('skip_reason')}",
+                      file=sys.stderr)
+        sys.exit(1)
 
     if args.strict and violations > 0:
         print(f"FAIL: {violations} countries exceed {args.threshold}% threshold "

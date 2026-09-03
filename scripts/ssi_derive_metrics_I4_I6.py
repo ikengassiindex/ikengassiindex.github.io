@@ -33,7 +33,9 @@ AMENDMENT_DRAFT_I4_transmission_thresholds.md.
           when kv >= the country's pinned transmission floor.
   I6_raw  substations within the same 3x3 block.
 
-  Both normalised Method B over FLEET P5/P95 (construct section 03), then
+  Both normalised Method B over THAT COUNTRY'S fleet P5/P95 (construct
+  section 03; the master construct states the anchoring is within a country
+  and not across the cohort), then
   INVERTED per the same section, because higher density means better
   resilience:
 
@@ -77,11 +79,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PINS = ROOT / "scripts" / "i4_transmission_thresholds.json"
 CELL = 0.1                      # degrees; ~11 km lat, 3x3 block ~33 km across
 UNIT_BREACH_MAX = 0.01          # >1% of records with kv>1000 = units are wrong
-AMENDMENT = ("AMENDMENT_DRAFT_I4_definition.md + "
+AMENDMENT = ("AMENDMENT_DRAFT_I4_I6_definition.md + "
              "AMENDMENT_DRAFT_I4_transmission_thresholds.md, pinned 30 Aug 2026")
 
 sys.path.insert(0, str(ROOT / "scripts"))
-from pipeline.scoring.engine import soft_clip_upper                  # noqa: E402
+from pipeline.scoring.engine import soft_clip                       # noqa: E402
 
 
 def load_pins():
@@ -147,7 +149,13 @@ def percentile(sv, q):
 def method_b(x, p5, p95):
     if p5 is None or p95 is None or p95 <= p5:
         return None
-    return max(0.0, soft_clip_upper((x - p5) / (p95 - p5)))
+    # soft_clip, NOT soft_clip_upper. Construct section 03 defines both
+    # Method A and Method B as N(x) = soft_clip((x - P5)/(P95 - P5)) and
+    # names this function. soft_clip_upper is the R_final overflow
+    # compressor: discontinuous at 1.0, so a ratio of 1.0001 returned
+    # 0.2693 and the worst substations in the fleet published as
+    # mid-fleet. M-006, re-scoped 31 August 2026.
+    return soft_clip((x - p5) / (p95 - p5))
 
 
 def method_b_inverted(x, p5, p95):
@@ -267,7 +275,7 @@ def make_floor(spec, subs):
     return floor_fn, " / ".join(f"{j['id']} {j['floor']}" for j in spec["jurisdictions"])
 
 
-def derive(slug, subs, lines, floor):
+def derive(slug, subs, lines, floor, floor_label=None):
     breach = sum(1 for ln in lines
                  if isinstance(ln.get("kv"), (int, float)) and ln["kv"] > 1000)
     if lines and breach / len(lines) > UNIT_BREACH_MAX:
@@ -314,8 +322,17 @@ def derive(slug, subs, lines, floor):
 
     a4 = (percentile(sorted(raw4), 0.05), percentile(sorted(raw4), 0.95))
     a6 = (percentile(sorted(raw6), 0.05), percentile(sorted(raw6), 0.95))
-    src = (f"derived per {AMENDMENT}: I4 = transmission line-km (kv >= {floor}) "
-           f"within a 3x3 block of {CELL} deg cells, Method B over fleet P5/P95, "
+    # floor_label, not floor. `floor` is a closure for any country with a
+    # sub-national threshold, so interpolating it wrote
+    # "<function make_floor.<locals>.floor_fn at 0x7f...>" into the published
+    # provenance of 136,731 records across us, uk, mexico and greenland — an
+    # unreadable string carrying a heap address that differed on every run.
+    # make_floor has returned a describe string since it was written; it was
+    # simply never threaded to here.
+    shown = floor_label if floor_label is not None else floor
+    src = (f"derived per {AMENDMENT}: I4 = transmission line-km (kv >= {shown}) "
+           f"within a 3x3 block of {CELL} deg cells, Method B over this "
+           f"country's fleet P5/P95, "
            f"inverted per construct section 03; I6 = substations in the same "
            f"block, same normalisation. {kept:,} of {len(lines):,} lines above "
            f"the floor.")
@@ -335,12 +352,58 @@ def derive(slug, subs, lines, floor):
     return n, len(subs) - n, kept, len(lines), a4, a6, raw4, raw6
 
 
+def derive_from_raw(slug, subs):
+    """Re-normalise the stored block sums. Reads no OSM, recomputes no geometry.
+
+    Added 31 August 2026 with the M-006 re-scope. The block sums are already
+    carried per record as _I4_raw_km and _I6_raw_count, and the defect being
+    repaired is in the NORMALISER, not in the sums. Re-running the full path
+    would re-read OSM and re-walk every 3x3 block to arrive at numbers the
+    records already hold, and would silently absorb any drift in the OSM
+    extract into a change advertised as a clip repair.
+
+    Anchors are recomputed from the stored raws, which is exactly what
+    derive() does with the sums it has just computed, so the two paths agree
+    by construction.
+    """
+    raw4, raw6, idx, missing = [], [], [], 0
+    for i, s in enumerate(subs):
+        m = s.get("metrics") or {}
+        v4, v6 = m.get("_I4_raw_km"), m.get("_I6_raw_count")
+        if not isinstance(v4, (int, float)) or not isinstance(v6, (int, float)):
+            missing += 1
+            continue
+        raw4.append(float(v4))
+        raw6.append(float(v6))
+        idx.append(i)
+    if not raw4:
+        raise ValueError("no record carries _I4_raw_km; run the full "
+                         "derivation for this country instead")
+    a4 = (percentile(sorted(raw4), 0.05), percentile(sorted(raw4), 0.95))
+    a6 = (percentile(sorted(raw6), 0.05), percentile(sorted(raw6), 0.95))
+    n = changed = 0
+    for j, i in enumerate(idx):
+        v4 = method_b_inverted(raw4[j], *a4)
+        v6 = method_b_inverted(raw6[j], *a6)
+        if v4 is None or v6 is None:
+            continue
+        m = subs[i].setdefault("metrics", {})
+        if (m.get("I4") != round(v4, 4)) or (m.get("I6") != round(v6, 4)):
+            changed += 1
+        m["I4"] = round(v4, 4)
+        m["I6"] = round(v6, 4)
+        n += 1
+    return n, missing, a4, a6, changed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("slugs", nargs="*")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--from-raw", action="store_true",
+                    help="re-normalise the stored block sums; reads no OSM")
     args = ap.parse_args()
 
     pins, held = load_pins()
@@ -358,9 +421,16 @@ def main() -> int:
             continue
         try:
             man, subs, paths = load_substations(slug)
-            lines = load_lines(slug)
-            floor_fn, floor_label = make_floor(pins[slug], subs)
-            n, sk, kept, tot, a4, a6, r4, r6 = derive(slug, subs, lines, floor_fn)
+            if args.from_raw:
+                floor_label = "(from stored raws)"
+                n, sk, a4, a6, changed = derive_from_raw(slug, subs)
+                kept = tot = 0
+            else:
+                lines = load_lines(slug)
+                floor_fn, floor_label = make_floor(pins[slug], subs)
+                n, sk, kept, tot, a4, a6, r4, r6 = derive(
+                    slug, subs, lines, floor_fn, floor_label)
+                changed = None
         except Exception as ex:
             print(f"  {slug:<14}ERROR — {ex}")
             continue
@@ -369,7 +439,8 @@ def main() -> int:
         m4 = got4[len(got4) // 2] if got4 else float("nan")
         m6 = got6[len(got6) // 2] if got6 else float("nan")
         print(f"  {slug:<14}{floor_label:>18}{kept:>12,}{n:>9,}{sk:>9,}"
-              f"{m4:>8.3f}{m6:>8.3f}")
+              f"{m4:>8.3f}{m6:>8.3f}"
+              + (f"{changed:>10,}" if changed is not None else ""))
         if args.verbose:
             print(f"      I4 raw km  P5 {a4[0]:.1f}  P95 {a4[1]:.1f}")
             print(f"      I6 raw cnt P5 {a6[0]:.1f}  P95 {a6[1]:.1f}")
@@ -377,9 +448,13 @@ def main() -> int:
             man.setdefault("meta", {}).setdefault("metric_derivations", []).append({
                 "metrics": ["I4", "I6"], "at_utc": datetime.now(timezone.utc).isoformat(),
                 "amendment": AMENDMENT, "kv_floor": pins[slug],
-                "kv_floor_label": floor_label,
+                "kv_floor_label": (None if args.from_raw else floor_label),
                 "lines_above_floor": kept, "lines_total": tot,
                 "n_derived": n, "n_skipped": sk,
+                "re_normalised_from_stored_raw": bool(args.from_raw),
+                "clip": ("soft_clip — construct section 03; replaces the "
+                         "soft_clip_upper overflow compressor, M-006"),
+                "n_values_changed": changed,
                 "anchors": {"I4": list(a4), "I6": list(a6)}})
             if paths is None:
                 man["substations"] = subs

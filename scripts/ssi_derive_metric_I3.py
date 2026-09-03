@@ -49,8 +49,38 @@ DEFINITION
   I3_raw      mean annual cumulative excess in degC-days, summed over days
               inside heat waves only
 
-  I3 = Method B over FLEET P5/P95, NOT inverted — more heat-wave excess is more
-  risk, and the metric carries risk in the same direction as R.
+  I3          Method C, bounded rescaling, NOT inverted — more heat-wave
+              excess is more risk, and the metric carries risk in the same
+              direction as R.
+
+                  IRI_current = 0.30 x min(1, I3_raw / ANCHOR)
+                  I3          = IRI_current / 0.30 = min(1, I3_raw / ANCHOR)
+
+METHOD C, AND WHY IT REPLACED METHOD B
+--------------------------------------
+Registered 31 August 2026 — DECISION_I3_normalisation_method_C.md, amended in
+the judgement layer under Constitution 8, and carried in the conformance
+register as a normalisation-method row.
+
+Until then this script normalised by Method B over PER-COUNTRY P5/P95, while
+its own provenance string said FLEET. Both facts mattered:
+
+  - Under a percentile anchor a substation's published value depends on facts
+    about OTHER substations. Adding Turkiye's recovered records moved every
+    other Turkish record with no change on the ground.
+  - It railed 10.3 per cent of the cohort at 0.000 or 1.000, treating a
+    substation with 82 per cent more heat-wave excess than another as
+    identical to it — against the pin that I3 exists to capture EXTREME
+    deviations.
+  - Luxembourg's P5/P95 spanned 2.06 degC-days and Colombia's 11.15, both
+    mapped onto the same published [0, 1]. On I3 as published the index was
+    not a cross-jurisdictional comparison.
+  - Method B produced no quantity on [0, 0.30], so the R2 adaptive-weight gate
+    could not test IRI_current against IRI_THRESH = 0.02 as the construct
+    requires.
+
+The anchor is a PIN, not a measurement that refreshes. Recomputing it each run
+would restore the population dependence this change exists to remove.
 
 SOURCE
 ------
@@ -78,7 +108,7 @@ A country with fewer than 4 years is REFUSED. A substation outside the grid or
 without coordinates is skipped and counted, never defaulted.
 """
 from __future__ import annotations
-import argparse, json, math, os, pathlib, sys
+import argparse, json, os, pathlib, sys
 from datetime import datetime, timezone
 
 import numpy as np
@@ -97,16 +127,49 @@ PCT = 90
 MIN_RUN = 3          # consecutive days to count as a heat wave
 MAX_SNAP = 3         # cells; ~33 km. Beyond this a substation is not on this grid
 AMENDMENT = "AMENDMENT_I3_heatwave_extreme_deviation.md"
+DECISION = "DECISION_I3_normalisation_method_C.md"
 
-
-def soft_clip_upper(x):
-    return x if x <= 1.0 else 1.0 + math.log(x) if x > 0 else x
+# The degC-days that map to the top of the IRI interval. The 99.9th
+# percentile of the 2018-2022 fleet, measured across 620,129 derived
+# records on 31 August 2026, pinned once and FROZEN. Changing it is an
+# amendment under Constitution 8, not an edit: it rescales every record
+# in the cohort at once.
+ANCHOR = 51.93
+IRI_TOP = 0.30
 
 
 def method_b(x, p5, p95):
     if p5 is None or p95 is None or p95 <= p5:
         return None
     return max(0.0, min(1.0, (x - p5) / (p95 - p5)))
+
+
+def method_c(x):
+    """Construct section 03, Method C — bounded rescaling.
+
+    N(x) = (x - x_min) / (x_max - x_min) with x_min 0 and x_max the anchor.
+    Saturation at the anchor is deliberate and visible: a fleet hotter than
+    the anchor piles up at 1.000 in the published data, which is the signal
+    that the pin needs revisiting, rather than silently rescaling everything
+    else the way a moving percentile would.
+
+    method_b is retained below because ssi_derive_metric_I5.py imports it.
+    Removing it would break I5 silently, which is the class of change this
+    estate treats as a defect.
+    """
+    if x is None or x < 0:
+        return None
+    return min(1.0, x / ANCHOR)
+
+
+def iri_current(x):
+    """The [0, 0.30] quantity R2 tests against IRI_THRESH = 0.02.
+
+    Method B produced no such quantity. It is stored per record so the gate
+    can be implemented without re-deriving anything.
+    """
+    n = method_c(x)
+    return None if n is None else round(IRI_TOP * n, 5)
 
 
 def percentile(sv, q):
@@ -291,19 +354,55 @@ def derive(slug, subs, dry):
 
     if not raw:
         raise ValueError("no substation fell on a finite grid cell")
-    sv = sorted(raw)
-    p5, p95 = percentile(sv, 0.05), percentile(sv, 0.95)
-    n = 0
+    n, sat = apply_method_c(subs, idx, raw, dry)
+    return n, skipped, snapped, sat, used, float(np.median(raw))
+
+
+def apply_method_c(subs, idx, raw, dry):
+    """Write I3 and its IRI from the raw degC-days. Returns (written, saturated).
+
+    Shared by the full derivation and by --from-raw so the two cannot drift
+    apart. A re-derivation that computed the metric differently from the
+    original path would be worse than no re-derivation.
+    """
+    n = sat = 0
     for k, i in enumerate(idx):
-        v = method_b(raw[k], p5, p95)
+        v = method_c(raw[k])
         if v is None:
             continue
+        if v >= 1.0:
+            sat += 1
         if not dry:
             m = subs[i].setdefault("metrics", {})
             m["I3"] = round(v, 4)
             m["_I3_raw_degC_days"] = round(raw[k], 3)
+            m["_I3_iri"] = iri_current(raw[k])
         n += 1
-    return n, skipped, snapped, (p5, p95), used, float(np.median(raw))
+    return n, sat
+
+
+def derive_from_raw(slug, subs, dry):
+    """Re-derive from the degC-days already carried on each record.
+
+    The change_log migration path declares that no re-ingestion of ERA5-Land
+    is required, because the raw quantity is stored per record. This is that
+    path. It touches no NetCDF and re-reads no grid, so it cannot change a raw
+    value — only how a raw value is normalised, which is the whole of the
+    amendment.
+    """
+    raw, idx, missing = [], [], 0
+    for i, s in enumerate(subs):
+        v = (s.get("metrics") or {}).get("_I3_raw_degC_days")
+        if not isinstance(v, (int, float)):
+            missing += 1
+            continue
+        raw.append(float(v))
+        idx.append(i)
+    if not raw:
+        raise ValueError("no record carries _I3_raw_degC_days; run the full "
+                         "derivation for this country instead")
+    n, sat = apply_method_c(subs, idx, raw, dry)
+    return n, missing, 0, sat, None, float(np.median(raw))
 
 
 def load_slugs():
@@ -331,31 +430,56 @@ def main():
     ap.add_argument("slugs", nargs="*")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--from-raw", action="store_true",
+                    help="re-normalise the stored _I3_raw_degC_days against "
+                         "the pinned anchor; reads no NetCDF")
     a = ap.parse_args()
     slugs = load_slugs() if a.all else a.slugs
     if not slugs:
         sys.exit("give country slugs or --all")
 
-    print(f"\n  I3 heat-wave IRI — {AMENDMENT}\n")
+    print(f"\n  I3 heat-wave IRI — Method C, anchor {ANCHOR} degC-days"
+          f" — {DECISION}\n")
     print(f"  {'country':<14}{'yrs':>5}{'derived':>9}{'skipped':>9}{'snapped':>9}"
-          f"{'med degC-d':>12}{'P5':>8}{'P95':>8}")
+          f"{'med degC-d':>12}{'saturated':>11}")
     for slug in slugs:
         try:
             man, subs, paths = load_subs(slug)
-            n, sk, snp, anch, used, med = derive(slug, subs, a.dry_run)
+            if a.from_raw:
+                n, sk, snp, sat, used, med = derive_from_raw(slug, subs, a.dry_run)
+                # The years belong to the raw values, which this path does not
+                # recompute. Carry the original declaration forward rather than
+                # restating it, so provenance survives the re-normalisation.
+                used = next((e.get("years") for e in reversed(
+                    (man.get("meta") or {}).get("metric_derivations") or [])
+                    if "I3" in (e.get("metrics") or []) and e.get("years")), None)
+            else:
+                n, sk, snp, sat, used, med = derive(slug, subs, a.dry_run)
         except Exception as ex:
             print(f"  {slug:<14}REFUSED — {ex}")
             continue
-        print(f"  {slug:<14}{len(used):>5}{n:>9,}{sk:>9,}{snp:>9,}{med:>12.1f}"
-              f"{anch[0]:>8.1f}{anch[1]:>8.1f}")
+        print(f"  {slug:<14}{len(used or []):>5}{n:>9,}{sk:>9,}{snp:>9,}"
+              f"{med:>12.1f}{sat:>11,}")
         if a.dry_run or not n:
             continue
         man.setdefault("meta", {}).setdefault("metric_derivations", []).append({
             "metrics": ["I3"], "at_utc": datetime.now(timezone.utc).isoformat(),
-            "amendment": AMENDMENT, "source": "ERA5-Land daily max 2m temperature",
+            "amendment": AMENDMENT, "decision": DECISION,
+            "source": "ERA5-Land daily max 2m temperature",
             "years": used, "baseline": f"pentad p{PCT}, +/-{WINDOW} pentad window",
-            "min_run_days": MIN_RUN, "n_derived": n, "n_skipped": sk, "n_snapped_to_land": snp,
-            "anchors": {"I3": list(anch)},
+            "min_run_days": MIN_RUN, "n_derived": n, "n_skipped": sk,
+            "n_snapped_to_land": snp,
+            "normalisation": "C_bounded",
+            # Deliberately NOT "anchors": that key means a per-country P5/P95
+            # pair, and the conformance register reads it as B_percentile.
+            "anchor": {"value": ANCHOR,
+                       "units": "degree Celsius days per year",
+                       "maps_to": IRI_TOP,
+                       "frozen": True,
+                       "basis": "99.9th percentile of the 2018-2022 fleet, "
+                                "620,129 records, pinned 31 August 2026"},
+            "n_saturated": sat,
+            "re_normalised_from_stored_raw": bool(a.from_raw),
             "caveat": "five-year baseline; within-period extremeness, not a "
                       "climate-trend statement"})
         if paths is None:

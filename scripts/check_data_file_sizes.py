@@ -50,7 +50,10 @@ def format_size(bytes_val: int) -> str:
 
 
 def scan_data_files(repo_root: Path, only_staged: bool = False) -> list[tuple[Path, int]]:
-    """Return [(relative_path, size_bytes), ...] for all ssi-data.json + grid-geo.json.
+    """Return [(relative_path, size_bytes), ...] for every published data file.
+
+    That means the manifests (ssi-data.json, grid-geo.json) AND every shard
+    beside them (ssi-data-substations-NN.json, grid-geo-l-NN.json, ...).
 
     If only_staged is True, restrict to files that git has staged for commit
     (used by the pre-commit hook path).
@@ -68,13 +71,20 @@ def scan_data_files(repo_root: Path, only_staged: bool = False) -> list[tuple[Pa
     else:
         staged = None
 
+    # Convention #79 shards a country's data across `ssi-data-substations-NN`
+    # and `grid-geo-l-NN` files. Enumerating a fixed pair of filenames per
+    # country measured the MANIFEST and left every shard invisible — and the
+    # shards are the only files large enough to need this guard at all. The
+    # file set is therefore derived from what is on disk, not from a literal.
     matches: list[tuple[Path, int]] = []
     for country_dir in sorted(repo_root.iterdir()):
         if not country_dir.is_dir() or country_dir.name.startswith('.'):
             continue
-        for filename in ('ssi-data.json', 'grid-geo.json'):
-            fp = country_dir / filename
-            if not fp.exists():
+        for fp in sorted(country_dir.glob('*.json')):
+            if not fp.is_file():
+                continue
+            if not (fp.name.startswith('ssi-data')
+                    or fp.name.startswith('grid-geo')):
                 continue
             rel = fp.relative_to(repo_root)
             if staged is not None and str(rel) not in staged:
@@ -93,7 +103,19 @@ def main() -> int:
                         help='Only check files staged for commit (git diff --cached)')
     parser.add_argument('--repo-root', type=Path, default=Path.cwd(),
                         help='Repository root (default: cwd)')
+    parser.add_argument('--list-files', action='store_true',
+                        help='Emit the enumerated file set as JSON and exit 0. '
+                             'Lets an instrument measure this gate\'s coverage '
+                             'by running it, rather than by reading its source.')
     args = parser.parse_args()
+
+    if args.list_files:
+        import json as _json
+        listed = scan_data_files(args.repo_root.resolve(),
+                                 only_staged=args.only_staged)
+        print(_json.dumps({'files': [str(rel) for rel, _ in listed],
+                           'count': len(listed)}))
+        return 0
 
     threshold_bytes = int(args.threshold * 1024 * 1024)
     warn_bytes = int(threshold_bytes * WARN_FRACTION)
