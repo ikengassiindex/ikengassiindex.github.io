@@ -20,14 +20,25 @@ reviewed and confirmed in full: 2026-09-03.
  5. **Step by step, auditable.** A change lands before the next one starts —
     added 2026-09-03 after five derivations on one working tree proved
     impossible to separate into commits afterwards.
- 6. **Git is run directly** (amended 2026-09-03; was: operator runs all git).
-    Conditions attached to the amendment:
-      - check for a stale `.git/*.lock` before operating; if one exists, STOP
-        and report. Never remove one unilaterally — a bridge-run `git status`
-        left a lock on 24 Aug 2026 that wedged `master documents` for ten days,
-        which is why this pin previously forbade git entirely.
-      - `git push` deploys the public site. Publishing is confirmed with the
-        operator each time; it is not covered by the standing amendment.
+ 6. **Read-only git may be run directly; every git WRITE is the operator's.**
+    (Amended 2026-09-03, then narrowed the same day on measurement.)
+      - direct: `status`, `diff`, `log`, `fetch`, `show`, `ls-files` — these
+        take no lock and strand nothing.
+      - operator: `add`, `commit`, `merge`, `rebase`, `push`.
+      - WHY, measured: git takes `.git/HEAD.lock` (and `index.lock`), writes,
+        then unlinks. This environment cannot unlink, so the write SUCCEEDS and
+        the cleanup silently fails, stranding a lock that blocks the next
+        write. A stale `index.lock` left this way on 24 Aug 2026 wedged the
+        `master documents` repo for ten days. A `git commit` run on 3 Sept
+        reproduced it exactly: the commit landed, `HEAD.lock` remained.
+      - a `git push` here deploys the public site; publishing is confirmed with
+        the operator regardless.
+      - if a stale `.git/*.lock` is found: STOP and report. Never remove one
+        unilaterally.
+      - the same limitation strands `tmp_obj_*` files in `.git/objects` (200 by
+        Sept 2026, 29.8 MB). Harmless; cleared by an operator-run
+        `git gc --prune=now`.
+
  7. **No `git add -u` sweeps** — explicit paths. Where a list typed from memory
     is the greater risk, `git diff --name-only | xargs git add` is acceptable
     because it can only ever name tracked, modified files; say so when used.
