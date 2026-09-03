@@ -220,7 +220,20 @@ jobs:
         run: |
           git config user.name "SSI Pipeline Bot"
           git config user.email "pipeline@ikengassiindex.github.io"
-          git add -A
+
+          # 2026-09-03: was `git add -A`, which stages untracked files too. On a
+          # runner that is normally harmless; in practice it means any file left
+          # in the tree gets committed as pipeline enrichment work, authored by
+          # the bot, inside a commit message about seismic and climate data.
+          # `-u` stages tracked modifications ONLY and structurally cannot adopt
+          # a stranger. On a clean CI checkout every tracked modification is by
+          # definition this run's own work, so -u is exact here.
+          git add -u
+          UNTRACKED=$(git ls-files --others --exclude-standard)
+          if [ -n "$UNTRACKED" ]; then
+            echo "::warning::untracked files present and NOT committed:"
+            echo "$UNTRACKED" | sed 's/^/::warning::  /'
+          fi
           CHANGES=$(git diff --cached --stat)
           if [ -n "$CHANGES" ]; then
             TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
@@ -233,18 +246,37 @@ jobs:
           - Monte Carlo rescoring (10k iterations)
 
           See pipeline-report artifact for full diff."
-            # KB §91.A — pull-rebase before push to defuse cron race
+            # KB §91.A — pull-rebase before push to defuse the cron race
             # against external pushes (intelligence/esg-refresh, manual).
-            # Fallback to merge -X ours if rebase conflicts (we always want
-            # to keep our enrichment data).
+            #
+            # 2026-09-03: the fallback was `git pull --no-rebase -X ours`, on the
+            # reasoning that "we always want to keep our enrichment data". That
+            # resolves every conflicting hunk in this run's favour, silently. The
+            # manifests are single-line JSON, so ANY concurrent change to the same
+            # file is a whole-file conflict — meaning the fallback could discard
+            # another writer's published work with no record that it happened.
+            #
+            # A conflict here is a real event: two writers changed the same
+            # country in the same window. It should stop and tell someone, not
+            # pick a winner. Rebase is retried, because a retry resolves the
+            # ordinary case where the other push simply landed first.
+            PUSHED=0
             for attempt in 1 2 3; do
-              git pull --rebase --autostash origin main && break
-              echo "Rebase attempt ${attempt} failed; trying merge -X ours"
+              if git pull --rebase --autostash origin main && git push origin main; then
+                PUSHED=1
+                break
+              fi
+              echo "::notice::rebase/push attempt ${attempt} failed; retrying"
               git rebase --abort 2>/dev/null || true
-              git pull --no-rebase --no-edit -X ours origin main && break
               sleep 5
             done
-            git push origin main
+            if [ "$PUSHED" != "1" ]; then
+              echo "::error::Could not rebase cleanly onto origin/main after 3 attempts."
+              echo "::error::Another writer changed the same files during this run."
+              echo "::error::REFUSING to resolve with -X ours — that would discard their"
+              echo "::error::work silently. Re-run the pipeline once main is settled."
+              exit 1
+            fi
             echo "✓ Committed and pushed enriched data"
           else
             echo "No changes to commit"

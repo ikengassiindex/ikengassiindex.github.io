@@ -4,12 +4,14 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - 'doctrine/**'
       - '*/ssi-data.json'
       - '*/grid-geo.json'
       - 'versions.json'
       - 'intelligence/countries.json'
   pull_request:
     paths:
+      - 'doctrine/**'
       - '*/ssi-data.json'
       - '*/grid-geo.json'
 
@@ -31,12 +33,22 @@ jobs:
             */bounds.json
             */ssi-data.json
             */grid-geo.json
+            doctrine/
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      # Every meta.metric_derivations entry names an amendment by filename. Until
+      # 2026-09-03 those documents lived outside version control and this gate ran
+      # on one laptop, so it proved a file EXISTED and never ran automatically.
+      # doctrine/ now sits in this repository beside the records that cite it.
+      # Tested in both directions: exits 0 here, exits 1 with all 5 MISSING
+      # against an empty directory.
+      - name: Provenance citations resolve
+        run: python3 scripts/check_provenance_citations_resolve.py
 
       - name: Validate versions.json
         run: |

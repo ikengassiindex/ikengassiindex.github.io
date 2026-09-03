@@ -38,10 +38,15 @@ from __future__ import annotations
 import json, os, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-ESTATE = pathlib.Path(os.environ.get(
-    "SSI_ESTATE",
-    pathlib.Path.home() / "Library/CloudStorage/OneDrive-IkengaSL"
-    / "Internal - IKENGA EU - Documents/0.22. IP agenda/SSI Index"))
+# Cited documents live in the repository that holds the citing records, so a
+# citation resolves inside one versioned unit and cannot change without a
+# commit. Before 2026-09-03 this pointed at a OneDrive folder with no git: the
+# gate proved a file EXISTED and could not prove it had not been edited since
+# the record cited it. SSI_ESTATE still overrides, for checking a working copy
+# elsewhere.
+DOCTRINE = ROOT / "doctrine"
+ESTATE = pathlib.Path(os.environ["SSI_ESTATE"]) if os.environ.get("SSI_ESTATE") \
+    else DOCTRINE
 
 
 def cited_documents(text):
@@ -57,7 +62,7 @@ def cited_documents(text):
 def main():
     if not ESTATE.exists():
         print(f"\n  estate folder not found: {ESTATE}")
-        print("  set SSI_ESTATE to the SSI Index folder path\n")
+        print("  expected doctrine/ in this repository; set SSI_ESTATE to override\n")
         return 2
 
     present = {p.name for p in ESTATE.rglob("*") if p.is_file()}
