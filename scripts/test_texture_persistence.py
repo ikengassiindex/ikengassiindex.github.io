@@ -94,6 +94,13 @@ def cell_stat(path, fld, how="max", nmax=0):
             b = np.asarray(v[t:t + CHUNK], dtype="float32")
             acc = np.maximum(acc, np.nanmax(np.where(np.isfinite(b), b, -np.inf), 0))
         acc[~np.isfinite(acc)] = np.nan
+    elif how == "mean":
+        tot = np.zeros(v.shape[1:], dtype="float64"); cnt = 0
+        for t in range(0, nt, CHUNK):
+            b = np.asarray(v[t:t + CHUNK], dtype="float32")
+            tot += np.nansum(np.where(np.isfinite(b), b, 0.0), 0)
+            cnt += b.shape[0]
+        acc = (tot / max(cnt, 1)).astype("float32")
     else:                                   # median, sampled to bound memory
         idx = np.linspace(0, nt - 1, min(nt, 60)).astype(int)
         acc = np.nanmedian(np.asarray(v[idx], dtype="float32"), 0)
@@ -141,15 +148,29 @@ def main() -> int:
     ap.add_argument("--fine-b", required=True)
     ap.add_argument("--coarse", required=True)
     ap.add_argument("--coarse-timesteps", type=int, default=31)
+    ap.add_argument("--statistic", choices=["max", "mean"], default="max",
+                    help="ATTEMPT 2, added 2026-09-10 AFTER attempt 1 failed. "
+                         "'max' is the original pre-registered construction "
+                         "and remains the default so that run stays "
+                         "reproducible. 'mean' tests a DIFFERENT hypothesis "
+                         "with its own bar, recorded in "
+                         "RESULT_I2_mosaic_test_1_FAILED.md s5: terrain "
+                         "speed-up is a mean effect, and test 3 showed the "
+                         "maximum is the unstable end of the distribution. "
+                         "Arguing this after a failure is the weakest "
+                         "position to argue from and is declared as such.")
     a = ap.parse_args()
 
     dsc = netCDF4.Dataset(a.coarse); cg = mf.Grid(dsc); dsc.close()
     print(f"\n  coarse (level) : {pathlib.Path(a.coarse).name}  {cg.shape} ~{cg.res_km:.1f} km")
     print(f"  fine A         : {pathlib.Path(a.fine_a).name}")
-    print(f"  fine B         : {pathlib.Path(a.fine_b).name}\n")
+    print(f"  fine B         : {pathlib.Path(a.fine_b).name}")
+    print(f"  texture from   : period {a.statistic.upper()}"
+          + ("   [ATTEMPT 2 — a different hypothesis after attempt 1 failed]"
+             if a.statistic == "mean" else "   [attempt 1, pre-registered]") + "\n")
 
-    gA, texA, statA = texture_field(a.fine_a, cg)
-    gB, texB, _     = texture_field(a.fine_b, cg)
+    gA, texA, statA = texture_field(a.fine_a, cg, how=a.statistic)
+    gB, texB, _     = texture_field(a.fine_b, cg, how=a.statistic)
     _,  texMed, _   = texture_field(a.fine_a, cg, how="median")
     coarse_stat = cell_stat(a.coarse, "fg10", "max", a.coarse_timesteps)
 
