@@ -68,11 +68,31 @@ reviewed and confirmed in full: 2026-09-03.
 12. **Components publish `_<C>_from_metrics` alongside the component**, and are
     not rebuilt from metrics until coverage is complete (31 Aug 2026).
 
-13. **No derivation runs in the pipeline bot's window.** The bot rewrites all
-    73 manifests on the first Thursday of each month, 06:00 UTC. No derivation
-    or data push until its run has landed. Conflicts now fail hard rather than
-    resolving with `-X ours`, so the residual risk is wasted work, not lost
-    work — but wasted work on 620,000 records is still worth avoiding.
+13. **No derivation runs in a bot's window. There are THREE, not one.**
+
+    | workflow | window |
+    |---|---|
+    | `pipeline-enrichment.yml` | 1st Thursday 06:00 UTC |
+    | `monthly-refresh.yml` | 2nd Thursday 10:00 UTC |
+    | `esg-refresh.yml` | 2nd Thursday 11:00 UTC |
+
+    Corrected 2026-09-10. This pin previously named only the first and gave
+    the next window as 1 October; the other two fired on 10 September, in the
+    middle of a session, and rejected two pushes. It also asserted that
+    "conflicts now fail hard rather than resolving with `-X ours`" — true of
+    `pipeline-enrichment.yml` alone, which is where that repair was made on
+    3 September and wrongly recorded as complete. The other two kept the
+    `-X ours` fallback for a further week. All three now fail hard, all three
+    stage by explicit path, and all three share one concurrency group so they
+    queue instead of racing.
+
+    `monthly-refresh.yml` rewrites `*/ssi-data.json` across all 39 countries,
+    so it is the one that could have reverted a whole derivation silently. No
+    derivation or data push inside any of the three windows.
+
+    The general lesson, worth more than the fix: a repair is not complete
+    because the file in front of you is clean. Ask how many places have the
+    same shape, and count them.
 
 14. **A coefficient must be verified against a primary or secondary source.**
     (Operator, 2026-09-03: *"we cannot state unverified as it is illogical."*)

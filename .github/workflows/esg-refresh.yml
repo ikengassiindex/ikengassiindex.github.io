@@ -15,9 +15,14 @@ on:
         type: string
 
 
-# KB §49.7 — Prevent commit-push race when two workflows push to main
+# KB §49.7 — Prevent commit-push race between the THREE workflows that push
+# to main (pipeline-enrichment, monthly-refresh, esg-refresh). Until
+# 2026-09-10 each declared its OWN group name, which serialises a workflow
+# only against itself: GitHub applies concurrency within a group, so three
+# different names gave no mutual exclusion at all and the comment claiming
+# otherwise was false. One shared group, queued rather than cancelled.
 concurrency:
-  group: esg-refresh-main
+  group: ssi-main-push
   cancel-in-progress: false
 
 permissions:
@@ -103,19 +108,43 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
+          # KB §91.D — explicit scope, not a sweep. Both steps above only
+          # `sed -i` existing */esg-report.html; this workflow creates no
+          # new files, so a tracked-modified add is provably complete and
+          # cannot pick up anything a build step left behind.
+          git add -u -- '*/esg-report.html'
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
             git commit -m "chore: monthly ESG report refresh [$(date +%Y-%m-%d)]"
             # KB §91.A — pull-rebase before push to defuse cron race against
-            # external pushes. Fallback to merge -X ours if rebase conflicts;
-            # the cron's cache-bust + footer-date payload always wins.
+            # external pushes.
+            #
+            # 2026-09-10: the `-X ours` merge fallback was REMOVED. It resolved
+            # every conflicting hunk in favour of the bot, silently discarding
+            # a human change to the same file — no conflict, no error, a
+            # clean-looking merge commit. This workflow rewrites
+            # */ssi-data.json, the file that carries every derived metric, so
+            # that fallback could revert a freshly-derived I1 or I2 across all
+            # 39 countries and leave nothing in the diff to show it.
+            #
+            # The same removal was made in pipeline-enrichment.yml on
+            # 2026-09-03 and was recorded as complete; it was not. Three
+            # workflows push to main and only one had been repaired.
+            #
+            # A rebase that will not converge in three attempts is now a HARD
+            # FAILURE. A refresh that has to be re-run is cheap; a derivation
+            # silently reverted is not.
             for attempt in 1 2 3; do
               git pull --rebase --autostash origin main && break
-              echo "Rebase attempt ${attempt} failed; trying merge -X ours"
+              echo "::warning::Rebase attempt ${attempt} failed"
               git rebase --abort 2>/dev/null || true
-              git pull --no-rebase --no-edit -X ours origin main && break
+              if [ "${attempt}" = "3" ]; then
+                echo "::error::Could not rebase onto origin/main after 3 attempts."
+                echo "::error::Refusing to merge with -X ours — that would discard"
+                echo "::error::whatever is on main. Re-run this workflow instead."
+                exit 1
+              fi
               sleep 5
             done
             git push origin main

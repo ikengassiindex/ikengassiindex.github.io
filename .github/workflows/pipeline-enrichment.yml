@@ -28,8 +28,14 @@ on:
 
 
 # KB §49.7 — Prevent commit-push race when two workflows push to main
+# KB §49.7 — Prevent commit-push race between the THREE workflows that push
+# to main (pipeline-enrichment, monthly-refresh, esg-refresh). Until
+# 2026-09-10 each declared its OWN group name, which serialises a workflow
+# only against itself: GitHub applies concurrency within a group, so three
+# different names gave no mutual exclusion at all and the comment claiming
+# otherwise was false. One shared group, queued rather than cancelled.
 concurrency:
-  group: pipeline-enrichment-main
+  group: ssi-main-push
   cancel-in-progress: false
 
 permissions:
