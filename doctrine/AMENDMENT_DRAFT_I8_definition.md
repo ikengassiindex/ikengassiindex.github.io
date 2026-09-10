@@ -17,8 +17,8 @@ Doing so has already changed the answer. See §4.
 
 ## 2. What ISO 9223 actually computes
 
-ISO 9223:2012 §8.2 gives a dose-response function for the first-year
-corrosion rate of carbon steel:
+ISO 9223:2012 §8.2 gives a dose-response function for the first-year corrosion
+rate of carbon steel:
 
     rcorr = 1.77 · Pd^0.52 · exp(0.020·RH + f_St)
           + 0.102 · Sd^0.62 · exp(0.033·RH + 0.040·T)          µm/a
@@ -31,17 +31,36 @@ corrosion rate of carbon steel:
     RH   annual mean relative humidity    %
     T    annual mean temperature          °C
 
-**COEFFICIENTS ARE NOT YET VERIFIED AGAINST THE STANDARD ITSELF.** They were
-assembled from secondary sources because ISO 9223 is a paid standard the estate
-does not hold. One retrieval returned an internally inconsistent form — f_St as
-a multiplier rather than inside the exponential, and the temperature branches
-inverted — and was rejected. The structure above was confirmed against the
-published zinc equation, which places its own f term inside the exponential.
+### Verification of the coefficients
 
-That is enough to reason about the fetch. **It is not enough to pin.** A copy
-of ISO 9223:2012 must be obtained and the coefficients checked before this
-amendment is registered. Recorded here rather than discovered after 620,000
-records carry the result.
+Ikenga does not hold ISO 9223, so every coefficient was checked against
+independent secondary sources rather than asserted. Four retrievals:
+
+    A  a hosted copy of the standard          all seven agree with the above
+    B  MDPI Coatings 2026 (16/4/488)          all seven agree with the above
+    C  MDPI Materials 2024 (17/24/6211)       agrees on six; gives 0.047, not
+                                              0.040, for T in the chloride term
+    D  a sample PDF of the standard itself    REJECTED as a corrupt extraction:
+                                              places f_St as a multiplier, puts
+                                              the Sd exponent (0.62) inside an
+                                              exponential, carries the ZINC
+                                              exponent 0.44 for Sd, and prints
+                                              τ where T belongs
+
+The single disputed coefficient is the temperature term in the chloride branch:
+**0.040 (A, B) against 0.047 (C)**. Resolved to 0.040 on two independent
+sources against one. C is recorded here as dissenting rather than dropped,
+because a reader repricing this metric must be able to see that the value was
+contested and on what basis it was settled.
+
+A separate retrieval (D) was discarded outright. It is worth naming: it was the
+source closest to the standard itself and the least reliable of the four,
+because it was machine-extracted from a PDF. Proximity to the primary source is
+not the same as fidelity to it.
+
+**Status: VERIFIED against secondary sources, with the dissent recorded.** Not
+verified against the primary. If Ikenga obtains ISO 9223:2012, §8.2 should be
+checked once and this section replaced by that citation.
 
 ## 3. What the planned fetch supplies
 

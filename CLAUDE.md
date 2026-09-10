@@ -9,13 +9,22 @@ These are the operator's own standing instructions, not codebase conventions.
 They govern HOW work is done here and are amended only by the operator. Last
 reviewed and confirmed in full: 2026-09-03.
 
- 1. **Never modify the rendering of the public index site** — design, layout,
-    presentation. Improve what feeds it, never how it looks.
+ 1. **The DESIGN of the public site is never touched.** Layout, styling,
+    presentation. Clarified by the operator 2026-09-03: *"the design of the
+    website is never to be touched, the data and information of course
+    endlessly evolves and that is normal."* So a claim the measurement no
+    longer supports is a data question, not a design question, and is raised
+    and corrected like any other.
+
  2. **Ikenga SL OneDrive only.** The sun.en OneDrive is the migrated-from
     account and is banned.
- 3. **Files created go in the SSI Index folder.** Exception taken 2026-09-03:
-    `doctrine/` lives in this repo, because a citation must resolve inside the
-    same versioned unit as the record citing it and CI sees only this repo.
+ 3. **The most efficient path that is equally the most auditable.** (Operator,
+    2026-09-03, replacing "files go in the SSI Index folder".) In practice:
+    working notes, findings, drafts and commit messages live in SSI Index;
+    anything code, CI or published data reads at runtime lives in the
+    repository that reads it — which is why `doctrine/` sits in this repo.
+    Efficiency alone does not decide, and neither does auditability alone.
+
  4. **No agents.**
  5. **Step by step, auditable.** A change lands before the next one starts —
     added 2026-09-03 after five derivations on one working tree proved
@@ -49,11 +58,51 @@ reviewed and confirmed in full: 2026-09-03.
     by scripts, and are never printed, logged or echoed.
 10. **I3 normalises by Method C** against a frozen anchor (operator decision,
     31 Aug 2026 — `doctrine/DECISION_I3_normalisation_method_C.md`).
-11. **I2 is populated despite carrying half its mechanism** (1 Sept 2026): a
-    declared half beats a silent absence, provided the half is declared on
-    every published value.
+11. **I2 is populated properly, from hourly data** (re-decided 2026-09-03).
+    The 1 Sept decision to populate it as a declared half-metric was taken when
+    I2 looked computable from daily fields. It is not: sqrt(max u², max v²) is
+    not max sqrt(u²+v²), the components are signed, and the error has no sign.
+    So I2 comes from hourly u/v with the speed formed BEFORE the temporal
+    reduction — Earth Engine, server-side. Takes component I coverage to 0.719.
+
 12. **Components publish `_<C>_from_metrics` alongside the component**, and are
     not rebuilt from metrics until coverage is complete (31 Aug 2026).
+
+13. **No derivation runs in the pipeline bot's window.** The bot rewrites all
+    73 manifests on the first Thursday of each month, 06:00 UTC. No derivation
+    or data push until its run has landed. Conflicts now fail hard rather than
+    resolving with `-X ours`, so the residual risk is wasted work, not lost
+    work — but wasted work on 620,000 records is still worth avoiding.
+
+14. **A coefficient must be verified against a primary or secondary source.**
+    (Operator, 2026-09-03: *"we cannot state unverified as it is illogical."*)
+    Publishing a number labelled unverified is not an option — either it is
+    checked against sources and the check is recorded, including any dissent,
+    or the metric does not pin. Machine extraction from a PDF of the standard
+    is not automatically superior to a peer-reviewed restatement: proximity to
+    the primary source is not fidelity to it. See
+    `doctrine/AMENDMENT_DRAFT_I8_definition.md` §2 for the worked example.
+
+15. **Spend: standing approval below a threshold, on services already set up.**
+    Above it, options are costed and the operator decides. Account creation and
+    credentials remain the operator's in every case (pin 9), so this covers
+    usage on services that already exist, never the establishing of them.
+    THRESHOLD NOT YET SET — pending.
+
+16. **Every change follows the pinned sequence** in
+    `doctrine/SEQUENCE_change_order.md` (operator pin, 2026-09-10):
+    decide → acquire → measure → pin → derive → propagate → project →
+    measure the result → land.
+      - The pin SPLITS when a parameter can only be measured: definition
+        before the data, parameter after the fleet exists.
+      - Documents are PROJECTIONS. Never hand-edited; the YAML changes and
+        the documents re-render.
+      - Render ONCE and LAST — they measure the repository — and render one
+        country and read it before looping 39.
+      - Land master documents BEFORE the site repo: the site's records cite
+        doctrine that master documents defines.
+      - The public website and any R recomputation are CONSEQUENCES, not
+        steps. Each needs its own operator decision, never automatic.
 
 ## What this repo is
 

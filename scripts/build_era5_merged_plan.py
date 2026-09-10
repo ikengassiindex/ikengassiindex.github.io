@@ -78,6 +78,9 @@ def merge_to(boxes, k):
     return groups
 
 
+MB_RATE = [MB_PER_DEG2]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--plan", required=True)
@@ -86,8 +89,21 @@ def main() -> int:
     ap.add_argument("--variables", nargs="+", required=True)
     ap.add_argument("--statistic", required=True)
     ap.add_argument("--tag", required=True)
+    ap.add_argument("--mb-per-deg2", type=float, default=None,
+                    help="override the byte rate. The default 0.0659 was "
+                         "MEASURED on ERA5-Land at 0.1 deg. A 0.25 deg product "
+                         "has (0.1/0.25)^2 = 0.16 of the cells per square "
+                         "degree, so its rate is ~0.0105 — DERIVED, not "
+                         "measured, and the plan says so.")
+    ap.add_argument("--dataset", default=None,
+                    help="override the dataset; the single-levels daily "
+                         "statistics need product_type, ERA5-Land does not")
+    ap.add_argument("--extra", default=None,
+                    help='JSON merged into every request, e.g. \'{"product_type":"reanalysis"}\'')
     a = ap.parse_args()
 
+    if a.mb_per_deg2:
+        MB_RATE[0] = a.mb_per_deg2
     old = json.loads(pathlib.Path(a.plan).read_text())
     flat, members = [], []
     for slug, bs in old["boxes"].items():
@@ -116,15 +132,16 @@ def main() -> int:
             "north": round(bb[0], 2), "west": round(bb[1], 2),
             "south": round(bb[2], 2), "east": round(bb[3], 2),
             "deg2": round(area(bb), 1),
-            "est_mb_per_variable_year": round(area(bb) * MB_PER_DEG2, 1),
+            "est_mb_per_variable_year": round(area(bb) * MB_RATE[0], 1),
             "covers_boxes": sorted(idx[id(b)] for b in g),
             "covers_countries": sorted({idx[id(b)].split(":")[0] for b in g})})
 
     nreq = len(regions) * len(years) * len(a.variables)
-    gb = tot * MB_PER_DEG2 * len(years) * len(a.variables) / 1000
+    gb = tot * MB_RATE[0] * len(years) * len(a.variables) / 1000
 
     plan = {
-        "dataset": old["dataset"],
+        "dataset": a.dataset or old["dataset"],
+        "extra_request": json.loads(a.extra) if a.extra else {},
         "years": old["years"],
         "tag": a.tag,
         "statistic": a.statistic,
@@ -139,11 +156,18 @@ def main() -> int:
                          "Measured by probe_era5_cost_frontier.py and "
                          "probe_era5_area_sensitivity.py — a global box prices "
                          "365.0 against a limit of 400.0, identical to Denmark.",
-            "mb_per_deg2": MB_PER_DEG2,
-            "mb_per_deg2_basis": f"extrapolated from {MEASURED_N} files of the "
-                                 f"stalled run, 2 to 2370 deg^2, observed rates "
-                                 f"0.054 to 0.084 MB/deg^2. AN EXTRAPOLATION, "
-                                 f"NOT A MEASUREMENT OF THE MERGED BOXES.",
+            "mb_per_deg2": MB_RATE[0],
+            "mb_per_deg2_basis": (
+                "MEASURED on ERA5-Land 0.1 deg from 12 files of the stalled "
+                "run, 2 to 2370 deg^2, observed rates 0.054 to 0.084 "
+                "MB/deg^2. An extrapolation to the merged boxes, not a "
+                "measurement of them."
+                if MB_RATE[0] == MB_PER_DEG2 else
+                f"DERIVED, NOT MEASURED. {MB_RATE[0]} MB/deg^2 was obtained "
+                f"from the 0.1 deg ERA5-Land measurement (0.0659) by the "
+                f"cell-count ratio for this grid. No file from this dataset "
+                f"has been weighed. Treat the size estimate as indicative "
+                f"until the first request lands."),
             "measured_throughput_per_day": 5.74},
     }
     pathlib.Path(a.out).write_text(json.dumps(plan, indent=2))

@@ -60,7 +60,12 @@ CACHE = ROOT / "scripts" / "pipeline" / ".cache"
 MIN_YEARS = 4
 MAX_SNAP = 6
 IRI_TOP = 0.30
-ANCHOR = None          # metres SWE. Pin by amendment after --raw-only.
+ANCHOR = 0.9029        # metres SWE. P99.9 of the fleet, FROZEN.
+                       # Operator pin 2026-09-09, DECISION_I1_anchor.md.
+                       # 628 of 622,079 records (0.101%) saturate at IRI_TOP.
+                       # Revisable only by amendment, and only if the fleet
+                       # saturates against it — a condition visible in the
+                       # published data.
 TIME_CHUNK = 40        # days read at once; bounds peak memory on a 2 GB file
 
 
@@ -268,12 +273,22 @@ def main() -> int:
         return 0
 
     # ---- 3. mean over years, refusing short records ----
-    vals, written = [], {}
+    vals, written, clamped = [], {}, [0]
     for (slug, k), by in peryear.items():
         good = [v for v in by.values() if v is not None and np.isfinite(v)]
         if len(good) < MIN_YEARS:
             continue
         raw = float(np.mean(good))
+        # ERA5-Land carries tiny negative snow water equivalents from numerical
+        # noise. Averaged and rounded to 5 dp they become NEGATIVE ZERO, which
+        # is numerically equal to 0.0 but serialises into the published JSON as
+        # "-0.0" — a negative snow load on 23,997 records when this was first
+        # run. A water equivalent below zero is physically impossible, so it is
+        # clamped here and the count is declared rather than silently absorbed.
+        if not raw > 0.0:
+            if raw != 0.0 or str(raw)[0] == "-":
+                clamped[0] += 1
+            raw = 0.0
         written.setdefault(slug, {})[k] = (raw, len(good))
         vals.append(raw)
 
@@ -285,6 +300,8 @@ def main() -> int:
     v = np.array(vals)
     qs = [50, 90, 99, 99.5, 99.9, 100]
     print(f"\n  FLEET — {len(v):,} substations with >= {MIN_YEARS} years")
+    print(f"    clamped to zero (negative or negative-zero SWE, physically "
+          f"impossible): {clamped[0]:,}")
     for q in qs:
         print(f"    P{q:<6} {np.percentile(v, q):.4f} m SWE")
     print(f"    zero or near-zero (<1 mm): "
@@ -293,11 +310,11 @@ def main() -> int:
     for slug, rows in sorted(written.items()):
         man, subs, paths = load(slug)          # reopened here, not held in pass one
         for k, (raw, ny) in rows.items():
-            subs[k]["_I1_raw"] = round(raw, 5)
+            subs[k]["_I1_raw"] = round(raw, 5) + 0.0
             subs[k]["_I1_years"] = ny
             if ANCHOR:
                 m = subs[k].setdefault("metrics", {})
-                m["I1"] = round(IRI_TOP * min(1.0, raw / ANCHOR), 5)
+                m["I1"] = round(IRI_TOP * min(1.0, max(0.0, raw) / ANCHOR), 5) + 0.0
         man.setdefault("meta", {}).setdefault("metric_derivations", []).append({
             "metric": "I1",
             "at_utc": datetime.now(timezone.utc).isoformat(),

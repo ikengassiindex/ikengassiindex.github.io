@@ -116,3 +116,92 @@ nothing is published. The exposure is to the plan. Counted from
   is resumed for any reason, the u and v sets should not be resumed with it,
   and the dmean set should not be spent until I8's definition is pinned and
   states which quantity it is actually computing.
+
+
+---
+
+# ADDENDUM — 2026-09-03, later the same day: I2 moves to gust
+
+Status: DRAFT for the operator's pin, alongside the body above.
+The body diagnosed I2. This resolves it, and NOT by the route the body proposed.
+
+## A1. What changed
+
+The body concluded that I2 needs hourly u and v, and that Earth Engine was the
+practical route because hourly through the CDS was prohibitive. Both halves were
+too quick.
+
+Asked what variables the datasets actually offer — which should have come before
+any of it — `derived-era5-single-levels-daily-statistics` carries
+
+    10m_wind_gust_since_previous_post_processing
+
+the maximum gust over each output interval. Its `daily_maximum` is a SCALAR
+maximum of a SCALAR field. There is nothing to combine, so the defect that
+broke I2 cannot arise: the error had no sign because two independently
+maximised components were being recombined, and here there is one number.
+
+Priced: **365.0 against a limit of 400.0, and area-free**, exactly as for
+ERA5-Land. 20 requests, ~1.3 GB, on the credential the estate already holds.
+
+Operator decision, 2026-09-03: proceed on gust; revisit hourly only if this
+proves unacceptable.
+
+## A2. The new definition
+
+    gust(d) = daily maximum 10 m wind gust at the unit's grid cell,  m/s
+    I2_raw  = mean annual sum over days of max(0, gust(d) − GUST_THRESHOLD)
+              in m/s-days
+
+    Method C, C_bounded on [0, 0.30], polarity higher-is-worse — unchanged.
+
+**GUST_THRESHOLD IS NOT PINNED AND IS NOT INVENTED HERE.** The old 17.2 m/s is
+Beaufort 8, a SUSTAINED (10-minute mean) value. Gusts exceed it routinely
+without damage, so carrying it over would manufacture excess on most of the
+fleet. Converting it requires choosing a gust factor, which is terrain-
+dependent and would be a judgement dressed as arithmetic.
+
+The threshold is therefore pinned the way I3's anchor was: fetch, derive the
+raw fleet, measure the distribution, pin against it under §8, re-derive. The
+fetch does not depend on the threshold, which is why it runs first.
+
+## A3. Why gust is arguably the better quantity, not merely the cheaper one
+
+I2's hazard is tree-fall and span failure. Those are gust-driven events:
+IEC 60826 designs overhead lines to a reference wind speed with gust response
+factors rather than to a mean. A metric on daily maximum gust is closer to the
+mechanism than one on daily maximum sustained wind would have been.
+
+This must not be overstated. It is a better proxy for the WIND DRIVER. The
+vegetation term declared in the body is still absent, and I2 still carries half
+of a two-term hazard. Nothing here changes that.
+
+## A4. Three declarations this carries
+
+**Resolution.** ERA5 single-levels is 0.25° (~31 km); I1, I3 and I5 are
+ERA5-Land at 0.1° (~9 km). The estate would mix grids, and 31 km is coarse for
+a site-level metric in complex terrain. Declared under Convention #7. ERA5-Land
+carries no gust variable — checked, it offers only the u and v components — so
+this is the price of a computable I2, not an oversight.
+
+**Gust is modelled, not observed.** ERA5's gust is a parametrisation of
+sub-grid variability, not a measurement. It inherits that model's behaviour,
+and in complex terrain gust parametrisations are known to be weak.
+
+**The 3-second gust is an interval maximum.** `since_previous_post_processing`
+is the maximum over each output interval, so a daily maximum of it is a true
+daily maximum gust. This was verified against the variable's definition rather
+than assumed — the assumption of that shape is exactly what produced the defect
+in the body above.
+
+## A5. What is superseded
+
+Section 6 of the body — "the defect decides the source" — stands as reasoning
+but its conclusion is withdrawn. It concluded hourly, because it did not ask
+whether a scalar gust field existed. The rule it rests on is unchanged and
+still governs I8: a nonlinear function of two variables cannot be computed from
+their independently pre-aggregated marginals. The answer for I2 was not to
+fetch both marginals at higher frequency. It was to fetch a field that is
+already the quantity wanted.
+
+That is the fourth strategy for this metric. It is recorded as such.

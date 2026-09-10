@@ -117,7 +117,8 @@ def main() -> int:
 
     def run(job):
         r, y, v, out = job
-        req = {"variable": [v], "year": [y],
+        req = {**plan.get("extra_request", {}),
+               "variable": [v], "year": [y],
                "month": [f"{m:02d}" for m in range(1, 13)],
                "day": [f"{d:02d}" for d in range(1, 32)],
                "daily_statistic": plan["statistic"],
