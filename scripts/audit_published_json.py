@@ -101,6 +101,11 @@ def main() -> int:
     by_country = collections.Counter()
     text_total = 0
     nfiles = 0
+    # A declared shard that is not on disk is NOT a clean file. This audit
+    # runs inside workflows whose checkout may not include every path, and a
+    # gate that reports "none" because it never saw the data is worse than no
+    # gate: it is a bar that cannot fail. Counted separately and fatal.
+    unchecked = []
 
     for slug in slugs():
         man_p = ROOT / slug / "ssi-data.json"
@@ -110,7 +115,11 @@ def main() -> int:
         files = [man_p]
         man = json.loads(man_p.read_text())
         for e in (man.get("substations_shards") or []):
-            files.append(ROOT / slug / pathlib.Path(e["path"]).name)
+            q = ROOT / slug / pathlib.Path(e["path"]).name
+            if q.exists():
+                files.append(q)
+            else:
+                unchecked.append(f"{slug}/{q.name}")
         before = sum(negz.values())
         for p in files:
             nfiles += 1
@@ -120,7 +129,16 @@ def main() -> int:
         by_country[slug] = sum(negz.values()) - before
 
     total = sum(negz.values())
-    print(f"\n  AUDIT — {nfiles} published JSON files, {len(slugs())} countries\n")
+    print(f"\n  AUDIT — {nfiles} published JSON files, {len(slugs())} countries")
+    if unchecked:
+        print(f"\n  NOT CHECKED — {len(unchecked)} declared shard(s) absent from")
+        print(f"  this checkout. The audit did not see them, so it cannot call")
+        print(f"  them clean. Run where the full tree is present.")
+        for u in unchecked[:8]:
+            print(f"    {u}")
+        if len(unchecked) > 8:
+            print(f"    … and {len(unchecked)-8} more")
+    print()
 
     print(f"  A. NEGATIVE ZERO by JSON path")
     if negz:
@@ -152,7 +170,11 @@ def main() -> int:
               f"{sum(1 for v in by_country.values() if v)} of {len(slugs())}")
 
     findings = total + sum(nonfinite.values()) + (0 if agree else 1)
-    print(f"\n  {findings:,} finding(s)")
+    print(f"\n  {findings:,} finding(s) · {len(unchecked)} file(s) NOT CHECKED")
+    if unchecked and a.gate:
+        print(f"  GATE FAILED — an audit that did not read the shards cannot")
+        print(f"  pass them. Give this job a full checkout.")
+        return 1
     if a.gate and findings:
         print(f"  GATE FAILED")
         return 1

@@ -102,6 +102,24 @@ jobs:
             fi
           done
 
+      # KB §91.E — negative-zero gate, added 2026-09-11.
+      # round() on a small negative yields -0.0: equal to 0.0, but serialised
+      # as the token "-0.0". It reached production as metrics.I1 = -0.0 on
+      # 23,997 substations (a negative snow load) and, once swept, as 251 more
+      # in modifier_impacts.* and skewness across 30 countries. The producer
+      # was fixed at five boundaries in the scoring engine (5bcaf8e8) and the
+      # records cleaned (63b011f6); this stops it coming back.
+      #
+      # It runs HERE and not in validate.yml because validate.yml uses a
+      # sparse checkout that pulls */ssi-data.json but not the shards - where
+      # every one of the 251 actually lived. A gate that cannot see the data
+      # is a bar that cannot fail. This job checks out the full tree, so the
+      # audit refuses if any declared shard is missing rather than reporting
+      # clean.
+      - name: Negative-zero gate on published records
+        if: steps.gate.outputs.skip != 'true'
+        run: python3 scripts/audit_published_json.py --gate
+
       # ── Step 3: Commit and push ──
       - name: Commit and push
         if: steps.gate.outputs.skip != 'true'
