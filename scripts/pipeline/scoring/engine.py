@@ -31,6 +31,7 @@ from copy import deepcopy
 import numpy as np
 
 from .modifier_registry import compute_modifier_terms, per_modifier_impacts
+from .numeric_hygiene import clean as _nz_clean, nz as _nz
 
 logger = logging.getLogger(__name__)
 
@@ -260,8 +261,10 @@ def apply_country_normalised_bands(substations):
         else:
             s["classification"] = classify_band_normalised(R, R_P5, R_P95)
             # Audit trail per Convention #56
-            s["_band_norm_R_P5"] = round(R_P5, 4)
-            s["_band_norm_R_P95"] = round(R_P95, 4)
+            # -0.0 hygiene, boundary 3 of 5 — written in place, so it does
+            # not pass through any return this module cleans
+            s["_band_norm_R_P5"] = _nz(round(R_P5, 4))
+            s["_band_norm_R_P95"] = _nz(round(R_P95, 4))
             n_norm += 1
     return (R_P5, R_P95, n_norm, n_skip)
 
@@ -621,14 +624,18 @@ def monte_carlo(components, modifiers, iterations=10_000, seed=None,
     else:
         skew = 0.0
 
-    return {
+    # -0.0 hygiene, boundary 1 of 5. round() on a small negative yields -0.0,
+    # which equals 0.0 but serialises as "-0.0". skewness is the field that
+    # actually did this in production; the other five here are the same shape
+    # and clean only by luck. See doctrine/FINDING_negative_zero_is_estate_wide.md
+    return _nz_clean({
         "R_median": round(R_median, 4),
         "R_P5": round(R_P5, 4),
         "R_P95": round(R_P95, 4),
         "CI_width": round(R_P95 - R_P5, 4),
         "skewness": round(skew, 4),
         "P_critical": round(P_critical, 4),
-    }
+    })
 
 
 def score_substation(sub, seismic_update=None, climate_update=None, socio_update=None):
@@ -725,7 +732,11 @@ def score_substation(sub, seismic_update=None, climate_update=None, socio_update
     updated["add_sum"] = round(add_sum, 4)
     updated["modifier_impacts"] = per_modifier_impacts(modifiers)
 
-    return updated
+    # -0.0 hygiene, boundary 2 of 5 and the important one: this is the
+    # record that reaches ssi-data.json. It covers every field the record
+    # carries, including fields added later — which is the part a point
+    # fix at a known-bad site cannot do.
+    return _nz_clean(updated)
 
 
 # ═══════════════════════════════════════════════════════════
@@ -793,7 +804,8 @@ def compute_fleet_summary(substations):
             "_stats_pending_l3_rescore": True,
         })
 
-    return summary
+    # -0.0 hygiene, boundary 4 of 5
+    return _nz_clean(summary)
 
 
 def compute_regional_summary(substations):
@@ -847,10 +859,11 @@ def compute_regional_summary(substations):
         summaries.append(entry)
 
     # Sort: regions with numeric median_R descending, then unclassified regions last
-    return sorted(
+    # -0.0 hygiene, boundary 5 of 5
+    return _nz_clean(sorted(
         summaries,
         key=lambda x: (x["median_R"] is None, -(x["median_R"] or 0.0)),
-    )
+    ))
 
 
 # ═══════════════════════════════════════════════════════════
