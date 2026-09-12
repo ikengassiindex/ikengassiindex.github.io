@@ -116,6 +116,26 @@ jobs:
       # is a bar that cannot fail. This job checks out the full tree, so the
       # audit refuses if any declared shard is missing rather than reporting
       # clean.
+      # KB §91.F — reproducibility gate, added 12 September 2026.
+      # Every metric is published alongside a raw counterpart so a reader can
+      # verify it WITHOUT trusting the producer. On 12 September that promise
+      # was found broken on 149,320 records across three metrics: I1 at 7.457
+      # per cent and I5 at 16.450 (metric computed from an unrounded raw while
+      # the raw was published rounded), and I1/I2 published on [0, 0.30] while
+      # I3-I6 used [0, 1], which also made _<C>_from_metrics mix two scales.
+      #
+      # All six now reproduce exactly. This stops any of it coming back, and
+      # means I7, I8 and I9 inherit the guarantee instead of each having to be
+      # caught the way these six were.
+      #
+      # It runs HERE rather than in validate.yml for the same reason as the
+      # negative-zero gate: validate.yml's sparse checkout pulls */ssi-data.json
+      # but not the shards, and the gate refuses rather than passing when a
+      # declared shard is missing.
+      - name: Metric reproducibility gate
+        if: steps.gate.outputs.skip != 'true'
+        run: python3 scripts/verify_metrics_reproducible.py --gate
+
       - name: Negative-zero gate on published records
         if: steps.gate.outputs.skip != 'true'
         run: python3 scripts/audit_published_json.py --gate
