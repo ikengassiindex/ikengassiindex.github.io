@@ -115,6 +115,37 @@ def in_bot_window(now=None) -> str | None:
     return None
 
 
+def load_country(slug):
+    """Returns (manifest, substations, shard_paths). Mirrors the ERA5 I2
+    derivation exactly so a record is read and written the same way whichever
+    instrument touches it."""
+    man = json.loads((ROOT / slug / "ssi-data.json").read_text())
+    sh = man.get("substations_shards")
+    if not sh:
+        return man, man.get("substations") or [], None
+    subs, paths = [], []
+    for e in sh:
+        q = ROOT / slug / pathlib.Path(e["path"]).name
+        raw = json.loads(q.read_text())
+        blk = raw if isinstance(raw, list) else (raw.get("substations") or [])
+        subs.extend(blk)
+        paths.append((q, len(blk), isinstance(raw, list)))
+    return man, subs, paths
+
+
+def save_country(slug, man, subs, paths):
+    if paths is None:
+        man["substations"] = subs
+        (ROOT / slug / "ssi-data.json").write_text(json.dumps(man))
+        return
+    off = 0
+    for q, cnt, was_list in paths:
+        blk = subs[off:off + cnt]
+        off += cnt
+        q.write_text(json.dumps(blk if was_list else {"substations": blk}))
+    (ROOT / slug / "ssi-data.json").write_text(json.dumps(man))
+
+
 def load_cellmap():
     if not CELLMAP.exists():
         sys.exit(f"no {CELLMAP.name} — run scripts/resolve_cerra_cells.py first")
@@ -265,6 +296,9 @@ def main() -> int:
                          "NOT I2 and must never be pinned against — it exists "
                          "to exercise the arithmetic against real data before "
                          "the archive is complete.")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="compute and report what would be written, touching "
+                         "no file")
     ap.add_argument("--spot-check", type=int, default=0, metavar="N",
                     help="with --probe-year: recompute N substations' annual "
                          "maxima directly from the monthly files, by brute "
@@ -280,6 +314,8 @@ def main() -> int:
         print(f"  as chosen-after wherever its output is used.")
 
     writing = not (a.raw_only or a.probe_year)
+    if writing and not a.candidates:
+        CANDIDATES = [GUST_THRESHOLD]
     if writing:
         if GUST_THRESHOLD is None or ANCHOR is None:
             sys.exit("GUST_THRESHOLD and ANCHOR are not pinned. Run --raw-only, "
@@ -418,7 +454,76 @@ def main() -> int:
     for s in sorted(by):
         print(f"    {s:<16}{by[s]:>9,}")
 
-    print(f"\n  Nothing written — --raw-only. metrics.I2 needs the pin.")
+    if a.raw_only:
+        print(f"\n  Nothing written — --raw-only. metrics.I2 needs the pin.")
+        return 0
+
+    # ── WRITE ───────────────────────────────────────────────────────────────
+    # ex was computed over CANDIDATES; in write mode that list is the single
+    # pinned threshold, so row 0 IS the pinned quantity. Asserted rather than
+    # assumed, because a mismatch here would publish the wrong metric silently.
+    if len(CANDIDATES) != 1 or CANDIDATES[0] != GUST_THRESHOLD:
+        sys.exit(f"internal: CANDIDATES is {CANDIDATES}, expected exactly "
+                 f"[{GUST_THRESHOLD}] in write mode. Refusing to write.")
+
+    raw_of = {}
+    for s_i, (sid, k) in enumerate(zip(slug_id[keep], sub_index[keep])):
+        raw_of[(slugs[sid], int(k))] = float(ex[0][s_i])
+
+    print(f"\n  WRITING metrics.I2 and metrics._I2_raw")
+    print(f"  threshold {GUST_THRESHOLD} m/s · anchor {ANCHOR} m/s-days · "
+          f"IRI_TOP {IRI_TOP}")
+    if a.dry_run:
+        print(f"  DRY RUN — nothing will be written\n")
+
+    written = skipped_absent = clamped = 0
+    per_country = {}
+    for slug in sorted({s for s, _ in raw_of}):
+        man, subs, paths = load_country(slug)
+        n = 0
+        for k, sub in enumerate(subs):
+            r = raw_of.get((slug, k))
+            if r is None:
+                # Convention #56 — outside the domain, or too few years. No
+                # field at all: not a zero, not a default, not a placeholder.
+                skipped_absent += 1
+                continue
+            m = sub.setdefault("metrics", {})
+            # The metric is computed from the ROUNDED raw, not the full-precision
+            # one, so that a reader holding the published record can recompute
+            # I2 from the published _I2_raw and get the same answer. Deriving
+            # from the unrounded value left 919 of 513,554 records (0.179%)
+            # whose published metric could not be reproduced from their own
+            # published inputs - and the same construction left 46,391 of I1's
+            # 622,079 (7.457%) in that state. The cost is at most 1 unit in the
+            # 5th decimal, 0.003% of the metric's range. Reproducibility of a
+            # published record is worth more than that.
+            r = round(r, 5) + 0.0
+            v = round(IRI_TOP * min(1.0, max(0.0, r) / ANCHOR), 5) + 0.0
+            if v == 0.0:
+                v = 0.0            # kill any negative zero before it is written
+                clamped += 1
+            m["I2"] = v
+            m["_I2_raw"] = r          # already rounded above; the pair agrees
+            n += 1
+        if not a.dry_run and n:
+            save_country(slug, man, subs, paths)
+        per_country[slug] = n
+        written += n
+        del subs
+
+    print(f"  {'country':<16}{'written':>10}")
+    for slug in sorted(per_country):
+        print(f"  {slug:<16}{per_country[slug]:>10,}")
+    print(f"\n  {written:,} records given metrics.I2")
+    print(f"  {622104 - written:,} left ABSENT — outside the CERRA domain or "
+          f"fewer than {MIN_YEARS} years")
+    print(f"  {clamped:,} written as exactly 0.0 (no day exceeded the threshold)")
+    if a.dry_run:
+        print(f"\n  DRY RUN — no file was touched.")
+    else:
+        print(f"\n  written. Verify with:")
+        print(f"    python3 scripts/audit_published_json.py --gate")
     return 0
 
 
