@@ -499,11 +499,20 @@ def main() -> int:
             # 5th decimal, 0.003% of the metric's range. Reproducibility of a
             # published record is worth more than that.
             r = round(r, 5) + 0.0
-            v = round(IRI_TOP * min(1.0, max(0.0, r) / ANCHOR), 5) + 0.0
+            # Construct section 03: the metric field carries N(x) in [0, 1];
+            # the 0.30 contribution is carried separately as _I2_iri, as I3
+            # does. Both derive from the ROUNDED raw so a reader can recompute
+            # either from the record.
+            n = min(1.0, max(0.0, r) / ANCHOR)
+            v = round(n, 4) + 0.0
+            iri = round(IRI_TOP * n, 5) + 0.0
             if v == 0.0:
                 v = 0.0            # kill any negative zero before it is written
                 clamped += 1
+            if iri == 0.0:
+                iri = 0.0
             m["I2"] = v
+            m["_I2_iri"] = iri
             m["_I2_raw"] = r          # already rounded above; the pair agrees
             n += 1
         if not a.dry_run and n:

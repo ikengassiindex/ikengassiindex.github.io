@@ -322,8 +322,16 @@ def main() -> int:
             subs[k]["_I1_raw"] = raw
             subs[k]["_I1_years"] = ny
             if ANCHOR:
+                # Construct section 03: both normalisation methods produce
+                # N(x) in [0, 1]. The metric field carries N(x); the 0.30
+                # contribution is carried separately as _I1_iri, exactly as
+                # I3 does. Until 12 September this published 0.30 x N(x) as
+                # the metric, which put I1 and I2 on a different scale from
+                # I3-I6 and made _<C>_from_metrics mix two scales.
                 m = subs[k].setdefault("metrics", {})
-                m["I1"] = round(IRI_TOP * min(1.0, max(0.0, raw) / ANCHOR), 5) + 0.0
+                n = min(1.0, max(0.0, raw) / ANCHOR)
+                m["I1"] = round(n, 4) + 0.0
+                m["_I1_iri"] = round(IRI_TOP * n, 5) + 0.0
         man.setdefault("meta", {}).setdefault("metric_derivations", []).append({
             "metric": "I1",
             "at_utc": datetime.now(timezone.utc).isoformat(),

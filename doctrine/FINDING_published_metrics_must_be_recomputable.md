@@ -52,23 +52,72 @@ The lesson is the ordinary one: a test that does not model the thing it
 measures will produce numbers, and the numbers will be wrong in whichever
 direction the test's assumption leans.
 
-## 4. The second problem, which is larger than the rounding
+## 4. A CLAIM IN THIS DOCUMENT WAS WRONG — corrected 12 September
 
-I1 and I2 normalise against a **global anchor recorded in doctrine**, so one
-record plus the decision document is enough to verify.
+This section previously asserted that I4, I5 and I6 normalise against
+per-country P5/P95 "published nowhere as numbers... only inside the provenance
+sentence, as words", and concluded that the estate had "two tiers of
+auditability and says so nowhere".
 
-I4, I5 and I6 normalise against **that country's fleet P5/P95, and those
-values are published nowhere as numbers.** They appear only inside the
-provenance sentence — "Method B over this country's fleet P5/P95" — 44,904
-times in Austria's manifest alone, always as words.
+**That was false.** The anchors are published, at full precision, in
+`meta.metric_derivations[]`:
 
-They are not unverifiable: a reader can re-derive the percentiles from all of
-that country's published raws, which is what `derive_from_raw` does. But that
-requires the whole country's file rather than the record in hand, and
-percentiles recomputed from *rounded* raws will not exactly equal the
-originals.
+    anchors : {'I4': [5.007807995615456, 131.79367741271264],
+               'I6': [38.0, 1079.0]}
+    anchor  : {'value': 51.93, 'units': 'degree Celsius days per year',
+               'maps_to': 0.3, 'frozen': True, 'basis': '...'}
 
-**So the estate has two tiers of auditability and says so nowhere.**
+The claim came from grepping a manifest for the string `anchor`, seeing 765
+hits, and inferring prose without opening one of them. It reached two commit
+messages before it was checked.
+
+One real property of that log does matter: **`metric_derivations` is
+APPEND-ONLY.** Austria carries three I1 entries and two for I4/I6. The LAST
+entry naming a metric is the live one; reading an earlier one gives a
+superseded anchor. I3's current Method C anchor supersedes an earlier Method B
+pair in the same log.
+
+Measured against the published anchors, taking the last entry per metric:
+
+| metric | checked | reproducible | not |
+|---|---|---|---|
+| I1 | 622,079 | **622,079** | 0 |
+| I2 | 513,554 | **513,554** | 0 |
+| I3 | 620,129 | **620,129** | 0 |
+| I4 | 620,696 | **620,696** | 0 |
+| **I5** | 620,129 | 518,119 | **102,010 — 16.450%** |
+| I6 | 620,696 | **620,696** | 0 |
+
+Five of six reproduce from the published record. **Only I5 does not**, and for
+the precision reason in section 2, not an anchor one.
+
+## 4a. The scale mismatch, found while checking the above
+
+Construct section 03 defines both normalisation methods as producing N(x) in
+[0, 1]. Published, I3/I4/I5/I6 carried N(x); **I1 and I2 carried 0.30 x N(x)**.
+
+The construct's line — "Method C ... Applies to: I1, I2, I3 [0, 0.30]" — is
+genuinely ambiguous. Beside C3 it reads "[0%, 100%]" and beside E2
+"(E2_local - 1.50) / (1.85 - 1.50)", which are unambiguously INPUT bounds. But
+`DECISION_I1_anchor.md` reads it as the output interval ("raw 0.9029 -> IRI
+0.3000"), and I1's raw runs to 0.9029 m, which cannot be an input bound of
+0.30. I3 resolved it one way, I1 and I2 the other. Both readings are
+defensible; together they were incoherent.
+
+It mattered because `ssi_derive_component_from_metrics.py` computes
+`sum(INTRA_WEIGHTS[k] * metrics[k]) / coverage` across both scales, so I1 and
+I2 entered the shadow component at roughly 30 per cent of their defined weight.
+
+**Aligned 12 September**, operator's pin, to [0, 1] — matching what both
+methods compute, matching four of the six metrics, and matching the shape I3
+already published:
+
+    I<n>       = round(min(1, raw / ANCHOR), 4)     [0, 1]
+    _I<n>_iri  = round(0.30 * min(1, raw / ANCHOR), 5)
+
+1,135,633 metric values changed. No raw, anchor, coverage or refusal moved, and
+no published R score moved. `_I_from_metrics` was rebuilt afterwards and is now
+arithmetically correct on all 622,104 records, range 0.0205 to 1.0000.
 
 ## 5. The principle
 
@@ -85,17 +134,20 @@ decimal, 0.003% of the metric's range. Verified across all 513,554 records:
 identity holds on every one, and ten records were rebuilt from their own
 lat/lon through all sixty archive files.
 
-**Outstanding, in order:**
+**Done since:** I1 repaired (46,391 records), I1 and I2 aligned to [0, 1],
+`_I_from_metrics` rebuilt, and the verifier rewritten to CHECK tier two
+against the published anchors rather than assert anything about them.
 
-1. I1 re-derive from the rounded raw — 622,079 records, ~46,391 last-digit
-   changes, anchor frozen and unchanged
-2. I5 re-derive likewise
-3. Publish the Method B P5/P95 for I4, I5 and I6 in each country's manifest
-4. A generic gate, so I7, I8 and I9 inherit the guarantee rather than each
-   having to be caught
+**Outstanding:**
 
-I3, I4 and I6 need no value change. Nothing measurable is wrong with them;
-they need only item 3.
+1. **I5.** The only metric that still does not reproduce. Its raw is published
+   at 5 dp against normalisation spans as narrow as 0.023 — about 2,300 steps
+   where ~10,000 are needed for a 4 dp metric. The information is not in the
+   record and cannot be recovered from it, so this needs a re-derivation from
+   the ERA5-Land archive (all 272 files are on disk) with the raw published at
+   7 dp.
+2. **A gate**, once I5 passes, so I7, I8 and I9 inherit the guarantee rather
+   than each having to be caught.
 
 ## 7. Why this was not caught in September
 

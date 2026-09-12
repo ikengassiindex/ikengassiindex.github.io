@@ -19,17 +19,18 @@ TWO TIERS, AND THE ESTATE SAYS SO NOWHERE
     frozen and recorded in doctrine. One record plus the decision document is
     enough to verify. This script checks those exactly.
 
-    COUNTRY-RELATIVE — I4, I5, I6. Method B against that country's own fleet
-    P5/P95, and those two numbers are published NOWHERE as values: they appear
-    only inside the provenance sentence, as words. A reader can recover them by
-    re-deriving percentiles from all of that country's published raws, but not
-    from the record in hand, and percentiles recomputed from ROUNDED raws will
-    not exactly equal the originals.
+    COUNTRY-RELATIVE — I3, I4, I5, I6. Normalised against that country's own
+    fleet, and the anchors ARE published, in meta.metric_derivations[]: as
+    `anchors` {metric: [P5, P95]} for the Method B metrics, and as `anchor`
+    {value, units, maps_to, frozen, basis} for I3's Method C. That log is
+    APPEND-ONLY, so the LAST entry naming a metric is the live one - reading
+    any earlier entry gives a superseded anchor.
 
-    So this script checks tier one exactly and reports tier two as UNVERIFIABLE
-    FROM THE RECORD rather than passing it. A check that cannot see the thing
-    it is meant to examine must not report green - that lesson cost this estate
-    four separate incidents in one week.
+    An earlier version of this script asserted those anchors were "published
+    nowhere as values, only inside the provenance sentence, as words". That
+    was false. It came from grepping the manifest for the string "anchor",
+    seeing 765 hits, and inferring prose without opening one. Corrected here
+    and in doctrine/FINDING_published_metrics_must_be_recomputable.md.
 
 WHAT --gate DOES
     Exits 1 if any tier-one metric fails, or if any file declared in a
@@ -44,16 +45,38 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # metric -> (raw field, where it lives, anchor, top, dp)
 GLOBAL = {
-    "I1": ("_I1_raw", "record",  0.9029,  0.30, 5),
-    "I2": ("_I2_raw", "metrics", 45.3363, 0.30, 5),
+    "I1": ("_I1_raw", "record",  0.9029,  0.30, 4),
+    "I2": ("_I2_raw", "metrics", 45.3363, 0.30, 4),
 }
-# metric -> raw field. Normaliser is per country and unpublished.
+# metric -> (raw field, normalisation). Anchors come from the manifest.
 COUNTRY_RELATIVE = {
-    "I3": "_I3_raw_degC_days",
-    "I4": "_I4_raw_km",
-    "I5": "_I5_raw_F_AA",
-    "I6": "_I6_raw_count",
+    "I3": ("_I3_raw_degC_days", "C"),      # frozen anchor, maps_to 0.30
+    "I4": ("_I4_raw_km",        "Binv"),   # Method B, inverted
+    "I5": ("_I5_raw_F_AA",      "B"),
+    "I6": ("_I6_raw_count",     "Binv"),
 }
+
+
+def method_b(x, p5, p95):
+    if p5 is None or p95 is None or p95 <= p5:
+        return None
+    return max(0.0, min(1.0, (x - p5) / (p95 - p5)))
+
+
+def live_anchors(man):
+    """metric_derivations is APPEND-ONLY: the LAST entry naming a metric wins."""
+    out = {}
+    for e in man.get("meta", {}).get("metric_derivations", []):
+        a = e.get("anchors")
+        if isinstance(a, dict):
+            for k, v in a.items():
+                if isinstance(v, (list, tuple)) and len(v) == 2:
+                    out[k] = ("B", float(v[0]), float(v[1]))
+        anc = e.get("anchor")
+        if isinstance(anc, dict) and anc.get("value") is not None:
+            for k in (e.get("metrics") or []):
+                out[k] = ("C", float(anc["value"]), float(anc.get("maps_to", 1.0)))
+    return out
 
 
 def slugs():
@@ -72,7 +95,8 @@ def main() -> int:
     # merged a raw that is ambiguous in two countries into one count and
     # reported 1,157 where the per-country measurement said 1,181. Two
     # instruments disagreeing about one quantity is the defect, not the gap.
-    amb = collections.Counter()
+    cr_ok = collections.Counter(); cr_bad = collections.Counter()
+    cr_noanchor = collections.Counter(); cr_ex = {}
     ncr = collections.Counter()
     unchecked = []
 
@@ -90,7 +114,7 @@ def main() -> int:
                     continue
                 raw = json.loads(q.read_text())
                 subs.extend(raw if isinstance(raw, list) else (raw.get("substations") or []))
-        local = {k: collections.defaultdict(set) for k in COUNTRY_RELATIVE}
+        anchors = live_anchors(man)
         for s in subs:
             m = s.get("metrics") or {}
             for k, (rf, where, anchor, top, dp) in GLOBAL.items():
@@ -101,18 +125,51 @@ def main() -> int:
                     continue
                 if not has_m:
                     continue
-                want = round(top * min(1.0, max(0.0, src[rf]) / anchor), dp)
+                # Aligned 12 September: the metric field carries N(x) in
+                # [0, 1] at 4 dp, and _<k>_iri the 0.30 contribution at 5 dp,
+                # each derived from the rounded raw. Both are checked.
+                nx = min(1.0, max(0.0, src[rf]) / anchor)
+                want = round(nx, 4)
+                want_iri = round(top * nx, 5)
+                if abs(m.get(f"_{k}_iri", -9e9) - want_iri) > 1e-9:
+                    bad[k] += 1
+                    example.setdefault(k, (slug, m.get(f"_{k}_iri"), want_iri,
+                                           src[rf]))
+                    continue
                 if abs(m[k] - want) > 1e-9:
                     bad[k] += 1
                     example.setdefault(k, (slug, m[k], want, src[rf]))
                 else:
                     ok[k] += 1
-            for k, rf in COUNTRY_RELATIVE.items():
-                if k in m and isinstance(m.get(rf), (int, float)):
-                    ncr[k] += 1
-                    local[k][m[rf]].add(m[k])
-        for k in COUNTRY_RELATIVE:
-            amb[k] += sum(1 for mv in local[k].values() if len(mv) > 1)
+            for k, (rf, how) in COUNTRY_RELATIVE.items():
+                if k not in m or not isinstance(m.get(rf), (int, float)):
+                    continue
+                ncr[k] += 1
+                if k not in anchors:
+                    cr_noanchor[k] += 1
+                    continue
+                kind, a1, a2 = anchors[k]
+                x = m[rf]
+                if kind == "C":
+                    # The metric field carries N(x) in [0, 1]; maps_to scales
+                    # the SEPARATE _<k>_iri field, not this one. Applying it
+                    # here reported I3 as 100% irreproducible, which was the
+                    # check being wrong, not I3.
+                    want = round(min(1.0, max(0.0, x) / a1), 4)
+                elif how == "Binv":
+                    w = method_b(a1 + a2 - x, a1, a2)
+                    want = None if w is None else round(w, 4)
+                else:
+                    w = method_b(x, a1, a2)
+                    want = None if w is None else round(w, 4)
+                if want is None:
+                    cr_noanchor[k] += 1
+                elif abs(m[k] - want) > 1e-9:
+                    cr_bad[k] += 1
+                    cr_ex.setdefault(k, (slug, m[k], want, x))
+                else:
+                    cr_ok[k] += 1
+
         del subs
 
     print(f"\n  TIER ONE — global anchor, verifiable from one record\n")
@@ -131,16 +188,20 @@ def main() -> int:
             s_, cur, want, r = example[k]
             print(f"           e.g. {s_}: published {cur}, from raw {r} -> {want}")
 
-    print(f"\n  TIER TWO — country-relative normaliser, NOT published as values\n")
-    for k, rf in COUNTRY_RELATIVE.items():
-        if not ncr[k]:
+    print(f"\n  TIER TWO — country-relative, anchors read from the manifest\n")
+    print(f"  {'metric':<8}{'checked':>11}{'reproducible':>14}{'NOT':>10}"
+          f"{'share':>9}{'no anchor':>12}")
+    for k in COUNTRY_RELATIVE:
+        n = cr_ok[k] + cr_bad[k]
+        if not n:
             continue
-        print(f"  {k:<8}{ncr[k]:>11,}   UNVERIFIABLE FROM THE RECORD "
-              f"({amb[k]:,} country/raw pair(s) map to more than one metric)")
-    print(f"\n  Tier two is not a pass and not a failure: the P5/P95 these use")
-    print(f"  are published nowhere as numbers, so this script cannot check")
-    print(f"  them. Publishing them in each manifest is what turns this into a")
-    print(f"  real check.")
+        if cr_bad[k]:
+            fail = True
+        print(f"  {k:<8}{n:>11,}{cr_ok[k]:>14,}{cr_bad[k]:>10,}"
+              f"{100*cr_bad[k]/n:>8.3f}%{cr_noanchor[k]:>12,}")
+        if k in cr_ex:
+            s_, cur, want, r = cr_ex[k]
+            print(f"           e.g. {s_}: published {cur}, from raw {r} -> {want}")
 
     if unchecked:
         fail = True
