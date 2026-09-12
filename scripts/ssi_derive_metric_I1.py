@@ -310,7 +310,16 @@ def main() -> int:
     for slug, rows in sorted(written.items()):
         man, subs, paths = load(slug)          # reopened here, not held in pass one
         for k, (raw, ny) in rows.items():
-            subs[k]["_I1_raw"] = round(raw, 5) + 0.0
+            # The metric derives from the ROUNDED raw, not the full-precision
+            # one, so a reader holding the published record can recompute I1
+            # from the published _I1_raw and get the same answer. Deriving from
+            # the unrounded value left 46,391 of 622,079 records (7.457%) whose
+            # published metric could not be reproduced from their own published
+            # inputs - found 12 September, repaired by
+            # scripts/ssi_repair_I1_reproducibility.py. The cost is at most 1
+            # unit in the 5th decimal, 0.003% of the metric's range.
+            raw = round(raw, 5) + 0.0
+            subs[k]["_I1_raw"] = raw
             subs[k]["_I1_years"] = ny
             if ANCHOR:
                 m = subs[k].setdefault("metrics", {})
