@@ -53,7 +53,7 @@ WHAT IT DOES NOT DO
     writes only under scripts/pipeline/.cache/, which is gitignored.
 """
 from __future__ import annotations
-import argparse, calendar, pathlib, re, sys, time
+import argparse, calendar, json, pathlib, re, sys, time
 from datetime import timedelta
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -131,7 +131,7 @@ def write_grid(src):
           f"{grid_path().stat().st_size/1e6:.1f} MB")
 
 
-def reduce_month(y, m, keep_raw) -> bool:
+def reduce_month(y, m, keep_raw, allow_short=False) -> bool:
     import netCDF4, numpy as np, cftime
     src, dst = raw_path(y, m), dmax_path(y, m)
     ndays = calendar.monthrange(y, m)[1]
@@ -140,11 +140,26 @@ def reduce_month(y, m, keep_raw) -> bool:
     tv = s.variables["valid_time"]
     stamps = cftime.num2date(tv[:], tv.units, getattr(tv, "calendar", "standard"))
     nt = len(stamps)
-    if nt != ndays * PER_DAY:
-        s.close()
-        print(f"    REFUSED — {nt} fields, expected {ndays*PER_DAY} "
-              f"({ndays} days x {PER_DAY}). Raw kept for inspection.")
-        return False
+    expected_fields = ndays * PER_DAY
+    if nt != expected_fields:
+        # EXTRA fields are never acceptable — duplicates or a wrong request
+        # shape are a different defect from an archive gap, and --allow-short-
+        # days must not wave them through.
+        if nt > expected_fields or not allow_short:
+            s.close()
+            print(f"    REFUSED — {nt} fields, expected {expected_fields} "
+                  f"({ndays} days x {PER_DAY}). Raw kept for inspection.")
+            if nt < expected_fields and not allow_short:
+                print(f"    If the {expected_fields - nt} missing field(s) are "
+                      f"genuinely absent from the archive rather than from this")
+                print(f"    retrieval, re-run with --allow-short-days: the gap is "
+                      f"then recorded in the file's own metadata instead of being")
+                print(f"    lost. Verify it is a real gap first — fetch the day "
+                      f"alone with probe_cerra_leadtime_semantics.py and see")
+                print(f"    whether it comes back short a second time.")
+            return False
+        print(f"    {nt} fields, expected {expected_fields} — "
+              f"{expected_fields - nt} missing. Enumerating by day.")
 
     # a field stamped at HH:00 is the maximum over the hour ENDING there,
     # so it belongs to the day that hour STARTED in
@@ -156,12 +171,16 @@ def reduce_month(y, m, keep_raw) -> bool:
               f"month {m:02d} after the hour-ending shift. Raw kept.")
         return False
     counts = np.bincount(day_of, minlength=ndays + 1)[1:]
-    if not (counts == PER_DAY).all():
-        bad = [(int(i + 1), int(c)) for i, c in enumerate(counts) if c != PER_DAY]
+    short = [(int(i + 1), int(c)) for i, c in enumerate(counts) if c != PER_DAY]
+    if short and not allow_short:
         s.close()
-        print(f"    REFUSED — days without exactly {PER_DAY} fields: {bad}. "
+        print(f"    REFUSED — days without exactly {PER_DAY} fields: {short}. "
               f"A short day is a silent low bias in a maximum. Raw kept.")
         return False
+    if short:
+        print(f"    SHORT DAYS ACCEPTED under --allow-short-days: {short}")
+        print(f"    Every value on those days is a LOWER BOUND on the true")
+        print(f"    maximum. Recorded in the file's short_days attribute.")
 
     var = s.variables[FIELD]
     ny, nx = var.shape[1], var.shape[2]
@@ -203,6 +222,13 @@ def reduce_month(y, m, keep_raw) -> bool:
     d.reduction = ("exact: a daily maximum is a maximum of maxima over one "
                    "variable, so no information required by I2 is lost")
     d.produced_by = "scripts/fetch_cerra_daily_max.py"
+    # Convention #56 — absence is recorded, never inferred from silence. A day
+    # with fewer than 24 hourly windows carries a maximum that is a LOWER BOUND
+    # on the truth, and the file says which days and how many fields each had,
+    # so a reader who never sees this script still knows.
+    d.short_days = json.dumps([{"day": dd, "fields": c, "expected": PER_DAY}
+                               for dd, c in short]) if short else "[]"
+    d.complete = "false" if short else "true"
     d.close()
     tmp.rename(dst)
 
@@ -289,6 +315,11 @@ def main() -> int:
     ap.add_argument("--months", help="comma list, e.g. 2018-01,2018-02")
     ap.add_argument("--years", help="range, e.g. 2018-2022")
     ap.add_argument("--keep-raw", action="store_true")
+    ap.add_argument("--allow-short-days", action="store_true",
+                    help="accept a month whose archive genuinely lacks an hour, "
+                         "recording which days are short in the output file. "
+                         "Never a default: verify the gap is in the archive and "
+                         "not in the retrieval first.")
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--reduce-only", action="store_true",
                     help="reduce raw files already on disk; fetch nothing")
@@ -331,7 +362,7 @@ def main() -> int:
             if not fetch_month(client, y, m):
                 failed += 1
                 continue
-        if reduce_month(y, m, a.keep_raw):
+        if reduce_month(y, m, a.keep_raw, a.allow_short_days):
             done += 1
         else:
             failed += 1

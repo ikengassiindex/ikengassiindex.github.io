@@ -31,6 +31,21 @@ PASS CRITERIA, FIXED HERE BEFORE THE TESTS RUN
     T6 metadata         the written file declares its leadtimes, its source and
                         the gust-day convention, so the archive is readable
                         without this script
+    T7 allow-short      with --allow-short-days a month missing ONE field is
+                        ACCEPTED, the short day is named in the file's
+                        short_days attribute, complete is "false", and every
+                        other day is untouched
+    T8 extras never     --allow-short-days must NOT wave through a month with
+                        MORE fields than expected. Duplicates are a different
+                        defect from an archive gap.
+
+    T7 and T8 were added on 12 September 2026, after --allow-short-days was
+    written and shipped WITHOUT a test for the path it enables. The flag was
+    gated on one of the reducer's two length checks and not the other, so the
+    first real use of it was refused in production. The suite tested only that
+    short months are REFUSED; nothing asserted the accept path worked at all.
+    A flag that adds a behaviour needs a test for that behaviour, not only for
+    the behaviour it relaxes.
 
     A test that only ever passes proves nothing, so T3 and T4 plant real
     defects and require a refusal. Attempt 2 of the mosaic passed three bars
@@ -38,7 +53,7 @@ PASS CRITERIA, FIXED HERE BEFORE THE TESTS RUN
     to fail for the right reason.
 """
 from __future__ import annotations
-import calendar, importlib.util, pathlib, shutil, sys
+import calendar, importlib.util, json, pathlib, shutil, sys
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -214,6 +229,38 @@ def main() -> int:
     ok = m.reduce_month(YEAR, MONTH, keep_raw=False)
     check("T4 wrong field count — REFUSED", ok is False)
     check("T4 wrong field count — raw NOT deleted", raw.exists())
+
+    # ---- T7 : --allow-short-days accepts, and records what it accepted ----
+    m = phase(5)
+    raw = m.raw_path(YEAR, MONTH)
+    plant(raw, drop=5)                       # one field missing from day 1
+    ok = m.reduce_month(YEAR, MONTH, keep_raw=True, allow_short=True)
+    check("T7 allow-short — a one-field gap is ACCEPTED", ok is True)
+    if ok:
+        d = netCDF4.Dataset(str(m.dmax_path(YEAR, MONTH)))
+        sd = json.loads(getattr(d, "short_days", "[]"))
+        comp = getattr(d, "complete", "?")
+        got = np.asarray(d.variables["fg10"][:], dtype="float32")
+        d.close()
+        check("T7 the short day is named in short_days",
+              len(sd) == 1 and sd[0]["day"] == 1 and sd[0]["fields"] == 23,
+              f"{sd}")
+        check("T7 complete flag is false", comp == "false", f"complete={comp}")
+        exp = expected()
+        check("T7 every OTHER day is unchanged",
+              np.array_equal(got[1:], exp[1:]),
+              f"days 2-{NDAYS} identical to the known answer")
+        check("T7 the short day is a LOWER bound, not a wrong number",
+              bool(np.all(got[0] <= exp[0])),
+              "day 1 <= the value it would have had with all 24 fields")
+
+    # ---- T8 : extras are refused even under --allow-short-days --------------
+    m = phase(6)
+    raw = m.raw_path(YEAR, MONTH)
+    plant(raw, duplicate=True)
+    ok = m.reduce_month(YEAR, MONTH, keep_raw=True, allow_short=True)
+    check("T8 extra fields REFUSED even with --allow-short-days", ok is False)
+    check("T8 no daily-max file written", not m.dmax_path(YEAR, MONTH).exists())
 
     print()
     bad = [n for n, ok, _ in results if not ok]

@@ -45,7 +45,7 @@ WHAT IT CHECKS
     the month that licences the other 59.
 """
 from __future__ import annotations
-import argparse, calendar, pathlib, sys
+import argparse, calendar, json, pathlib, sys
 from datetime import timedelta
 
 import numpy as np
@@ -130,8 +130,32 @@ def main() -> int:
     check("C2 boundary day — the last day, whose 24th field is stamped "
           "00:00 of the next month",
           ndays in order and not any(d == ndays for d, _ in bad_days))
-    check("C3 first day — short by design in hour 00:00-01:00, still 24 fields",
-          int((day_of == 1).sum()) == 24, f"{int((day_of == 1).sum())} fields")
+    # C3 — every day must carry 24 hourly windows, UNLESS the daily-max file
+    # itself declares that day short. A file that claims completeness must be
+    # complete; a file that declares a gap must have exactly the gap it
+    # declares. Checking against the claim, and the claim against the raw, is
+    # stronger than checking against 24: it catches both a silent short day
+    # and a declaration that does not match the data.
+    declared = {}
+    try:
+        for e in json.loads(getattr(D, "short_days", "[]")):
+            declared[int(e["day"])] = int(e["fields"])
+    except Exception:
+        pass
+    claims_complete = getattr(D, "complete", "true") == "true"
+    actual = {d: int((day_of == d).sum()) for d in range(1, ndays + 1)}
+    mismatch = [(d, actual[d], declared.get(d, 24)) for d in actual
+                if actual[d] != declared.get(d, 24)]
+    check("C3 day completeness — 24 fields per day, or exactly the shortfall "
+          "the file declares",
+          not mismatch,
+          (f"all {ndays} days as declared"
+           + (f"; declared short: {declared}" if declared else ""))
+          if not mismatch else f"day/actual/declared {mismatch[:4]}")
+    check("C3b the completeness flag matches the declaration",
+          claims_complete == (not declared),
+          f"complete={getattr(D,'complete','?')}, "
+          f"{len(declared)} day(s) declared short")
 
     dmax_all = float(np.nanmax(np.asarray(dv[:], dtype="float32")))
     full = len(order) == ndays

@@ -124,6 +124,28 @@ def complete_years():
     return full, partial
 
 
+def month_gaps(year):
+    """Days in a year whose daily maximum was built from fewer than 24 hourly
+    windows. fetch_cerra_daily_max.py records these in each file's short_days
+    attribute; a value there is a LOWER BOUND on the true maximum, so the
+    derivation must carry the caveat rather than let it end at the file."""
+    out = []
+    for m in range(1, 13):
+        q = ARCHIVE / f"cerra_dmax_{year}{m:02d}.nc"
+        if not q.exists():
+            continue
+        d = netCDF4.Dataset(str(q))
+        raw = getattr(d, "short_days", "[]")
+        d.close()
+        try:
+            for e in json.loads(raw):
+                out.append((f"{year}-{m:02d}-{e['day']:02d}",
+                            e["fields"], e["expected"]))
+        except Exception:
+            pass
+    return out
+
+
 def year_stats(year, ii, jj):
     """One pass over a year's twelve monthly files. Returns, per cell, the
     annual maximum and the exceedance sum at every candidate threshold. Both
@@ -271,6 +293,15 @@ def main() -> int:
                   f"{', '.join(f'{m:02d}' for m in miss)}. An annual maximum "
                   f"from a part-year is not an annual maximum.")
     print(f"  complete years on disk: {', '.join(full) if full else 'NONE'}")
+
+    gaps = [g for y in full for g in month_gaps(y)]
+    if gaps:
+        print(f"\n  ARCHIVE GAPS — {len(gaps)} day(s) built from fewer than 24")
+        print(f"  hourly windows. Every maximum on these days is a LOWER BOUND.")
+        for tag, got, exp in gaps:
+            print(f"    {tag}   {got} of {exp} fields")
+        print(f"  This is CERRA's gap, not the retrieval's, and it belongs in")
+        print(f"  the metric's limitation. It does not stop the derivation.")
 
     if len(full) < MIN_YEARS:
         print(f"\n  Fewer than MIN_YEARS={MIN_YEARS} complete years. "
