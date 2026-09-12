@@ -117,6 +117,21 @@ def derive(slug, subs, dry):
     if not raw:
         raise ValueError("no finite value")
 
+    # REPRODUCIBILITY — the whole chain hangs off the ROUNDED raw.
+    #
+    # Until 12 September the raw was published at 5 dp while the metric and the
+    # anchors were computed from full precision. F_AA's P5-P95 span is as narrow
+    # as 0.023 (Greenland), which is ~2,300 steps of 1e-5 where a 4 dp metric
+    # needs ~10,000 — so 102,010 of 620,129 records (16.450%) carried an I5 that
+    # could not be recomputed from the record's own published inputs, and the
+    # information needed was not in the record to recover.
+    #
+    # 7 dp gives ~230,000 steps across the narrowest span. The raw is rounded
+    # FIRST, the anchors are the percentiles OF the rounded raws, and the metric
+    # is computed from them — so published raw + published anchors reproduce the
+    # published metric exactly.
+    RAW_DP = 7
+    raw = [round(x, RAW_DP) + 0.0 for x in raw]
     sv = sorted(raw)
     p5, p95 = i3.percentile(sv, 0.05), i3.percentile(sv, 0.95)
     n = 0
@@ -126,8 +141,8 @@ def derive(slug, subs, dry):
             continue
         if not dry:
             m = subs[i].setdefault("metrics", {})
-            m["I5"] = round(v, 4)
-            m["_I5_raw_F_AA"] = round(raw[k], 5)
+            m["I5"] = round(v, 4) + 0.0
+            m["_I5_raw_F_AA"] = raw[k]        # already rounded; the pair agrees
         n += 1
     return n, skipped, snapped, (p5, p95), used, float(np.median(raw))
 
@@ -163,6 +178,9 @@ def main():
             "years": used, "hotspot_rise_K": HOTSPOT_RISE,
             "n_derived": n, "n_skipped": sk, "n_snapped_to_land": snp,
             "anchors": {"I5": list(anch)},
+            "raw_decimals": 7,
+            "reproducibility": "metric = round(method_b(_I5_raw_F_AA, *anchors), 4); "
+                               "anchors are the P5/P95 of the published raws",
             "caveat": "loading held constant at rated; daily maximum not daily "
                       "mean; ranks as mean ambient temperature does"})
         if paths is None:
