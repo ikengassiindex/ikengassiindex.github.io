@@ -81,8 +81,24 @@ FIELD = "fg10"
 MIN_YEARS = 4
 IRI_TOP = 0.30
 
-GUST_THRESHOLD = None     # m/s. Pin by amendment from the --raw-only curve.
-ANCHOR = None             # m/s-days mapping to the top of [0, 0.30].
+# ── PINNED 12 September 2026, operator decision ──────────────────────────
+# doctrine/DECISION_I2_threshold_and_anchor.md
+#
+# GUST_THRESHOLD is a DECLARED REFERENCE LEVEL, not a damage onset. The
+# fragility literature puts median structural failure at ~40 m/s for wood
+# poles and ~60 m/s for towers; the windiest substation in this fleet sees
+# 40.75 m/s once in five years, so no threshold in this range can be a damage
+# claim. Chosen on the shoulder of the response curve rather than its
+# inflection at 26 m/s, which is the point of maximum sensitivity to any
+# change in the underlying data.
+GUST_THRESHOLD = 25.0     # m/s
+
+# ANCHOR is the frozen P99.9 of the fleet's I2_raw at that threshold, the same
+# construction as I1's anchor (0.9029 m SWE, P99.9, frozen 9 September). It
+# saturates 503 of 513,554 records at 0.098 per cent against I1's 0.101, so
+# 0.30 means the same thing in both metrics and the I-axis aggregates one
+# scale rather than two. Not a physical constant.
+ANCHOR = 45.3363          # m/s-days
 
 CANDIDATES = [15.0, 17.2, 20.0, 22.5, 25.0, 27.5, 30.0, 32.5, 35.0, 40.0]
 
@@ -236,6 +252,14 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw-only", action="store_true")
     ap.add_argument("--years", help="comma list; default every complete year")
+    ap.add_argument("--candidates",
+                    help="comma list of thresholds in m/s, overriding the "
+                         "a-priori grid. The grid is a SAMPLING choice, not a "
+                         "property of the data: the field carries ~450,000 "
+                         "distinct values per day with a median gap of 6e-5 "
+                         "m/s, so any threshold is available. A grid chosen "
+                         "AFTER seeing the coarse curve must be declared as "
+                         "such wherever its output is used.")
     ap.add_argument("--probe-year", metavar="YYYY",
                     help="compute ONE year and print its distribution. This is "
                          "NOT I2 and must never be pinned against — it exists "
@@ -246,6 +270,14 @@ def main() -> int:
                          "maxima directly from the monthly files, by brute "
                          "force, and require exact agreement")
     a = ap.parse_args()
+    if a.candidates:
+        global CANDIDATES
+        CANDIDATES = [float(x) for x in a.candidates.split(",")]
+        print(f"\n  CANDIDATE GRID OVERRIDDEN on the command line: "
+              f"{', '.join(f'{c:g}' for c in CANDIDATES)}")
+        print(f"  The grid is a SAMPLING choice, not a property of the data.")
+        print(f"  A grid chosen AFTER seeing the coarse curve must be declared")
+        print(f"  as chosen-after wherever its output is used.")
 
     writing = not (a.raw_only or a.probe_year)
     if writing:
@@ -345,6 +377,35 @@ def main() -> int:
               f"{(np.median(nz) if len(nz) else 0):>18.2f}"
               f"{(np.percentile(nz, 99) if len(nz) else 0):>10.2f}"
               f"{col.max():>10.2f}")
+    if len(CANDIDATES) == 1:
+        # ANCHOR is the second coefficient and it is chosen the way I1's was:
+        # a frozen fleet percentile, declared, never a claimed physical value.
+        # I1 took P99.9 of its fleet (0.9029 m SWE), which saturated 628 of
+        # 622,079 records at IRI_TOP - 0.101 per cent. The same construction
+        # here keeps the two metrics' top-of-scale meaning consistent.
+        col = ex[0]
+        thr = CANDIDATES[0]
+        print(f"\n  I2_raw DISTRIBUTION at GUST_THRESHOLD = {thr:g} m/s")
+        print(f"  mean annual sum of max(0, gust - {thr:g}) over days, m/s-days")
+        print(f"    {'percentile':>12}{'I2_raw':>12}{'saturating above it':>22}")
+        for q in (50, 75, 90, 95, 99, 99.5, 99.9, 99.99, 100):
+            v = float(np.percentile(col, q))
+            n = int((col > v).sum())
+            print(f"    {('P'+str(q)):>12}{v:>12.3f}{n:>15,} "
+                  f"({100*n/len(col):.3f}%)")
+        print(f"\n    zero-valued (no day exceeded the threshold): "
+              f"{int((col == 0).sum()):,} ({100*(col==0).mean():.1f}%)")
+        print(f"\n  FOLLOWING THE I1 PRECEDENT — anchor at P99.9:")
+        a999 = float(np.percentile(col, 99.9))
+        nsat = int((col > a999).sum())
+        print(f"    ANCHOR = {a999:.4f} m/s-days")
+        print(f"    {nsat:,} of {len(col):,} records ({100*nsat/len(col):.3f}%) "
+              f"would saturate at IRI_TOP = {IRI_TOP}")
+        print(f"    I1 for comparison: 628 of 622,079 = 0.101% saturated")
+        print(f"\n    The anchor is a DECLARED fleet percentile, frozen at the")
+        print(f"    moment of pinning. It is not a physical constant and the")
+        print(f"    limitation must say so, exactly as I1's does.")
+
     print("\n  A threshold that leaves ~100% of the fleet above zero is not")
     print("  discriminating; one that leaves almost none is not measuring.")
     print("  The pin is a judgement about where wind stops being weather and")
