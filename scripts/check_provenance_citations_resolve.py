@@ -29,8 +29,22 @@ WHAT IT CHECKS
 --------------
 Every `amendment` and `decision` string in every country's
 meta.metric_derivations, split on
-' + ' and stripped of trailing prose after a comma, must name a file that
-exists in the SSI Index estate folder.
+' + ' and stripped of trailing prose after a comma, AND every document named in
+the per-record `_metrics_source` string, must name a file that exists in the SSI
+Index estate folder.
+
+THE RECORD-LEVEL SURFACE WAS ADDED 17 SEPTEMBER 2026, AND IT MATTERED.
+Until then this gate read the manifest only. The I4/I6 citation named in the
+paragraph above was repaired in meta.metric_derivations and NOT in the records:
+`_metrics_source` on 37 countries' substations still named
+AMENDMENT_DRAFT_I4_definition.md, a file that exists nowhere. So this gate —
+written for exactly that defect, and naming it in its own docstring — reported
+"all 5 cited documents resolve" and exited 0 while the defect it was built for
+sat live on the published records of 37 countries.
+
+A gate that reads half the surface where a defect occurs will certify the half
+it reads. The lesson is registered in
+doctrine/DOCTRINE_a_check_must_read_the_artefact.md.
 
 Exit 1 if any citation dangles.
 """
@@ -83,6 +97,33 @@ def main():
                     seen.setdefault(doc, set()).add(country)
                     if doc not in present:
                         dangling.setdefault(doc, set()).add(country)
+
+        # The RECORD-level citation. The manifest and the records can disagree,
+        # and have: repairing one is not repairing the other. Sampled from the
+        # head of the first shard rather than by parsing every record, because
+        # the string is constant within a country and a full parse of 39 shards
+        # is minutes of I/O for one value. Stated here so the sampling is not
+        # mistaken for a census.
+        # A country is sharded or it is not, and only 6 of 39 are. A first
+        # version of this read `substations_shards` alone and so never looked
+        # at 33 countries' records at all, reporting 6 dangling where 37 dangle
+        # — the same unsharded-fallback blind spot that silenced a conformance
+        # check earlier the same day.
+        shards = d.get("substations_shards") or []
+        targets = [man.parent / sh.get("path", "") for sh in shards[:1]] or [man]
+        for shard in targets:
+            if not shard.exists():
+                continue
+            with shard.open(encoding="utf-8", errors="replace") as fh:
+                head = fh.read(262144)
+            m = re.search(r'"_metrics_source"\s*:\s*"([^"]*)"', head)
+            if not m:
+                continue
+            for doc in re.findall(r"[A-Za-z0-9_.\-]+\.(?:md|html|yaml|json)",
+                                  m.group(1)):
+                seen.setdefault(doc, set()).add(country)
+                if doc not in present:
+                    dangling.setdefault(doc, set()).add(country)
 
     print("\n  provenance citations — does every cited document exist?\n")
     for doc in sorted(seen):
