@@ -193,8 +193,34 @@ scattered records the sentinel also reports as non-reproducing.
 Splitting the cohort that way is a decision, not a workaround, and it gets stated
 in the judgement file at step 3.
 
+**REVISED AGAIN, 17 September 2026, by the step-4 dry run. THE SUBSTITUTION MUST
+NOT RESCORE.** `scripts/r7_substitute_and_rescore.py` exists and its dry run did
+its job: on 300 Sweden records it changed `mult_product` on zero of them — the
+retired-skip guard already excluded v1, so removing the field is arithmetically
+inert — while bands appeared to move anyway. The control (rescore twice, no
+substitution) found the Monte Carlo is unseeded:
+`engine.py:707` calls it without a seed and the docstring at 560 says
+`None = non-deterministic`. See `FINDING_the_monte_carlo_is_unseeded.md`,
+which also records that my first measurement of the effect was wrong by an order
+of magnitude and why.
+
+So step 4 becomes a DELTA, not a rescore:
+
+- Where `mult_product` does not change, write nothing. Rescoring injects noise
+  for no benefit. On Sweden that is every record.
+- Where it changes, propagate arithmetically. `soft_clip_upper` is the identity
+  at or below 1.0 on 99.4 per cent of records, so the shift is exact there and
+  first-order in the compressed remainder.
+- The five non-reproducing countries still cannot take a delta against a baseline
+  that does not reproduce. They are the one population that needs recomputation,
+  and that decision now carries the seeding question with it.
+
+`scripts/r7_substitute_and_rescore.py` is therefore SUPERSEDED BEFORE FIRST USE
+in its rescoring form. It stays on disk, dry-run by default, as the instrument
+that found this; it is not to be run with `--write`.
+
 - One country first, from the reproducing 34. Read the result before looping —
-  Pin 16, and it has caught a defect at least twice.
+  Pin 16, and it has now caught a defect three times.
 - Then cohort-wide.
 - Pin 13: not in a bot window. `pipeline-enrichment.yml` 1st Thursday 06:00 UTC,
   `monthly-refresh.yml` 2nd Thursday 10:00 UTC, `esg-refresh.yml` 2nd Thursday
