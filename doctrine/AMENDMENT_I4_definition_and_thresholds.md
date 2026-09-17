@@ -1,9 +1,17 @@
 # AMENDMENT — I4 and I6 density: definitions, floors, and declared limits
 
-**FOR OPERATOR SIGNATURE. Nothing in this document is in force until it is
-signed.** On signature it SUPERSEDES `AMENDMENT_DRAFT_I4_I6_definition.md` and
-`AMENDMENT_DRAFT_I4_transmission_thresholds.md`, both of which remain unsigned,
-and it becomes the sole authority for **I4 and I6**.
+**SIGNED BY THE OPERATOR, 17 SEPTEMBER 2026.** It SUPERSEDES
+`AMENDMENT_DRAFT_I4_I6_definition.md` and
+`AMENDMENT_DRAFT_I4_transmission_thresholds.md`, both of which were unsigned and
+stated so on their face, and it is now the sole authority for **I4 and I6**.
+
+**The three elections, as made:**
+
+| election | decided |
+|---|---|
+| Floor scope | **Sign the 13 sourced floors as verified; carry the other 26 as DECLARED UNVERIFIED.** Not held as ABSENT: holding would mean a derivation run writing ABSENT across most of the estate, in a layer that reaches no published score, and the honest alternative is to name them unverified and require sourcing before any rebuild. |
+| Mexico | **69**, per CENACE's own PRODESEN. The 115 pinned in August read CFE's ladder without a citation; the sourced figure wins. |
+| I6 population | **Derive for Luxembourg and Iceland.** I6 needs no voltage floor and could always have covered them. |
 
 > **I6 WAS ADDED TO THIS DOCUMENT ON THE SAME DAY IT WAS DRAFTED, AFTER A GAP
 > WAS FOUND IN IT.** The first issue superseded
@@ -252,12 +260,25 @@ against floors no doctrine document can see.
 
 ---
 
-**Signed:** ................................  **Date:** ....................
+**Signed:** operator  **Date:** 17 September 2026
 
-*Scope elected (delete two): all 39 floors · the 13 sourced, others held ABSENT ·
-signature held pending the remaining 26*
+Recorded as the estate records every other decision of this kind — `decided_by:
+operator` with a date, in the judgement layer and in the change log — rather than
+by a signature this repository has no means of verifying.
 
-*Mexico elected (delete one): 115 as pinned · 69 per CENACE*
+**Applied the same day:**
 
-*I6 population elected (delete one): hold to I4's gate · derive for Luxembourg
-and Iceland*
+| | |
+|---|---|
+| `italy` 132 → 120 | 413 of 41,662 units changed, 1.0%, mean −0.0006 |
+| `mexico` 115 → 69 | 2,789 of 3,085 units changed, 90.4%, mean −0.0213 |
+| `I6` for luxembourg + iceland | 1,408 units added; no existing value changed |
+| I4 status | blocked → implemented |
+| I6 coverage | **622,104 of 622,104 — the only metric in the register at complete coverage** |
+
+Italy moving only 1.0 per cent is worth stating plainly: Method B normalises
+within a country, so adding the 120 kV tier lifts the whole distribution and
+changes the ORDERING very little. The correction was still worth making — the
+floor now matches what Terna calls its own network — but it is a correction to
+the declaration more than to the numbers, and anyone expecting a visible shift in
+Italy's I4 should not.

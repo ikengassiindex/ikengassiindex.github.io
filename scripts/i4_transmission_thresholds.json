@@ -1,5 +1,5 @@
 {
- "_comment": "Per-country transmission voltage floor (kV) for metric I4, pinned 30 August 2026 per AMENDMENT_DRAFT_I4_transmission_thresholds.md. A line counts toward I4 when kv >= floor. Entries marked needs_pin are held out until a flag-officer decision; the derivation refuses to run for them.",
+ "_comment": "Per-country transmission voltage floor (kV) for metric I4. THE AUTHORITY FOR THIS FILE IS doctrine/AMENDMENT_I4_definition_and_thresholds.md, signed by the operator on 17 September 2026; this file is that amendment's SERIALISATION and not its own authority. A line counts toward I4 when kv >= floor. Entries marked _needs_pin are held out and the I4 derivation refuses for them; I6 needs no floor and is derived for them separately under --i6-only-for-held, per the same signature. Thirteen floors are verified against named primary sources; the remaining twenty-six are DECLARED UNVERIFIED and carry the 30 August reading, and must be sourced before component I is rebuilt from the metric layer.",
  "_basis": "measured line-km by voltage from each country's grid-geo.json; floor is the TSO transmission tier",
  "australia": 132,
  "austria": 220,
@@ -18,7 +18,7 @@
  "hungary": 132,
  "ireland": 110,
  "israel": 161,
- "italy": 132,
+ "italy": 120,
  "japan": 154,
  "korea": 154,
  "latvia": 110,
@@ -62,10 +62,11 @@
  "_us_basis": "NERC Bulk Electric System: Transmission Elements operated at 100 kV or higher. A cited standard, not our choice; and 100 vs 115 moves only 9,842 km (1%), so the pin is insensitive to it. Excludes 69 kV (360,666 km), which NERC excludes.",
  "greenland": 60,
  "_greenland_basis": "Held on the reasoning that 132 kV is implausible for the system. The data disagrees: 132 kV is 80.2 km, 30.3% of greenland's line-km \u2014 the Buksefjord-Nuuk hydro link \u2014 above a 60/63/66/70 kV tier of 148.1 km, with 10.5 kV town distribution below. Nukissiorfiit runs isolated town grids linked to hydro plants; the 60 kV floor captures every hydro-to-town transmission link (228.3 km, 28 records) and excludes town distribution. A 132 kV floor would leave 80 km on 12 records. Substation voltages corroborate: 3 at 63 kV, 17 at 10.5 kV.",
- "mexico": 115,
+ "mexico": 69,
  "_needs_pin": {
   "luxembourg": "57.5% of line-km carries no voltage. TESTED against OSM 31 Aug 2026: only 116 of 797 untagged lines exist in OSM even including minor_line and cable, and NONE carries a voltage tag. Not recoverable from OSM.",
   "iceland": "50.2% of line-km carries no voltage. TESTED against OSM 31 Aug 2026: grid-geo line ids are 1..1,427, sequential synthetic integers rather than OSM way ids, so no id join exists; OSM holds only 153 voltage-bearing lines for the whole country against 1,230 untagged register lines. Not recoverable from OSM."
  },
- "_mexico_basis": "Held at 50.6% of line-km with no voltage. Recovered 8,426 line voltages from OSM by way-id join gated on geometry (both endpoints within 50 m; median agreement 0.4 m), taking the untagged share to 1.5%. The ladder is then CFE's grid \u2014 115 kV 72,852 km, 230 kV 45,063 km, 400 kV 40,327 km, 138/161 kV below, 34.5/13.8 kV distribution. CFE's Red Nacional de Transmision is 400/230/161/138/115 kV, so 115 kV is the floor."
+ "_mexico_basis": "69, not 115. CENACE's PRODESEN states the Red Nacional de Transmision 'incluye las tensiones iguales o mayores a 69 kV' and books a 'Transmision 69 a 138 kV' tier of 54,437 km against 56,409 km for 161-400 kV: subtransmision is not a legal category in Mexico and the 69-138 kV band sits INSIDE the RNT. The 115 floor pinned 30 August read CFE's ladder as beginning at 115 and carried no citation; it excluded the 69 and 85 kV tiers, 4,092 km, 3.7 per cent of the RNT. Operator elected 69 on signature, 17 September 2026, on the ground that CENACE's figure is sourced and the other was not. NOTE the earlier recovery work stands: 8,426 line voltages were recovered from OSM by way-id join gated on geometry (both endpoints within 50 m, median agreement 0.4 m), taking the untagged share from 50.6 per cent to 1.5 per cent.",
+ "_italy_basis": "120, not 132. Terna's own reporting tier is '150-132-120 kV' (Codice di Rete) and its statistical annex books 45,343 km at 150-120 kV plus a further 3,550 km of RTN lines BELOW 120 kV, so a 132 floor excludes the 120 kV RTN tier. Terna's RTN perimeter is fixed by ministerial asset list (DM 25 giugno 1999) and not by voltage, so any kV floor for Italy is an approximation; 120 is the tightest available. Changed on signature, 17 September 2026, from the 132 pinned 30 August."
 }

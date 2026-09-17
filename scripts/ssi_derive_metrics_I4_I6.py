@@ -78,9 +78,15 @@ from datetime import datetime, timezone
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PINS = ROOT / "scripts" / "i4_transmission_thresholds.json"
 CELL = 0.1                      # degrees; ~11 km lat, 3x3 block ~33 km across
+RAW_DP = 3                      # decimals _I4_raw_km publishes at; the
+                                # metric derives from the ROUNDED value so
+                                # a record can recompute its own metric
 UNIT_BREACH_MAX = 0.01          # >1% of records with kv>1000 = units are wrong
-AMENDMENT = ("AMENDMENT_DRAFT_I4_I6_definition.md + "
-             "AMENDMENT_DRAFT_I4_transmission_thresholds.md, pinned 30 Aug 2026")
+# Repointed 17 September 2026 on signature. The two drafts this replaces both
+# stated on their face that nothing had been written to the register, and were
+# nonetheless the sole authority for a metric on 622,104 records. One of them
+# was additionally cited here under a filename that existed nowhere.
+AMENDMENT = "AMENDMENT_I4_definition_and_thresholds.md, signed 17 Sep 2026"
 
 sys.path.insert(0, str(ROOT / "scripts"))
 from pipeline.scoring.engine import soft_clip                       # noqa: E402
@@ -275,7 +281,7 @@ def make_floor(spec, subs):
     return floor_fn, " / ".join(f"{j['id']} {j['floor']}" for j in spec["jurisdictions"])
 
 
-def derive(slug, subs, lines, floor, floor_label=None):
+def derive(slug, subs, lines, floor, floor_label=None, i6_only=False):
     breach = sum(1 for ln in lines
                  if isinstance(ln.get("kv"), (int, float)) and ln["kv"] > 1000)
     if lines and breach / len(lines) > UNIT_BREACH_MAX:
@@ -320,6 +326,16 @@ def derive(slug, subs, lines, floor, floor_label=None):
         raw6.append(sum(sub_n.get(x, 0) for x in blk))
         idx.append(i)
 
+    # ROUND THE RAW FIRST, then anchor and normalise from the rounded value.
+    # Added 17 September 2026. Deriving the metric from the unrounded block sum
+    # while publishing that sum rounded to RAW_DP makes the published metric
+    # unrecomputable from the published record: 13 Italian units came out
+    # +/-0.0001 away on the first re-derivation under the signed floors. It is
+    # the same defect registered in
+    # FINDING_published_metrics_must_be_recomputable.md and already repaired for
+    # I1 and I5. raw6 is a count and needs no rounding. derive_from_raw() reads
+    # sums that are already rounded, so it needs no equivalent.
+    raw4 = [round(v, RAW_DP) for v in raw4]
     a4 = (percentile(sorted(raw4), 0.05), percentile(sorted(raw4), 0.95))
     a6 = (percentile(sorted(raw6), 0.05), percentile(sorted(raw6), 0.95))
     # floor_label, not floor. `floor` is a closure for any country with a
@@ -330,22 +346,42 @@ def derive(slug, subs, lines, floor, floor_label=None):
     # make_floor has returned a describe string since it was written; it was
     # simply never threaded to here.
     shown = floor_label if floor_label is not None else floor
-    src = (f"derived per {AMENDMENT}: I4 = transmission line-km (kv >= {shown}) "
-           f"within a 3x3 block of {CELL} deg cells, Method B over this "
-           f"country's fleet P5/P95, "
-           f"inverted per construct section 03; I6 = substations in the same "
-           f"block, same normalisation. {kept:,} of {len(lines):,} lines above "
-           f"the floor.")
+    if i6_only:
+        src = (f"derived per {AMENDMENT}: I6 = substations within a 3x3 block "
+               f"of {CELL} deg cells, Method B over this country's fleet "
+               f"P5/P95, inverted per construct section 03. I4 IS ABSENT for "
+               f"this country: its transmission voltage floor is held in "
+               f"_needs_pin and I6 needs no floor.")
+    else:
+        src = (f"derived per {AMENDMENT}: I4 = transmission line-km (kv >= {shown}) "
+               f"within a 3x3 block of {CELL} deg cells, Method B over this "
+               f"country's fleet P5/P95, "
+               f"inverted per construct section 03; I6 = substations in the same "
+               f"block, same normalisation. {kept:,} of {len(lines):,} lines "
+               f"above the floor.")
     n = 0
     for j, i in enumerate(idx):
-        v4 = method_b_inverted(raw4[j], *a4)
         v6 = method_b_inverted(raw6[j], *a6)
-        if v4 is None or v6 is None:
+        if v6 is None:
             continue
         m = subs[i].setdefault("metrics", {})
-        m["I4"] = round(v4, 4)
+        if i6_only:
+            # I6 ALONE, for a country whose I4 floor is held. Structural, not
+            # incidental: with no lines there are no block sums, so a4 would be
+            # (0, 0) and method_b_inverted would return None for every record —
+            # and the old combined guard `if v4 is None or v6 is None` would
+            # then have silently derived NOTHING while reporting success. I4 is
+            # not written here, and must not be: an absent metric is the
+            # declared state for these countries, not a zero.
+            assert "I4" not in m and "_I4_raw_km" not in m, (
+                "i6_only would overwrite an existing I4 on %s" % slug)
+        else:
+            v4 = method_b_inverted(raw4[j], *a4)
+            if v4 is None:
+                continue
+            m["I4"] = round(v4, 4)
+            m["_I4_raw_km"] = raw4[j]        # already rounded to RAW_DP above
         m["I6"] = round(v6, 4)
-        m["_I4_raw_km"] = round(raw4[j], 3)
         m["_I6_raw_count"] = raw6[j]
         subs[i]["_metrics_source"] = src
         n += 1
@@ -402,6 +438,10 @@ def main() -> int:
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--i6-only-for-held", action="store_true",
+                    help="derive I6 for a country whose I4 floor is held in "
+                         "_needs_pin; I6 needs no floor. Operator election of "
+                         "17 September 2026.")
     ap.add_argument("--from-raw", action="store_true",
                     help="re-normalise the stored block sums; reads no OSM")
     args = ap.parse_args()
@@ -415,16 +455,31 @@ def main() -> int:
     print(f"  {'country':<14}{'floor':>18}{'lines kept':>12}{'derived':>9}"
           f"{'skipped':>9}{'med I4':>8}{'med I6':>8}")
     for slug in sorted(slugs):
+        i6_only = False
         if slug not in pins:
-            why = held.get(slug, "no pinned threshold")
-            print(f"  {slug:<14}REFUSED — {why}")
-            continue
+            if slug in held and args.i6_only_for_held:
+                # I6 needs no voltage floor: it counts substations, not lines.
+                # Holding it because I4 is held was a stated choice - "so the
+                # two metrics always describe the same population" - and the
+                # operator elected on 17 September 2026 to derive it anyway,
+                # on the I2 precedent that uneven coverage inside component I
+                # is declared rather than levelled down.
+                i6_only = True
+            else:
+                why = held.get(slug, "no pinned threshold")
+                print(f"  {slug:<14}REFUSED — {why}")
+                continue
         try:
             man, subs, paths = load_substations(slug)
             if args.from_raw:
                 floor_label = "(from stored raws)"
                 n, sk, a4, a6, changed = derive_from_raw(slug, subs)
                 kept = tot = 0
+            elif i6_only:
+                floor_label = "I6 only (floor held)"
+                n, sk, kept, tot, a4, a6, r4, r6 = derive(
+                    slug, subs, [], None, floor_label, i6_only=True)
+                changed = None
             else:
                 lines = load_lines(slug)
                 floor_fn, floor_label = make_floor(pins[slug], subs)
@@ -434,9 +489,11 @@ def main() -> int:
         except Exception as ex:
             print(f"  {slug:<14}ERROR — {ex}")
             continue
-        got4 = sorted(s["metrics"]["I4"] for s in subs if "metrics" in s)
-        got6 = sorted(s["metrics"]["I6"] for s in subs if "metrics" in s)
-        m4 = got4[len(got4) // 2] if got4 else float("nan")
+        got4 = sorted(s["metrics"]["I4"] for s in subs
+                      if "metrics" in s and "I4" in s["metrics"])
+        got6 = sorted(s["metrics"]["I6"] for s in subs
+                      if "metrics" in s and "I6" in s["metrics"])
+        m4 = got4[len(got4) // 2] if got4 else float("nan")   # nan when I6-only
         m6 = got6[len(got6) // 2] if got6 else float("nan")
         print(f"  {slug:<14}{floor_label:>18}{kept:>12,}{n:>9,}{sk:>9,}"
               f"{m4:>8.3f}{m6:>8.3f}"
@@ -446,8 +503,9 @@ def main() -> int:
             print(f"      I6 raw cnt P5 {a6[0]:.1f}  P95 {a6[1]:.1f}")
         if not args.dry_run and n:
             man.setdefault("meta", {}).setdefault("metric_derivations", []).append({
-                "metrics": ["I4", "I6"], "at_utc": datetime.now(timezone.utc).isoformat(),
-                "amendment": AMENDMENT, "kv_floor": pins[slug],
+                "metrics": (["I6"] if i6_only else ["I4", "I6"]),
+                "at_utc": datetime.now(timezone.utc).isoformat(),
+                "amendment": AMENDMENT, "kv_floor": (None if i6_only else pins[slug]),
                 "kv_floor_label": (None if args.from_raw else floor_label),
                 "lines_above_floor": kept, "lines_total": tot,
                 "n_derived": n, "n_skipped": sk,
@@ -455,7 +513,8 @@ def main() -> int:
                 "clip": ("soft_clip — construct section 03; replaces the "
                          "soft_clip_upper overflow compressor, M-006"),
                 "n_values_changed": changed,
-                "anchors": {"I4": list(a4), "I6": list(a6)}})
+                "anchors": ({"I6": list(a6)} if i6_only
+                            else {"I4": list(a4), "I6": list(a6)})})
             if paths is None:
                 man["substations"] = subs
                 (ROOT / slug / "ssi-data.json").write_text(json.dumps(man))
