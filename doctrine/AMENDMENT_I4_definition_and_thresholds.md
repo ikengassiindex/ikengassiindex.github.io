@@ -1,0 +1,198 @@
+# AMENDMENT — I4 transmission density: definition, floors, and declared limits
+
+**FOR OPERATOR SIGNATURE. Nothing in this document is in force until it is
+signed.** On signature it SUPERSEDES `AMENDMENT_DRAFT_I4_I6_definition.md` and
+`AMENDMENT_DRAFT_I4_transmission_thresholds.md`, both of which remain unsigned,
+and it becomes the sole authority for I4.
+
+**Date drafted:** 17 September 2026. **Evidence:** every figure below is either
+measured against the deployed tree on that date, or cited to a named primary
+source. Where neither is true the row says so.
+
+**Why this document exists.** I4 is derived and published on 100 per cent of
+622,104 substations. Its definition cites two documents that state on their face
+that nothing was written to the register, and its 37 country floors live in
+`scripts/i4_transmission_thresholds.json`, a file no doctrine document
+references. Asked on 17 September whether the 30 August pin was ever made, the
+operator did not recall. The estate therefore cannot establish its own authority
+for a published metric, and this amendment is the instrument that settles it.
+
+---
+
+## 1. The definition
+
+    I4_raw   transmission line-km within a 3x3 block of 0.1 degree cells
+             (~33 km across) centred on the substation's cell, counting a line
+             when kv >= that country's floor in section 2.
+    I4       Method B over THAT COUNTRY'S fleet P5/P95, then INVERTED per
+             construct section 03: N'(x) = N(P5 + P95 - x), because higher
+             density is better resilience.
+
+**Definition A (local), not B (regional).** Measured 17 September 2026 by
+decomposing the variance of A into between- and within-region parts. Definition
+B keeps only the between-region part:
+
+| country | substations | regions | B keeps | B destroys |
+|---|---:|---:|---:|---:|
+| Poland | 27,764 | 74 | 58.8% | **41.2%** |
+| France | 168,894 | 102 | 59.2% | **40.8%** |
+| Spain | 12,438 | 66 | 45.2% | **54.8%** |
+
+B discards between two-fifths and more than half of the discriminating signal.
+The construct's own rationale for inverting this metric describes local network
+redundancy, which is what A measures and what B averages away.
+
+## 2. The floors
+
+Generated from `scripts/i4_transmission_thresholds.json` rather than retyped, so
+the values in this table and the values the deriver reads are the same values.
+**On signature this table, not that file, is the authority; the file becomes its
+serialisation.**
+
+| country | floor (kV) | status | basis |
+|---|---|---|---|
+| `australia` | 132 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `austria` | 220 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `belgium` | 150 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `canada` | 230 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `chile` | 220 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `colombia` | 230 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `costa-rica` | 138 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `czechia` | 220 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `denmark` | 132 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `estonia` | 110 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `finland` | 110 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `france` | 63 | CONFIRMED | RTE, *Bilan électrique* — "63 kV à 400 kV", 105,817 km |
+| `germany` | 220 | CONFIRMED | Bundesnetzagentur/SMARD — transmission "at least 220 kilovolts" |
+| `greece` | 150 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `greenland` | 60 | CONFIRMED as pinned | pin file `_greenland_basis`, verified: 228.0 km on 28 records ≥60 kV; 132 kV is 80.1 km on 12 |
+| `hungary` | 132 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `ireland` | 110 | CONFIRMED (operational, not statutory) | EirGrid — "operated at 400 kV, 220 kV and 110 kV" |
+| `israel` | 161 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `italy` | 132 | **CHANGE TO 120** | Terna *Codice di Rete* — RTN tiers "150-132-120 kV"; annex: 45,343 km at 150-120 plus 3,550 km RTN below 120 |
+| `japan` | 154 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `korea` | 154 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `latvia` | 110 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `lithuania` | 110 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `mexico` | 115 | CONTESTED — 69 vs 115, 4,092 km, 3.7% | CENACE PRODESEN — "tensiones iguales o mayores a 69 kV"; pin file reads CFE's ladder as 400/230/161/138/115 |
+| `netherlands` | 110 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `new-zealand` | 110 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `norway` | 300 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `poland` | 220 | CONFIRMED | PSE — 400 kV 9,624 km + 220 kV 6,896 km |
+| `portugal` | 150 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `slovakia` | 220 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `slovenia` | 110 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `spain` | 220 | CONFIRMED (peninsula; islands run to 66 kV) | Ley 24/2013 Art. 34 — transporte secundario ≥220 kV |
+| `sweden` | 220 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `switzerland` | 220 | — not sourced — | carries the 30 August reading; no primary source checked |
+| `turkey` | 154 | CONFIRMED as operating level, not the legal >36 kV boundary | TEİAŞ *Stratejik Planı* — "154 kV ve 400 kV" |
+| `uk` | EW 275 / SCO 132 / NI 110 | CONFIRMED | Energy Act 2004 s.180 — ≥132 kV Scotland, >132 kV England & Wales |
+| `us` | 100 | CONFIRMED (radial exclusion E1 applies) | NERC Bulk Electric System; FERC Order No. 773 |
+
+### Held — I4 is ABSENT, and that is a decision, not a gap
+
+| country | state | rule | tested basis |
+|---|---|---|---|
+| `iceland` | I4 ABSENT | declared | 50.2% of line-km carries no voltage. TESTED against OSM 31 Aug 2026: grid-geo line ids are 1..1,427, sequential synthetic integers rather than OSM way ids, so no id join exists; OSM holds only 153 voltage-bearing lines for the whole country against 1,230 untagged register lines. Not recoverable from OSM. |
+| `luxembourg` | I4 ABSENT | declared | 57.5% of line-km carries no voltage. TESTED against OSM 31 Aug 2026: only 116 of 797 untagged lines exist in OSM even including minor_line and cable, and NONE carries a voltage tag. Not recoverable from OSM. |
+
+### The one change requested
+
+**`italy` 132 → 120.** Terna's own reporting tier is "150-132-120 kV", and its
+statistical annex books 45,343 km at 150-120 kV plus a further 3,550 km of RTN
+*below* 120 kV. A 132 kV floor excludes the 120 kV RTN tier. 41,662 substations.
+Terna's RTN perimeter is fixed by ministerial asset list (DM 25 giugno 1999) and
+not by voltage, so any kV floor for Italy is an approximation; 120 is the
+tightest available.
+
+### The one contested reading, not a change
+
+**`mexico` 115.** CENACE's PRODESEN states the Red Nacional de Transmisión
+"incluye las tensiones iguales o mayores a 69 kV" and books a "Transmisión 69 a
+138 kV" tier of 54,437 km. The pin file reads CFE's ladder as beginning at 115.
+The difference is the 69 and 85 kV tiers, 4,092 km, 3.7 per cent of the RNT.
+**Recorded as a divergence rather than resolved.** Signing this amendment at 115
+is defensible; so is 69. What is not defensible is leaving the disagreement
+unrecorded.
+
+## 3. What the floors do NOT buy — the proxy declaration
+
+The 30 August draft hoped a voltage filter would make this "RTN density in fact
+and not by proxy". **It does not.** Measured 17 September 2026 against each
+TSO's own published transmission length:
+
+| country | filtered ÷ published |
+|---|---|
+| `poland` | 0.99× |
+| `france` | 1.23× |
+| `italy` | 1.33× |
+| `turkey` | 0.74× |
+| `mexico` | 1.48× |
+| `luxembourg` | 0.33× (held) |
+
+Poland moves from 7.23x the national transmission length unfiltered to 0.99x
+filtered; France from 2.79x to 1.23x. The residual spread is 4.5x between best
+and worst.
+
+> **CONVENTION #7 DECLARATION, which survives signature.** I4 is
+> **transmission-voltage OSM power-line density**, a documented proxy for RTN
+> density. It must not be published as "RTN density". OSM mixes transmission and
+> distribution unevenly between countries, and the ratios above are the measure
+> of that unevenness. This declaration travels with every published value.
+
+## 4. Declared limits
+
+**4.1 Twenty-six of thirty-nine floors are unsourced.** Eleven were checked
+against named primary sources for this amendment, plus the two held countries.
+The remaining twenty-six carry the 30 August reading, which that draft itself
+labelled "NOT measured — my reading ... a starting point for your pin, not as a
+finding". Checking eleven produced one change and one contested reading.
+**Signing this amendment signs twenty-six unverified coefficients unless they are
+held.** The operator may (a) sign all 39 and accept that, (b) sign the 13 and
+hold the rest as ABSENT, or (c) hold signature until the 26 are checked.
+
+**4.2 `kv = 0` is a sentinel for unknown, not a voltage**, and countries use two
+encodings — the UK omits the field on 35.4 per cent of line-km, Finland supplies
+0 on 33.8 per cent. Any code touching these floors must treat both as unknown.
+
+**4.3 Zero-density substations.** A substation whose 3x3 block contains no
+qualifying line scores a raw of zero, which after inversion becomes the WORST
+band. Measured: France 0.1 per cent, Poland 6.2 per cent, **Spain 13.2 per
+cent**. Whether that is genuine remoteness or an artefact of a distribution-only
+substation is NOT decided by this amendment and remains open.
+
+**4.4 I4 does not reach any published score.** `components.I` is the
+`enrich_esg_gaps` fill and sits on 8.1 per cent of records; the metric layer sits
+on 100 per cent and is separate. Measured on Poland, `components.I` never equals
+`_I_from_metrics` — 0 of 2,247 records, differing by more than 0.10 on 76 per
+cent. I4 is a foundation, not a visible change to any published score.
+
+## 5. What signature does
+
+1. This document supersedes both drafts and becomes I4's sole authority.
+2. `scripts/i4_transmission_thresholds.json` becomes the serialisation of §2,
+   and gains a header naming this amendment — closing the finding that 37
+   coefficients determining a published metric are referenced by no doctrine
+   document.
+3. The deriver's `AMENDMENT` constant changes to name this document, which
+   repairs the citation of `AMENDMENT_DRAFT_I4_definition.md` — a file that
+   exists nowhere and is currently cited by the published records.
+4. Italy re-derives at 120 kV. No other country's values change.
+5. I4's status moves from `blocked` to `implemented` for the signed set, with a
+   change-log entry naming element I4.
+6. The conformance rows for provenance citation, declared-blocked-found-on-
+   records and coefficients-outside-doctrine close for I4.
+
+**If this is not signed**, the alternative is to withdraw I4 from the metric
+layer until it is. What is not available is the present state: published on
+622,104 records, citing documents that say nothing was written to the register,
+against floors no doctrine document can see.
+
+---
+
+**Signed:** ................................  **Date:** ....................
+
+*Scope elected (delete two): all 39 floors · the 13 sourced, others held ABSENT ·
+signature held pending the remaining 26*
+
+*Mexico elected (delete one): 115 as pinned · 69 per CENACE*
