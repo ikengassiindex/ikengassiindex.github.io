@@ -10,6 +10,18 @@ headers that nothing has been written to the register.
 622,104 substations, under those two unsigned drafts. This paper exists because
 that is the wrong order and the order cannot now be reversed, only regularised.
 
+> **CORRECTION, 17 September 2026, same day.** The first issue of this paper
+> checked the thresholds in the drafts' *proposed* column and assumed the
+> derivation had used them. It had not. Reading `_metrics_source` on the deployed
+> records shows the derivation deviated from the draft in four places, and in
+> three of them it was RIGHT and the draft's table was wrong. The corrected
+> position is in §2.0. Two of the five "errors" reported in the first issue —
+> the United Kingdom and the United States — are not errors in the published
+> metric at all. The error rate against deployed values is **three countries and
+> 44,790 substations, not five and 175,265.** The check was run against the
+> document rather than against the estate, which is the same fault this session
+> has now found four times.
+
 ---
 
 ## 0. First, what is and is not at stake
@@ -77,6 +89,37 @@ That warning was warranted. Thirteen of the 39 have now been checked against
 named primary sources. **Five of the thirteen need to change, and one country
 cannot take a threshold at all.**
 
+### 2.0 What the derivation actually used
+
+Read from `_metrics_source` on the deployed records, 17 September 2026. The
+drafts' proposed column and the code agree in 35 of 39 countries. Where they
+differ, the code is the better record:
+
+| country | draft table | **deployed** | against the sourced authority |
+|---|---|---|---|
+| us | 115 | **100** | code is CORRECT — NERC BES / FERC Order 773 |
+| uk | 275 | **EW 275 / SCO 132 / NI 110** | code is CORRECT — matches Energy Act 2004 s.180 |
+| mexico | 230 | **115** | both wrong; should be 69 |
+| luxembourg | 150 | **I4 ABSENT** | code is CORRECT to abstain — 57.5% of line-km has no voltage |
+| iceland | 132 | **I4 ABSENT** | code abstains — 50.2% no voltage; defensible |
+
+Luxembourg and Iceland carry `_I4_raw_km = -1.0` on every record and no I4 at
+all, which is the ABSENT sentinel and the right answer for a country where half
+the network has no usable voltage attribute.
+
+**So the deployed metric is wrong in three countries, not five:**
+
+| country | deployed | should be | substations |
+|---|---:|---:|---:|
+| italy | 132 | **120** | 41,662 |
+| mexico | 115 | **69** | 3,085 |
+| greenland | 60 | **none — ABSENT** | 43 |
+| | | | **44,790 of 622,104 = 7.2%** |
+
+The table that follows records the authority for every country checked, and the
+"draft" column is retained because the drafts are what this paper closes — but
+the operative comparison is against the deployed column above.
+
 | country | draft | **pinned** | verdict and authority |
 |---|---:|---:|---|
 | france | 63 | **63** | CONFIRMED — RTE *Bilan électrique*, "63 kV à 400 kV", 105,817 km |
@@ -104,12 +147,17 @@ threshold for Italy is an approximation — 120 is the tightest one available.
 **Mexico → 69.** This is the largest single error in the draft. "Subtransmisión"
 is not a legal category in Mexico: CENACE places the 69–138 kV tier *inside* the
 Red Nacional de Transmisión, as "Transmisión 69 a 138 kV", 54,437 km against
-56,409 km for the 161–400 kV tier. **A 230 kV threshold discards about 49 per
-cent of Mexico's legally defined transmission network by length.** Note the
+56,409 km for the 161–400 kV tier. **A 230 kV threshold would discard about 49
+per cent of Mexico's legally defined transmission network by length.** The
+deployed threshold is 115 kV, not the draft's 230, so the live error is smaller
+than the draft implied — but 115 kV still excludes the 69 kV and 85 kV tiers,
+4,092 km, and is not the boundary CENACE states. Note the
 boundary is administrative, not statutory: the Ley de la Industria Eléctrica
 states no voltage at all.
 
-**Luxembourg → 220.** The trap is that 65 kV is high voltage but is regulated as
+**Luxembourg → 220, but no published value is affected.** I4 is ABSENT on all
+723 Luxembourg records, so this pin governs a future derivation rather than a
+live one. The trap is that 65 kV is high voltage but is regulated as
 distribution. ILR's tariff classes are THT 220 kV (transport); HT 65 kV, MT
 20 kV, BT 400 V (distribution). The draft's 150 kV admits almost nothing —
 measured, 195 km survives a 220 kV cut against ILR's published 590 km of
@@ -117,7 +165,8 @@ transport, and Creos is simultaneously the sole TSO and dominant DSO, so
 ownership does not disambiguate. Note also that 380 kV enters service around
 2027 and this pin will need revisiting.
 
-**United States → 100.** The draft's 115 kV has no federal basis. The defensible
+**United States — already 100, confirm it.** The draft's table said 115 kV, which
+has no federal basis; the derivation used 100 and was right. The defensible
 figure is the NERC Bulk Electric System bright line, *"all Transmission Elements
 operated at 100 kV or higher"*, approved by FERC Order No. 773 (20 December
 2012) and mandatory. Two caveats must travel with it: exclusion E1 removes
@@ -144,10 +193,17 @@ than".
 The draft's single 275 kV excludes Scottish transmission entirely. Measured, the
 difference is large: 14,619 km survives a 275 kV cut against 36,724 km at 132 kV.
 
-**Recommendation:** pin 132 kV for the UK as a whole and declare the England and
-Wales over-capture, OR split the country. The estate keys on country, so a split
-is a schema change; 132 with a declared over-capture is the lighter path and I
-recommend it, but it is an over-capture and must be named as one.
+**This is already implemented correctly and needs no change.** The deployed
+`_metrics_source` reads `kv >= EW 275 / SCO 132 / NI 110`, which matches the
+statute in all three territories: >132 kV in England and Wales is satisfied by
+275 kV, since NGET operates only 400 and 275; ≥132 kV in Scotland; and ≥110 kV
+in Northern Ireland, where NIE operates 275 and 110 with no 400 and no 220.
+
+The first issue of this paper recommended pinning 132 kV nationally or splitting
+the country, having read the draft's table rather than the code. The split
+already exists. **Confirm it as pinned.** The only open point is GB offshore,
+where s.180 applies the ≥132 kV limb regardless of territory — relevant only if
+OFTO assets are in scope, and they do not appear to be.
 
 ### 2.3 Greenland has no transmission network
 
@@ -259,8 +315,11 @@ decision before the inversion is applied. It is not addressed in either draft.
 ## 5. What is requested
 
 1. **Definition A**, 0.1° cells, 3×3 block — confirm or substitute a stated radius.
-2. **The 13 sourced thresholds** as pinned in §2, including the four corrections,
-   the UK treatment chosen in §2.2, and Greenland declared NOT APPLICABLE.
+2. **The 13 sourced thresholds** as pinned in §2. Three of them change a deployed
+   value — italy 132→120, mexico 115→69, greenland 60→ABSENT, together 44,790
+   substations. Four are confirmations of what the code already does correctly
+   against the draft's own table: us 100, the UK territorial split, and the
+   Luxembourg and Iceland abstentions.
 3. **Whether to hold the 26 unsourced countries** (recommended) or sign the
    draft's unverified reading for them.
 4. **The zero-density treatment** in §4.4.
