@@ -101,6 +101,31 @@ Change-log entry and `to_version` restamp per Bible §8.
   11:00 UTC.
 - Pin 5: this change lands before anything else starts.
 
+### 4b — The front end reads v1 by name  *(propagate)*
+
+Found while scoping step 2, and it is not optional — the cutover has a
+presentation cascade:
+
+- `map.js:820` — `const R7 = ssi.modifiers.R7_cyber;`
+- `map.js:975` — `['R7 Cyber-Exposure', ssi.modifiers.R7_cyber]` in the popup
+  modifier table
+- `country-renderer.js:159` — `R7: 'R7_cyber'` in the key map
+- `country-renderer.js:502, 526` — reads and a median comparison on the same field
+
+Leave `modifiers.R7_cyber` in the payload and a reader sees the RETIRED value
+labelled "R7 Cyber-Exposure" while the score behind it comes from v2. Remove it
+and the same cards render undefined. Neither is acceptable, so the front end must
+read `R7_cyber_v2`.
+
+**This is a data-feed change, not a design change** — Pin 1 as the operator
+clarified it on 2026-09-03: the field a card reads is data; the card is design.
+Same cards, same positions, same labels. It must still be proven render-identical
+before it ships, per Bible §7 ("enforced in code, not requested in review"), and
+it is named here rather than discovered mid-build.
+
+Whether the displayed LABEL changes from "R7 Cyber-Exposure" is a separate
+operator decision, not a developer one.
+
 ### 5 — Measure the result  *(measure the result)*
 
 Predicted from `RESULT_what_completing_the_R7_cutover_costs.md`: 31,726 band
@@ -121,13 +146,6 @@ and `push`; explicit paths, no `-u` sweep. The public site and any R
 recomputation are consequences needing their own operator decision, never
 automatic.
 
-## Test execution — decide before step 2
-
-`pytest` is not installed in the Cowork device VM. Either the operator runs the
-suite on his Mac, or the tests and `scripts/pipeline/` are staged into the cloud
-container and run there. Pick one now, so "tests pass" is a fact rather than a
-claim.
-
 ## What would stop this plan
 
 - The data-layer sentinel in step 2 passing before the change. That would mean it
@@ -136,3 +154,40 @@ claim.
   off the predicted 5.1%. Stop and diagnose rather than continuing to 39.
 - Discovery that the 78,558 no-v1 records are not a clean population. They have
   not been characterised beyond their count.
+
+## Flagged in passing, NOT part of this change
+
+`map.js:1385` guards a branch that, when a country's `substations` array holds
+arrays rather than objects, expands each row into a full record with values
+generated from sine functions of the row index — `R7_cyber`, `unemployment_rate`,
+`gdp_per_capita`, `V_socio`, `E2_local`, `DER_ratio`, `seismic.zone`,
+`seismic.pga_g`, `markov.risk_score`, `markov.ettc_years`,
+`markov.corrosion_class` — plus a hardcoded
+`graph_topology: {degree: 2, betweenness_centrality: 0.5, is_bridge: 0}`.
+
+Measured: all 622,104 published records are objects, not arrays, so the branch is
+unreachable on today's data. It is live code, in the served page, that would
+fabricate silently if any country were ever published in compact form. Recorded
+here so it is not re-discovered; it belongs to the Pin 14 sweep, not to R7.
+
+## Test execution — RESOLVED 17 September 2026
+
+Both environments work; the question is settled by measurement, not preference.
+
+- **Cloud container.** 15 files staged (the test, `conftest.py`, `pytest.ini`,
+  `versions.json`, `intelligence/edition-config.json`, `intelligence/countries.json`,
+  and the `scripts.pipeline.scoring` / `.utils` modules — all stdlib imports).
+  `95 passed in 0.28s`. No path or import problems.
+- **Device VM.** `pip3 install pytest --break-system-packages` succeeds; pytest
+  9.1.1 available.
+
+Use the container for the code-level suite (fast iteration) and the device VM for
+any check that must read the 2.1 GB of deployed records, which the container does
+not have.
+
+**Note:** the suite is 95 tests, not the 91 `CLAUDE.md` records. Minor staleness,
+recorded not corrected — the count is not load-bearing.
+
+**And the point that matters:** those 95 tests pass right now, today, with the
+cutover not done. Confirmed by execution, not inferred. The suite cannot see the
+defect, which is why step 2 exists.
