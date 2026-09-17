@@ -231,9 +231,22 @@ def compute_modifier_terms(modifiers):
         # R7_cyber post v4.24 MUST migrate to R7_cyber_v2" — but this function,
         # which is that reader, never looked at the flag. It multiplied every
         # modifier present, so a record carrying both R7_cyber and R7_cyber_v2
-        # had the cyber modifier applied twice. Sweden's published scores carry
-        # that double-count today; every other v4.2-cohort country would have
-        # acquired it on its next re-score.
+        # would have the cyber modifier applied twice. This guard is what stops
+        # that, and it stays.
+        #
+        # CORRECTED 17 September 2026. These lines previously asserted that
+        # "Sweden's published scores carry that double-count today". Measured
+        # against the published artefact — 622,104 records, 39 countries, every
+        # shard — that is not so. ZERO Sweden records fit the both-hypothesis;
+        # Sweden's published mult_product over the chain recomputed WITH v2 and
+        # WITHOUT v1 is 1.000001 (sd 0.000023), a clean single count. Estate
+        # wide, the both-hypothesis fits 84 records: 0.0%. Whether the double
+        # count was corrected and Sweden re-scored after these lines were
+        # written, or was never true of the artefact, the measurement cannot
+        # say — but as written it was a present-tense claim about published
+        # data that the published data contradicts, sitting where the next
+        # reader would trust it. See doctrine/RESULT_the_r7_data_sentinel.md;
+        # scripts/check_r7_cutover_complete.py re-derives it in one command.
         if spec.get("retired"):
             successor = spec.get("superseded_by")
             has_succ = bool(successor and successor in modifiers)

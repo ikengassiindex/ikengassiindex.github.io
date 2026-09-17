@@ -25,11 +25,16 @@ For every substation in every country ssi-data.json:
 - ``sub["_r7_cyber_v2_source"]`` = ``AUDIT_TRAIL_VALUE`` marker.
 - ``sub["_r7_cyber_v2_fallback_reason"]`` = machine-parseable reason string
   when a Convention #56 fallback path was taken (else absent).
-- ``sub["_r7_cyber_v1_retired"]`` = False (dual-write per GATE-A-11
-  ~6-month transition; v1 remains live + emitted).
+- ``sub["_r7_cyber_v1_retired"]`` = True (GATE-A-11-REVISED hard cutover,
+  18 August 2026; reconciled here 17 September 2026 — the ~6-month
+  dual-write it previously implemented was superseded and this script was
+  never brought across).
 - ``sub["_r7_cyber_v1_value"]`` = snapshot of ``sub["modifiers"]["R7_cyber"]``
-  taken at first-apply time (Convention #56 audit trail).
-- ``sub["modifiers"]["R7_cyber"]`` — NEVER MODIFIED (BINDING per GATE-A-11).
+  taken at substitution time (Convention #56 audit trail).
+- ``sub["modifiers"]["R7_cyber"]`` — SNAPSHOTTED then REMOVED, so the
+  emitted modifier set carries exactly one cyber modifier. Downstream
+  readers take it by name; a retired value left in place is displayed as
+  the live one.
 
 Cache-bust markers on each country manifest (top-level ``meta`` key):
 
@@ -122,18 +127,17 @@ def apply_to_country(
     audit_key = m.AUDIT_TRAIL_KEY
     audit_val = m.AUDIT_TRAIL_VALUE
     fallback_key = m.FALLBACK_KEY
-    v1_retired_key = m.V1_RETIRED_KEY
-    v1_value_key = m.V1_VALUE_KEY
-    registry_key = m.REGISTRY_KEY
+    # v1_retired_key / v1_value_key / registry_key were bound here and written
+    # out inline. They now live behind m.substitute_v1_with_v2 — one policy, one
+    # place. Removed rather than left unused so nothing tempts a re-inline.
 
     for sub in substations:
-        modifiers = sub.setdefault("modifiers", {})
-        v1_val = modifiers.get("R7_cyber")
-
         r7_v2, audit_meta = m.compute_r7_cyber_v2_for_sub(sub, country_inputs)
 
-        # Write R7 v2 modifier sibling (dual-write per GATE-A-11).
-        modifiers[registry_key] = r7_v2
+        # Substitution policy lives in ONE place — r7_cyber_v2.substitute_v1_with_v2.
+        # It used to be written out again here, which is how this script and the
+        # registry drifted apart. Do not re-inline it.
+        v1_val = m.substitute_v1_with_v2(sub, r7_v2)
 
         # Audit trail marker (present on every substation post-apply).
         sub[audit_key] = audit_val
@@ -149,12 +153,9 @@ def apply_to_country(
             # Clean up any stale marker if a prior run wrote one.
             del sub[fallback_key]
 
-        # Dual-write transition markers (v1 remains live per GATE-A-11).
-        sub[v1_retired_key] = False  # BINDING at v0 first apply.
         if v1_val is None:
             summary["v1_marker_missing_count"] += 1
         else:
-            sub[v1_value_key] = v1_val
             try:
                 summary["r7_v1_values_snapshot"].append(float(v1_val))
             except (TypeError, ValueError):

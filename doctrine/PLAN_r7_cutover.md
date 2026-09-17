@@ -59,6 +59,39 @@ one yields.
 Retire-with-comment discipline per Convention #56: the superseded policy is
 commented out with its date and authority, not deleted.
 
+**DONE, 17 September 2026.** Four files.
+
+- `r7_cyber_v2.py` — dual-write text replaced throughout; the marker write now
+  snapshots v1, removes `modifiers["R7_cyber"]`, and sets
+  `_r7_cyber_v1_retired` True. Also recorded there: the module carried a
+  tombstone date of "~Q1 2027", which GATE-A-11-REVISED had already moved to
+  Session M+1.
+- **The policy was extracted to one function**, `substitute_v1_with_v2`, and both
+  call sites now use it. It had been written out twice, in two files — which is
+  precisely how this module and the registry came to state opposite policies for
+  a month with nothing noticing. Duplication was the root cause, not an
+  incidental detail, so removing it is part of the fix rather than tidying.
+- `session_m_r7_v2_cohort_apply.py` — inlined copy removed, calls the function.
+- `modifier_registry.py` — the Sweden double-count claim corrected against the
+  artefact. The guard itself is untouched.
+
+**And the reason step 1 was not finished when the code was right.** After the
+policy was reversed — `False` → `True`, and the modifier removed — the suite
+still reported **95 passed**. Every existing test covered the pure compute path
+or the registry constants; nothing covered the write path where the policy lives.
+A reversal of the module's central behaviour was invisible to its own sentinel.
+That is the second instance in one day of `DOCTRINE_a_check_must_read_the_artefact.md`,
+the first being `TestPostCutoverInvariants`.
+
+`TestSubstitutionSemantics` (9 tests) now pins it, and was verified the only way
+worth anything: the superseded behaviour was restored in a scratch copy and the
+suite run again. **4 failed, 100 passed.** Restored, **104 passed**. A test that
+has not been seen to fail is not evidence.
+
+`TestDualWriteSemantics` renamed `TestComputePathIsPure` — what it asserts is
+still true and still wanted, but a test named for the superseded policy reads as
+a pin on it.
+
 ### 2 — Add the invariant that can actually see the cutover  *(pin)*
 
 `TestPostCutoverInvariants` reads `versions.json`, `edition-config.json`, the

@@ -333,7 +333,12 @@ class TestConvention56Fallback:
 # ══════════════════════════════════════════════════════════════════
 
 
-class TestDualWriteSemantics:
+class TestComputePathIsPure:
+    # Renamed from TestDualWriteSemantics, 17 September 2026. What it asserts is
+    # still true and still worth asserting — compute_r7_cyber_v2_for_sub does not
+    # mutate the record — but "dual write" is the superseded policy, and a test
+    # named for it reads as a pin ON that policy. The mutation now lives in
+    # substitute_v1_with_v2 and is covered by TestSubstitutionSemantics.
 
     def test_v1_value_snapshot_captured_via_full_apply_semantic(self, sub_with_v1, eu_country_inputs_full):
         """Confirm the per-sub compute path returns a v2 value without touching sub v1 field.
@@ -652,6 +657,98 @@ class TestIntegrationPerCountry:
         (country_dir / "r7_cyber_v2_inputs.json").write_text("{ malformed json ")
         result = R7V2.load_country_inputs("test-country")
         assert result is None
+
+
+# ══════════════════════════════════════════════════════════════════
+# TestSubstitutionSemantics — the v1 -> v2 SUBSTITUTION, which nothing
+# in this file covered until 17 September 2026
+# ══════════════════════════════════════════════════════════════════
+
+
+class TestSubstitutionSemantics:
+    """Pin ``substitute_v1_with_v2``, the policy this module exists to apply.
+
+    Why this class was added. On 17 September 2026 the module's dual-write
+    stance was reversed to the hard cutover the registry had already adopted —
+    ``_r7_cyber_v1_retired`` False -> True, and ``modifiers["R7_cyber"]``
+    removed. **All 95 tests still passed.** The suite covered the pure compute
+    path and the registry constants, and nothing at all covered the write path
+    where the policy actually lives, so a reversal of the module's central
+    behaviour was invisible to it.
+
+    That is the same failure as ``TestPostCutoverInvariants`` asserting
+    versions.json and the registry flags while the published records went
+    unread — see ``doctrine/DOCTRINE_a_check_must_read_the_artefact.md`` and
+    ``doctrine/RESULT_the_r7_data_sentinel.md``. These tests cover the code;
+    ``scripts/check_r7_cutover_complete.py`` covers the artefact. Neither
+    substitutes for the other.
+    """
+
+    def test_marks_v1_retired(self, sub_with_v1):
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.03)
+        assert sub_with_v1[R7V2.V1_RETIRED_KEY] is True, \
+            "substitution must mark v1 retired; False was the dual-write default"
+
+    def test_snapshots_v1_value_before_removing_it(self, sub_with_v1):
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.03)
+        assert sub_with_v1[R7V2.V1_VALUE_KEY] == 1.02
+
+    def test_removes_v1_from_the_emitted_modifier_set(self, sub_with_v1):
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.03)
+        assert "R7_cyber" not in sub_with_v1["modifiers"], \
+            "a retired modifier left in the emitted set is displayed by " \
+            "map.js and country-renderer.js as the live one"
+
+    def test_writes_v2_as_the_cyber_modifier(self, sub_with_v1):
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.03)
+        assert sub_with_v1["modifiers"][R7V2.REGISTRY_KEY] == 1.03
+
+    def test_untouched_modifiers_survive(self, sub_with_v1):
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.03)
+        assert sub_with_v1["modifiers"]["R3_C_mult"] == 1.10
+
+    def test_record_with_no_v1_is_not_an_error(self):
+        """78,558 published records carry v2 with no v1 beneath it."""
+        sub = {"substation_id": "no-v1", "modifiers": {"R3_C_mult": 1.10}}
+        returned = R7V2.substitute_v1_with_v2(sub, 1.03)
+        assert returned is None
+        assert sub[R7V2.V1_RETIRED_KEY] is True
+        assert R7V2.V1_VALUE_KEY not in sub, \
+            "no v1 means no snapshot; do not invent one"
+        assert sub["modifiers"][R7V2.REGISTRY_KEY] == 1.03
+
+    def test_is_idempotent_and_does_not_lose_the_snapshot(self, sub_with_v1):
+        """A second pass must not overwrite the snapshot with nothing."""
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.03)
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.04)
+        assert sub_with_v1[R7V2.V1_VALUE_KEY] == 1.02, \
+            "the original v1 snapshot must survive a re-run"
+        assert sub_with_v1["modifiers"][R7V2.REGISTRY_KEY] == 1.04
+        assert "R7_cyber" not in sub_with_v1["modifiers"]
+
+    def test_cyber_modifier_is_counted_exactly_once_afterwards(self, sub_with_v1):
+        """The whole point: no double count.
+
+        Operator design intent, 22 August 2026 — v2 substitutes v1, never a
+        dual-write, so the cyber modifier is never counted twice.
+        """
+        from scripts.pipeline.scoring.modifier_registry import compute_modifier_terms
+        R7V2.substitute_v1_with_v2(sub_with_v1, 1.03)
+        mult, _add = compute_modifier_terms(sub_with_v1["modifiers"])
+        assert math.isclose(mult, 1.10 * 1.03, rel_tol=1e-12), \
+            "mult_product must be the non-cyber chain times v2, exactly once"
+
+    def test_double_count_would_be_caught_by_this_test(self, sub_with_v1):
+        """Guard the guard: a record carrying BOTH must not multiply both.
+
+        This is what the registry's retired-skip guard prevents. If that guard
+        were removed, this assertion is what fails.
+        """
+        from scripts.pipeline.scoring.modifier_registry import compute_modifier_terms
+        both = {"R3_C_mult": 1.10, "R7_cyber": 1.02, "R7_cyber_v2": 1.03}
+        mult, _add = compute_modifier_terms(both)
+        assert math.isclose(mult, 1.10 * 1.03, rel_tol=1e-12), \
+            "retired v1 must be skipped, not multiplied alongside v2"
 
 
 if __name__ == "__main__":

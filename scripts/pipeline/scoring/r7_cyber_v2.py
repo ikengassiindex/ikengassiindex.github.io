@@ -8,11 +8,16 @@ Implements the R7_cyber v2 composite modifier per D2 formula construct
 (`R7_CYBER_V2_FORMULA_CONSTRUCT_DRAFT.md` at
 `SSI Index/Upgrade Methodology Rulebook/01-R7-Cyber-v2-CRA-Integration/`).
 
-Sibling to R7_cyber v1 (legacy DESI + ACN scalar proxy, `[0.99, 1.05]`
-envelope) with which it co-exists during the ~6-month dual-write
-transition per Gate A GATE-A-11 operator sign-off 18 August 2026
-Session B. R7 v1 remains live + emitted; R7 v2 is written as a sibling
-field so downstream consumers may select either.
+SUBSTITUTE for R7_cyber v1 (legacy DESI + ACN scalar proxy, `[0.99,
+1.05]` envelope) — not a sibling. GATE-A-11 was REVISED on 18 August
+2026 from a ~6-month dual-write to a hard cutover, and
+``modifier_registry.py`` marks v1 ``retired`` accordingly. This module's
+dual-write text and behaviour were never brought across, so the registry
+and this file stated opposite policies until 17 September 2026.
+Reconciled per ``doctrine/PLAN_r7_cutover.md`` step 1.
+
+Operator design intent, 22 August 2026: **v2 substitutes v1, never a
+dual-write** — the cyber modifier is never counted twice.
 
 Load-bearing methodology anchor
 -------------------------------
@@ -90,14 +95,22 @@ Convention #56 fallback
 
 Dual-write semantics (GATE-A-11)
 --------------------------------
-- ``R7_cyber`` v1 is NEVER modified by this module. v1 remains live
-  + emitted by the pre-existing R7 pipeline path.
-- ``R7_cyber_v2`` is written as a sibling field on
-  ``sub["modifiers"]``.
-- ``_r7_cyber_v1_retired`` initialized False at v0 first apply;
-  transitions True at v1 tombstone timing (~Q1 2027 per operator).
-- ``_r7_cyber_v1_value`` captures the last-computed v1 multiplier
-  at time of v2 first apply (Convention #56 audit trail).
+- ``R7_cyber`` v1 is SNAPSHOTTED, then REMOVED from
+  ``sub["modifiers"]``. Removed rather than left in place because the
+  emitted modifier set is read BY NAME downstream — ``map.js`` and
+  ``country-renderer.js`` both display ``modifiers.R7_cyber`` — so a
+  retired value left sitting there is shown to a reader as the live one.
+  Convention #56 is served by the snapshot, not by leaving a dead field
+  in the chain where it invites the double count.
+- ``R7_cyber_v2`` is written on ``sub["modifiers"]`` as the SOLE cyber
+  modifier.
+- ``_r7_cyber_v1_retired`` is True from this apply onward. It was False
+  at v0 first apply under the superseded dual-write policy, whose
+  tombstone date was ~Q1 2027; GATE-A-11-REVISED moved that to Session
+  M+1 and this flag was never updated. Measured 17 September 2026 across
+  all 622,104 published records: False on 619,522, True on ZERO.
+- ``_r7_cyber_v1_value`` captures the last-computed v1 multiplier at the
+  time of substitution (Convention #56 audit trail).
 
 Convention preservation matrix
 ------------------------------
@@ -591,6 +604,43 @@ def load_country_inputs(country_slug: str) -> Optional[Dict[str, Any]]:
 # ══════════════════════════════════════════════════════════════════
 
 
+def substitute_v1_with_v2(sub, r7_v2):
+    """Apply the R7 v1 -> v2 SUBSTITUTION to one record, in place.
+
+    The single home for this policy. Both ``apply_r7_cyber_v2_to_country``
+    below and ``scripts/session_m_r7_v2_cohort_apply.py`` call it, because the
+    previous arrangement — the same policy written out twice, in two files —
+    is how this module and ``modifier_registry.py`` came to state opposite
+    things for a month without anything noticing.
+
+    What it does, and why in this order:
+
+    1. Write ``R7_cyber_v2`` as the cyber modifier.
+    2. Snapshot the old ``R7_cyber`` to ``_r7_cyber_v1_value``.
+    3. Remove ``R7_cyber`` from the emitted modifier set. Downstream readers
+       take modifiers by name (``map.js``, ``country-renderer.js``), so a
+       retired value left in place is displayed to a reader as the live one,
+       and sits in the chain inviting the double count that
+       ``modifier_registry.compute_modifier_terms`` now has a guard against.
+    4. Mark ``_r7_cyber_v1_retired`` True.
+
+    The snapshot precedes the removal so that a failure between the two loses
+    nothing that was not already recorded.
+
+    Returns the v1 value that was snapshotted, or None if the record carried
+    no v1 — which is 78,558 records as of 17 September 2026, and is not an
+    error: they carry v2 with nothing beneath it.
+    """
+    modifiers = sub.setdefault("modifiers", {})
+    v1_val = modifiers.get("R7_cyber")
+    modifiers[REGISTRY_KEY] = r7_v2
+    if v1_val is not None:
+        sub[V1_VALUE_KEY] = v1_val
+        modifiers.pop("R7_cyber", None)
+    sub[V1_RETIRED_KEY] = True
+    return v1_val
+
+
 def apply_r7_cyber_v2_to_country(
     country_slug: str,
     dry_run: bool = False,
@@ -598,9 +648,12 @@ def apply_r7_cyber_v2_to_country(
     """Apply R7_cyber v2 v0 first-apply pass to a single country.
 
     Reads country ssi-data via ``_ssi_data_shard_reader`` (Convention #79
-    sharding preserved). Writes ``R7_cyber_v2`` sibling field alongside
-    R7 v1 (dual-write per GATE-A-11). NEVER modifies existing
-    ``R7_cyber`` v1 value.
+    sharding preserved). Writes ``R7_cyber_v2`` as the sole cyber
+    modifier, snapshots the v1 value to ``_r7_cyber_v1_value``, marks
+    ``_r7_cyber_v1_retired`` True and REMOVES ``modifiers["R7_cyber"]``.
+
+    Substitution, not dual-write (GATE-A-11-REVISED 18 Aug 2026;
+    reconciled 17 Sep 2026).
 
     Returns a summary dict (n_processed, n_populated_v2, fallback distribution).
     """
@@ -630,24 +683,14 @@ def apply_r7_cyber_v2_to_country(
     }
 
     for sub in substations:
-        modifiers = sub.setdefault("modifiers", {})
-        # Capture R7 v1 value snapshot for audit trail (dual-write GATE-A-11).
-        v1_val = modifiers.get("R7_cyber")
-        # Compute R7 v2.
         r7_v2, audit = compute_r7_cyber_v2_for_sub(sub, country_inputs)
-        # Write dual-write markers.
-        modifiers[REGISTRY_KEY] = r7_v2
+        substitute_v1_with_v2(sub, r7_v2)
         sub[AUDIT_TRAIL_KEY] = AUDIT_TRAIL_VALUE
         if audit["fallback_reason"]:
             sub[FALLBACK_KEY] = audit["fallback_reason"]
         elif FALLBACK_KEY in sub:
             # Clean up stale fallback marker if this pass populates cleanly.
             del sub[FALLBACK_KEY]
-        # Dual-write transition markers (v1 remains live per GATE-A-11).
-        sub[V1_RETIRED_KEY] = False
-        if v1_val is not None:
-            sub[V1_VALUE_KEY] = v1_val
-
         # Update summary.
         if audit["fallback_reason"] == "no_country_inputs" or \
            audit["fallback_reason"] == "no_entity_no_product_data":
