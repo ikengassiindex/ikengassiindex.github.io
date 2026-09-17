@@ -1,9 +1,18 @@
-# AMENDMENT — I4 transmission density: definition, floors, and declared limits
+# AMENDMENT — I4 and I6 density: definitions, floors, and declared limits
 
 **FOR OPERATOR SIGNATURE. Nothing in this document is in force until it is
 signed.** On signature it SUPERSEDES `AMENDMENT_DRAFT_I4_I6_definition.md` and
 `AMENDMENT_DRAFT_I4_transmission_thresholds.md`, both of which remain unsigned,
-and it becomes the sole authority for I4.
+and it becomes the sole authority for **I4 and I6**.
+
+> **I6 WAS ADDED TO THIS DOCUMENT ON THE SAME DAY IT WAS DRAFTED, AFTER A GAP
+> WAS FOUND IN IT.** The first issue superseded
+> `AMENDMENT_DRAFT_I4_I6_definition.md` — which defines I4 *and* I6 — and
+> replaced the authority for I4 only. Signing it would have left I6, a metric
+> already declared `implemented` on 37 countries, with its defining document
+> superseded and nothing in its place: no authority at all, which is worse than
+> the unsigned draft it has now. Found by asking what else the superseded
+> document contained, which is a question the first issue never asked.
 
 **Date drafted:** 17 September 2026. **Evidence:** every figure below is either
 measured against the deployed tree on that date, or cited to a named primary
@@ -42,7 +51,44 @@ B discards between two-fifths and more than half of the discriminating signal.
 The construct's own rationale for inverting this metric describes local network
 redundancy, which is what A measures and what B averages away.
 
-## 2. The floors
+## 1a. I6 — substation density
+
+    I6_raw   substations within the SAME 3x3 block of 0.1 degree cells used by
+             I4, centred on the substation's own cell.
+    I6       Method B over THAT COUNTRY'S fleet P5/P95, then INVERTED, exactly
+             as I4: denser surroundings mean better resilience and a lower
+             metric.
+
+**I6 needs no voltage floor.** It counts substations, not lines, so section 2
+does not apply to it and none of the threshold questions in this amendment touch
+it. Measured on the deployed records, 17 September 2026: `_I6_raw_count` runs
+from 1 to 4,183 with a median of 144, across 37 countries.
+
+### The one election I6 requires
+
+I6 is ABSENT in Luxembourg and Iceland — **not because it cannot be computed
+there.** It can: it needs no voltage, and the voltage gaps that hold I4 in those
+two countries are irrelevant to counting substations. It is withheld because the
+deriver holds it to I4's country gate, in its own words, *"so the two metrics
+always describe the same population"*.
+
+That is a stated design choice and not an oversight, and it has a real argument
+behind it: I4 and I6 both feed component I, and letting them cover different
+countries makes `_I_coverage` mean different things in different places.
+
+**But it is inconsistent with how I2 was handled.** I2 is ABSENT for 108,550
+substations outside the CERRA domain while every other I metric is present for
+them, and component I's coverage is declared as geographically uneven rather than
+levelled down. The estate already tolerates and declares uneven coverage within
+component I. Holding a computable metric hostage to an uncomputable one is the
+opposite convention, applied to the same component.
+
+At stake: 1,408 substations — Luxembourg 723, Iceland 685.
+
+*I6 population elected (delete one): hold to I4's gate as now · derive I6
+independently for Luxembourg and Iceland*
+
+## 2. The floors (I4 only)
 
 Generated from `scripts/i4_transmission_thresholds.json` rather than retyped, so
 the values in this table and the values the deriver reads are the same values.
@@ -189,6 +235,13 @@ uneven: France, Germany, Italy, Israel and Costa Rica at 100 per cent, Austria a
 4. Italy re-derives at 120 kV. No other country's values change.
 5. I4's status moves from `blocked` to `implemented` for the signed set, with a
    change-log entry naming element I4.
+5a. **I6's judgement entry is rewritten to describe what it derives.** It
+   currently reads "Density of the surrounding transmission and distribution
+   network" with units "index" — generic where the quantity is a count of
+   substations in a 3x3 block, normalised Method B per country and inverted.
+   I6 is already declared `implemented`, so this corrects a description rather
+   than adding a claim, and it is the same staleness found in I5 on 17
+   September. A change-log entry names element I6.
 6. The conformance rows for provenance citation, declared-blocked-found-on-
    records and coefficients-outside-doctrine close for I4.
 
@@ -205,3 +258,6 @@ against floors no doctrine document can see.
 signature held pending the remaining 26*
 
 *Mexico elected (delete one): 115 as pinned · 69 per CENACE*
+
+*I6 population elected (delete one): hold to I4's gate · derive for Luxembourg
+and Iceland*
