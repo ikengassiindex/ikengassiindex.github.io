@@ -48,8 +48,13 @@ one yields.
 - `scripts/pipeline/scoring/r7_cyber_v2.py` — the module docstring's dual-write
   framing and the `V1_RETIRED_KEY` initialised `False` at first apply.
 - `scripts/session_m_r7_v2_cohort_apply.py` — same value, same stated reason.
-- `scripts/pipeline/scoring/modifier_registry.py` — already correct; do not touch
-  beyond confirming it.
+- `scripts/pipeline/scoring/modifier_registry.py` — the retired-skip guard is
+  correct and stays. **One comment in it is not:** it states that "Sweden's
+  published scores carry that double-count today". Zero Sweden records fit the
+  both-hypothesis, and Sweden's published product ÷ chain(v2) is 1.000001
+  (sd 0.000023). The claim is corrected in this step, in the same change —
+  a present-tense assertion about published data, written into production code,
+  that the published data contradicts. See `RESULT_the_r7_data_sentinel.md`.
 
 Retire-with-comment discipline per Convention #56: the superseded policy is
 commented out with its date and authority, not deleted.
@@ -72,6 +77,15 @@ deployed tree:
 passes both sides of a change has not tested the change. Run it and watch it fail
 first — that is the acceptance criterion for the sentinel itself.
 
+**DONE, 17 September 2026** — `scripts/check_r7_cutover_complete.py`. Red on all
+three conditions, as required. Its first run changed steps 4 and 5; see
+`RESULT_the_r7_data_sentinel.md`. Two carry-overs from that run:
+
+- **Condition C must be SPLIT before it gates a release.** It currently conflates
+  "the chain uses v2" with "the published product reproduces at all". Those are
+  different failures and only the first belongs to this change.
+- The sentinel does not cover the front end (step 4b). Nothing automated does.
+
 ### 3 — Pin the declarations in `SSI_FOUNDATION_judgement.yaml`  *(pin)*
 
 Three things get declared before any derivation runs, not after:
@@ -93,8 +107,26 @@ Change-log entry and `to_version` restamp per Bible §8.
 
 ### 4 — Derive  *(derive → propagate)*
 
-- One country first. Read the result before looping 39 — Pin 16, and it has
-  caught a defect at least twice.
+**Revised 17 September 2026 by the sentinel's first run.** Five countries —
+france, germany, us, italy, japan — hold 398,599 records, **64.1% of the
+estate**, and on **397,852** of them the published `mult_product` reproduces from
+the record's own modifiers under NO cyber hypothesis. The ratio of published to recomputed runs at a median 1.0085–1.1004
+with a standard deviation near 0.047: a distribution, not a scalar. Their
+published product predates their current modifier values.
+
+**So the cutover cannot be applied to those five countries as a delta.** There is
+no reproducible baseline to apply a delta to. They need the Phase ζ rescore
+(39-country Monte Carlo, ~4–6 h) — which was already a deferred
+operator-execution phase, and is now on this change's critical path rather than
+beside it.
+
+The other 34 countries (223,505 records) reproduce and can take the delta, bar 57
+scattered records the sentinel also reports as non-reproducing.
+Splitting the cohort that way is a decision, not a workaround, and it gets stated
+in the judgement file at step 3.
+
+- One country first, from the reproducing 34. Read the result before looping —
+  Pin 16, and it has caught a defect at least twice.
 - Then cohort-wide.
 - Pin 13: not in a bot window. `pipeline-enrichment.yml` 1st Thursday 06:00 UTC,
   `monthly-refresh.yml` 2nd Thursday 10:00 UTC, `esg-refresh.yml` 2nd Thursday
@@ -132,6 +164,13 @@ Predicted from `RESULT_what_completing_the_R7_cutover_costs.md`: 31,726 band
 changes (5.1%), 17,699 worse / 14,027 better, Critical +12.2%. **Measure against
 that prediction and report the difference**, rather than re-citing the prediction
 as the outcome.
+
+**Caveat that must travel with that prediction.** It was computed before the
+stale-baseline finding. For the five non-reproducing countries a band change
+measured against a baseline that does not reproduce is not a measurement of this
+change — it is the two effects summed. Report the 34 reproducing countries and
+the 5 rescored countries **separately**, and never quote a single cohort-wide
+band-change figure that mixes them.
 
 Also measure, because it is the open question the cutover may or may not close:
 does `mult_product` reproduce from the published chain afterwards? It currently
