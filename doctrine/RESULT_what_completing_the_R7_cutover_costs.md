@@ -1,3 +1,23 @@
+> ## ⚠ SUPERSEDED FOR COST, 17 September 2026
+>
+> **Section 2 onward measured the wrong bands.** Every band figure in this
+> document — 31,726 changes, 5.1 per cent, 17,699 worse / 14,027 better,
+> Critical +12.2 per cent, "Italy moves 5,692 to a better band and not one to a
+> worse" — was computed with `classify_band`, the ABSOLUTE cutoffs. The site
+> publishes per-country normalised bands (Phase 2D). Recomputing absolute bands
+> from published `R_median` reproduces this document's "published" column
+> bit-for-bit, against a published distribution that is entirely different.
+>
+> Corrected measurement: `RESULT_what_the_R7_cutover_costs_in_published_bands.md`
+> — 4,249 band changes on the attributable population, 87 per cent of them to a
+> worse band.
+>
+> **Section 1 stands.** Which chain each country's published product reproduces
+> from is unaffected, and is confirmed independently in
+> `RESULT_the_r7_data_sentinel.md`. Kept whole rather than edited: a superseded
+> measurement that is still cited elsewhere is evidence, and rewriting it would
+> hide how the error was made.
+
 # RESULT — what completing the R7 cutover would cost
 
 **Date** 17 September 2026

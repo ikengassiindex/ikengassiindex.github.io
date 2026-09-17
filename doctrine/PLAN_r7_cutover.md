@@ -254,10 +254,24 @@ operator decision, not a developer one.
 
 ### 5 — Measure the result  *(measure the result)*
 
-Predicted from `RESULT_what_completing_the_R7_cutover_costs.md`: 31,726 band
-changes (5.1%), 17,699 worse / 14,027 better, Critical +12.2%. **Measure against
-that prediction and report the difference**, rather than re-citing the prediction
-as the outcome.
+**WITHDRAWN 17 September 2026.** The 31,726 / 5.1% / 17,699 worse / 14,027
+better / Critical +12.2% figures measured ABSOLUTE bands while the site publishes
+per-country normalised ones. See the superseding banner on that document and
+`RESULT_what_the_R7_cutover_costs_in_published_bands.md`.
+
+**The prediction to measure against is now:**
+
+    attributable population                     221,384  (35.6% of estate)
+       already cut over, cost nil                81,442
+       can move                                 139,942
+    R_median moves                               61,471
+    BAND CHANGES                                  4,249  (3.0% of those, 0.68% of estate)
+       worse 3,716   better 533
+
+87 per cent of the movement is to a worse band, because v2 near 1.03 replaces a
+v1 centred on 1.02. The remaining 400,655 records are excluded as unattributable:
+their published `mult_product` does not reproduce from their own modifiers, so a
+ratio applied to them measures the substitution plus whatever else has drifted.
 
 **Caveat that must travel with that prediction.** It was computed before the
 stale-baseline finding. For the five non-reproducing countries a band change
