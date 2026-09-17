@@ -138,6 +138,41 @@ Three things get declared before any derivation runs, not after:
 
 Change-log entry and `to_version` restamp per Bible §8.
 
+**DONE, 17 September 2026.** `SSI_FOUNDATION_judgement.yaml`, five edits plus two
+change-log entries. `to_version` needed no restamp — it already reads
+`judgement pin 2026-09-17`.
+
+**The doctrine was ahead of the code, which is the reverse of the usual.** The
+entry already carried `substitutes: R7_cyber`, `interaction: Mutually exclusive
+… Both reaching the published product on one asset is a double count`, and a
+`limitations` field stating plainly that the guard was not deployed and published
+scores still reflected the superseded modifier. The 21 August rebuild was honest
+about a gap the code then took a month to close. What needed correcting was
+narrower than planned:
+
+- **v1's retirement basis.** It read "no verifiable provenance". That understates
+  it: an unverified coefficient might still measure something, and a name hash
+  does not. Restated with the measurement and cited to the finding.
+- **"Wherever that is so"** — the product layer's absence was declared
+  conditionally. It is unconditional: 619,522 of 619,522.
+- **The 30 distinct values** are now declared on the entry, so the national
+  granularity is doctrine rather than an unrecorded property of the output.
+- **The 78,558 no-v1 records** are declared, with the reason the retirement
+  marker is still set on them.
+
+**A regression I introduced and caught before landing.** I first wrote v1's
+explanation into `source:`. `render2.py` treats a truthy `source` as a CITATION —
+it would have printed that prose in the Source row, and dropped R7_cyber from
+both the blocked-source table and the conformance gap. The file's own words:
+"A citation that was never read is worse than an admitted gap." `source` is back
+to `null` and the substance sits in `blocked_on`, which is the field the renderer
+prints in the blocked table. Verified after the fix: 30 elements carry a blocked
+source and R7_cyber is among them.
+
+**Not rendered.** Pin 16 puts *project* after *derive*, and render once and last.
+The documents therefore lag the YAML until step 4 runs. Deliberate, and stated
+here so it is not mistaken for an omission.
+
 ### 4 — Derive  *(derive → propagate)*
 
 **Revised 17 September 2026 by the sentinel's first run.** Five countries —
