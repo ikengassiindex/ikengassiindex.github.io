@@ -55,13 +55,20 @@ that is the wrong order and the order cannot now be reversed, only regularised.
 
 Measured on Poland, 17 September 2026:
 
-| layer | present on |
+| layer | present on, ESTATE-WIDE |
 |---|---:|
-| `metrics.I1`–`I6`, `_I_from_metrics` | **100%** (27,764 of 27,764) |
-| `components.I`, `R_base` | **8.1%** (2,247) |
+| `metrics.I1`–`I6`, `_I_from_metrics` | **100%** (622,104) |
+| `components.I`, `R_base` | **87.4%** (543,546) |
 
-`components.I` is **never** equal to `_I_from_metrics` — 0 of 2,247 records, with
-the two differing by more than 0.10 on 76 per cent and ranging −0.58 to +0.75.
+> The first two issues of this paper carried 8.1% here. **That is Poland's
+> figure, not the estate's**, measured on one country and generalised — the same
+> fault as the two corrections above. Estate-wide it is 87.4 per cent, and
+> coverage is very uneven: France, Germany and Italy at 100 per cent, Austria at
+> 5.0 per cent.
+
+`components.I` equals `_I_from_metrics` on **149 of 543,546 records — 0.027 per
+cent** — differing by more than 0.10 on 51.9 per cent, mean +0.0610, range
+−0.974 to +0.994.
 `components.I` is still the `enrich_esg_gaps` fill.
 
 **So the drafts' §5 condition held.** I4 reaches no published R score. Whatever is

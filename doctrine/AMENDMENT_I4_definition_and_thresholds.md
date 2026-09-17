@@ -161,11 +161,20 @@ band. Measured: France 0.1 per cent, Poland 6.2 per cent, **Spain 13.2 per
 cent**. Whether that is genuine remoteness or an artefact of a distribution-only
 substation is NOT decided by this amendment and remains open.
 
-**4.4 I4 does not reach any published score.** `components.I` is the
-`enrich_esg_gaps` fill and sits on 8.1 per cent of records; the metric layer sits
-on 100 per cent and is separate. Measured on Poland, `components.I` never equals
-`_I_from_metrics` — 0 of 2,247 records, differing by more than 0.10 on 76 per
-cent. I4 is a foundation, not a visible change to any published score.
+**4.4 I4 does not reach any published score, and the layer it does reach is
+not small.** `components.I` is the `enrich_esg_gaps` fill, not a sum of the
+metrics, so nothing in this amendment changes a published R. Measured across the
+whole estate on 17 September 2026, not on one country: **543,546 records (87.4
+per cent) carry `components.I`**, and it equals `_I_from_metrics` on **149 of
+them — 0.027 per cent**. The two differ by more than 0.10 on 51.9 per cent of
+records, mean +0.0610, range −0.974 to +0.994.
+
+Rebuilding component I from the metric layer would move **89,056 substations
+(16.4 per cent) across a classification band** — 67,097 to a worse band, 21,959
+to a better. That is not a consequence of this amendment and is recorded here so
+that signature is not read as endorsing the fill. Country coverage is very
+uneven: France, Germany, Italy, Israel and Costa Rica at 100 per cent, Austria at
+5.0 per cent, Poland at 8.1 per cent.
 
 ## 5. What signature does
 
