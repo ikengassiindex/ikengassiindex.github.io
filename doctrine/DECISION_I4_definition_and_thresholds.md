@@ -22,6 +22,33 @@ that is the wrong order and the order cannot now be reversed, only regularised.
 > document rather than against the estate, which is the same fault this session
 > has now found four times.
 
+> **SECOND CORRECTION, 17 September 2026.** The first two issues both checked
+> the drafts and the records and never opened
+> `scripts/i4_transmission_thresholds.json`, which is where the coefficients
+> actually live. That file carries a measured, reasoned basis for three of the
+> cases reported here as defects:
+>
+> * **Greenland's 60 kV is not a fabricated default.** `_greenland_basis`
+>   records that 132 kV is 80.1 km on 12 records — the Buksefjord–Nuuk hydro
+>   link — above a 60/63/66/70 kV tier, with 10.5 kV town distribution below,
+>   and that a 60 kV floor captures every hydro-to-town link while excluding
+>   distribution. **Verified against the geometry: 228.0 km on 28 records
+>   against the file's claimed 228.3 km on 28, and 132 kV at 80.1 km / 30.3%
+>   against its claimed 80.2 km / 30.3%.** The arithmetic reproduces. The
+>   recommendation to declare Greenland NOT APPLICABLE is WITHDRAWN as stated
+>   and restated as a genuine choice in §2.3.
+> * **Mexico's 115 kV is not the draft's 230.** `_mexico_basis` records that
+>   8,426 line voltages were recovered from OSM by way-id join gated on
+>   geometry, taking the untagged share from 50.6% to 1.5%, and pins 115 against
+>   CFE's RNT ladder. The correction to 69 kV is now a contested 3.7% of the
+>   network, not "the largest single error in the draft".
+> * **Luxembourg and Iceland are not an undeclared abstention.** Both are held
+>   in `_needs_pin` with a reason tested against OSM on 31 August 2026.
+>
+> **What survives as a clear change is Italy alone.** The fault is the same one
+> the first correction recorded: a check run against one artefact, concluding
+> absence, without looking where the answer lives. Twice, in the same document.
+
 ---
 
 ## 0. First, what is and is not at stake
@@ -109,12 +136,15 @@ the network has no usable voltage attribute.
 
 **So the deployed metric is wrong in three countries, not five:**
 
-| country | deployed | should be | substations |
-|---|---:|---:|---:|
-| italy | 132 | **120** | 41,662 |
-| mexico | 115 | **69** | 3,085 |
-| greenland | 60 | **none — ABSENT** | 43 |
-| | | | **44,790 of 622,104 = 7.2%** |
+| country | deployed | position | substations |
+|---|---:|---|---:|
+| italy | 132 | **change to 120** — Terna's own tier is "150-132-120 kV"; no counter-basis in the pin file | 41,662 |
+| mexico | 115 | **contested** — CENACE places 69–138 kV inside the RNT; the pin file reads CFE's ladder as starting at 115. 4,092 km, 3.7% | 3,085 |
+| greenland | 60 | **defensible as pinned** — captures every hydro-to-town link, verified | 43 |
+
+**Only Italy is a clear change: 41,662 substations, 6.7%.** Mexico turns on
+whether CENACE's "Transmisión 69 a 138 kV" tier is in scope, which is a reading
+of the source and not an error. Greenland's pin is measured and reproduces.
 
 The table that follows records the authority for every country checked, and the
 "draft" column is retained because the drafts are what this paper closes — but
@@ -217,10 +247,22 @@ Danish-language government documents do call the 56.7 km 132 kV Buksefjord line 
 *transmissionsledning*, so the word is findable — but it denotes a single radial
 generator lead-in to Nuuk, not a network.
 
-**Recommendation: I4 is NOT APPLICABLE for Greenland and must be declared ABSENT,
-not zero.** The draft's proposed 60 kV would be a fabricated coefficient. This is
-the same discipline already applied to the 108,550 substations outside the CERRA
-domain, which carry no I2 rather than an estimate.
+**This is a genuine choice, and the pin file argues the other side of it with
+measurements that reproduce.** Two defensible positions:
+
+*As pinned (60 kV).* In an islanded system the hydro-to-town links ARE the
+functional transmission, and I4 measures local network redundancy. The 60 kV
+floor captures all 228.0 km of them across 28 records and excludes 10.5 kV town
+distribution. A 132 kV floor would leave 80 km on 12 records.
+
+*Declared ABSENT.* There is no interconnected network, no TSO and no regulatory
+boundary, so "transmission density" names something that does not exist there —
+the same discipline applied to the 108,550 substations outside the CERRA domain,
+which carry no I2 rather than an estimate.
+
+I lean to the first, having checked the arithmetic. The first issue of this paper
+asserted the second and called the 60 kV pin fabricated, which was wrong: it is
+measured, documented, and reproduces. 43 substations either way.
 
 ### 2.4 Twenty-six countries remain unsourced
 
