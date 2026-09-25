@@ -1,0 +1,87 @@
+# Colombia v4.23 Ingestion Audit — Step 2 Fetch
+# ==============================================
+# Task: #229 (WAVE2-Step2 Colombia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: colombia/v4_23-ingestion-audit-colombia-preflight.yaml
+# Status: FETCH_COMPLETE (partial via retry, cache-hit on second run)
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: colombia
+source_id: CO-C1-osm-overpass
+fetched_at_utc: "2026-07-13T00:00:00Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 185990
+raw_sha256: 1c8f671725fe67b85215b9953d3b23a3e8def76197009e78cdfee0c1fbbe544c
+provincial_scope: null  # Single-query, whole country
+
+empirical_counts:
+  substations: 770  # post Discipline #36 filter (778 raw)
+  transmission_lines: 2847
+
+empirical_finding_of_note:
+  finding: >
+    Colombia OSM Overpass required MULTIPLE 504 gateway retries across all 3
+    endpoints (overpass-api.de / kumi / private.coffee) for both substation
+    way + line queries. First run partially succeeded (70 subs + 0 lines);
+    second run cache-hit on the 70-sub cache + successfully fetched the
+    remaining substation-way batch (778 total) + lines batch (2847) via
+    kumi.systems endpoint. Endpoint-fallback + backoff strategy paid off at
+    country-scale.
+  implication: >
+    Countries larger than ~500k km² approaching the Overpass timeout
+    envelope. If Colombia had failed all endpoints, bbox partitioning by
+    department cluster would have been needed.
+
+owner_resolution_provenance:
+  direct_osm_operator_tag: 121
+  alias_normalised_osm_operator: 63
+  layer_1_ISA_TSO_threshold_ge_220kv: 83
+  layer_2_department_map: 0  # OSM Colombia doesn't populate department tags on substation elements
+  layer_3_Emcali_cali_metro_geofence: 24
+  layer_4_ISA_default: 479
+  unresolved: 0  # ISA default catches all — Convention #56 preserved
+
+empirical_finding_department_tag_sparsity:
+  finding: >
+    OSM Colombian substations do NOT populate department tags (addr:state /
+    region / department). All net-new subs fell to ISA_default via Layer 4.
+    However — the merge step's baseline-department-promotion logic kicked
+    in for baseline-matched subs (404 enriched), promoting OSM ISA_default
+    outputs to proper DSOs based on baseline department field.
+  implication: >
+    The novel "baseline department promotion in merge" pattern is essential
+    for Colombia. Without it, 479 ISA_default OSM outputs would remain as
+    ISA when they should be EPM/Enel-Codensa/Chec/etc. Pattern generalises
+    to future countries with rich baseline region field + sparse OSM tags.
+
+discipline_41_line_parity:
+  post_fetch: PASS (770 subs + 2847 lines, ratio 3.70 — clean transmission-tier)
+
+discipline_36_cross_border_filter:
+  polygon_source: colombia/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 8
+  lines_dropped_outside_polygon: ~10
+  final_state: CLEAN
+
+wall_clock:
+  step_2_fetch_seconds: ~600  # ~10 min including 504 gateway retries + rate-limit backoff
+  cache_hit_second_run: true
+  endpoints_used: [overpass-api.de, overpass.kumi.systems, overpass.private.coffee]
+
+warnings:
+  - "Overpass 504 gateway on primary endpoint (repeated) — retried via kumi.systems + private.coffee successfully"
+  - "OSM lines partial fetch on first attempt (0 lines); cache-hit on 2nd run recovered 2847"
+  - "Discipline #36 — dropped 8 substations + ~10 lines outside Colombia polygon"
+  - "OSM Colombia does not populate department tags (0 subs with region metadata) — merge step's baseline-department-promotion is essential"
+
+auditability_chain:
+  parent_preflight: colombia/v4_23-ingestion-audit-colombia-preflight.yaml
+  step_2_fetch: colombia/v4_23-ingestion-audit-colombia-fetch.yaml
+  step_4_merge: colombia/v4_23-ingestion-audit-colombia-merge.yaml
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: colombia/ssi-data.json
+
+status: READY_FOR_STEP_4

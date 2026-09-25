@@ -1,0 +1,430 @@
+# SSI Index v4.23 — Finland P29 Wave 3 Pre-flight Source Discovery
+# ================================================================
+# Convention #7 Data-Layer Anchoring: documented-proxy discipline
+# Convention #56: visibly-honest degradation preserved
+# Convention #60: non-commercial provenance (OSM ODbL + Fingrid SOE +
+#   Suomen Energia public)
+# Convention #78 BINDING: Finnish + Swedish (Åland/Bothnian bilingual)
+#   + Sami minority + English 11th cohort-wide enforcement candidate
+# Convention #78 §4bis.5 Layer 3 geofence: EXPECTED 7th enforcement
+#   (Helsinki metro Helen Sähköverkko vs Vantaan Energia boundary)
+# Discipline #36: cross-border filter tolerance 5.0 km (existing FI
+#   entry — Baltic archipelago + Bothnian coastline precedent)
+# Discipline #41: line-substation parity [1.5-5.0] healthy band target
+#
+# Authored: 2026-07-18 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================================
+
+country_code: fi
+country_name: Finland
+country_name_fi: Suomi  # Finnish native
+country_name_sv: Finland  # Swedish native (constitutional bilingualism)
+country_name_se: Suomâ  # Northern Sami native
+wave: 3
+priority: P29
+smallest_first_rank: 8  # of 10 remaining Wave 3 candidates
+scope: EXTENDS_NORDIC_CLUSTER_POST_DENMARK
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: finland/ssi-data.json
+  substation_count: 3885  # LARGER than initially projected (~1000 estimate)
+  region_count: 18  # maakunta (first-tier admin regions)
+  voltage_distribution:
+    "110.0": 3760  # DOMINANT — Fingrid TSO 110 kV backbone + some DSO
+    "400.0": 73    # EHV backbone (Cross-Finland Fingrid transmission)
+    "45.0": 23     # Finnish-specific sub-transmission tier
+    "220.0": 16    # legacy Fingrid transmission (largely superseded)
+    "20.0": 11     # MV distribution
+    "500.0": 1     # HVDC (EstLink 2 terminal Anttila)
+    "150.0": 1     # rare
+  owner_attribution:
+    untagged: 3885  # 100% — CLEAN SLATE PATTERN (Ireland/NZ/DK analog)
+  total_attributed_pct: 0.0
+  tso_zone: Fingrid  # single national zone (no bidding split — Nordic synchronous FI)
+  bbox:
+    lon_min: 21.0502  # Åland archipelago
+    lon_max: 30.9461  # Russian border Karelia
+    lat_min: 59.8275  # Åland southern
+    lat_max: 69.9093  # Arctic Lapland (Kilpisjärvi)
+  bounds_json_features: 18
+
+# ---------------------------------------------------------------
+# Architectural signatures
+# ---------------------------------------------------------------
+architectural_signatures:
+  extends_nordic_cluster_post_dk: true  # DK + FI Nordic cluster start
+  fenno_scandia_entso_e_synchronous_grid: true  # via Sweden/Norway + Estonia EstLink 1+2 HVDC
+  finnish_dominant_plus_swedish_bilingual: true  # Constitution bilingual (Åland archipelago 100% Swedish)
+  sami_minority_language_northern_boundary: true  # Lappi region — Northern/Skolt/Inari Sami
+  110kv_main_transmission_tier_signature: true  # 96.8% of baseline @ 110 kV
+  400kv_ehv_backbone_fingrid: true  # 73 subs
+  nordic_hydro_backbone_western_finland: true  # Bothnian hydro corridor
+  nuclear_capture_expected: true  # Olkiluoto 1+2+3 (world's largest EPR reactor) + Loviisa 1+2
+  estonia_estlink_hvdc_1_2_terminals: true  # 350 MW + 650 MW = 1000 MW total
+  russian_border_karelia_exclusion: true  # No cross-border with Russia (post-2022 disconnect)
+  clean_slate_baseline_pattern: true  # 100% untagged
+  helsinki_metro_multi_dso_split: true  # Helen (city) + Vantaan Energia (northern suburb)
+  aland_islands_swedish_only_territorial_extension: true  # Autonomous demilitarized zone
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING alias map projection
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 11  # after DECADE MILESTONE closed at DK P28
+  script_class: FINNISH_PLUS_SWEDISH_PLUS_SAMI_PLUS_ENGLISH
+  scripts_supported:
+    - Finnish  # ~80% expected — ä ö å diacritics
+    - Swedish  # ~15% — Åland 100% + Bothnian coast bilingual
+    - Sami  # ~2% — Lappi region minority
+    - English  # ~3%
+  primary_operators:
+    fingrid:
+      # State-owned TSO — established 1996 unbundling from IVO + Teollisuuden Voima
+      finnish: [Fingrid, Fingrid Oyj, Fingrid Oy]
+      swedish: [Fingrid Abp]
+      english: [Fingrid, Finnish Grid]
+      legal_form: [Oyj, Oy, Abp]  # public LTD / private LTD / Swedish
+      role: SINGLE_NATIONAL_TSO
+      voltage_scope: [400, 220, 110]  # Finnish transmission tiers
+      ownership: 53.1% State + 27.2% Ilmarinen + 19.7% other
+    # Predecessors (pre-1996 unbundling)
+    ivo:
+      finnish: [IVO, Imatran Voima]  # merged to Fortum 1998
+      english: [Imatran Voima]
+      role: LEGACY_TSO_TRANSMISSION_pre_1996
+    tvo:
+      finnish: [Teollisuuden Voima, TVO]
+      english: [Industrial Power Company]
+      role: NUCLEAR_GENERATION_OLKILUOTO  # 3 reactors, world's largest EPR
+    # ── Major DSOs ──
+    caruna:
+      # LARGEST DSO — First Sentier Investors + Elo + KEVA
+      finnish: [Caruna, Caruna Oy, Caruna Oyj, Caruna Networks Oy]
+      role: LARGEST_DSO_MULTI_REGION
+      coverage: Uusimaa (excl Helsinki) + Varsinais-Suomi + Satakunta + Etelä-Pohjanmaa + Pohjanmaa + Keski-Pohjanmaa (~1M customers)
+      predecessors: [Fortum Sähkönsiirto, Fortum Distribution]
+      note: Fortum → Caruna 2014 rebrand (sale to consortium)
+    elenia:
+      finnish: [Elenia, Elenia Oy, Elenia Verkko Oy]
+      role: SECOND_LARGEST_DSO
+      coverage: Pirkanmaa (Tampere) + Kanta-Häme + Päijät-Häme + Keski-Suomi + Pohjois-Pohjanmaa (~430k customers)
+      predecessors: [Vattenfall Verkko, Vattenfall Distribution Finland]
+      note: Vattenfall → Elenia 2012 rebrand
+    helen_sahkoverkko:
+      finnish: [Helen Sähköverkko, Helen Sähköverkko Oy, Helen Elverk]
+      swedish: [Helsingfors Energi Elnät]
+      role: HELSINKI_METROPOLITAN_DSO
+      coverage: Helsinki city (~400k customers)
+      ownership: Helsinki Municipal (Helen Oy subsidiary)
+      predecessors: [Helsingin Energia, HELEN]
+      note: 6TH §4bis.5 enforcement geofence subject
+    vantaan_energia_sahkoverkot:
+      finnish: [Vantaan Energia, Vantaan Energia Sähköverkot Oy, VESV]
+      swedish: [Vanda Energi]
+      role: HELSINKI_NORTHERN_SUBURB_DSO
+      coverage: Vantaan (Vantaa city) + Kerava (~110k customers)
+      ownership: Vantaa Municipal + Helsinki + Espoo
+    turku_energia:
+      finnish: [Turku Energia, Turku Energia Sähköverkot]
+      swedish: [Åbo Energi]
+      role: TURKU_METROPOLITAN_DSO
+      coverage: Turku city (Åbo) (~135k customers)
+    tampereen_sahkolaitos:
+      finnish: [Tampereen Sähkölaitos, Tampereen Energia Oy, Tampere Energia]
+      role: TAMPERE_METROPOLITAN_DSO_CO_EXISTS_ELENIA
+      coverage: Tampere city core (Elenia covers surrounding Pirkanmaa)
+    # ── Minor + Municipal DSOs ──
+    savon_voima:
+      finnish: [Savon Voima Verkko, Savon Voima]
+      role: REGIONAL_DSO_SAVONIA
+      coverage: Pohjois-Savo + Etelä-Savo + Kymenlaakso
+    ksoy_verkko:
+      finnish: [KSOY-verkko, Keski-Suomen Sähkövoima]
+      role: REGIONAL_DSO_KESKI_SUOMI
+      coverage: Central Finland
+    kymenlaakson_sahko:
+      finnish: [Kymenlaakson Sähköverkko, KSS-verkko]
+      role: REGIONAL_DSO_KYMENLAAKSO
+    lappeenrannan_energia:
+      finnish: [Lappeenrannan Energia, LPR Energia]
+      role: MINOR_DSO_SOUTH_KARELIA
+    tornio_energia:
+      finnish: [Tornion Energia, Torninlaakson Sähkö]
+      role: MINOR_DSO_LAPPI
+      coverage: Tornio (border with Sweden Haparanda)
+    rovaniemen_energia:
+      finnish: [Rovaniemen Energia, Rovaniemen Verkko Oy]
+      role: MINOR_DSO_LAPPI_ROVANIEMI
+    # ── Åland (Autonomous) ──
+    mariehamns_elnat:
+      swedish: [Mariehamns Elnät, Mariehamns Elnät Ab]
+      finnish: [Maarianhaminan sähköverkko]
+      role: DSO_ALAND_AUTONOMOUS
+      coverage: Åland archipelago (100% Swedish-speaking)
+      note: Åland has separate energy law (Elmarknadslag)
+    kraftnat_aland:
+      swedish: [Kraftnät Åland, Kraftnät Åland Ab]
+      role: TSO_ALAND_AUTONOMOUS
+      note: Åland grid separately connected via HVDC to Sweden mainland
+    # ── Nuclear operators ──
+    fortum:
+      finnish: [Fortum, Fortum Power and Heat, Fortum Oyj, Fortum Sähkönmyynti]
+      swedish: [Fortum Kraft]
+      role: NUCLEAR_LOVIISA_GENERATION_RETAIL
+      note: Owns Loviisa 1+2 nuclear; grid=Fingrid TSO
+      predecessors: [IVO Imatran Voima]
+    # ── Rail traction 25 kV AC ──
+    vr_group:
+      finnish: [VR-Yhtymä, VR, VR Group, VR Track]
+      swedish: [VR-Group, VR]
+      english: [VR Group, Finnish Railways]
+      role: RAIL_TRACTION_INFRASTRUCTURE
+      voltage_scope: [25]  # 25 kV AC electrified main lines (Helsinki-Turku + Helsinki-St.Petersburg legacy)
+    # ── Industrial captives ──
+    stora_enso:
+      finnish: [Stora Enso, Stora Enso Oyj]
+      role: INDUSTRIAL_CAPTIVE_FOREST_PULP_PAPER
+    upm_kymmene:
+      finnish: [UPM, UPM-Kymmene, UPM-Kymmene Oyj]
+      role: INDUSTRIAL_CAPTIVE_FOREST_PULP_PAPER
+    metsa_group:
+      finnish: [Metsä Group, Metsä-Botnia, Metsä Fibre]
+      swedish: [Metsä]
+      role: INDUSTRIAL_CAPTIVE_FOREST_PULP_PAPER
+    outokumpu:
+      finnish: [Outokumpu, Outokumpu Oyj]
+      role: INDUSTRIAL_CAPTIVE_STAINLESS_STEEL_TORNIO
+    ssab_raahe:
+      finnish: [SSAB Raahe, Rautaruukki]
+      swedish: [SSAB]
+      role: INDUSTRIAL_CAPTIVE_STEEL_RAAHE
+    nokia:
+      finnish: [Nokia, Nokia Oyj]
+      role: INDUSTRIAL_CAPTIVE_TELECOM
+  legal_form_suffixes:
+    oyj: [Oyj, Oy]  # public LTD / private LTD
+    ab_abp: [Ab, Abp, AB]  # Swedish/Åland
+    ky: [Ky]  # commandiittiyhtiö — limited partnership
+    ry: [ry]  # rekisteröity yhdistys — registered association
+  finnish_diacritics_normalized: true  # ä ö å NFC composition
+  sami_diacritics_normalized: true  # ŋ ǯ â (Northern Sami)
+  binding_threshold_hits_projection: 30-100  # Finnish + Swedish + minimal Sami cohabitation
+  binding_threshold_actual_TBD_step_4: null
+
+# ---------------------------------------------------------------
+# Voltage-class × multi-DSO resolver
+# ---------------------------------------------------------------
+voltage_class_dso_resolver:
+  pattern: MULTI_LAYER_TSO_PLUS_METRO_GEOFENCE_PLUS_REGIONAL_DSO
+  layers:
+    - name: Fingrid TSO threshold (≥110 kV baseline dominates)
+      condition: voltage_kv >= 110
+      attribution: Fingrid
+      priority: 1
+      note: Finnish 110/220/400 kV = Fingrid TSO; some DSOs also 110 kV but Layer 5 catches via direct OSM
+    - name: HVDC interconnector (EstLink + FennoSkan)
+      condition: voltage_kv in [350, 500] AND name matches ['EstLink', 'FennoSkan', 'Anttila', 'Espoo HVDC']
+      attribution: Fingrid HVDC
+      priority: 2
+    - name: Nuclear plant identity
+      condition: name matches ['Olkiluoto', 'Loviisa', 'OL1', 'OL2', 'OL3', 'LO1', 'LO2']
+      attribution: TVO Olkiluoto (or Fortum Loviisa)
+      priority: 3
+    - name: VR Group rail traction (25 kV AC)
+      condition: voltage_kv == 25 AND name contains rail_context
+      attribution: VR Group
+      priority: 4
+    - name: Helsinki §4bis.5 geofence (7TH ENFORCEMENT — Helen vs Vantaan)
+      condition: region == 'Uusimaa' AND voltage_kv < 110
+      sub_layers:
+        - condition: lat >= 60.15 AND lat <= 60.30 AND lon >= 24.85 AND lon <= 25.20
+          attribution: Helen Sähköverkko
+          note: Helsinki city core geofence
+        - condition: lat > 60.28 AND lon >= 24.85 AND lon <= 25.20
+          attribution: Vantaan Energia Sähköverkot
+          note: Vantaa northern suburb
+        - condition: fallback (Uusimaa region catch-all)
+          attribution: Caruna
+          note: Caruna covers Uusimaa outside Helsinki+Vantaa
+      priority: 5
+    - name: Åland special jurisdiction (Swedish autonomous)
+      condition: region == 'Ahvenanmaa' OR region == 'Åland' OR lon <= 21.5
+      attribution: Kraftnät Åland / Mariehamns Elnät
+      priority: 6
+    - name: Region → dominant DSO map (18 regions)
+      condition: voltage_kv < 110 AND region is not null
+      attribution: <region-mapped DSO>
+      priority: 7
+    - name: Fingrid catch-all (safety net)
+      condition: fallback
+      attribution: Fingrid
+      priority: 8  # Layer 8 CATCH-ALL
+
+# ---------------------------------------------------------------
+# Region → dominant DSO map
+# ---------------------------------------------------------------
+region_to_dso_map:
+  # Metropolitan concentration
+  Uusimaa: Caruna  # Helsinki via §4bis.5 geofence; Caruna covers surrounding
+  # Southern Finland
+  Varsinais-Suomi: Caruna  # Turku Energia in Turku core (Layer 5 sub-cascade)
+  Satakunta: Caruna
+  Kymenlaakso: KSS-verkko  # Kymenlaakson Sähköverkko
+  Etelä-Karjala: Lappeenrannan Energia
+  # Central Finland
+  Pirkanmaa: Elenia  # Tampere Sähkölaitos in Tampere core (Layer 5 sub-cascade)
+  Kanta-Häme: Elenia
+  Päijät-Häme: Elenia
+  Keski-Suomi: Elenia
+  # Western Finland
+  Etelä-Pohjanmaa: Caruna
+  Pohjanmaa: Caruna
+  Keski-Pohjanmaa: Caruna
+  # Eastern Finland
+  Pohjois-Savo: Savon Voima
+  Etelä-Savo: Savon Voima
+  Pohjois-Karjala: Savon Voima
+  # Northern Finland
+  Pohjois-Pohjanmaa: Elenia  # north Elenia coverage
+  Kainuu: Fingrid  # limited DSO coverage — mostly TSO
+  Lappi: Fingrid  # limited DSO coverage — mostly TSO (Rovaniemen Energia in Rovaniemi core)
+  # Autonomous
+  Ahvenanmaa: Kraftnät Åland  # Åland Swedish autonomous
+  Åland: Kraftnät Åland
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 geofence assessment
+# ---------------------------------------------------------------
+layer_3_geofence:
+  enforcement_needed: true  # 7TH COHORT-WIDE ENFORCEMENT EXPECTED
+  rationale: |
+    Uusimaa region (788 subs — LARGEST region) contains 3 metropolitan
+    DSOs: Helen Sähköverkko (Helsinki city) + Vantaan Energia
+    (Vantaa northern suburb) + Caruna (Uusimaa outside metros).
+    Requires metropolitan geofence to disambiguate Helsinki CBD
+    from Vantaa suburb from surrounding Caruna region.
+
+    Cumulative Convention #78 §4bis.5 enforcement expected to grow
+    to 7:
+    - Prague CZ (Czechia P20)
+    - Warsaw PL (Poland P21)
+    - EWZ Zurich CH (Switzerland P24)
+    - SIG Geneva CH (Switzerland P24)
+    - Auckland NZ (New Zealand P27)
+    - Copenhagen DK (Denmark P28 — 6TH; HIGHEST hits 615)
+    - NEW: Helsinki FI (Finland P29 — 7TH)
+  proposed_enforcement:
+    helsinki_helen_geofence:
+      lat_min: 60.15
+      lat_max: 60.28
+      lon_min: 24.85
+      lon_max: 25.20
+      attribution: Helen Sähköverkko
+      note: Helsinki city core (~40 km²)
+    vantaan_geofence:
+      condition: lat > 60.28 AND lat <= 60.40 AND lon 24.85-25.20
+      attribution: Vantaan Energia Sähköverkot
+      note: Vantaa northern suburb
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border filter (EXISTING FI ENTRY)
+# ---------------------------------------------------------------
+discipline_36:
+  boundary_tolerance_km: 5.0  # Baltic archipelago + Bothnian coastline precedent
+  existing_tolerance_source: cross_border_tolerances.json
+  cross_border_interconnectors:
+    - EstLink 1 HVDC (350 MW) — Anttila FI ↔ Harku EE 2007
+    - EstLink 2 HVDC (650 MW) — Anttila FI ↔ Püssi EE 2014
+    - FennoSkan 1 HVDC (400 MW) — Rauma FI ↔ Dannebo SE 1989
+    - FennoSkan 2 HVDC (800 MW) — Rauma FI ↔ Finnböle SE 2011
+    - AC synchronous ties with Sweden (multiple 400+220 kV lines)
+    - AC synchronous ties with Norway (limited)
+    - NO Russian border (post-2022 disconnect via RAO Nordic dissolution)
+  aland_islands_swedish_hvdc: preserved  # via Sweden Björkö-Åland HVAC
+  expected_pre_filter_drift_pct: 0.5
+
+# ---------------------------------------------------------------
+# Discipline #41 line parity target
+# ---------------------------------------------------------------
+discipline_41:
+  target_ratio_range: [1.5, 5.0]  # Healthy band
+  baseline_line_count: null  # to be captured from grid-geo.json at Step 4
+  projection: |
+    Finland transmission grid: ~14,600 km Fingrid 110/220/400 kV
+    Finland distribution grid: ~370,000 km MV/LV across ~80 DSOs
+    Baseline captures 110 kV Fingrid backbone heavily (3,760 subs);
+    OSM captures Fingrid + DSO. Expected line-substation ratio
+    HEALTHY (2-8×) or possibly NEAR-UNITY like Denmark
+    (Nordic OSM community MV/LV cluster-tagging pattern).
+
+# ---------------------------------------------------------------
+# Data sources
+# ---------------------------------------------------------------
+data_sources:
+  primary:
+    - name: OpenStreetMap
+      endpoint_pool:
+        - overpass-api.de
+        - kumi.systems
+        - private.coffee
+      license: ODbL
+      convention_60_compliant: true
+  cross_reference:
+    - name: Fingrid Annual Report 2024
+      url: https://www.fingrid.fi/en
+      convention_60_compliant: true  # State-Owned Enterprise
+    - name: Suomen Energia (Finnish Energy)
+      url: https://energia.fi/en
+      convention_60_compliant: true
+    - name: Tilastokeskus (Statistics Finland)
+      url: https://www.stat.fi/en
+      convention_60_compliant: true
+    - name: Energiavirasto (Finnish Energy Authority)
+      url: https://energiavirasto.fi/en
+      convention_60_compliant: true
+
+# ---------------------------------------------------------------
+# Convention #56 hazard baselines (Phase 4c prep)
+# ---------------------------------------------------------------
+convention_56_hazard_baselines:
+  flood: 0.35        # MOD-LOW — spring snowmelt (Kokemäenjoki + Vantaa) + Baltic coastal
+  wildfire: 0.35     # MOD — boreal forest (2018 summer + 2021 Lappi peatland)
+  winter: 0.65      # HIGH — Arctic Circle + snow load + ice/rime + polar night wind stress
+  adapt: 0.80       # HIGH — Climate Act 2015 statutory carbon neutrality 2035 (2nd Nordic after Denmark)
+  compound: 0.45     # MOD — winter storm + snow load compounds
+  just: 0.50         # MOD — peat phaseout 2030 + coal transition Vaasa/Helsinki + Just Transition Fund €165M
+  sources:
+    - JRC EU-Flood-Atlas (Kokemäenjoki + Bothnian coast)
+    - Copernicus wildfire monitoring
+    - ECMWF ERA5 winter storm + snow load climatology
+    - ND-GAIN adaptation index (Finland rank ~7/181)
+    - IPCC AR6 Europe chapter (northern Europe warming 2× global)
+    - Ilmastolaki (Climate Act) 2015 carbon neutrality 2035
+    - Just-Transition Fund €165M targeted peat regions
+    - FMI (Finnish Meteorological Institute) climatology
+
+# ---------------------------------------------------------------
+# Empirical projection (Step 4 forecast)
+# ---------------------------------------------------------------
+step_4_projection:
+  raw_fetch_estimate: 4500-7500  # Given DK-analog 3.3× baseline capture
+  post_filter_estimate: 4485-7485
+  net_new_estimate: 500-2500  # Moderate given baseline 3885 already substantial
+  net_new_pct_estimate: 13-64
+  convention_78_hits_estimate: 30-100
+  line_growth_estimate: 1-5x
+  step_4b_retroactive_attribution_estimate: 3800-3880  # dominant retroactive
+  step_4b_class_diversity_estimate: 15-25  # 6 major DSOs + Åland + Fingrid + captives
+
+# ---------------------------------------------------------------
+# Next steps
+# ---------------------------------------------------------------
+next_step: Step 2 — Operator local OSM Overpass fetch (residential IP)
+handoff_command: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.finland.osm_overpass 2>&1 \
+    | tee finland/v4_23-osm-overpass.log

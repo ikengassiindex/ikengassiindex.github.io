@@ -1,0 +1,502 @@
+# SSI Index v4.23 — New Zealand P27 Wave 3 Pre-flight Source Discovery
+# =====================================================================
+# Convention #7 Data-Layer Anchoring: documented-proxy discipline
+# Convention #56: visibly-honest degradation preserved via partial-fetch
+# Convention #60: non-commercial provenance (OSM ODbL + Transpower + ENA public)
+# Convention #78 BINDING: English dominant + Māori Te Reo cohabitation 9th
+#   cohort-wide enforcement candidate
+# Convention #78 §4bis.5 Layer 3 geofence: EXPECTED 5th enforcement
+#   (Auckland Vector + Counties Energy metropolitan carve-out — 3-way split)
+# Discipline #36: cross-border filter tolerance 5.0 km (existing NZ entry
+#   from Mode 2 remediation — Pacific coastline + Fiordland precedent)
+# Discipline #41: line-substation parity [1.5-5.0] healthy band target
+#
+# Authored: 2026-07-17 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# =====================================================================
+
+country_code: nz
+country_name: New Zealand
+country_name_mi: Aotearoa  # Māori Te Reo name (native)
+wave: 3
+priority: P27
+smallest_first_rank: 6  # of 12 remaining Wave 3 candidates
+scope: FIRST_SOUTHERN_HEMISPHERE_WAVE_3_EVENT
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: new-zealand/ssi-data.json
+  substation_count: 1558  # LARGER than initially projected (~650 estimate)
+  region_count: 16  # NZ regions + Chatham/Kermadec/Tokelau territorial extensions
+  voltage_distribution:
+    "11": 640    # dominant MV distribution
+    "33.0": 545  # sub-transmission (NZ-specific 33 kV tier)
+    "110.0": 110 # transmission (Transpower TSO threshold)
+    "66.0": 104  # transmission (Transpower TSO)
+    "220.0": 89  # EHV backbone (Transpower TSO)
+    "25.0": 29   # MV distribution
+    "50.0": 17   # sub-transmission (rare)
+    "22.0": 17   # MV distribution
+  owner_attribution:
+    untagged: 1558  # 100% — CLEAN SLATE PATTERN (Ireland-analog)
+  total_attributed_pct: 0.0  # BASELINE ZERO — same signature as Ireland pre-P25
+  tso_zone: Transpower  # placeholder; not literal ownership
+  bbox:
+    lon_min: 167.2776
+    lon_max: 178.3514
+    lat_min: -46.5897
+    lat_max: -34.8210
+  bounds_json_features: 24  # 16 regions + Mode 3 territorial extensions (Chatham + Kermadec + Tokelau + Ross)
+
+# ---------------------------------------------------------------
+# Architectural signatures
+# ---------------------------------------------------------------
+architectural_signatures:
+  first_southern_hemisphere_wave_3_event: true
+  first_english_multi_dso_wave_3: true  # Ireland was single-DSO English; NZ multi-DSO
+  richest_multi_dso_architecture_wave_3: true  # 29 EDBs (RICHER than Swiss 8-way)
+  cook_strait_hvdc_inter_island_link: true  # 1200 MW HVDC (2 x 350 kV DC + 1 x 500 kV DC pole 3)
+  north_south_island_synchronous_split: true  # 2 AC synchronous zones joined by HVDC
+  first_maori_te_reo_diacritic_wave_3: true  # ā ē ī ō ū + Rangatiratanga cohabit
+  chatham_kermadec_tokelau_offshore_wave_3: true  # Mode 3 territorial extensions preserved
+  extensive_hydro_backbone: true  # South Island Waitaki + Clyde + Manapouri
+  geothermal_taupo_volcanic_zone: true  # North Island Wairakei + Kawerau + Ngawha
+  clean_slate_baseline_pattern: true  # 100% untagged — Ireland-analog
+  layer_3_admin_expected_active: true  # 16 populated regions like Korean do/si
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING alias map (100-entry projection)
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 9  # after 8-country cumulative
+  script_class: MOSTLY_ENGLISH_PLUS_MAORI_DIACRITICS
+  scripts_supported:
+    - English  # ~95% expected
+    - Maori_Te_Reo  # macron diacritics ā ē ī ō ū (~5%)
+  primary_operators:
+    transpower:
+      english: [Transpower, Transpower New Zealand, Transpower NZ, Transpower New Zealand Limited]
+      te_reo: [Whakaū]  # (Māori for "Transpower" concept — rarely used in OSM tags)
+      legal_form: [Ltd, Limited]
+      role: SINGLE_NATIONAL_TSO
+      voltage_scope: [220, 110, 66]  # NZ transmission tiers
+      ownership: State-owned Enterprise (SOE)
+    edb_north_island:
+      # Auckland region (253 subs — LARGEST metro)
+      vector:
+        english: [Vector, Vector Ltd, Vector Limited]
+        te_reo: [Vector Aotearoa]
+        role: METROPOLITAN_DSO
+        coverage: Auckland central + suburbs (60% of Auckland region)
+      counties_energy:
+        english: [Counties Energy, Counties Power, Counties Manukau Power]
+        role: METROPOLITAN_DSO
+        coverage: Auckland southern (Papakura + Franklin + Waiuku)
+      counties_power_ltd:
+        english: [Counties Power Ltd, Counties Power Limited]
+        role: METROPOLITAN_DSO_ALIAS
+      # Northland (44 subs)
+      top_energy:
+        english: [Top Energy, Top Energy Ltd]
+        role: REGIONAL_DSO
+        coverage: Northland (northern half — Kaitaia to Whangarei)
+      northpower:
+        english: [Northpower, Northpower Ltd]
+        role: REGIONAL_DSO
+        coverage: Northland (southern half — Whangarei to Kaipara)
+      # Waikato (94 subs)
+      wel_networks:
+        english: [WEL Networks, WEL Networks Ltd, Waikato Electricity Lines]
+        role: REGIONAL_DSO
+        coverage: Waikato central (Hamilton + Cambridge + Te Awamutu)
+      waipa_networks:
+        english: [Waipa Networks, Waipa Networks Ltd]
+        role: REGIONAL_DSO
+        coverage: Waipa district (Cambridge)
+      the_lines_company:
+        english: [The Lines Company, The Lines Company Ltd, TLC]
+        role: REGIONAL_DSO
+        coverage: King Country (Waikato western)
+      # Bay of Plenty (91 subs)
+      horizon_networks:
+        english: [Horizon Networks, Horizon Networks Ltd, Horizon Energy]
+        role: REGIONAL_DSO
+        coverage: Bay of Plenty (Whakatane + Kawerau + Opotiki)
+      unison_networks:
+        english: [Unison Networks, Unison Networks Ltd]
+        role: REGIONAL_DSO_MULTI_REGION
+        coverage: Rotorua + Taupo + Hawke's Bay (Napier + Hastings)
+      # Gisborne (23 subs)
+      eastland_network:
+        english: [Eastland Network, Eastland Group, Eastland Network Ltd]
+        role: REGIONAL_DSO
+        coverage: Gisborne + East Cape
+      # Taranaki (43 subs) — Powerco cross-regional
+      # Manawatu-Whanganui (77 subs) — Powerco + Electra
+      powerco:
+        english: [Powerco, Powerco Ltd, Powerco Limited]
+        role: REGIONAL_DSO_MULTI_REGION
+        coverage: Taranaki + Manawatu-Whanganui + Coromandel + Wairarapa + Tasman (LARGEST EDB by geographic spread)
+      electra:
+        english: [Electra, Electra Ltd, Electra Limited]
+        role: REGIONAL_DSO
+        coverage: Kapiti coast + Horowhenua
+      # Wellington (342 subs — LARGEST region)
+      wellington_electricity:
+        english: [Wellington Electricity, Wellington Electricity Lines, WELL]
+        role: METROPOLITAN_DSO
+        coverage: Wellington City + Hutt Valley + Kapiti (partial)
+      wellington_electricity_lines_ltd:
+        english: [Wellington Electricity Lines Ltd, Wellington Electricity Lines Limited]
+        role: METROPOLITAN_DSO_ALIAS
+    edb_south_island:
+      # Marlborough (8 subs)
+      marlborough_lines:
+        english: [Marlborough Lines, Marlborough Lines Ltd]
+        role: REGIONAL_DSO
+        coverage: Marlborough (Blenheim + Picton + Havelock)
+      # Nelson-Tasman (13 subs) — Network Tasman
+      network_tasman:
+        english: [Network Tasman, Network Tasman Ltd]
+        role: REGIONAL_DSO
+        coverage: Nelson + Tasman (Motueka + Golden Bay)
+      nelson_electricity:
+        english: [Nelson Electricity, Nelson Electricity Ltd]
+        role: REGIONAL_DSO
+        coverage: Nelson City
+      # West Coast (18 subs)
+      westpower:
+        english: [Westpower, Westpower Ltd]
+        role: REGIONAL_DSO
+        coverage: West Coast (Greymouth + Hokitika)
+      buller_electricity:
+        english: [Buller Electricity, Buller Electricity Ltd]
+        role: REGIONAL_DSO
+        coverage: Buller (Westport)
+      # Canterbury (284 subs)
+      orion_new_zealand:
+        english: [Orion, Orion NZ, Orion New Zealand, Orion Ltd]
+        te_reo: [Orion Aotearoa]
+        role: METROPOLITAN_DSO
+        coverage: Christchurch + Selwyn + Waimakariri + Canterbury central
+      mainpower_nz:
+        english: [MainPower NZ, MainPower, MainPower New Zealand]
+        role: REGIONAL_DSO
+        coverage: North Canterbury (Rangiora + Amberley + Kaikoura)
+      alpine_energy:
+        english: [Alpine Energy, Alpine Energy Ltd]
+        role: REGIONAL_DSO
+        coverage: South Canterbury (Timaru + Twizel + Waimate)
+      network_waitaki:
+        english: [Network Waitaki, Network Waitaki Ltd]
+        role: REGIONAL_DSO
+        coverage: Waitaki district (Oamaru)
+      # Otago (81 subs)
+      aurora_energy:
+        english: [Aurora Energy, Aurora Energy Ltd]
+        role: REGIONAL_DSO
+        coverage: Dunedin + Central Otago + Queenstown Lakes
+      otago_net:
+        english: [OtagoNet, Otago Net, OtagoNet Ltd]
+        role: REGIONAL_DSO
+        coverage: Coastal Otago (Balclutha + Oamaru)
+      # Southland (107 subs)
+      power_net:
+        english: [PowerNet, Power Net, PowerNet Ltd, Electricity Invercargill, EIL]
+        role: REGIONAL_DSO
+        coverage: Southland (Invercargill + Gore + Stewart Island)
+      the_power_company:
+        english: [The Power Company, TPC]
+        role: REGIONAL_DSO
+        coverage: Southland (Fiordland + Te Anau)
+      # Otago-Southland cross-boundary
+      pulse_energy:
+        english: [Pulse Energy, Pulse Energy Ltd]
+        role: RETAIL_ONLY  # NOT a DSO — retail electricity provider
+        note: EXCLUDE from DSO attribution — separate from network ownership
+    industrial_captives:
+      new_zealand_aluminium_smelters:
+        english: [NZAS, New Zealand Aluminium Smelters, Tiwai Point]
+        role: INDUSTRIAL_CAPTIVE
+        coverage: Southland Tiwai Point aluminium smelter (Meridian Energy contract)
+      methanex:
+        english: [Methanex NZ, Methanex, Methanex Motunui, Methanex Waitara]
+        role: INDUSTRIAL_CAPTIVE
+        coverage: Taranaki methanol production
+      fonterra:
+        english: [Fonterra, Fonterra Cooperative, Fonterra Cooperative Group]
+        role: INDUSTRIAL_CAPTIVE
+        coverage: Dairy processing (multi-region)
+      contact_energy:
+        english: [Contact Energy, Contact Energy Ltd]
+        role: GENERATION_RETAIL  # NOT DSO
+        note: Generation-retail, treat separately from DSO attribution
+      meridian_energy:
+        english: [Meridian Energy, Meridian Energy Ltd, Meridian]
+        te_reo: [Meridian Aotearoa]
+        role: GENERATION_RETAIL_MAJORITY_HYDRO
+        note: Owns Waitaki + Clyde + Manapouri generation; grid ownership is Transpower
+      mercury_nz:
+        english: [Mercury NZ, Mercury Energy, Mercury NZ Ltd]
+        role: GENERATION_RETAIL_MAJORITY_HYDRO_GEOTHERMAL
+        note: Owns Waikato + Taupo generation; grid ownership is Transpower
+      genesis_energy:
+        english: [Genesis Energy, Genesis Energy Ltd]
+        role: GENERATION_RETAIL_MAJORITY_GAS_COAL
+        note: Owns Huntly + Tokaanu; grid ownership is Transpower
+      trustpower:
+        english: [Trustpower, Trustpower Ltd]
+        role: GENERATION_RETAIL_HYDRO
+        note: Bay of Plenty hydro; grid ownership is Transpower
+    transportation_captives:
+      kiwirail:
+        english: [KiwiRail, Kiwirail, KiwiRail Ltd, KiwiRail Group]
+        te_reo: [Ara Whanui]  # Māori name
+        role: RAIL_TRACTION_SUB_OWNER
+        coverage: Main trunk line 25 kV AC electrified (Palmerston North to Hamilton)
+      auckland_transport:
+        english: [Auckland Transport, AT Metro, KiwiRail Metro Auckland]
+        role: METROPOLITAN_RAIL_TRACTION
+        coverage: Auckland metro rail electrification 25 kV AC (Puhinui + Papatoetoe)
+  legal_form_suffixes:
+    limited: [Ltd, Limited, Limited Company]
+    incorporated: [Inc, Incorporated]
+    plc: [PLC]  # rare in NZ
+    council: [Council, City Council, District Council, Regional Council]  # local government
+  maori_diacritics_normalized: true  # NFC normalization for macron composition (ā ē ī ō ū)
+  binding_threshold_hits_projection: 30-80  # English-dominant + minimal Māori
+  binding_threshold_actual_TBD_step_4: null
+
+# ---------------------------------------------------------------
+# Voltage-class × RICHEST multi-DSO resolver
+# ---------------------------------------------------------------
+voltage_class_dso_resolver:
+  pattern: MULTI_LAYER_TSO_PLUS_REGIONAL_DSO_PLUS_METRO_GEOFENCE
+  layers:
+    - name: Transpower TSO threshold
+      condition: voltage_kv >= 110
+      attribution: Transpower
+      priority: 1
+      note: NZ transmission tier is 220/110/66 kV; ≥110 kV → Transpower TSO
+    - name: KiwiRail electrified traction
+      condition: voltage_kv in [25, 26] AND name contains rail_context
+      attribution: KiwiRail
+      priority: 2
+    - name: NZAS Tiwai Point aluminium smelter
+      condition: name matches ['NZAS', 'Tiwai Point', 'Bluff Aluminium']
+      attribution: NZAS
+      priority: 3
+    - name: Auckland metropolitan carve-out (§4bis.5 Layer 3 geofence — 5th enforcement)
+      condition: region == 'Auckland' AND voltage_kv < 110
+      sub_layers:
+        - condition: lat >= -36.85 AND lat <= -36.75 AND lon >= 174.65 AND lon <= 174.90
+          attribution: Vector
+          note: Vector Auckland CBD + suburbs geofence
+        - condition: lat < -37.00 OR (name contains 'Papakura' OR name contains 'Franklin')
+          attribution: Counties Energy
+          note: Counties Energy south of Auckland CBD
+        - condition: fallback
+          attribution: Vector
+          note: Vector catch-all for Auckland region
+      priority: 4
+    - name: Wellington metropolitan (single-EDB — no geofence needed)
+      condition: region == 'Wellington' AND voltage_kv < 110
+      attribution: Wellington Electricity
+      priority: 5
+    - name: Canterbury metropolitan (Orion NZ Christchurch + regional split)
+      condition: region == 'Canterbury' AND voltage_kv < 110
+      sub_layers:
+        - condition: lat >= -43.70 AND lat <= -43.40 AND lon >= 172.30 AND lon <= 172.85
+          attribution: Orion New Zealand
+          note: Orion Christchurch metropolitan geofence
+        - condition: lat < -43.90
+          attribution: Alpine Energy
+          note: Alpine Energy South Canterbury (Timaru + Twizel)
+        - condition: lat > -43.20
+          attribution: MainPower NZ
+          note: MainPower North Canterbury (Rangiora + Amberley)
+        - condition: fallback
+          attribution: Orion New Zealand
+          note: Orion catch-all for Canterbury region
+      priority: 6
+    - name: Region → dominant EDB map (Layer 3)
+      condition: voltage_kv < 110 AND region is not null
+      attribution: <region-mapped EDB>
+      priority: 7
+    - name: Transpower catch-all
+      condition: fallback
+      attribution: Transpower
+      priority: 8  # LAYER 5 CATCH-ALL
+
+# ---------------------------------------------------------------
+# Region → dominant EDB map (16 regions × 29 EDBs)
+# ---------------------------------------------------------------
+region_to_dso_map:
+  # North Island
+  Northland: [Top Energy, Northpower]  # split; Top Energy northern half
+  Auckland: [Vector, Counties Energy]  # split via §4bis.5 geofence Layer 3 5th enforcement
+  Waikato: [WEL Networks, Waipa Networks, The Lines Company, Powerco]  # 4-way split
+  Bay of Plenty: [Horizon Networks, Unison Networks]  # split
+  Gisborne: [Eastland Network]
+  Hawke's Bay: [Unison Networks]
+  Taranaki: [Powerco]
+  Manawatu-Whanganui: [Powerco, Electra]  # split
+  Wellington: [Wellington Electricity, Powerco]  # split — Powerco Wairarapa
+  # South Island
+  Marlborough: [Marlborough Lines]
+  Nelson: [Nelson Electricity]
+  Tasman: [Network Tasman, Powerco]  # split
+  West Coast: [Westpower, Buller Electricity]  # split
+  Canterbury: [Orion New Zealand, MainPower NZ, Alpine Energy, Network Waitaki]  # 4-way split
+  Otago: [Aurora Energy, OtagoNet]  # split
+  Southland: [PowerNet, The Power Company]  # split — TPC Fiordland
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 geofence assessment
+# ---------------------------------------------------------------
+layer_3_geofence:
+  enforcement_needed: true  # 5th COHORT-WIDE ENFORCEMENT EXPECTED
+  rationale: |
+    Auckland region (253 subs) splits between Vector (metropolitan CBD +
+    suburbs, ~65% of Auckland) and Counties Energy (southern Auckland,
+    Papakura + Franklin + Waiuku, ~35%). Simple region → EDB mapping
+    insufficient; lat/lon geofence required to disambiguate.
+
+    Cumulative Convention #78 §4bis.5 enforcement expected to grow
+    to 5:
+    - Prague CZ (Czechia P20)
+    - Warsaw PL (Poland P21)
+    - EWZ Zurich CH (Switzerland P24)
+    - SIG Geneva CH (Switzerland P24)
+    - NEW: Auckland NZ (Vector vs Counties Energy split)
+
+    Wellington (single-EDB Wellington Electricity) does NOT require
+    geofence — Powerco Wairarapa is geographically distinct
+    (Masterton region separate from Wellington City).
+
+    Christchurch (Canterbury region) considered but Orion NZ is
+    dominant enough that a soft-boundary Layer 3 admin-based
+    attribution suffices; keeping metropolitan geofence to Auckland
+    only for empirical parsimony. If Step 4 empirical outcome shows
+    Christchurch attribution ambiguity, extend to 6th enforcement
+    retroactively.
+  proposed_enforcement:
+    auckland_vector_geofence:
+      lat_min: -36.85
+      lat_max: -36.75
+      lon_min: 174.65
+      lon_max: 174.90
+      attribution: Vector
+      note: Auckland CBD + North Shore + eastern suburbs
+    auckland_counties_energy:
+      condition: name contains 'Papakura' OR 'Franklin' OR 'Waiuku' OR lat < -37.00
+      attribution: Counties Energy
+      note: Auckland southern (below Manukau Harbour approx.)
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border filter (EXISTING NZ ENTRY)
+# ---------------------------------------------------------------
+discipline_36:
+  boundary_tolerance_km: 5.0  # existing entry from Mode 2 remediation
+  existing_tolerance_source: cross_border_tolerances.json
+  rationale_existing: |
+    Heavily indented Pacific coastline (North Cape, East Cape,
+    Coromandel, Fiordland, Stewart Island); bounds.json simplified
+    at sub-cadastral precision. 100% of prior audit outliers sat
+    within 5 km of polygon edge. Cleared 101 of 101 audit outliers;
+    max observed drift 3.8 km.
+  cross_border_interconnectors: 0  # No submarine link to Australia or Pacific islands
+  cook_strait_hvdc_status: DOMESTIC  # HVDC Inter-Island link is intra-NZ
+  chatham_kermadec_tokelau_status: TERRITORIAL_EXTENSIONS_INCLUDED  # Mode 3 pattern
+  ross_dependency_antarctic: EXCLUDED  # Antarctic territorial claim not within grid scope
+  expected_pre_filter_drift_pct: 0.5  # LOW (existing tolerance validated)
+  cohort_precedent: iceland  # Nordic + NZ share isolated-grid + coastline patterns
+
+# ---------------------------------------------------------------
+# Discipline #41 line parity target
+# ---------------------------------------------------------------
+discipline_41:
+  target_ratio_range: [1.5, 5.0]  # Healthy band
+  baseline_line_count: null  # to be captured from grid-geo.json at Step 4
+  projection: |
+    NZ transmission grid: ~11,000 km Transpower 220/110/66 kV
+    NZ distribution grid: ~200,000 km MV/LV across 29 EDBs
+    Baseline likely captures transmission + significant MV
+    distribution (given 1558 baseline subs); OSM captures full
+    MV/LV distribution. Expected line-substation ratio
+    HEALTHY (3-8×) — between Korean (3.29) transmission-focused
+    and Irish (46.27) full MV/LV over-capture.
+
+# ---------------------------------------------------------------
+# Data sources (OSM Overpass + Transpower + ENA public reports)
+# ---------------------------------------------------------------
+data_sources:
+  primary:
+    - name: OpenStreetMap
+      endpoint_pool:
+        - overpass-api.de
+        - kumi.systems
+        - private.coffee
+      query_type: substations + power lines
+      license: ODbL
+      convention_60_compliant: true
+  cross_reference:
+    - name: Transpower NZ Annual Report 2024-2025
+      url: https://www.transpower.co.nz/
+      purpose: TSO backbone verification (220 kV Cook Strait HVDC + North+South Island)
+      convention_60_compliant: true  # State-Owned Enterprise
+    - name: Electricity Authority (EA)
+      url: https://www.ea.govt.nz/
+      purpose: 29 EDB registry + Electricity Industry Participation Code
+      convention_60_compliant: true  # Regulatory authority
+    - name: Electricity Networks Association (ENA)
+      url: https://www.ena.org.nz/
+      purpose: 29 EDB member directory + regional coverage cross-check
+      convention_60_compliant: true  # Public industry association
+    - name: Stats NZ (Statistics New Zealand)
+      url: https://www.stats.govt.nz/
+      purpose: 16 regions boundary + population/GDP context
+      convention_60_compliant: true  # Public statistics agency
+
+# ---------------------------------------------------------------
+# Convention #56 hazard baselines (Phase 4c prep)
+# ---------------------------------------------------------------
+convention_56_hazard_baselines:
+  flood: 0.60        # Wet+temperate Pacific climate + Auckland pluvial + Canterbury river floods (2021 Westport)
+  wildfire: 0.30     # Alpine + Canterbury dry east + Northland wildfire clusters
+  winter: 0.40       # Southern Alps + South Island winter + Wellington storm gusts
+  adapt: 0.75        # Zero Carbon Act 2019 + NZ ETS 2008 + Climate Change Commission
+  compound: 0.60     # Alpine Fault + Wellington fault + Wairarapa fault seismic + storm compounds
+  just: 0.30         # Coal transition slower (Huntly retained) + Southland Tiwai smelter closure/preserve ambiguity
+  sources:
+    - JRC EU-Flood-Atlas (analog for Pacific pluvial exposure)
+    - Copernicus (Sentinel-3 wildfire monitoring)
+    - ECMWF ERA5 (winter cold snap + storm climatology)
+    - ND-GAIN adaptation index (NZ rank ~11/181, 2024 — HIGH)
+    - IPCC AR6 Australasia chapter (drought + storm projection)
+    - Just-Transition Fund analog: NZ Just Transitions Unit (post-2018 Taranaki oil-gas)
+    - GeoNet (NZ seismic + volcanic monitoring)
+
+# ---------------------------------------------------------------
+# Empirical projection (Step 4 forecast)
+# ---------------------------------------------------------------
+step_4_projection:
+  raw_fetch_estimate: 2000-3000  # Larger given multi-DSO capture
+  post_filter_estimate: 1990-2990
+  net_new_estimate: 200-800  # Moderate given already-captured baseline MV
+  net_new_pct_estimate: 15-50
+  convention_78_hits_estimate: 30-80  # English-dominant + minimal Māori
+  line_growth_estimate: 5-20x  # Multi-DSO distribution capture
+  step_4b_retroactive_attribution_estimate: 1500-1800  # 1558 baseline untagged → mostly region-mapped
+  step_4b_class_diversity_estimate: 25-35  # 16 regions × ~2 EDBs each + Auckland split + captives
+
+# ---------------------------------------------------------------
+# Next steps
+# ---------------------------------------------------------------
+next_step: Step 2 — Operator local OSM Overpass fetch (residential IP)
+handoff_command: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.new_zealand.osm_overpass 2>&1 \
+    | tee new-zealand/v4_23-osm-overpass.log

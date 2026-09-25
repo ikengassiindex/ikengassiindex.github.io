@@ -1,0 +1,150 @@
+# SSI Index v4.23 workstream — Greenland Step 4 delta audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the delta computation between existing greenland/ssi-data.json + grid-geo.json
+# and fresh OSM Overpass output.  Documents Option A merge strategy (subs +
+# lines one-shot from sandbox — Greenland is small enough to execute end-to-end
+# without operator-local dependency).
+#
+# STATUS: CLOSED in-session.  Unlike Austria (which required operator local
+# execution due to ~5 min wall-clock exceeding sandbox 45s bash budget),
+# Greenland's small footprint (~44 subs + ~112 lines) allowed full merge
+# execution from sandbox in ~0.3 seconds.
+
+schema_version: v4_23-ingestion-audit-delta-1
+country_slug: greenland
+discovery_date_utc: "2026-07-13"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+parent_state_transitions:
+  - greenland/v4_23-ingestion-audit-greenland-preflight.yaml
+  - greenland/v4_23-ingestion-audit-greenland-fetch.yaml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Baseline state (pre-Step-4)
+# ─────────────────────────────────────────────────────────────────────────────
+baseline_state:
+  ssi_data_json:
+    substations: 37
+    voltage_kv_populated_pct: 54.1
+    owner_populated_pct: 0.0
+    file_size_bytes: 106357
+    file_size_mb: 0.10
+  grid_geo_json:
+    lines: 125
+    file_size_bytes: 61316
+    file_size_mb: 0.06
+    schema_kind: compact_ssi_index_native
+  discipline_36_status: |
+    Greenland bounds Mode-2 fjord-tolerance remediated per task #60
+    (2026-06-24 commit 86d7c9df).  5 km tolerance envelope handles 88.7%
+    ice-cover + extreme coastline complexity.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Fresh OSM Overpass output (pre-filter)
+# ─────────────────────────────────────────────────────────────────────────────
+fresh_osm_output:
+  substations:
+    total: 44
+    breakdown_by_osm_type: {nodes: 14, ways: 30, relations: 0}
+    tag_completeness: {operator_pct: 63.6, voltage_pct: 43.2, name_pct: 6.8}
+  transmission_lines:
+    total: 112
+    breakdown_by_power_class: {line: 21, minor_line: 82, cable: 9}
+    tag_completeness: {operator_pct: 1.9, voltage_pct: 21.4, name_pct: 3.9}
+  provenance:
+    source_id: AT-C1-osm-overpass
+    source_id_corrected: GL-C1-osm-overpass
+    licence: ODbL
+    endpoint: https://overpass-api.de/api/interpreter
+    cache_files: 4                                # 1 sub + 3 line classes
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Merge strategy — Option A (subs + lines one-shot)
+# ─────────────────────────────────────────────────────────────────────────────
+merge_strategy: Option A — subs + lines one-shot from sandbox
+merge_strategy_rationale: |
+  Greenland's small size (~44 subs + ~112 lines total, ~63 KB combined cache)
+  enables end-to-end merge execution from sandbox — unlike Austria which
+  required operator local execution due to ~5 min wall-clock.  Wall-clock
+  measured: ~0.3 seconds for full pipeline (fetch from cache + merge + write).
+  No operator-local dependency needed.
+
+merge_operations:
+  operation_1_owner_enrichment_via_pure_monopoly:
+    scope: All 44 OSM substations
+    architectural_distinction: |
+      Unlike Austria (fragmented multi-utility — untagged → None) and
+      Mexico (CFE-monopoly with industrial self-gen exceptions), Greenland
+      applies PURE MONOPOLY fallback rule.  100% of tagged operators =
+      Nukissiorfiit (28/28 subs + 2/2 lines at Step 2 probe).  Zero
+      exceptions since Nukissiorfiit IS the sole utility.  Convention #56
+      preserved via explicit provenance-class label 'nukissiorfiit_monopoly_fallback'.
+    expected_direct_tagged: 28
+    expected_monopoly_fallback: 16
+
+  operation_2_voltage_cross_validation:
+    scope: Matched pairs with both voltages populated
+    threshold: max/min ratio > 1.5
+    expected_finding_rate_pct: <5.0                # anchor: mid-Mexico (0.04%) and Austria (25.6%)
+
+  operation_3_voltage_fill:
+    scope: Matched pairs where existing has NO voltage
+    expected_range: 5-15                            # baseline 45.9% missing → 17 subs eligible
+
+  operation_4_net_new_substation_ingestion:
+    scope: OSM subs with no existing match within 500m
+    expected_range: 5-10                            # 44 OSM - 37 baseline = 7 raw delta
+
+  operation_5_line_densification_REVERSED:
+    scope: OSM lines with no existing match within 100m + tier ±20%
+    baseline_richer_than_osm: true
+    expected_appended_range: 0-10                   # baseline 125 vs OSM 112 = -13 raw
+    architectural_note: |
+      REVERSED delta — baseline (125) has more lines than OSM (112).
+      This is expected: existing ingestion likely captured Nukissiorfiit
+      operational line topology that OSM contributors haven't detailed.
+      Merge still runs (net-new anything OSM has that existing doesn't)
+      but contribution is small.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Discipline #36 cross-border enforcement
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_36_status:
+  bounds_json: greenland/bounds.json (Mode 2, 540 KB — dense coastline detail)
+  tolerance_km: 5.0                                 # Mode 2 fjord tolerance
+  bounds_remediated: task #60 (2026-06-24 commit 86d7c9df)
+  in_workstream_filter_expected: ~50 lines stripped (from 112 → ~62 retained)
+  post_merge_sentinel_expected: PASS (0.00% outside)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Convention preservation matrix
+# ─────────────────────────────────────────────────────────────────────────────
+convention_preservation:
+  convention_46: N/A — single-country canonical
+  convention_56_visibly_honest_degradation: |
+    Applied end-to-end: (a) voltage stays None on OSM-untagged (no fabrication);
+    (b) name stays None on OSM-untagged (no fabrication); (c) net-new subs
+    get {} placeholders for L2/L3 dict-typed fields; (d) PURE MONOPOLY
+    fallback tagged with explicit provenance-class label so downstream audit
+    sees the inference chain.
+  convention_60_non_commercial_provenance: |
+    OSM (ODbL) only in Phase 1.  Nukissiorfiit public tariff schedules
+    queued as Phase 2 supplement.  No commercial ESG providers.
+  convention_64_strict_per_country: |
+    Merge script writes ONLY to greenland/*.json.  Zero cross-country
+    contamination possible by construction.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Auditability chain
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  step_1_preflight: greenland/v4_23-ingestion-audit-greenland-preflight.yaml
+  step_2_fetch: greenland/v4_23-ingestion-audit-greenland-fetch.yaml
+  step_3_l1_connector: scripts/pipeline/ingestion/greenland/osm_overpass.py
+  step_4_merge_script: scripts/pipeline/ingestion/greenland/merge_into_ssi_data.py
+  step_4_delta_audit: greenland/v4_23-ingestion-audit-greenland-delta.yaml (this file)
+  step_4_merge_audit: greenland/v4_23-ingestion-audit-greenland-merge.yaml
+  step_4_voltage_xcheck: greenland/v4_23-voltage-cross-validation.json
+  discipline_36_gate: scripts/check_cross_border.py --all --strict
+  discipline_41_gate: tests/test_substation_line_parity.py

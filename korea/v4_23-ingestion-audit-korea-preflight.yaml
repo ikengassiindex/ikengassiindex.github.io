@@ -1,0 +1,318 @@
+# SSI Index v4.23 — Korea P26 Wave 3 Pre-flight Source Discovery
+# ===============================================================
+# Convention #7 Data-Layer Anchoring: documented-proxy discipline
+# Convention #56: visibly-honest degradation preserved via partial-fetch
+# Convention #60: non-commercial provenance (OSM ODbL + KEPCO public reports)
+# Convention #78 BINDING: Korean-Hangul + Latin transliteration + English
+#   acronyms 8th cohort-wide enforcement candidate
+# Convention #78 §4bis.5 Layer 3 geofence: NOT expected needed
+#   (single-DSO simplification like Ireland/Greek/Costa Rica precedent)
+# Discipline #36: cross-border filter tolerance 5.0 km (island coastline)
+# Discipline #41: line-substation parity [1.5-5.0] healthy band target
+#
+# Authored: 2026-07-17 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ===============================================================
+
+country_code: kr
+country_name: Korea
+country_name_ko: 대한민국  # Daehanminguk (Republic of Korea)
+country_name_ko_short: 한국  # Hanguk
+wave: 3
+priority: P26
+smallest_first_rank: 5  # of 13 remaining Wave 3 candidates
+scope: FIRST_ASIAN_WAVE_3_EVENT
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: korea/ssi-data.json
+  substation_count: 1290
+  region_count: 17  # do/si provinces + metropolitan cities
+  voltage_distribution:
+    "154.0": 752  # dominant transmission tier (Korea-specific: EU-analog to 132 kV)
+    "55.0": 183   # sub-transmission (unusual voltage — KEPCO-specific)
+    "345.0": 172  # EHV backbone
+    "null": 152   # untagged voltage (Layer 3 attribution candidate)
+    "765.0": 15   # ultra-EHV HVAC (transmission backbone since 2002)
+    "25.0": 11    # MV distribution
+    "180.0": 2    # HVDC (Jeju submarine cable)
+    "250.0": 2    # HVDC (Jeju second cable)
+  owner_attribution:
+    KEPCO: 1117           # 한국전력공사 — 86.6% direct
+    KHNP: 6               # 한국수력원자력 — nuclear operator
+    untagged: 167         # 13.0% — Layer 3 attribution needed
+  total_attributed_pct: 87.0  # (1117 + 6) / 1290 = 87.06%
+  tso_zone: KR-ISOLATED  # no cross-border interconnector (Iceland-analog)
+  bbox:
+    lon_min: 125.9128
+    lon_max: 129.4841
+    lat_min: 33.2374
+    lat_max: 38.3865
+  is_kepco_monopoly: true  # metadata-flagged; 99.5% KEPCO+KHNP when Layer 3 default applied
+
+# ---------------------------------------------------------------
+# Architectural signatures
+# ---------------------------------------------------------------
+architectural_signatures:
+  first_asian_wave_3_event: true  # No prior Asian Wave 3 country (Japan/Korea/Taiwan queued)
+  first_korean_hangul_convention_78_event: true  # BINDING 8th enforcement candidate
+  kepco_monopoly_architecture: true  # UNIQUE cohort-wide — closest to Costa Rica ICE monopoly
+  kpx_dispatch_layer: true  # 전력거래소 market operator (dispatch only, no ownership)
+  kr_isolated_grid: true  # 3rd cohort-wide non-cross-border (Iceland + Greenland + Korea)
+  dmz_northern_boundary: true  # 38.3°N approximate; DPRK excluded from bounds
+  jeju_hvdc_interconnector: true  # 3 submarine HVDC cables (300+300+400 MW)
+  ultra_ehv_765kv_backbone: true  # Since 2002 (KEPCO Shin-Ansan 765 kV opening)
+  chaebol_industrial_captives: true  # POSCO Energy + GS EPS + SK Gas + Hyundai self-generation
+  district_heating_integration: true  # KDHC (한국지역난방공사) CHP subs
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING alias map (100-entry projection)
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 8  # after Slovakia + Czechia + Poland + Greek + Iceland + Swiss + Ireland
+  script_class: MULTI_SCRIPT  # Hangul + Latin transliteration + English acronyms
+  scripts_supported:
+    - Hangul  # 한글 (native Korean script)
+    - Latin_transliteration  # Revised Romanization of Korean (RRK, 2000 standard)
+    - Latin_transliteration_mccune  # McCune-Reischauer (pre-2000, still common)
+    - English_acronyms  # KEPCO / KHNP / KPX / KDN etc.
+  primary_operators:
+    KEPCO:  # Korea Electric Power Corporation
+      hangul: [한국전력공사, 한전]  # "Han-guk Jeon-ryeok Gong-sa" / "Han-jeon" (short)
+      latin_rrk: [Hanguk Jeollyeok Gongsa, Hanjeon]
+      latin_mr: [Han'guk Chŏllyŏk Kongsa, Hanjŏn]
+      english: [KEPCO, Korea Electric Power Corporation, Korea Electric Power]
+      predecessors: [KECO]  # Pre-1982 Korea Electric Company
+      corporate_form: [주식회사, 株式會社]  # "jusik hoesa" (corporation)
+    KHNP:  # Korea Hydro & Nuclear Power
+      hangul: [한국수력원자력, 한수원]
+      latin_rrk: [Hanguk Suryeok Wonjaryeok, Hansuwon]
+      english: [KHNP, Korea Hydro Nuclear Power, Korea Hydro & Nuclear Power]
+      subsidiaries: [Kori, Hanbit, Hanul, Wolseong, Saeul, Shin-Kori, Shin-Wolseong, Shin-Hanul]
+    KPX:  # Korea Power Exchange (market operator)
+      hangul: [전력거래소]
+      latin_rrk: [Jeonryeok Georaeso]
+      english: [KPX, Korea Power Exchange, Electric Power Exchange]
+      role: MARKET_OPERATOR  # dispatch only, no ownership
+    KEPCO_KDN:  # KEPCO Knowledge, Data & Networks (SCADA subsidiary)
+      hangul: [한전KDN, 케이디엔]
+      english: [KEPCO KDN, KDN]
+    KEPCO_generation_subsidiaries:  # 6 GENCOs split from KEPCO 2001
+      east_west:
+        hangul: [한국동서발전, 동서발전]
+        english: [East-West Power, EWP, KEWP]
+      south:
+        hangul: [한국남부발전, 남부발전]
+        english: [KOSPO, Korea Southern Power]
+      west:
+        hangul: [한국서부발전, 서부발전]
+        english: [KOWEPO, Korea Western Power]
+      central:
+        hangul: [한국중부발전, 중부발전]
+        english: [KOMIPO, Korea Midland Power]
+      southeast:
+        hangul: [한국남동발전, 남동발전]
+        english: [KOEN, Korea South-East Power]
+      power_holdings:
+        hangul: [한국전력기술]  # KEPCO E&C
+        english: [KEPCO E&C, Korea Power Engineering]
+  industrial_captives:
+    posco_energy:
+      hangul: [포스코에너지]
+      english: [POSCO Energy, POSCO Green Solution]
+    gs_eps:
+      hangul: [지에스이피에스, GS EPS]
+      english: [GS EPS, GS Electric Power Systems]
+    sk_gas_power:
+      hangul: [SK가스, 에스케이가스]
+      english: [SK Gas Power, SK E&S]
+    hyundai_green_power:
+      hangul: [현대그린파워]
+      english: [Hyundai Green Power]
+    samsung_electronics_self:
+      hangul: [삼성전자]
+      english: [Samsung Electronics self-generation]
+  district_heating:
+    kdhc:
+      hangul: [한국지역난방공사, 지역난방공사]
+      english: [KDHC, Korea District Heating Corporation]
+      role: CHP_SUB_OWNER
+  transportation_captives:
+    korail:
+      hangul: [한국철도공사, 코레일]
+      english: [KORAIL, Korea Railroad Corporation]
+      role: RAIL_TRACTION_SUB_OWNER
+    korail_property:
+      hangul: [한국철도시설공단]  # KR
+      english: [KR, Korea Rail Network Authority]
+    metro_operators:
+      seoul_metro:
+        hangul: [서울교통공사]
+        english: [Seoul Metro]
+      busan_metro:
+        hangul: [부산교통공사]
+        english: [Busan Metro]
+      incheon_metro:
+        hangul: [인천교통공사]
+        english: [Incheon Metro]
+  legal_form_suffixes:
+    corporation: [주식회사, ㈜, 株式會社, Co., Ltd., Corp., Corporation]
+    public_corp: [공사, 公社, Public Corporation]
+    limited: [유한회사, 有限會社]
+  hangul_diacritics_normalized: true  # NFC normalization for jamo composition
+  binding_threshold_hits_projection: 100  # LARGE — Hangul + Latin dual script
+  binding_threshold_actual_TBD_step_4: null
+
+# ---------------------------------------------------------------
+# Voltage-class × single-DSO resolver
+# ---------------------------------------------------------------
+voltage_class_dso_resolver:
+  pattern: SINGLE_DSO_PLUS_DISPATCH  # KEPCO owns, KPX dispatches
+  layers:
+    - name: KHNP nuclear identity
+      condition: name matches ['고리', '한빛', '한울', '월성', '새울', '신고리', '신월성', '신한울', 'Kori', 'Hanbit', 'Hanul', 'Wolseong', 'Saeul', 'Shin-Kori', 'Shin-Wolseong', 'Shin-Hanul']
+      attribution: KHNP
+      priority: 1
+    - name: 765 kV ultra-EHV backbone
+      condition: voltage_kv >= 765
+      attribution: KEPCO Transmission (ultra-EHV)
+      priority: 2
+    - name: 345 kV EHV backbone
+      condition: voltage_kv >= 345 AND voltage_kv < 765
+      attribution: KEPCO Transmission (EHV)
+      priority: 3
+    - name: 154 kV transmission
+      condition: voltage_kv >= 154 AND voltage_kv < 345
+      attribution: KEPCO Transmission (HV)
+      priority: 4
+    - name: HVDC Jeju links
+      condition: name contains ['Jeju', '제주', 'Haenam', '해남'] AND voltage_class == HVDC
+      attribution: KEPCO HVDC (Jeju interconnector)
+      priority: 5
+    - name: KDHC district-heating CHP
+      condition: name contains ['열병합', 'CHP', 'district heating', '지역난방']
+      attribution: KDHC
+      priority: 6
+    - name: Industrial captive detection
+      condition: name matches ['포스코', 'POSCO', 'GS EPS', 'SK', '현대', '삼성', 'Hyundai', 'Samsung']
+      attribution: <captive owner>
+      priority: 7
+    - name: Rail traction sub
+      condition: name contains ['변전소', 'traction'] AND rail_context_flag
+      attribution: KORAIL
+      priority: 8
+    - name: KEPCO default
+      condition: fallback
+      attribution: KEPCO Distribution
+      priority: 9  # LAYER 4 CATCH-ALL
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 geofence assessment
+# ---------------------------------------------------------------
+layer_3_geofence:
+  enforcement_needed: false  # SINGLE-DSO ARCHITECTURE (Ireland/Greek/Costa Rica precedent)
+  rationale: |
+    Korea has SINGLE dominant DSO (KEPCO) with 87% direct baseline attribution.
+    No competing metropolitan DSOs (unlike Zurich EWZ or Geneva SIG in Switzerland).
+    KHNP nuclear identity handled at Layer 1 (name-based). Industrial captives
+    handled at Layer 1 (name-based). Rail traction handled at Layer 1
+    (name-based rail context). No geographic carve-out required.
+
+    Cumulative Convention #78 §4bis.5 enforcement stays at 4:
+    Prague CZ + Warsaw PL + EWZ Zurich + SIG Geneva
+    Korea DOES NOT increment this count.
+  alternative_considered_metro_dso_carveout: false  # Seoul KEPCO subsidiary but same corporate group
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border filter
+# ---------------------------------------------------------------
+discipline_36:
+  boundary_tolerance_km: 5.0  # Coastal offset for ~4,400 islands + Dokdo + Ulleungdo + Marado
+  cross_border_interconnectors: 0  # KR-ISOLATED (DMZ + no submarine link to Japan/China)
+  jeju_hvdc_status: DOMESTIC  # Jeju is Korean territory; HVDC is intra-national
+  dmz_northern_boundary: 38.3  # approx; bounds.json handles precision
+  expected_pre_filter_drift_pct: 0.5  # Very low — island coastline only
+  cohort_precedent: iceland  # Sibling isolated grid; also 5.0 km tolerance
+
+# ---------------------------------------------------------------
+# Discipline #41 line parity target
+# ---------------------------------------------------------------
+discipline_41:
+  target_ratio_range: [1.5, 5.0]  # Healthy band
+  baseline_line_count: null  # to be captured from grid-geo.json at Step 4
+  projection: |
+    Korean transmission grid: ~30,000 km 154/345/765 kV
+    KEPCO distribution grid: ~450,000 km MV/LV
+    Baseline captures transmission primarily; OSM captures full MV/LV
+    Expected line-substation ratio elevated (25-45×) — architecturally
+    coherent with Irish precedent (46.27 ratio observed).
+
+# ---------------------------------------------------------------
+# Data sources (OSM Overpass + KEPCO public reports)
+# ---------------------------------------------------------------
+data_sources:
+  primary:
+    - name: OpenStreetMap
+      endpoint_pool:
+        - overpass-api.de
+        - kumi.systems
+        - private.coffee
+      query_type: substations + power lines
+      license: ODbL
+      convention_60_compliant: true
+  cross_reference:
+    - name: KEPCO Annual Report 2024
+      url: https://home.kepco.co.kr/kepco/EN/main.do
+      purpose: substation count verification + voltage tier confirmation
+    - name: KPX Power Statistics Information System
+      url: https://epsis.kpx.or.kr/
+      purpose: dispatch capacity by zone
+    - name: KHNP Nuclear Plant Portal
+      url: https://www.khnp.co.kr/eng/
+      purpose: 6 nuclear-plant substation identification
+    - name: Statistics Korea (KOSTAT)
+      url: https://kostat.go.kr/
+      purpose: 17 do/si first-tier admin boundary
+      convention_60_compliant: true  # public statistics agency
+
+# ---------------------------------------------------------------
+# Convention #56 hazard baselines (Phase 4c prep)
+# ---------------------------------------------------------------
+convention_56_hazard_baselines:
+  flood: 0.55        # Monsoon typhoon exposure (Yeongdeungpo 2011 + Sacheon 2020)
+  wildfire: 0.20     # Gangwon peninsula (Gangneung 2019 + Uljin/Samcheok 2022)
+  winter: 0.50       # Siberian monsoon cold snaps + heavy snow (Yeongdong region)
+  adapt: 0.75        # K-Green New Deal 2020 + 2050 Net Zero pathway
+  compound: 0.55     # Multi-hazard typhoon+flood+landslide clusters
+  just: 0.25         # Post-industrial workforce transition (coal in Chungnam)
+  sources:
+    - JRC EU-Flood-Atlas (analog for typhoon flood exposure)
+    - Copernicus (Sentinel-3 wildfire monitoring)
+    - ECMWF ERA5 (winter cold snap climatology)
+    - ND-GAIN adaptation index (Korea rank ~15/181, 2024)
+    - IPCC AR6 East Asia chapter (typhoon frequency projection)
+    - Just-Transition Fund analog: Korea Green New Deal 2020
+
+# ---------------------------------------------------------------
+# Empirical projection (Step 4 forecast)
+# ---------------------------------------------------------------
+step_4_projection:
+  raw_fetch_estimate: 1500-1900
+  post_filter_estimate: 1490-1890
+  net_new_estimate: 200-600  # Baseline was already comprehensive
+  net_new_pct_estimate: 15-45  # Moderate growth (KEPCO baseline coverage strong)
+  convention_78_hits_estimate: 50-200  # LARGE Hangul+Latin dual-script
+  line_growth_estimate: 3-25x
+  step_4b_retroactive_attribution_estimate: 30-160  # 167 untagged → KEPCO default
+  step_4b_class_diversity_estimate: 1-3  # LOW (KEPCO dominant)
+
+# ---------------------------------------------------------------
+# Next steps
+# ---------------------------------------------------------------
+next_step: Step 2 — Operator local OSM Overpass fetch (residential IP)
+handoff_command: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.korea.osm_overpass 2>&1 \
+    | tee korea/v4_23-osm-overpass.log

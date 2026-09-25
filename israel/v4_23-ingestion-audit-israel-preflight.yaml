@@ -1,0 +1,209 @@
+# Israel v4.23 Ingestion Audit — Pre-flight
+# ==========================================
+# Task: #223 (WAVE2-Step1 Israel)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: israel
+  iso2: IL
+  iso3: ISR
+  wave: 2
+  priority: 14
+  step: 1
+  target: "Owner enrichment via OSM Overpass — 3rd pure-monopoly-class instance"
+  rationale: >
+    Israel carries 257 substations with 0% owner tagged and 100% voltage-
+    tagged (239 at 161 kV Israel national trunk + 18 at 400 kV EHV — a
+    transmission-heavy baseline). Third application of the pure-monopoly
+    pattern (after Greenland Nukissiorfiit + Costa Rica ICE — though Costa
+    Rica added 7-DSO nested overlay; Israel is closer to Greenland's pure
+    single-owner architecture). IEC (Israel Electric Corporation) operates
+    ~99% of the national grid; Noga was spun out as system operator
+    2020-2021 (took TSO role from IEC); minor private IPPs post-2010
+    reforms (OPC + Dorad + Delek + Enlight + industrial captives at
+    Ashdod Refineries + Israel Chemicals/Dead Sea Works).
+
+baseline_state:
+  ssi_data_substations: 257
+  grid_geo_substations: 258  # estimated
+  grid_geo_lines: 4152
+  lines_per_substation_ratio: 16.15  # TASK #182 OUTLIER CANDIDATE (MV deep-ingestion)
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0
+  region_coverage_pct: 100.0  # 6 administrative districts populated
+  district_split:
+    southern: 87       # 33.9% — Negev + Beersheba + Ashkelon + Eilat
+    central: 51        # 19.8% — Rishon LeZion + Rehovot + Petah Tikva
+    northern: 48       # 18.7% — Galilee + Nazareth + Tiberias
+    haifa: 36          # 14.0% — Haifa metro + coast
+    tel-aviv: 18       # 7.0%  — Tel Aviv metro
+    jerusalem: 17      # 6.6%  — Jerusalem district
+  voltage_class_baseline:
+    161_kv: 239        # 93.0% — Israel's unique HV national trunk (US-standard heritage)
+    400_kv: 18         # 7.0%  — EHV backbone + Egypt cross-border (Sinai) + Jordan interconnect
+    other: 0           # 100% transmission-tier only (no MV baseline coverage)
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [34.20, 29.45, 35.90, 33.35]  # west, south, east, north (Israel bounds)
+    strategy: >
+      Single-query pattern — Israel bbox ~22k km² (~1.1× Slovenia, ~10× Luxembourg).
+      Sub-2-minute fetch expected.
+    expected_yield:
+      substations: 500-1500
+      lines: 3000-7000
+    tag_completeness_hypothesis: >
+      Israel OSM tagging density typically 50-70% for coastal plain
+      (Tel Aviv + Haifa + Central district — dense urban). Negev rural
+      + Galilee 30-50%. West Bank + Golan Heights may show contested
+      area tagging inconsistency — Discipline #36 polygon handles this
+      via bounds.json national territory definition.
+    lp_dd_class: canonical
+
+  fallback_pure_monopoly:
+    strategy: iec_monopoly_default_with_minor_private_ipp_overlay
+    rationale: >
+      Third pure-monopoly instance (after Greenland Nukissiorfiit +
+      Costa Rica ICE — though Costa Rica extended with 7-DSO overlay).
+      IEC (Israel Electric Corporation, established 1923) is the
+      vertically-integrated state monopoly handling ALL transmission
+      (161 + 400 kV) + ~99% distribution nationally. Noga is the TSO
+      system operator (spun out from IEC 2020-2021 as post-reform
+      independent system operator); grid infrastructure remains
+      IEC-owned. Private IPPs (OPC / Dorad / Delek / Enlight / industrial
+      captives) hold small production assets but typically feed IEC grid.
+    tso_threshold_kv: 161  # IEC operates 400 + 161 kV transmission
+    tso_operator: IEC  # Israel Electric Corporation (חברת חשמל לישראל)
+    monopoly_default_operator: IEC
+    private_ipp_operators_expected:
+      - OPC Energy Ltd
+      - Dorad Energy Ltd (Ashkelon)
+      - Delek Israel Electricity
+      - Enlight Renewable Energy
+      - Ashdod Refineries (industrial captive)
+      - Israel Chemicals / ICL / Dead Sea Works (Dead Sea industrial captive)
+      - Noga (system operator, non-owner of infrastructure)
+    hebrew_alias_handling: >
+      IEC tags may appear as "חברת חשמל לישראל" (Hebrew name), "חשמל",
+      "Israel Electric Corp", "IEC Ltd", etc. Case-insensitive Unicode
+      alias map required.
+
+  dso_alias_normalisation:
+    aliases:
+      # IEC variants (English + Hebrew + Ltd forms)
+      "IEC": "IEC"
+      "iec ltd": "IEC"
+      "iec ltd.": "IEC"
+      "israel electric": "IEC"
+      "israel electric corporation": "IEC"
+      "israel electric corp": "IEC"
+      "israel electric corp.": "IEC"
+      "חברת חשמל לישראל": "IEC"  # Hebrew formal name
+      "חברת חשמל": "IEC"           # Hebrew short
+      "חשמל": "IEC"                # Hebrew shortest (context-dependent)
+      # Noga TSO SO (owns no infrastructure but may tag lines)
+      "Noga": "Noga (System Operator)"
+      "noga": "Noga (System Operator)"
+      "נגה": "Noga (System Operator)"
+      # OPC variants
+      "OPC": "OPC Energy"
+      "opc energy": "OPC Energy"
+      "opc energy ltd": "OPC Energy"
+      # Dorad variants
+      "Dorad": "Dorad Energy"
+      "dorad energy": "Dorad Energy"
+      "dorad energy ltd": "Dorad Energy"
+      # Delek variants
+      "Delek Israel Electricity": "Delek Israel Electricity"
+      "delek electricity": "Delek Israel Electricity"
+      # Enlight variants
+      "Enlight": "Enlight Renewable Energy"
+      "enlight renewable": "Enlight Renewable Energy"
+      # Industrial captives
+      "Ashdod Refineries": "Ashdod Refineries"
+      "ORL": "Ashdod Refineries"  # Oil Refineries Ltd
+      "ICL": "Israel Chemicals"
+      "Israel Chemicals": "Israel Chemicals"
+      "Dead Sea Works": "Israel Chemicals"
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/israel/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # IEC TSO threshold + IEC monopoly default + Hebrew alias map
+    - osm_overpass.py  # single-query fetch (~22k km²)
+    - merge_into_ssi_data.py  # 500m proximity + Step 4b retroactive attribution
+  pattern_reused_from: greenland (pure monopoly) + costa-rica (Step 4b retroactive)
+  differentiators_vs_greenland:
+    - grid_size: 257 subs vs Greenland's 43 (6× larger)
+    - private_ipp_presence: Israel has minor private IPPs (OPC/Dorad/Delek) vs Greenland's 0
+    - hebrew_language_tags: Unicode alias map required
+    - unique_voltage_tier: 161 kV national trunk (US-standard heritage) vs typical EU 220/380 kV
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # IEC default catches all + private IPPs surface via direct OSM tag
+  post_merge_voltage_coverage: 60-80%  # from 100% transmission-only to multi-tier including MV
+  post_merge_substations: 500-1500
+  post_merge_lines: 4500-8000  # baseline 4,152 already high; densification moderate
+  km_of_lines: 6000-15000
+
+risks_flagged:
+  - risk_1: >
+      Line-density ratio 16.15 flagged in task #182 pattern (MV deep-ingestion).
+      Post-merge net-new lines may compound this OR retire if OSM lines
+      duplicate baseline MV — verify grid-geo state after Step 4 merge.
+  - risk_2: >
+      Contested-area substations (West Bank / Golan Heights). Discipline
+      #36 cross-border filter uses israel/bounds.json — polygon defines
+      Israel's national territory. Substations outside polygon get
+      dropped honestly per Convention #56 (no political characterisation).
+  - risk_3: >
+      Hebrew Unicode operator tags may not match ASCII alias keys if
+      normalisation misses (e.g. mixed direction RTL/LTR, kaf sofit vs
+      medial kaf). Case-insensitive lower-case + unicode NFC normalisation
+      recommended.
+  - risk_4: >
+      IEC TSO threshold at 161 kV is UNIQUELY LOW globally — most other
+      countries use 110/132/138/150 kV. Getting this right at Layer 1 is
+      essential to distinguish IEC transmission from private-IPP or
+      industrial-captive HV substations.
+
+convention_preservation:
+  discipline_36:
+    scope: Israel bounds already CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      IEC monopoly default is Convention #56-compliant — IEC genuinely
+      operates ~99% of national grid. Private IPPs surface via direct
+      OSM tag; industrial captives similarly. No political characterisation
+      of contested territory — Discipline #36 polygon handles this via
+      empirical bounds.json.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to israel/ + scripts/pipeline/ingestion/israel/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.israel.osm_overpass`
+    locally. Expected wall-clock <2 min (small country).
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.israel.merge_into_ssi_data`.
+  step_4b: >
+    If baseline > OSM (like Costa Rica pattern), apply retroactive
+    attribution via same monopoly-default resolver.
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2

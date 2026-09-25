@@ -1,0 +1,283 @@
+# Poland v4.23 Ingestion Audit — Step 1 Pre-flight Source Discovery
+# ==================================================================
+# Task: #277 (WAVE2-Step1 Poland)
+# Date: 16 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Wave 2 Priority: 21 (LARGEST expected substation delta cohort-wide; 4-DSO
+#                     territorial partition + Innogy Stoen Warsaw metro +
+#                     PSE TSO; 4 rebrand-predecessor alias classes)
+# Status: READY_FOR_STEP_2_FETCH
+
+schema_version: v4_23-ingestion-audit-preflight-1
+country_slug: poland
+country_iso2: PL
+country_iso3: POL
+
+# ── Baseline state (as of pre-fetch snapshot) ────────────────────────────
+
+baseline_state:
+  ssi_data_substations: 2247
+  grid_geo_lines: TBD_at_step_2         # populated post-fetch
+  voltage_coverage_pct: ~44.5           # 999/2247 have numeric voltage (110 kV 928 + 220 kV 39 + 400 kV 32 + 150 kV 1)
+  region_coverage_pct: 100.0            # 16/16 województwa populated in baseline
+  owner_coverage_pct: 0.0               # baseline has ZERO owner tags — same as Czechia P20 signature
+  bounds_features: 16                   # 16 województwa polygons in bounds.json
+  min_fleet_pin: TBD                    # KB §56 fleet-floor pin (2100 established Phase 2A recalibration; verify)
+
+# ── Data source primary — OSM Overpass API ──────────────────────────────
+
+primary_source:
+  source_id: PL-C1-osm-overpass
+  publisher: OpenStreetMap contributors via Overpass API
+  licence: ODbL (Open Database License) — attribution required
+  endpoint_primary: https://overpass-api.de/api/interpreter
+  endpoint_fallback: https://overpass.kumi.systems/api/interpreter
+  expected_query_scope: >
+    3 element-type queries for substations (way + node + relation)
+    + 1 combined query for lines (power=line + cable + minor_line).
+    Area header: area["ISO3166-1"="PL"]->.pl
+  expected_yield:
+    substations_way: 30000-45000  # Poland ~4× Czechia scale (Czechia 10,213 way subs)
+    substations_node: 2000-5000
+    substations_relation: 20-50
+    lines: 180000-250000          # Central European line-density profile
+    line_ratio_pre_merge: 5.5-6.5 # Central European average (Czechia 5.24, Slovakia 5.4)
+    total_raw_bytes: ~180-250 MB  # LARGEST fetch cohort-wide (below only US 44,634 subs)
+  expected_scale_context: >
+    Poland is LARGEST Wave 2 cohort by substation delta — ~4× Czechia
+    scale (Czechia baseline 1,074 → 8,899 net-new; Poland baseline 2,247
+    → expected 32,000-42,000 net-new). Wave 2 P21 will materially
+    extend cumulative Wave 2 substation counter and trigger LARGEST
+    single-country line-merge dedupe pass (~5-8 min sandbox est. — likely
+    similar Czechia timeout class, plan for operator local execution).
+
+# ── Owner attribution architecture ──────────────────────────────────────
+
+owner_attribution:
+  fallback_class: region-jurisdiction × voltage-class + Layer 3 lat/lon geofence
+  reuse_source: czechia (deepest predecessor post-BINDING; 3rd application overall)
+  visegrad_trio_position: 3 of 3 (post Slovakia P19 + Czechia P20)
+
+  tso_threshold: ≥220 kV → PSE_TSO
+    # Polskie Sieci Elektroenergetyczne SA (state TSO)
+    # 400 kV backbone (Continental European sync since 1993) + 220 kV EHV
+    # 39 baseline subs at 220 kV + 32 at 400 kV = 71 EHV total (3.2% of baseline)
+
+  distribution_partition:
+    method: NUTS-2 województwa + Warsaw metro Layer 3 geofence
+    dso_map:
+      PGE_Dystrybucja:
+        territories: |
+          Mazowieckie (excluding Warsaw metro) + Łódzkie + Świętokrzyskie +
+          Lubelskie + Podkarpackie + Warmińsko-Mazurskie
+        share_estimated: ~35% (LARGEST DSO territorially)
+        rebrand_predecessor: PGE Rzeszów + PGE Zamość + PGE Lublin + PGE Skarżysko
+          (regional predecessors consolidated 2019)
+      Tauron_Dystrybucja:
+        territories: |
+          Małopolskie + Śląskie + Opolskie + Dolnośląskie +
+          Podkarpackie (Bieszczady portion)
+        share_estimated: ~24%
+        rebrand_predecessor: EnergiaPro + Enion (both consolidated 2008)
+      Enea_Operator:
+        territories: |
+          Wielkopolskie + Zachodniopomorskie + Lubuskie + Kujawsko-Pomorskie +
+          Bydgoszcz + Gorzów Wielkopolski
+        share_estimated: ~19%
+        rebrand_predecessor: ENEA Operator sp. z o.o. (formed 2007 from Zachodniopomorska
+          Grupa Energetyczna consolidation)
+      Energa_Operator:
+        territories: |
+          Pomorskie + Warmińsko-Mazurskie (Elbląg portion) +
+          Kujawsko-Pomorskie (Toruń portion)
+        share_estimated: ~14%
+        rebrand_predecessor: Energa Operator SA (2006 from Grupa Energetyczna
+          Zachód + Koncern Energetyczny Energa)
+      Innogy_Stoen_Operator:
+        territories: |
+          Warsaw metropolitan area (Warszawa admin bounds)
+        share_estimated: ~8%
+        rebrand_predecessor: RWE Stoen Operator (pre-2020) + Stoen Operator
+          (pre-2016) + ZE Warszawa (pre-2003)
+        layer_3_geofence_bbox: [52.10, 52.35, 20.85, 21.25]   # Warsaw admin — TBD refinement (bbox_refinement candidate per Task #262 methodology)
+        note: >
+          Innogy Stoen operates Warsaw metro area only — Layer 3 lat/lon
+          geofence critical. Post-fetch bbox refinement candidate (Prague
+          precedent Task #262 methodology).
+
+  private_industrial_captives:
+    - KGHM Polska Miedź (Zagłębie Miedziowe copper mining — Lubuskie/Dolnośląskie)
+    - JSW Jastrzębska Spółka Węglowa (Silesian coal mining)
+    - PKN Orlen (Płock petrochemical + Trzebinia refinery)
+    - PKP Energetyka (Polish State Railways electric traction — 3 kV DC)
+    - Tram/metro traction operators (Warszawski Metro + PKM Warszawa + MPK Kraków + MPK Wrocław + MZKZG Gdańsk)
+
+# ── Convention #78 BINDING 3rd enforcement — LARGEST alias class ────────
+
+convention_78_binding_3rd_enforcement:
+  enforcement_number: 3
+  cumulative_5_country_hits_pre_poland: 5957   # LT 1 + EE 20 + LV 143 + SK 615 + CZ 5178
+  expected_poland_alias_hits: 8000-15000       # LARGEST cohort-wide — 4 rebrand events + Polish NFC + Cyrillic + comma legal-form
+  cumulative_6_country_hits_post_poland: 13957-20957
+  cadence_precedent_ratio_post_poland: 1395-2095× above 10-instance BINDING threshold
+
+  alias_class_distribution_estimated:
+    polish_nfc_diacritics: HIGH       # ą ć ę ł ń ó ś ź ż — dominant class
+    cyrillic_script: LOW              # Eastern Silesia + Podlaskie Belarusian minority OSM
+    comma_separated_legal_form: MODERATE  # SA + sp. z o.o. + sp. z o. o. variants
+    predecessor_rebrand_alias_classes:
+      pge_2019_rebrand: MODERATE      # 4 regional predecessors (Rzeszów + Zamość + Lublin + Skarżysko)
+      tauron_2008_rebrand: MODERATE   # EnergiaPro + Enion predecessors
+      enea_2007_rebrand: LOW-MODERATE # ZGE Zachodniopomorska Grupa Energetyczna predecessor
+      energa_2006_rebrand: LOW-MODERATE   # GEZ + Koncern Energetyczny Energa predecessors
+      rwe_stoen_pre_2020_rebrand: MODERATE # RWE Stoen Operator predecessor pre-Innogy takeover
+      stoen_pre_2016_rebrand: LOW      # Pre-RWE Stoen Operator SA predecessor
+      ze_warszawa_pre_2003_rebrand: LOW  # ZE Warszawa predecessor pre-Stoen
+    typographic_quotes: LOW           # Polish typographic quotes „..." like German/Czech/Latvian
+
+  first_5_rebrand_predecessor_alias_events_cohort_wide: >
+    Poland has 5-7 distinct rebrand-predecessor alias classes across 4 DSO
+    + 1 Warsaw metro operator — this is UNIQUE cohort-wide (Czechia had 1
+    with E.ON→EG.D 2021; Slovakia had 0). Poland becomes the empirical
+    stress test for Convention #78 BINDING multi-generational rebrand
+    predecessor tracking. 20-30 rebrand-alias entries expected in the
+    100-150 entry multi-script alias map.
+
+  new_sub_convention_candidate:
+    scope: >
+      Multi-generational rebrand-predecessor alias tracking — codify
+      that where a DSO territory has cycled through ≥3 corporate
+      identities in living OSM contributor memory (i.e. subs still tagged
+      with predecessor names), the Layer 3 connector authoring MUST
+      preemptively include ALL predecessor mappings, not just the most
+      recent rebrand. Poland Innogy Stoen empirical case (RWE Stoen 2020
+      → Stoen 2016 → ZE Warszawa 2003) is the codifying instance.
+    empirical_evidence_precedent: Czechia E.ON→EG.D 2021 (single generation)
+    poland_extension: multi-generation (2-3 generations)
+    future_countries_potentially_affected: >
+      Germany (E.ON → innogy → Westenergie 2020 predecessor cascade),
+      UK (National Grid ESO → NESO 2024 rebrand), Netherlands (Alliander
+      → Liander predecessor), Belgium (Fluvius 2018 merger of Eandis +
+      Infrax predecessors), France (EDF Réseau de Distribution → Enedis
+      2016 rebrand).
+
+# ── Convention #78 §4bis.5 Layer 3 geofence 3rd enforcement ─────────────
+
+layer_3_geofence_3rd_enforcement:
+  enforcement_number: 3
+  precedent_countries:
+    slovenia_1st_enforcement: pre-binding-promotion (Wave 2 P8)
+    slovakia_2nd_enforcement_post_binding: P19 (SUCCESS)
+    czechia_3rd_enforcement_post_binding: P20 (SUCCESS, Prague bbox refinement)
+  poland_4th_enforcement_expected: P21 (this closure)
+
+  geofence_composition:
+    pse_tso_threshold: ≥220 kV via voltage class (Convention #56 preserved)
+    innogy_stoen_warsaw_bbox: [52.10, 52.35, 20.85, 21.25]  # TBD refinement post-fetch
+    pge_north_east_bbox: TBD    # Mazowieckie non-Warsaw + Łódzkie + Świętokrzyskie + Lubelskie + Podkarpackie + Warmińsko-Mazurskie
+    tauron_south_bbox: TBD      # Małopolskie + Śląskie + Opolskie + Dolnośląskie
+    enea_west_north_bbox: TBD   # Wielkopolskie + Zachodniopomorskie + Lubuskie + Kujawsko-Pomorskie (excluding Toruń)
+    energa_north_bbox: TBD      # Pomorskie + Warmińsko-Mazurskie Elbląg + Kujawsko-Pomorskie Toruń
+    unresolved_default: pge_dystrybucja  # LARGEST DSO territorial default
+
+  warsaw_bbox_refinement_forecast: >
+    Post-fetch retrospective bbox audit expected to refine Warsaw metro
+    Innogy Stoen bbox similar to Prague PRE distribuce methodology (Task
+    #262). Warsaw admin bounds (~517 km²) vs historic Innogy Stoen
+    concession area (~250-350 km²) — refinement candidate. If empirical
+    fetch shows >10% baseline attribution to Innogy Stoen, bbox
+    refinement will be needed.
+
+# ── Discipline #36 cross-border filter ──────────────────────────────────
+
+discipline_36_cross_border_filter:
+  polygon_source: poland/bounds.json (16-województwa multi-polygon)
+  tolerance_km: 0.1  # 100m default (Central European precedent — same as Slovakia + Czechia)
+  expected_dropped_substations: 50-150  # Kaliningrad enclave + Belarus/Ukraine/Lithuania/Slovakia/Czech border overspill
+  expected_dropped_lines: 300-800       # transnational 400 kV PSE↔50Hertz Germany + PSE↔ČEPS Czech + PSE↔SEPS Slovakia + PSE↔Ukraine (via Rzeszów-Kaliningrad direct)
+  bordering_countries: 7                # Germany + Czech + Slovakia + Ukraine + Belarus + Lithuania + Russia (Kaliningrad enclave)
+  synchronous_area: Continental_European_since_1993
+
+# ── Discipline #41 line parity ──────────────────────────────────────────
+
+discipline_41_line_parity:
+  pre_fetch_baseline_ratio: >
+    Baseline 2,247 subs + 6,484 lines (baseline gaudit if available) = 2.89
+    line ratio; Central European average pre-merge post-fetch ratio
+    expected 5.5-6.5 (below Slovakia 13.31 line-heavy outlier; above
+    Czechia 5.24). Poland OSM Central European average line-mapping
+    culture.
+
+# ── Expected empirical outcome ──────────────────────────────────────────
+
+expected_merge_outcome:
+  substations_pre_bounds_filter: 32000-50000
+  substations_post_bounds_filter: 31500-49500
+  lines_pre_bounds_filter: 180000-250000
+  lines_post_bounds_filter: 179200-249200
+  substation_baseline_overlap: >
+    Expected 15-25% overlap between OSM subs + baseline (baseline
+    2,247 mostly derived from PSE Sieć 400/220 kV grid map + regional
+    DSO maps; OSM MV distribution tier below 110 kV likely not
+    represented in baseline).
+  net_new_substations: 30000-42000  # LARGEST cohort-wide
+  final_substation_count: 32247-44247
+  final_line_count: 165000-230000
+  final_line_ratio: 5.0-6.0
+  merge_bottleneck_prediction: >
+    Line-merge dedupe pass on 6,484 baseline × ~200,000 OSM lines =
+    ~1.3 GIGA-comparisons — 5-15 min wall-clock on operator SSD.
+    Sandbox 180s timeout PROBABLY insufficient — plan for operator
+    local execution from the start.
+
+# ── Ownership coverage forecast ─────────────────────────────────────────
+
+expected_ownership_coverage:
+  direct_osm_operator_tag: 55-70%      # HIGHEST cohort-wide expected due to strong Polish OSM community
+  direct_osm_alias_normalised: 8000-15000
+  pse_tso_via_voltage: ~3%             # 400/220 kV EHV backbone
+  dso_via_layer_3_geofence: 27-40%     # 5-DSO territorial partition catch-all
+  private_industrial_captives_via_direct_tag: 3-5%
+  unresolved_null: 0.0%                # 100% coverage target
+
+# ── Cohort progress after Poland closure ────────────────────────────────
+
+cohort_progress_post_poland:
+  wave_1_complete: 5 (Canada + Norway + Mexico + Austria + Greenland)
+  wave_2_complete: 16 (Australia + Belgium + Netherlands + Chile + Hungary +
+                       Luxembourg + Slovenia + Costa Rica + Israel +
+                       Colombia + Lithuania + Estonia + Latvia + Slovakia +
+                       Czechia + Poland)
+  cumulative_countries_closed: 21
+  visegrad_trio_complete: 3 of 3 (Slovakia P19 + Czechia P20 + Poland P21)
+
+# ── Milestone context ───────────────────────────────────────────────────
+
+milestone_context:
+  visegrad_trio_completion: >
+    Poland P21 closure completes the Visegrád Trio (Slovakia + Czechia +
+    Poland) at v4.23 canonical refresh. Hungary already shipped Wave 2
+    P7 (16 June 2026) but under different sub-convention path (Hungary
+    OSM populates NUTS-3 tags — no Layer 3 geofence needed). Post-Poland:
+    all 4 Visegrád Group countries at v4.23 (Hungary NUTS-3 + SK/CZ/PL
+    Layer 3 geofence).
+  convention_78_binding_multi_generation: >
+    Poland is the empirical stress test for Convention #78 BINDING
+    multi-generation rebrand-predecessor tracking. If Poland's 5-7
+    rebrand-predecessor alias classes all surface at fetch time, this
+    validates the sub-convention candidate (multi-generation rebrand
+    predecessor tracking codified at Step 3 connector authoring).
+
+# ── Auditability chain ─────────────────────────────────────────────────
+
+auditability_chain:
+  step_1_preflight: poland/v4_23-ingestion-audit-poland-preflight.yaml (this file)
+  step_2_fetch: TBD (operator local OSM Overpass fetch — likely 30-60 min budget for Poland scale)
+  step_3_connector: TBD (scripts/pipeline/ingestion/poland/{osm_overpass,merge_into_ssi_data,_base}.py)
+  step_4_merge: TBD (operator local merge execution — likely 15-30 min budget)
+  step_5_doc_cascade: TBD (Visegrád Trio completion + Convention #78 BINDING 3rd enforcement + Layer 3 geofence 4th enforcement)
+  register_hash_pin: 2ca50d583f43       # unchanged (methodology-invariant enrichment)
+  nn_tag_pin: v33-calibrated-scipy-20260427T074651Z
+
+status: READY_FOR_STEP_2_FETCH

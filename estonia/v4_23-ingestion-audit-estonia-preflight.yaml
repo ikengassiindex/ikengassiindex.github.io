@@ -1,0 +1,248 @@
+# Estonia v4.23 Ingestion Audit — Pre-flight
+# ==========================================
+# Task: #238 (WAVE2-Step1 Estonia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: estonia
+  iso2: EE
+  iso3: EST
+  wave: 2
+  priority: 17
+  step: 1
+  target: "Owner enrichment via OSM Overpass — 2-operator vertically-integrated state monopoly via Eesti Energia holding (Baltic Trio 2nd instance)"
+  rationale: >
+    Estonia carries 614 substations with 0% owner tagged, 77.9% voltage
+    tagged (478/614 covering 450/330/150/110/35/10/6 kV + 22.1% unknown),
+    and 100% region tagged across all 15 Estonian counties (maakonnad).
+    Estonia's electricity architecture parallels Lithuania — a 2-operator
+    vertically-integrated state monopoly via Eesti Energia holding:
+    Elering AS (state TSO ≥110 kV, 2010 spinoff from Eesti Energia) +
+    Elektrilevi OÜ (unified state DSO ≤110 kV, 2013 spinoff from Eesti
+    Energia). Both 100% state-owned via Eesti Energia Grupp — pure
+    vertically-integrated state architecture like Lithuania's EPSO-G
+    holding. Baltic Trio sibling to Lithuania — empirical validation
+    of the +871% Baltic OSM density hypothesis before Latvia lands as
+    Priority 18.
+
+baseline_state:
+  ssi_data_substations: 614
+  grid_geo_substations: 614  # matches (rough)
+  grid_geo_lines: 1800  # estimated
+  lines_per_substation_ratio: 2.93  # estimated clean transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 77.9  # 478/614 — 136 unknown-voltage subs
+  region_coverage_pct: 100.0  # 15 Estonian counties populated
+  county_split:
+    Harju: 101       # 16.5% — Tallinn capital + metro
+    Ida-Viru: 88     # 14.3% — Narva Russian-speaking region + industrial cluster
+    Lääne-Viru: 84   # 13.7% — Rakvere + Kunda
+    Jõgeva: 80       # 13.0% — inland east-central
+    Rapla: 43        # 7.0%  — central Estonia
+    Tartu: 42        # 6.8%  — Tartu 2nd city
+    Pärnu: 40        # 6.5%  — Pärnu SW coast
+    Lääne: 32        # 5.2%  — Haapsalu W coast
+    Järva: 29        # 4.7%  — central Estonia
+    Viljandi: 24     # 3.9%  — south-central
+    Saare: 14        # 2.3%  — Saaremaa island (largest Baltic island)
+    Valga: 12        # 2.0%  — SE Latvia border
+    Võru: 12         # 2.0%  — SE Russia border
+    Põlva: 11        # 1.8%  — SE
+    Hiiu: 2          # 0.3%  — Hiiumaa island (smaller)
+  voltage_class_baseline:
+    450_kv: 1        # Estlink 1 HVDC subsea converter station (450 kV DC)
+    330_kv: 16       # Elering EHV backbone (Soviet-era 330 kV transmission)
+    150_kv: 1        # Rare mid-tier (possibly LV-EE cross-border artifact)
+    110_kv: 147      # Elering TSO subtransmission + Elektrilevi mixed 110 kV
+    35_kv: 37        # Elektrilevi subtransmission (Soviet-era)
+    10_kv: 275       # Elektrilevi MV distribution — dominant tier (44.8%)
+    6_kv: 1          # Rare legacy
+    0_kv: 136        # 22.1% — voltage-null / unknown
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [21.75, 57.50, 28.20, 59.70]  # west, south, east, north (Estonia bounds)
+    strategy: >
+      Single-query pattern — Estonia bbox ~45k km² (~1.5× Lithuania territory).
+      Sub-2-minute fetch expected. Endpoint-fallback strategy per Lithuania
+      precedent — Baltic countries recently added heavy MV/LV distribution
+      coverage in OSM, so response payloads may be larger than baseline
+      suggests.
+    expected_yield:
+      substations: 2500-5000  # +307-714% Baltic OSM density hypothesis (Lithuania +871% empirical)
+      lines: 3500-6000
+    tag_completeness_hypothesis: >
+      Baltic OSM tagging density typically 60-80% for Tallinn/Tartu
+      metropolitan + Narva industrial. Rural east + island regions
+      (Saaremaa + Hiiumaa) may be 40-60%. Historical Soviet-era operator
+      names may appear on older-tagged subs (Põhivõrk pre-2010, Eesti
+      Energia Jaotusvõrk pre-2013). Cyrillic aliases likely in
+      Ida-Virumaa (Narva) — Russian-speaking OSM contributors have
+      empirically tagged in Cyrillic in Lithuanian border-adjacent
+      Kaliningrad (Convention #78 sub-convention on multi-script OSM
+      handling).
+    lp_dd_class: canonical
+
+  fallback_pure_monopoly_2_operator:
+    strategy: elering_tso_threshold_plus_elektrilevi_monopoly_default
+    rationale: >
+      2-operator resolver mirror of Lithuania Priority 16 pattern. Estonia's
+      power grid is entirely state-owned via Eesti Energia Grupp AS holding
+      company. Elering AS (TSO, spun out 2010) + Elektrilevi OÜ (unified
+      national DSO, spun out 2013) are both 100% state-owned subsidiaries.
+      No private IPPs or regional overlays — Eesti Energia (generation +
+      retail parent) is separate legal entity that doesn't own grid
+      infrastructure. Baltic Trio (Estonia + Latvia + Lithuania)
+      desynchronised from Russian IPS grid February 2025, synchronised with
+      Continental EU grid — Estlink 1 (450 kV DC, 2006, 350 MW) + Estlink 2
+      (450 kV DC, 2014, 650 MW) HVDC subsea to Finland provide cross-border
+      interconnection. LatEst cross-border at Latvia border to south.
+    tso_threshold_kv: 110  # Elering operates 450 (HVDC) + 330 + 110 kV transmission
+    tso_operator: Elering  # Elering AS (100% state-owned via Eesti Energia Grupp)
+    monopoly_default_operator: Elektrilevi  # Elektrilevi OÜ
+    holding_company: Eesti Energia Grupp  # Eesti Energia Group AS
+    system_operator_note: >
+      Elering handles both TSO ownership AND SO functions in Estonia. No
+      separate system operator entity like Noga (Israel) or XM SA ESP
+      (Colombia). Elering also owns natural gas transmission (Eesti Gaas
+      spinoff 2015), but scope here is electricity only.
+
+  operator_alias_normalisation:
+    aliases:
+      # Elering variants (English + Estonian + legal-form + Soviet-era)
+      "Elering": "Elering"
+      "Elering AS": "Elering"
+      "AS Elering": "Elering"
+      "Elering A.S.": "Elering"
+      # Põhivõrk — pre-2010 predecessor (Eesti Energia subsidiary)
+      "Põhivõrk": "Elering-legacy"
+      "OÜ Põhivõrk": "Elering-legacy"
+      "Põhivõrk OÜ": "Elering-legacy"
+      "Pohivork": "Elering-legacy"  # accent-stripped
+      # Elektrilevi variants (English + Estonian + legal-form)
+      "Elektrilevi": "Elektrilevi"
+      "Elektrilevi OÜ": "Elektrilevi"
+      "OÜ Elektrilevi": "Elektrilevi"
+      # Eesti Energia Jaotusvõrk — pre-2013 predecessor DSO
+      "Eesti Energia Jaotusvõrk": "Elektrilevi-legacy"
+      "Jaotusvõrk OÜ": "Elektrilevi-legacy"
+      "OÜ Jaotusvõrk": "Elektrilevi-legacy"
+      # Eesti Energia holding (parent — non-owner but may appear on OSM tags)
+      "Eesti Energia": "Eesti Energia Grupp (Holding Company)"
+      "Eesti Energia AS": "Eesti Energia Grupp (Holding Company)"
+      "AS Eesti Energia": "Eesti Energia Grupp (Holding Company)"
+      "Enefit": "Eesti Energia Grupp (Holding Company)"
+      "Enefit Group": "Eesti Energia Grupp (Holding Company)"
+      # Cyrillic potential (Ida-Virumaa / Narva Russian-speaking population)
+      # Elering Russian: Элеринг · Elektrilevi Russian: Электрилеви
+      "элеринг": "Elering"
+      "электрилеви": "Elektrilevi"
+      # Elektriraudtee — Estonian Railways (electric traction only, not grid)
+      "Elektriraudtee": "Estonian Railways (Electric)"
+      "Elektriraudtee AS": "Estonian Railways (Electric)"
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/estonia/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # Elering TSO threshold + Elektrilevi monopoly default + alias map
+    - osm_overpass.py  # single-query fetch (~45k km²)
+    - merge_into_ssi_data.py  # 500m proximity + Step 4b retroactive + Step 5 alias-retighten
+  pattern_reused_from: lithuania (Baltic Trio 2-operator monopoly template)
+  differentiators_vs_lithuania:
+    - operator_language: Estonian (Finno-Ugric / Uralic) vs Lithuanian (Baltic / Indo-European)
+    - script: Latin with Ä Ö Õ Ü Š Ž diacritics vs Latin with ą č ę ė į š ų ū ž diacritics
+    - cyrillic_bridging: Ida-Virumaa/Narva (Russian-speaking) vs Lithuania Kaliningrad-adjacent
+    - holding_structure: Eesti Energia Grupp (vertical - unbundling 2010+2013) vs EPSO-G (holding 2012)
+    - baltic_trio_context: Same Feb 2025 EU synchronisation event
+    - hvdc_cross_border: Estlink 1+2 to Finland (450 kV DC) vs Lithuania NordBalt HVDC to Sweden + LitPol Link to Poland
+    - island_topology: Saaremaa + Hiiumaa islands (0.3-2.3% of subs) vs Lithuania mainland-only
+    - historical_alias_depth: Põhivõrk (pre-2010) + Eesti Energia Jaotusvõrk (pre-2013) vs Lithuania LESTO (pre-2016) + Lietuvos energija (pre-2011)
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # 2-operator monopoly catches all
+  post_merge_voltage_coverage: 40-80%  # from 77.9% baseline to multi-tier
+  post_merge_substations: 2500-5000  # Baltic OSM density hypothesis
+  post_merge_lines: 3500-6000
+  km_of_lines: 5000-10000
+
+risks_flagged:
+  - risk_1: >
+      110 kV is a MIXED tier in Estonia — Elering operates transmission
+      backbone at 110 kV AND Elektrilevi operates subtransmission at
+      110 kV. Empirically the baseline is transmission-heavy (only 147
+      subs at 110 kV of 614 total), so most 110 kV subs are Elering.
+      Threshold at 110 kV gives Elering the majority; below-110 kV
+      goes to Elektrilevi default. Some misattribution possible for
+      Elektrilevi 110 kV subs (small fraction).
+  - risk_2: >
+      Historical Soviet-era operator names may appear on very old OSM
+      tags (Põhivõrk pre-2010 TSO predecessor, Eesti Energia
+      Jaotusvõrk pre-2013 DSO predecessor). Alias map catches both
+      historical variants → legacy tags; can be retighten-pass-collapsed
+      to primary owner at Step 5 if needed.
+  - risk_3: >
+      3-country border zones with Latvia (S) + Russia (E) + Finland
+      (N — subsea only via Estlink 1+2). Discipline #36 cross-border
+      filter uses estonia/bounds.json. Estlink HVDC terminates at
+      Harku (Harjumaa) + Anttila (Finland) — subsea cable itself
+      not in scope for substation ingestion.
+  - risk_4: >
+      Cyrillic alias handling — Ida-Virumaa (Narva) has substantial
+      Russian-speaking population and empirically Russian-speaking OSM
+      contributors have tagged in Cyrillic in similar Lithuanian
+      Kaliningrad-adjacent contexts. Elering/Elektrilevi Cyrillic
+      renderings (Элеринг / Электрилеви) preemptively included in
+      alias map per Convention #78 sub-convention on multi-script
+      OSM handling.
+  - risk_5: >
+      Saaremaa + Hiiumaa islands (Saare + Hiiu counties, 16 subs
+      combined at baseline) may have subsea grid connection to
+      mainland via Väinameri Strait. Grid topology should preserve
+      HVDC/HVAC cable attribution. Also potential Ruhnu island (Latvia
+      border) with tiny grid infrastructure.
+
+convention_preservation:
+  discipline_36:
+    scope: Estonia bounds CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      Elering + Elektrilevi 2-operator monopoly is Convention #56-compliant —
+      both genuinely operate 100% of national grid via Eesti Energia state
+      holding. Historical Elering-legacy + Elektrilevi-legacy variants
+      preserved distinctly for audit trail; can be collapsed via retighten pass.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to estonia/ + scripts/pipeline/ingestion/estonia/.
+  convention_78:
+    scope: >
+      2nd Baltic Trio empirical instance (after Lithuania). Multi-script
+      OSM alias handling (Latin + Cyrillic) validates the pattern from
+      1 instance (Lithuania: 1 Cyrillic ЕСО tag) to potentially deeper
+      Ida-Virumaa cluster.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.estonia.osm_overpass`
+    locally. Expected wall-clock <2 min.
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.estonia.merge_into_ssi_data`
+    (includes Step 4b retroactive attribution + Step 5 alias-retighten).
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+    Baltic Trio empirical validation of +871% OSM density hypothesis
+    (Lithuania precedent).
+
+status: READY_FOR_STEP_2

@@ -1,0 +1,267 @@
+# Colombia v4.23 Ingestion Audit — Pre-flight
+# ============================================
+# Task: #228 (WAVE2-Step1 Colombia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: colombia
+  iso2: CO
+  iso3: COL
+  wave: 2
+  priority: 15
+  step: 1
+  target: "Owner enrichment via OSM Overpass — 6th region-jurisdiction × voltage-class instance (LARGEST DSO cardinality yet)"
+  rationale: >
+    Colombia carries 378 substations with 0% owner tagged and 100% voltage +
+    region tagged (28 distinct departments populated as region field —
+    Antioquia + Bogotá + Valle del Cauca largest). Sixth application of the
+    region-jurisdiction × voltage-class fallback pattern (after Belgium 3 +
+    Netherlands 4 + Hungary 4 + Chile lat-band + Slovenia 5-DSO NUTS-3 map)
+    with the LARGEST DSO cardinality yet (~30 DSOs regulated by CREG).
+    Colombia's electricity architecture: ISA (Interconexión Eléctrica S.A.,
+    state-linked) handles TSO ≥220 kV national transmission + XM SA ESP
+    system operator (spun out from ISA, non-owner of infrastructure); ~30
+    regional distributors handle sub-220 kV with departmental territories.
+    NOVEL PATTERN: department-name lookup from baseline region field (100%
+    populated) — simpler than lat/lon geofence because Colombia's
+    department boundaries are cleanly ingested at baseline.
+
+baseline_state:
+  ssi_data_substations: 378
+  grid_geo_substations: 379
+  grid_geo_lines: 2278
+  lines_per_substation_ratio: 6.03  # clean transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0
+  region_coverage_pct: 100.0  # 28 departments populated
+  department_split_top15:
+    antioquia: 62         # 16.4% — Medellín + Antioquia (EPM territory)
+    bogota: 51            # 13.5% — Bogotá D.C. (Enel-Codensa)
+    valle-del-cauca: 33   # 8.7%  — Cali (Emcali) + rest Pacific (EPSA)
+    atlantico: 20         # 5.3%  — Barranquilla (Air-e)
+    boyaca: 20            # 5.3%  — Tunja (EBSA)
+    santander: 18         # 4.8%  — Bucaramanga (Essa)
+    caldas: 16            # 4.2%  — Manizales (Chec — Eje Cafetero)
+    cundinamarca: 16      # 4.2%  — Bogotá suburbs (Enel-Codensa)
+    casanare: 15          # 4.0%  — Yopal (Enerca)
+    cordoba: 13           # 3.4%  — Montería (Afinia)
+    norte-de-santander: 12  # 3.2%  — Cúcuta (CENS)
+    sucre: 11             # 2.9%  — Sincelejo (Afinia)
+    tolima: 11            # 2.9%  — Ibagué (Enertolima)
+    meta: 10              # 2.6%  — Villavicencio (Emsa)
+    huila: 8              # 2.1%  — Neiva (Electrohuila)
+  voltage_class_baseline:
+    500_kv: 7           # 1.9% — EHV backbone (ISA)
+    230_kv: 39          # 10.3% — HV national trunk (ISA)
+    220_kv: 16          # 4.2% — HV national trunk (ISA)
+    115_kv: 213         # 56.3% — subtransmission (DSO — largest tier)
+    110_kv: 103         # 27.2% — subtransmission (DSO)
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [-79.10, 1.10, -66.80, 12.60]  # west, south, east, north
+    strategy: >
+      Single-query pattern — Colombia bbox ~1,142k km² (50× Slovenia, 22× Israel,
+      ~2× Chile). Fetch may take 3-5 minutes; if 429/504 encountered may need
+      bbox partitioning by department cluster.
+    expected_yield:
+      substations: 800-2500
+      lines: 3000-10000
+    tag_completeness_hypothesis: >
+      Colombia OSM tagging density typically 40-60% for Andean urban centres
+      (Bogotá + Medellín + Cali + Barranquilla). Rural coasts (Guajira +
+      Chocó) + Amazon basin (Amazonas + Vaupés + Guainía) 10-30%. OSM
+      operator= tags likely sparse — ISA/EPM/Enel-Codensa direct tags for
+      major backbone, unresolved for MV distribution net-new.
+    lp_dd_class: canonical
+
+  fallback_region_jurisdiction_with_ISA_default:
+    strategy: department_name_to_dso_map_plus_isa_tso_threshold_plus_isa_default
+    rationale: >
+      Baseline has 100% region attribution as department names (28 distinct)
+      — this is the cleanest resolver base yet cohort-wide. Layer 2 uses
+      department-name-to-DSO map directly (no lat/lon geofence needed for
+      baseline subs); Layer 3 uses lat/lon geofence for net-new OSM subs
+      without department tag; Layer 4 falls back to ISA default (Convention
+      #56 visibly-honest).
+    tso_threshold_kv: 220  # ISA operates 500 + 230 + 220 kV backbone
+    tso_operator: ISA  # Interconexión Eléctrica S.A. (state-linked TSO)
+    system_operator_non_owner: XM SA ESP  # spun out from ISA, non-owner of infrastructure
+    dso_departments_map:
+      # Departments where DSO is unambiguous by department alone
+      antioquia: EPM
+      bogota: Enel-Codensa
+      atlantico: Air-e
+      magdalena: Air-e
+      la-guajira: Air-e
+      bolivar: Afinia
+      cesar: Afinia
+      cordoba: Afinia
+      sucre: Afinia
+      santander: Essa
+      norte-de-santander: CENS
+      boyaca: EBSA
+      caldas: Chec
+      quindio: Chec
+      risaralda: Chec
+      huila: Electrohuila
+      tolima: Enertolima
+      nariño: Cedenar
+      casanare: Enerca
+      meta: Emsa
+      arauca: Enerca-Enelar
+      guaviare: Emsa-Guaviare
+      putumayo: Emsa-Putumayo
+      caqueta: Electrocaqueta
+      choco: DisPac
+      amazonas: Amazonas
+      vichada: Emsa-Vichada
+      vaupes: Emsa-Vaupes
+      guainia: Emsa-Guainia
+      san-andres: Sopesa
+
+    dso_departments_split_by_geofence:
+      # Departments where multiple DSOs overlap — need cantonal/lat-lon geofence
+      cundinamarca:
+        default: Enel-Codensa  # majority — Bogotá suburbs
+        edge_cases: null       # rural NE Cundinamarca overlaps with EBSA (Boyacá)
+      valle-del-cauca:
+        default: EPSA          # rest of Valle del Cauca
+        cali_metro_geofence:
+          bbox: "3.30-3.60°N, -76.65 to -76.40°W"
+          dso: Emcali
+      cauca:
+        default: CEO           # Compañía Energética de Occidente
+        note: "Some Popayán urban may overlap with Cencar"
+
+  dso_alias_normalisation:
+    aliases:
+      # ISA + XM variants
+      "ISA": "ISA"
+      "Interconexión Eléctrica": "ISA"
+      "Interconexion Electrica": "ISA"
+      "Interconexión Eléctrica S.A.": "ISA"
+      "ISA - Interconexión Eléctrica": "ISA"
+      "XM": "XM SA ESP (System Operator)"
+      "XM SA ESP": "XM SA ESP (System Operator)"
+      # Major DSOs (English + Spanish variants)
+      "EPM": "EPM"
+      "Empresas Públicas de Medellín": "EPM"
+      "Empresas Publicas de Medellin": "EPM"
+      "EPM ESP": "EPM"
+      "Codensa": "Enel-Codensa"
+      "Enel Codensa": "Enel-Codensa"
+      "Enel Colombia": "Enel-Codensa"
+      "Enel-Codensa": "Enel-Codensa"
+      "Codensa S.A.": "Enel-Codensa"
+      "Emcali": "Emcali"
+      "EMCALI": "Emcali"
+      "Empresas Municipales de Cali": "Emcali"
+      "EPSA": "EPSA"
+      "Empresa de Energía del Pacífico": "EPSA"
+      "CENS": "CENS"
+      "Centrales Eléctricas del Norte de Santander": "CENS"
+      "EBSA": "EBSA"
+      "Empresa de Energía de Boyacá": "EBSA"
+      "Air-e": "Air-e"
+      "Air-e SAS ESP": "Air-e"
+      "Afinia": "Afinia"
+      "Cedenar": "Cedenar"
+      "Centrales Eléctricas de Nariño": "Cedenar"
+      "Essa": "Essa"
+      "Electrificadora de Santander": "Essa"
+      "Chec": "Chec"
+      "Central Hidroeléctrica de Caldas": "Chec"
+      "Electrohuila": "Electrohuila"
+      "Electrificadora del Huila": "Electrohuila"
+      "Enertolima": "Enertolima"
+      "Empresa de Energía de Boyacá": "EBSA"
+      # Legacy operator names for Air-e/Afinia
+      "Electricaribe": "Air-e-or-Afinia-legacy"
+      "Electricosta": "Air-e-legacy"
+      # GEB (transmission + minor DSO)
+      "GEB": "GEB"
+      "Grupo Energía Bogotá": "GEB"
+      "EEB": "GEB"
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/colombia/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # ISA TSO threshold + department-name-to-DSO map + Cali metro geofence + ISA default
+    - osm_overpass.py  # single-query fetch (~1,142k km², may partition)
+    - merge_into_ssi_data.py  # 500m proximity + Step 4b retroactive + baseline-department lookup
+  pattern_reused_from: slovenia (region-jurisdiction × voltage) + costa-rica (Step 4b retroactive integration)
+  differentiators_vs_slovenia:
+    - dso_cardinality: ~30 DSOs vs Slovenia's 5 (6× larger)
+    - regional_metadata_source: department names (Spanish, natural language) vs NUTS-3 codes (SI###)
+    - country_size: 1,142k km² vs 20k km² (57× larger)
+    - state_utility_default: ISA fires as fallback (like Costa Rica ICE) vs Slovenia unresolved
+    - system_operator_non_owner_distinction: XM SA ESP tagged separately from ISA (like Noga in Israel)
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # department map + ISA default catches all
+  post_merge_voltage_coverage: 40-70%  # from 100% transmission-only to multi-tier including MV
+  post_merge_substations: 800-2500
+  post_merge_lines: 3000-10000
+  km_of_lines: 10000-30000
+
+risks_flagged:
+  - risk_1: >
+      Colombia has enormous departmental cardinality (30+) and OSM tagging
+      quality varies widely by region. Bogotá + Medellín likely have high
+      operator= tag density; Amazon basin near-zero.
+  - risk_2: >
+      Cauca department has CEO (Compañía Energética de Occidente) but some
+      Popayán urban may show Cencar or older Cedelca names — verify alias
+      map catches historical variants.
+  - risk_3: >
+      Air-e vs Afinia split of former Electricaribe: SW (Air-e: Atlántico
+      + Magdalena + La Guajira) vs NE (Afinia: Bolívar + Cesar + Córdoba +
+      Sucre). If OSM tags show "Electricaribe" historical name, need to
+      route by department to disambiguate (not by alias alone).
+  - risk_4: >
+      2-country border zones with Panama (NW), Ecuador (S), Peru (SE),
+      Brazil (E), Venezuela (E). Discipline #36 cross-border filter uses
+      colombia/bounds.json.
+  - risk_5: >
+      Islas de San Andrés (Caribbean archipelago ~250 km NW of Cartagena)
+      is Colombian territory but has isolated grid (Sopesa). May sit at
+      polygon boundary; verify after fetch.
+
+convention_preservation:
+  discipline_36:
+    scope: Colombia bounds already CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      ISA state-utility default is Convention #56-compliant — ISA/XM
+      operates majority + de facto default for unmapped territory.
+      Historical Electricaribe route via department (not alias alone).
+      OSM-tag-unresolved cases surface honestly.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to colombia/ + scripts/pipeline/ingestion/colombia/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.colombia.osm_overpass`
+    locally. Expected wall-clock 3-5 min (may need bbox partitioning).
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.colombia.merge_into_ssi_data`.
+    Includes Step 4b retroactive attribution + Step 5 alias-retighten passes.
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2

@@ -1,0 +1,77 @@
+{
+  "module": "d05_osm",
+  "country": "Ireland",
+  "country_code": "IE",
+  "description": "OpenStreetMap power infrastructure extraction — substations and transmission lines",
+  "data_source": {
+    "api": "Overpass API",
+    "mirror": "https://overpass.kumi.systems/api/interpreter",
+    "reference_url": "https://wiki.openstreetmap.org/wiki/Power_infrastructure",
+    "usage_policy": "ODbL open access"
+  },
+  "spatial_bounds": {
+    "region": "Republic of Ireland",
+    "exclude_northern_ireland": true,
+    "lat_min": 51.4,
+    "lat_max": 55.4,
+    "lon_min": -10.5,
+    "lon_max": -5.9,
+    "note": "Northern Ireland excluded (lat > 54.45 AND lon > -7.2)"
+  },
+  "osm_queries": [
+    {
+      "feature": "power=substation",
+      "description": "All mapped electrical substations",
+      "expected_count": 600
+    },
+    {
+      "feature": "power=sub_station",
+      "description": "Alternative tagging for substations",
+      "expected_count": 100
+    },
+    {
+      "feature": "power=line",
+      "description": "Overhead transmission lines",
+      "expected_count": "variable"
+    },
+    {
+      "feature": "power=cable",
+      "description": "Underground/submarine cables",
+      "expected_count": "variable"
+    }
+  ],
+  "voltage_filter": {
+    "transmission_kv": [400, 220, 110],
+    "distribution_kv": [38, 20, 10],
+    "hv_threshold_kv": 110,
+    "mv_threshold_kv": 10,
+    "include_unknowns": true,
+    "note": "HV (≥110kV), MV (10-110kV), named unknowns classified by geographic context"
+  },
+  "target_statistics": {
+    "total_substations": 1000,
+    "hv_substations": 150,
+    "mv_substations": 400,
+    "lv_substations": 450,
+    "transmission_lines_km": 6500,
+    "distribution_lines_km": 35000
+  },
+  "counties": [
+    "Carlow", "Cavan", "Clare", "Cork", "Donegal", "Dublin",
+    "Dún Laoghaire–Rathdown", "Fingal", "Galway", "Kerry", "Kildare",
+    "Kilkenny", "Laois", "Leitrim", "Limerick", "Longford", "Louth",
+    "Mayo", "Meath", "Monaghan", "Offaly", "Roscommon", "Sligo",
+    "South Dublin", "Tipperary", "Waterford", "Westmeath", "Wexford",
+    "Wicklow"
+  ],
+  "validation": {
+    "coordinate_check": true,
+    "voltage_parsing": true,
+    "deduplication": true,
+    "name_enrichment": true
+  },
+  "output_format": "GeoJSON with properties",
+  "reference_year": 2025,
+  "refresh_freq": "quarterly",
+  "license": "ODbL 1.0"
+}

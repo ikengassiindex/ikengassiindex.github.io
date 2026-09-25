@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Complete Formula Construct (Denmark)</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --paper: #faf9f6;
+  --accent: #c0392b;
+  --accent2: #2c3e7a;
+  --accent3: #1a6b4a;
+  --accent4: #d4740e;
+  --muted: #6b7280;
+  --border: #d1cfc9;
+  --code-bg: #f0ede6;
+  --highlight: #fff8e1;
+  --tag-bg: #e8e6df;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+  --sans: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --teal: #0e7490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--serif); color: var(--ink); background: var(--paper); line-height: 1.72; -webkit-font-smoothing: antialiased; }
+.page { max-width: 960px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+.header { text-align: center; padding: 3.5rem 0 2.5rem; border-bottom: 3px double var(--border); margin-bottom: 3rem; }
+.header .tag { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); background: rgba(192,57,43,0.08); padding: 0.3em 1em; border-radius: 2px; margin-bottom: 1rem; }
+.header h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0.5rem 0; }
+.subtitle { font-size: 1.1rem; color: var(--muted); font-weight: 400; margin-bottom: 1rem; }
+.meta { display: flex; gap: 2.5rem; font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; justify-content: center; flex-wrap: wrap; }
+h2 { font-size: 1.5rem; font-weight: 700; margin: 3rem 0 1.2rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); color: var(--ink); }
+h3 { font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.8rem; color: var(--accent2); }
+h4 { font-size: 0.95rem; font-weight: 600; margin: 1.2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1rem; }
+table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
+thead { background: var(--ink); color: #fff; }
+thead th { padding: 0.8rem 1rem; text-align: left; font-weight: 600; font-family: var(--mono); letter-spacing: 0.03em; font-size: 0.75rem; text-transform: uppercase; }
+tbody td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+tbody tr:hover { background: #f5f3f0; }
+.mono { font-family: var(--mono); font-size: 0.85rem; }
+.num { text-align: right; font-family: var(--mono); font-weight: 500; }
+.tag-calibration { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #fadbd8; color: #922b21; }
+.tag-param { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #d5f5e3; color: #1a6b4a; }
+.tag-note { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 2px; background: #e0f7fa; color: #0e7490; }
+.formula-box { background: var(--highlight); border-left: 4px solid var(--accent4); padding: 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-family: var(--mono); font-size: 0.85rem; overflow-x: auto; }
+.highlight-box { background: #fff8f0; border-left: 4px solid var(--accent); padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+.calibration-note { background: #fff3e0; border-left: 4px solid var(--accent4); padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+.coefficient-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+.coefficient-table th { background: var(--code-bg); padding: 0.6rem 0.8rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); }
+.coefficient-table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+@media print { body { font-size: 11pt; } .page { padding: 1rem; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <span class="tag">SSI v4.0.2</span>
+  <h1>Complete Formula Construct</h1>
+  <p class="subtitle">Denmark (DK) — Energinet Transmission Grid</p>
+  <div class="meta">
+    <span><strong>Country:</strong> Denmark (DK)</span>
+    <span><strong>Version:</strong> 4.0.2</span>
+    <span><strong>Date:</strong> 2026-03-27</span>
+    <span><strong>Author:</strong> Ikenga Project</span>
+  </div>
+</div>
+
+<h2>1. Executive Overview</h2>
+
+<p>Denmark's power system (operated by Energinet, the state-owned transmission system operator for both electricity and gas) is a global leader in renewable energy integration and represents a unique island grid topology with exceptionally high offshore wind penetration (~50%+ of generation). Unlike Norway's hydropower dominance or Sweden's nuclear-hydro balance, Denmark has ZERO nuclear capacity (Risø research reactor decommissioned in 2000; no commercial nuclear plant ever built), making the system fundamentally dependent on wind variability and sophisticated grid balancing through cross-border interconnections and flexible gas backing. The system is geographically divided into two synchronous areas (DK1 and DK2) reflecting distinct electrical characteristics: DK1 (Jutland and Funen) operates synchronously with Continental Europe (UCTE), while DK2 (Zealand and islands) synchronizes with the Nordic system via Sweden. Denmark serves as a crucial energy bridge between Nordic hydro, European coal/gas, and emerging offshore wind—exporting renewable energy during strong winds and importing dispatchable power during calm periods. The system is exceptionally exposed to North Sea and Baltic coastal hazards (winter storms, storm surge, coastal erosion) and represents the world's most interconnected island grid with 11+ major HVDC/AC cross-border links. The SSI v4.0.2 formula for Denmark is fundamentally adapted with critical calibration reflecting DK zero nuclear capacity (κ_nuclear = 0), extreme wind integration (~50%+), flat terrain (no mountains, no avalanches), district heating integration (>60% of households), and heightened emphasis on North Sea/Baltic maritime hazards, storm surge risk, and coastal corrosion:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Seismic intensity:</strong> α=0.05 (exceptionally stable continental platform), no significant seismicity. No mining-induced seismicity. Minimal postglacial rebound effects. Cap = 1.01 (negligible seismic hazard globally).</li>
+  <li><strong>Wind energy dominance:</strong> κ_wind = 0.50+ (offshore wind expanding rapidly: Horns Rev 1/2/3, Anholt, Kriegers Flak, offshore energy islands planned ~12+ GW by 2030). Unlike Norway's hydro, Denmark's generation highly variable minute-by-minute (wind ramps), requiring real-time balancing via interconnects and gas-fired CHP plants.</li>
+  <li><strong>North Sea/Baltic coastal hazards:</strong> κ_coastal = 0.40 (dominant, winter storms from Atlantic/North Sea exposure), κ_surge = 0.25 (storm surge + sea level rise, low-lying terrain threatens west Jutland). Much more intense than Norway's fjord exposure due to open ocean fetch and flat, vulnerable coastline.</li>
+  <li><strong>Zero nuclear capacity:</strong> FUNDAMENTAL DIFFERENTIATOR from Sweden and most European systems. No nuclear decommissioning concerns; focus entirely on renewable integration + flexible gas backup + cross-border trade.</li>
+  <li><strong>District heating integration:</strong> >60% of households connected to CHP district heating (unique to Denmark + parts of Sweden). Provides load flexibility and waste heat utilization; CHP plants (gas-fired, biomass) provide frequency support and balancing.</li>
+  <li><strong>Island grid topology:</strong> Zealand (largest), Funen, Bornholm connected by Great Belt link and Øresund interconnect to Sweden. Creates unique voltage coupling challenges requiring sophisticated grid control.</li>
+  <li><strong>Coastal corrosion:</strong> κ_corrosion = C2–C4 (maritime stress, more aggressive than inland). North Sea west coast (Esbjerg, Hvide Sande, Thyborøn) extreme C4 salt spray; east Jutland and Funen coast C3; inner Denmark C2; interior C1.</li>
+  <li><strong>Grid operator:</strong> Energinet (Danish TSO) — state-owned, controls transmission grid, gas network. ~40 DSOs operate local distribution networks.</li>
+  <li><strong>Regulator:</strong> Forsyningstilsynet (Danish Energy Regulatory Authority); Statistics: Danmarks Statistik; Geology: GEUS (Geological Survey of Denmark and Greenland); Environment: Miljøstyrelsen (Danish EPA); Weather: DMI (Danish Meteorological Institute); Cyber: CFCS (Center for Cybersikkerhed). Energy transition: World leader in offshore wind (50%+ generation target), hydrogen strategy (Green Fuels for Denmark, HySynergy projects), phase-out coal by 2030, district heating decarbonization.</li>
+</ul>
+
+<h2>2. Structural Framework — 95 Variables Retained</h2>
+
+<p>All 95 SSI v4.0.2 variables are mapped to Danish data sources. Administrative structure uses <strong>5 Regioner (regions, 2019 reform)</strong> as primary units, with 98 Kommuner (municipalities) as lower tiers. Bidding zones: DK1 (Jutland + Funen, synchronous with Continental Europe UCTE), DK2 (Zealand + islands, synchronous with Nordic Nordel system). Substations prefix: <strong>DK_</strong></p>
+
+<table>
+<thead><tr><th>Component</th><th>Variables</th><th>Primary Data Source</th><th>Danish Institution</th></tr></thead>
+<tbody>
+<tr><td><strong>A — Resilience</strong></td><td>20</td><td>Transmission system topology, redundancy, major interconnects (11: Norway via Skagerrak 1-4 HVDC 1.7 GW, Sweden via Øresund AC + Konti-Skan HVDC ~2 GW, Germany via multiple AC + Kriegers Flak Combined Grid Solution HVDC, Netherlands via COBRAcable HVDC 700 MW, UK via Viking Link HVDC 1.4 GW), EHV/HV network, HVDC/AC link reliability</td><td>Energinet dispatch data; Forsyningstilsynet annual reports; network maps</td></tr>
+<tr><td><strong>B — Grid Telemetry</strong></td><td>19</td><td>Equipment condition, transformer age, oil analysis, substation inventory, coastal corrosion monitoring (C2–C4 zones), storm damage protection measures, wind farm interconnect status</td><td>Energinet operational logs; Forsyningstilsynet compliance reports; utility asset registries</td></tr>
+<tr><td><strong>C — Socio-Economic</strong></td><td>9</td><td>Population, income, employment, regional development, energy intensity (district heating integration >60%, industrial food/pharma, brewing), wind industry workforce, renewable technology manufacturing</td><td>Danmarks Statistik Census 2024; regional offices; Kommune development surveys; district heating operator data</td></tr>
+<tr><td><strong>D — Environmental</strong></td><td>7</td><td>Seismic hazard (negligible), North Sea winter storms, storm surge risk, coastal erosion, sea level rise, wind resource variability, flooding in low-lying areas (west Jutland)</td><td>GEUS (Geological Survey); DMI (Meteorological Institute); Miljøstyrelsen; flood monitoring network; coastal agencies</td></tr>
+<tr><td><strong>E — Energy System</strong></td><td>8</td><td>DER (growing solar ~10-15%), EV charging (emerging), grid stability, wind generation (offshore + onshore major), renewable penetration (50%+), DSO data, CHP/district heating dispatch</td><td>Energinet open data; Forsyningstilsynet statistics; DSO operator records; wind plant data; CHP operator dispatch</td></tr>
+<tr><td><strong>F — Markov Input</strong></td><td>12</td><td>Maintenance records, failure rates, storm damage history (North Sea), coastal erosion damage, wind farm outage data, district heating system disruption, grid restoration time</td><td>Energinet operational logs; Forsyningstilsynet filings; DSO maintenance data; DMI incident reports; coastal monitoring data</td></tr>
+<tr><td><strong>G — Modifiers</strong></td><td>3</td><td>CAIDI, grid capacity margins, system losses, reserve margins, interconnect stability, cross-border flow patterns (highly variable with wind ramps)</td><td>Energinet monthly reports; Forsyningstilsynet performance indicators; Nord Pool energy market data</td></tr>
+<tr><td><strong>H — Seismic & Hazards</strong></td><td>7</td><td>PGA maps (negligible), North Sea/Baltic storm intensity maps, storm surge hazard mapping, coastal erosion risk, wind resource forecast, flooding hazard, sea level rise projections</td><td>GEUS seismic/hazard data (minimal); DMI storm/wind monitoring; Miljøstyrelsen flood/coastal monitoring; ESA satellite coastal change detection</td></tr>
+<tr><td><strong>I — Markov Output</strong></td><td>7</td><td>Risk classifications, criticality projections, regional resilience ratings, transition rates</td><td>Derived from F, H via CIGRÉ TB 761</td></tr>
+<tr><td><strong>ID — Keys</strong></td><td>3</td><td>Substation ID, Region/Kommune, voltage class</td><td>Energinet registry; OSM; Danish geodetic data</td></tr>
+</tbody>
+</table>
+
+<h2>3. Seismic Calibration — Extremely Stable Continental Platform with Minimal Activity</h2>
+
+<p>Denmark, situated on the stable continental platform of northern Europe, experiences essentially zero natural seismic activity. The country has no significant seismicity, no mining-induced earthquakes, and no postglacial rebound effects (unlike far northern Scandinavia). This creates an exceptionally seismically stable regime requiring minimal seismic design factors—among the safest regions globally for power infrastructure:</p>
+
+<table class="coefficient-table">
+<tr><th>Parameter</th><th>Value</th><th>Zone</th><th>Rationale</th></tr>
+<tr><td><strong>R6b α (sensitivity)</strong></td><td class="num">0.05</td><td>Entire country</td><td>Denmark's natural PGA &lt;0.005g across all regions. Extremely stable continental platform, exceptional crustal stability. No amplification needed. α=0.05 reflects negligible seismic hazard, lower than Norway/Sweden.</td></tr>
+<tr><td><strong>α_rebound</strong></td><td class="num">0.00</td><td>N/A (no postglacial rebound in Denmark)</td><td>Unlike far northern Norway/Sweden, Denmark experiences no significant postglacial rebound. Land stability uniform across country.</td></tr>
+<tr><td><strong>α_mining</strong></td><td class="num">0.00</td><td>N/A (no mining affecting grid)</td><td>Denmark has no hard rock mining, coal mining, or quarrying affecting transmission infrastructure. Seismic risk zero.</td></tr>
+<tr><td><strong>PGA_ref (baseline)</strong></td><td class="num">0.005g</td><td>Stable zones (entire Denmark)</td><td>Denmark's baseline natural seismic PGA (~0.005g) exceptionally low globally, reflecting crustal stability.</td></tr>
+<tr><td><strong>Cap (max amplifier)</strong></td><td class="num">1.01</td><td>All zones</td><td>Denmark's seismic hazard so minimal that cap = 1.01 (effectively no amplification). Globally one of safest regions for power infrastructure seismic design.</td></tr>
+<tr><td><strong>Seismic zones</strong></td><td>1</td><td>—</td><td><strong>Zone 1:</strong> Entire Denmark (PGA &lt;0.005g, uniform stability across all regions). No Zone 2 or Zone 3 (no hazard gradient).</td></tr>
+</tbody>
+</table>
+
+<div class="calibration-note">
+<strong>Seismic Formula for Denmark:</strong><br>
+R6_seismic = clip(1.0 + α × max(0, PGA − PGA_ref), 1.0, 1.01)<br>
+where α = 0.05 (extremely stable), PGA_ref = 0.005g, clip range [1.0, 1.01]<br>
+<strong>Impact:</strong> All substations → 1.00–1.01× (no amplification). Denmark's seismic component negligible globally. Dominates risk assessment are coastal hazards (North Sea storms, storm surge, coastal erosion, sea level rise) rather than earthquakes.
+</div>
+
+<h2>4. Corrosion Classification — North Sea Coastal Exposure + Interior Shelter</h2>
+
+<p>Denmark's unique island geography creates distinct corrosion zones. North Sea west coast (Esbjerg, Hvide Sande, Thyborøn in Jutland) experiences severe C4 salt spray corrosion, the most aggressive maritime environment in Denmark. East Jutland coast and Funen coastline experience moderate C3 maritime corrosion. Interior regions (south Zealand, Lolland-Falster, central Jutland) have C2 (inland maritime, low salt stress). Central Jutland interior has minimal C1 corrosion stress. Baltic exposure (east coast of Zealand) creates moderate C3 stress due to brackish water and lower salt concentration than North Sea.</p>
+
+<table class="coefficient-table">
+<tr><th>ISO 9223 Class</th><th>Environment Type</th><th>Regions</th><th>Corrosion Factor (κ)</th></tr>
+<tr><td><strong>C4</strong></td><td>Very high North Sea coastal salt spray + maritime humidity + strong Atlantic fetch winds</td><td>North Sea west coast Jutland (Esbjerg, Hvide Sande, Thyborøn area), exposed offshore substations</td><td>1.16</td></tr>
+<tr><td><strong>C3</strong></td><td>Moderate coastal + maritime, salt spray, Atlantic/Baltic exposure</td><td>East Jutland coast, Funen coast (north and south), north Zealand coast, Bornholm island, Baltic exposure zones</td><td>1.07</td></tr>
+<tr><td><strong>C2</strong></td><td>Inland maritime, low salt spray, temperate humidity, sheltered</td><td>Interior Jutland, south Zealand, Lolland-Falster islands, interior Great Belt zone, central regions</td><td>0.95</td></tr>
+<tr><td><strong>C1</strong></td><td>Interior continental, very dry, minimal corrosion stress</td><td>Central Jutland interior (Silkeborg area), interior valleys, protected inland zones</td><td>0.78</td></tr>
+</tbody>
+</table>
+
+<h2>5. Hazard Adaptation — North Sea Storms + Storm Surge + Coastal Erosion + Sea Level Rise</h2>
+
+<p>Denmark's hazard profile is dominated by maritime and coastal threats. Unlike Norway's avalanche hazard or Sweden's forestry/mining risks, Denmark faces continuous North Sea exposure, storm surge vulnerability (low-lying terrain), coastal erosion (Atlantic wave energy), and emerging sea level rise. No seismic hazard, no avalanche risk, no permafrost. Water-related hazards (flooding in low-lying west Jutland) significant but distinct from mountain-fed flooding. Wind resource variability (minute-by-minute ramps) creates grid stability challenges unique to high offshore wind systems.</p>
+
+<table class="coefficient-table">
+<tr><th>Hazard Type</th><th>Component</th><th>Data Source</th><th>Weight in Markov κ_climate</th></tr>
+<tr><td><strong>North Sea winter storms</strong></td><td>D1: Storm intensity + gust speed + frequency + Atlantic fetch</td><td>DMI (Danish Meteorological Institute) historical records + extreme weather database + North Sea monitoring; severe Atlantic exposure</td><td>0.40 (dominant in coastal regions)</td></tr>
+<tr><td><strong>Storm surge + flooding</strong></td><td>D2: Sea level rise + tidal coupling + extreme precipitation + low terrain</td><td>DMI, Miljøstyrelsen flood forecasts, coastal monitoring; west Jutland extremely vulnerable</td><td>0.25 (major threat west Jutland, emerging nationwide)</td></tr>
+<tr><td><strong>Sea level rise</strong></td><td>D3: Long-term elevation change + climate scenario modeling</td><td>DMI climate projections + GEUS coastal surveys + ESA satellite monitoring; flat terrain amplifies impact</td><td>0.15 (emerging 30-year+ timescale)</td></tr>
+<tr><td><strong>Wind loading infrastructure</strong></td><td>D4: Gust loading on transmission towers + overhead line strain</td><td>DMI wind monitoring + structural analysis; constant high wind baseline</td><td>0.10 (endemic, not extreme event)</td></tr>
+<tr><td><strong>Coastal erosion</strong></td><td>D5: North Sea/Baltic wave action + shoreline retreat + cliff collapse</td><td>DMI maritime division + coastal monitoring + satellite (ESA Copernicus); multi-meter/year rates in exposed areas</td><td>0.10 (substation relocation risk in century timescale)</td></tr>
+</tbody>
+</table>
+
+<div class="highlight-box">
+<strong>Markov Climate Shift Matrix for Denmark:</strong><br>
+κ_climate = 1.0 + max(0.40 × north_sea_storm_frequency, 0.25 × storm_surge_risk, 0.15 × sea_level_rise_stress, 0.10 × wind_loading, 0.10 × coastal_erosion_stress)<br>
+<strong>Interpretation:</strong> North Sea winter storms dominant coastal regions (west Jutland particularly vulnerable). Storm surge + sea level rise emerging nationwide threat, especially low-lying Zealand + Lolland-Falster. Wind loading endemic but not acute. Coastal erosion long-term risk. NO AVALANCHE, NO PERMAFROST, NO SEISMIC hazards (unlike Norway/far northern Sweden). Maritime hazards fundamentally different from Nordic systems—flat terrain amplifies surge/flood risk.
+</div>
+
+<h2>6. Flat Terrain & Coastal Vulnerability — Zero Elevation Relief + Storm Surge Exposure</h2>
+
+<p>Denmark is exceptionally flat (highest point Møllehøj 170.86m), with mean elevation ~0–50m across most of country. West Jutland (Esbjerg area) and Lolland-Falster islands extremely low-lying (0–5m elevation). This creates unique vulnerability to storm surge, sea level rise, and coastal flooding—unlike Norway's fjord-protected valleys or Sweden's higher central plateau. Flat terrain also means no topographic amplification of wind, but constant moderate-to-strong winds endemic to North Sea exposure. Substation foundation design must account for soft clay/sand soils (no bedrock) and potential flooding/groundwater stress.</p>
+
+<div class="calibration-note">
+<strong>Coastal Vulnerability & Terrain Elevation Modifiers:</strong><br>
+Applied to R6 (hazard) and foundation design factors for substations in flood/surge-prone areas:<br>
+κ_surge = 1.00 (inland, >10m elevation)<br>
+κ_surge = 1.05–1.10 (coastal, 5–10m elevation)<br>
+κ_surge = 1.15–1.25 (low-lying coast/island, &lt;5m elevation, west Jutland, Lolland-Falster)<br>
+κ_foundation = 1.02–1.08 (soft soil subsidence risk, clay-dominated, groundwater stress)<br>
+<strong>Critical regions:</strong> West Jutland coast (Esbjerg, Hvide Sande, Thyborøn), Lolland-Falster islands, low-lying Zealand areas. Sea level rise (0.5–1.5m by 2100 per IPCC scenarios) will progressively shift more substations into higher-risk surge zones. Soft soil foundation monitoring critical for long-term asset integrity.
+</div>
+
+<h2>7. Wind Resource Variability & Renewable Integration — 50%+ Offshore Wind + Real-Time Balancing</h2>
+
+<p>Denmark's energy system is fundamentally dependent on wind (50%+ generation target via 12+ GW offshore capacity by 2030). Unlike Norway's predictable multi-hour hydro ramps or Sweden's stable nuclear baseload, Denmark's generation exhibits minute-by-minute variability (wind ramps of ±1 GW/minute during squalls). This creates unique grid stability challenges requiring: (1) rapid frequency/voltage correction via interconnects (imports from Nordic hydro during calm periods); (2) real-time balancing via CHP gas plants; (3) district heating load shifting; (4) grid strength maintenance (synchronous condensers or HVDC converters). This is fundamentally different from Nordic systems and drives elevated T (transition) and V (voltage) component weights.</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Offshore wind dominance:</strong> κ_wind = 0.50+ (Horns Rev 1/2/3, Anholt, Kriegers Flak existing; energy islands + Crown Energy Island planned expanding to 12+ GW by 2030). North Sea winter storms actually increase generation (higher wind speeds), but create grid stress (frequency swings, ramp events).</li>
+  <li><strong>Onshore wind:</strong> ~8–10 GW planned (Jutland interior, central regions). Less intermittency than offshore due to sheltering, but lower capacity factors.</li>
+  <li><strong>Solar PV:</strong> ~10–15% penetration (growing, flat terrain ideal for utility-scale ground-mounted arrays). Less variable than wind (predictable daily/seasonal pattern); combines well with wind (wind peaks winter, solar peaks summer).</li>
+  <li><strong>Biomass/CHP:</strong> ~15–20% (district heating integration, waste-to-energy plants, straw burning). District heating provides unique load flexibility—CHP plants can modulate output 0–100% in seconds, supporting wind ramps.</li>
+  <li><strong>Gas backup:</strong> ~10% (declining, LNG flexibility, phase-out by ~2035). Rapid-start gas plants (CCGT) critical for calm-period imports to cover wind shortfalls.</li>
+  <li><strong>Import/Export capacity:</strong> 11+ major HVDC/AC interconnects absolutely critical. System designed to import ~5–8 GW during calm periods (Nordic hydro, German coal), export ~10+ GW during strong winds (renewable-heavy periods).</li>
+</ul>
+
+<h2>8. District Heating Integration — CHP Coupled Load Flexibility (>60% of Households)</h2>
+
+<p>Denmark is globally unique in district heating penetration: >60% of households connected to centralized CHP (combined heat and power) district heating networks. This provides critical grid balancing capability: CHP plants can modulate electricity output in seconds (while maintaining heat supply) to follow wind ramps and frequency swings. Unlike Norway's hydropower or Sweden's nuclear, Denmark's CHP provides rapid grid support specifically designed for wind integration. District heating also enables thermal storage (insulated tank systems) at customers, providing flexible load that shifts demand temporally. This integration is not captured in standard grid analysis and creates unique resilience pattern (grid stress during simultaneous high-wind generation + low heating demand, e.g., spring warm spells).</p>
+
+<div class="calibration-note">
+<strong>CHP/District Heating Grid Coupling Modifier (κ_chp):</strong><br>
+Applied to V (voltage) and T (transition) components for substations serving district heating networks:<br>
+κ_chp = 0.85–0.90 (in CHP-served zones, increased frequency support reduces voltage/transition risk)<br>
+κ_chp = 1.00 (baseline, non-CHP zones)<br>
+κ_chp_mismatch = 1.10–1.20 (during spring/fall shoulder seasons when heating demand collapses but wind remains strong; CHP cannot reduce output without local thermal load)<br>
+<strong>Critical interpretation:</strong> CHP provides resilience during winter storms (high wind + high heat demand → full output). Creates vulnerability during shoulder seasons (wind peaks, heating demand drops, CHP oversupply → grid curtailment or export stress). Unique to Denmark; not comparable to Nordic systems.
+</div>
+
+<h2>9. Geographic Profile — Island Grid Topology with North Sea Exposure + Flat Terrain + Maximum Interconnection</h2>
+
+<p>Denmark spans ~43,000 km² across island topology: Zealand (largest, 7,286 km², contains Copenhagen metro ~2.5 million), Funen (3,481 km²), major islands (Bornholm, Lolland, Falster), plus ~7,000 islands &lt;5 hectares. Transmission grid organized into two synchronous zones (DK1, DK2) reflecting distinct electrical characteristics, with 11+ major HVDC/AC interconnects to neighboring systems. Highest population density in Northern Europe (relative to energy). Flat terrain (mean elevation 0–50m) with coastal vulnerability dominance over any mountain/forest/seismic factors:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>DK1 — West Denmark (Jutland + Funen, ~24,000 km²):</strong> Synchronous with Continental Europe (UCTE). North Sea exposure (west coast C4 corrosion, severe storms). Major offshore wind (Horns Rev, Anholt, planned energy islands). Agricultural hinterland. Esbjerg energy hub (LNG, interconnects). κ_thermal = 0.98 (mild maritime temperate), κ_winter = 0.40 (North Sea dominance, severe), κ_surge = 1.15 (west coast exposed, low elevation). Interconnects to Germany (multiple AC + Kriegers Flak HVDC), Norway (Skagerrak 1-4 HVDC), Sweden (Konti-Skan HVDC partial link). Corrosion C3–C4 coastal, C2 interior.</li>
+  <li><strong>DK2 — East Denmark (Zealand + islands, ~9,000 km²):</strong> Synchronous with Nordic Nordel system (via Sweden). Copenhagen metropolitan area (largest load center ~1.5 GWe peak). Kriegers Flak offshore wind (shared with Germany). Baltic + Øresund maritime exposure (moderate C3). Soft soil (clay), groundwater risk. κ_thermal = 0.98, κ_winter = 0.35 (coastal but less severe than west), κ_surge = 1.10 (low elevation, flood-prone). Interconnects to Sweden (Øresund AC, Konti-Skan HVDC), Germany (Kriegers Flak Combined Grid Solution HVDC), UK (Viking Link HVDC 1.4 GW), Netherlands (COBRAcable HVDC 700 MW). Corrosion C2–C3. Bornholm island (separate grid, test bed for energy island concept, isolated microgrid resilience focus).</li>
+</ul>
+
+<div class="calibration-note">
+<strong>Regional Temperature, Storm, Surge & Corrosion (κ_thermal, κ_winter, κ_surge, κ_corrosion):</strong><br>
+Equipment thermal life + maritime/surge resilience modulated by regional climate and environmental stress. No avalanche, no permafrost, no elevation relief. Flat terrain amplifies surge/flood risk; North Sea exposure dominates west DK1.<br>
+<strong>DK1 (West Denmark/Jutland):</strong> κ_thermal = 0.98, κ_winter = 0.40, κ_surge = 1.15–1.25 (low elevation west coast), κ_corrosion = 1.16 (C4 coast) / 0.95 (inland C2)<br>
+<strong>DK2 (East Denmark/Zealand):</strong> κ_thermal = 0.98, κ_winter = 0.35, κ_surge = 1.10 (moderate elevation, soft soil), κ_corrosion = 1.07 (C3 coast) / 0.95 (interior C2)<br>
+North Sea exposure + storm surge vulnerability + flat terrain + maritime corrosion dominance. NO avalanche, NO mountain hazards, NO seismic. UNIQUE PROFILE: coastal/maritime dominance with extreme interconnection (11+ HVDC/AC links).
+</div>
+
+<h2>10. Energy System — Offshore Wind Absolute Dominance (50%+) + NO NUCLEAR + CHP/District Heating + Flexible Gas</h2>
+
+<p>Denmark's energy system represents a global pilot for high-renewable integration: ~50%+ wind (world leader in offshore penetration), ~10–15% solar (growing), ~15–20% CHP/biomass (district heating coupling), ~10% gas (declining, phase-out target ~2035), ZERO nuclear capacity, NO coal by 2030. This combination creates fundamental system characteristics: (1) generation varies ±30–40% day-to-day based on wind patterns; (2) system requires imports during calm periods (hydro from Nordic, coal/gas from Germany); (3) CHP provides rapid balancing (district heating coupling); (4) 11+ interconnects provide resilience + export capability; (5) climate change (changing wind patterns, altered precipitation) poses challenges to Nordic hydro availability (Denmark's primary import source during calm periods):</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Offshore wind:</strong> ~6.5 GW installed (Horns Rev 1/2/3, Anholt, Kriegers Flak, Bornholm Offshore). Expanding to 12+ GW by 2030 via energy islands + Crown Energy Island + additional offshore farms (Sørlige Nordsjø expansion, Utsira expansion, Dogger Bank expansion). North Sea winter storms create high generation (grid stress, frequency swings) + frequent ramp events. Lowest capacity factor in northern Europe (wind sheltering from continent) but highest relative penetration.</li>
+  <li><strong>Onshore wind:</strong> ~8–10 GW planned (Jutland interior, central regions, less variable than offshore). Capacity factor 25–35% (lower than offshore 40–50%).</li>
+  <li><strong>Solar PV:</strong> ~10–15% (growing rapidly, flat terrain ideal for ground-mounted arrays, 300+ MW/year installation rate). Seasonal complementarity with winter-dominant wind.</li>
+  <li><strong>CHP/Biomass:</strong> ~15–20% (district heating integration, straw burning, waste-to-energy, industrial heat recovery). ~50 large CHP plants (typically 50–200 MWe each), provide rapid load following for wind ramps.</li>
+  <li><strong>Gas:</strong> ~10% (declining, rapid-start CCGT for calm periods, LNG flexibility, phase-out by ~2035). Serves as backup during multi-day calm periods (anticyclonic patterns, summer highs).</li>
+  <li><strong>Nuclear:</strong> 0% — Denmark has NEVER built a commercial nuclear plant (Risø research reactor decommissioned 2000) and has strong political opposition to nuclear. NO nuclear decommissioning concerns. FUNDAMENTAL DIFFERENTIATOR from Sweden.</li>
+  <li><strong>Import/Export capacity:</strong> ESSENTIAL INFRASTRUCTURE. 11+ interconnects: Norway (Skagerrak 1-4 HVDC 1.7 GW total), Sweden (Øresund AC ~1.2 GW, Konti-Skan HVDC ~1 GW, total ~2 GW), Germany (multiple AC lines + Kriegers Flak Combined Grid Solution HVDC, total ~6+ GW), Netherlands (COBRAcable HVDC 700 MW), UK (Viking Link HVDC 1.4 GW). System designed to import ~5–8 GW during 3-day+ calm periods, export ~10–15 GW during storm periods (renewable surplus).</li>
+  <li><strong>Grid stability:</strong> Wind provides minimal inertia. Frequency regulation via: (1) Nordic hydro (frequency support from interconnects); (2) CHP modulation (seconds response); (3) Synthetic inertia from HVDC converters (emerging); (4) battery storage (growth target 2–5 GW by 2035). Energinet implementing minimum synchronous generation + synthetic inertia requirements. Grid strength maintenance critical for high offshore wind penetration.</li>
+</ul>
+
+<h2>11. Renewable Integration & Power-to-X Strategy</h2>
+
+<p>Denmark is balancing rapid renewable growth with sector coupling and emerging hydrogen economy:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+  <li><strong>Offshore wind expansion (12+ GW by 2030):</strong> Energy islands (20+ km offshore) with 100+ turbine clusters. Requires new HVDC transmission infrastructure, power-to-X facilities (hydrogen electrolysis, synthetic fuels). Coastal substations (especially DK1 west, DK2 east) will face major voltage/frequency stress. Storm interaction with offshore forecasting creates unique ramp-rate challenges. Arctic-like conditions in North Sea during winter drive specialized equipment ratings.</li>
+  <li><strong>Onshore wind (8–10 GW):</strong> Distributed across Jutland interior, central regions. Grid integration via 110 kV/132 kV distribution network. Lower intermittency than offshore; combines well with solar.</li>
+  <li><strong>Solar expansion (10–15%):</strong> Ground-mounted utility-scale (Denmark Flatland ideal), distributed rooftop (cities). Predictable daily/seasonal variability; growing rapidly (~300+ MW/year). Combines well with winter-dominant wind (summer solar peaks, winter wind peaks).</li>
+  <li><strong>Power-to-X (hydrogen/synthetic fuels):</strong> Green Fuels for Denmark program, HySynergy projects targeting 1–3 GW hydrogen electrolysis capacity by 2030 (cliff-side locations at offshore wind hubs). Emerging industrial demand (~100–300 MW by 2035) at specific coastal locations. Grid stability implications for concentrated load nodes + frequency support from fuel production process.</li>
+  <li><strong>Battery storage:</strong> Emerging (currently &lt;100 MW); planned expansion to 2–5 GW by 2035 to smooth wind/solar variability and support frequency regulation. Storage interconnects at wind hubs (west DK1, offshore) and demand centers (Copenhagen ~800 MW demand, Aarhus ~400 MW).</li>
+  <li><strong>EV charging:</strong> Projected 150–300 MW additional load by 2035 (concentrated in Copenhagen metro ~120 MW, Aarhus ~50 MW, Odense ~30 MW). Smart charging with time-of-use tariffs; vehicle-to-grid (V2G) emerging capability. T1 (grid stability) amplified in metropolitan substations during peak charging.</li>
+  <li><strong>District heating decarbonization:</strong> CHP plants transitioning from gas to biomass/waste/heat pump integration. Large heat pumps (10–50 MW each) emerging in major district heating networks, creating new electrification load. Coupling with wind via real-time market signals.</li>
+  <li><strong>Microgrid resilience:</strong> Bornholm island planning full islanding capability (local offshore wind + storage) for energy independence. Test bed for isolated grid operation.</li>
+</ul>
+
+<h2>12. Administrative & Institutional Framework</h2>
+
+<table>
+<thead><tr><th>Role</th><th>Nordic Equivalent</th><th>Danish Institution</th><th>Data Contribution</th></tr></thead>
+<tbody>
+<tr><td><strong>Grid Operator</strong></td><td>Swedish: Svenska kraftnät, Norwegian: Statnett</td><td>Energinet (TSO, state-owned, electricity + gas)</td><td>Hourly dispatch, Nord Pool integration, transmission flows, system adequacy, SCADA telemetry, EHV substation registry, bidding zone operations (DK1–DK2), HVDC interconnect management (11 major links to NO/SE/DE/NL/UK)</td></tr>
+<tr><td><strong>Regulator</strong></td><td>Swedish: Ei, Norwegian: NVE/RME</td><td>Forsyningstilsynet (Danish Energy Regulatory Authority)</td><td>Tariff regulation, performance standards, market oversight, environmental compliance, renewable integration requirements, offshore wind licensing, power-to-X framework</td></tr>
+<tr><td><strong>Statistics</strong></td><td>Swedish: SCB, Norwegian: SSB</td><td>Danmarks Statistik</td><td>Census 2024, regional demographics (Region-level), employment, income, municipal data, energy poverty metrics, district heating penetration, renewable technology employment</td></tr>
+<tr><td><strong>Weather & Flood</strong></td><td>Swedish: SMHI, Norwegian: MET</td><td>DMI (Danish Meteorological Institute)</td><td>Temperature, rainfall, wind, extreme weather alerts (North Sea storms, Atlantic low patterns), flood forecasts, drought indices, wind resource assessment, storm surge forecasting, coastal wave data</td></tr>
+<tr><td><strong>Geology/Seismic</strong></td><td>Swedish: SGU, Norwegian: NGU</td><td>GEUS (Geological Survey of Denmark and Greenland)</td><td>Geological mapping, soil data (clay/sand/soft ground focus), subsidence monitoring, hazard maps (flooding, coastal erosion), seismic data (minimal), ground stability assessment</td></tr>
+<tr><td><strong>Environment</strong></td><td>Swedish: Naturvårdsverket, Norwegian: Miljødirektoratet</td><td>Miljøstyrelsen (Danish EPA)</td><td>Air quality, water quality, environmental impact assessments, flood hazard mapping, wetland inventory, climate monitoring, coastal erosion tracking, sea level rise projections, offshore wind environmental compliance</td></tr>
+<tr><td><strong>Cyber Security</strong></td><td>Swedish: MSB, Norwegian: NSM</td><td>CFCS (Center for Cybersikkerhed)</td><td>Cyber threat monitoring, critical infrastructure protection, SCADA security oversight, Nordic cybersecurity cooperation, offshore wind farm cyber protection</td></tr>
+<tr><td><strong>Land Use/Geodesy</strong></td><td>Swedish: Lantmäteriet, Norwegian: Kartverket</td><td>Kortforsyningen (Danish Geodetic Authority)</td><td>Geodetic data, land use mapping, spatial planning, cadastral records, transmission corridor zoning, coastal baseline mapping, digital elevation (minimal relief), soil type mapping</td></tr>
+<tr><td><strong>District Heating</strong></td><td>—</td><td>Danish District Heating Association (KKIK) + individual operator networks (Ørsted, Viegand Maagøe, Høje-Tåstrup, etc.)</td><td>CHP dispatch data, real-time load flexibility, thermal storage status, grid support capability, district heating coverage by Kommune</td></tr>
+<tr><td><strong>DSO Operators (~40 total)</strong></td><td>—</td><td>RADIUS, N1, Cerius, NOE, KONSTANT, Energi Fyn, Vilsted El-Selskab, Aarhus Vand og Energi, and ~30+ municipal operators</td><td>Local distribution data, customer metrics, outage statistics, DER penetration (solar), corrosion/storm damage reports, EV charging load forecasts</td></tr>
+<tr><td><strong>Wind Industry</strong></td><td>—</td><td>Ørsted, Vattenfall, Statkraft, Crown Energy, Copenhagen Infrastructure Partners, and others</td><td>Wind farm data, generation forecasts, SCADA status, maintenance schedules, power-to-X facility planning</td></tr>
+<tr><td><strong>Open Mapping</strong></td><td>—</td><td>OpenStreetMap</td><td>Power infrastructure, transmission lines, substation locations, island/fjord/coastline terrain, wind farm locations</td></tr>
+<tr><td><strong>Copernicus (ESA)</strong></td><td>—</td><td>ESA + Danish research institutions (DTU, Aarhus University, GEUS, DMI)</td><td>ERA5 weather data, CMIP6 climate projections, satellite imagery (flood/storm surge/coastal change monitoring), wind resource assessment, coastal erosion tracking via SAR</td></tr>
+</tbody>
+</table>
+
+<h2>13. Component Weights — 6-Component Architecture Preserved with Wind & Coastal Emphasis</h2>
+
+<p>The SSI v4.0.2 framework maintains the standard 6-component weighting, adapted for Denmark's risk profile with emphasis on environmental/climate hazards (North Sea storms, storm surge, coastal erosion, sea level rise) and ZERO seismic weight (exceptional stability). Wind variability and CHP/grid balance dominance drive risk assessment. Condition component reflects maritime corrosion + coastal flood vulnerability. Insulation/climate component heavily weighted for North Sea salt spray corrosion + wind loading + storm surge/flooding. Voltage/transition components elevated due to wind ramp events + interconnect stress. Energy component focused on renewable variability + import/export cycles + CHP dispatch:</p>
+
+<table class="coefficient-table">
+<tr><th>Component</th><th>Weight</th><th>Denmark-Specific Focus</th></tr>
+<tr><td><strong>C (Condition)</strong></td><td class="num">0.30</td><td>Transformer age, condition state, maintenance quality. Denmark's transmission grid modernized (post-1990s investment, ongoing smart grid upgrades). Coastal equipment (DK1 west, DK2 coast) requires intensive corrosion damage assessment. Flood-prone substations (west Jutland, Lolland-Falster) require foundation/groundwater monitoring. Soft soil subsidence (clay/sand) requires structural inspection. Wind farm integration equipment (power electronics, HVDC converters at offshore substations) requires condition tracking. CHP/district heating substations require dual circuit integrity monitoring.</td></tr>
+<tr><td><strong>V (Voltage)</strong></td><td class="num">0.10</td><td>Voltage stress, loading ratio, VoLL. Copenhagen metropolitan demand concentration (~1.5 GWe peak, 2.5M population) + industrial loads (pharma, brewing, food processing). DK1 load center (Aarhus ~400 MW demand). DK1-DK2 decoupling (different synchronous zones, electrical stress at interconnect). Offshore wind generation (12+ GW) must couple through coastal substations (voltage stress during high-wind, low-load periods). CHP plant dispatch modulation creates voltage swings during ramp events. Emerging EV load (150–300 MW by 2035) creates metropolitan voltage stress. Solar generation (distributed rooftop) creates reverse power flow during midday peak solar + low load periods (spring/fall shoulder). Interconnect flows to Sweden/Germany/UK/Netherlands couple Danish voltage to European grid (frequency swings imported).</td></tr>
+<tr><td><strong>I (Insulation/Climate)</strong></td><td class="num">0.25</td><td>Insulation climate stress, winter storm damage, North Sea corrosion aging, flooding/surge mechanical stress. Elevated weight reflects dominant coastal/maritime hazards + North Sea salt spray + storm loading + flood exposure. IRI snow/ice/cold/wind/salt spray + flooding mechanical stress components critical. Thermal stress κ_thermal [0.98] baseline (mild maritime, no extreme preservation like Arctic). Wind loading endemic (transmission lines + tower design require North Sea wind design standards). Maritime corrosion (C2–C4) in coastal zones (DK1 west C4 severe, DK2 coast C3) accelerates insulation aging dramatically. Storm surge + flooding mechanical stress (κ_surge 1.10–1.25) critical in low-lying zones. Winter storm impact loads create transmission line/tower fatigue acceleration (ice shedding + wind vortex dynamics). Soft soil saturation (clay-dominated) during flooding creates foundation moisture + insulation moisture ingress risk.</td></tr>
+<tr><td><strong>E (Environment)</strong></td><td class="num">0.10</td><td>Environmental sensitivity, wind resource quality, storm surge/flood risk, corrosion class (C1–C4), maritime salt spray pressure, soil subsidence. Denmark's clean air (industrial emissions minimal relative to North Sea maritime salt) provides minimal corrosion offset. Regional climate (maritime temperate) + North Sea exposure drives corrosion factor κ_corrosion [0.78–1.16] (highest range globally). Wind resource quality (7–8 m/s average offshore, 5–6 m/s onshore, highly variable daily) is critical environmental factor determining generation adequacy. Coastal erosion + sea level rise emerging long-term environmental factors (0.5–1.5m rise by 2100). Soil type (clay-dominated western regions, sand/gravel eastern) affects foundation stability + flood groundwater behavior.</td></tr>
+<tr><td><strong>S (Storm/Coastal Hazard)</strong></td><td class="num">0.20</td><td>Seismic PGA (negligible, α=0.05), natural disasters (winter storms dominant), storm surge risk (emerging), sea level rise, coastal erosion, wind resource variability. Natural seismic hazard MINIMAL (α=0.05, PGA &lt;0.005g across entire country). Weight elevated due to North Sea storm dominance + storm surge vulnerability + coastal erosion + wind variability. κ_winter = 0.40 (North Sea dominance, severe gale-force, highest in west DK1), κ_surge = 1.10–1.25 (storm surge + sea level rise, flat terrain amplification), κ_wind_variability = 0.30–0.50 (minute-by-minute ramps, ±1 GW/minute during squalls). Seismic component negligible (~1.00×). Wind variability modulates S component real-time (highly volatile daily/seasonal). Storm surge risk emerging (tipping point when 1–2m rise occurs, infrastructure redesign threshold).</td></tr>
+<tr><td><strong>T (Transition)</strong></td><td class="num">0.05</td><td>DER ratio (solar ~10–15%, growing rapidly), EV load (emerging 150–300 MW by 2035), renewable integration stress (wind expansion 6.5→12+ GW critical), CHP/district heating modernization, power-to-X transition, grid modernization. Transition stress elevated compared to Norway/Sweden due to wind ramp integration (10% existing → 50%+ generation within 10 years) and CHP coupling. Focus: offshore wind transmission infrastructure (coastal HVDC hubs + submarine cables), energy island facilities (hydrogen, synthetic fuels), metropolitan EV charging (smart grid coordination), solar rooftop integration (distributed generation, reverse power flow), district heating heat pump electrification, battery storage deployment (2–5 GW), hydropower import dependency (climate change risk). T_transition_modifier [1.10–1.30] for wind integration hubs (DK1 west coast, Esbjerg energy hub), hydrogen production sites (energy islands, coastal), metropolitan electrification zones (Copenhagen, Aarhus, Odense). CHP transition from gas → biomass/heat pump creates unique facility-level stress (equipment modernization + fuel switching).</td></tr>
+</tbody>
+</table>
+
+<h2>14. Formula Summary — Denmark SSI v4.0.2</h2>
+
+<div class="formula-box">
+R = 0.30·C + 0.10·V + 0.25·I + 0.10·E + 0.20·S + 0.05·T<br><br>
+where:<br>
+C = f(transformer age, condition state, maintenance quality, coastal corrosion assessment, flood/surge damage assessment, soft soil subsidence monitoring, wind farm integration equipment condition)<br>
+V = f(voltage stress, loading ratio, VoLL, bidding zone coupling [DK1-DK2], European interconnect sensitivity, wind ramp stress, CHP dispatch variability, EV load surge, solar reverse power flow, offshore wind coupling stress)<br>
+I = f(insulation climate stress, North Sea salt spray corrosion, winter storm/wind loading/surge mechanical stress, flood moisture ingress, thermal life expectancy, moisture saturation (soft soil + flooding))<br>
+E = f(environmental sensitivity, wind resource variability, storm surge/flood risk, coastal erosion risk, corrosion class [C1–C4], maritime salt spray pressure, soil subsidence, sea level rise projection)<br>
+S = f(seismic PGA [negligible, α=0.05], winter storm intensity [κ_winter 0.40, dominant], storm surge hazard [κ_surge 1.10–1.25, low elevation amplification], sea level rise [0.5–1.5m by 2100], coastal erosion [multi-meter/year], wind variability [±30–40% daily generation swing], hydro import dependency [climate-sensitive Nordic source])<br>
+T = f(DER ratio [solar 10–15% growing], EV load [150–300 MW by 2035], offshore wind integration [6.5→12+ GW expansion], renewable penetration [50%+ generation], CHP/district heating modernization, power-to-X demand [hydrogen emerging], Nordic market stability [11 interconnects], battery storage deployment [2–5 GW], hydropower import climate risk)<br><br>
+Modifiers applied: R3_C_mult (social, metropolitan concentration), R4_F_topo (topology, 2-zone bidding structure [DK1-DK2], 11 interconnects), R6_restoration (rapid emergency load shedding capability), R6_winter_storm (North Sea gale, κ_winter=0.40 DK1), R6_surge (coastal flooding, κ_surge 1.10–1.25), R6_coastal_erosion (multi-meter/year shoreline retreat), R6_wind_variability (minute-by-minute ramps ±1 GW), R6_seismic (negligible, α=0.05), R6_hydro_import (climate-dependent Nordic supply during calm periods), R7_cyber (high-speed HVDC control, offshore wind farm cyber protection), R_interconnect (11 HVDC/AC ties to NO/SE/DE/NL/UK)<br><br>
+Band classification: Low [&lt;0.25], Medium [0.25–0.50], High [0.50–0.75], Critical [≥0.75]
+</div>
+
+<h2>15. Data Sources — 20+ Danish Institutions Mapped</h2>
+
+<p>All 95 variables have Danish equivalents. Primary sources organized by category:</p>
+
+<ul style="margin-left: 1.5rem; margin-bottom: 1.5rem;">
+  <li><strong>Grid Operations (Energinet):</strong> www.energinet.dk — hourly dispatch, Nord Pool integration, system state reports, real-time SCADA, EHV substation registry, bidding zone operations (DK1–DK2), frequency/voltage telemetry, wind/solar forecast integration, HVDC interconnect management (11 links to NO/SE/DE/NL/UK), gas network operations</li>
+  <li><strong>Regulation (Forsyningstilsynet):</strong> www.forsyningstilsynet.dk — tariff regulation, performance standards, market oversight, environmental compliance, annual reports, renewable integration requirements, offshore wind licensing, power-to-X framework, smart grid directives</li>
+  <li><strong>Statistics (Danmarks Statistik):</strong> www.dst.dk — Census 2024, Region-level demographics, employment, income, municipal data, energy poverty surveys, renewable technology employment, EV charging infrastructure census</li>
+  <li><strong>Meteorology (DMI):</strong> www.dmi.dk — weather forecasts, temperature/rainfall/wind records, extreme weather alerts (North Sea storms, Atlantic patterns), flood forecasts, wind resource assessment, coastal wave/storm surge data, long-range seasonal forecasting</li>
+  <li><strong>Geology (GEUS):</strong> www.geus.dk — geological mapping, soil data (clay/sand/subsidence), hazard maps (flooding, coastal erosion), seismic data (minimal), ground stability assessment, coastal baseline monitoring</li>
+  <li><strong>Environment (Miljøstyrelsen):</strong> www.mst.dk — air quality, water quality, environmental impact assessments, flood hazard maps, wetland inventory, climate monitoring, coastal erosion tracking, sea level rise projections, offshore wind environmental compliance</li>
+  <li><strong>Cyber Security (CFCS):</strong> www.cfcs.dk — cyber threat monitoring, critical infrastructure protection, SCADA security oversight, Nordic cybersecurity cooperation, offshore wind farm cyber protection</li>
+  <li><strong>Land Survey (Kortforsyningen):</strong> www.kortstyrelsen.dk — geodetic data, land use mapping, spatial planning, cadastral records, transmission corridor zoning, coastal baseline mapping, soil type mapping, digital elevation (minimal relief)</li>
+  <li><strong>District Heating (KKIK + operators):</strong> Danish District Heating Association — CHP dispatch data, real-time load flexibility, thermal storage status, grid support capability, district heating coverage by Kommune, fuel source tracking (gas → biomass transition)</li>
+  <li><strong>DSO Operators (~40 total):</strong> RADIUS, N1, Cerius, NOE, KONSTANT, Energi Fyn, Vilsted El-Selskab, Aarhus Vand og Energi, and ~30+ municipal operators — distribution data, customer count, outage logs, DER penetration (solar rooftop), corrosion/storm damage reports, EV charging load forecast</li>
+  <li><strong>Wind Industry (Ørsted, Vattenfall, Statkraft, Crown Energy, CIP, others):</strong> Wind farm data, generation forecasts, SCADA status, maintenance schedules, power-to-X facility planning, offshore wind capacity expansion timeline</li>
+  <li><strong>Open Mapping (OSM):</strong> OpenStreetMap — power infrastructure, transmission lines, substation locations, island/coastline terrain, wind farm locations, district heating network mapping</li>
+  <li><strong>Copernicus (ESA):</strong> ERA5 reanalysis weather, CMIP6 climate projections, satellite imagery (flood/storm surge/coastal change monitoring via Sentinel-1 SAR), wind resource assessment, coastal erosion tracking, sea level rise validation</li>
+  <li><strong>Nordic Market (Nord Pool):</strong> www.nordpoolgroup.com — price signals, Nordic power exchange data, cross-border flow patterns (11 interconnects), wind forecast integration, bidding zone price spreads (DK1 vs DK2)</li>
+</ul>
+
+<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+<p style="text-align: center; font-size: 0.85rem; color: var(--muted); margin-top: 2rem;">
+<strong>SSI v4.0.2</strong> — Complete Formula Construct (Denmark) · Ikenga Project · 2026-03-27<br>
+95 variables · Energinet transmission grid scored · 2 bidding zones (DK1–DK2) · 1 seismic zone (minimal activity) · 4 corrosion classes (C1–C4) · 20+ data sources · 5 Regioner · 98 Kommuner<br>
+Continental platform calibration with ultra-low natural seismicity (α=0.05), zero nuclear capacity (FUNDAMENTAL DIFFERENTIATOR from Sweden), NO AVALANCHE/PERMAFROST hazards, North Sea winter storm + storm surge + coastal erosion dominance (flat terrain amplifies), offshore wind absolute dominance (50%+ generation, 12+ GW by 2030), wind variability ±30–40% daily, renewable integration + CHP/district heating coupling (unique grid balance), 11 HVDC/AC interconnects (world's most interconnected island grid), and "energy bridge between Nordic hydro and European coal/gas" role in European energy system
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+{
+  "workstream": "SSI v4.23 Wave 4 — Portugal P33",
+  "priority": "P33",
+  "wave": 4,
+  "smallest_first_rank": 3,
+  "architecture": "wave_4_sweden_p32_option_b_inheritance_iberian_3_zone",
+  "scope": "WAVE_4_IBERIAN_MV_INHERITANCE_FROM_SWEDEN_P32_OPTION_B",
+  "delta": {
+    "substations_before": 3490,
+    "substations_after": 13977,
+    "substations_delta": 10487,
+    "substations_growth_pct": 300.5,
+    "lines_before": 78971,
+    "lines_after": 78971,
+    "lines_delta": 0,
+    "lines_growth_pct": 0.0,
+    "adjacency_entries": 7765
+  },
+  "convention_78_binding_15th_enforcement": {
+    "cohort_wide_enforcement_number": 15,
+    "script_class": "PORTUGUESE_PLUS_ENGLISH_PLUS_SPANISH_PLUS_MIRANDESE_4_LANGUAGE",
+    "alias_hits": 10587,
+    "cumulative_ledger_note": "Portugal alias hits add to Convention #78 BINDING cumulative ledger. Projected ~1,500-2,500 PT hits reflecting Iberian OSM operator= tagging density."
+  },
+  "convention_78_section_4bis_5_layer_3": {
+    "cohort_wide_enforcement_number": null,
+    "required": false,
+    "architectural_simplification": "single_dso_e_redes_99pct_mainland_monopoly",
+    "azores_madeira_carve_outs_via_bbox_layer_not_4bis_5": true,
+    "note": "Portugal is first Wave 4 country with §4bis.5 NOT REQUIRED. E-REDES holds ~99% mainland market share; Açores + Madeira islanded grids (EDA + EEM) resolved via bbox layer, not metropolitan geofence."
+  },
+  "discipline_36_cross_border_filter": {
+    "boundary_tolerance_km": 6.0,
+    "highest_wave_4_tolerance": true,
+    "continental_azores_madeira_bboxes_applied": true
+  },
+  "discipline_41_parity": {
+    "line_substation_ratio": 5.65,
+    "healthy_band_min": 1.5,
+    "healthy_band_max": 5.0,
+    "signature": "ABOVE_HEALTHY_BAND",
+    "baseline_pre_enhancement": 1.1,
+    "note": "Baseline 1.10 BELOW_HEALTHY_BAND — Sweden P32 Option B inheritance targeted to recover to HEALTHY_BAND via minor_line inclusion + no-voltage inference."
+  },
+  "sweden_p32_option_b_inheritance": {
+    "power_minor_line_included": true,
+    "no_voltage_lines_accepted": true,
+    "portugal_specific_line_voltage_inference_kv": {
+      "minor_line": 20.0,
+      "cable_no_voltage": 20.0,
+      "line_no_voltage": 60.0
+    },
+    "lines_voltage_inferred_count": 1768,
+    "convention_56_visibly_honest_lines": "Every voltage-inferred line carries `_vi: true` compact flag. Portugal uses 60 kV for `line no-voltage` inference (Portuguese E-REDES regional subtransmission standard) vs Nordic Sweden P32 130 kV."
+  },
+  "portugal_p33_hotfix_option_b_extended_to_subs": {
+    "extension_rationale": "Portugal P33 first-pass revealed Iberian OSM community sparse on voltage tags for BOTH lines AND substations. First-pass merger dropped 10,487 raw subs (-65.3% regression). HOTFIX extends Sweden P32 Option B pattern to substations via substation=* tag class inference.",
+    "cohort_wide_architectural_finding": "Wave 4 Option B pattern applies to BOTH lines AND subs for Iberian jurisdictions (Portugal P33 established; Spain P36 + future Iberian countries MUST inherit).",
+    "portugal_specific_sub_voltage_inference_kv": {
+      "substation_transmission": 220.0,
+      "substation_distribution": 30.0,
+      "substation_minor_distribution": 15.0,
+      "substation_traction": 25.0,
+      "power_substation_generic": 30.0
+    },
+    "subs_voltage_inferred_count": 10487,
+    "convention_56_visibly_honest_subs": "Every voltage-inferred sub carries `_vi: true` compact flag in both ssi-data.json + grid-geo.json `s` entries. Resolution layer suffixed with `_voltage_inferred` for audit traceability."
+  },
+  "resolution_layer_counts": {
+    "fallback_default_dso_voltage_inferred": 763,
+    "alias_hit_voltage_inferred": 8651,
+    "voltage_lv_default_voltage_inferred": 965,
+    "voltage_lv_default": 702,
+    "alias_hit": 1936,
+    "voltage_subtransmission": 349,
+    "rail_traction_frequency_voltage_inferred": 11,
+    "voltage_ehv": 347,
+    "voltage_hv_transmission": 57,
+    "fallback_default_dso": 43,
+    "voltage_regional_transmission": 20,
+    "voltage_hv_transmission_voltage_inferred": 7,
+    "azores_bbox_carve_out_voltage_inferred": 53,
+    "azores_bbox_carve_out": 35,
+    "madeira_bbox_carve_out_voltage_inferred": 37,
+    "madeira_bbox_carve_out": 1,
+    "_subs_voltage_inferred_total": 10487
+  },
+  "endpoint_stats": {
+    "lines_processed": 78971,
+    "lines_filtered_no_geom": 0,
+    "lines_filtered_no_voltage": 0,
+    "endpoints_matched": 70506,
+    "endpoints_unmatched": 87436,
+    "lines_voltage_inferred": 1768
+  },
+  "convention_56_partial_fetch": {
+    "partial_fetch_subs": false,
+    "partial_fetch_lines": false,
+    "failed_zones_subs": [],
+    "failed_zones_lines": []
+  },
+  "grid_spatial_index": {
+    "cell_size_deg": 0.1,
+    "cell_size_km_approx": 11,
+    "nearest_sub_radius_m": 500
+  },
+  "architectural_first_instances": [
+    "🇵🇹 FIRST Iberian Wave 4 country enhancement",
+    "FIRST cohort-wide first-Europe coal phase-out 2021 (Pego + Sines)",
+    "FIRST single-DSO monopoly architectural simplification (E-REDES 99%)",
+    "FIRST Iberian synchronous grid + MIBEL market coupling architecture",
+    "FIRST islanded archipelago dual pattern (Açores + Madeira via bbox)",
+    "FIRST Wave 4 §4bis.5 NOT REQUIRED (single-DSO simplification)",
+    "FIRST Mirandese minority language enforcement (~15,000 speakers)",
+    "Convention #78 BINDING 15th cohort-wide enforcement",
+    "5 400 kV AC cross-border interconnectors with Spain preserved",
+    "R6d_wildfire 0.90 HIGHEST cohort-wide (2017 Pedrógão Grande)"
+  ]
+}

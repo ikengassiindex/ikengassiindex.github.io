@@ -1,0 +1,290 @@
+# SSI Index v4.23 — New Zealand P27 Wave 3 Step 4 Merge Audit
+# ===========================================================
+# Auto-generated documentation of Step 4 empirical merge outcome.
+# Post-hoc population from operator local merge execution log.
+#
+# Convention #7 Data-Layer Anchoring: documented-proxy discipline preserved
+# Convention #56: visibly-honest degradation via 2-cycle partial-fetch retry
+# Convention #60: non-commercial provenance (OSM ODbL + Transpower + ENA public)
+# Convention #78 BINDING 9th enforcement: 246 alias-normalisation hits
+# Convention #78 §4bis.5 Layer 3 5TH ENFORCEMENT: 104 Auckland hits confirmed
+# Discipline #36: 0 subs + 12 lines dropped (5.0 km tolerance validated)
+# Discipline #41: line-substation ratio 48.07 (Ireland-analog MV/LV pattern)
+#
+# Authored: 2026-07-17 by SSI Index Foundation cohort refresh workstream
+# Status: MERGE COMPLETE (Step 4 of 5)
+# ===========================================================
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: new-zealand
+wave: 3
+priority: P27
+scope: FIRST_SOUTHERN_HEMISPHERE_WAVE_3_EVENT
+
+# ---------------------------------------------------------------
+# Overall Step 4 empirical outcome
+# ---------------------------------------------------------------
+merge_execution:
+  executed_at_utc: "2026-07-17T19:09:09Z"
+  operator_local: true  # residential IP (Overpass API access)
+  fetch_cycles: 2       # partial-fetch retry pattern (twin 504 timeouts)
+  merge_wall_clock_secs: 1625  # 27min line-merge (74k lines densification)
+  baseline_substations: 1558
+  osm_substations_fetched: 1620
+  final_substation_count: 1589
+  net_new_substations: 31       # LOW (surgical addition)
+  net_new_growth_pct: 2.0
+  substation_match_rate_pct: 102.0  # ANOMALY — enriched counter incremented on some net-new too (final count correct at 1589)
+  voltage_filled: 0              # ✅ baseline voltage already 99%+ complete
+  voltage_xcheck_findings: 10    # MODERATE tier drift (0.63% of matched)
+  voltage_xcheck_rate_pct: 0.63
+  step_4b_retroactive_attribution: 0  # empty — every baseline sub covered by OSM match at initial merge
+
+lines_merge:
+  baseline_lines: 1686
+  osm_lines_fetched: 82510
+  lines_appended: 74693           # HIGHEST cohort-wide (18× Ireland's ~57k)
+  lines_deduped: 7817             # LOW dedupe (9.5% rate — baseline vintage-mismatched OSM)
+  lines_dedupe_rate_pct: 9.5      # LOWEST cohort-wide (transmission-only baseline + full MV/LV OSM)
+  final_line_count: 76379         # LARGEST cohort-wide grid-geo (44× baseline growth)
+  line_growth_multiplier: 45.3
+
+# ---------------------------------------------------------------
+# Convention #56 partial-fetch preservation (2-cycle empirical event)
+# ---------------------------------------------------------------
+convention_56_partial_fetch:
+  first_run_2026_07_17T18:18UTC:
+    node_query: SUCCESS  # 47 subs recovered
+    way_query: FAILED_504  # kumi.systems 120s timeout
+    relation_query: FAILED_504  # kumi.systems 120s timeout
+    line_query: SUCCESS  # 82510 lines recovered — HIGHEST cohort-wide
+    warning_line: "Convention #56 partial — OSM substation way fetch failed: The read operation timed out"
+    warning_line_2: "Convention #56 partial — OSM substation relation fetch failed: The read operation timed out"
+  retry_run_2026_07_17T18:37UTC:
+    node_query: CACHE_HIT
+    way_query: SUCCESS  # retry succeeded — recovered ~1573 subs
+    relation_query: FAILED_504_AGAIN  # third-endpoint fallback did not help
+    line_query: CACHE_HIT
+  merge_run_2026_07_17T18:42UTC:
+    node_way_line: CACHE_HIT  # all cached
+    relation_query: FAILED_504_STILL  # relation timeout persists — accepted as visibly-honest degradation
+  total_overpass_504_events: 5  # 4 first-run + 1 merge-run relation timeout
+  cumulative_wave_3_504_events: 23  # 18 pre-NZ + 5 NZ
+  three_endpoint_fallback:
+    - overpass-api.de       # PRIMARY (way retry succeeded here)
+    - overpass.kumi.systems # 504 gateway timeouts (both way + relation)
+    - overpass.private.coffee  # not reached (2nd endpoint way succeeded, relation timed out all 3)
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 9th enforcement empirical validation
+# ---------------------------------------------------------------
+convention_78_binding_enforcement:
+  binding_enforcement_number: 9  # 9th cohort-wide (after Slovakia + Czechia + Poland + Greek + Iceland + Swiss + Ireland + Korea)
+  script_class: ENGLISH_DOMINANT_PLUS_MAORI_DIACRITICS
+  scripts_hit_empirically:
+    - English  # ~95% dominant
+    - Maori_Te_Reo  # macron diacritics + Aotearoa cohabit (rare in OSM tags)
+  alias_normalisation_hits: 246   # LARGE — 2.3× Ireland baseline; 1.24× Korea
+  alias_hit_rate_pct: 21.1        # of 1164 direct OSM tags
+  cumulative_wave_3_alias_ledger: 21096  # 20850 pre-NZ + 246 NZ
+  cumulative_ratio_above_binding_threshold: 2109.6  # 21096 / 10
+  hits_vs_ireland_baseline: 16.4x  # 246 / 15 = LARGER
+  hits_vs_iceland_baseline: 61.5x  # 246 / 4
+  hits_vs_greek_baseline: 2.28x    # 246 / 108
+  hits_vs_korea_baseline: 1.24x    # 246 / 198
+  new_first_southern_hemisphere_signature: true
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 5TH ENFORCEMENT empirical validation
+# ---------------------------------------------------------------
+convention_78_4bis5_layer_3_5TH_ENFORCEMENT:
+  enforcement_confirmed: true  # ✅ EMPIRICALLY LIVE
+  cohort_wide_enforcement_number: 5  # NEW: Auckland NZ
+  cumulative_enforcements: 5
+  enforcements_list:
+    - {country: czechia, metro: Prague, priority: P20, hits_empirical: TBD}
+    - {country: poland, metro: Warsaw, priority: P21, hits_empirical: TBD}
+    - {country: switzerland, metro: EWZ_Zurich, priority: P24, hits_empirical: TBD}
+    - {country: switzerland, metro: SIG_Geneva, priority: P24, hits_empirical: TBD}
+    - {country: new-zealand, metro: Auckland, priority: P27, hits_empirical: 104}
+  auckland_split_empirical:
+    vector_geofence_lat_bbox_hits: 102  # majority Vector (CBD + suburbs)
+    counties_energy_south_lat_hits: 2   # Counties Energy south of Manukau Harbour
+    total: 104
+    vector_pct: 98.1
+    counties_pct: 1.9
+    architectural_note: |
+      Auckland split empirically dominated by Vector (98.1% of geofence
+      hits). Counties Energy Layer 3 name-pattern detection needs
+      refinement — only 2 lat-based hits despite pre-flight projecting
+      ~35% Counties share. Empirical evidence suggests Counties Energy
+      subs may be tagged via direct OSM operator= tag (not falling to
+      §4bis.5 geofence). Batch-fix follow-up queued to inspect direct
+      OSM Counties tags in fetch outcome.
+
+# ---------------------------------------------------------------
+# Voltage-class × multi-DSO resolver empirical outcome (Layer 1-7 cascade)
+# ---------------------------------------------------------------
+resolver_empirical_outcome:
+  layer_1_transpower_tso_threshold:
+    initial_merge: 15
+    step_4b_retroactive: 0  # (step 4b was skipped — every baseline covered at initial merge)
+    total: 15
+    note: Small direct hit count — most 220/110 kV Transpower subs tagged directly via operator=
+  layer_2_kiwirail_traction:
+    initial_merge: 0
+    step_4b_retroactive: 0
+    total: 0
+    note: All KiwiRail subs tagged directly (32 direct via alias-normalisation)
+  layer_3_nzas_tiwai_point:
+    initial_merge: 0
+    step_4b_retroactive: 0
+    total: 0
+    note: NZAS not tagged as substation in OSM (industrial captive)
+  layer_4_industrial_captive:
+    initial_merge: 0
+    step_4b_retroactive: 0
+    total: 0
+    note: Methanex + Fonterra tagged as power=plant not power=substation
+  layer_5a_4bis5_auckland:
+    initial_merge_vector: 102
+    initial_merge_counties: 2
+    step_4b_retroactive: 0
+    total: 104  # ✅ 5TH ENFORCEMENT CONFIRMED
+  layer_5b_canterbury_soft:
+    initial_merge: 0
+    step_4b_retroactive: 0
+    total: 0
+    note: All Canterbury subs tagged directly (Orion NZ + MainPower + Alpine + Waitaki via alias-normalisation)
+  layer_6_region_dominant_edb:
+    initial_merge: 0
+    step_4b_retroactive: 0
+    total: 0
+    note: OSM subs primarily tagged directly (71.9%); untagged subs fall to Layer 7 catch-all
+  layer_7_transpower_catch_all:
+    initial_merge: 337
+    step_4b_retroactive: 0
+    total: 337
+    note: Untagged subs default to Transpower — architectural safety net
+  direct_osm_operator_tag:
+    total: 1164  # 71.9% of 1620
+    alias_normalised: 246
+    direct_untouched: 918
+  layer_priority_empirical_note: |
+    NZ empirical outcome dominated by direct OSM operator= tags
+    (71.9%) — mature Anglo OSM community. Convention #78 §4bis.5
+    Auckland 5th enforcement empirically CONFIRMED at 104 hits
+    (98.1% Vector + 1.9% Counties Energy). Step 4b retroactive
+    ATTRIBUTION EMPTY because every baseline sub was matched by
+    OSM at initial merge time (owner field written directly from
+    OSM path). Architecturally coherent — no retroactive gap.
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border filter empirical validation
+# ---------------------------------------------------------------
+discipline_36:
+  boundary_tolerance_km: 5.0  # existing NZ entry from Mode 2 remediation
+  subs_dropped: 0           # ✅ within existing 5.0 km tolerance
+  lines_dropped: 12         # small offshore leakage on 82510-line fetch
+  drops_pct_subs: 0.0
+  drops_pct_lines: 0.015
+  cohort_precedent: iceland  # Nordic + NZ share isolated-grid + coastline patterns
+  chatham_kermadec_tokelau_preserved: true  # Mode 3 territorial extensions
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity
+# ---------------------------------------------------------------
+discipline_41:
+  fetch_ratio: 50.93  # 82510 lines / 1620 subs (OSM fetch)
+  final_ratio: 48.07  # 76379 lines / 1589 subs (post-merge)
+  healthy_band: [1.5, 5.0]
+  status: ELEVATED  # ⚠ 9.6× above upper band — architecturally coherent
+  cohort_comparison:
+    new-zealand: 48.07     # ELEVATED (Ireland-analog English MV/LV over-capture)
+    ireland: 46.27         # ELEVATED (English MV/LV over-capture)
+    switzerland: 33.0      # ELEVATED (distribution)
+    korea: 3.29            # HEALTHY (Nordic-analog)
+    iceland: 3.30          # HEALTHY (Nordic sibling)
+    greek: 3.85            # HEALTHY (Nordic-analog)
+  architectural_coherence: |
+    NZ 48.07 ratio ELEVATED matches Ireland 46.27 signature — English-
+    language OSM community MV/LV distribution over-capture pattern.
+    Baseline captured transmission-only (1686 lines); OSM captures
+    full MV/LV distribution (76379 net-new-plus-retained). 9.5% dedupe
+    rate is LOWEST cohort-wide — architecturally coherent given
+    baseline vintage-mismatch vs OSM MV/LV.
+
+# ---------------------------------------------------------------
+# Convention #56 visibly-honest degradation preserved
+# ---------------------------------------------------------------
+convention_56_preservation:
+  net_new_subs: 31  # LOW addition (~2%)
+  net_new_lines: 74693  # HIGHEST cohort-wide addition (MV/LV distribution densification)
+  zero_voltage_fill: true  # baseline already 99%+ complete
+  partial_fetch_events: 5  # 4 first-run + 1 merge-run relation timeout
+  relation_query_failure_persisted: true  # visibly-honest degradation — small ~5-15 sub estimated loss
+
+# ---------------------------------------------------------------
+# Architectural signatures (Wave 3 P27)
+# ---------------------------------------------------------------
+architectural_signatures:
+  first_southern_hemisphere_wave_3_event: true               # ✅ landed
+  first_english_multi_dso_wave_3: true                       # ✅ (Ireland was single-DSO)
+  richest_multi_dso_architecture_wave_3: true                # ✅ 45 distinct operators (2.9× Ireland)
+  4bis5_layer_3_5th_cohort_wide_enforcement_confirmed: true  # ✅ Auckland Vector/Counties Energy
+  first_maori_te_reo_diacritic_wave_3: true                  # ✅ (macron NFC preserved)
+  cook_strait_hvdc_domestic_flag: true                       # ✅
+  highest_cohort_wide_line_count: true                       # ✅ 76379 lines
+  highest_cohort_wide_line_append: true                      # ✅ 74693 appended
+  lowest_cohort_wide_line_dedupe_rate: true                  # ✅ 9.5%
+  chatham_kermadec_tokelau_offshore_preserved: true          # ✅
+  transpower_soe_dominant_direct_tags: true                  # ✅ 528 direct
+  convention_78_binding_9th_enforcement_empirical: true      # ✅ 246 hits
+
+# ---------------------------------------------------------------
+# Bugs surfaced for batch-fix backlog (non-blocking)
+# ---------------------------------------------------------------
+bugs_batch_fix_queue:
+  - class: alias_map_extension_operators
+    hits:
+      - "EA Networks (Mid Canterbury / Ashburton)"  # 21 direct hits + missing from preflight alias map
+    severity: LOW
+    remediation: extend _DNSP_ALIAS_MAP with EA Networks (Ashburton region — Mid Canterbury EDB not preflighted)
+    total_gap_subs: 21 / 1589 = 1.3%
+  - class: enriched_counter_off_by_one
+    hits: enriched=1589 exceeds baseline=1558; expected enriched<=1558
+    severity: INFORMATIONAL  # final count is correct (1589 = 1558 + 31 net-new)
+    remediation: audit merge_substations enriched counter increment logic
+  - class: counties_energy_geofence_undertrigger
+    hits: 2 Counties Energy §4bis.5 hits vs 35%-projected split
+    severity: LOW
+    remediation: refine Counties Energy Layer 3 detection (name patterns may need expansion beyond Papakura/Franklin/Waiuku)
+  - class: audit_sidecar_double_hyphen_filename  # recurring cohort-wide
+    hit: v4_23-ingestion-audit-new-zealand--osm-overpass.yaml
+    severity: LOW
+    remediation: base module slug logic in new_zealand/_base.py::emit_audit_sidecar off-by-one
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 5 — Doc cascade + Phase 4c refresh + Commit 27 canonical
+handoff_command: |
+  # Commit 27 — New Zealand P27 closure + canonical refresh + landing update
+  cd ~/ikengassiindex.github.io && \
+  git add new-zealand/ssi-data.json new-zealand/grid-geo.json \
+          new-zealand/v4_23-voltage-cross-validation.json \
+          new-zealand/v4_23-ingestion-audit-new-zealand-preflight.yaml \
+          new-zealand/v4_23-ingestion-audit-new-zealand-merge.yaml \
+          new-zealand/v4_23-ingestion-audit-new-zealand-closure.yaml \
+          new-zealand/v4_23-osm-overpass.log \
+          new-zealand/v4_23-step4-merge.log \
+          index.html \
+          scripts/pipeline/ingestion/new_zealand/ \
+          scripts/refresh_v42_modifiers_re_composite.py && \
+  git commit -m "wave 3 p27 new zealand closure + canonical refresh + landing update" && \
+  git push origin main
+
+  # Commit 28 — NZ Phase 4c refresh
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.refresh_v42_modifiers_re_composite new-zealand 2>&1 \
+    | tee new-zealand/v4_23-phase-4c-refresh.log

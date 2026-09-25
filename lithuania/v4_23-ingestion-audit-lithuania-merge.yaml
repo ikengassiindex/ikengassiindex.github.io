@@ -1,0 +1,191 @@
+# Lithuania v4.23 Ingestion Audit — Step 4 Merge
+# ==============================================
+# Task: #236 (WAVE2-Step4 Lithuania)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: lithuania/v4_23-ingestion-audit-lithuania-preflight.yaml
+# Sibling fetch:      lithuania/v4_23-ingestion-audit-lithuania-fetch.yaml
+# Status: MERGE_COMPLETE + Step 5 alias-retighten pass
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: lithuania
+source_id: LT-C1-osm-overpass
+merged_at_utc: "2026-07-13T00:00:00Z"
+
+baseline_state:
+  ssi_data_substations: 505
+  grid_geo_substations: 506
+  grid_geo_lines: 1486
+  lines_per_substation_ratio: 2.94  # clean transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 97.4  # 492/505
+  region_coverage_pct: 100.0  # 10 counties populated
+
+merge_stats:
+  enriched: 698               # OSM subs matched existing baseline via 500m proximity
+  voltage_filled: 2           # sparse voltage gaps closed from OSM
+  net_new_substations: 4396   # OSM added 8.7× baseline — LARGEST net-new absolute in Wave 2
+  voltage_xcheck_findings: 18 # 2.6% mismatch rate on matched pairs
+  step_4b_retroactive_attribution: 19  # baseline subs without OSM neighbor
+  step_4b_breakdown:
+    Litgrid_TSO_threshold_ge_110kv: 13
+    ESO_default_state_dso_via_epso_g_holding: 6
+  lines_appended: 2496
+  lines_deduped: 2246
+
+step_5_alias_retighten_pass:
+  rationale: >
+    Post-merge alias-normalisation pass — 1 Cyrillic-script variant surfaced
+    ("ЕСО" = ESO in Russian script). Kaliningrad-adjacent OSM tagging
+    possibly by Russian-speaking contributors. Patched into _base.py::_DNSP_ALIAS_MAP
+    and normalised in-place.
+  aliases_added:
+    - "ЕСО" (Cyrillic) → "ESO"
+  subs_normalised: 1
+  final_distinct_operators: 8  # was 9 pre-retighten
+
+final_state:
+  ssi_data_substations: 4901  # 505 baseline + 4396 net-new
+  grid_geo_lines: 3982
+  lines_per_substation_ratio: 0.81  # SUB-HEAVY (opposite direction from task #182)
+  ssi_data_bytes: ~7_100_000  # 7.1 MB — largest cohort file yet in Wave 2
+  grid_geo_bytes: ~2_400_000  # 2.4 MB
+
+owner_coverage_post:
+  total: 100.0%  # 4901/4901
+  by_operator:
+    ESO: 4615                             # 94.2% — unified state DSO (via EPSO-G) + retighten
+    Litgrid: 278                          # 5.7%  — state TSO (via EPSO-G) — 400 + 330 + 110 kV backbone
+    "UAB Vėjas LT;Ignitis renewables": 2   # 0.04% — joint wind IPP + Ignitis renewables partnership
+    ESO-legacy: 2                         # 0.04% — LESTO pre-2016 legacy tag preserved for audit
+    Enefit Green: 1                       # 0.02% — Estonian renewables IPP (cross-border presence)
+    UAB Energijos Žara: 1                 # 0.02% — small renewables IPP
+    UAB SOLI LT: 1                        # 0.02% — small solar IPP
+    UAB Secundus navitas: 1               # 0.02% — small IPP
+  distinct_operators: 8
+  unresolved: 0  # 100% attribution
+  cohort_wide_significance: >
+    8 distinct operators — CLEANEST cohort-wide operator concentration
+    (99.9% concentrated in state duopoly ESO + Litgrid). Post-1994 EPSO-G
+    state-holding architecture produces the sharpest state-vs-IPP division
+    in the Wave 2 cohort. Contrast: Colombia 55 operators (unbundled market)
+    vs Lithuania 8 (state duopoly). Both are architecturally honest.
+
+voltage_split_post:
+  ehv_ge_220kv: 37              # 400 + 330 kV Litgrid backbone + LitPol Link
+  hv_100_to_219kv: 271          # 110 kV mixed Litgrid/ESO tier
+  distribution_lt_100kv: 664    # 35 + 30 + 10 + 0.4 kV ESO distribution
+  unknown: 3929                 # 80.2% — OSM MV/LV subs without voltage tags
+  voltage_coverage_pct: 19.8
+
+region_split_post:
+  baseline_counties_preserved: 505  # 100% baseline retained
+  net_new_without_region: 4396      # OSM doesn't populate county
+  region_coverage_pct: 10.3
+
+grid_geo:
+  total_km: 11376  # haversine
+  lines_per_substation: 0.81
+
+discipline_36_cross_border_filter:
+  polygon_source: lithuania/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 0
+  lines_dropped_outside_polygon: 5
+  final_state: CLEAN
+
+discipline_41_line_parity:
+  post_merge: PASS
+  substation_orphans: 0
+  line_orphans: 0
+  ratio_state: >
+    2.94 (baseline) → 0.81 (post-merge). Sub-heavy inversion reflects
+    OSM's fine-grained MV substation tagging without corresponding MV/LV
+    line tagging. Architecturally honest — not a task #182 outlier concern
+    (Norway + Israel remain sole cohort-wide outliers at 15+).
+
+convention_preservation:
+  discipline_36:
+    status: HELD
+  discipline_41:
+    status: HELD
+    ratio_direction: sub_heavy (opposite of task #182 outlier direction)
+  convention_46:
+    status: HELD
+    scope: All changes contained to lithuania/ + scripts/pipeline/ingestion/lithuania/
+  convention_56:
+    status: HELD
+    scope: >
+      2-operator monopoly is Convention #56-compliant — ESO + Litgrid
+      genuinely operate 99.9% of national grid via EPSO-G state holding.
+      Historical ESO-legacy (LESTO pre-2016) preserved distinctly for
+      audit trail. Cyrillic ЕСО variant normalised via alias-retighten
+      with original tag preserved in v43_provenance sidecar.
+  convention_60:
+    status: HELD
+    scope: OSM only — no commercial providers used.
+  convention_64:
+    status: HELD
+    scope: Grupotec + Rely + Config B / C valuation paths unaffected.
+
+architectural_pattern:
+  fallback_class: 2-operator pure state monopoly via EPSO-G holding company
+  reuse_source: israel (pure monopoly template) + greenland (single-default fallback)
+  wave_2_priority_number: 16
+  cumulative_countries_closed: 16
+  cohort_progress: >
+    Wave 1 (5 of 5): Canada + Norway + Mexico + Austria + Greenland
+    Wave 2 (11 of 5-6, +6 over-quota): Australia + Belgium + Netherlands + Chile +
+    Hungary + Luxembourg + Slovenia + Costa Rica + Israel + Colombia + Lithuania
+  fallback_classes_empirically_validated: 5
+  pure_monopoly_class_applications: 4 (Greenland + Costa Rica + Israel + Lithuania)
+
+lessons_generalised:
+  - >
+      **Baltic OSM density is unique**: Lithuania's OSM added +871% substations
+      vs baseline (505 → 4901) — LARGEST relative-growth cohort-wide.
+      Baltic OSM contributor community has mapped MV/LV distribution
+      exhaustively. Pattern likely to repeat in Latvia + Estonia (Baltic
+      Trio siblings).
+  - >
+      **Simplest 2-operator resolver validates cleanest**: Litgrid TSO
+      + ESO monopoly default produced 99.9% state-duopoly attribution
+      with only 6 tiny IPPs surviving (UAB Vėjas LT + Ignitis renewables
+      + Enefit Green + 4 smaller). Fewer operators than any other Wave 2
+      country. Reflects EPSO-G's post-1994 vertical integration.
+  - >
+      **Cyrillic Unicode alias handling**: Lithuania surfaced 1 Cyrillic
+      "ЕСО" tag from likely Kaliningrad-adjacent Russian-speaking OSM
+      contributor. NFC + case-insensitive lookup extended to catch
+      Cyrillic ↔ Latin bridging. Pattern generalises to any future country
+      with multi-script OSM community (Ukraine, Kazakhstan, other post-
+      Soviet states).
+  - >
+      **Sub-heavy line ratio (0.81) is architecturally honest**: OSM's
+      fine-grained MV substation tagging without corresponding MV/LV
+      line tagging inverts the ratio. Not a task #182 outlier concern
+      (opposite direction). Norway + Israel remain sole cohort-wide
+      line-density outliers.
+  - >
+      **Baltic Trio Feb 2025 EU synchronisation context**: 400 kV LitPol
+      Link + NordBalt HVDC captured cleanly in OSM. Cross-border 400 kV
+      tag preservation empirically validates Discipline #36 polygon +
+      100m tolerance for post-2025 grid topology.
+
+deployment_state:
+  pipeline_ready: true
+  ui_refresh_ready: true
+  register_hash_pin: 2ca50d583f43  # unchanged (methodology-invariant enrichment)
+  nn_tag_pin: v33-calibrated-scipy-20260427T074651Z
+
+auditability_chain:
+  parent_preflight: lithuania/v4_23-ingestion-audit-lithuania-preflight.yaml
+  step_2_fetch: lithuania/v4_23-ingestion-audit-lithuania-fetch.yaml
+  step_4_merge: lithuania/v4_23-ingestion-audit-lithuania-merge.yaml
+  step_5_alias_retighten: 1_sub_Cyrillic_ЕСО_to_ESO
+  commit_hash_placeholder: TBD_at_step_5_close
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: lithuania/ssi-data.json + lithuania/grid-geo.json
+
+status: READY_FOR_STEP_5

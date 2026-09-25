@@ -1,0 +1,80 @@
+# Chile v4.23 Ingestion Audit — Step 2 fetch
+# ==========================================
+# Task: #199 (WAVE2-Step2 Chile)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local OSM Overpass fetch complete
+
+meta:
+  country: chile
+  iso2: CL
+  iso3: CHL
+  wave: 2
+  step: 2
+  parent_preflight: chile/v4_23-ingestion-audit-chile-preflight.yaml
+  fetched_at_utc: "2026-07-13T16:14:07Z"
+  operator_environment: residential IP (sandbox arch)
+  wall_clock_secs: ~180  # 3 min
+
+fetch_run:
+  outcome: success
+  substations_parsed: 1042  # pre-Discipline #36 filter
+  substations_post_bounds_filter: 1034
+  lines_parsed: 4656  # pre-Discipline #36 filter
+  lines_post_bounds_filter: 4614
+  raw_bytes_fetched: 253261
+  raw_sha256: 5492969a6be5acbb6ec7c2fc25362a60f5f0db4f31ec8775c99cf0c58be9f21f
+
+  discipline_36_dropped:
+    substations: 8
+    lines: 42
+    reason: "~0.8% cross-border overshoot filtered by Discipline #36 (100m default tolerance)"
+
+owner_provenance_distribution:
+  osm_operator_tag_direct: 408  # 39.5%
+  osm_operator_tag_direct_alias_normalised: 82  # 7.9% — Chilectra/ELECDA/EMELAT/CONAFE normalised
+  region_fallback_TSO_gte110kV_majority_default_TRANSELEC: 172  # 16.6%
+  region_fallback_OHiggins_CGE: 72  # 7.0%
+  region_fallback_Antofagasta_CGE: 61  # 5.9%
+  region_fallback_Atacama_CGE: 47  # 4.5%
+  region_fallback_Valparaíso_Chilquinta: 37  # 3.6%
+  region_fallback_Biobío_CGE: 23  # 2.2%
+  region_fallback_Metropolitana_Enel: 19  # 1.8%
+  region_fallback_Ñuble_CGE: 19  # 1.8%
+  region_fallback_Los_Ríos_SAESA: 17  # 1.6%
+  region_fallback_Araucanía_Frontel: 16  # 1.5%
+  region_fallback_Coquimbo_CGE: 15  # 1.5%
+  region_fallback_Tarapacá_CGE: 15  # 1.5%
+  region_fallback_Maule_CGE: 13  # 1.3%
+  region_fallback_Los_Lagos_SAESA: 10  # 1.0%
+  region_fallback_Arica_y_Parinacota_CGE: 6  # 0.6%
+  region_fallback_Aysén_Edelaysén: 2  # 0.2%
+  total_direct_osm: 490  # 408 + 82
+  total_region_fallback: 544
+  total_unresolved: 0
+  direct_osm_pct: 47.4
+  region_fallback_pct: 52.6
+
+dnsp_alias_normalisation:
+  count_normalised_via_case_insensitive_map: 82
+  breakdown: |
+    Chilectra → Enel Distribución (pre-2018 Enel acquisition of Chilectra Chile).
+    ELECDA/EMELAT/CONAFE → CGE Distribución (subsidiary consolidation —
+    Antofagasta/Atacama/Coquimbo regional subsidiaries).
+    Grupo SAESA / SAESA Grupo → SAESA.
+    Case-insensitive lookup catches accented variants (edelaysén/Edelaysén).
+
+architectural_notes:
+  - "Fifth v4.23 fallback class VALIDATED — latitude-band region geofence works for narrow N-S countries. 16 lat-bands + Metropolitana/Valparaíso lon disambiguation resolves 100% of untagged. Zero unresolved."
+  - "TSO majority-default TRANSELEC (172 subs, ~60% market share) empirically deployed with visibly-honest provenance tag 'region_fallback_TSO_gte110kV_majority_default_transelec_60pct'."
+  - "Chile OSM tag density: 39.5% direct + 7.9% alias-normalised = 47.4% direct-tagged (better than expected for LatAm; comparable to Australia's 54.5%)."
+  - "Line ratio 4614/1034 = 4.46 (transmission + some sub-transmission)."
+
+warnings_preserved:
+  - "Discipline #36 — dropped 8 substations + 42 lines outside Chile polygon (100m default tolerance)"
+  - "Owner enrichment: 490/1034 direct OSM operator= tag (47.4%; of these 82 DNSP-alias-normalised — Chilectra/ELECDA/EMELAT/CONAFE); 544 region_jurisdiction_fallback (52.6%); 0 unresolved (Convention #56 preserved as None)"
+
+next_step: "Step 3 CLOSED (task #200 L1 connector shipped in commit d0edd3a4). Step 4 (task #201) merge execution in progress."
+
+status: STEP_2_CLOSED

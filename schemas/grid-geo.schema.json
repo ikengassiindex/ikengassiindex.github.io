@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ikengassiindex.github.io/schemas/grid-geo.schema.json",
+  "title": "SSI Index — grid-geo.json (canonical schema)",
+  "description": "Per-country grid topology: substations (dict keyed by OSM ID) and power lines (array). Canonical schema as of Phase 0a (KB §65). 29/32 countries conform exactly. Documented exceptions: denmark (additive line.n), slovenia (additive sub.r), greenland (deliberate islanded-grid alternate schema — not validated here).",
+  "type": "object",
+  "required": ["s", "l"],
+  "additionalProperties": true,
+  "properties": {
+    "s": {
+      "type": "object",
+      "description": "Substations — dict keyed by OSM ID (string).",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/substation"
+      }
+    },
+    "l": {
+      "type": "array",
+      "description": "Power lines — array of canonical line objects.",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/$defs/line"
+      }
+    },
+    "a": {
+      "type": "object",
+      "description": "Optional: adjacency lookup (substation_id → [line_id, ...]). May be empty.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"type": ["integer", "string"]}
+      }
+    }
+  },
+  "$defs": {
+    "substation": {
+      "type": "object",
+      "description": "Required: x, y coordinates. Other fields are widely-present but not always (Canada has 1 substation without n; BE/LU/NL/CZ have substations with null voltage where OSM tag was missing).",
+      "required": ["x", "y"],
+      "additionalProperties": true,
+      "properties": {
+        "x": {"type": "number", "description": "Longitude (decimal degrees)"},
+        "y": {"type": "number", "description": "Latitude (decimal degrees)"},
+        "n": {"type": ["string", "null"], "description": "Substation name (free text). May be missing (Canada) or null."},
+        "v": {"type": ["number", "null"], "description": "Max voltage in kV. null = unknown (OSM voltage tag missing); 0 = explicit zero placeholder."},
+        "r": {"type": "string", "description": "Optional: admin region code (e.g. NUTS-3 'SI041')"}
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": ["i", "p", "kv"],
+      "additionalProperties": true,
+      "properties": {
+        "i": {"type": ["integer", "string"], "description": "Line ID (sequential or OSM way ID)"},
+        "p": {
+          "type": "array",
+          "description": "Geometry — array of [lon, lat] coord pairs",
+          "minItems": 2,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {"type": "number"}
+          }
+        },
+        "kv": {"type": "number", "description": "Voltage in kV (0 = unknown)"},
+        "ss": {"type": ["integer", "string"], "description": "Start substation ID (-1 = unknown)"},
+        "se": {"type": ["integer", "string"], "description": "End substation ID (-1 = unknown)"},
+        "n": {"type": "string", "description": "Optional: line name (Denmark only currently)"}
+      }
+    }
+  }
+}

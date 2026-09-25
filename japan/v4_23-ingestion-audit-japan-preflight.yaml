@@ -1,0 +1,417 @@
+# SSI Index v4.23 — Japan P35 Wave 4 Pre-flight
+# ================================================
+# 🇯🇵 WAVE 4 P35 = FIFTH Wave 4 country 🇯🇵
+# Portugal P33 bi-directional Option B pattern INHERITED.
+# Convention #78 BINDING 17TH ENFORCEMENT (Japanese + English +
+# Ainu + Ryukyuan 4-language).
+#
+# UNIQUE cohort-wide architectural signatures:
+#   - 🌍 FIRST ISLANDED grid architecture (NO cross-border interconnectors)
+#   - 🌍 FIRST 50/60 Hz frequency split (Fossa Magna line)
+#   - 🌍 FIRST 9-regional-utility post-2020 unbundling architecture
+#   - 🌍 FIRST 6.6 kV MV distribution voltage standard
+#   - 🚨 HIGHEST-COHORT-WIDE R9_compound baseline 0.85
+#     (earthquake+tsunami+volcano+typhoon+nuclear compound)
+#
+# 4-of-9 remaining Wave 4 candidates after UK+Sweden+Portugal+Italy+Japan:
+#   Japan P35 THIS closure
+#   Spain P36
+#   France P37
+#   Germany P38
+#   US P39
+#
+# NO §4bis.5 Layer 3 enforcement (regional-monopoly architecture —
+# each of 9 utilities is single-DSO in its region, no metro splits).
+#
+# Authored: 2026-07-19 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================
+
+country_code: jp
+country_name: Japan
+country_name_ja: 日本  # Nihon / Nippon
+country_name_ain: アイヌモシㇼ  # Ainu Mosir
+country_name_ryu: 大和  # Ryukyuan (Yamato)
+country_name_en: Japan
+country_slug: japan
+wave: 4
+priority: P35
+smallest_first_rank: 5  # of 9 Wave 4 candidates
+scope: WAVE_4_PACIFIC_ISLANDED_MV_INHERITANCE_FROM_PORTUGAL_P33_BI_DIRECTIONAL
+
+# ---------------------------------------------------------------
+# Wave 4 architecture requirements (Portugal P33 bi-directional inheritance)
+# ---------------------------------------------------------------
+wave_4_architecture_requirements:
+  merger_schema_target: canonical_compact_s_l_a
+  osm_overpass_query_hints:
+    substations: out center
+    lines: out geom
+  portugal_p33_bi_directional_option_b_inheritance:
+    lines_side_sweden_p32_inheritance:
+      include_power_minor_line: true
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        minor_line: 6.6  # 🌍 JAPANESE MV STANDARD (unique cohort-wide)
+        cable_no_voltage: 6.6  # JAPANESE MV standard for cables
+        line_no_voltage: 66.0  # JAPANESE subtransmission (vs Italy 132 / Portugal 60)
+    subs_side_portugal_p33_extension:
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        substation_transmission: 275.0  # Japanese 275 kV HV standard
+        substation_distribution: 6.6  # 🌍 JAPANESE MV STANDARD
+        substation_minor_distribution: 6.6  # same 6.6 kV rural
+        substation_traction: 1.5  # JR 1.5 kV DC classic (vs Italy 3 kV DC / Portugal 25 kV AC)
+        power_substation_generic: 6.6  # Japanese MV default
+  merger_operations_required:
+    - substation_id_assignment
+    - line_id_assignment
+    - polyline_conversion_to_compact_p_array
+    - line_endpoint_ss_se_matching_string_ids
+    - adjacency_graph_construction
+    - grid_based_spatial_index_for_large_N_merges
+    - bbox_split_fallback_if_single_bbox_fails
+  compact_schema_write: via_scripts_pipeline_utils_grid_geo_sharding_write_grid_geo
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: japan/ssi-data.json
+  ssi_data_schema: wrapped
+  substation_count: 5893
+  grid_geo_json_path: japan/grid-geo.json
+  grid_geo_schema: compact_s_l_a
+  s_dict_count: 5981
+  l_list_count: 11628
+  a_dict_count: 5981
+  line_substation_parity_baseline: 1.97  # HEALTHY_BAND (just above 1.5 min)
+  parity_signature_baseline: HEALTHY_BAND_PRE_ENHANCEMENT_SEVERELY_UNDER_REPRESENTED
+  substation_growth_potential: MAJOR  # Only 5,893 subs for 126M pop = severely under-represented (like Italy 4,293 for 60M)
+  voltage_distribution_expected:
+    "500.0": TEPCO_KEPCO_EHV_BACKBONE  # 500 kV national EHV
+    "275.0": TSO_TRANSMISSION_STANDARD  # 275 kV Japanese HV (vs Italy 220 kV)
+    "154.0": REGIONAL_TRANSMISSION  # 154 kV regional
+    "66.0": SUBTRANSMISSION  # 66 kV Japanese subT standard
+    "22.0": E_DISTRIBUZIONE_MV  # 22 kV regional MV
+    "6.6": JAPANESE_MV_STANDARD  # 🌍 6.6 kV UNIQUE COHORT-WIDE MV standard
+  bbox:
+    lat_min: 24.05  # Sakishima Yonaguni south
+    lat_max: 45.53  # Hokkaido Wakkanai/Sōya-misaki north
+    lon_min: 122.93  # Sakishima west
+    lon_max: 153.99  # Ogasawara Minamitorishima east
+  bounds_json_features: 47  # 47 prefectures
+
+# ---------------------------------------------------------------
+# Architectural signatures — Islanded + 9-utility + 50/60 Hz split
+# ---------------------------------------------------------------
+architectural_signatures:
+  fully_islanded_grid_architecture: true  # 🌍 UNIQUE cohort-wide
+  no_cross_border_interconnectors: true  # 🌍 Only Wave 4 country without any
+  post_2020_9_regional_utility_unbundling: true
+  50_60_hz_frequency_split_fossa_magna: true  # 🌍 UNIQUE cohort-wide
+  frequency_converter_stations:
+    shin_shinano: 600  # MW
+    higashi_shimizu: 300  # MW
+    sakuma: 300  # MW
+    minami_fukumitsu: 900  # MW
+    total_east_west_conversion_capacity: 2100  # MW
+  major_islands_electricity:
+    honshu: MAINLAND
+    hokkaido: NORTH_ISLAND
+    kyushu: SOUTH_ISLAND
+    shikoku: SOUTH_ISLAND
+    okinawa: SOUTH_RYUKYU_ISLANDED  # 100% islanded
+  intra_japan_hvdc_interconnectors:
+    hokkaido_honshu_hvdc: 1200  # MW Kitahon+Shin-Kitahon
+    kanmon_kyushu_honshu: 500  # kV
+    kii_suido_ac_shikoku_honshu: 600  # kV AC
+    anan_kihoku_hvdc_shikoku: 1400  # MW
+  9_regional_utilities:
+    east_50hz:
+      tepco_power_grid: KANTO_TOKYO
+      tohoku_electric_power_network: TOHOKU
+      hokkaido_electric_power_network: HOKKAIDO
+    west_60hz:
+      kansai_transmission_and_distribution: KANSAI_OSAKA
+      chubu_electric_power_grid: CHUBU_NAGOYA
+      kyushu_electric_power_td: KYUSHU
+      chugoku_electric_power_td: CHUGOKU_HIROSHIMA
+      shikoku_electric_power_td: SHIKOKU
+      okinawa_electric_power: OKINAWA_ISLANDED
+  jr_rail_traction:
+    1500v_dc_classic_jr_east_west: true
+    25kv_ac_60hz_shinkansen: true
+    fukuoka_shinkansen: true
+  nuclear_reactors_post_fukushima:
+    pre_2011_operational: 54
+    post_2011_operational_restart_2024: 12
+    layer_4b_generation_carve_out: true
+  disputed_islands:
+    kuril_russia: 4  # Northern Territories
+    takeshima_dokdo_korea: 1
+    senkaku_diaoyu_china_taiwan: 8
+  ogasawara_bonin_1000km_south_tokyo: true
+  sakishima_2500km_southwest_mainland: true
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 17TH ENFORCEMENT scoping (4-LANGUAGE)
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 17
+  script_class: JAPANESE_PLUS_ENGLISH_PLUS_AINU_PLUS_RYUKYUAN_4_LANGUAGE
+  scripts_supported:
+    - Japanese  # ~93% expected — Kanji + Hiragana + Katakana + Rōmaji
+    - English  # ~5% — international OSM tagging
+    - Ainu  # ~<1% — Hokkaido indigenous (Ainu People Promotion Act 2019)
+    - Ryukyuan  # ~<1% — Okinawa recognized dialect group
+  japanese_script_challenges:
+    kanji_normalisation_needed: true  # 東京電力 vs Tokyo Electric Power
+    hiragana_katakana_mixed: true
+    romaji_multi_convention: true  # Hepburn + Kunrei + Nihon-shiki
+    fullwidth_halfwidth_ambiguity: true
+  primary_operators:
+    tepco_power_grid:
+      japanese: [東京電力パワーグリッド, TEPCO PG, TEPCOパワーグリッド, 東電PG, 東京電力ホールディングス, TEPCO Holdings]
+      english: [TEPCO, Tokyo Electric Power, TEPCO Power Grid, Tokyo Electric Power Grid]
+      role: KANTO_REGIONAL_TSO_TD_50HZ
+      coverage: Kanto region (Tokyo + Kanagawa + Saitama + Chiba + Ibaraki + Tochigi + Gunma + eastern Yamanashi + Shizuoka east)
+      customers_millions: 29.0
+      ownership: State majority-controlled post-Fukushima (Nuclear Damage Compensation Facilitation Corp)
+    kansai_td:
+      japanese: [関西電力送配電, 関電T&D, 関西電力T&D, Kansai T&D, KEPCO T&D, 関電]
+      english: [KEPCO, Kansai Electric Power, Kansai T&D, Kansai Transmission and Distribution]
+      role: KANSAI_REGIONAL_TSO_TD_60HZ
+      coverage: Kansai region (Osaka + Kyoto + Hyogo + Nara + Wakayama + Shiga + Fukui)
+      customers_millions: 13.2
+      ownership: State minority + Osaka+Kyoto municipal (~10%) + private
+    chubu_power_grid:
+      japanese: [中部電力パワーグリッド, 中電PG, Chubu PG, 中部電力ミライズ]
+      english: [Chubu Electric Power, Chubu Power Grid, Chubu PG]
+      role: CENTRAL_HONSHU_TSO_TD_60HZ
+      coverage: Chubu region (Aichi + Gifu + Mie + Shizuoka west + Nagano)
+      customers_millions: 8.4
+      ownership: Private post-2016 unbundling
+    kyushu_td:
+      japanese: [九州電力送配電, 九電T&D, Kyushu T&D, 九州電力]
+      english: [Kyushu Electric Power, Kyushu T&D]
+      role: KYUSHU_REGIONAL_TSO_TD_60HZ
+      coverage: Kyushu region (Fukuoka + Nagasaki + Kumamoto + Oita + Saga + Miyazaki + Kagoshima)
+      customers_millions: 8.8
+    tohoku_epc_network:
+      japanese: [東北電力ネットワーク, 東北電力送配電, 東北EPCネットワーク, Tohoku EPC Network]
+      english: [Tohoku Electric Power Network, Tohoku EPC Network]
+      role: TOHOKU_REGIONAL_TSO_TD_50HZ
+      coverage: Tohoku region (Aomori + Iwate + Akita + Miyagi + Yamagata + Fukushima + Niigata)
+      customers_millions: 7.6
+    hokkaido_epc_network:
+      japanese: [北海道電力ネットワーク, HEPCO Network, ホクデンNW, 北電NW]
+      english: [Hokkaido Electric Power Network, HEPCO Network]
+      role: HOKKAIDO_REGIONAL_TSO_TD_50HZ
+      coverage: Hokkaido island (Sapporo + Asahikawa + Hakodate + Kushiro)
+      customers_millions: 3.7
+    chugoku_td:
+      japanese: [中国電力ネットワーク, 中国電力送配電, Chugoku T&D, 中電NW]
+      english: [Chugoku Electric Power Network, Chugoku T&D]
+      role: CHUGOKU_REGIONAL_TSO_TD_60HZ
+      coverage: Chugoku region (Hiroshima + Okayama + Yamaguchi + Tottori + Shimane)
+      customers_millions: 4.9
+    shikoku_td:
+      japanese: [四国電力送配電, 四電T&D, Shikoku T&D, 四国電力]
+      english: [Shikoku Electric Power Transmission and Distribution, Shikoku T&D]
+      role: SHIKOKU_REGIONAL_TSO_TD_60HZ
+      coverage: Shikoku island (Kagawa + Ehime + Kochi + Tokushima)
+      customers_millions: 2.5
+    okinawa_electric_power:
+      japanese: [沖縄電力, Okinawa Electric Power, OKINAWA-EPCO, オキ電]
+      english: [Okinawa Electric Power, OKINAWA-EPCO]
+      role: OKINAWA_ISLANDED_TSO_TD_60HZ
+      coverage: Okinawa Prefecture (Main island + Miyako + Ishigaki + Yonaguni + Ogasawara)
+      customers_millions: 0.9
+      note: 100% islanded — no HVDC to mainland
+    # ═══ Rail traction (Layer 4c) ═══
+    jr_east:
+      japanese: [JR東日本, 東日本旅客鉄道, JR-EAST]
+      english: [JR East, East Japan Railway Company]
+      role: RAIL_TRACTION_JR_EAST_1500V_DC_25KV_AC_SHINKANSEN
+    jr_west:
+      japanese: [JR西日本, 西日本旅客鉄道, JR-WEST]
+      english: [JR West, West Japan Railway Company]
+      role: RAIL_TRACTION_JR_WEST
+    jr_central:
+      japanese: [JR東海, 東海旅客鉄道, JR-CENTRAL]
+      english: [JR Central, Central Japan Railway Company]
+      role: RAIL_TRACTION_JR_CENTRAL_TOKAIDO_SHINKANSEN
+    jr_kyushu:
+      japanese: [JR九州, 九州旅客鉄道, JR-KYUSHU]
+      english: [JR Kyushu]
+      role: RAIL_TRACTION_JR_KYUSHU_KYUSHU_SHINKANSEN
+    jr_hokkaido:
+      japanese: [JR北海道, 北海道旅客鉄道, JR-HOKKAIDO]
+      english: [JR Hokkaido]
+      role: RAIL_TRACTION_JR_HOKKAIDO_HOKKAIDO_SHINKANSEN
+    jr_shikoku:
+      japanese: [JR四国, 四国旅客鉄道, JR-SHIKOKU]
+      english: [JR Shikoku]
+      role: RAIL_TRACTION_JR_SHIKOKU
+    # ═══ Metro operators ═══
+    tokyo_metro:
+      japanese: [東京メトロ, 東京地下鉄, Tokyo Metro]
+      english: [Tokyo Metro]
+      role: RAIL_METRO_TOKYO_1500V_DC
+    toei:
+      japanese: [都営地下鉄, 東京都交通局, Toei Subway]
+      english: [Toei Subway, Tokyo Metropolitan Bureau of Transportation]
+      role: RAIL_METRO_TOKYO_TOEI
+    osaka_metro:
+      japanese: [大阪メトロ, 大阪市高速電気軌道, Osaka Metro]
+      english: [Osaka Metro]
+      role: RAIL_METRO_OSAKA
+    # ═══ Nuclear operators (Layer 4b generation carve-out) ═══
+    japan_atomic_power:
+      japanese: [日本原子力発電, 原電, JAPCO]
+      english: [Japan Atomic Power Company, JAPC]
+      role: GEN_NUCLEAR_MULTIPLE
+    j_power:
+      japanese: [J-POWER, 電源開発, 電源開発株式会社]
+      english: [J-Power, Electric Power Development Company, EPDC]
+      role: GEN_NUCLEAR_COAL_HYDRO_MULTIPLE
+    # ═══ Renewable generation ═══
+    edf_japan_renewables:
+      japanese: [EDF Japan Renewables]
+      role: GEN_RENEWABLE_MULTIPLE
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 — NOT REQUIRED for Japan
+# ---------------------------------------------------------------
+convention_78_4bis_5_layer_3_geofence:
+  required: false
+  rationale: |
+    Japan is REGIONAL-MONOPOLY jurisdiction — each of 9 regional
+    utilities is single-DSO in its territory. No metropolitan
+    multi-DSO splits exist (unlike Milan A2A+E-Distribuzione or
+    Rome ACEA+E-Distribuzione). Tokyo → TEPCO PG only. Osaka →
+    Kansai T&D only. Nagoya → Chubu PG only. Post-2020 unbundling
+    separated generation from T&D but didn't create metro splits.
+
+    Compare to:
+    - Portugal P33: SINGLE-DSO simplification (E-REDES 99% mainland)
+    - Japan P35: REGIONAL-MONOPOLY simplification (9 non-overlapping territories)
+    - Both are architectural simplifications requiring NO §4bis.5
+
+  cumulative_enforcement_roster_pre_japan:
+    1: Prague CZ (P20)
+    2: Warsaw PL (P21)
+    3: EWZ Zurich CH (P24)
+    4: SIG Geneva CH (P24)
+    5: Auckland NZ (P27)
+    6: Copenhagen DK (P28 — 615)
+    7: Helsinki FI (P29 — 446)
+    8: Istanbul TR (P30 — 178)
+    9: London UK (P31 — 1994 LARGEST)
+    10: Stockholm SE (P32 — 24)
+    11: Milan IT (P34 — 350)
+    12: Rome IT (P34 — 131)
+  japan_signature: REGIONAL_MONOPOLY_ARCHITECTURAL_SIMPLIFICATION_NO_4BIS_5
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border tolerance
+# ---------------------------------------------------------------
+discipline_36_tolerance:
+  boundary_tolerance_km: 6.0
+  entry_added_to: cross_border_tolerances.json
+  rationale_summary: |
+    6.0 km tolerance — MATCHES Portugal P33 highest Wave 4 tolerance.
+    Justified by: (a) 430 inhabited islands + ~7,000 total islands;
+    (b) Ogasawara/Bonin 1,000 km south of Tokyo; (c) Sakishima
+    2,500 km southwest of mainland (Yonaguni close to Taiwan);
+    (d) Rebun+Rishiri north of Hokkaido; (e) Sanriku Coast fjord-like
+    ria coastline; (f) Seto Inland Sea complex archipelago; (g)
+    disputed islands (Kuril + Takeshima + Senkaku).
+  expected_drops_estimate:
+    subs: 100_300
+    lines: 50_150
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity target
+# ---------------------------------------------------------------
+discipline_41_parity_target:
+  baseline_pre_enhancement: 1.97  # HEALTHY_BAND (just above 1.5 min)
+  target_ratio_min: 1.5
+  target_ratio_max: 5.0
+  anticipated_signature_post_bi_directional_option_b: HEALTHY_BAND_STAYS_STABLE
+  rationale: |
+    Japan baseline 1.97 already HEALTHY_BAND — bi-directional Option B
+    inheritance will grow BOTH subs + lines proportionally. Japan is
+    severely under-represented at 5,893 subs for 126M pop (like Italy
+    4,293 for 60M) — expect MAJOR sub growth via bi-directional Option B.
+
+# ---------------------------------------------------------------
+# Anticipated architectural first-instances via Japan P35 closure
+# ---------------------------------------------------------------
+architectural_first_instances_anticipated:
+  1: 🇯🇵 FIRST Pacific Wave 4 country enhancement
+  2: 🌍 FIRST ISLANDED grid architecture cohort-wide (no cross-border interconnectors)
+  3: 🌍 FIRST 50/60 Hz frequency split architecture cohort-wide (Fossa Magna line)
+  4: 🌍 FIRST 9-regional-utility post-unbundling architecture cohort-wide
+  5: 🌍 FIRST 6.6 kV MV distribution voltage standard cohort-wide
+  6: 🚨 HIGHEST-COHORT-WIDE R9_compound baseline (0.85 — earthquake+tsunami+volcano+typhoon+nuclear)
+  7: FIRST Ainu (アイヌ) minority language enforcement (Hokkaido indigenous, statutory 2019)
+  8: FIRST Ryukyuan (琉球) recognized dialect enforcement (Okinawa Prefecture)
+  9: FIRST Japanese kanji+hiragana+katakana+rōmaji multi-script normalization
+  10: FIRST regional-monopoly architectural simplification (NO §4bis.5, sibling to Portugal single-DSO)
+  11: Portugal P33 bi-directional Option B pattern FIRST inheritance at Pacific scale
+  12: Convention #78 BINDING 17th cohort-wide enforcement (Japanese + English + Ainu + Ryukyuan)
+  13: 4 frequency converter stations preserved (Shin-Shinano + Higashi-Shimizu + Sakuma + Minami-Fukumitsu)
+  14: 4 intra-Japan HVDC preserved (Hokkaido-Honshu + Kanmon + Kii-Suido + Anan-Kihoku)
+  15: Okinawa 100% islanded electricity system
+
+# ---------------------------------------------------------------
+# Cumulative Wave 4 progression projection at Japan closure
+# ---------------------------------------------------------------
+cumulative_wave_4_projection_at_japan_closure:
+  countries_terminally_complete: 5  # UK + Sweden + Portugal + Italy + Japan
+  wave_4_progression_pct: 55.6  # 5/9
+  canonical_cohort_completion_pct: 89.7  # 35/39
+  convention_78_binding_enforcements: 17
+  convention_78_alias_ledger_projected: 55000_65000  # +5k-15k JP alias hits
+  convention_78_4bis_5_layer_3_enforcements: 12  # UNCHANGED (Japan regional-monopoly)
+  nordic_cluster_completion: TERMINAL_COMPLETE_5_OF_5
+  iberian_cluster_progress: 1_of_2  # Portugal + future Spain P36
+  mediterranean_cluster_progress: 1_of_1  # Italy (Spain P36 also Mediterranean)
+  pacific_cluster_started: 1_of_1  # Japan first Pacific OECD
+  option_b_pattern_bi_directional_validated_scales: nordic_iberian_mediterranean_pacific
+  remaining_wave_4_candidates: 4  # spain + france + germany + us
+  next_smallest_first: spain_p36  # Iberian sibling to Portugal — direct pattern inheritance
+
+# ---------------------------------------------------------------
+# Layer 4 hazard baselines
+# ---------------------------------------------------------------
+layer_4_hazard_baselines:
+  R6c_flood: 0.75  # HIGH 2018 West Japan floods 200+ dead + 2019 Hagibis + 2020 Kumamoto + 2023 Hokuriku
+  R6d_wildfire: 0.20  # LOW-MOD humid climate + monsoon rainfall + rapid response networks
+  R6e_winter: 0.65  # HIGH Hokkaido -30°C sustained + Niigata heavy snow load transmission worst-in-world
+  R8_adapt: 0.55  # MOD Green Growth Strategy 2020 Net-Zero 2050 + 6th Strategic Energy Plan 2021 + GX Basic Policy 2023 ¥150tn
+  R9_compound: 0.85  # 🚨 HIGHEST cohort-wide — Fukushima 2011 M9+tsunami+nuclear canonical compound + Nankai Trough megaquake 30-yr 70% probability
+  R10_just: 0.55  # MOD Ainu 2019 statutory + Ryukyuan/Okinawan + Hokkaido depopulation + Fukushima Just Transition
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 2 Operator local OSM Overpass fetch
+handoff_command_step_2: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.japan.osm_overpass 2>&1 \
+    | tee japan/v4_23-osm-overpass.log
+
+anticipated_step_2_pattern: |
+  Japan 377k km² area (slightly larger than Italy 301k km²). Bbox-split
+  strongly recommended aligned with 9 regional utility territories:
+  Hokkaido + Tohoku + Kanto (TEPCO) + Chubu + Kansai + Chugoku +
+  Shikoku + Kyushu + Okinawa+Sakishima. Ogasawara/Bonin can be
+  bundled with Kanto or separate. Portugal P33 bi-directional Option B
+  pattern INHERITED — expect major sub growth from 5,893 baseline to
+  30k-50k post-fetch given Japan is severely under-represented in OSM
+  subs pre-Wave-4 (like Italy 4,293 → 51,910). Line growth to 80k-150k
+  projected. Grid-geo projected 50-80 MB — likely stays under Convention
+  #80 90 MB threshold single file.

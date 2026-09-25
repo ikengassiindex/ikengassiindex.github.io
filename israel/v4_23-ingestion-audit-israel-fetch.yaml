@@ -1,0 +1,79 @@
+# Israel v4.23 Ingestion Audit — Step 2 Fetch
+# ============================================
+# Task: #224 (WAVE2-Step2 Israel)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: israel/v4_23-ingestion-audit-israel-preflight.yaml
+# Status: FETCH_COMPLETE
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: israel
+source_id: IL-C1-osm-overpass
+fetched_at_utc: "2026-07-13T00:00:00Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 53363
+raw_sha256: 77564194b4aa18f0c86f8e2947fae268516578a98226276f747256743671b9ba
+provincial_scope: null  # Single-query, whole country
+
+empirical_counts:
+  substations: 257  # post Discipline #36 (0 dropped by polygon; 14 lines dropped)
+  transmission_lines: 4411  # post Discipline #36
+
+empirical_finding_of_note:
+  finding: >
+    Israel OSM coverage matched baseline count almost exactly (257 vs 257).
+    Sub-tag OSM operator= density LOW (only 6 of 257 = 2.4%) — reflects
+    Israel's monopoly-dominated grid where IEC owns virtually everything
+    but OSM tagging discipline is sparse. This is a pure test case for
+    the monopoly-default resolver: 98% of subs got attributed via
+    Layer 1 TSO threshold (216) or Layer 2 monopoly default (35).
+
+owner_resolution_provenance:
+  direct_osm_operator_tag: 4
+  alias_normalised_osm_operator: 2  # Hebrew "חברת החשמל" + English "Israel Electric Company" — surfaced 2 new aliases
+  layer_1_IEC_TSO_threshold_ge_161kv: 216  # 84.0% — 161 + 400 kV backbone
+  layer_2_IEC_monopoly_default: 35        # 13.6% — MV/unknown voltage subs
+  unresolved: 0                            # Convention #56 preserved — monopoly default catches all
+
+alias_normalisation_gaps_surfaced:
+  # New aliases surfaced during OSM fetch — patched retroactively via
+  # Step 5 alias-retighten pass:
+  - variant: "Israel Electric Company"
+    canonical: IEC
+    hebrew_equivalent: null
+    normalisation_added_to_base_py: true
+  - variant: "חברת החשמל"
+    canonical: IEC
+    hebrew_note: >
+      "The Electric Company" (definite article ה + חברת חשמל without לישראל).
+      Formal name variant that OSM Hebrew-speaking editors use.
+    normalisation_added_to_base_py: true
+
+discipline_41_line_parity:
+  post_fetch: PASS (257 subs + 4,411 lines, ratio 17.16 — TASK #182 outlier persists)
+
+discipline_36_cross_border_filter:
+  polygon_source: israel/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 0
+  lines_dropped_outside_polygon: 14
+  final_state: CLEAN
+
+wall_clock:
+  step_2_fetch_seconds: ~150  # substations way+relation + line query with 504 gateway retry
+  cache_hit_second_run: true
+
+warnings:
+  - "Convention #56 partial — OSM substation node fetch timed out (retry successful)"
+  - "Overpass 504 gateway on primary endpoint — retried via kumi.systems successfully"
+  - "Discipline #36 — dropped 14 lines outside Israel polygon (100m default tolerance)"
+
+auditability_chain:
+  parent_preflight: israel/v4_23-ingestion-audit-israel-preflight.yaml
+  step_2_fetch: israel/v4_23-ingestion-audit-israel-fetch.yaml
+  step_4_merge: israel/v4_23-ingestion-audit-israel-merge.yaml
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: israel/ssi-data.json
+
+status: READY_FOR_STEP_4

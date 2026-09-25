@@ -1,0 +1,25 @@
+{
+  "schema_version": "v4_23-voltage-cross-validation-1",
+  "generated_at_utc": "2026-07-13T11:21:00Z",
+  "source_pair": {
+    "existing_source": "OSM voltage= tags (mexico/ssi-data.json, prior ingestion vintage)",
+    "new_source": "MX-C1-osm-overpass fresh OSM voltage= tags"
+  },
+  "methodology": "For each matched substation pair (500 m proximity threshold), compare existing OSM-derived voltage_kv vs fresh OSM voltage_kv from L1 connector. Flag as 'voltage_tier_mismatch' when the ratio exceeds 1.5x.",
+  "counts": {
+    "matched_pairs_evaluated": 2435,
+    "voltage_tier_mismatches": 1,
+    "voltage_tier_mismatch_rate_pct": 0.04
+  },
+  "findings": [
+    {
+      "substation_id": "MX_00753",
+      "match_distance_m": 44.1,
+      "existing_voltage_kv": 230.0,
+      "osm_voltage_kv": 20.0,
+      "ratio": 11.5,
+      "osm_feature_id": "osm_relation_16016584",
+      "flag": "voltage_tier_mismatch"
+    }
+  ]
+}

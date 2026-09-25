@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Gap Audit (Denmark)</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Helvetica Neue',sans-serif; color:var(--ink); background:var(--paper); font-size:13px; line-height:1.6; }
+.page { max-width:1200px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.mono { font-family:'Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:monospace; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-full { background:#d5f5e3; color:#1a6b4a; }
+.tag-partial { background:#fff3cd; color:#856404; }
+.tag-gap { background:#fadbd8; color:#922b21; }
+.tag-proxy { background:#ebdef0; color:#6c3483; }
+.tag-na { background:#d6eaf8; color:#1a5276; }
+.sev-high { color:#922b21; font-weight:700; }
+.sev-med { color:#856404; font-weight:700; }
+.sev-low { color:#1a6b4a; font-weight:700; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+.summary-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin:1.5rem 0; }
+.summary-card { background:#fff; border:1px solid var(--border); border-radius:6px; padding:0.8rem; text-align:center; }
+.summary-card .number { font-size:1.6rem; font-weight:700; font-family:monospace; }
+.summary-card .label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Gap Audit (Denmark)</h1>
+<p class="subtitle">Data Availability Assessment · Coverage Gaps · Quality Concerns · Mitigation Strategies · Pre-Ingestion Planning</p>
+<div class="meta">
+  <span><strong>Country:</strong> Denmark (DK)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Variables Assessed:</strong> 95</span>
+  <span><strong>Phase:</strong> Pre-Ingestion Planning</span>
+</div>
+
+<!-- COVERAGE SUMMARY -->
+<h2>Coverage Summary</h2>
+<div class="summary-grid">
+  <div class="summary-card"><div class="number" style="color:var(--accent3)">65</div><div class="label">Full Coverage (68%)</div></div>
+  <div class="summary-card"><div class="number" style="color:#856404">11</div><div class="label">Partial Coverage (12%)</div></div>
+  <div class="summary-card"><div class="number" style="color:#6c3483">9</div><div class="label">Proxy / Model (9%)</div></div>
+  <div class="summary-card"><div class="number" style="color:var(--accent)">5</div><div class="label">Gap (5%)</div></div>
+  <div class="summary-card"><div class="number" style="color:var(--accent2)">5</div><div class="label">Derived / N/A (5%)</div></div>
+</div>
+
+<p class="note"><strong>Overall Assessment:</strong> Denmark has excellent open data infrastructure. Energinet (TSO) publishes comprehensive real-time grid data. Forsyningstilsynet provides DSO performance benchmarks. Danmarks Statistik offers world-class socio-economic data. DMI operates dense weather station network (~100 stations for small country). GEUS provides geological mapping. Denmark's lack of nuclear eliminates nuclear-specific gaps. Wind dominance (~50%+) creates unique wind integration gaps. Estimated coverage ~92% (high for Nordic). Main gaps: DSO-level asset vintage (fragmented across ~40 operators), per-substation wind curtailment data, building-level energy poverty data, offshore cable condition data, soft soil foundation assessment data. Strengths: Energinet real-time API, dense weather station network, excellent socio-economic registers, geological mapping, no nuclear complexity.</p>
+
+<!-- GAP 1: DATA AVAILABILITY -->
+<h2>1. Data Availability Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Gap Description</th><th>Severity</th><th>Mitigation</th><th>Fallback Value</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GA-1</td>
+  <td class="mono">I4, B1.2, F.7</td>
+  <td><strong>Substation vintage (installation year):</strong> ~40 independent DSOs with fragmented archival practices. Pre-1980 records sparse outside Energinet transmission infrastructure. OSM start_date coverage ~70-75% for Denmark HV. Danish electrification timeline: 1920s–1950s (municipal systems), 1950s–1980s (regional consolidation), 1990s+ (wind integration). Regional variation moderate (eastern vs western Denmark).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Extract vintage from DSO aggregate fleet reports via Energinet coordination. Apply Danish electrification cohorts: 1920s–1950s (municipal era), 1950s–1980s (regional consolidation), 1990s+ (wind/liberalization). OSM start_date where available. Cross-reference with Energinet transmission asset inventory. Request standardized data via Forsyningstilsynet coordination. Better coverage than southern European regions but DSO fragmentation remains challenge.</td>
+  <td>Cohort-based age (median vintage per region × σ)</td>
+</tr>
+<tr>
+  <td class="mono">GA-2</td>
+  <td class="mono">C3, C4</td>
+  <td><strong>Voltage quality per-substation:</strong> Forsyningstilsynet publishes aggregate SAIDI/SAIFI compliance by DSO. Per-substation voltage quality varies across ~40 fragmented operators. Regional variation modest. Coastal vs inland distinction relevant (wind-driven volatility).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Forsyningstilsynet compliance rates + DSO annual SAIDI/SAIFI reports. Apply regional variation based on wind integration (western Jylland higher wind generation volatility). Markov input: C3 = 0.94 (meets EU standards), C4 from system-level metrics. Danish grid reliability good; wind dominance creates variable frequency management. Eastern regions (Copenhagen, Sjælland) more stable than western wind-rich zones.</td>
+  <td>C3 = 0.94 (Denmark compliance), C4 from Forsyningstilsynet database</td>
+</tr>
+<tr>
+  <td class="mono">GA-3</td>
+  <td class="mono">B3.1–B3.9</td>
+  <td><strong>Equipment condition (transformer oil, insulation, grounding):</strong> DSOs hold most inspection data (restricted access). Energinet operates transmission equipment with better metadata. Forsyningstilsynet has some operational data but granular per-substation condition data not published. Flat/low-altitude geography creates distinct environmental profile (soft soil, no alpine stress). Wind-driven salt spray in western regions.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Apply IEEE C57.91 + CIGRÉ TB 761 models calibrated to Danish climate (temperate, maritime, flat). DMI temperature norms and Energinet load history validate. Danish climate advantage: moderate temperatures (less extreme than Arctic). Western coastal salt spray creates 1.05–1.15× corrosion factor (worse than inland). Soft soil settlements and high water table create mechanical stress unique to lowland infrastructure. Widen σ for pre-1950 equipment.</td>
+  <td>Age-based curves (CIGRÉ TB 761) with κ_corrosion [1.05–1.15] (coastal penalty) and κ_settlement [1.08–1.12] (soft soil factor)</td>
+</tr>
+<tr>
+  <td class="mono">GA-4</td>
+  <td class="mono">V2</td>
+  <td><strong>Critical infrastructure dependency:</strong> Danmarks Statistik register-based system available with excellent coverage. Per-substation mapping feasible via spatial analysis. OSM completeness ~75-80% for Denmark HV (good for Nordic region). Flat terrain and dense settlement enable comprehensive mapping. Copenhagen concentration significant (critical infrastructure cluster).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Danmarks Statistik municipal facility counts (hospitals, schools, emergency services) by Kommune. Copenhagen metropolitan area shows high concentration. Industrial zones: manufacturing, dairy processing, pharmaceutical (mapped via Danmarks Statistik). Population density weighting straightforward (no terrain complexity). Better OSM coverage than southern regions, comprehensive Danish municipal registers.</td>
+  <td>Kommune-level critical facility count × population density</td>
+</tr>
+<tr>
+  <td class="mono">GA-5</td>
+  <td class="mono">E2</td>
+  <td><strong>Employment by sector (β decomposition):</strong> Danmarks Statistik provides excellent employment data by Kommune. Sector mapping to β weights straightforward via NACE classification. Quarterly labor force survey available. Wind manufacturing and export significant sector.</td>
+  <td class="sev-low">LOW</td>
+  <td>Map NACE to β_H/β_M/β_L. Manufacturing/wind/energy → β_H. Agriculture/services → β_M/β_L. Danmarks Statistik quarterly labor force for interpolation. Regional variation: western Jylland higher in wind/manufacturing employment vs eastern urban-focused regions. Wind sector employment concentrated (Vestas, Ørsted supply chains).</td>
+  <td>National average β scaled by Kommune employment</td>
+</tr>
+<tr>
+  <td class="mono">GA-6</td>
+  <td class="mono">C.3</td>
+  <td><strong>Energy poverty temporal:</strong> Danmarks Statistik + Eurostat SILC provide data. Denmark's energy poverty very low (~4%, among lowest in EU). Annual coverage available. Danish wealth and efficient building stock mean energy poverty driven by edge cases (geographic isolation in Bornholm, far islands).</td>
+  <td class="sev-low">LOW</td>
+  <td>Use most recent Danmarks Statistik/Eurostat year. Denmark's advantage: high incomes, excellent building stock efficiency, minimal baseline poverty. Island/remote communities (Bornholm, Ærøskøbing) show slightly higher vulnerability. Widen σ 0.008/yr for remote island populations (edge case more relevant than income poverty). Energy poverty negligible factor vs Nordic peers.</td>
+  <td>Most recent Danmarks Statistik + linear interpolation with island adjustment</td>
+</tr>
+<tr>
+  <td class="mono">GA-7</td>
+  <td class="mono">F.5, F.6, F.12</td>
+  <td><strong>Markov recovery rates (maintenance CAPEX):</strong> Forsyningstilsynet publishes aggregate CAPEX by DSO/year. Per-substation data unavailable but Danish DSOs generally well-capitalized. Energinet invests heavily in transmission maintenance. Flat geography reduces avalanche/flood hazard maintenance vs Nordic peers.</td>
+  <td class="sev-low">LOW</td>
+  <td>Use Forsyningstilsynet regulatory database (CAPEX as % of revenue). Danish DSOs and Energinet historically strong maintenance investment. Apply 0.98–1.05× multiplier vs CIGRÉ baseline (lower than Nordic due to reduced hazard). Wind integration maintenance slightly elevated (blade/tower fatigue monitoring). District heating coupling (CHP) adds heating system maintenance. Monitor Forsyningstilsynet maintenance reports.</td>
+  <td>CIGRÉ TB 761 × 1.02 (Denmark moderate maintenance factor)</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 2: RESOLUTION GAPS -->
+<h2>2. Resolution Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Available Resolution</th><th>Desired Resolution</th><th>Gap</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GR-1</td>
+  <td class="mono">C1, C2, G.1 (CAIDI)</td>
+  <td>Kommune (98) or DSO level</td>
+  <td>Substation or district</td>
+  <td class="sev-med">Regional fragmentation</td>
+  <td>Within-Kommune from Danmarks Statistik demographics. Forsyningstilsynet publishes annual SAIDI by DSO. Sub-regional from power density (load per km²) and wind integration intensity. Denmark's administrative structure: 98 Kommune (small, excellent statistics). Flat terrain and comprehensive municipal data enable good sub-regional interpolation.</td>
+</tr>
+<tr>
+  <td class="mono">GR-2</td>
+  <td class="mono">S1 (grid capacity)</td>
+  <td>System-wide (Energinet) or region</td>
+  <td>Substation or transmission line</td>
+  <td class="sev-low">Regional-level</td>
+  <td>Energinet publishes regional capacity and wind integration zones. Sub-regional capacity from demand density. Fallback: uniform within region adjusted for wind generation and load. Eastern Sjælland (Copenhagen) shows tighter capacity than western regions. Monitor Energinet capacity reports and wind forecast integration.</td>
+</tr>
+<tr>
+  <td class="mono">GR-3</td>
+  <td class="mono">V1 (VoLL)</td>
+  <td>Kommune from Forsyningstilsynet tariff studies</td>
+  <td>Substation or DSO area</td>
+  <td class="sev-low">Kommune-level</td>
+  <td>Use Danmarks Statistik economic data (GDP by Kommune). Apply sector weighting (manufacturing/wind-intensive regions higher VoLL). Copenhagen metropolitan area highest VoLL. Agricultural/rural Kommune lower VoLL. DK1/DK2 transmission boundary (Great Belt) reflects regional VoLL differences.</td>
+</tr>
+<tr>
+  <td class="mono">GR-4</td>
+  <td class="mono">I1, I3, I5 (weather)</td>
+  <td>DMI ~100 stations, excellent for small area + real-time forecasts</td>
+  <td>Substation exact location</td>
+  <td class="sev-low">Excellent</td>
+  <td>IDW from nearest 3 DMI stations (most substations <20km from station). DMI programmatic API access available. Copernicus ERA5 0.25° grid as backup. DMI coverage superior globally for 43,000 km² country. Coastal stations capture maritime effects. Integration straightforward and world-class.</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 3: TEMPORAL GAPS -->
+<h2>3. Temporal / Frequency Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Available Freq.</th><th>Desired Freq.</th><th>Staleness Risk</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GT-1</td>
+  <td class="mono">D-Stat (Census, Demographics)</td>
+  <td>Census + annual register-based updates</td>
+  <td>Annual</td>
+  <td class="sev-low">LOW</td>
+  <td>Danmarks Statistik CPR register updated continuously. Annual demographic data available. δ_staleness = 0.01/yr (excellent).</td>
+</tr>
+<tr>
+  <td class="mono">GT-2</td>
+  <td class="mono">C.3 (income/poverty)</td>
+  <td>Danmarks Statistik annual + Eurostat SILC biennial</td>
+  <td>Annual</td>
+  <td class="sev-low">LOW</td>
+  <td>Danmarks Statistik provides annual income data. Eurostat SILC adds EU-harmonized poverty measure. Energy poverty negligible. δ_staleness = 0.01/yr (excellent).</td>
+</tr>
+<tr>
+  <td class="mono">GT-3</td>
+  <td class="mono">D6, G.1 (SAIDI/CAIDI)</td>
+  <td>Annual (Forsyningstilsynet publishes Q2 following year)</td>
+  <td>Quarterly</td>
+  <td class="sev-low">LOW</td>
+  <td>Forsyningstilsynet annual reliability report. Energinet publishes monthly system metrics real-time. δ_staleness = 0.03/yr.</td>
+</tr>
+<tr>
+  <td class="mono">GT-4</td>
+  <td class="mono">D-DSO (utility reports)</td>
+  <td>Annual (published Q1–Q2)</td>
+  <td>Quarterly</td>
+  <td class="sev-low">LOW</td>
+  <td>Forsyningstilsynet collects annual data from DSOs. δ_staleness = 0.05/yr (manageable).</td>
+</tr>
+<tr>
+  <td class="mono">GT-5</td>
+  <td class="mono">Geological monitoring (GEUS)</td>
+  <td>Continuous + annual reports</td>
+  <td>Real-time</td>
+  <td class="sev-low">LOW</td>
+  <td>GEUS monitors soft soil and geological hazards. Maps published with updates. Continuous monitoring network. δ_staleness = 0/yr (continuous).</td>
+</tr>
+<tr>
+  <td class="mono">GT-6</td>
+  <td class="mono">Coastal flooding + Storm surge forecasts</td>
+  <td>Continuous monitoring + daily forecasts</td>
+  <td>Daily/Real-time</td>
+  <td class="sev-low">LOW</td>
+  <td>Kystdirektoratet (Coastal Authority) publishes coastal hazard maps. DMI provides daily storm surge and extreme sea level forecasts. Real-time monitoring for critical areas. δ_staleness = 0/yr (real-time).</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 4: QUALITY CONCERNS -->
+<h2>4. Data Quality Concerns</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Variable(s)</th><th>Quality Concern</th><th>Severity</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">GQ-1</td>
+  <td class="mono">D7, G.2 (OSM power graph)</td>
+  <td><strong>OSM completeness for Danish power infrastructure:</strong> OSM coverage ~75-80% for HV in Denmark. Good in urban areas (Copenhagen, Aarhus ~85-90%), variable in rural regions (~70-75%). Flat terrain and urban density support mapping. Improving rapidly.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Cross-validate with Energinet transmission map (published). Supplement with DSO data requests via Forsyningstilsynet. Kortforsyningen (Danish mapping authority) has authoritative infrastructure layers. Flag rural zones with lower confidence. Target OSM improvement campaign for Danish coverage gaps.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-2</td>
+  <td class="mono">H.1, H.3 (Geological hazard)</td>
+  <td><strong>Coastal flooding and storm surge mapping:</strong> Kystdirektoratet provides coastal hazard mapping. DMI storm surge forecasts excellent. Soft soil subsidence risk (GEUS mapping) present in lowland areas. Infrastructure impacts localized but relevant for coastal substations.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Kystdirektoratet coastal hazard layer. Identify substations <500m from high-risk coastal zones (est. ~30-50). Apply coastal storm hazard multiplier (1.1–1.3× weather damage for Nov-Feb). GEUS soft soil mapping identifies subsidence risk areas. Monitor DMI and Kystdirektoratet joint coastal research programs.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-3</td>
+  <td class="mono">H.4, H.5, H.7 (Soft soil + Coastal corrosion)</td>
+  <td><strong>Soft soil foundation stability + Coastal corrosion:</strong> Denmark built on soft soil (Quaternary deposits, no bedrock). Subsidence, settlement, and foundation instability possible in ~50% of land area. Coastal corrosion moderate in western regions (maritime salt spray). ISO 9223 class C2-C3 coastal, C1-C2 inland. Temperate climate allows normal corrosion rates.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>GEUS geological maps identify soft soil zones. Identify substations in high-subsidence risk areas (est. ~200-400). Apply soft soil foundation penalty (1.08–1.15× structural degradation). Coastal corrosion: apply ISO 9223 C2-C3 (western coast) vs C1-C2 (inland). Require geotechnical site assessment for high-risk areas. Temperate climate reduces extreme corrosion vs Arctic but maritime exposure relevant.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-4</td>
+  <td class="mono">T1 (DER + EV)</td>
+  <td><strong>Wind generation + EV charging growth:</strong> Energinet renewable registry. Wind dominance (~50%+ peak generation) means wind ramp rates and curtailment critical. Small PV underreported. EV charging data fragmented across networks (DriveGreen, Clever, Tesla Supercharger, etc.).</td>
+  <td class="sev-low">LOW</td>
+  <td>Energinet real-time for wind/utility-scale. Energistyrelsen renewable registry for grid-connected assets. Apply 1.1–1.2× for unregistered small PV (growing rapidly). EV from charging operators + Vejdirektoratet (Danish Road Authority). Wind ramp rate forecasting essential for frequency management. Seasonal variation (winter high wind, summer lower) critical.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-5</td>
+  <td class="mono">H.1 (Offshore wind cable condition)</td>
+  <td><strong>Offshore wind cable reliability:</strong> Energinet holds offshore cable data (proprietary). Long subsea cables (~40+ offshore farms). Marine hazard exposure high. Limited public access to condition data. Aging assessment challenging (restricted access, harsh environment).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Request Energinet comprehensive offshore cable inventory and condition reports. Cables: ~40 offshore wind farms, mix of AC/HVDC export lines. Apply cable-specific aging model (salt water accelerated, cold slows some degradation). Establish liaison for cable monitoring. Resilience: redundancy analysis, repair logistics. External damage risk (fishing, shipping) non-negligible.</td>
+</tr>
+<tr>
+  <td class="mono">GQ-6</td>
+  <td class="mono">C.6 (Migration)</td>
+  <td><strong>International + domestic migration:</strong> Denmark experiences EU/EEA labor migration. Refugee/asylum migration significant post-2015. Danmarks Statistik tracks accurately via CPR register. Population growth ~0.5%/yr (lower than Sweden/Norway).</td>
+  <td class="sev-low">LOW</td>
+  <td>Use Danmarks Statistik CPR migration data (comprehensive). Population growth ~0.5%/yr. Domestic migration toward Copenhagen metropolitan area. Urban concentration increasing. Monitor quarterly Danmarks Statistik updates. Regional variation: Copenhagen +1.2%/yr, rural areas -0.2%/yr.</td>
+</tr>
+</tbody>
+</table>
+
+<!-- GAP 5: DENMARK-SPECIFIC GAPS -->
+<h2>5. Denmark-Specific Gaps</h2>
+
+<table>
+<thead><tr><th>Gap ID</th><th>Issue</th><th>Impact</th><th>Severity</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">DK-1</td>
+  <td><strong>DSO fragmentation (~40 operators):</strong> Fragmented distribution system across 98 Kommune. ~40 independent DSOs with different IT systems, reporting standards, data formats. Consolidation ongoing but slower than Germany/Sweden. Data standardization challenge moderate.</td>
+  <td>Metadata inconsistency, asset ID conflicts, regional comparison difficult. Data aggregation complexity moderate. Less severe than Norway but more than Sweden. Standardization via Forsyningstilsynet possible and improving.</td>
+  <td class="sev-high">HIGH</td>
+  <td>Build DSO-specific ingestion pipelines. Forsyningstilsynet regulatory filings provide unified view (annual). Request standardized data via Forsyningstilsynet coordination. Document all reconciliation decisions. Target largest ~20 DSOs first (cover ~85% of grid). Establish Forsyningstilsynet liaison for standardization advocacy. Wind-focused DSOs (Vestkraft, Radius, etc.) priority for wind integration data.</td>
+</tr>
+<tr>
+  <td class="mono">DK-2</td>
+  <td><strong>Wind dominance (~50%+ generation):</strong> Denmark leads globally in wind penetration. Wind ramp rates, curtailment decisions, forecast integration critical. No hydro baseload (vs Norway/Sweden). Seasonal wind profile (winter high, summer variable). Real-time grid management highly wind-dependent.</td>
+  <td>Grid stability highly sensitive to wind availability (winter storms, summer doldrums). Real-time frequency management requires wind ramp forecasting (±5 GW/10 min possible). Multi-hour wind drought risk (rare but possible). Extreme winter weather compounds ramp rate extremes. No hydro hedge vs other Nordic regions.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Integrate Energinet real-time wind monitoring into resilience model. Track GAMA/EMD wind forecast integration. Apply seasonal wind profiles (winter high, summer lower). Model wind curtailment scenarios (capacity auction data). Frequency stability: include wind ramp rate constraints. Climate sensitivity: storm track shifts (1-3 days/decade northward) impacts peak wind seasons. Demand-side flexibility (smart charging, heat pump scheduling) critical. Ørsted/Vestas forecasting models best-in-class.</td>
+</tr>
+<tr>
+  <td class="mono">DK-3</td>
+  <td><strong>Island grid connectivity (Great Belt + Øresund critical links):</strong> Denmark split by geography: Great Belt (DK1 Jylland, DK2 Sjælland/Bornholm). Øresund Bridge (SE-DK link). Island grids: Bornholm, Fur, Ærøskøbing. Critical transmission corridors narrow, limited redundancy. Fault on Great Belt bridge cable = major regional impact.</td>
+  <td>Great Belt + Øresund cables critical for power flow. Single failure risk moderate (dual cables but same corridor). Island grids vulnerable to isolation (Bornholm grid ~300 MW, renewable-heavy). Frequency/voltage stability management requires careful coordination. North-South flow bottleneck on Great Belt.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Energinet bidding zone maps (DK1–DK2 boundary). Model three scenarios: (1) Current topology (dual cables Great Belt). (2) Øresund link maintenance. (3) Bornholm isolation contingency. Flag Great Belt and Øresund as critical corridors for resilience. Monitor Energinet capacity reports. Island grids: real-time monitoring (Bornholm Energy technical team). Redundancy assessment: single-cable failure impact analysis.</td>
+</tr>
+<tr>
+  <td class="mono">DK-4</td>
+  <td><strong>Offshore wind cable reliability:</strong> ~40 offshore wind farms connected via long subsea cables (some >50km). Export cables to Germany, Sweden. Marine hazard exposure high (shipping, fishing, storms). Cable aging in harsh marine environment. Condition data proprietary (Energinet-held).</td>
+  <td>Cable failure = potential offshore farm isolation. Repair timescale long (weeks-months for deep cables). External damage risk (trawling, anchoring). Salt water corrosion + cold temperatures accelerate some degradation. Strategic grid bottleneck (offshore generation isolated).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Request Energinet comprehensive offshore cable inventory and condition reports. Map all ~40 offshore farms + export cables. Apply cable-specific aging model (subsea environment harsh). Establish Energinet liaison for cable monitoring. Resilience: redundancy analysis (identify critical cables), repair logistics. External hazard mapping (shipping lanes, fishing zones). Marine authority coordination (DTU, Sejfart og Handel). Insurance/resilience: cable-specific fragility curves.</td>
+</tr>
+<tr>
+  <td class="mono">DK-5</td>
+  <td><strong>District heating CHP coupling:</strong> ~63% of Danish households on district heating. CHP (combined heat/power) dominance (Dong Energy, Vores Energi). Electricity-heat joint dispatch data available but integration fragmented. Thermal inertia in heating networks provides flexibility but requires modeling.</td>
+  <td>Electricity and heat markets coupled via CHP units. Heat storage (district heating pipes, thermal tanks) provides grid stability service (shifting load across hours). Model requires dual-layer optimization: electricity demand + heat demand. CHP dispatch decisions driven by heat demand and electricity price signals.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Access CHP operational data from Ørsted (largest operator), Vores Energi, Varmelast. Model electricity-heat coupling. Apply thermal inertia to grid stability (heat storage = virtual battery). District heating network model: pipe volumes, flow rates, temperatures. Seasonal variation: summer low heat demand (cooling via heat pump reversibility growing). Demand response: smart heat storage scheduling (load shifting). Energinet + Dansk Fjernvarme (district heating association) liaison.</td>
+</tr>
+<tr>
+  <td class="mono">DK-6</td>
+  <td><strong>Soft soil conditions and foundation stability:</strong> Denmark underlain by soft Quaternary deposits (no bedrock). Subsidence, settlement, foundation instability possible in ~50% of land area. GEUS geological maps identify risk zones. Substation footings vulnerable. Unique challenge vs Nordic peers (rocks, permafrost).</td>
+  <td>Foundation settlement creates ground-level instability (mechanical stress on equipment footings). Subsidence risk varies by location (highest in eastern Sjælland, western Jylland wetlands). Transformer/breaker foundations at risk. Groundwater table fluctuations (seasonal) compound effects. Long-term infrastructure at risk (50+ year timescale).</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>GEUS geological mapping identifies soft soil zones (Pleistocene/Holocene deposits). Identify substations in high-subsidence risk areas (est. ~200-400 critical). Geotechnical site assessment for high-risk infrastructure. Apply soft soil settlement penalty (1.08–1.15× structural/foundation degradation). Groundwater monitoring (seasonal variation). Require detailed site investigations for DSO pre-ingestion. Monitor GEUS ongoing subsidence research (GPS networks, satellite InSAR).</td>
+</tr>
+<tr>
+  <td class="mono">DK-7</td>
+  <td><strong>Sea level rise + storm surge mapping:</strong> Low-lying country (mean elevation ~30m). Sea level rise accelerating (~4-6 mm/yr, accelerating). Storm surge + high tide + heavy rain compound effects. Kystdirektoratet mapping incomplete for some infrastructure. Climate change increases extreme sea level frequency.</td>
+  <td>Coastal substation/line infrastructure vulnerable to flooding (est. 50-80 installations in direct risk zones). Winter storms (Dec-Feb) most severe. Storm surge + high tide + heavy rain create compound hazard. Coastal retreat rate variable (0.1-1.0 m/yr by location). Multi-decadal planning horizon at risk.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Use Kystdirektoratet coastal hazard maps (some gaps). DMI storm surge and extreme sea level forecasts. Identify coastal infrastructure (<100m above sea level, <500m from high tide). Apply coastal storm hazard multiplier (1.1–1.3× weather damage for Nov-Feb). Sea level rise scenario modeling: 0.5-1.0 m by 2100 (regional). Storm surge frequency increases 2-4× (CMIP6 RCP4.5). Coastal resilience: raised infrastructure, drainage improvement, relocation contingency for high-risk assets.</td>
+</tr>
+<tr>
+  <td class="mono">DK-8</td>
+  <td><strong>DK1/DK2 synchronous boundary and frequency management:</strong> Great Belt cables (AC/HVDC mix) create frequency management challenge. Wind integration requires real-time frequency control. Frequency deviation tolerance narrow in Northern European Synchronous Area (NESA). DK1-DK2 boundary near Energinet control center sensitivity.</td>
+  <td>Frequency stability requires wind ramp rate management. Imbalance market pricing reflects frequency sensitivity. Reserve requirements higher vs hydro-baseload regions. System inertia lower than Nordic peers (no hydro, limited thermal baseload). Synthetic inertia from grid-forming inverters emerging solution.</td>
+  <td class="sev-med">MEDIUM</td>
+  <td>Energinet frequency monitoring and reserve procurement data. Model frequency response requirements (wind ramp-driven). Reserve market data (Nordic Balancing and Settlement). Synthetic inertia from offshore wind and solar PV (grid-forming inverters). Demand response potential (EVs, heat pumps, smart home flexibility). Stability analysis: frequency nadir post-large-disturbance. ENTSO-E Nordic synchronous area coordination.</td>
+</tr>
+<tr>
+  <td class="mono">DK-9</td>
+  <td><strong>Bornholm islanding risk and isolated grid stability:</strong> Bornholm island grid (~300 MW, 40,000 people). ~60% renewable generation (wind farm heavy). Single Great Belt cable fault = island isolation. No hydro flexibility (vs Norway). Frequency/voltage stability critical.</td>
+  <td>Island isolation risk moderate (one cable, but backup possible via Øresund if available). Renewable-heavy generation unstable under isolation. Battery storage minimal. Demand-supply balance critical. Historical outages (2015, 2019) caused economic impact. Systemic vulnerability if frequency collapse occurs.</td>
+  <td class="sev-high">HIGH</td>
+  <td>Comprehensive Bornholm resilience assessment: real-time monitoring (Bornholm Energy). Isolation contingency: load shedding protocols, rapid-start DG. Frequency/voltage stability under island operation. Battery storage expansion (Bornholm Battery Project progress). Demand response potential (industrial flexibility, EV charging curtailment). Great Belt cable redundancy analysis. Renewable integration: wind ramp management, forecast accuracy. Establish direct liaison with Bornholm Energy operator.</td>
+</tr>
+</tbody>
+</table>
+
+<!-- COVERAGE MATRIX -->
+<h2>6. Coverage Matrix by Layer</h2>
+
+<table>
+<thead><tr><th>Layer</th><th>Vars</th><th style="background:var(--accent3);color:#fff">Full</th><th style="background:#856404;color:#fff">Partial</th><th style="background:#6c3483;color:#fff">Proxy</th><th style="background:var(--accent);color:#fff">Gap</th><th style="background:var(--accent2);color:#fff">Derived</th><th>Overall</th></tr></thead>
+<tbody>
+<tr><td class="mono">A — Resilience</td><td class="num">20</td><td class="num">15</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">0</td><td><span class="tag tag-full">92%</span></td></tr>
+<tr><td class="mono">B.1 — Open</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">B.2 — Proxy</td><td class="num">4</td><td class="num">3</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">B.3 — Fuzzy</td><td class="num">12</td><td class="num">5</td><td class="num">1</td><td class="num">2</td><td class="num">4</td><td class="num">0</td><td><span class="tag tag-partial">75%</span></td></tr>
+<tr><td class="mono">C — Socio</td><td class="num">9</td><td class="num">9</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">D — Environ.</td><td class="num">7</td><td class="num">6</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">E — Open Data</td><td class="num">8</td><td class="num">8</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">F — Markov In</td><td class="num">12</td><td class="num">6</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td><span class="tag tag-partial">83%</span></td></tr>
+<tr><td class="mono">G — Modifiers</td><td class="num">3</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">H — Hazard</td><td class="num">7</td><td class="num">6</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr><td class="mono">I — Markov Out</td><td class="num">7</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">7</td><td><span class="tag tag-na">DERIVED</span></td></tr>
+<tr><td class="mono">ID — Join Keys</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="tag tag-full">100%</span></td></tr>
+<tr style="border-top:2px solid var(--ink);font-weight:700"><td>Total</td><td class="num">95</td><td class="num">65</td><td class="num">11</td><td class="num">9</td><td class="num">5</td><td class="num">5</td><td></td></tr>
+</tbody>
+</table>
+
+<div class="note">
+  <strong>Overall assessment:</strong> Pre-deployment coverage: 65 variables fully covered (68%), 11 partially covered (12%), 9 proxy/model-based (9%), 5 true gaps (5%), 5 derived (5%). True gaps: (1) DSO fragmentation (~40 operators) affects substation vintage data standardization. (2) Soft soil foundation stability requires site-specific geotechnical assessment. (3) Offshore wind cable condition data sparse. (4) Per-substation wind curtailment data unavailable. (5) Building-level energy poverty data unavailable (negligible factor). <strong>Advantages:</strong> (1) Energinet real-time API world-class (generation, load, wind, constraints), (2) DMI weather station network exceptional for Denmark's small size (~100 stations), (3) Danmarks Statistik registers excellent (CPR demographics, income, migration), (4) GEUS geological mapping for soft soil hazard assessment, (5) Forsyningstilsynet regulatory transparency (annual DSO reporting), (6) No nuclear complexity (wind+thermal focus), (7) Wind integration leadership globally (Vestas, Ørsted ecosystem). <strong>Remaining challenges:</strong> (1) DSO fragmentation (~40 operators), less severe than Norway but non-trivial, (2) Wind dominance creates grid flexibility complexity (no hydro hedge), (3) Soft soil foundation risk requires site-specific assessment, (4) Offshore wind cable condition (proprietary Energinet data), (5) Bornholm island isolation risk (renewable-heavy, limited backup), (6) Great Belt/Øresund transmission corridor bottleneck, (7) Coastal flood/storm surge mapping gaps (Kystdirektoratet ongoing improvements).
+</div>
+
+<!-- PRE-INGESTION VALIDATION -->
+<h2>7. Pre-Ingestion Validation Priorities</h2>
+
+<table>
+<thead><tr><th>Priority</th><th>Task</th><th>Owner</th><th>Timeline</th><th>Dependency</th></tr></thead>
+<tbody>
+<tr>
+  <td class="mono">P1</td>
+  <td><strong>DSO contact outreach:</strong> Request standardized asset data (vintage, location, voltage) from ~40 DSOs via Forsyningstilsynet coordination. Target largest ~20 DSOs first for rapid coverage (~85% of grid).</td>
+  <td>Forsyningstilsynet liaison</td>
+  <td>2026-04 to 2026-07</td>
+  <td>GA-1, DK-1</td>
+</tr>
+<tr>
+  <td class="mono">P2</td>
+  <td><strong>Energinet integration:</strong> Real-time API access for generation (wind/thermal), load, constraints, wind forecasts, offshore generation. Bidding zone maps (DK1–DK2). Historical topology and transmission capacity. Submarine cable inventory and condition. CHP dispatch data coordination with Ørsted/operators.</td>
+  <td>Energinet data team</td>
+  <td>2026-04 to 2026-05</td>
+  <td>GR-2, GR-3, DK-2, DK-4</td>
+</tr>
+<tr>
+  <td class="mono">P3</td>
+  <td><strong>DMI weather ingestion:</strong> Confirm ~100 station coverage, DMI API access. Download historical temperature/precipitation/wind data (1980–2026). Coastal maritime data validation. Storm surge and extreme sea level forecast integration.</td>
+  <td>DMI liaison</td>
+  <td>2026-04</td>
+  <td>GR-4, GT-5, GT-6</td>
+</tr>
+<tr>
+  <td class="mono">P4</td>
+  <td><strong>GEUS geological data:</strong> Soft soil mapping (Quaternary deposit zones). Subsidence risk assessment. Coastal hazard integration. Site-specific geotechnical hazard classification.</td>
+  <td>GEUS liaison</td>
+  <td>2026-04 to 2026-05</td>
+  <td>DK-6, GQ-2, GQ-3</td>
+</tr>
+<tr>
+  <td class="mono">P5</td>
+  <td><strong>Offshore wind characterization:</strong> Energinet offshore cable inventory and condition reports. ~40 offshore farms mapping and export cable assessment. Marine hazard data (shipping, fishing zones). Cable-specific aging model calibration.</td>
+  <td>Energinet + DTU liaison</td>
+  <td>2026-05 to 2026-07</td>
+  <td>DK-4, GQ-5</td>
+</tr>
+<tr>
+  <td class="mono">P6</td>
+  <td><strong>Kystdirektoratet coastal hazard data:</strong> Coastal flood and storm surge mapping. Sea level rise scenario integration (2050/2100). Erosion rate assessment by region. Critical coastal infrastructure identification.</td>
+  <td>Kystdirektoratet liaison</td>
+  <td>2026-05 to 2026-06</td>
+  <td>DK-7, GQ-2</td>
+</tr>
+<tr>
+  <td class="mono">P7</td>
+  <td><strong>District heating CHP integration:</strong> Ørsted, Vores Energi, and other major CHP operator coordination. Electricity-heat dispatch coupling data. Thermal storage modeling. Demand response and smart heating system integration potential.</td>
+  <td>CHP operator liaison</td>
+  <td>2026-05 to 2026-06</td>
+  <td>DK-5</td>
+</tr>
+</tbody>
+</table>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> — Gap Audit (Denmark) · Ikenga Project · 2026-03-27 · Pre-Ingestion Planning<br>
+~2,000–3,500 HV substations target · 95 variables assessed · 5 remaining gaps · ~92% coverage targeted
+</p>
+
+</div>
+</body>
+</html>

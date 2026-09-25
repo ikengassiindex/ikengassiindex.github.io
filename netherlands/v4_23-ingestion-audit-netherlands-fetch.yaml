@@ -1,0 +1,89 @@
+# Netherlands v4.23 Ingestion Audit — Step 2 fetch
+# ================================================
+# Task: #194 (WAVE2-Step2 Netherlands)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local OSM Overpass fetch complete
+
+meta:
+  country: netherlands
+  iso2: NL
+  iso3: NLD
+  wave: 2
+  step: 2
+  parent_preflight: netherlands/v4_23-ingestion-audit-netherlands-preflight.yaml
+  fetched_at_utc: "2026-07-13T15:49:23Z"
+  operator_environment: residential IP (sandbox arch)
+  wall_clock_secs: ~180  # 3 min single-query
+
+fetch_run:
+  outcome: success
+  substations_parsed: 6964  # pre-Discipline #36 filter
+  substations_post_bounds_filter: 6958
+  lines_parsed: 20699  # pre-Discipline #36 filter
+  lines_post_bounds_filter: 20496
+  raw_bytes_fetched: 2191365
+  raw_sha256: 715d95b2db10d65cecc6e1fd15037f70d9c5ea165723423782c68f4aa3f0b63a
+
+  discipline_36_dropped:
+    substations: 6
+    lines: 203
+    reason: "~0.1% cross-border overshoot filtered by Discipline #36 (100m default tolerance)"
+
+owner_provenance_distribution:
+  osm_operator_tag_direct: 2726  # 39.2% of 6,958
+  osm_operator_tag_direct_alias_normalised: 2  # 0.03% — Enduris/Alliander tags
+  region_fallback_Noord_Holland_Liander: 948  # 13.6%
+  region_fallback_Gelderland_Liander: 584  # 8.4%
+  region_fallback_Zuid_Holland_Stedin: 515  # 7.4%
+  region_fallback_Noord_Brabant_Enexis: 467  # 6.7%
+  region_fallback_Utrecht_Stedin: 426  # 6.1%
+  region_fallback_Zeeland_Stedin: 329  # 4.7%
+  region_fallback_Groningen_Enexis: 208  # 3.0%
+  region_fallback_Flevoland_Liander: 154  # 2.2%
+  region_fallback_Limburg_Enexis: 149  # 2.1%
+  region_fallback_TSO_gte110kV: 138  # 2.0%
+  region_fallback_Friesland_Liander: 74  # 1.1%
+  region_fallback_Drenthe_Enexis: 71  # 1.0%
+  region_fallback_small_DSO_Coteq_geofence: 63  # 0.9%
+  region_fallback_small_DSO_Westland_Infra_geofence: 53  # 0.8%
+  region_fallback_Overijssel_Enexis: 28  # 0.4%
+  region_fallback_small_DSO_Rendo_geofence: 23  # 0.3%
+  total_direct_osm: 2728  # 2726 + 2
+  total_region_fallback: 4230
+  total_unresolved: 0
+  direct_osm_pct: 39.2
+  region_fallback_pct: 60.8
+
+primary_dso_mapping_validated:
+  Liander: 1760  # from Noord-Holland + Gelderland + Flevoland + Friesland fallbacks
+  Stedin: 1270  # from Zuid-Holland + Utrecht + Zeeland fallbacks
+  Enexis: 923  # from Noord-Brabant + Groningen + Limburg + Drenthe + Overijssel fallbacks
+  TenneT: 138  # TSO ≥110 kV
+  # Small DSOs (geofence-resolved)
+  Coteq: 63
+  Westland_Infra: 53
+  Rendo: 23
+
+dnsp_alias_normalisation:
+  count_normalised_via_case_insensitive_map: 2
+  breakdown: |
+    Only 2 tags matched alias map — reflects Netherlands OSM tagging is mostly
+    already using canonical DSO names (Fluvius/ORES/Stedin/etc. — not
+    historical variants). Case-insensitive lookup provides forward-compat for
+    future OSM data drift.
+
+architectural_notes:
+  - "Netherlands baseline had grown to 5,449 substations from prior pipeline run (baseline check pre-Belgium session showed 1,639 — a rescore/refresh had occurred between then and Wave 2 execution). This is expected within the workstream context."
+  - "12-province geofence resolves 100% of untagged with clean primary/small-DSO nested logic. Zero unresolved."
+  - "Line ratio 20,496/6,958 = 2.95 — clean transmission-tier."
+  - "Case-insensitive alias map improvement over Belgium delivered as expected — 2 alias-normalised (down from Belgium's 168 — because NL OSM tagging is cleaner)."
+
+warnings_preserved:
+  - "Discipline #36 — dropped 6 substations + 203 lines outside Netherlands polygon (100m default tolerance)"
+  - "Owner enrichment: 2728/6958 direct OSM operator= tag (39.2%; of these 2 DNSP-alias-normalised); 4230 region_jurisdiction_fallback (60.8%); 0 unresolved (Convention #56 preserved as None)"
+
+next_step: "Step 3 CLOSED (task #195 L1 connector shipped in commit 3d303f3e). Step 4 (task #196) merge execution in progress."
+
+status: STEP_2_CLOSED

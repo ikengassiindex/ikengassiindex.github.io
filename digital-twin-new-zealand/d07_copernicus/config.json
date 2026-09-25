@@ -1,0 +1,127 @@
+{
+  "module": "d07_copernicus",
+  "country": "New Zealand",
+  "country_code": "NZ",
+  "description": "Copernicus Climate Data Store (CDS) extraction — CMIP6 climate projections",
+  "data_source": {
+    "provider": "Copernicus Climate Data Store (CDS)",
+    "url": "https://cds.climate.copernicus.eu/",
+    "dataset": "CMIP6 projections",
+    "license": "CC BY 4.0"
+  },
+  "variables": [
+    "surface_solar_radiation",
+    "soil_moisture",
+    "land_cover_classification",
+    "sea_level_rise",
+    "surface_temperature",
+    "precipitation_change",
+    "storm_intensity",
+    "alpine_snowline_elevation"
+  ],
+  "climate_scenarios": [
+    {
+      "scenario": "SSP2-4.5",
+      "description": "Intermediate emissions scenario (sustainable pathways)",
+      "warming_trajectory": "1.0-1.5°C by 2050"
+    },
+    {
+      "scenario": "SSP5-8.5",
+      "description": "High emissions scenario (fossil fuel development)",
+      "warming_trajectory": "2.0-2.5°C by 2050"
+    }
+  ],
+  "projection_years": [2030, 2040, 2050],
+  "baseline_period": "1985-2014",
+  "spatial_resolution": {
+    "level": "region",
+    "total_regions": 16,
+    "grid_spacing_km": 10.0
+  },
+  "regional_parameters": {
+    "coastal_regions": ["Northland", "Auckland", "Bay of Plenty", "Gisborne", "Hawke's Bay", "Taranaki", "Wellington", "Tasman", "Nelson", "Marlborough", "West Coast", "Canterbury"],
+    "alpine_regions": ["Tasman", "Marlborough", "West Coast", "Canterbury", "Otago"],
+    "eastern_regions": ["Gisborne", "Hawke's Bay", "Canterbury"],
+    "northern_regions": ["Northland", "Auckland"],
+    "north_island_regions": ["Northland", "Auckland", "Waikato", "Bay of Plenty", "Gisborne", "Hawke's Bay", "Taranaki", "Manawatu-Whanganui", "Wellington"],
+    "south_island_regions": ["Tasman", "Nelson", "Marlborough", "West Coast", "Canterbury", "Otago", "Southland"]
+  },
+  "nz_context": {
+    "climate_change_drivers": [
+      "Rising Pacific sea levels (0.3-0.5m by 2050 SSP2-4.5)",
+      "Increased storm intensity and frequency (cyclone exposure)",
+      "Mild warming trajectory (slower than global average)",
+      "Precipitation divergence: wetter west, drier east",
+      "Alpine snow line rising (affecting hydro generation)",
+      "Soil moisture variability increasing (drought risk Canterbury/Hawke's Bay)"
+    ],
+    "vulnerable_sectors": [
+      "Coastal protection (Auckland, Wellington, Christchurch)",
+      "Hydroelectric generation (Waitaki scheme, southern lakes)",
+      "Agriculture (Canterbury drought risk, changing growing seasons)",
+      "Fisheries (water temperature shifts)",
+      "Infrastructure (sea level rise, intensified storms)",
+      "Ecosystems (alpine species, native forests)"
+    ],
+    "strategic_priorities": [
+      "Sea level rise adaptation in major cities",
+      "Water security (east vs west divide)",
+      "Renewable energy resilience (hydro + wind)",
+      "Agricultural productivity shifts",
+      "Biodiversity conservation (alpine and marine)"
+    ]
+  },
+  "land_cover_classes": [
+    {
+      "id": 10,
+      "name": "Cropland",
+      "percentage_nz": 8
+    },
+    {
+      "id": 20,
+      "name": "Forest",
+      "percentage_nz": 25
+    },
+    {
+      "id": 30,
+      "name": "Pasture/Herbaceous vegetation",
+      "percentage_nz": 46
+    },
+    {
+      "id": 40,
+      "name": "Shrubland",
+      "percentage_nz": 12
+    },
+    {
+      "id": 50,
+      "name": "Urban/built-up",
+      "percentage_nz": 2
+    },
+    {
+      "id": 60,
+      "name": "Bare/sparse vegetation",
+      "percentage_nz": 5
+    },
+    {
+      "id": 70,
+      "name": "Water/Wetland",
+      "percentage_nz": 2
+    }
+  ],
+  "validation_ranges": {
+    "temperature_change_celsius": [0, 3],
+    "precipitation_change_pct": [-20, 20],
+    "sea_level_rise_m": [0, 0.75],
+    "solar_radiation_change_pct": [-10, 10],
+    "soil_moisture_change_pct": [-30, 30],
+    "storm_intensity_change_pct": [0, 30],
+    "alpine_snowline_rise_m": [0, 200]
+  },
+  "reference_year": 2025,
+  "refresh_freq": "as_updated_by_CDS",
+  "quality_control": {
+    "ensemble_members": 10,
+    "model_agreement_threshold_pct": 66,
+    "uncertainty_quantification": true
+  }
+}

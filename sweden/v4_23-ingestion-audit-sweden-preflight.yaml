@@ -1,0 +1,382 @@
+# SSI Index v4.23 — Sweden P32 Wave 4 Pre-flight
+# ================================================
+# 🎉 WAVE 4 P32 = NORDIC CLUSTER COMPLETION MILESTONE 🎉
+# ================================================
+# Wave 4 Priority 32 = 2nd Wave 4 country.
+# Post-Sweden: 5 of 5 Nordic countries v4.23-enhanced (Iceland +
+# Denmark + Finland + Norway + Sweden). Nordic cluster COMPLETE.
+#
+# Convention #78 BINDING 14TH ENFORCEMENT candidate: Swedish
+# (Svenska + ä å ö) + Sami (Northern/Southern/Lule + ŧ ǧ) +
+# Finnish/Meänkieli (Tornedalen border) + English 4-language.
+#
+# Convention #78 §4bis.5 Layer 3 10TH ENFORCEMENT candidate:
+# Stockholm metropolitan (Ellevio Stockholm + Vattenfall Stockholm
+# 2-way split) — smaller than London 1,994 but still substantial.
+#
+# Discipline #36: 4.0 km cross-border tolerance (NEW sweden entry).
+# Discipline #41: baseline ratio 5.58 (already above healthy band —
+# grid-geo `l` 20,877 / `s` 3,872 = MV/LV dense). Wave 4 enhancement
+# will multiply lines further; expected post-Wave-4 ratio 8-15
+# ABOVE_HEALTHY_BAND (comparable to UK-post-enhancement).
+#
+# Authored: 2026-07-18 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================
+
+country_code: se
+country_name: Sweden
+country_name_sv: Sverige
+country_name_sm: Ruoŧŧa  # Northern Sami
+country_name_fi: Ruotsi  # Finnish/Meänkieli
+country_name_en: Sweden
+country_slug: sweden
+wave: 4
+priority: P32
+smallest_first_rank: 2  # of 9 Wave 4 candidates (after UK P31)
+scope: WAVE_4_NORDIC_CLUSTER_COMPLETION_5_OF_5
+
+# ---------------------------------------------------------------
+# Wave 4 architecture requirements (post-Turkey schema-bug lesson)
+# ---------------------------------------------------------------
+wave_4_architecture_requirements:
+  merger_schema_target: canonical_compact_s_l_a
+  osm_overpass_query_hints:
+    substations: out center
+    lines: out geom
+  merger_operations_required:
+    - substation_id_assignment
+    - line_id_assignment
+    - polyline_conversion_to_compact_p_array
+    - line_endpoint_ss_se_matching_string_ids
+    - adjacency_graph_construction
+    - grid_based_spatial_index_for_large_N_merges
+    - bbox_split_fallback_if_single_bbox_fails
+  compact_schema_write: via_scripts_pipeline_utils_grid_geo_sharding_write_grid_geo
+  # Sweden projected 30-45 MB grid-geo — safely under 90 MB sharding threshold
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: sweden/ssi-data.json
+  ssi_data_schema: wrapped
+  substation_count: 3744
+  grid_geo_json_path: sweden/grid-geo.json
+  grid_geo_schema: compact_s_l_a
+  s_dict_count: 3872
+  l_list_count: 20877
+  a_dict_count: 3858  # already populated (Nordic OSM community mature)
+  substation_id_format: osm_id_integer_10_digit  # e.g. 1275744416
+  line_id_format: osm_id_integer_7_8_digit  # e.g. 17259067
+  ss_se_type_in_baseline: string_empty_or_populated  # ss/se empty in first entry
+  voltage_distribution_expected:
+    "400.0": SWEDISH_EHV_BACKBONE  # Svenska kraftnät EHV
+    "500.0": HVDC_INTERCONNECTOR  # Fenno-Skan + NordBalt + Baltic Cable
+    "220.0": TSO_TRANSMISSION  # Legacy 220 kV backbone
+    "130.0": SUBTRANSMISSION  # Swedish MV
+    "45.0": SECONDARY_DISTRIBUTION
+    "20.0": LV
+  bbox:
+    lon_min: 10.96  # Bohuslän western coast
+    lon_max: 24.17  # Torneå Finnish border
+    lat_min: 55.34  # Smygehuk southernmost mainland
+    lat_max: 69.06  # Treriksröset triple-border
+  bounds_json_features: 21  # per-län admin regions
+
+# ---------------------------------------------------------------
+# Architectural signatures — Nordic synchronous + Sami minority
+# ---------------------------------------------------------------
+architectural_signatures:
+  nordic_cluster_completion_5_of_5: true  # Iceland + DK + FI + NO + SE
+  nordic_synchronous_grid_via_fingrid_statnett_energinet: true
+  four_bidding_zones_SE1_SE2_SE3_SE4: true
+  # SE1 Norrland North (Luleå/Kiruna/Boden)
+  # SE2 Norrland South (Umeå/Sundsvall/Östersund)
+  # SE3 Central (Stockholm/Göteborg/Uppsala/Karlstad)
+  # SE4 South (Malmö/Öresund/Helsingborg)
+  six_hvdc_subsea_interconnectors:
+    fenno_skan_1_finland_1989_400mw: true
+    fenno_skan_2_finland_2011_800mw: true
+    konti_skan_denmark_1965_1988_680mw: true
+    swepol_link_poland_2000_600mw: true
+    nordbalt_lithuania_2015_700mw: true
+    baltic_cable_germany_1994_600mw: true
+  norwegian_land_border_ac_synchronous: true  # world's longest peace-time border
+  finnish_land_border_torneå_river: true
+  öresund_bridge_denmark_2000: true  # car+rail only, not HV
+  # 4 nuclear reactors remaining (post-2020 phase-out of 6):
+  nuclear_generation_4_reactors: true
+  # Forsmark 1+2+3 (Uppland) + Ringhals 3+4 (Varberg) + Oskarshamn 3
+  # Ringhals 1+2 closed 2020; Barsebäck 1+2 closed 1999+2005
+  # Layer 4b nuclear carve-out at Forsmark/Ringhals/Oskarshamn
+  world_first_climate_act_2018_statutory_net_zero_2045: true
+  norrbotten_green_industrial_transition:  # World-leading
+    - Hybrit + SSAB + Vattenfall + LKAB — H2 Green Steel
+    - Northvolt battery gigafactory Skellefteå (paused 2024)
+    - HYBRIT direct reduction iron ore
+  richest_cohort_wide_island_archipelago_stockholm_skärgård_30000_islands: true
+  gotland_öland_island_carve_outs: true
+  # Sami rights + language minorities
+  sami_parliament_sametinget_1993_statutory: true
+  meänkieli_finnish_tornedalen_minority_language_2000_recognized: true
+  sami_reindeer_grazing_rights_vs_wind_mining_conflicts: true
+  kiruna_town_relocation_2015_2035_mine_expansion: true
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 14TH ENFORCEMENT scoping
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 14
+  script_class: SWEDISH_PLUS_SAMI_PLUS_FINNISH_MEÄNKIELI_PLUS_ENGLISH_4_LANGUAGE
+  scripts_supported:
+    - Swedish  # ~92% expected — Latin + ä å ö diacritics
+    - Sami  # ~2% — Northern/Southern/Lule Sami; ŧ ǧ ï ï̌ special chars
+    - Finnish  # ~2% — Meänkieli Tornedalen border + Finnish Sami minorities
+    - Norwegian  # ~1% — Norwegian OSM tags on border
+    - English  # ~3% — international OSM tagging
+  primary_operators:
+    svenska_kraftnät:
+      swedish: [Svenska kraftnät, SvK, Svenska Kraftnät, Affärsverket svenska kraftnät]
+      english: [Swedish National Grid, Swedish Transmission System Operator, SVK]
+      sami: [Ruoŧa Fápmoruossat]  # Northern Sami approximate
+      finnish: [Ruotsin sähköverkko]
+      role: NATIONAL_TSO_STATE_OWNED
+      voltage_scope: [400, 220]
+      ownership: State 100% affärsverk
+    # ═══ Major DSOs ═══
+    vattenfall_eldistribution:
+      swedish: [Vattenfall Eldistribution, Vattenfall Elnät, Vattenfall Distribution, Vattenfall AB Eldistribution]
+      english: [Vattenfall Distribution, Vattenfall Electricity Distribution]
+      role: LARGEST_DSO_STATE_OWNED
+      coverage: Nationwide with concentration in Stockholm + Norrland + Gotland
+      customers_millions: 0.9
+      ownership: State 100% (Vattenfall AB)
+    ellevio:
+      swedish: [Ellevio, Ellevio AB]
+      english: [Ellevio]
+      predecessors: [Fortum Distribution, Fortum Sverige Distribution]
+      role: SECOND_LARGEST_DSO_STOCKHOLM_METRO
+      predecessor_rebrand: Fortum → Ellevio 2015 (sale to Borealis+Folksam)
+      coverage: Stockholm + Central Sweden + Halland
+      customers_millions: 0.99
+      ownership: Borealis Infrastructure + Folksam + AMF + APG
+      convention_78_4bis_5_10th_enforcement: STOCKHOLM_metropolitan_geofence_candidate
+    eon_energidistribution:
+      swedish: [E.ON Energidistribution, E.ON Elnät, EON, E.ON Sverige]
+      english: [E.ON Distribution, EON, E.ON Sweden]
+      role: THIRD_LARGEST_DSO_SOUTHERN_SWEDEN
+      coverage: Southern Sweden Skåne + Blekinge + Småland + Öland
+      customers_millions: 1.0
+      ownership: E.ON SE (German parent)
+    göteborg_energi:
+      swedish: [Göteborg Energi, Göteborg Energi Nät, Göteborg Energi AB]
+      english: [Gothenburg Energy]
+      role: GOTHENBURG_MUNICIPAL_DSO
+      coverage: Göteborg city + Mölndal
+      customers_millions: 0.28
+      ownership: Göteborg Stad municipality
+      convention_78_4bis_5_11th_enforcement_candidate: GOTHENBURG_metropolitan_geofence
+    kraftringen:
+      swedish: [Kraftringen, Kraftringen Nät, Kraftringen Energi]
+      english: [Kraftringen]
+      role: LUND_ESLÖV_HÖRBY_MUNICIPAL_DSO
+      coverage: Lund + Eslöv + Hörby + Lomma
+      ownership: Lund municipality primary + Eslöv+Hörby+Lomma partners
+    jämtkraft:
+      swedish: [Jämtkraft, Jämtkraft AB]
+      english: [Jämtkraft]
+      role: JÄMTLAND_MUNICIPAL_DSO
+      coverage: Östersund + Jämtland county
+      ownership: Östersund + Krokom + Åre municipalities
+    öresundskraft:
+      swedish: [Öresundskraft, Öresundskraft AB]
+      english: [Öresundskraft]
+      role: HELSINGBORG_MUNICIPAL_DSO
+      coverage: Helsingborg + Ängelholm
+      ownership: Helsingborg municipality
+    # ═══ Nuclear generation (Layer 4b generation carve-out) ═══
+    vattenfall_nuclear:
+      swedish: [Forsmark, Forsmarks Kraftgrupp, Forsmark Kärnkraftverk]
+      english: [Forsmark Nuclear Power Plant]
+      role: NUCLEAR_FORSMARK_3_REACTORS
+      ownership: Vattenfall AB
+    ringhals:
+      swedish: [Ringhals, Ringhals Kärnkraftverk]
+      english: [Ringhals Nuclear Power Plant]
+      role: NUCLEAR_RINGHALS_2_REMAINING_REACTORS
+      note: Ringhals 1+2 closed 2020; 3+4 operational
+    oskarshamn_kärnkraftverk:
+      swedish: [OKG, Oskarshamn Kärnkraftverk]
+      english: [Oskarshamn Nuclear Power Plant, OKG]
+      role: NUCLEAR_OSKARSHAMN_1_REMAINING_REACTOR
+      note: O1+O2 closed 2017/2015; O3 operational
+    barsebäck_closed:
+      swedish: [Barsebäck, Barsebäcks Kraft AB]
+      role: NUCLEAR_BARSEBÄCK_CLOSED_1999_2005  # historical
+    # ═══ Rail traction (Layer 4c) ═══
+    trafikverket:
+      swedish: [Trafikverket, Trafikverket Underhåll, Banverket]  # Banverket pre-2010
+      english: [Swedish Transport Administration]
+      role: RAIL_TRACTION_15KV_AC
+      note: 15 kV 16.7 Hz AC electrified backbone Stockholm-Göteborg-Malmö-Umeå-Luleå
+    # ═══ HVDC interconnector consortiums ═══
+    fenno_skan_consortium:
+      swedish: [Fenno-Skan, Svk-Fingrid Fenno-Skan]
+      role: HVDC_FINLAND_SWEDEN_1989_2011
+    swepol_link:
+      swedish: [SwePol Link, SwePol]
+      english: [SwePol Link]
+      role: HVDC_POLAND_SWEDEN_2000_600MW
+    nordbalt:
+      swedish: [NordBalt, NordBalt HVDC]
+      english: [NordBalt]
+      role: HVDC_LITHUANIA_SWEDEN_2015_700MW
+    baltic_cable:
+      swedish: [Baltic Cable, Baltic Cable AB]
+      english: [Baltic Cable]
+      role: HVDC_GERMANY_SWEDEN_1994_600MW
+    # ═══ Cross-border partner operators (route to SvK) ═══
+    fingrid_nordic:
+      finnish: [Fingrid, Fingrid Oyj]
+      english: [Fingrid]
+      role: FINNISH_TSO_via_fenno_skan
+      route_to: Svenska kraftnät
+    statnett:
+      norwegian: [Statnett, Statnett SF]
+      english: [Statnett]
+      role: NORWEGIAN_TSO_via_ac_synchronous
+      route_to: Svenska kraftnät
+    energinet_nordic:
+      danish: [Energinet, Energinet.dk]
+      english: [Energinet]
+      role: DANISH_TSO_via_konti_skan
+      route_to: Svenska kraftnät
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 10TH ENFORCEMENT candidate
+# ---------------------------------------------------------------
+convention_78_4bis_5_stockholm_geofence:
+  cohort_wide_enforcement_number: 10  # candidate — after UK London 9th
+  geofence_architecture: 2_way_metropolitan_split
+  cumulative_enforcement_roster_pre_sweden:
+    1: Prague CZ (P20)
+    2: Warsaw PL (P21)
+    3: EWZ Zurich CH (P24)
+    4: SIG Geneva CH (P24)
+    5: Auckland NZ (P27)
+    6: Copenhagen DK (P28 — 615)
+    7: Helsinki FI (P29 — 446)
+    8: Istanbul TR (P30 — 57+121=178)
+    9: London UK (P31 — 1,994 LARGEST)
+  candidate: Stockholm SE (P32 candidate — 2-way Ellevio + Vattenfall split)
+  stockholm_context: |
+    Stockholm metropolitan area (~2.4M population = ~23% of Swedish
+    population; ~30% of Swedish electricity demand). Two-way DSO split:
+    (a) Ellevio Stockholm — inner-city + eastern suburbs (Nacka +
+    Ekerö + Solna + Sundbyberg + Stockholm inner + some Stockholm
+    outer wards); (b) Vattenfall Eldistribution Stockholm — outer
+    western + northern suburbs + Uppsala.
+  geofence_bboxes:
+    ellevio_stockholm:
+      lat: [59.20, 59.50]
+      lon: [17.80, 18.25]
+      operator_canonical: Ellevio Stockholm
+      customers_millions: 0.7
+    vattenfall_stockholm:
+      lat: [59.30, 59.60]
+      lon: [17.55, 18.10]
+      operator_canonical: Vattenfall Eldistribution Stockholm
+      customers_millions: 0.5
+  anticipated_hits: 500_1500  # comparable to Helsinki 446; less than London 1,994
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border tolerance
+# ---------------------------------------------------------------
+discipline_36_tolerance:
+  boundary_tolerance_km: 4.0
+  entry_added_to: cross_border_tolerances.json
+  rationale_summary: |
+    Nordic synchronous grid + 6 HVDC subsea interconnectors +
+    long Norwegian land border AC synchronous + Finnish river
+    border + island archipelago Stockholm skärgård 30,000+ +
+    Gotland/Öland + West Coast bohuslän skerries. 4.0 km
+    intermediate between Alpine 0.5 km and Aegean 5.0 km.
+  expected_drops_estimate:
+    subs: 40_100
+    lines: 20_60
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity target
+# ---------------------------------------------------------------
+discipline_41_parity_target:
+  baseline_pre_enhancement: 5.58  # 20,877 / 3,744 = ALREADY ABOVE band
+  target_ratio_min: 1.5
+  target_ratio_max: 5.0
+  anticipated_signature: STAYS_ABOVE_HEALTHY_BAND_post_enhancement
+  rationale: |
+    Sweden baseline is ALREADY ABOVE_HEALTHY_BAND at 5.58 (grid-geo
+    l 20,877 / s 3,872 = MV/LV dense Nordic pattern). Post-Wave-4
+    enhancement anticipated to add 30,000-60,000 net-new lines
+    bringing ratio to 8-15 — comparable to UK-post-enhancement
+    ABOVE_HEALTHY_BAND signature. Reflects mature Nordic OSM
+    tagging community.
+
+# ---------------------------------------------------------------
+# Anticipated architectural first-instances via Sweden P32 closure
+# ---------------------------------------------------------------
+architectural_first_instances_anticipated:
+  1: 🎉 NORDIC CLUSTER COMPLETION MILESTONE (5-of-5 Nordics v4.23-enhanced)
+  2: Convention #78 BINDING 14TH cohort-wide enforcement (Swedish + Sami + Finnish + English 4-language)
+  3: Convention #78 §4bis.5 10TH cohort-wide enforcement Stockholm 2-way (Ellevio + Vattenfall)
+  4: FIRST cohort-wide Sami minority (Sápmi Ruoŧŧa) language enforcement
+  5: FIRST cohort-wide Meänkieli minority (Tornedalen border) language enforcement
+  6: FIRST world-first statutory climate framework Layer 4 adapt 0.80 (Climate Act 2018 Net-Zero 2045)
+  7: 6 HVDC subsea interconnector portfolio preserved (Fenno-Skan 1+2 + Konti-Skan + SwePol + NordBalt + Baltic Cable)
+  8: Norrbotten green industrial transition preserved (HYBRIT + H2 Green Steel + Northvolt)
+  9: Stockholm skärgård 30,000+ island archipelago carve-out preserved
+  10: Nordic synchronous grid Wave 4 completion (all 4 Nordic TSOs v4.23-enhanced)
+  11: Second Wave 4 country to use bbox-split fallback IF single-bbox line query fails
+  12: Second Wave 4 country to use Convention #80 grid-geo sharding IF exceeds 90 MB (unlikely for Sweden — projected 30-45 MB)
+
+# ---------------------------------------------------------------
+# Cumulative Wave 4 progression projection at Sweden P32 closure
+# ---------------------------------------------------------------
+cumulative_wave_4_projection_at_sweden_closure:
+  countries_terminally_complete: 2  # UK + Sweden
+  wave_4_progression_pct: 22.2  # 2/9
+  canonical_cohort_completion_pct: 82.1  # 32/39
+  convention_78_binding_enforcements: 14
+  convention_78_alias_ledger_projected: 38500_39500  # +1000-2000 SE alias hits
+  convention_78_4bis_5_layer_3_enforcements: 10  # +Stockholm 10th
+  nordic_cluster_completion: true  # 5-of-5 (IS + DK + FI + NO + SE)
+  remaining_wave_4_candidates: 7  # spain + italy + japan + portugal + france + germany + us
+  next_smallest_first: portugal_or_italy  # baseline lines ~11k
+
+# ---------------------------------------------------------------
+# Layer 4 hazard baselines
+# ---------------------------------------------------------------
+layer_4_hazard_baselines:
+  R6c_flood: 0.30  # LOW-MOD lakes + Göta älv 2000+2006
+  R6d_wildfire: 0.35  # MOD 2018 mega-fires + boreal
+  R6e_winter: 0.75  # HIGH Arctic Norrland -40°C sustained
+  R8_adapt: 0.80  # HIGH world-first Climate Act 2018 Net-Zero 2045
+  R9_compound: 0.45  # MOD Baltic geopolitical + Arctic + Sami
+  R10_just: 0.55  # MOD-HIGH Sami + Norrbotten green + coal 2020 first-OECD
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 2 Operator local OSM Overpass fetch
+handoff_command_step_2: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.sweden.osm_overpass 2>&1 \
+    | tee sweden/v4_23-osm-overpass.log
+
+anticipated_step_2_pattern: |
+  Sweden 447k km² area (2× UK). Wave 4 architecture proven on UK
+  — single-bbox may work OR fall through to 6-zone bbox-split
+  fallback (SE1 Norrland-north + SE2 Norrland-south + SE3-north +
+  SE3-south + SE4 + Gotland-Öland). Expected line count 50k-100k
+  post-filter (2.5-5× baseline 20,877). Grid-geo projected 30-45 MB
+  (well under Convention #80 90 MB sharding threshold).

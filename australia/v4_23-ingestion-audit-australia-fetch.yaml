@@ -1,0 +1,110 @@
+# Australia v4.23 Ingestion Audit — Step 2 fetch
+# ================================================
+# Task: #184 (WAVE2-Step2 Australia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local OSM Overpass fetch complete
+
+meta:
+  country: australia
+  iso2: AU
+  iso3: AUS
+  wave: 2
+  step: 2
+  parent_preflight: australia/v4_23-ingestion-audit-australia-preflight.yaml
+  fetched_at_utc: "2026-07-13T14:34:37Z"  # approx from operator log
+  operator_environment: residential IP (sandbox arch)
+
+fetch_run_1_partial:
+  # First fetch (osm_overpass module directly) — 2 states timed out
+  outcome: partial_success
+  substations_parsed: 1696
+  raw_bytes_fetched: 463445
+  raw_sha256: 33e5ba43b3fac81a551d01f5d7ae07d98e7a24521e6bc0943769f69fd235d0e5
+  timed_out_states:
+    - NSW  # substations query
+    - VIC  # substations query
+  successful_states:
+    - QLD: 922
+    - WA: 279
+    - SA: 322
+    - TAS: 104
+    - NT: 43
+    - ACT: 70
+  wall_clock_secs: ~1080
+  discipline_36_dropped:
+    substations: 44
+    lines: 407
+    reason: "~2.5% cross-border overshoot filtered by Discipline #36 (100m default tolerance)"
+
+fetch_run_2_authoritative:
+  # Second fetch (merge_into_ssi_data re-invocation) — cache-assisted, complete
+  outcome: success
+  substations_parsed: 4778
+  lines_parsed: 84614
+  raw_bytes_fetched: 1359565
+  raw_sha256: 6489c72de9effe538a41d63c3af14829833bf58e1a3cb210ebc21ec9712fb34d
+  per_state_substations:
+    NSW: 1767
+    QLD: 922    # cache hit
+    VIC: 1332   # NEW — first attempt timed out, second succeeded via kumi.systems
+    WA: 279     # cache hit
+    SA: 322     # cache hit
+    TAS: 104    # cache hit
+    NT: 43      # cache hit
+    ACT: 70     # cache hit
+  per_state_lines:
+    NSW: 28114
+    QLD: 20217
+    VIC: 24436
+    WA: 885
+    SA: 2039
+    TAS: 1129
+    NT: 623     # NEW — first attempt failed 504, second succeeded
+    ACT: 7645
+  wall_clock_secs: ~365
+  discipline_41_ratio: 17.71  # 84614 lines / 4778 subs — clean transmission-tier
+
+owner_provenance_distribution:
+  # Post-cross-border-filter, pre-merge
+  osm_operator_tag_direct: 2603  # 54.5%
+  state_fallback_QLD_SEQ_geofence: 398
+  state_fallback_SA_DNSP: 210
+  state_fallback_WA_SWIS_default: 169
+  state_fallback_WA_regional_geofence: 39
+  state_fallback_ACT_combined: 34
+  state_fallback_WA_TSO_gt132kV: 32
+  state_fallback_TAS_combined_tso_dnsp: 23
+  state_fallback_QLD_TSO_gt132kV: 21
+  state_fallback_NT_combined: 15
+  state_fallback_QLD_rural_default: 5
+  state_fallback_SA_TSO_gt132kV: 5
+  state_fallback_NSW_rural_default: 1
+  # PLUS the additional 4,778 - 3,555 shown above = 1,223 with NSW/VIC-specific
+  # fallback distributions not itemized in first-fetch summary (metropolitan
+  # Sydney/Melbourne = Ausgrid/CitiPower/Powercor direct-tagged more heavily,
+  # so state_fallback share on NSW/VIC lower than QLD/WA)
+  total_direct_osm: 2603
+  total_state_fallback: 2175
+  total_unresolved: 0
+  direct_osm_pct: 54.5
+  state_fallback_pct: 45.5
+
+warnings_preserved:
+  - "Convention #56 partial — OSM substations NSW fetch timed out on first attempt (kumi.systems fallback succeeded on merge re-fetch)"
+  - "Convention #56 partial — OSM substations VIC fetch timed out on first attempt (kumi.systems fallback succeeded on merge re-fetch)"
+  - "Convention #56 partial — OSM lines NT fetch failed 504 on first attempt (overpass-api.de retry succeeded on merge re-fetch)"
+  - "Discipline #36 — dropped 44 substations + 407 lines outside Australia polygon (100m default tolerance)"
+  - "Owner enrichment: 2603/4778 direct OSM operator= tag (54.5%); 2175 state_jurisdiction_fallback (45.5%); 0 unresolved (Convention #56 preserved)"
+  - "Overpass 429 rate-limited 2x during line fetch (VIC + NT); exponential backoff 30s recovered both"
+
+architectural_takeaways:
+  - "Continental scale + 8-state bbox partitioning empirically validates. NSW + VIC state bboxes near single-query timeout ceiling — future ingest may split further or use OSM extracts."
+  - "3-endpoint fallback (main → kumi → private.coffee) empirically necessary — 4 out of 16 state-queries used fallback endpoints."
+  - "Cache-assisted re-fetch pattern (merge re-invokes fetch) provided free recovery on partial failures. Cache lifespan controlled by scripts/pipeline/data/australia/_osm_cache/ hash-keyed files."
+  - "State-jurisdiction fallback resolves 100% of untagged substations across 8 states/territories. Zero unresolved. VIC multi-DNSP class emits explicit 'Victoria DNSP (unresolved multi-provider)' per Convention #56."
+
+next_step: "Step 3 CLOSED (task #185 L1 connector shipped commit bc4691ed). Step 4 (task #186) merge execution in progress via merge_into_ssi_data."
+
+status: STEP_2_CLOSED

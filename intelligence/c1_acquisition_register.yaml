@@ -1,0 +1,659 @@
+# ════════════════════════════════════════════════════════════════════════════
+# C1 ACQUISITION REGISTER — regulator continuity-of-supply returns
+#
+# WHY THIS FILE EXISTS
+# ────────────────────
+# The metric registry in the component builder blocks C1, C2, C3 and C4 on one
+# source class: "regulator continuity return — SAIDI / SAIFI / C3_MT_exceed_pct
+# / planned-unplanned split, sub-national". The same source class is the sole
+# dependency of V1 ("SAIDI; V_socio is already present at 100% coverage") and
+# half of E1 ("C1_raw and avg_load_MW").
+#
+# One acquisition therefore unblocks components C (weight 0.30), V (0.10) and
+# part of E (0.10) — by the rank-variance decomposition of
+# doctrine/FINDING_what_determines_a_substations_rank.md, over half of what
+# decides a substation's position within its own country.
+#
+# Until it lands, C V E S and T are what
+# doctrine/FINDING_every_traced_component_is_a_hash.md measured them to be.
+#
+# RULES THIS FILE OBEYS
+# ─────────────────────
+# Pin 14  every coefficient verified against a primary or secondary source
+# Pin 15  open public data only; no paid source is entered here, ever
+# §7.6    no citation not read — `read: true` means the page was fetched and
+#         the fields below were taken from it, not from a search snippet
+# §7.9    a jurisdiction not yet researched says so; it gets no placeholder
+#
+# FIELD MEANINGS
+# ──────────────
+# unit          the geographic unit the regulator publishes at
+# unit_count    how many such units exist (the granularity ceiling)
+# records       published substations in that jurisdiction
+# per_unit      records / unit_count — how many assets share one measured value
+# metrics       which of C1 C2 C3 C4 the publication carries
+# licence       as stated by the publisher; null where the publisher states none
+# route         machine-readable access, or the form the data takes if none
+# read          true only where the cited URL was fetched and read
+# ════════════════════════════════════════════════════════════════════════════
+
+version: 1
+compiled: 2026-09-25
+blocks: [C1, C2, C3, C4, V1, E1]
+total_jurisdictions: 39
+researched: 5
+
+jurisdictions:
+
+  france:
+    records: 168894
+    regulator: CRE
+    operator: Enedis
+    CORRECTION:
+      date: 2026-09-25
+      what_was_recorded: >
+        This register's first version carried France at "département, 96 units,
+        1,759 substations per measured value" and left the unit of the two
+        critère B datasets as "not yet verified from the primary source". The
+        département figure was read off the sibling C3 dataset and generalised
+        to critère B. That generalisation was wrong.
+      what_is_true: >
+        Enedis publishes critère B and the coupure frequency NATIONALLY ONLY —
+        18 records and 485 bytes for the duration series, 18 records and 707
+        bytes for the frequency series, one value per year. Neither is
+        sub-national. The only sub-national continuity dataset Enedis
+        publishes is the regulatory indicator, 94 records at département,
+        2009 to 2024.
+      consequence_for_the_mosaic: >
+        France cannot serve as the calibration donor for a C3 transfer to
+        Italy. The transfer needs a jurisdiction publishing C1, C2 and C4
+        sub-nationally alongside C3, so that the cross-sectional relationship
+        can be fitted. France has C3 sub-nationally and the other three only
+        as 18 national points. Italy is its mirror image: C1, C2 and C4 per
+        province, no C3. Neither is a donor; together they are evidence that
+        the four metrics are not published as a set anywhere yet checked.
+    publications:
+      - name: Indicateur réglementaire continuité d'alimentation
+        url: https://opendata.enedis.fr/datasets/indicateur-continuite-dalimentation/
+        metrics: [C3]
+        unit: département
+        records: 94
+        size: 17 kB
+        years: 2009-01-01 to 2024-12-31
+        refresh: annual
+        licence: Licence Ouverte / Open Licence 2.0
+        read: true
+        status: THE ONE SUB-NATIONAL C METRIC FRANCE PUBLISHES. Not yet fetched.
+      - name: Durée moyenne de coupure par client BT (critère B)
+        url: https://opendata.enedis.fr/datasets/duree-moyenne-de-coupure-bt
+        metrics: [C1]
+        unit: national
+        records: 18
+        size: 485 bytes
+        refresh: twice yearly, last 29 June 2026
+        licence: Licence Ouverte / Open Licence 2.0
+        read: true
+      - name: Fréquence moyenne de coupure par client BT
+        url: https://opendata.enedis.fr/datasets/frequence-moyenne-de-coupure-par-client-bt/
+        metrics: [C2]
+        unit: national
+        records: 18
+        size: 707 bytes
+        licence: Licence Ouverte / Open Licence 2.0
+        read: true
+      - name: Durée / Fréquence moyenne de coupure par client HTA
+        url: https://opendata.enedis.fr/datasets/frequence-moyenne-annuelle-de-coupure-par-client-hta/
+        metrics: [C1, C2]
+        unit: not yet verified
+        read: false
+    what_the_typed_file_invented:
+      file: "SSI Index/SSI_v4_0 France/france-pipeline/data/raw/cre_tiqe.csv"
+      producer: ingestion/cre_tiqe.py::fetch()
+      finding: >
+        The typed file carries SAIDI_min, SAIFI, CAIDI_min and C4_planned_count
+        per département. Enedis publishes none of those four at département
+        level — they exist only as national annual series. So four of its five
+        measured columns are not merely unfetched, they are quantities no
+        French source publishes at that unit.
+        The fifth column, C3_MT_exceed_pct, IS published per département by
+        Enedis, has been since 2009, under Licence Ouverte 2.0, in a 17 kB
+        file. It was typed too.
+    status: partially_established
+  germany:
+    records: 108016
+    regulator: Bundesnetzagentur
+    publications:
+      - name: Versorgungsunterbrechungen Strom — SAIDI je Bundesland
+        url: https://www.statistikportal.de/de/nachhaltigkeit/ergebnisse/ziel-9-industrie-innovation-und-infrastruktur/versorgungsunterbrechungen
+        metrics: [C1]
+        note: >
+          SAIDI(EnWG) for each of the 16 Länder plus a national figure. The
+          portal is the statistical offices' SDG-9 presentation; the source it
+          names is the Bundesnetzagentur.
+        unit: Bundesland
+        unit_count: 16
+        per_unit: 6751
+        years: 2008 to 2024
+        licence: >
+          null — the portal footer states "Alle Rechte vorbehalten". The
+          primary source is BNetzA and its terms must be read there before
+          this row can be used.
+        route: HTML table only; no CSV or XLSX offered on this page
+        read: true
+      - name: Bundesnetzagentur — Kennzahlen der Versorgungsunterbrechungen Strom
+        url: https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Versorgungssicherheit/Versorgungsunterbrechungen/Auswertung_Strom/start.html
+        metrics: [C1, C2]
+        unit: not yet verified
+        licence: not yet verified
+        route: not yet verified
+        read: false
+    status: partially_established
+    open: >
+      Licence unresolved. 16 units for 108,016 substations is 6,751 assets per
+      measured value — the coarsest granularity so far and a real limit on what
+      C can claim in Germany.
+
+  italy:
+    records: 41662
+    regulator: ARERA
+    publications:
+      - name: >
+          Pubblicazione comparativa degli indicatori di continuità del servizio
+          elettrico (13th edition, reference year 2024)
+        url: https://www.arera.it/comunicati-operatore/dettaglio/continuita-servizio-e-qualita-tensione-nuova-interfaccia
+        metrics: [C1, C2]
+        note: >
+          Number and duration of interruptions. Published under TIQD, the
+          integrated output-based regulation text for 2024-2027.
+        unit: >
+          ambito territoriale — comune density class (over 50,000 inhabitants
+          / 5,000-50,000 / under 5,000) crossed with distributor
+        unit_count: not yet counted
+        years: 2024, with twelve prior comparative editions
+        licence: not stated on the page
+        route: >
+          SAS Visual Analytics interface at reporting.arera.it; no download or
+          API located yet
+        read: true
+    status: partially_established
+    open: >
+      The unit is not province. Joining to Italian substations needs
+      lat/lon -> comune -> density class and distributor. That join is finer
+      than province if the underlying table can be obtained; the SAS interface
+      is not yet a machine-readable route.
+
+  us:
+    records: 73859
+    regulator: US Energy Information Administration (EIA)
+    publications:
+      - name: Form EIA-861 Annual Electric Power Industry Report — Reliability file
+        url: https://www.eia.gov/electricity/data/eia861/
+        metrics: [C1, C2]
+        note: >
+          "The data contain information on non-momentary electrical
+          interruptions. If collected, utilities report the system average
+          interruption duration index (SAIDI), the system average interruption
+          frequency index (SAIFI)." Reported by the filing utility. "If
+          collected" is load-bearing: the return is conditional, so coverage
+          must be measured per year before use, not assumed.
+        unit: filing utility
+        unit_count: not yet counted from the file
+        years: 1990 to 2025 (2025 early release)
+        licence: >
+          Public domain. "U.S. government publications are in the public
+          domain and are not subject to copyright protection." Acknowledgment
+          with publication date is required.
+        licence_url: https://www.eia.gov/about/copyrights_reuse.php
+        route: annual ZIP per year, direct download, no key
+        read: true
+    status: partially_established
+    open: >
+      The join from substation to filing utility is the work. Utility service
+      territories are published separately; that join has to be built and
+      measured, and every substation that falls in no territory gets no C
+      rather than a default.
+
+  uk:
+    records: 59744
+    regulator: Ofgem
+    publications:
+      - name: RIIO-2 Electricity Distribution Annual Report 2024 to 2025
+        url: https://www.ofgem.gov.uk/sites/default/files/2026-01/ED-annual-report-2024-2025.pdf
+        metrics: [C1, C2, C4]
+        note: >
+          Customer Minutes Lost is SAIDI under its GB name; Customer
+          Interruptions per 100 customers is SAIFI x 100. Planned and
+          unplanned are reported separately, which is C4's split directly.
+        unit: DNO licence area
+        unit_count: 14
+        per_unit: 4267
+        years: 2001-02 to 2024-25
+        licence: not yet verified
+        route: >
+          the report itself carries charts, not tables; it states "a
+          supplementary datafile containing additional performance data is
+          published alongside this report" — that file is the route and has
+          not been located yet
+        read: true
+    status: partially_established
+    open: >
+      14 units for 59,744 substations. The six DNO groups run their own open
+      data portals, several at primary-substation level, which would be far
+      finer than the licence area. That is the route worth establishing for
+      the UK, not the Ofgem aggregate.
+
+# ── not yet researched ──────────────────────────────────────────────────────
+# These carry no entry rather than an empty one. §7.9.
+not_yet_researched:
+  [poland, austria, portugal, australia, spain, czechia, canada,
+   belgium, japan, norway, netherlands, lithuania, denmark, latvia, turkey,
+   finland, sweden, hungary, mexico, switzerland, estonia, slovenia,
+   new-zealand, slovakia, korea, ireland, chile, colombia, luxembourg, greece,
+   iceland, israel, costa-rica, greenland]
+
+# ════════════════════════════════════════════════════════════════════════════
+# WHAT THE ESTATE ALREADY HOLDS
+# Swept before any further web research, at the operator's instruction.
+# Searched: all mounted folders, the private pipeline repo, the ENN connector
+# trees, and every .csv under SSI Index/SSI_v4_0 *.
+# ════════════════════════════════════════════════════════════════════════════
+
+already_in_estate:
+
+  italy:
+    verdict: ACQUIRED — real regulator data, never wired
+    files:
+      - "SSI Index/SSI_v4_0 Italy and sources/formulas and ingestions/zzz Old ingestion logs/arera_tiqe_2024_dso_raw.csv"
+      - "SSI Index/SSI_v4_0 Italy and sources/formulas and ingestions/zzz Old ingestion logs/arera_tiqe_2024_regional.csv"
+    schema: concentrazione, impresa, regione, utenti_bt, D1L, N1L, indice
+    mapping: D1L -> C1 (SAIDI, minutes per LV user per year); N1L -> C2 (SAIFI)
+    rows: 91 DSO-region records
+    unit: distributor x concentration class x region
+    per_unit: 458
+    coverage: 36995573 LV users, all 20 regions
+    source: >
+      ARERA Pubblicazione Comparativa Continuità Servizio Elettrico 2024,
+      published November 2025, data year 2024. Three PDFs
+      (Alta / Media / Bassa Concentrazione), transcribed.
+    provenance_note: >
+      Session 21 (3 March 2026) replaced an earlier estimated series with
+      these figures and recorded the deltas: Basilicata had been
+      overestimated by 44 per cent, Piemonte underestimated by 46 per cent,
+      Trentino-Alto Adige by 40 per cent. That is the measured cost of typing
+      a continuity series instead of fetching it.
+    wired: false
+    wired_check: >
+      grep across ssi-pipeline/ and ikengassiindex.github.io/scripts/ returns
+      no reference to these files, to D1L, or to arera_tiqe. Italy's published
+      C V E S T remain 100 per cent inside the vary band.
+
+  france:
+    verdict: NOT ACQUIRED — typed constants behind a function named fetch()
+    file: "SSI Index/SSI_v4_0 France/france-pipeline/data/raw/cre_tiqe.csv"
+    producer: "SSI Index/SSI_v4_0 France/france-pipeline/ingestion/cre_tiqe.py"
+    schema: dept_code, dept_name, region_name, SAIDI_min, SAIFI, CAIDI_min, C3_MT_exceed_pct, C4_planned_count
+    rows: 96 départements
+    note: >
+      The schema is exactly C1 C2 C3 C4 and the column C3_MT_exceed_pct is the
+      string the metric registry blocks on, verbatim. The values are not
+      measurements. cre_tiqe.py::fetch() performs no request: it assigns one
+      of seven typed base values by région, adds one of twenty-two typed
+      per-département adjustments, and writes the result under a docstring
+      citing CRE's Bilan de la qualité de l'électricité. Ain and Allier carry
+      identical SAIDI because both are Auvergne-Rhône-Alpes. SAIFI, C3 and C4
+      are constant within each région.
+    rule: §7.2 — no measured value typed. §7.6 — no citation not read.
+
+  switzerland:
+    verdict: ROUTE NAMED, NOT ACQUIRED
+    named_in: "ssi-pipeline/SSI_ESG_Data_Sources_and_SDG_Mapping.md:261"
+    entry: >
+      "Continuity component C (only 2 unique values) | SFOE / Swissgrid |
+      bfe.admin.ch, swissgrid.ch | Grid reliability statistics (SAIDI, SAIFI
+      by canton) | CSV"
+    note: >
+      Switzerland's dead C — one value, 0.5, on 947 records — was already
+      recorded as a gap, with the unblocking source and its format named.
+      Nothing was fetched.
+
+  italy_L0_definitions:
+    read_from: https://www.arera.it/dati-e-statistiche/dettaglio/prestazioni-delle-imprese-distributrici-continuita-del-servizio-23
+    read: true
+    date_read: 2026-09-25
+    durata_D1L: >
+      "durata annua media di interruzioni (minuti persi) per le interruzioni
+      senza preavviso lunghe (> 3 minuti)" — annual average minutes lost, per
+      LV user, counting UNPLANNED LONG interruptions only.
+    numero_N1L: >
+      "numero medio di interruzioni per le interruzioni senza preavviso lunghe
+      e brevi" — annual average count, per LV user, counting UNPLANNED LONG
+      AND SHORT interruptions.
+    consequence_1: >
+      D1L and N1L are not on the same basis. D1L excludes short interruptions;
+      N1L includes them. D1L / N1L is therefore NOT a restoration time: the
+      numerator omits the duration of events the denominator counts.
+      arera_tiqe_2024_regional.csv publishes CAIDI_min and CAIDI_ratio built on
+      that ratio, and session 21 drew a substantive conclusion from it — that
+      restoration is faster in the south and worst in Piemonte at 15.73 min.
+      That conclusion is not supported by ARERA's own definitions. The two
+      columns must not feed a score and the inference must not be repeated.
+    consequence_2: >
+      Both indices are "senza preavviso" — unplanned only. C4, the planned /
+      unplanned split, is absent from this publication entirely. Italy has C1
+      and C2 on an unplanned basis and no C4 from this source.
+    consequence_3: >
+      C1 for Italy means unplanned-long SAIDI. France's critère B and the
+      Ofgem CML are not necessarily on that basis. Cross-country comparison of
+      C is already excluded by the per-country band, but the basis must be
+      recorded per country or the within-country series will drift when a
+      regulator changes its exclusions.
+
+  italy_L4_independent_constraint:
+    verdict: LOCATED, NOT YET FETCHED
+    name: Rapporto annuale degli output
+    obligation: article 58 of ARERA deliberation 617/2023/R/eel
+    who: each distribution company with more than 100,000 delivery points
+    count: 10 companies, each publishing on its own site
+    url: https://www.arera.it/comunicati-operatore/dettaglio/prime-edizioni-rapporto-annuale-degli-output-e-di-monitoraggio-piano-di-sviluppo-imprese-distribuzione-24
+    read: true
+    why_it_matters: >
+      This is published by the operators themselves, independently of ARERA's
+      comparative tables. It is therefore a genuine constraint on the 91-row
+      L3 — the first one Italy has. E-Distribuzione alone carries the majority
+      of the 36,995,573 LV users, so agreement or disagreement on that one
+      company already tests most of the estate.
+    caution: >
+      Independent of the comparative tables only if the companies compute it
+      from their own records rather than restating ARERA's published figures.
+      That has to be read before the residual means anything — the lesson of
+      arera_tiqe_2024_regional.csv.
+
+  italy_L4_RECONCILED:
+    verdict: INDEPENDENT CONSTRAINT OBTAINED AND IT HOLDS
+    date: 2026-09-25
+    source:
+      name: E-Distribuzione — Rapporto Annuale degli Output, 30/06/2025
+      url: https://www.e-distribuzione.it/content/dam/e-distribuzione/documenti/Rapporto%20annuale%20degli%20output%202025.pdf
+      obligation: article 58, ARERA deliberation 617/2023/R/eel
+      basis: the company's own operational records
+      data_year: 2024
+      unit: province
+      unit_count: 107
+      read: true
+    published_national_totals_2024:
+      durata_unplanned_long_all_causes: 73.11
+      durata_unplanned_long_other_causes: 44.84
+      numero_unplanned_long_and_short_all_causes: 5.502
+      numero_unplanned_long_and_short_other_causes: 3.985
+      durata_planned_all_causes: 95.53
+      durata_planned_other_causes: 90.71
+    residual_against_L3:
+      L3: ARERA comparative tables 2024, the 53 E-DISTRIBUZIONE rows
+      L3_users: 31732983
+      L3_share_of_italy: 0.858
+      N1L: "L3 3.985  vs  L4 3.985   residual 0.000 — exact agreement"
+      D1L: "L3 45.610 vs  L4 44.840  residual +0.770 min, +1.7%"
+      reading: >
+        This is what an independent check looks like. One index agrees to
+        three decimals; the other agrees to within 1.7 per cent and the
+        residual carries information — the weighting basis differs, ARERA
+        aggregating over ambiti and the company over provinces. Set it beside
+        arera_tiqe_2024_regional.csv, which agreed to 0.0000 on every row
+        because it was the same numbers rearranged.
+    why_L4_supersedes_L3_for_italy:
+      granularity: >
+        107 provinces against 91 DSO x concentration x region. In fleet terms
+        356 substations per measured value against 458 — and the join is
+        direct: italy's records already carry the province name in `region`
+        and the NUTS-3 code in `province`, 108 codes across 41,662 records,
+        none missing. No geocoding, no polygon intersection, no ID
+        reconciliation of the kind that blocks I4.
+      completeness: >
+        E-Distribuzione publishes durata CON preavviso — planned interruptions
+        — which ARERA's comparative publication omits entirely. That is C4,
+        and it is the larger number: 95.53 planned all-cause minutes against
+        73.11 unplanned. A C1 built on ARERA's D1L alone counts well under
+        half the minutes a customer actually loses.
+      exceptional_events: >
+        all causes 73.11 minus other causes 44.84 = 28.27 minutes per user of
+        exceptional events in 2024, 38.7 per cent of all-cause minutes. This
+        is the CEER definitional axis with a number on it, published by the
+        operator, per province.
+    coverage_gap: >
+      E-Distribuzione is 85.8 per cent of Italy's LV users. The remaining
+      14.2 per cent sit with the other 14 DSOs in the ARERA tables; nine of
+      them exceed 100,000 delivery points and so publish their own Rapporto
+      under the same article 58. Those are the next nine reads, and the ARERA
+      L3 covers them in the meantime.
+    blocked_on: >
+      the 107-province table itself. The figures above are the document's
+      national totals. The per-province rows must be parsed from the PDF, not
+      transcribed by eye — §7.2. The file has to be on disk for that.
+
+  italy_L4_ACQUIRED:
+    verdict: MEASURED. Italy has a real C1, C2 and C4.
+    date: 2026-09-25
+    built_by: scripts/ssi_build_c_metrics_italy.py
+    output: data/c_metrics/italy.csv
+    definitions: data/c_definitions/italy.yaml
+    source_file:
+      name: Rapporto annuale degli output 2025.pdf
+      url: https://www.e-distribuzione.it/content/dam/e-distribuzione/documenti/Rapporto%20annuale%20degli%20output%202025.pdf
+      sha256: 64d9fde3b0dfecb2dbe05b041b66889e5269ad13135ef56641e3421d701eb933
+      not_committed: >
+        the PDF is E-Distribuzione's own publication and is cited, not
+        redistributed. The hash pins the copy the build was run against.
+    parse_gate: >
+      the builder refuses to write unless the parse reproduces the document's
+      own three national totals exactly (73.11/44.84, 5.502/3.985,
+      95.53/90.71) and finds 104 rows in each of the three tables covering an
+      identical province set. No value is typed.
+    join:
+      unit: province, matched on the fleet's own `region` field
+      exact: 100
+      alias: 4
+      aliases_declared: "Forlì-Cesena->FORLI', Reggio nell'Emilia->REGGIO EMILIA, Pesaro e Urbino->PESARO, Verbano-Cusio-Ossola->VERBANIA"
+      source_provinces_unused: 0
+      fleet_covered: 40793
+      fleet_total: 41662
+      fleet_covered_pct: 97.91
+      substations_per_measured_value: 392
+    no_C_from_this_layer:
+      Trento: 251
+      Bolzano-Bozen: 214
+      "Valle d'Aosta/Vallée d'Aoste": 58
+      Unknown: 300
+      records_carrying_a_region_name_not_a_province: 46
+      note: >
+        Trento, Bolzano and Valle d'Aosta are not E-Distribuzione territory —
+        SET, EDYNA and DEVAL serve them, and ARERA's L3 covers all three. The
+        other 346 get no C. They are absent, not zero.
+    measured_spread:
+      C1_all_causes: "30.52 (Isernia) to 245.52 (Caserta), 8.0x, median 63.34"
+      C1_other_causes: "21.12 to 92.53, 4.4x, median 40.22"
+      C2_all_causes: "2.35 to 13.24, 5.6x"
+      C4_all_causes: "16.57 to 296.74, 17.9x, median 94.16"
+      note: >
+        104 measured values against the 2,101 the hash currently produces.
+        Fewer distinct numbers and the first real ones. The ceiling is stated:
+        392 substations share a measured value, and C cannot resolve below the
+        province in Italy.
+    what_the_typed_values_cost:
+      compared: >
+        the 16 provinces typed into
+        "SSI Enhanced Neural Network/ssi_enn_v30/layer0/italian_saidi.py"
+        against the measured 2024 figures
+      result: >
+        not one is close. Against all-causes the typed values run from -41 per
+        cent (Caserta, typed 145, measured 245.52) to +168 per cent (Matera,
+        typed 122, measured 45.46). Cosenza was typed at 175 and is 78.57.
+        Against other-causes every one of the sixteen is too high, by between
+        30 and 264 per cent.
+      reading: >
+        This is the third independent measurement of the same thing. ARERA's
+        own regional repair moved values by up to 46 per cent; the ENN's typed
+        provinces are out by up to 264 per cent. Typed continuity values are
+        not approximately right.
+
+  italy_L1_national:
+    verdict: NOT LOCATED
+    note: >
+      The comparative publication page carries the three territorial tables
+      and no aggregate. ARERA's Relazione Annuale is the candidate and has not
+      been read. Until it is, Italy has one measured layer and one located but
+      unfetched constraint.
+
+  france_L2_ACQUIRED:
+    verdict: MEASURED — C3 across 94 départements. The one sub-national C metric France publishes.
+    date: 2026-09-25
+    built_by: scripts/ssi_build_c_metrics_france.py
+    output: data/c_metrics/france.csv
+    definitions: data/c_definitions/france.yaml
+    source:
+      name: Enedis — Indicateur réglementaire continuité d'alimentation
+      url: https://opendata.enedis.fr/datasets/indicateur-continuite-dalimentation/
+      licence: Licence Ouverte / Open Licence 2.0
+      read_via: the portal's Explore v2.1 API, in the operator's browser
+    gate: >
+      The builder carries the count, the three annual sums and the 2024 min and
+      max exactly as the Enedis API itself computed them, and refuses to write
+      unless the transferred rows reproduce every one. n=94,
+      sum(2024)=197.84799486999702 to fourteen significant figures. A
+      transcription error cannot pass that.
+    spread_2024: Paris 0.000245 per cent to Aveyron 7.05 per cent
+    national_anchor:
+      layer: 1
+      years: 2022 2023 2024
+      C1_2024: 53.300
+      C2_2024: 1.911
+      C4_2024: 18.272
+    definitional_correction:
+      what: >
+        Enedis' published critère B is "hors événements exceptionnels et hors
+        RTE". It is not an all-causes figure. Earlier in this session France's
+        53.300 was set against Italy's all-causes 73.11 and France called the
+        better performer. On the matched basis — Italy's "altre cause" 44.840 —
+        France is 19 per cent worse. Both definitions files now carry a
+        do_not_compare block naming that exact pairing.
+    c4_schema_correction: >
+      France and Italy both publish planned interruption DURATION in minutes.
+      The typed France file emitted C4_planned_count. No French source
+      publishes a planned count. C4 is a duration and the schema says so.
+    open_residual: >
+      Whether the critère B duration series counts sub-three-minute
+      interruptions is not stated by Enedis. Bounded at roughly 7 per cent of
+      53.300 in the worst case and realistically far less. Recorded, not
+      assumed away. Route: CRE's current qualité reporting, unread.
+
+  C3_STRUCTURAL_FINDING:
+    date: 2026-09-25
+    question: >
+      Can C3 be transferred to Italy by fitting its relationship to C1, C2 and
+      C4 in a donor jurisdiction that publishes all four sub-nationally?
+    answer: >
+      Not from any jurisdiction yet checked, and the reason is structural
+      rather than a gap in searching.
+    evidence:
+      italy:
+        C1: published, DSO x concentration x region
+        C2: published, same unit
+        C4: published, province (E-Distribuzione)
+        C3: NOT published. Collected by ARERA per ambito — "Numero di utenti
+            MT con un numero di interruzioni oltre lo standard" — and not
+            disclosed.
+      norway:
+        C1: published, national / nettselskap / fylke / sluttbrukargruppe
+        C2: published, same units, kortvarige <=3 min and langvarige >3 min
+        C4: published, "varsla" reported separately from "ikkje-varsla"
+        C3: no regulated-breach metric in RME's external documentation
+        source: https://www.nve.no/media/20400/ekstern-dokumentasjon-avbrotsstatistikken.pdf
+      spain:
+        C1: published, TIEPI, national / CCAA / provincia / municipio x zona
+        C2: published, NIEPI, same units
+        C4: published, programmed distinguished from unplanned
+        C3: >
+            NOT published. MITECO states there are no published measures
+            regarding the number or percentage of customers exceeding
+            individual quality limits. The limits themselves exist in Orden
+            ECO/797/2002; the exceedance data is not disclosed.
+        source: https://www.miteco.gob.es/en/energia/energia-electrica/electricidad/calidad-servicio/indices.html
+      france:
+        C1: national only, 18 records
+        C2: national only, 18 records
+        C4: national only
+        C3: published, 94 départements, 2009-2024
+    the_pattern: >
+      C3 is published sub-nationally in exactly one of four jurisdictions
+      checked, and that one publishes nothing else sub-nationally. The three
+      that publish C1, C2 and C4 all withhold C3.
+    why_structurally: >
+      C1, C2 and C4 are fleet-performance statistics — what the average
+      customer experienced. C3 is a compliance statistic — how many customers
+      breached an individual guarantee. They come from different regulatory
+      instruments and the regimes that publish one do not publish the other.
+      That is not a coincidence to be searched around.
+    consequence_for_the_transfer: >
+      A transfer needs C3 and C1/C2/C4 at the SAME units in the SAME
+      jurisdiction so the cross-sectional relationship can be fitted. No
+      overlap exists in four jurisdictions. France cannot donate to Italy
+      because France has no sub-national C1, C2 or C4 to fit C3 against.
+      The mosaic has nothing to bridge with.
+    what_this_licenses: >
+      It converts "we could not obtain C3" into "C3 is not published at the
+      required unit in four of four jurisdictions checked, for a stated
+      structural reason". That is what makes a declared renormalisation over
+      the present metrics a finding-backed decision rather than a convenience.
+    best_next_acquisition: >
+      Spain. TIEPI and NIEPI at municipio x zona (urbana, semiurbana, rural
+      concentrada, rural dispersa) is the finest unit located anywhere so far,
+      with programmed separated from unplanned, CSV and Excel, all years,
+      under the public-sector reuse initiative.
+
+  connectors_carrying_typed_constants:
+    - path: "SSI Enhanced Neural Network/ssi_cw_implementation/connectors/arera_saidi.py"
+      holds: _SAIDI_REFERENCE, 13 provinces, 2017-2024, typed
+      has_loader: load_saidi_from_csv
+      has_fetcher: false
+    - path: "SSI Enhanced Neural Network/ssi_enn_v30/layer0/italian_saidi.py"
+      holds: SAIDI_BY_PROVINCE, 16 typed provinces across 10 regions
+      caution: >
+        carries saidi_after_min, a projected value for a hypothetical BESS
+        deployment. Not a measurement of anything and must never reach a score.
+      has_fetcher: false
+
+  other_36:
+    verdict: nothing found
+    searched: >
+      every .csv under SSI Index/SSI_v4_0 * (39 files) by header, plus a
+      filename sweep for saidi/saifi/critere-b/tiepi/niepi/continuity/
+      interruption/outage/reliability/cml/eia-861 across all mounted folders.
+      Only the four files above matched.
+
+revised_sequence:
+  1: >
+    italy — wire the ARERA data that is already acquired and already verified.
+    458 substations per measured unit, finer than anything located on the open
+    web today. No new acquisition needed; this is the cheapest real C in the
+    estate.
+  2: >
+    france — replace cre_tiqe.py::fetch() with a real fetch against the Enedis
+    Licence Ouverte 2.0 datasets. The schema and the consumer already exist.
+  3: >
+    switzerland — the route is already written down. Fetch it and the dead C
+    on 947 records stops being 0.5.
+  4: the remaining 36, in descending record count.
+
+# ── the cross-country floor, not yet read ───────────────────────────────────
+ceer:
+  name: 7th CEER-ECRB Benchmarking Report on the Quality of Electricity and Gas Supply
+  url: https://www.ceer.eu/wp-content/uploads/2024/04/7th-Benchmarking-Report-2022.pdf
+  published: 2022-12-22
+  covers: CEER members and observers and Energy Community Contracting Parties
+  unit: national
+  note: >
+    National granularity only, so it cannot satisfy the sub-national
+    requirement. Its value is definitional: it states, per country, how SAIDI
+    is computed — planned versus unplanned, exceptional events in or out —
+    which is what makes the national returns comparable to each other. Read it
+    before the first connector is written, not after.
+  read: false

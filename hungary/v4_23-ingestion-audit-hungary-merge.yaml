@@ -1,0 +1,147 @@
+# Hungary v4.23 Ingestion Audit — Step 4 merge
+# ============================================
+# Task: #206 (WAVE2-Step4 Hungary)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local merge execution complete
+
+meta:
+  country: hungary
+  iso2: HU
+  iso3: HUN
+  wave: 2
+  step: 4
+  parent_fetch: hungary/v4_23-ingestion-audit-hungary-fetch.yaml
+  merged_at_utc: "2026-07-13T16:37:18Z"
+  wall_clock_secs: ~285  # 4.75 min (line merge was slower — 32k lines)
+
+merge_operations:
+  substations:
+    baseline: 3502
+    fresh_osm: 3528
+    matched_within_500m: 3523  # 99.9% match rate
+    owner_enriched: 3523
+    voltage_filled: 8  # small — most baseline nulls didn't have OSM neighbor with voltage
+    voltage_xcheck_mismatches: 1  # 0.03% — near-perfect (only Chile's 0.0% is cleaner)
+    net_new: 5
+    final_count: 3507
+    delta_pct: +0.1  # enrichment-only pattern like Netherlands
+  lines:
+    baseline: 4261
+    fresh_osm: 35002
+    appended: 28017  # LARGEST cohort-wide line delta
+    deduped_midpoint_100m: 6985  # 19.9% dedupe rate
+    final_count: 32278
+    delta_pct: +657.5  # LARGEST cohort-wide
+
+file_sizes_post_merge:
+  ssi_data_json_mb: 9.0
+  grid_geo_json_mb: 17.0
+  under_90_mb_threshold: true
+  optimisation_needed: false
+
+authoritative_cohort_metrics_post_merge:
+  substations: 3507
+  lines: 32278
+  km_of_transmission_lines_haversine: 48799  # LARGEST cohort-wide
+  km_per_substation: 13.9
+  distinct_operators: 72
+  discipline_41_ratio: 9.20  # high — reflects MV distribution deep-ingestion (like Norway 26.5)
+  voltage_split:
+    ehv_gte_220kv: 65  # 1.9%
+    hv_100_to_219kv: 307  # 8.8%
+    distribution_lt_100kv: 652  # 18.6%
+    unknown_null: 2483  # 70.8% — baseline nulls preserved, most net-new lines lack voltage tags
+
+coverage_post_merge:
+  owner_coverage_pct: 99.9  # ! from 0.0% baseline (4th cohort-country near-100% — BE + NL + CL + HU)
+  voltage_coverage_pct: 29.2  # baseline 29% + 8 voltage_filled — modest improvement (net-new lines mostly lack voltage tags)
+  region_coverage_pct: 99.9  # baseline 100%; 5 net-new have region=None
+  owner_coverage_by_provenance:
+    direct_osm_operator_tag: "22.0% of fresh OSM (775/3,528 including 501 alias-normalised)"
+    dnsp_alias_normalised_case_insensitive: "14.2% of fresh OSM (501/3,528) — BIGGEST cohort-wide"
+    region_jurisdiction_fallback: "78.0% of fresh OSM (2,753/3,528)"
+    convention_56_unresolved_null: 0
+
+top_15_operators_post_merge:
+  - {rank: 1, name: "ELMŰ-ÉMÁSZ", count: 2274, note: "Budapest + Northeast NUTS-3 codes (E.ON brand-preserved subsidiary)"}
+  - {rank: 2, name: "E.ON Hungária", count: 939, note: "Transdanubia + Southern Great Plain — post-2020 consolidation of former DÉMÁSZ + Innogy + E.ON regionals"}
+  - {rank: 3, name: "EED", count: 50, note: "Industrial operator (direct-tagged)"}
+  - {rank: 4, name: "MAVIR", count: 48, note: "TSO ≥220 kV EHV backbone"}
+  - {rank: 5, name: "ETI", count: 29, note: "Industrial (direct-tagged)"}
+  - {rank: 6, name: "NKM", count: 27, note: "Nemzeti Közművek — state energy company (direct-tagged)"}
+  - {rank: 7, name: "EDE", count: 20, note: "Industrial (direct-tagged)"}
+  - {rank: 8, name: "MÁV", count: 13, note: "Hungarian State Railways (direct-tagged; MÁV Zrt.)"}
+  - {rank: 9, name: "BKV", count: 9, note: "Budapest transit — tram/metro traction (direct-tagged)"}
+  - {rank: 10, name: "ELMŰ Zrt.", count: 8, note: "Legal entity suffix variant — should normalise to ELMŰ-ÉMÁSZ (residual)"}
+  - {rank: 11, name: "NKM Áramhálózati Kft.", count: 6, note: "NKM grid subsidiary — legal entity variant"}
+  - {rank: 12, name: "NKM;MÁV", count: 5, note: "Joint-ownership OSM tag — legitimately preserved"}
+  - {rank: 13, name: "ELMŰ Hálózati Kft.", count: 3, note: "Legal entity variant — should normalise to ELMŰ-ÉMÁSZ (residual)"}
+  - {rank: 14, name: "EED;MÁV", count: 3, note: "Joint-ownership OSM tag"}
+  - {rank: 15, name: "MOL", count: 3, note: "MOL Hungarian oil/gas company industrial substations (direct-tagged)"}
+
+residual_alias_normalisation:
+  count_residual: 11  # ELMŰ Zrt. 8 + ELMŰ Hálózati Kft. 3
+  breakdown: |
+    Legal-entity-suffix variants ("Zrt." / "Kft." — Hungarian corporate types)
+    not case-insensitively matched. Fix in future refresh: add legal-suffix-
+    stripping preprocessing to alias normalisation (regex \s+(Zrt|Kft|Nyrt)\.?$).
+    Convention #56 preserves current state.
+
+industrial_owner_diversity:
+  finding: |
+    Hungary's 15 operators post-merge include state industrial (NKM 27 + 6 =
+    33) + railway (MÁV 13, BKV 9) + oil/gas (MOL 3) + industrial (EED 50 +
+    ETI 29 + EDE 20). Similar diversity pattern to Chile (127 operators
+    with mining/generators) but at smaller scale (Hungary 72 vs Chile 127).
+    Reflects Hungarian OSM tagging captures industrial-owned substations
+    directly.
+
+voltage_cross_validation:
+  matched_pairs: 3523
+  mismatches_gt_1_5x_ratio: 1
+  mismatch_rate_pct: 0.03
+  note: >
+    NEAR-PERFECT — 2nd cleanest cohort-wide (Chile 0.0%, Hungary 0.03%,
+    Netherlands 0.6%, Belgium 3.1%, Australia 48.8%). Reflects Hungary's
+    baseline vintage was OSM-derived + fresh OSM voltage data fully
+    consistent with baseline.
+
+discipline_41_line_parity:
+  post_merge_check: OK
+  final_ratio: 9.20
+  envelope_after_task_182: "0.3 - 30 (widened)"
+  status: >
+    HIGH ratio reflects MV distribution deep-ingestion — similar pattern to
+    Norway (26.5) and Slovenia (27.75). Hungary OSM captures 22 kV + 35 kV +
+    lower distribution beyond transmission-tier. Legitimate deep-ingestion,
+    not a bug.
+
+convention_preservation:
+  discipline_36:
+    outcome: 0 substations + 15 lines dropped (~0.04% overshoot)
+    tolerance: 100m default
+    status: PASS
+  discipline_41:
+    outcome: All net-new substations covered by ≥1 fresh line
+    status: PASS
+  convention_46:
+    outcome: no portfolio-scoped changes
+    status: PRESERVED
+  convention_56:
+    outcome: >
+      Legal-entity-suffix residuals (11 subs) preserved rather than force-
+      normalised. Joint-ownership tags (NKM;MÁV etc.) preserved verbatim
+      as legitimate multi-owner attribution.
+    status: PRESERVED
+  convention_60:
+    outcome: OSM (ODbL) only — no commercial providers
+    status: PRESERVED
+  convention_64:
+    outcome: strict per-country resolution
+    status: PRESERVED
+
+next_step: "Step 5 (task #207): UI + doc cascade — landing page data-subs 3,502 → 3,507, country page fleet + km + v4.23 callout."
+
+status: STEP_4_CLOSED

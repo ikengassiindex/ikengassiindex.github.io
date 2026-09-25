@@ -1,0 +1,173 @@
+{
+  "code": "ES",
+  "iso2": "ES",
+  "iso3": "ESP",
+  "prefix": "ES_",
+  "name": "Spain",
+  "tso_zone": "REE",
+  "tso": "Red Eléctrica de España",
+  "regulator": "CNMC",
+  "regions_label": "Comunidades Autónomas (NUTS-2)",
+  "regions_count": 19,
+  "bidding_zones": ["MIBEL-ES", "SEIE-Baleares", "SEIE-Canarias", "SEIE-Ceuta", "SEIE-Melilla"],
+  "min_fleet": 3500,
+  "bbox": {"lon_min": -18.2, "lon_max": 4.4, "lat_min": 27.6, "lat_max": 43.8},
+  "weights": {"C": 0.30, "V": 0.10, "I": 0.25, "E": 0.10, "S": 0.20, "T": 0.05},
+  "seismic_alpha": 0.50,
+  "R3_tiers": {
+    "Capital-Intensive": 1.02,
+    "Industrial-Major":  1.04,
+    "Commercial":        1.06,
+    "Light-Industrial":  1.08,
+    "Light-Rural":       1.10
+  },
+  "R6_modifiers": {
+    "R6_seismic":     {"range": [0.04, 0.18], "active": true,  "note": "IGN — Andalucía/Murcia/Pirineos peak 0.12-0.18g; Galicia/Mesetas 0.04g"},
+    "R6c_flood":      {"range": [0.04, 0.10], "active": true,  "note": "Ebro/Guadalquivir/Júcar/Segura + 2024 DANA Valencia ref event"},
+    "R6_storm":       {"range": [0.02, 0.06], "active": true,  "note": "Cantabrian Atlantic-side storms; smaller exposure than IE"},
+    "R6_drought":     {"range": [0.00, 0.10], "active": false, "note": "CANDIDATE-DEFERRED — Iberian chronic drought, awaiting AEMET integration"},
+    "R6_restoration": {"range": [0.00, 0.04], "active": true,  "note": "Uniform mainland; archipelago + autonomous cities slightly higher"}
+  },
+  "default_region": {
+    "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.33,
+    "pga_base": 0.08, "T_base": 0.35,
+    "seismic_zone": "Low", "corrosion": "C3",
+    "der_ratio": 0.45, "ev_share": 0.04, "v_socio": 0.28,
+    "ep_rate": 10, "elderly": 20, "pop_density": 94, "gdp_pc": 28000, "unemp": 11.0
+  },
+  "regions": {
+    "Madrid": {
+      "C_base": 0.56, "V_base": 0.42, "I_base": 0.46, "E_base": 0.38,
+      "pga_base": 0.06, "T_base": 0.42,
+      "seismic_zone": "Low", "corrosion": "C4",
+      "der_ratio": 0.32, "ev_share": 0.07, "v_socio": 0.18,
+      "ep_rate": 5, "elderly": 18, "pop_density": 850, "gdp_pc": 38000, "unemp": 8.5
+    },
+    "Cataluña": {
+      "C_base": 0.54, "V_base": 0.40, "I_base": 0.44, "E_base": 0.36,
+      "pga_base": 0.10, "T_base": 0.40,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.40, "ev_share": 0.06, "v_socio": 0.22,
+      "ep_rate": 6, "elderly": 19, "pop_density": 240, "gdp_pc": 32000, "unemp": 10.0
+    },
+    "País Vasco": {
+      "C_base": 0.52, "V_base": 0.38, "I_base": 0.42, "E_base": 0.36,
+      "pga_base": 0.08, "T_base": 0.40,
+      "seismic_zone": "Low", "corrosion": "C3",
+      "der_ratio": 0.42, "ev_share": 0.06, "v_socio": 0.20,
+      "ep_rate": 5, "elderly": 22, "pop_density": 304, "gdp_pc": 35000, "unemp": 8.5
+    },
+    "Comunidad Valenciana": {
+      "C_base": 0.48, "V_base": 0.36, "I_base": 0.40, "E_base": 0.36,
+      "pga_base": 0.10, "T_base": 0.36,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.42, "ev_share": 0.05, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 19, "pop_density": 215, "gdp_pc": 24000, "unemp": 12.5
+    },
+    "Andalucía": {
+      "C_base": 0.46, "V_base": 0.36, "I_base": 0.38, "E_base": 0.35,
+      "pga_base": 0.18, "T_base": 0.36,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.50, "ev_share": 0.04, "v_socio": 0.32,
+      "ep_rate": 12, "elderly": 17, "pop_density": 96, "gdp_pc": 22000, "unemp": 18.0
+    },
+    "Galicia": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.36, "E_base": 0.34,
+      "pga_base": 0.04, "T_base": 0.36,
+      "seismic_zone": "Very Low", "corrosion": "C5",
+      "der_ratio": 0.65, "ev_share": 0.04, "v_socio": 0.28,
+      "ep_rate": 10, "elderly": 25, "pop_density": 91, "gdp_pc": 25000, "unemp": 11.0
+    },
+    "Aragón": {
+      "C_base": 0.44, "V_base": 0.34, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.12, "T_base": 0.38,
+      "seismic_zone": "Moderate", "corrosion": "C2",
+      "der_ratio": 0.62, "ev_share": 0.04, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 22, "pop_density": 27, "gdp_pc": 29000, "unemp": 10.0
+    },
+    "Castilla y León": {
+      "C_base": 0.42, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.05, "T_base": 0.34,
+      "seismic_zone": "Very Low", "corrosion": "C2",
+      "der_ratio": 0.55, "ev_share": 0.03, "v_socio": 0.30,
+      "ep_rate": 11, "elderly": 26, "pop_density": 25, "gdp_pc": 25000, "unemp": 11.0
+    },
+    "Castilla-La Mancha": {
+      "C_base": 0.42, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.06, "T_base": 0.34,
+      "seismic_zone": "Low", "corrosion": "C2",
+      "der_ratio": 0.55, "ev_share": 0.03, "v_socio": 0.32,
+      "ep_rate": 12, "elderly": 21, "pop_density": 26, "gdp_pc": 22000, "unemp": 13.0
+    },
+    "Navarra": {
+      "C_base": 0.46, "V_base": 0.34, "I_base": 0.38, "E_base": 0.34,
+      "pga_base": 0.12, "T_base": 0.38,
+      "seismic_zone": "Moderate", "corrosion": "C2",
+      "der_ratio": 0.62, "ev_share": 0.05, "v_socio": 0.22,
+      "ep_rate": 6, "elderly": 21, "pop_density": 63, "gdp_pc": 33000, "unemp": 9.0
+    },
+    "Cantabria": {
+      "C_base": 0.42, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.06, "T_base": 0.34,
+      "seismic_zone": "Low", "corrosion": "C5",
+      "der_ratio": 0.48, "ev_share": 0.04, "v_socio": 0.26,
+      "ep_rate": 8, "elderly": 23, "pop_density": 110, "gdp_pc": 26000, "unemp": 10.0
+    },
+    "La Rioja": {
+      "C_base": 0.42, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.08, "T_base": 0.34,
+      "seismic_zone": "Low", "corrosion": "C2",
+      "der_ratio": 0.55, "ev_share": 0.04, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 22, "pop_density": 63, "gdp_pc": 28000, "unemp": 9.5
+    },
+    "Asturias": {
+      "C_base": 0.42, "V_base": 0.32, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.05, "T_base": 0.32,
+      "seismic_zone": "Very Low", "corrosion": "C3",
+      "der_ratio": 0.48, "ev_share": 0.04, "v_socio": 0.28,
+      "ep_rate": 10, "elderly": 27, "pop_density": 98, "gdp_pc": 24000, "unemp": 11.0
+    },
+    "Murcia": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.34, "E_base": 0.33,
+      "pga_base": 0.15, "T_base": 0.32,
+      "seismic_zone": "High", "corrosion": "C5",
+      "der_ratio": 0.50, "ev_share": 0.03, "v_socio": 0.34,
+      "ep_rate": 12, "elderly": 16, "pop_density": 134, "gdp_pc": 22000, "unemp": 15.0
+    },
+    "Extremadura": {
+      "C_base": 0.38, "V_base": 0.30, "I_base": 0.32, "E_base": 0.30,
+      "pga_base": 0.05, "T_base": 0.30,
+      "seismic_zone": "Very Low", "corrosion": "C2",
+      "der_ratio": 0.65, "ev_share": 0.02, "v_socio": 0.38,
+      "ep_rate": 14, "elderly": 21, "pop_density": 25, "gdp_pc": 20000, "unemp": 17.0
+    },
+    "Baleares": {
+      "C_base": 0.42, "V_base": 0.34, "I_base": 0.34, "E_base": 0.32,
+      "pga_base": 0.08, "T_base": 0.32,
+      "seismic_zone": "Low", "corrosion": "C5",
+      "der_ratio": 0.32, "ev_share": 0.05, "v_socio": 0.24,
+      "ep_rate": 7, "elderly": 18, "pop_density": 240, "gdp_pc": 28000, "unemp": 9.5
+    },
+    "Canarias": {
+      "C_base": 0.42, "V_base": 0.34, "I_base": 0.36, "E_base": 0.33,
+      "pga_base": 0.10, "T_base": 0.32,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.30, "ev_share": 0.04, "v_socio": 0.32,
+      "ep_rate": 12, "elderly": 17, "pop_density": 295, "gdp_pc": 22000, "unemp": 18.0
+    },
+    "Ceuta": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.30,
+      "pga_base": 0.10, "T_base": 0.30,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.20, "ev_share": 0.02, "v_socio": 0.35,
+      "ep_rate": 13, "elderly": 13, "pop_density": 4500, "gdp_pc": 22000, "unemp": 26.0
+    },
+    "Melilla": {
+      "C_base": 0.40, "V_base": 0.32, "I_base": 0.32, "E_base": 0.30,
+      "pga_base": 0.10, "T_base": 0.30,
+      "seismic_zone": "Moderate", "corrosion": "C5",
+      "der_ratio": 0.20, "ev_share": 0.02, "v_socio": 0.36,
+      "ep_rate": 14, "elderly": 12, "pop_density": 6600, "gdp_pc": 20000, "unemp": 25.0
+    }
+  }
+}

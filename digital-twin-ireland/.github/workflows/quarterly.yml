@@ -1,0 +1,61 @@
+name: Quarterly Refresh — Ireland Digital Twin
+
+on:
+  schedule:
+    - cron: '0 10 1 1,4,7,10 *'   # 1st of Jan/Apr/Jul/Oct, 10:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  quarterly-refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: d01_tso — EirGrid TSO data refresh
+        run: python d01_tso/main.py
+
+      - name: d02_regulator — CRU regulatory refresh
+        run: python d02_regulator/main.py
+
+      - name: d03_hazard — Natural hazard refresh
+        run: python d03_hazard/main.py
+
+      - name: d04_statistics — Grid statistics refresh
+        run: python d04_statistics/main.py
+
+      - name: d06_weather — Weather data refresh
+        run: python d06_weather/main.py
+
+      - name: Validate all outputs
+        run: |
+          python -c "
+          import json
+          modules = ['d01_tso', 'd02_regulator', 'd03_hazard', 'd04_statistics', 'd06_weather']
+          for m in modules:
+              with open(f'{m}/output.json') as f:
+                  data = json.load(f)
+              assert 'meta' in data, f'{m}: missing meta'
+              assert 'data' in data, f'{m}: missing data'
+              assert data['meta']['version'] == '4.0.2', f'{m}: version mismatch'
+              print(f'  ✓ {m}: {data[\"meta\"][\"records\"]} records')
+          print('Quarterly validation passed')
+          "
+
+      - name: Commit updated outputs
+        run: |
+          git config user.name "SSI Pipeline Bot"
+          git config user.email "pipeline@ikenga.eu"
+          git add */output.json
+          git diff --staged --quiet || git commit -m "chore: quarterly refresh Q$(( ($(date +%-m) - 1) / 3 + 1 )) $(date +%Y)"
+          git push

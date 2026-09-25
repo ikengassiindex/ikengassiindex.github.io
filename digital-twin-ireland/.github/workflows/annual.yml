@@ -1,0 +1,117 @@
+name: Annual Full Pipeline — Ireland Digital Twin
+
+on:
+  schedule:
+    - cron: '0 10 1 1 *'   # January 1, 10:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  annual-full-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ── Stage 1: Run all 7 ingestion modules ──
+      - name: d01_tso — EirGrid TSO extraction
+        run: python d01_tso/main.py
+
+      - name: d02_regulator — CRU regulatory extraction
+        run: python d02_regulator/main.py
+
+      - name: d03_hazard — Natural hazard extraction
+        run: python d03_hazard/main.py
+
+      - name: d04_statistics — Grid statistics extraction
+        run: python d04_statistics/main.py
+
+      - name: d05_osm — OpenStreetMap extraction
+        run: python d05_osm/main.py
+
+      - name: d06_weather — Weather data extraction
+        run: python d06_weather/main.py
+
+      - name: d07_copernicus — Climate projection extraction
+        run: python d07_copernicus/main.py
+
+      # ── Stage 2: Merge and validate ──
+      - name: Merge module outputs
+        run: python pipeline/merge.py
+
+      - name: Validate merged output
+        run: |
+          python -c "
+          import json
+          with open('pipeline/combined_ingestion.json') as f:
+              data = json.load(f)
+          modules = data.get('modules', {})
+          assert len(modules) == 7, f'Expected 7 modules, got {len(modules)}'
+          for name, mod in modules.items():
+              assert 'meta' in mod, f'{name}: missing meta'
+              print(f'  ✓ {name}: {mod[\"meta\"][\"records\"]} records')
+          print(f'Merged output validated: {len(modules)} modules')
+          "
+
+      # ── Stage 3: Score country ──
+      - name: Run scoring engine
+        run: |
+          python ../scripts/score-country.py \
+            --country Ireland \
+            --config ../data/ireland_config.json \
+            --osm d05_osm/output.json \
+            --output ../ireland/ssi-data.json
+
+      # ── Stage 4: Generate GeoJSON ──
+      - name: Generate grid-geo.json
+        run: |
+          python -c "
+          import json
+          with open('../ireland/ssi-data.json') as f:
+              data = json.load(f)
+          features = []
+          for s in data['substations']:
+              features.append({
+                  'type': 'Feature',
+                  'geometry': {'type': 'Point', 'coordinates': [s['lon'], s['lat']]},
+                  'properties': {
+                      'id': s['substation_id'], 'name': s['name'],
+                      'R_median': s['R_median'], 'classification': s['classification'],
+                      'voltage_kv': s['voltage_kv'], 'region': s['region']
+                  }
+              })
+          geojson = {'type': 'FeatureCollection', 'features': features}
+          with open('../ireland/grid-geo.json', 'w') as f:
+              json.dump(geojson, f)
+          print(f'Generated grid-geo.json with {len(features)} features')
+          "
+
+      - name: Commit all outputs
+        run: |
+          git config user.name "SSI Pipeline Bot"
+          git config user.email "pipeline@ikenga.eu"
+          git add */output.json pipeline/combined_ingestion.json
+          git diff --staged --quiet || git commit -m "chore: annual full pipeline $(date +%Y)"
+          git push
+
+      # ── Trigger publish ──
+      - name: Trigger publish workflow
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'publish.yml',
+              ref: 'main'
+            })

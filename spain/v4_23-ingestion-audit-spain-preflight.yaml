@@ -1,0 +1,460 @@
+# SSI Index v4.23 — Spain P36 Wave 4 Pre-flight
+# ================================================
+# 🇪🇸 WAVE 4 P36 = SIXTH Wave 4 country 🇪🇸
+# Iberian sibling to Portugal — DIRECT bi-directional Option B inheritance.
+# Convention #78 BINDING 18TH ENFORCEMENT (Spanish + English + Catalan +
+# Galician + Basque + Aranese 6-language).
+#
+# 3-of-9 remaining Wave 4 candidates after UK+Sweden+Portugal+Italy+Japan+Spain:
+#   Spain P36 THIS closure
+#   France P37
+#   Germany P38
+#   US P39
+#
+# Spain architectural distinctiveness:
+#   - IBERIAN CLUSTER COMPLETION 2-of-2 milestone (Portugal + Spain both
+#     v4.23-enhanced with bi-directional Option B)
+#   - Madrid §4bis.5 13TH ENFORCEMENT candidate (Naturgy + Iberdrola)
+#   - 6-language Convention #78 BINDING enforcement
+#   - Balearic + Canary Islands (1,700 km offshore) + Ceuta+Melilla
+#     African exclaves
+#   - INELFE HVDC France (2015) + Spain-Morocco 2× subsea HVDC
+#   - First-Europe offshore floating wind auctions 2023
+#   - Peninsular renewables leader (50%+ renewable electricity 2024)
+#   - 2021 COMPLETE coal phase-out
+#
+# Authored: 2026-07-19 by SSI Index Foundation cohort refresh workstream
+# Status: PREFLIGHT (Step 1 of 5)
+# ================================================
+
+country_code: es
+country_name: Spain
+country_name_es: España
+country_name_ca: Espanya  # Catalan
+country_name_gl: España  # Galician (same as Spanish)
+country_name_eu: Espainia  # Basque
+country_name_oc: Espanha  # Aranese/Occitan
+country_name_en: Spain
+country_slug: spain
+wave: 4
+priority: P36
+smallest_first_rank: 6  # of 9 Wave 4 candidates
+scope: WAVE_4_IBERIAN_CLUSTER_COMPLETION_BI_DIRECTIONAL_OPTION_B
+
+# ---------------------------------------------------------------
+# Wave 4 architecture requirements (Portugal P33 bi-directional inheritance)
+# ---------------------------------------------------------------
+wave_4_architecture_requirements:
+  merger_schema_target: canonical_compact_s_l_a
+  osm_overpass_query_hints:
+    substations: out center
+    lines: out geom
+  portugal_p33_bi_directional_option_b_inheritance:
+    lines_side_sweden_p32_inheritance:
+      include_power_minor_line: true
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        minor_line: 20.0  # Spanish MV standard (same as Portugal)
+        cable_no_voltage: 20.0
+        line_no_voltage: 66.0  # Spanish subT (vs Portugal 60 kV, Italy 132 kV, Japan 66 kV)
+    subs_side_portugal_p33_extension:
+      accept_no_voltage_with_inference: true
+      voltage_inference_defaults_kv:
+        substation_transmission: 220.0  # Spanish HV standard (matches Portugal REN)
+        substation_distribution: 20.0  # Spanish MV distribution standard
+        substation_minor_distribution: 15.0  # Spanish MV rural (same as Portugal)
+        substation_traction: 3.0  # RENFE 3 kV DC classic + 25 kV AC AVE (matches Italy 3 kV)
+        power_substation_generic: 20.0  # Iberdrola/Endesa/Naturgy MV default
+  merger_operations_required:
+    - substation_id_assignment
+    - line_id_assignment
+    - polyline_conversion_to_compact_p_array
+    - line_endpoint_ss_se_matching_string_ids
+    - adjacency_graph_construction  # 🚨 CRITICAL — baseline has ZERO adjacency
+    - grid_based_spatial_index_for_large_N_merges
+    - bbox_split_fallback_if_single_bbox_fails
+  compact_schema_write: via_scripts_pipeline_utils_grid_geo_sharding_write_grid_geo
+
+# ---------------------------------------------------------------
+# Baseline empirical state (pre-fetch)
+# ---------------------------------------------------------------
+baseline:
+  ssi_data_json_path: spain/ssi-data.json
+  ssi_data_schema: wrapped
+  substation_count: 3423
+  grid_geo_json_path: spain/grid-geo.json
+  grid_geo_schema: compact_s_l_a
+  s_dict_count: 3529
+  l_list_count: 22765
+  a_dict_count: 0  # 🚨 EMPTY — baseline ingested without endpoint matching
+  line_substation_parity_baseline: 6.65  # ABOVE_HEALTHY_BAND (line-rich sub-poor)
+  parity_signature_baseline: ABOVE_HEALTHY_BAND_SUB_POOR_LINE_RICH
+  substation_growth_potential: MAJOR  # Only 3,423 subs for 48M pop = 71 subs/M pop
+  adjacency_rebuild_required: true  # Wave 4 will populate from scratch
+  voltage_distribution_expected:
+    "400.0": REE_EHV_BACKBONE  # 400 kV national EHV
+    "220.0": REE_HV_TRANSMISSION  # Spanish HV standard
+    "132.0": REE_SUBTRANSMISSION  # 132 kV regional
+    "66.0": DSO_SUBTRANSMISSION  # 66 kV DSO subT
+    "45.0": DSO_MV_HIGH
+    "20.0": DSO_MV_STANDARD  # Iberdrola/Endesa/Naturgy MV standard
+    "15.0": DSO_MV_RURAL
+  bbox_mainland_only:
+    lat_min: 35.99  # Punta de Tarifa Gibraltar
+    lat_max: 43.79  # Estaca de Bares Galicia
+    lon_min: -9.30  # Cabo Touriñán Galicia
+    lon_max: 4.33   # Cap de Creus Cataluña
+  bbox_note: Includes Balearic Islands within main bbox
+  bbox_canary:
+    lat_min: 27.63  # El Hierro south
+    lat_max: 29.42  # Lanzarote north
+    lon_min: -18.16  # El Hierro west
+    lon_max: -13.42  # Lanzarote east
+  bbox_ceuta_melilla:
+    ceuta: {lat: [35.87, 35.92], lon: [-5.38, -5.28]}
+    melilla: {lat: [35.27, 35.31], lon: [-2.97, -2.92]}
+  bounds_json_features: 19  # Peninsula + Balearic + Canary + Ceuta + Melilla + minor
+
+# ---------------------------------------------------------------
+# Architectural signatures — Iberian cluster completion 2-of-2
+# ---------------------------------------------------------------
+architectural_signatures:
+  iberian_cluster_completion_2_of_2: true  # Portugal + Spain both v4.23-enhanced
+  iberian_synchronous_grid_via_ree_ren: true
+  mibel_market_coupling_portugal_since_2007: true
+  peninsula_single_bidding_zone: true  # mainland unified
+  balearic_bidding_zone_sime: true
+  canary_6_sub_systems_islanded: true  # completely isolated no HVDC to mainland
+  five_400kv_ac_cross_border_interconnectors_portugal:
+    falagueira_cedillo: true
+    aldeadavila_pocinho: true
+    alto_lindoso_cartelle: true
+    puebla_de_guzman_tavira: true
+    alqueva_balboa: true
+  cross_border_france:
+    inelfe_hvdc_2000mw_2015: true  # Baixas-Santa Llogaia 2×1,000 MW HVDC
+    hendaye_larrun_ac: true  # traditional AC
+    biscay_gulf_hvdc_2028_pending: true  # future
+  cross_border_morocco:
+    tarifa_fardioua_hvdc_700mw_1998: true
+    tarifa_fardioua_2nd_link: true  # 2nd link
+  cross_border_andorra_radial_ac: true
+  balearic_cometa_hvdc:
+    peninsula_mallorca_400mw_2011: true
+  ree_redeia_umbrella_2022: true
+  major_dsos:
+    iberdrola_i_de:
+      market_share_pct: 40
+      customers_millions: 11
+      dominant_regions: [Basque Country, Valencia, Castilla-La Mancha, Extremadura, Murcia]
+    endesa_e_distribucion:
+      market_share_pct: 30
+      customers_millions: 13
+      dominant_regions: [Cataluña, Andalucía, Aragón, Baleares, Canarias]
+      parent: Enel (Italian)
+    naturgy_ufd:
+      market_share_pct: 10
+      customers_millions: 4
+      dominant_regions: [Madrid, Castilla y León, Galicia]
+      predecessor: Gas Natural Fenosa Distribución
+    edp_hc_energia:
+      market_share_pct: 5
+      customers_millions: 0.9
+      dominant_regions: [Asturias]
+      predecessor: Hidrocantábrico
+      parent: EDP (Portuguese)
+    viesgo:
+      market_share_pct: 5
+      customers_millions: 0.7
+      dominant_regions: [Cantabria, Northern Castilla]
+      parent: TotalEnergies (acquired 2020)
+  coal_phase_out_2021_complete: true  # FIRST major European economy
+  first_europe_offshore_floating_wind_2023: true  # SAITEC + PLOCAN
+  renewable_electricity_share_pct_2024: 50  # peninsular leader
+  # Regional autonomies with co-official languages
+  cataluna_catalan_official: true
+  valencia_valencian_dialect: true
+  balearic_catalan_official: true
+  galicia_galician_official: true
+  basque_country_euskara_official: true
+  navarre_partial_basque_official: true  # zona vascófona
+  val_daran_aranese_occitan_official: true
+  ceuta_melilla_african_exclaves: true
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 18TH ENFORCEMENT scoping (6-LANGUAGE)
+# ---------------------------------------------------------------
+convention_78_alias_scoping:
+  binding_enforcement_number: 18
+  script_class: SPANISH_PLUS_ENGLISH_PLUS_CATALAN_PLUS_GALICIAN_PLUS_BASQUE_PLUS_ARANESE_6_LANGUAGE
+  cohort_wide_signature: THIRD_HIGHEST_LANGUAGE_COUNT_COHORT_WIDE  # after Italy 8, then Spain 6
+  scripts_supported:
+    - Spanish (Castellano)  # ~93% expected — Latin + á é í ó ú ñ ¿ ¡ diacritics
+    - English  # ~5% — international OSM tagging
+    - Catalan (Català)  # ~10M speakers Cataluña + Valencia + Balearic; à é è í ï ó ò ú ü ç l·l
+    - Galician (Galego)  # ~2M speakers Galicia; á é í ó ú ñ ç
+    - Basque (Euskara)  # ~750k speakers País Vasco + Navarra; distinctive non-Indo-European
+    - Aranese (Aranés/Occitan)  # ~<5k speakers Val d'Aran; ç ò ü
+  primary_operators:
+    ree_redeia:
+      spanish: [REE, Red Eléctrica de España, Red Eléctrica, Redeia, Redeia Corporación]
+      catalan: [REE, Xarxa Elèctrica d'Espanya]
+      galician: [REE, Rede Eléctrica de España]
+      basque: [REE, Espainiako Sare Elektrikoa]
+      english: [REE, Spanish National Grid, Spanish Transmission System Operator, Spanish TSO, Redeia]
+      role: NATIONAL_TSO_STATE_MAJORITY_OWNED
+      voltage_scope: [400, 220, 132]
+      ownership: State via SEPI (~20%) + private
+    iberdrola_i_de:
+      spanish: [i-DE, iDE, Iberdrola Distribución, Iberdrola i-DE, Iberdrola Distribución España, Iberdrola España]
+      catalan: [i-DE, Iberdrola Distribució]
+      basque: [i-DE, Iberdrola Banaketa]
+      english: [Iberdrola i-DE, Iberdrola Distribution, Iberdrola]
+      role: LARGEST_DSO_40PCT_MARKET_SHARE
+      predecessor_rebrand: Iberdrola Distribución → i-DE ~2020
+      coverage: Basque Country + Valencia + Castilla-La Mancha + Extremadura + Murcia
+      customers_millions: 11.0
+      ownership: Iberdrola SA (Basque parent)
+    endesa_e_distribucion:
+      spanish: [Endesa, e-distribución, E-Distribución, Endesa Distribución, Endesa Redes Digitales]
+      catalan: [Endesa, e-distribució]
+      english: [Endesa, E-Distribución, Endesa Distribution]
+      role: SECOND_LARGEST_DSO_30PCT
+      predecessor_rebrand: Endesa Distribución → e-distribución ~2020
+      coverage: Cataluña + Andalucía + Aragón + Baleares + Canarias
+      customers_millions: 13.0
+      ownership: Enel (Italian) subsidiary
+    naturgy_ufd:
+      spanish: [Naturgy, UFD, Naturgy UFD, Naturgy Electricidad España, Unión Fenosa Distribución, Gas Natural Fenosa Distribución]
+      galician: [Naturgy, UFD]
+      english: [Naturgy, UFD, Naturgy Electricity Spain]
+      role: THIRD_LARGEST_DSO_MADRID_CASTILLA_GALICIA
+      predecessor_rebrand: Unión Fenosa Distribución → UFD 2011 → Naturgy 2018
+      coverage: Madrid + Castilla y León + Galicia
+      customers_millions: 4.0
+      ownership: Naturgy Energy Group (private)
+      convention_78_4bis_5_13th_enforcement_candidate: MADRID_metropolitan_geofence
+    edp_hc_energia:
+      spanish: [EDP HC Energía, EDP Hidrocantábrico, HC Energía, Hidrocantábrico, EDP España]
+      english: [EDP HC Energía, EDP Spain]
+      role: ASTURIAS_REGIONAL_DSO
+      coverage: Asturias primary
+      predecessor: Hidroeléctrica del Cantábrico → EDP takeover 2001
+      customers_millions: 0.9
+      ownership: EDP (Portuguese parent)
+    viesgo:
+      spanish: [Viesgo, Grupo Viesgo, Viesgo Distribución]
+      english: [Viesgo]
+      role: CANTABRIA_NORTHERN_CASTILLA_DSO
+      coverage: Cantabria + Northern Castilla y León
+      customers_millions: 0.7
+      ownership: TotalEnergies (French, acquired 2020)
+    # ═══ Small regional DSOs ═══
+    grupo_energetico_del_sur:
+      spanish: [Grupo Energético del Sur, GES]
+      role: MUNICIPAL_DSO_ARAGON
+    distribuidora_electrica_bermeo:
+      spanish: [Distribuidora Eléctrica Bermeo]
+      basque: [Bermeoko Elektrizitate Banatzailea]
+      role: MUNICIPAL_DSO_BASQUE_COUNTRY
+    # ═══ Rail traction ═══
+    adif:
+      spanish: [ADIF, Administrador de Infraestructuras Ferroviarias, Adif Alta Velocidad]
+      catalan: [ADIF, Administrador d'Infraestructures Ferroviàries]
+      english: [ADIF, Spanish Rail Infrastructure Administrator]
+      role: RAIL_TRACTION_3KV_DC_25KV_AC_AVE
+      note: 3 kV DC classic + 25 kV AC AVE high-speed
+    metro_madrid:
+      spanish: [Metro de Madrid, Metro Madrid, MDM]
+      english: [Madrid Metro]
+      role: RAIL_METRO_MADRID_600V_DC
+    metro_barcelona:
+      spanish: [TMB, Transports Metropolitans de Barcelona, Metro de Barcelona]
+      catalan: [TMB, Metro de Barcelona, Metro Barcelona]
+      english: [Barcelona Metro, TMB]
+      role: RAIL_METRO_BARCELONA_1200V_DC
+    # ═══ Renewable generation (Layer 4b) ═══
+    iberdrola_renovables:
+      spanish: [Iberdrola Renovables, Iberdrola Renewables]
+      english: [Iberdrola Renewables]
+      role: GEN_RENEWABLE_MULTIPLE
+    acciona_energia:
+      spanish: [Acciona Energía, Acciona]
+      english: [Acciona Energy]
+      role: GEN_RENEWABLE_MULTIPLE
+    naturgy_renovables:
+      spanish: [Naturgy Renovables]
+      role: GEN_RENEWABLE_MULTIPLE
+    # ═══ HVDC + AC interconnector consortiums ═══
+    inelfe:
+      spanish: [INELFE, Interconnexion France-Espagne, Baixas-Santa Llogaia]
+      catalan: [INELFE, Interconnexió França-Espanya]
+      french: [INELFE, Interconnexion France-Espagne]
+      english: [INELFE, France-Spain Interconnection]
+      role: HVDC_FRANCE_SPAIN_2015_2000MW
+    spain_morocco_hvdc:
+      spanish: [Tarifa-Fardioua HVDC, España-Marruecos HVDC]
+      english: [Tarifa-Fardioua HVDC, Spain-Morocco Interconnection]
+      role: HVDC_MOROCCO_1998_700MW
+    cometa_hvdc:
+      spanish: [Cometa, Cometa HVDC, Peninsula-Mallorca]
+      catalan: [Cometa]
+      role: HVDC_BALEARIC_2011_400MW
+    # ═══ Cross-border partner TSOs (route to REE) ═══
+    ren_portugal:
+      portuguese: [REN, Redes Energéticas Nacionais]
+      spanish: [REN, Redes Energéticas Nacionales Portugal]
+      english: [REN, Portuguese TSO]
+      role: PORTUGUESE_TSO_via_iberian_synchronous
+      route_to: REE
+    rte_france:
+      french: [RTE, Réseau de Transport d'Électricité]
+      spanish: [RTE]
+      english: [RTE, French TSO]
+      role: FRENCH_TSO_via_inelfe_hendaye
+      route_to: REE
+    one_morocco:
+      arabic: [ONEE, المكتب الوطني للكهرباء والماء الصالح للشرب]
+      spanish: [ONEE, ONE Marruecos]
+      french: [ONEE, Office National de l'Électricité et de l'Eau Potable]
+      english: [ONEE, Moroccan National Electricity and Water Office]
+      role: MOROCCAN_TSO_via_tarifa_fardioua_hvdc
+      route_to: REE
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 13TH ENFORCEMENT candidate — Madrid
+# ---------------------------------------------------------------
+convention_78_4bis_5_madrid_geofence:
+  cohort_wide_enforcement_number: 13  # candidate
+  geofence_architecture: 2_way_metropolitan_split
+  cumulative_enforcement_roster_pre_spain:
+    1: Prague CZ (P20)
+    2: Warsaw PL (P21)
+    3: EWZ Zurich CH (P24)
+    4: SIG Geneva CH (P24)
+    5: Auckland NZ (P27)
+    6: Copenhagen DK (P28 — 615)
+    7: Helsinki FI (P29 — 446)
+    8: Istanbul TR (P30 — 178)
+    9: London UK (P31 — 1994 LARGEST)
+    10: Stockholm SE (P32 — 24)
+    11: Milan IT (P34 — 350)
+    12: Rome IT (P34 — 131)
+  candidate: Madrid ES (P36 — 2-way Naturgy + Iberdrola i-DE)
+  madrid_context: |
+    Madrid metropolitan area (~6.7M population Comunidad de Madrid).
+    Two-way DSO split: (a) Naturgy — dominant in Madrid inner + core
+    metropolitan (via Unión Fenosa historical concession); (b) Iberdrola
+    i-DE — outer metropolitan zones + some inner overlap. Endesa has
+    minor presence in a few localities. Iberdrola i-DE's south Madrid
+    coverage is via ~2010s regulatory reallocation.
+  geofence_bboxes:
+    naturgy_madrid:
+      lat: [40.35, 40.55]
+      lon: [-3.85, -3.60]
+      operator_canonical: Naturgy Madrid
+    iberdrola_i_de_madrid:
+      lat: [40.30, 40.65]
+      lon: [-3.95, -3.50]
+      operator_canonical: Iberdrola i-DE Madrid
+  anticipated_hits: 400_1200  # comparable to Milan 350 or Helsinki 446
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border tolerance
+# ---------------------------------------------------------------
+discipline_36_tolerance:
+  boundary_tolerance_km: 5.0
+  entry_added_to: cross_border_tolerances.json
+  rationale_summary: |
+    5.0 km tolerance — Iberian Mediterranean+Atlantic coastline complexity
+    + Balearic archipelago + Canary Islands remote offshore + Ceuta+Melilla
+    African exclaves + Pyrenees ridge complexity. Comparable to Italy 5.0 km
+    (matches). Portugal is 6.0 km (higher due to Açores+Madeira mid-Atlantic
+    extension); Spain has slightly less remote islands.
+  expected_drops_estimate:
+    subs: 100_250
+    lines: 50_150
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity target
+# ---------------------------------------------------------------
+discipline_41_parity_target:
+  baseline_pre_enhancement: 6.65  # ABOVE_HEALTHY_BAND sub-poor line-rich
+  target_ratio_min: 1.5
+  target_ratio_max: 5.0
+  anticipated_signature_post_option_b_bi_directional: HEALTHY_BAND_via_MAJOR_SUB_GROWTH
+  rationale: |
+    Spain baseline 6.65 ABOVE_HEALTHY_BAND — sub-poor + line-rich pattern
+    (opposite of Portugal baseline which was line-poor + sub-rich). Wave 4
+    bi-directional Option B inheritance should MASSIVELY grow subs (from
+    3,423 to 25k-40k+ via Portugal P33 subs pattern application), bringing
+    parity DOWN to 1.5-3.0 HEALTHY_BAND. This is the mirror-image recovery
+    pattern to Portugal's line-side recovery.
+
+# ---------------------------------------------------------------
+# Anticipated architectural first-instances via Spain P36 closure
+# ---------------------------------------------------------------
+architectural_first_instances_anticipated:
+  1: 🇪🇸 FIRST Iberian cluster completion milestone 2-of-2 (Portugal + Spain both v4.23-enhanced)
+  2: 🌍 3RD HIGHEST cohort-wide 6-language Convention #78 BINDING enforcement (Spanish + English + Catalan + Galician + Basque + Aranese)
+  3: Convention #78 §4bis.5 13TH enforcement candidate (Madrid 2-way Naturgy + Iberdrola i-DE)
+  4: FIRST cohort-wide 5-DSO market fragmentation architecture (Iberdrola + Endesa + Naturgy + EDP HC + Viesgo)
+  5: FIRST cohort-wide adjacency graph REBUILD from empty baseline (a_dict_count 0 → populated via Wave 4)
+  6: FIRST cohort-wide dual-Iberian synchronous grid representation (Spain + Portugal REE-REN)
+  7: INELFE HVDC France + Spain-Morocco 2× HVDC + Cometa Balearic HVDC preserved
+  8: FIRST cohort-wide North African Spanish exclaves (Ceuta + Melilla) captured
+  9: FIRST cohort-wide first-Europe offshore floating wind auctions 2023 codification
+  10: 2021 COMPLETE coal phase-out (FIRST major European economy) Layer 4 adapt signature
+  11: Portugal P33 bi-directional Option B pattern FIRST direct Iberian sibling inheritance
+  12: Peninsular renewable electricity leader 50%+ 2024
+
+# ---------------------------------------------------------------
+# Cumulative Wave 4 progression projection at Spain closure
+# ---------------------------------------------------------------
+cumulative_wave_4_projection_at_spain_closure:
+  countries_terminally_complete: 6  # UK + Sweden + Portugal + Italy + Japan + Spain
+  wave_4_progression_pct: 66.7  # 6/9
+  canonical_cohort_completion_pct: 92.3  # 36/39
+  convention_78_binding_enforcements: 18
+  convention_78_alias_ledger_projected: 65000_75000  # +10k-20k ES alias hits (Iberdrola+Endesa+Naturgy strong)
+  convention_78_4bis_5_layer_3_enforcements: 13  # Milan 11th + Rome 12th + Madrid 13th
+  nordic_cluster_completion: TERMINAL_COMPLETE_5_OF_5
+  iberian_cluster_completion: TERMINAL_COMPLETE_2_OF_2  # Portugal + Spain
+  mediterranean_cluster_progress: 1_of_1  # Italy (Spain also Mediterranean but Iberian primary)
+  pacific_cluster_progress: 1_of_1  # Japan
+  option_b_pattern_bi_directional_validated_scales: NORDIC + IBERIAN + MEDITERRANEAN + PACIFIC + IBERIAN_2X
+  remaining_wave_4_candidates: 3  # france + germany + us
+  next_smallest_first: france_p37
+
+# ---------------------------------------------------------------
+# Layer 4 hazard baselines
+# ---------------------------------------------------------------
+layer_4_hazard_baselines:
+  R6c_flood: 0.55  # MOD-HIGH 2024 DANA Valencia 220 dead + 1997 Biescas + Ebro + Guadalquivir seasonal
+  R6d_wildfire: 0.75  # HIGH 2022 Zamora Sierra de la Culebra + 2023 Tenerife + annual Mediterranean (below Portugal 0.90)
+  R6e_winter: 0.20  # LOW Mediterranean mild + Pyrenees limited transmission grid
+  R8_adapt: 0.60  # MOD-HIGH PNIEC 2020-2030 + Ley Cambio Climático 2021 + 2021 coal phase-out COMPLETE + first-Europe floating wind 2023
+  R9_compound: 0.55  # MOD DANA + drought + wildfire compound (below Portugal 0.70)
+  R10_just: 0.55  # MOD 2021 coal phase-out complete + Almeria greenhouse + Andalucía depopulation + 6-language minorities
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 2 Operator local OSM Overpass fetch
+handoff_command_step_2: |
+  cd ~/ikengassiindex.github.io && \
+  python3 -m scripts.pipeline.ingestion.spain.osm_overpass 2>&1 \
+    | tee spain/v4_23-osm-overpass.log
+
+anticipated_step_2_pattern: |
+  Spain mainland 493k km² area (~larger than Italy 301k km² by 60%).
+  Bbox-split strongly recommended aligned with 4-zone architecture:
+  Peninsula North (Galicia+Asturias+Cantabria+Basque+Navarra+Aragón+
+  Cataluña+Castilla y León) + Peninsula Center (Madrid+Castilla-La
+  Mancha+Extremadura) + Peninsula South (Andalucía+Murcia+Valencia) +
+  Balearic + Canary Islands + Ceuta+Melilla. Portugal P33 bi-directional
+  Option B pattern INHERITED — expect MAJOR sub growth from 3,423
+  baseline to 25k-45k post-fetch given sub-poor line-rich pattern.
+  Line count already 22,765 — additional growth 40k-70k projected.
+  Grid-geo projected 50-100 MB — may trigger Convention #80 sharding
+  threshold (approaching 90 MB).

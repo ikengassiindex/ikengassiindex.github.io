@@ -1,0 +1,8 @@
+{# Standard page-script loaders (top of body) — shared across all 8 page types.
+   Loads: ssi-versions, nav.js, ssi-engine, per-country ssi-metadata, renders nav.
+   Variables: slug, page (e.g. "map", "regional", etc.) #}
+<script src="../ssi-versions.js?_=3"></script>
+<script src="../nav.js?v={{ '../nav.js' | cb }}"></script>
+<script src="../ssi-engine.js?v={{ '../ssi-engine.js' | cb }}"></script>
+<script src="ssi-metadata.js?v={{ (slug + '/ssi-metadata.js') | cb }}"></script>
+<script>renderNav('{{ page }}');</script>

@@ -1,0 +1,335 @@
+# Ireland v4.23 Ingestion Audit — Step 1 Pre-flight Source Discovery
+# ===================================================================
+# Task: #330 (WAVE3-Step1 Ireland)
+# Date: 17 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Wave 3 Priority: 25 (FOURTH Wave 3 country post-Switzerland;
+#                     smallest-first cadence continues at 994 baseline
+#                     subs; SIMPLER architecture than Swiss 8-way via
+#                     single national DSO Greek-precedent)
+# Status: READY_FOR_STEP_2_FETCH
+
+schema_version: v4_23-ingestion-audit-preflight-1
+country_slug: ireland
+country_iso2: IE
+country_iso3: IRL
+
+# ── Baseline state (as of pre-fetch snapshot 17 July 2026) ───────────────
+
+baseline_state:
+  ssi_data_substations: 994
+  grid_geo_lines: 1800                        # Line-substation ratio 1.81 HEALTHY (unlike Swiss 0.66)
+  voltage_coverage_pct: 99.9                  # 993/994 voltage populated
+    # 675 MV + 261 HV-110 + 51 HV-220 + 5 EHV-400 + 2 EHV-275
+  region_coverage_pct: 100.0                  # 26/26 counties populated
+  owner_coverage_pct: 0.0                     # ⚡ ZERO baseline — clean slate signature
+  bounds_features: 26                         # 26 Republic of Ireland county polygons
+  min_fleet_pin: 950                          # KB §56 fleet-floor (Ireland 994 baseline; +5% headroom)
+  re_norm_coverage_pct: 94.8                  # 942/994 populated; 52 subs latent gap
+    # Empirical cohort-wide pattern (iceland 5.5% + switzerland 5.2%) → ireland 5.2% CONFIRMED
+    # dual-purpose phase 4c pattern locked cohort-wide
+
+# ── Data source primary — OSM Overpass API ──────────────────────────────
+
+primary_source:
+  source_id: IE-C1-osm-overpass
+  publisher: OpenStreetMap contributors via Overpass API
+  licence: ODbL (Open Database License) — attribution required
+  endpoint_primary: https://overpass-api.de/api/interpreter
+  endpoint_fallback: https://overpass.kumi.systems/api/interpreter
+  endpoint_second_fallback: https://overpass.private.coffee/api/interpreter
+  expected_query_scope: >
+    3 element-type queries for substations (way + node + relation) + 1
+    combined query for lines (power=line + cable + minor_line). Area
+    header: area["ISO3166-1"="IE"]->.ie
+  expected_yield:
+    substations_way: 700-1800                 # Moderate OSM density (western European contributor cohort)
+    substations_node: 300-800
+    substations_relation: 5-20
+    lines: 2500-6000                          # Ireland transmission density moderate
+    line_ratio_pre_merge: 3.0-4.5             # Ireland moderate transmission density
+    total_raw_bytes: ~8-20 MB                 # Smaller than Switzerland (~15-40 MB) but larger than Iceland
+  expected_scale_context: >
+    Ireland is FOURTH Wave 3 cohort at 994 baseline subs. Expected
+    2-4× substation growth to ~1,900-3,900 net-new. Line densification
+    expected MODERATE (baseline 1800 lines is closer to expected
+    Central European density than Swiss 625 undercount — expected
+    ~2-3× line growth to ~4,000-6,000). Western European OSM
+    contributor density is MODERATE (higher than Nordic/Mediterranean
+    but lower than Central European) — 504 gateway timeouts less
+    likely than Iceland/Greek Nordic-Arctic/Mediterranean sparsity
+    but possible on line-query. Convention #56 partial-fetch
+    preservation ready.
+
+# ── Grid architecture — EirGrid TSO + ESB Networks single national DSO ──
+
+grid_architecture:
+  tso_transmission:
+    operator_id: EIRGRID
+    operator_names_aliases:
+      - "EirGrid"                             # English primary
+      - "EirGrid plc"                          # With legal form
+      - "EirGrid Plc"                          # Capitalisation variant
+      - "EirGrid Group"                        # Alternative naming
+      - "EIRGRID"                              # Uppercase
+      - "Éirid"                                # Gaeilge (Irish) name
+      - "Eirgrid"                              # Camelcase-less variant
+    voltage_thresholds:
+      backbone_kv: 400                          # 5 subs at 400 kV (Moyle + EWIC interconnector + spine)
+      high_voltage_kv: 275                      # 2 subs at 275 kV
+      subtransmission_kv: 220                   # 51 subs at 220 kV
+      distribution_boundary_kv: 110             # 261 subs at 110 kV (mixed TSO/DSO tier)
+    tso_threshold_rule: "≥110 kV → EIRGRID"    # Ireland's 110 kV is architecturally TSO
+      # Ireland 110 kV is MAIN transmission tier (like Greek 66 kV subtransmission)
+    established: 2006                           # EU 3rd Package unbundling from ESB Group
+    unbundling_completed: 2008                  # Full asset transfer
+    grid_synchronous: TRUE                      # UCTE/Continental Europe synchronous area (via SEM/I-SEM)
+    grid_frequency_hz: 50
+    cross_border_interconnectors: 3             # Moyle (HVDC-500MW) + East-West (HVDC-500MW) + N.I. AC land
+    note: >
+      EirGrid is state-owned Irish TSO. Sister TSO SONI (System
+      Operator for Northern Ireland) coordinates via I-SEM (Integrated
+      Single Electricity Market) with Republic of Ireland. Cross-border
+      interconnectors: Moyle HVDC 500 MW (undersea to Scotland/GB) +
+      East-West HVDC 500 MW (undersea to Wales/GB) + AC land border
+      with Northern Ireland. Post-Brexit unique cohort position: EU
+      member Republic of Ireland coordinating with GB/UK (non-EU)
+      via SEM/I-SEM cross-border pathway.
+
+  dso_distribution:
+    architectural_note: >
+      Ireland has SINGLE national DSO (ESB Networks) covering ALL 26
+      Republic of Ireland counties. Analogous to Greek DEDDIE
+      simplification. NO Convention #78 §4bis.5 Layer 3 geofence
+      needed — voltage-class × single-DSO resolver handles all
+      distribution attribution cleanly. Dublin metropolitan area does
+      NOT require carve-out (ESB Networks covers Dublin as part of
+      unified national grid).
+
+    esb_networks:
+      operator_id: ESB_NETWORKS
+      operator_names_aliases:
+        - "ESB Networks"                        # English primary
+        - "ESB Networks DAC"                    # With Designated Activity Company legal form
+        - "ESB Networks Ltd"                    # Alternative Ltd variant
+        - "ESB Networks Limited"
+        - "ESB"                                 # Ambiguous parent
+        - "ESB Group"                           # Parent Electricity Supply Board
+        - "Electricity Supply Board"            # English full name
+        - "Bord Solátbhair Leictreachais"       # Gaeilge (Irish) full name
+        - "Bord Solathair Leictreachais"        # ASCII transliteration
+      territory: >
+        All 26 counties of Republic of Ireland (national single DSO)
+      share_estimated: ~100%                    # SINGLE national DSO
+      predecessor: ESB Distribution — pre-2010 rebrand to ESB Networks
+      voltage_range: 110 kV + MV (38/20/10 kV) + LV (0.4 kV)
+      customer_base: ~2.3M electricity customers
+
+  private_captives_estimated:
+    - "Iarnród Éireann (Irish Rail — DART electric traction 25 kV AC + 1.5 kV DC)"
+    - "Dublin Airport (industrial captive — Dublin Airport Authority DAA)"
+    - "Intel Ireland (semiconductor fab industrial captive — Leixlip)"
+    - "Google Ireland Data Centres (Dublin)"
+    - "Microsoft Ireland Data Centres (Dublin)"
+    - "Amazon Web Services Ireland Data Centres"
+    - "Facebook/Meta Ireland Data Centres"
+    - "Aughinish Alumina (industrial captive — Limerick alumina refinery)"
+    - "Bord na Móna (state peat harvesting — Midlands)"
+    - "Moneypoint Coal Plant (decommissioning 2025 — Clare county)"
+
+  grid_topology_notes:
+    single_national_dso: TRUE                   # Greek-precedent simplification
+    post_brexit_unique: TRUE                    # EU member coordinating with GB non-EU via SEM/I-SEM
+    cross_border_hvdc_undersea: TRUE            # Moyle + East-West interconnectors
+    coal_phase_out_underway: TRUE               # Moneypoint 915 MW closure 2025
+    just_transition_fund_eligible: TRUE         # EU JTF €68M Midlands region
+    renewable_generation_growth: HIGH           # 40% wind share 2023 (top-3 EU); target 80% by 2030
+    hydro_generation_share_pct: ~2              # Ardnacrusha + Erne + Turlough Hill pumped storage
+    wind_generation_share_pct: ~40              # LARGEST western European wind share
+    thermal_share_pct: ~40                      # Natural gas + coal (declining)
+
+# ── Convention #78 BINDING 7th enforcement (post-Switzerland cumulative) ─
+
+convention_78_binding_7th_enforcement:
+  enforcement_number: 7
+  cumulative_9_country_hits_pre_ireland: 20637
+    # Latvia 1 + Estonia 20 + Latvia (first) 143 + Slovakia 615 + Czechia 5178
+    # + Poland 14449 + Greece 108 + Iceland 4 + Switzerland 119
+  expected_ireland_alias_hits: 10-50            # LOWEST cohort-wide expected
+    # English-language dominant + minimal Gaeilge cohabitation + moderate legal-form variants
+    # (Ltd/Limited/DAC/plc/Teoranta) + single ESB Distribution → ESB Networks 2010 rebrand
+  cumulative_10_country_hits_post_ireland: 20647-20687
+  cadence_precedent_ratio_post_ireland: 2065-2069x above 10-instance BINDING threshold
+  status_signal: "Convention #78 BINDING continues cohort-wide adoption — 7th enforcement"
+
+  alias_class_distribution_estimated:
+    english_language_dominant: TRUE             # ~90% English operator= tags expected
+    gaeilge_irish_diacritics: LOW               # <5% Gaeilge tag drift (á é í ó ú + Éirid)
+    legal_form_variants:
+      - "Ltd"                                   # English abbreviation
+      - "Limited"                               # English full form
+      - "plc"                                   # Public Limited Company
+      - "DAC"                                   # Designated Activity Company (2014 Companies Act)
+      - "Teoranta"                              # Gaeilge (Irish) = Limited
+      - "Teo"                                   # Abbreviated Gaeilge
+      - "Cuideachta"                            # Gaeilge = Company
+    predecessor_rebrand_alias_classes:
+      esb_distribution_pre_2010: MODERATE       # 15-year legacy (2010 → ESB Networks)
+      eirgrid_pre_unbundling_2006: LOW          # Small — TSO was ESB Group pre-2006
+    non_republic_alignment_class: LOW           # Minor Northern Ireland tag drift (SONI + NIE Networks)
+
+  new_sub_convention_candidate_status:
+    scope: >
+      Ireland is FIRST English-language Wave 3 cohort country. Minimal
+      multi-script cohabitation (English + minor Gaeilge). Convention
+      #78 BINDING 7th enforcement expected LOWEST cohort-wide count
+      (10-50 hits vs Switzerland 119 largest). Codifies architectural
+      pattern: monolingual cohort countries produce lower Convention
+      #78 alias-normalisation counts than multi-language ones. Future
+      P26+ preflights should expect English/GB/Australia/US cohort
+      countries to follow similar signature.
+
+# ── Convention #78 §4bis.4 two-phase workflow status ────────────────────
+
+convention_78_4bis_4_two_phase_workflow:
+  phase_1_l1_ingestion: PENDING_STEP_2_FETCH
+  phase_2_l2_l3_l4_rescore: DEFERRED_POST_STEP_4
+  visibly_honest_degradation_marker: >
+    Net-new subs will carry Convention #56 neutral defaults post-merge.
+    Phase 4c refresh via scripts/refresh_v42_modifiers_re_composite.py
+    will populate v4.2 modifier chain + Re composite. Ireland requires
+    _COUNTRY_HAZARD_BASELINES entry — see recommendation below.
+    Empirically expect ~52 baseline latent gap + net-new = TOTAL scope
+    per Iceland/Switzerland cohort-wide dual-purpose pattern.
+
+  hazard_baseline_recommendation:
+    country_slug: ireland
+    flood: 0.65                                 # HIGH — 2015-2016 major flooding + Atlantic storms + Shannon basin
+    wildfire: 0.15                              # LOW-MOD — sparse forestry; 2018 gorse fires exception
+    winter: 0.55                                # MODERATE — Atlantic storm systems (Ophelia 2017, Emma 2018)
+    adapt: 0.75                                 # HIGH — ND-GAIN 15/181; Climate Action Plan 2024 statutory net-zero 2050
+    compound: 0.60                              # MOD-HIGH — Atlantic storm + inland flooding + wind gust clusters
+    just: 0.45                                  # MODERATE — Moneypoint 915 MW closure 2025 + EU JTF €68M Midlands
+    source_citations:
+      flood: "OPW (Office of Public Works) flood atlas + River Shannon Basin registry + IPCC AR6"
+      wildfire: "Coillte (Irish Forestry Board) fire registry + Copernicus EFFIS 2024 Ireland"
+      winter: "Met Éireann storm registry + Storm Ophelia/Emma incident reports"
+      adapt: "ND-GAIN 2024 Ireland ~15/181 (high readiness) + Climate Action Plan 2024"
+      compound: "IPCC AR6 Ch 12 + OPW combined-hazard registry + Atlantic multi-hazard events"
+      just: "EU Just Transition Fund IE 2021-2027 — €68M Midlands region (Bord na Móna peat + Moneypoint coal transition)"
+
+# ── NUTS-3 territorial map ────────────────────────────────────────────────
+
+territorial_map:
+  nuts_2_regions:
+    IE04: "Northern and Western Region"        # Donegal + Sligo + Mayo + Roscommon + Galway
+    IE05: "Southern Region"                    # Cork + Kerry + Waterford + Limerick + Clare + Tipperary + Kilkenny
+    IE06: "Eastern and Midland Region"         # Dublin + Meath + Kildare + Wicklow + Westmeath + Longford + Louth + Wexford + Carlow + Kilkenny + Laois + Offaly
+  nuts_3_regions: 8                            # Post-2015 Ireland NUTS-3 restructure
+  # NUTS-3 codes:
+  # IE041 Border + IE042 West + IE051 Mid-West + IE052 South-East +
+  # IE053 South-West + IE061 Dublin + IE062 Mid-East + IE063 Midland
+  counties_used_as_region_field: 26            # 26 Republic of Ireland counties (traditional partition)
+  osm_ref_nuts_3_density: HYPOTHESIS            # Verify at Step 2 fetch (Wave 2/3 precedent — empirically per country)
+
+# ── Convention #78 §4bis.5 Layer 3 geofence — NOT NEEDED ────────────────
+
+convention_78_4bis_5_layer_3_geofence:
+  status: NOT_REQUIRED
+  rationale: >
+    Ireland has SINGLE national DSO (ESB Networks) covering ALL 26
+    Republic of Ireland counties. Analogous to Greek DEDDIE
+    simplification (Wave 3 P22 precedent). Voltage-class × single-DSO
+    resolver handles all distribution attribution cleanly:
+    - ≥110 kV → EirGrid TSO
+    - <110 kV → ESB Networks DSO
+    - Voltage None → ESB Networks default
+    NO metropolitan carve-out needed (Dublin is part of unified national
+    grid). Convention #78 §4bis.5 cumulative enforcement count stays at
+    4 (Prague CZ + Warsaw PL + EWZ Zürich + SIG Geneva).
+  cumulative_enforcement_count_post_ireland: 4    # Unchanged
+  ireland_single_dso_confirmation: >
+    Single national DSO ESB Networks empirically simplifies architecture
+    to Greek P22-style voltage-class × single-DSO resolver. Simplest
+    Wave 3 cohort onboarding since Greek P22.
+
+# ── Cross-border filter (Discipline #36) preflight ──────────────────────
+
+cross_border_filter:
+  bounds_json_features: 26                     # 26 county polygons
+  bbox_envelope:
+    lat_min: 51.42                             # Southernmost — Mizen Head (Cork county)
+    lat_max: 55.38                             # Northernmost — Malin Head (Donegal county)
+    lon_min: -10.48                            # Westernmost — Blasket Islands (Kerry)
+    lon_max: -6.02                             # Easternmost — Wicklow Head
+  tolerance_km: 1.0                            # PROPOSED — moderate for Atlantic coastline + HVDC precision
+  mode_class: MODE_2_ATLANTIC_COASTLINE        # 3 major cross-border classes (Moyle + EWIC + NI AC land)
+  ireland_specific_considerations:
+    - "Ireland has 3 major cross-border interconnectors: Moyle HVDC 500 MW (Scotland) + East-West HVDC 500 MW (Wales) + Northern Ireland AC land border"
+    - "500+ km land border with Northern Ireland (excluded from Republic bounds via bounds.json)"
+    - "Atlantic coastline complexity (Ring of Kerry + Wild Atlantic Way peninsulas + Aran Islands)"
+    - "Post-Brexit unique cohort position: EU member coordinating with GB non-EU via SEM/I-SEM"
+    - "Expected drop rate: 0.3-1.5% pre-filter (Atlantic coastline moderate complexity; NI border pre-excluded)"
+
+# ── Sequence 2 workflow — smallest-first Wave 3 cadence ─────────────────
+
+wave_3_smallest_first_sequence:
+  step_1_preflight: THIS_DOCUMENT (Task #330)
+  step_2_operator_local_fetch: PENDING (Task #331 candidate)
+  step_3_l1_connector: PENDING
+    # scripts/pipeline/ingestion/ireland/{__init__,_base,osm_overpass,merge_into_ssi_data}.py
+    # SIMPLER than switzerland (single national DSO vs 8-way multi-metro)
+    # ~1200-1500 LOC (smaller than Switzerland's 1968 due to single-DSO simplification)
+  step_4_merge_execution: PENDING
+  step_5_doc_cascade: PENDING
+
+wave_3_p25_position_signals:
+  fourth_wave_3_country: TRUE                  # Post Greece P22 + Iceland P23 + Switzerland P24
+  first_english_language_wave_3: TRUE          # FIRST English-language cohort event
+  first_post_brexit_wave_3: TRUE               # EU member coordinating with GB non-EU
+  simplest_dso_architecture_since_greece: TRUE  # Single national DSO (Greek DEDDIE precedent)
+  convention_78_binding_7th_enforcement: TRUE
+  convention_78_4bis_5_layer_3_not_needed: TRUE  # Second cohort-wide non-enforcement (post-Greece)
+  eu_member: TRUE                              # Republic of Ireland is EU member
+  oecd_member: TRUE                            # OECD founding member 1961
+  eurozone: TRUE                               # EUR (Euro)
+  nordic_council_member: FALSE
+  isolated_grid: FALSE                         # Synchronised UCTE via SEM/I-SEM
+  post_brexit_unique_position: TRUE            # Coordinates with GB non-EU via SEM/I-SEM
+  wind_penetration_leader: TRUE                # 40% wind share 2023 (top-3 EU)
+
+# ── Precedent references ────────────────────────────────────────────────
+
+precedent_references:
+  ingestion_pattern_source: greece (Wave 3 P22 single-DSO precedent — closest sibling)
+  l1_connector_source: greece (single-DSO simplification pattern)
+  merge_script_source: greece (Wave 3 canonical latest)
+  bounds_filter_source: canada (keyword-only args + tolerance_km loaded from cross_border_tolerances.json)
+  hazard_baseline_source: UK/Scotland (Atlantic coastline sibling proxy; Ireland has no direct sibling)
+  english_language_alias_source: NEW (first English-language Wave 3 country — precedent for future
+                                       UK/US/Australia/Canada monolingual English cohort)
+
+# ── Post-Switzerland empirical hypothesis extended ──────────────────────
+
+post_switzerland_hypothesis:
+  baseline_re_norm_gap_cohort_wide: >
+    Iceland P23 discovered 5.5% latent baseline gap. Switzerland P24
+    confirmed 5.2% gap. Ireland baseline audit shows 5.2% gap. Twin
+    Wave 3 precedents empirically LOCK the cohort-wide dual-purpose
+    Phase 4c pattern:
+    - Baseline coverage assumptions from preflight audits are NOT always accurate
+    - Phase 4c refresh serves DUAL purpose (net-new + latent baseline gap closure)
+    - Expect ~5% gap on every future P26+ country baseline
+  discovery_generalisation: >
+    Documented cohort-wide finding. Post-Wave-3 batch-fix candidate:
+    add pre-fetch baseline coverage audit script that flags <100%
+    Re_norm coverage to alert operator BEFORE Phase 4c refresh time.
+
+# ── Refresh trail closure ───────────────────────────────────────────────
+
+refresh_trail:
+  authored_at_utc: 20260717T143500Z
+  authored_by: ikenga-ssi-foundation
+  supersedes: none (first Irish v4.23 audit doc)
+  next_review_at: post_step_2_fetch_completion

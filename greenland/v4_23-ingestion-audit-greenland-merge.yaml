@@ -1,0 +1,192 @@
+# SSI Index v4.23 workstream — Greenland Step 4 merge audit (final closure)
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the final merge-execution pass.  Populated from live sandbox execution
+# 2026-07-13T15:00:15Z.
+#
+# STATUS: CLOSED.  Wall-clock 0.3s (all cache hits).  Discipline #36 sentinel
+# GREEN (0.00% outside polygon).  Discipline #41 sentinel GREEN (5/5 tests
+# pass + 1 opt-in SKIP as designed).
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: greenland
+discovery_date_utc: "2026-07-13"
+execution_date_utc: "2026-07-13T15:00:15Z"
+closure_date_utc: "2026-07-13T15:00:15Z"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+parent_state_transitions:
+  - greenland/v4_23-ingestion-audit-greenland-delta.yaml
+  - greenland/v4_23-ingestion-audit-greenland-fetch.yaml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Execution context — sandbox one-shot
+# ─────────────────────────────────────────────────────────────────────────────
+execution_context:
+  machine: sandbox (residential-IP-equivalent Overpass access)
+  invocation: python3 -m scripts.pipeline.ingestion.greenland.merge_into_ssi_data
+  wall_clock_seconds: 0.3
+  reason_sandbox_execution_possible: |
+    Greenland's small footprint (~44 subs + ~112 lines) fits comfortably in
+    the 45s bash timeout, unlike Austria which required operator local run.
+    All Overpass fetch phases completed via cached responses from Step 2
+    probe.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Empirical merge stats
+# ─────────────────────────────────────────────────────────────────────────────
+empirical_merge_stats:
+  substations:
+    enriched: 38                                    # 37 baseline all matched via 500m proximity + 1 late-match retry
+    voltage_filled: 0                               # ALL baseline subs with voltage already had it; missing voltage stays missing
+    net_new_substations: 6                          # 44 OSM - 38 matched = 6 net-new
+    voltage_xcheck_findings: 0                      # BEST-IN-COHORT — no tier mismatches!
+    voltage_xcheck_rate_pct: 0.00                   # vs Austria 25.61%, Mexico 0.04%
+    final_substation_count: 43                      # 37 baseline + 6 net-new
+    baseline_multiplier: 1.16                       # SMALLEST v4.23 multiplier — validation not growth workstream
+  transmission_lines:
+    lines_appended: 3
+    lines_deduped: 59                               # existing baseline covered these already
+    final_line_count: 128                           # 125 + 3
+    baseline_multiplier: 1.02
+  provenance:
+    raw_sha256: "aec9ac4d89fa1950502f05b4886ef491b9572ff5703a22f45fa5e0e4a58b6802"
+    raw_bytes_fetched: 12732                        # substation query cache bytes
+    monopoly_fallback_subs: 16                      # untagged OSM subs → Nukissiorfiit
+    monopoly_fallback_lines: 60                     # untagged OSM lines → Nukissiorfiit (from 62 lines post-bounds-filter)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Expected vs actual comparison
+# ─────────────────────────────────────────────────────────────────────────────
+expected_vs_actual:
+  substations:
+    expected_total_fresh_osm: 44
+    actual_total_fresh_osm: 44                      # EXACT MATCH ✅
+    expected_net_new_range: 5-10
+    actual_net_new: 6                               # inside expected range ✅
+    expected_owner_tag_direct_pct: 63.6
+    actual_owner_tag_direct_pct: 63.6               # 28/44 EXACT MATCH
+    expected_monopoly_fallback_count: 16
+    actual_monopoly_fallback_count: 16              # EXACT MATCH — 100% of untagged tail
+  transmission_lines:
+    expected_total_fresh_osm: 112
+    actual_total_fresh_osm: 112                     # EXACT MATCH ✅
+    post_discipline_36_filter: 62                   # 50 lines stripped as outside Greenland 5km fjord polygon
+    baseline_line_count: 125
+    reversed_delta_confirmed: true                  # 112 OSM < 125 baseline; only 3 net-new after dedupe
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Discipline #36 cross-border enforcement — post-merge sentinel
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_36_post_merge:
+  gate_result: PASS
+  outside_polygon_count: 0
+  outside_polygon_pct: 0.00
+  max_km_outside: 0.0
+  severity: CLEAN
+  substations_inside: 43
+  substations_total: 43
+  bounds_source: greenland/bounds.json (540 KB Mode 2 fjord detail)
+  tolerance_km: 5.0
+  in_workstream_lines_stripped: 50                  # 112 raw OSM → 62 retained
+  in_workstream_subs_stripped: 0                    # all 44 OSM subs within polygon
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Discipline #41 line-substation coupling verification
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_41_verification:
+  parity_test_result: PASS
+  tests_passed: 5
+  tests_skipped: 1                                  # opt-in live-cohort sweep
+  tests_failed: 0
+  ratio_lines_to_subs_pre_merge: 1.41               # 62 lines / 44 subs (post-bounds-filter, pre-merge)
+  ratio_lines_to_subs_post_merge: 2.98              # 128 / 43
+  ratio_vs_baseline: 3.38                           # 125 / 37
+  parity_msg_from_l1_connector: "Discipline #41 OK — 44 substations + 62 lines (ratio 1.41)."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Convention preservation matrix
+# ─────────────────────────────────────────────────────────────────────────────
+convention_preservation_verified:
+  convention_46: N/A — single-country canonical
+  convention_56_owner_none_untagged_tail:
+    count: 0                                        # ZERO — PURE MONOPOLY fallback filled all 16 untagged
+    rationale: |
+      PURE MONOPOLY fallback rule applied to 100% of the untagged tail
+      (Nukissiorfiit is the SOLE utility, empirically confirmed at 100%
+      concentration in tagged sample).  Provenance class label
+      'nukissiorfiit_monopoly_fallback' preserves audit visibility.
+      Unlike Austria (23% owner=None untagged tail) and Mexico (small
+      exception class for industrial self-gen), Greenland has zero
+      exceptions by architecture.
+  convention_56_null_placeholders_dict_class:
+    dict_fields_empty: "climate_trajectory + seismic + socio_economic + graph_topology + markov + transition + components + modifiers + modifier_impacts + modifier_impact + modifier_pct + environmental = {}"
+    v42_neutral_defaults: "Re_raw=1.0, Re_norm=0.0, mult_product=1.0, add_sum=0.0"
+    scalar_fields_none: "R_base_median, R_median, R_P5/P95, classification, fleet_percentile"
+  convention_60_source_id_pin: GL-C1-osm-overpass
+  convention_60_licence: ODbL
+  convention_60_no_commercial_provider: OSM only in Phase 1
+  convention_64_no_cross_country_writes: verified — merge writes only to greenland/*.json
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. File-size deltas
+# ─────────────────────────────────────────────────────────────────────────────
+file_size_deltas:
+  ssi_data_json:
+    baseline_bytes: 106357
+    final_bytes: 136314                             # ~130 KB
+    final_mb: 0.13
+    growth_ratio: 1.28
+    under_90mb_sentinel_threshold: true             # trivially — Greenland is smallest v4.23 file
+  grid_geo_json:
+    baseline_bytes: 61316
+    final_bytes: 72906                              # ~71 KB
+    final_mb: 0.07
+    growth_ratio: 1.19
+    under_90mb_sentinel_threshold: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. Voltage cross-validation summary
+# ─────────────────────────────────────────────────────────────────────────────
+voltage_cross_validation:
+  report_file: greenland/v4_23-voltage-cross-validation.json
+  matched_pairs_evaluated: 38
+  tier_mismatches: 0
+  mismatch_rate_pct: 0.00                           # BEST-IN-COHORT!
+  interpretation: |
+    Perfect voltage-tag agreement between baseline and fresh OSM.
+    Baseline was itself OSM-derived from a prior vintage, so the ~54% of
+    baseline subs with populated voltage_kv had OSM voltage= tags that
+    survived the vintage — and those tags haven't been updated in the
+    intervening period.  No inconsistency to flag.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. Auditability chain closure
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  step_1_preflight: greenland/v4_23-ingestion-audit-greenland-preflight.yaml
+  step_2_fetch: greenland/v4_23-ingestion-audit-greenland-fetch.yaml
+  step_3_l1_connector: scripts/pipeline/ingestion/greenland/osm_overpass.py
+  step_4_merge_script: scripts/pipeline/ingestion/greenland/merge_into_ssi_data.py
+  step_4_delta_audit: greenland/v4_23-ingestion-audit-greenland-delta.yaml
+  step_4_merge_audit: greenland/v4_23-ingestion-audit-greenland-merge.yaml (this file)
+  step_4_voltage_xcheck: greenland/v4_23-voltage-cross-validation.json
+  step_4_data_deliverable_ssi: greenland/ssi-data.json (final, 130 KB, 43 substations)
+  step_4_data_deliverable_grid: greenland/grid-geo.json (final, 71 KB, 128 lines)
+  step_4_commit: PENDING_PUSH
+  discipline_36_gate: PASS (0.00% outside)
+  discipline_41_gate: PASS (5/5 tests + 1 opt-in SKIP)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 10. Warnings + notes
+# ─────────────────────────────────────────────────────────────────────────────
+warnings:
+  - "Discipline #36 partial (ingestion filter): stripped 50 of 112 lines outside Greenland polygon (5 km Mode 2 fjord tolerance)."
+  - "Owner enrichment: 28/44 substations (63.6%) attributed via direct OSM operator= tag; 16 untagged filled via PURE MONOPOLY fallback rule (Nukissiorfiit — 100% concentration confirmed at Step 2)."
+
+notes:
+  - "Wall-clock 0.3s — Greenland is the ONLY v4.23 workstream completed end-to-end from sandbox in a single call. Austria required ~5min operator-local run; this achievement reflects Greenland's small footprint (44 subs + 112 lines vs Austria's 15,213 + 70,964)."
+  - "Validation workstream not growth workstream — baseline (37 subs + 125 lines) already substantially captured Greenland's isolated-microgrid architecture. Fresh OSM added 6 subs + 3 lines. Real value-add of this workstream: owner enrichment (0% → 100% via PURE MONOPOLY rule) + voltage cross-validation (0 findings)."
+  - "Line count decreased from 125 baseline to 128 final — the '3 appended' represents the delta after 59 duplicates deduped against existing tier match. Reversed delta pattern confirmed from Step 1 pre-flight prediction."
+  - "PURE MONOPOLY fallback rule is architectural first in v4.23 workstream. Documented in scripts/pipeline/ingestion/greenland/osm_overpass.py::NUKISSIORFIIT_CANONICAL_NAME and provenance_class = 'nukissiorfiit_monopoly_fallback'. Applied to 16/44 substations (36.4%) + 60/62 lines (96.8%)."
+  - "Phase 2 supplement candidates queued: (a) Nukissiorfiit public tariff schedules for voltage cross-validation on the 25 untagged-voltage subs (56.8% of fresh OSM); (b) Greenland Statistics Bureau (Grønlands Statistik) energy datasets for kommune/settlement enrichment (regions currently null on all 6 net-new subs)."

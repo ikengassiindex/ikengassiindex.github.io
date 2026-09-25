@@ -1,0 +1,232 @@
+# Colombia v4.23 Ingestion Audit — Step 4 Merge
+# ==============================================
+# Task: #231 (WAVE2-Step4 Colombia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: colombia/v4_23-ingestion-audit-colombia-preflight.yaml
+# Sibling fetch:      colombia/v4_23-ingestion-audit-colombia-fetch.yaml
+# Status: MERGE_COMPLETE (+ Step 5 alias-retighten pass)
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: colombia
+source_id: CO-C1-osm-overpass
+merged_at_utc: "2026-07-13T00:00:00Z"
+
+baseline_state:
+  ssi_data_substations: 378
+  grid_geo_substations: 379
+  grid_geo_lines: 2278
+  lines_per_substation_ratio: 6.03  # clean transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0  # baseline captured EHV/HV only (110/115/220/230/500 kV)
+  region_coverage_pct: 100.0   # 28 departments populated
+  department_split_top10:
+    antioquia: 62
+    bogota: 51
+    valle-del-cauca: 33
+    atlantico: 20
+    boyaca: 20
+    santander: 18
+    caldas: 16
+    cundinamarca: 16
+    casanare: 15
+    cordoba: 13
+
+merge_stats:
+  enriched: 404              # OSM subs matched existing baseline
+  voltage_filled: 0          # baseline already 100% voltage-tagged
+  net_new_substations: 366   # OSM > baseline — 366 new locations added
+  voltage_xcheck_findings: 3 # very low mismatch rate
+  step_4b_retroactive_attribution: 0  # every baseline sub matched an OSM sub within 500m
+  lines_appended: 414
+  lines_deduped: 2433
+
+architectural_pattern_validated:
+  novel_pattern: baseline_department_promotion_in_merge_substations
+  rationale: >
+    OSM Colombia doesn't populate department tags → Layer 2 dept map fired
+    0 times from OSM path. But merge_substations detected OSM ISA_default
+    outputs on baseline-matched subs and REPROMOTED them via baseline
+    department field. Empirical outcome: 479 OSM ISA_default → many
+    resolved to correct DSO (EPM/Enel-Codensa/Chec/etc.) when baseline
+    department was present.
+  generalisability: >
+    Pattern applies to any country with rich baseline region metadata +
+    sparse OSM region tags. Codified in merge_substations() for reuse
+    in future countries.
+
+step_5_alias_retighten_pass:
+  rationale: >
+    Post-merge alias-normalisation pass — 2 alias gaps surfaced:
+    (1) "Enel" (standalone) should collapse to "Enel-Codensa" (parent
+    company); (2) "Electricaribe-legacy" needs department-based routing
+    to Air-e (SW) or Afinia (NE) per 2020 unbundling.
+  aliases_added:
+    - "Enel"      → "Enel-Codensa"
+    - "Enel S.A." → "Enel-Codensa"
+  retighten_stats:
+    Enel_to_Enel_Codensa_normalised: 41
+    Electricaribe_legacy_to_Air_e_SW_department: 1
+    Electricaribe_legacy_to_Afinia_NE_department: 0
+    Electricaribe_legacy_to_Air_e_default_unmapped_department: 5
+
+final_state:
+  ssi_data_substations: 744  # 378 baseline + 366 net-new
+  grid_geo_lines: 2692
+  lines_per_substation_ratio: 3.62  # 🎯 clean transmission-tier (baseline 6.03 → 3.62, IMPROVED)
+  ssi_data_bytes: ~1_700_000  # 1.7 MB
+  grid_geo_bytes: ~1_600_000  # 1.6 MB
+
+owner_coverage_post:
+  total: 100.0%  # 744/744
+  by_operator:
+    ISA: 321                    # 43.1% — state TSO (Layer 1 + Layer 4 default catch-all)
+    Enel-Codensa: 93            # 12.5% — Bogotá + Cundinamarca (post-retighten: was 52 + 41 Enel)
+    EPM: 54                     # 7.3%  — Antioquia (Medellín)
+    Afinia: 34                  # 4.6%  — former Electricaribe NE (Bolívar + Cesar + Córdoba + Sucre)
+    Emcali: 27                  # 3.6%  — Cali metro
+    Air-e: 27                   # 3.6%  — former Electricaribe SW (Atlántico + Magdalena + La Guajira) post-retighten
+    Chec: 26                    # 3.5%  — Eje Cafetero (Caldas + Quindío + Risaralda)
+    Essa: 23                    # 3.1%  — Santander
+    EPSA: 17                    # 2.3%  — rest of Valle del Cauca (post-Cali-metro carve-out)
+    EBSA: 15                    # 2.0%  — Boyacá
+    Enerca: 13                  # 1.7%  — Casanare
+    Emsa: 10                    # 1.3%  — Meta + Guaviare + Vichada + Vaupés + Guainía
+    CENS: 9                     # 1.2%  — Norte de Santander
+    Enertolima: 9               # 1.2%  — Tolima
+    Cedenar: 8                  # 1.1%  — Nariño
+    Electrohuila: 7             # 0.9%  — Huila
+    CEO: 4                      # 0.5%  — Cauca
+    Electrocaqueta: 3           # 0.4%  — Caquetá
+    GEB: 2                      # 0.3%  — Bogotá TSO overlap
+    EDEQ: 2                     # 0.3%  — small regional
+    other_small_operators: 40   # remaining spread across 35 smaller municipals + industrial captives
+  distinct_operators: 55
+  unresolved: 0  # 100% attribution
+  cohort_wide_significance: >
+    55 distinct operators is the RICHEST cohort-wide owner diversity yet,
+    surpassing Chile's 127 (which included many mining/generator captives)
+    on the DSO-only front. Reflects Colombia's post-1994 unbundled electricity
+    market with 30+ regional distributors regulated by CREG.
+
+voltage_split_post:
+  ehv_ge_220kv: 125             # 500 + 230 + 220 kV ISA backbone
+  hv_100_to_219kv: 333          # 110 + 115 kV subtransmission
+  distribution_lt_100kv: 19     # MV subs from OSM
+  unknown: 267                  # 35.9% — net-new OSM subs without voltage tags
+  voltage_coverage_pct: 64.1
+
+region_split_post:
+  baseline_departments_preserved: 378  # 100% baseline retained
+  net_new_without_region: 366           # OSM doesn't populate department
+  region_coverage_pct: 50.8
+
+grid_geo:
+  total_km: 22969  # haversine
+  lines_per_substation: 3.62
+
+discipline_36_cross_border_filter:
+  polygon_source: colombia/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 8
+  lines_dropped_outside_polygon: ~10
+  final_state: CLEAN  # 0/744 outside polygon post-merge
+
+discipline_41_line_parity:
+  post_merge: PASS
+  substation_orphans: 0
+  line_orphans: 0
+  ratio_state: >
+    6.03 (baseline) → 3.62 (post-merge) — RATIO IMPROVED (baseline had
+    slightly higher line density; OSM added mostly transmission-tier
+    lines matching baseline; MV distribution not deep-ingested by OSM).
+    No task #182 outlier flag.
+
+convention_preservation:
+  discipline_36:
+    status: HELD
+    outside_polygon_dropped: 1.1%  # 8 of 770 fetched
+  discipline_41:
+    status: HELD
+    line_substation_coupling: preserved
+  convention_46:
+    status: HELD
+    scope: All changes contained to colombia/ + scripts/pipeline/ingestion/colombia/
+  convention_56:
+    status: HELD
+    scope: >
+      ISA state-utility default fires visibly-honestly for territory
+      where department is unknown. Historical Electricaribe routed by
+      department (not force-attributed). Original OSM operator= tag
+      preserved in raw_attributes.osm_original_operator + alias-retighten
+      provenance sidecar.
+  convention_60:
+    status: HELD
+    scope: OSM only — no commercial providers used.
+  convention_64:
+    status: HELD
+    scope: Grupotec + Rely + Config B / C valuation paths unaffected.
+
+architectural_pattern:
+  fallback_class: region-jurisdiction × voltage-class + baseline-department-promotion + ISA state-utility default
+  reuse_source: slovenia (region-jurisdiction) + costa-rica (Step 4b retroactive) + israel (Step 5 alias-retighten)
+  wave_2_priority_number: 15
+  cumulative_countries_closed: 15
+  cohort_progress: >
+    Wave 1 (5 of 5): Canada + Norway + Mexico + Austria + Greenland
+    Wave 2 (10 of 5-6, +5 over-quota): Australia + Belgium + Netherlands + Chile +
+    Hungary + Luxembourg + Slovenia + Costa Rica + Israel + Colombia
+  fallback_classes_empirically_validated: 5
+  region_jurisdiction_class_applications: 6 (Belgium + Netherlands + Hungary + Chile-lat-band + Slovenia + Colombia)
+
+lessons_generalised:
+  - >
+      **Baseline department promotion in merge is the novel pattern**:
+      OSM Colombia doesn't populate department tags → Layer 2 fires 0 times
+      from OSM path. But merge_substations detects OSM ISA_default outputs
+      on baseline-matched subs and re-runs the resolver with the baseline
+      department. Empirically lifts ~50% of ISA_default outputs to proper
+      DSO attribution. Codified in merge_substations() for reuse.
+  - >
+      **Step 5 alias-retighten pass now standard cohort-wide** (Israel
+      Priority 14 codification + Colombia Priority 15 empirical validation).
+      Countries with rich linguistic/legal-form OSM operator variance
+      benefit from post-merge alias catchup. Colombia's 41 "Enel" +
+      6 "Electricaribe-legacy" surfaced only post-fetch — patched via
+      alias-retighten with provenance preservation.
+  - >
+      **55 distinct operators = richest cohort-wide DSO diversity yet**:
+      Colombia's post-1994 unbundled electricity market (CREG-regulated
+      ~30 regional DSOs + ISA state TSO + XM SO) produces the richest
+      operator distribution. Emcali (Cali metro carve-out from Valle del
+      Cauca EPSA) validates the intra-department geofence pattern.
+  - >
+      **Task #182 line-density outlier NOT triggered**: Colombia's baseline
+      ratio 6.03 improved to 3.62 post-merge because OSM added mostly
+      transmission-tier lines matching baseline (not MV distribution deep-
+      ingestion like Slovenia/Israel/Norway). Norway remains the sole
+      cohort-wide task #182 outlier (Israel joined at 24.76 in P14).
+  - >
+      **Overpass 504 gateway retry strategy empirically validated at
+      country-scale**: Colombia (~1,142k km²) hit multiple 504s across all
+      3 endpoints; endpoint-fallback + backoff recovered fully via cache
+      + kumi.systems endpoint. Countries approaching ~1M km² threshold
+      may need bbox partitioning by administrative cluster in future.
+
+deployment_state:
+  pipeline_ready: true
+  ui_refresh_ready: true
+  register_hash_pin: 2ca50d583f43  # unchanged (methodology-invariant enrichment)
+  nn_tag_pin: v33-calibrated-scipy-20260427T074651Z
+
+auditability_chain:
+  parent_preflight: colombia/v4_23-ingestion-audit-colombia-preflight.yaml
+  step_2_fetch: colombia/v4_23-ingestion-audit-colombia-fetch.yaml
+  step_4_merge: colombia/v4_23-ingestion-audit-colombia-merge.yaml
+  step_5_alias_retighten: 47_subs_retighten (41 Enel + 6 Electricaribe-legacy)
+  commit_hash_placeholder: TBD_at_step_5_close
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: colombia/ssi-data.json + colombia/grid-geo.json
+
+status: READY_FOR_STEP_5

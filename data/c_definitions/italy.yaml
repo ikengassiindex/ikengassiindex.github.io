@@ -1,0 +1,149 @@
+# ════════════════════════════════════════════════════════════════════════════
+# C DEFINITIONS — Italy.  Layer 0 of the C mosaic.
+# What the numbers in data/c_metrics/italy.csv count, in the publisher's own
+# words. Read before the values are used, not after. §7.6 — each quotation
+# below was read at its cited source on 25 September 2026.
+# ════════════════════════════════════════════════════════════════════════════
+
+jurisdiction: italy
+regulator: ARERA
+compiled: 2026-09-25
+
+indices:
+
+  C1_unplanned_long_min:
+    source_label: Durata media per utente delle interruzioni (lunghe) senza preavviso
+    unit: minutes per LV user per year
+    counts: unplanned interruptions longer than 3 minutes
+    excludes: planned interruptions; unplanned interruptions of 3 minutes or less
+    arera_wording: >
+      "durata annua media di interruzioni (minuti persi) per le interruzioni
+      senza preavviso lunghe (> 3 minuti)"
+    arera_source: https://www.arera.it/dati-e-statistiche/dettaglio/prestazioni-delle-imprese-distributrici-continuita-del-servizio-23
+
+  C2_unplanned_longshort_n:
+    source_label: Numero medio per utente delle interruzioni (lunghe e brevi) senza preavviso
+    unit: interruptions per LV user per year
+    counts: unplanned interruptions, both long and short
+    excludes: planned interruptions
+    arera_wording: >
+      "numero medio di interruzioni per le interruzioni senza preavviso lunghe
+      e brevi"
+
+  C4_planned_min:
+    source_label: Durata media per utente delle interruzioni con preavviso
+    unit: minutes per LV user per year
+    counts: planned interruptions
+    note: >
+      ARERA's own comparative publication omits planned interruptions
+      entirely. This index exists only because E-Distribuzione publishes it in
+      its Rapporto annuale degli output. It is the larger of the two: 95.53
+      planned minutes against 73.11 unplanned, nationally, in 2024.
+
+  C3_mt_exceed_pct:
+    status: absent
+    note: >
+      No source located for Italy. France publishes it (Enedis, per
+      département). The column is present and empty; it is not zero.
+
+cause_split:
+  all_causes: >
+    "il totale delle interruzioni lunghe senza preavviso per tutte le origini
+    e cause occorse durante l'anno 2024"
+  other_causes: >
+    interruptions originating on the company's own MV or LV networks and
+    classified under art. 12.1(c) of the Testo Integrato della Regolazione
+    Output-Based, Del. 617/2023 all. A, including unplanned long interruptions
+    of more than 8 hours so originating.
+  difference_2024_national:
+    C1: 73.11 - 44.84 = 28.27 minutes per user
+    share_of_all_cause_minutes: 0.387
+  meaning: >
+    The gap between the two is the exceptional-event and upstream-origin
+    contribution. This is the axis CEER's benchmarking exists to document.
+    Which variant feeds a score is a declaration, not a detail: choosing
+    "altre cause" removes 38.7 per cent of the minutes an Italian customer
+    actually lost in 2024.
+
+do_not:
+  caidi: >
+    C1 / C2 is NOT a restoration time and must not be computed. C1 counts only
+    long interruptions; C2 counts long and short. The numerator omits the
+    duration of events the denominator counts. arera_tiqe_2024_regional.csv
+    publishes CAIDI_min and CAIDI_ratio on exactly that ratio and session 21
+    drew a substantive conclusion from it — that restoration is faster in the
+    south and worst in Piemonte. That conclusion is unsupported.
+
+comparability_with_france:
+  like_for_like_2024:
+    italy_C1_altre_cause: 44.840
+    france_C1_critere_B: 53.300
+    why_these_two: >
+      Enedis publishes critère B "hors événements exceptionnels et hors RTE" —
+      exceptional events and upstream transmission origin both removed. That is
+      the same exclusion Italy's "altre cause" applies. France is the worse of
+      the two on this basis.
+  do_not_compare:
+    italy_all_causes_against_france: >
+      Italy's 73.11 "tutte le cause" includes exceptional events and upstream
+      origin; France publishes no open all-causes equivalent. Pairing 73.11
+      with 53.300 makes France look 27 per cent better when on a matched basis
+      it is 19 per cent worse. That error was made in this session before the
+      Enedis exclusions were read.
+
+C3_proxy:
+  status: PROXY — not a measurement. Evidence tier below the measured metrics.
+  file: data/c_metrics/italy_c3_proxy.csv
+  built_by: scripts/ssi_build_c3_proxy_italy.py
+  construct_borrowed_from: >
+    France's Indicateur réglementaire continuité d'alimentation — the share of
+    a département's customers outside the regulated continuity standard.
+    Distance from the standard. The construct is imported; no French number is.
+  formula: N1L(ambito) / TIQE article 32 maximum for that ambito's concentration class
+  numerator:
+    what: measured annual count of unplanned long plus short interruptions per BT user
+    source: ARERA comparative publication 2024, per ambito territoriale
+    acquired: yes — arera_tiqe_2024_dso_raw.csv, 91 ambiti, 36,995,573 BT users
+  denominator:
+    what: the regulated maximum, per concentration class
+    source: TIQE, deliberazione 617/2023 allegato A, article 32, years 2024-2025
+    values:
+      alta_concentrazione: 6
+      media_concentrazione: 9
+      bassa_concentrazione: 10
+    wording: "interruzioni senza preavviso lunghe più brevi all'anno"
+    why_it_matches: >
+      The standard is written on "interruzioni senza preavviso lunghe più
+      brevi" and N1L counts "interruzioni senza preavviso lunghe e brevi".
+      Same quantity, same basis. That is why the ratio means anything.
+  unit: region
+  unit_count: 20
+  why_not_finer: >
+    The proxy is computed per ambito and can only be carried to substations at
+    a unit the fleet can be joined on. Italy's records carry no `owner` — 0 of
+    41,662 — so the distributor is unknown, and no comune population, so the
+    concentration class is unknown. The NUTS-3 code they do carry yields the
+    region. C1, C2 and C4 reach province; C3 reaches region. Mixed granularity
+    within one component is expected in a mosaic and is stated, not hidden.
+  results_2024:
+    national: 0.4360
+    spread: 6.9x across 20 regions
+    worst: Sicilia 0.814, Sardegna 0.687, Calabria 0.654, Campania 0.644
+    best: Trentino-Alto Adige 0.118, Valle d'Aosta 0.184, Friuli-Venezia Giulia 0.272
+    note: >
+      Dividing by the class standard removes the settlement-density effect the
+      raw count carries. Raw N1L medians run 1.93 / 2.66 / 3.91 across alta,
+      media and bassa; the ratios run 0.322 / 0.296 / 0.391.
+  declared_differences_from_the_real_C3:
+    customer_class: >
+      the numerator is the BT-user average; article 32's standard governs MT
+      users. The same network events drive both, so the ratio is a monotone
+      proxy for breach propensity, but the classes differ. An approximation,
+      not an identity.
+    quantity: >
+      France publishes a share of customers. This is a ratio of an average to
+      a threshold. Same construct, different quantity.
+    tail: >
+      it uses a mean, so it cannot see the tail that an exceedance count is
+      made of. A region whose average is comfortable can still contain
+      customers in breach.

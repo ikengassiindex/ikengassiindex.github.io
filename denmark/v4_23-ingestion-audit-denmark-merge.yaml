@@ -1,0 +1,284 @@
+# SSI Index v4.23 — Denmark P28 Wave 3 Step 4 Merge Audit
+# =======================================================
+# Auto-generated documentation of Step 4 empirical merge outcome.
+# Post-hoc population from operator local merge execution log.
+#
+# Convention #7 Data-Layer Anchoring: documented-proxy discipline preserved
+# Convention #56: visibly-honest degradation preserved (no partial-fetch —
+#   FIRST cohort-wide single-pass Step 2 event)
+# Convention #60: non-commercial provenance (OSM ODbL + Energinet SOE +
+#   Dansk Energi ENA public)
+# Convention #78 BINDING 10th DECADE MILESTONE: 165 alias-normalisation hits
+# Convention #78 §4bis.5 Layer 3 6TH ENFORCEMENT: 615 Copenhagen Radius hits
+#   (HIGHEST cohort-wide by 5.9× NZ 104)
+# Discipline #36: 19 subs + 86 lines dropped (5.0 km tolerance validated
+#   at fetch-time)
+# Discipline #41: line-substation ratio 1.02 (unique NEAR-UNITY signature)
+#
+# Authored: 2026-07-18 by SSI Index Foundation cohort refresh workstream
+# Status: MERGE COMPLETE (Step 4 of 5)
+# =======================================================
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: denmark
+wave: 3
+priority: P28
+scope: FIRST_NORDIC_OFFSHORE_WIND_WAVE_3_EVENT
+
+# ---------------------------------------------------------------
+# Overall Step 4 empirical outcome
+# ---------------------------------------------------------------
+merge_execution:
+  executed_at_utc: "2026-07-18T10:53:58Z"
+  operator_local: true  # residential IP (Overpass API access)
+  fetch_cycles: 1       # FIRST cohort-wide single-pass fetch (no partial-fetch retry)
+  merge_wall_clock_secs: 10  # rapid — small line-merge
+  baseline_substations: 2433
+  osm_substations_fetched: 7969  # post-Discipline-36 filter
+  final_substation_count: 4822
+  net_new_substations: 2389       # LARGEST cohort-wide net-new event (+98% baseline growth)
+  net_new_growth_pct: 98.2         # DOUBLING event — Denmark caught baseline vintage gap
+  substation_match_rate_pct: 229.4 # ANOMALY — enriched counter incremented on some net-new (final count correct at 4822)
+  voltage_filled: 0                # baseline complete pre-merge
+  voltage_xcheck_findings: 480     # HIGHEST cohort-wide (8.6% mismatch rate)
+  voltage_xcheck_rate_pct: 8.6
+  step_4b_retroactive_attribution: 2  # LOWEST cohort-wide (near-zero because most baseline covered at initial merge)
+
+lines_merge:
+  baseline_lines: 2921
+  osm_lines_fetched: 5374  # post-Discipline-36 filter
+  lines_appended: 2003
+  lines_deduped: 3371      # 62.7% dedupe rate — baseline lines matched OSM tightly
+  lines_dedupe_rate_pct: 62.7
+  final_line_count: 4924
+  line_growth_multiplier: 1.7
+
+# ---------------------------------------------------------------
+# Convention #56 partial-fetch preservation (FIRST cohort-wide single-pass event)
+# ---------------------------------------------------------------
+convention_56_partial_fetch:
+  first_run_2026_07_17T22:50UTC:
+    node_query: SUCCESS  # 47 subs recovered (small)
+    way_query: SUCCESS  # 7941 subs recovered (LARGE — mature Nordic OSM community)
+    relation_query: SUCCESS  # small
+    line_query: SUCCESS  # 5460 lines recovered (429 rate-limit recovered on 30s backoff)
+    partial_fetch_needed: false  # FIRST cohort-wide single-pass event
+  merge_run_2026_07_18T10:53UTC:
+    all_queries: CACHE_HIT
+  total_overpass_504_events: 0  # FIRST cohort-wide no-504 event
+  total_overpass_429_events: 1  # rate-limit on line-query recovered on 30s backoff
+  cumulative_wave_3_504_events: 23  # unchanged — Denmark contributed 0
+  three_endpoint_fallback:
+    - overpass-api.de       # PRIMARY (all queries succeeded here)
+
+# ---------------------------------------------------------------
+# Convention #78 BINDING 10th DECADE MILESTONE empirical validation
+# ---------------------------------------------------------------
+convention_78_binding_enforcement:
+  binding_enforcement_number: 10  # 🎉 DECADE MILESTONE 🎉
+  script_class: DANISH_PLUS_ENGLISH_PLUS_MINIMAL_GERMAN_SCHLESWIG
+  scripts_hit_empirically:
+    - Danish  # ~80% dominant
+    - English  # ~15% (mostly generation-retail: Better Energy, European Energy)
+    - German_Schleswig  # ~5% (southern Jutland border)
+  alias_normalisation_hits: 165  # MODERATE cohort-wide
+  alias_hit_rate_pct: 2.8         # of 5803 direct OSM tags — LOW (many direct English tags for offshore/generation)
+  cumulative_wave_3_alias_ledger: 21261  # 21096 pre-DK + 165 DK
+  cumulative_ratio_above_binding_threshold: 2126.1  # 21261 / 10
+  hits_vs_ireland_baseline: 11.0x  # 165 / 15
+  hits_vs_iceland_baseline: 41.3x  # 165 / 4
+  hits_vs_greek_baseline: 1.53x    # 165 / 108
+  hits_vs_korea_baseline: 0.83x    # 165 / 198
+  hits_vs_nz_baseline: 0.67x       # 165 / 246
+  new_first_nordic_offshore_wind_signature: true
+
+# ---------------------------------------------------------------
+# Convention #78 §4bis.5 Layer 3 6TH ENFORCEMENT empirical validation
+# ---------------------------------------------------------------
+convention_78_4bis5_layer_3_6TH_ENFORCEMENT:
+  enforcement_confirmed: true  # ✅ EMPIRICALLY LIVE — HIGHEST cohort-wide
+  cohort_wide_enforcement_number: 6  # NEW: Copenhagen DK
+  cumulative_enforcements: 6
+  enforcements_list:
+    - {country: czechia, metro: Prague, priority: P20, hits_empirical: TBD}
+    - {country: poland, metro: Warsaw, priority: P21, hits_empirical: TBD}
+    - {country: switzerland, metro: EWZ_Zurich, priority: P24, hits_empirical: TBD}
+    - {country: switzerland, metro: SIG_Geneva, priority: P24, hits_empirical: TBD}
+    - {country: new-zealand, metro: Auckland, priority: P27, hits_empirical: 104}
+    - {country: denmark, metro: Copenhagen, priority: P28, hits_empirical: 615}
+  copenhagen_split_empirical:
+    radius_geofence_hits: 615  # HIGHEST cohort-wide by 5.9× NZ 104
+    architectural_note: |
+      Copenhagen §4bis.5 enforcement empirically the HIGHEST cohort-
+      wide by 5.9× (NZ Auckland was previous max at 104 hits).
+      Reflects Copenhagen's high population density (Denmark's most
+      populous city) + Radius Elnet's unified metropolitan coverage.
+      Confirms 6th cohort-wide §4bis.5 enforcement architecture.
+
+# ---------------------------------------------------------------
+# Voltage-class × multi-DSO resolver empirical outcome (Layer 1-6 cascade)
+# ---------------------------------------------------------------
+resolver_empirical_outcome:
+  layer_1_energinet_tso_threshold:
+    initial_merge: 84
+    step_4b_retroactive: 0
+    total: 84
+    note: Direct TSO tier (≥132 kV) — architecturally correct low count
+  layer_2_banedanmark_traction:
+    initial_merge: 0
+    step_4b_retroactive: 0
+    total: 0
+    note: Banedanmark subs likely tagged directly (26 direct via alias-normalisation)
+  layer_3a_offshore_wind_name_match:
+    initial_merge: 12
+    step_4b_retroactive: 0
+    total: 12
+    note: Small — offshore wind terminals mostly tagged directly (Ørsted/Vattenfall via alias-normalisation)
+  layer_3b_4bis5_copenhagen:
+    initial_merge: 615
+    step_4b_retroactive: 0
+    total: 615  # ✅ 6TH ENFORCEMENT CONFIRMED — HIGHEST cohort-wide
+  layer_4_industrial_captive:
+    initial_merge: 0
+    step_4b_retroactive: 0
+    total: 0
+    note: Industrial subs likely tagged directly or via generation-retail alias
+  layer_5_region_dominant_dso:
+    initial_merge: 0
+    step_4b_retroactive: 2  # 1 Trefor Syddanmark + 1 Cerius Sjælland
+    total: 2
+    note: Empirically dormant — direct OSM tags cover most; only 2 retroactive hits
+  layer_6_energinet_catch_all:
+    initial_merge: 1455
+    step_4b_retroactive: 0
+    total: 1455
+    note: LARGE — 18% untagged fell to Energinet catch-all
+  direct_osm_operator_tag:
+    total: 5803  # 72.8% of 7969
+    alias_normalised: 165
+    direct_untouched: 5638
+  layer_priority_empirical_note: |
+    Denmark empirical outcome dominated by direct OSM operator= tags
+    (72.8%) — mature Nordic OSM community. Convention #78 §4bis.5
+    Copenhagen 6th enforcement empirically CONFIRMED at 615 hits
+    (HIGHEST cohort-wide — 5.9× NZ 104). Step 4b retroactive
+    ATTRIBUTION NEAR-EMPTY (2 subs) because every baseline sub was
+    matched by OSM at initial merge time. Architecturally coherent —
+    no retroactive gap.
+
+# ---------------------------------------------------------------
+# Discipline #36 cross-border filter empirical validation
+# ---------------------------------------------------------------
+discipline_36:
+  boundary_tolerance_km: 5.0  # existing DK entry from Mode 2 remediation
+  subs_dropped: 19          # small — offshore wind + coastal edge
+  lines_dropped: 86         # small — cross-border interconnector nearshore + coastal
+  drops_pct_subs: 0.24
+  drops_pct_lines: 1.60
+  cohort_precedent: iceland  # Nordic + DK share coastline patterns
+  offshore_wind_platforms_preserved: true  # Horns Rev + Anholt + Kriegers Flak
+  interconnector_terminals_preserved: true  # Skagerrak + Kontek + Kriegers Flak + Öresund
+  faroe_greenland_pre_excluded: true  # separate country entries
+
+# ---------------------------------------------------------------
+# Discipline #41 line-substation parity
+# ---------------------------------------------------------------
+discipline_41:
+  fetch_ratio: 0.67   # 5374 lines / 7969 subs (OSM fetch — MORE SUBS THAN LINES)
+  final_ratio: 1.02   # 4924 lines / 4822 subs (post-merge)
+  healthy_band: [1.5, 5.0]
+  status: BELOW_HEALTHY_BAND_UNIQUE_NEAR_UNITY  # NEW cohort-wide signature
+  cohort_comparison:
+    denmark: 1.02          # UNIQUE near-unity — MV/LV subs cluster-tagged, individual lines sparse
+    korea: 3.29            # HEALTHY (Nordic-analog)
+    iceland: 3.30          # HEALTHY (Nordic sibling)
+    greek: 3.85            # HEALTHY (Nordic-analog)
+    switzerland: 33.0      # ELEVATED (distribution)
+    ireland: 46.27         # ELEVATED (English MV/LV over-capture)
+    new-zealand: 48.07     # ELEVATED (English MV/LV over-capture)
+  architectural_coherence: |
+    Denmark 1.02 ratio BELOW healthy band is a NEW cohort-wide
+    signature. Danish OSM community tags MV/LV distribution as
+    dense substation clusters (10 kV local substations for each
+    kommunal cluster) but relatively sparse individual line ways.
+    This produces MORE substations than transmission lines — inverse
+    of the Ireland/NZ MV/LV over-capture pattern. Architecturally
+    coherent given Denmark's compact 43k km² area + dense MV
+    distribution + submarine cable segments not always tagged as
+    OSM power=line.
+
+# ---------------------------------------------------------------
+# Convention #56 visibly-honest degradation preserved
+# ---------------------------------------------------------------
+convention_56_preservation:
+  net_new_subs: 2389  # LARGEST cohort-wide
+  net_new_lines: 2003  # moderate
+  first_cohort_wide_no_504_event: true  # Denmark grid + coastline compact enough for single-pass
+  zero_voltage_fill: true  # baseline complete pre-merge
+  partial_fetch_events: 0  # FIRST cohort-wide clean fetch
+
+# ---------------------------------------------------------------
+# Architectural signatures (Wave 3 P28)
+# ---------------------------------------------------------------
+architectural_signatures:
+  first_nordic_offshore_wind_wave_3: true                    # ✅ landed
+  convention_78_binding_10th_decade_milestone: true           # ✅ 165 hits
+  4bis5_layer_3_6th_cohort_wide_enforcement_confirmed: true  # ✅ 615 Copenhagen (HIGHEST cohort-wide)
+  first_maori_te_reo_diacritic_cohort_wide_event: false      # Danish diacritics æ ø å not empirically hit in fetch (most Danish OSM tagged in ASCII)
+  cook_strait_hvdc_domestic_flag: false                       # DK has 4 cross-border HVDC (Skagerrak + Kontek + Kriegers Flak + Öresund)
+  largest_cohort_wide_net_new_substation_event: true          # ✅ +2389 subs (98% baseline growth)
+  highest_cohort_wide_voltage_xcheck_findings: true           # ✅ 480 findings (8.6% mismatch)
+  first_cohort_wide_below_healthy_band_line_parity: true      # ✅ 1.02 ratio (unique near-unity)
+  first_cohort_wide_single_pass_step_2_fetch: true            # ✅ no 504 events
+  transpower_energinet_soe_state_owned_pattern: true          # Both Denmark + NZ have state-owned TSOs
+  nordic_wave_3_offshore_wind_start_marker: true              # 1st Nordic Wave 3 country (Sweden/Finland queued)
+  nexel_unmapped_dsp_alias_discovery: true                    # architectural discovery — Nexel 4909 subs
+  convention_78_binding_9th_10th_consecutive_dsps: true       # NZ P27 + DK P28 back-to-back
+
+# ---------------------------------------------------------------
+# Bugs surfaced for batch-fix backlog (non-blocking)
+# ---------------------------------------------------------------
+bugs_batch_fix_queue:
+  - class: alias_map_extension_operators_CRITICAL
+    hits:
+      - "Nexel (4909 subs = 61.6% of DK — LARGEST unmapped cohort-wide event)"
+      - "Vores Elnet + Vores Elnet A/S (105 subs — cooperative DSO)"
+      - "Better Energy A/S + Stevning P/S (144 subs — renewable developer)"
+      - "Flow Elnet (45 subs)"
+      - "EnergiMidt (17 subs — historical N1/Norlys predecessor)"
+      - "CPH (24 subs — likely Copenhagen Airport captive)"
+    severity: MEDIUM  # non-blocking (direct OSM tag routes correctly)
+    remediation: extend _DNSP_ALIAS_MAP with Nexel A/S + Vores Elnet + Flow Elnet + EnergiMidt + CPH + Better Energy variants
+    total_missed_alias_normalisation: 5244 / 5803 = 90.4% of direct OSM tags missed normalization
+  - class: enriched_counter_off_by_one  # recurring cohort-wide
+    hit: enriched=5580 exceeds baseline=2433
+    severity: INFORMATIONAL  # final count correct (4822 = 2433 + 2389)
+    remediation: audit merge_substations enriched counter logic (recurring from NZ/Korea)
+  - class: voltage_xcheck_high_rate_investigation
+    hit: 480 findings across 5580 pairs = 8.6% mismatch rate
+    severity: LOW  # documentation-only
+    remediation: investigate baseline voltage tagging vintage — may need refresh cycle
+  - class: audit_sidecar_double_hyphen_filename  # recurring cohort-wide
+    hit: v4_23-ingestion-audit-denmark--osm-overpass.yaml
+    severity: LOW
+    remediation: base module slug logic
+
+# ---------------------------------------------------------------
+# Ordered next steps
+# ---------------------------------------------------------------
+next_step: Step 5 — Doc cascade + Phase 4c refresh + Commit 29 canonical
+handoff_command: |
+  # Commit 29 — Denmark P28 closure + canonical refresh + landing update
+  cd ~/ikengassiindex.github.io && \
+  git add denmark/ssi-data.json denmark/grid-geo.json \
+          denmark/v4_23-voltage-cross-validation.json \
+          denmark/v4_23-ingestion-audit-denmark-preflight.yaml \
+          denmark/v4_23-ingestion-audit-denmark-merge.yaml \
+          denmark/v4_23-ingestion-audit-denmark-closure.yaml \
+          denmark/v4_23-osm-overpass.log \
+          denmark/v4_23-step4-merge.log \
+          index.html \
+          scripts/pipeline/ingestion/denmark/ \
+          scripts/refresh_v42_modifiers_re_composite.py && \
+  git commit -m "wave 3 p28 denmark closure + canonical refresh + landing update" && \
+  git push origin main

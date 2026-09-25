@@ -1,0 +1,315 @@
+# Slovakia v4.23 Ingestion Audit — Pre-flight
+# ============================================
+# Task: #249 (WAVE2-Step1 Slovakia)
+# Date: 16 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+#
+# ⚡ CONVENTION #78 BINDING ENFORCEMENT — FIRST EMPIRICAL TEST ⚡
+# First country onboarded after Convention #78 sub-convention BINDING
+# promotion methodology-version event (Latvia Priority 18 closure, 16
+# July 2026). Preemptive multi-script alias mapping MUST be codified at
+# Step 3 connector authoring time. Slovakia tests whether this enforcement
+# produces first-cohort clean output at connector authoring (Estonia
+# precedent = zero Step 5 patches needed).
+
+meta:
+  country: slovakia
+  iso2: SK
+  iso3: SVK
+  wave: 2
+  priority: 19
+  step: 1
+  target: "Owner enrichment via OSM Overpass — region-jurisdiction × voltage-class (SEPS TSO + 3 regional DSOs via NUTS-3 geofence) + Convention #78 BINDING first-enforcement test"
+  rationale: >
+    Slovakia carries 1,512 substations with 0% owner tagged, 100% voltage
+    tagged (perfect — cleaner than any Baltic Trio country), and 100%
+    region tagged across 8 NUTS-3 codes (SK010 Bratislava + SK021 Trnava
+    + SK022 Trenčín + SK023 Nitra + SK031 Žilina + SK032 Banská Bystrica
+    + SK041 Prešov + SK042 Košice). Slovakia's electricity architecture
+    follows the region-jurisdiction × voltage-class pattern (like
+    Belgium/Netherlands/Chile/Hungary/Slovenia/Colombia/Norway): SEPS
+    (Slovenská elektrizačná prenosová sústava, state TSO 100%) + 3
+    regional DSOs (ZSD west + SSD centre + VSD east) via clean NUTS-3
+    territorial partition. First country onboarded post Convention #78
+    BINDING promotion — tests preemptive multi-script alias enforcement
+    at Step 3 connector authoring time.
+
+baseline_state:
+  ssi_data_substations: 1512
+  grid_geo_lines: 1636  # SPARSE baseline (10× less than Latvia's 16,245)
+  lines_per_substation_ratio: 1.08  # transmission-tier only
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0  # PERFECT baseline — cleaner than Baltic Trio countries
+  region_coverage_pct: 100.0  # 8 NUTS-3 regions all populated
+  region_split_by_dso_target:
+    ZSD_west:
+      SK010_Bratislava: 253
+      SK021_Trnava: 73
+      SK022_Trenčín: 244
+      SK023_Nitra: 70
+      subtotal_west: 640  # 42.3% — Bratislava metro + western Slovakia
+    SSD_centre:
+      SK031_Žilina: 282
+      SK032_Banská_Bystrica: 53
+      subtotal_centre: 335  # 22.2% — northern + central Slovakia
+    VSD_east:
+      SK041_Prešov: 116
+      SK042_Košice: 421
+      subtotal_east: 537  # 35.5% — eastern Slovakia (US Steel Košice industrial complex)
+  voltage_class_baseline:
+    750_kv: 2      # Mir/Slavia Ukraine cross-border HVAC (SEPS)
+    420_kv: 2      # legacy Soviet-era EHV
+    400_kv: 27     # SEPS Continental European EHV backbone
+    380_kv: 1
+    230_kv: 1
+    220_kv: 6      # Soviet-era HV
+    110_kv: 955    # 63.2% — SEPS TSO + DSO subtransmission (DOMINANT)
+    42_kv: 1
+    25_kv: 1
+    22_kv: 512     # 33.9% — regional DSO MV distribution (dominant Slovak MV tier)
+    6_kv: 3
+    3_kv: 1
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [16.83, 47.73, 22.57, 49.61]  # west, south, east, north (Slovakia bounds)
+    strategy: >
+      Single-query pattern — Slovakia bbox ~49k km² (similar to Estonia).
+      Sub-2-minute fetch expected. Endpoint-fallback strategy per LT + EE
+      + LV precedent.
+    expected_yield:
+      substations: 2500-6000  # empirical post-Baltic Trio range
+      lines: 3500-9000  # sparse baseline should permit substantial OSM densification
+    tag_completeness_hypothesis: >
+      Slovakia OSM tagging density expected moderate — Bratislava metro
+      well-mapped, eastern Košice industrial region moderately mapped,
+      rural centre + east sparser. Historical Czechoslovak-era operator
+      names may appear (pre-1993 Slovak-Czech unified grid). Post-Soviet
+      cohort — Convention #78 BINDING enforcement mandates preemptive
+      Cyrillic alias handling (some Rusyn/Ukrainian OSM contributors in
+      eastern Slovakia + Ukraine border zone). Semi-colon compound tags
+      likely (per Estonia + Latvia precedent — SEPS;VSD/SSD/ZSD shared-
+      node handoffs at DSO connection points).
+    lp_dd_class: canonical
+
+  fallback_region_jurisdiction_by_voltage_class:
+    strategy: seps_tso_threshold_plus_3_regional_dso_via_nuts3_geofence
+    rationale: >
+      Region-jurisdiction × voltage-class pattern (7th cohort-wide
+      application after Belgium 3-region + Netherlands 4-region + Chile
+      latitude-band + Hungary 4-region + Slovenia 5-DSO NUTS-3 map +
+      Colombia department + Norway county). Slovakia's clean 3-way
+      east/centre/west partition maps 1:1 to NUTS-3 codes — no geofence
+      lat/lon needed if OSM populates NUTS-3 tags (per Slovenia + Hungary
+      precedent). SEPS as unified state TSO at ≥110 kV; 3 regional DSOs
+      at ≤110 kV via NUTS-3 map. Each DSO carries 51% state + 49%
+      strategic partner (RWE/EPH/E.ON) but state control preserved.
+    tso_threshold_kv: 110
+    tso_operator: SEPS  # Slovenská elektrizačná prenosová sústava (100% state-owned)
+    dso_partition_via_nuts3:
+      ZSD (Západoslovenská distribučná): [SK010, SK021, SK022, SK023]  # 42.3% baseline
+      SSD (Stredoslovenská distribučná): [SK031, SK032]  # 22.2% baseline
+      VSD (Východoslovenská distribučná): [SK041, SK042]  # 35.5% baseline
+    holding_partial_state:
+      ZSD_parent: ZSE Energia (Západoslovenská energetika a.s. — 51% Slovak state / 49% E.ON)
+      SSD_parent: SSE Distribúcia (Stredoslovenská energetika a.s. — 51% Slovak state / 49% EPH)
+      VSD_parent: VSD (Východoslovenská energetika a.s. — 51% Slovak state / 49% RWE Innogy)
+    system_operator_note: >
+      SEPS handles both TSO ownership AND SO functions in Slovakia. No
+      separate system operator entity. Slovenské elektrárne (SE) is
+      generation-only (Enel Group + Slovak Power Holding), non-grid.
+
+  operator_alias_normalisation:
+    # ⚡ CONVENTION #78 BINDING ENFORCEMENT — PREEMPTIVE MULTI-SCRIPT MAPPING ⚡
+    aliases:
+      # SEPS variants (English + Slovak + legal-form)
+      "SEPS": "SEPS"
+      "SEPS a.s.": "SEPS"
+      "SEPS, a.s.": "SEPS"
+      "a.s. SEPS": "SEPS"
+      "Slovenská elektrizačná prenosová sústava": "SEPS"
+      "Slovenská elektrizačná prenosová sústava a.s.": "SEPS"
+      "Slovenska elektrizacna prenosova sustava": "SEPS"  # accent-stripped
+      # SEPS Cyrillic (Convention #78 BINDING preemptive — Rusyn/Ukrainian OSM in eastern Slovakia)
+      "сепс": "SEPS"
+      "словенска електризачна преносова сустава": "SEPS"
+      # SEPS predecessor — Slovenský energetický podnik (pre-2002 unbundling)
+      "Slovenský energetický podnik": "SEPS-legacy"
+      "Slovenský energetický podnik š.p.": "SEPS-legacy"
+      "Slovensky energeticky podnik": "SEPS-legacy"  # accent-stripped
+      # ZSD variants (west)
+      "ZSD": "ZSD"
+      "ZSD a.s.": "ZSD"
+      "Západoslovenská distribučná": "ZSD"
+      "Západoslovenská distribučná a.s.": "ZSD"
+      "Zapadoslovenska distribucna": "ZSD"  # accent-stripped
+      # ZSE Energia (parent of ZSD)
+      "ZSE": "ZSE Energia (Holding — West Slovakia)"
+      "ZSE Energia": "ZSE Energia (Holding — West Slovakia)"
+      "Západoslovenská energetika": "ZSE Energia (Holding — West Slovakia)"
+      "Zapadoslovenska energetika": "ZSE Energia (Holding — West Slovakia)"
+      # ZSD predecessor — Západoslovenské energetické závody
+      "Západoslovenské energetické závody": "ZSD-legacy"
+      "Zapadoslovenske energeticke zavody": "ZSD-legacy"  # accent-stripped
+      # SSD variants (centre)
+      "SSD": "SSD"
+      "SSD a.s.": "SSD"
+      "Stredoslovenská distribučná": "SSD"
+      "Stredoslovenská distribučná a.s.": "SSD"
+      "Stredoslovenska distribucna": "SSD"  # accent-stripped
+      # SSE Energia (parent of SSD)
+      "SSE": "SSE (Holding — Centre Slovakia)"
+      "SSE Energia": "SSE (Holding — Centre Slovakia)"
+      "Stredoslovenská energetika": "SSE (Holding — Centre Slovakia)"
+      "Stredoslovenska energetika": "SSE (Holding — Centre Slovakia)"
+      # SSD predecessor
+      "Stredoslovenské energetické závody": "SSD-legacy"
+      "Stredoslovenske energeticke zavody": "SSD-legacy"  # accent-stripped
+      # VSD variants (east)
+      "VSD": "VSD"
+      "VSD a.s.": "VSD"
+      "Východoslovenská distribučná": "VSD"
+      "Východoslovenská distribučná a.s.": "VSD"
+      "Vychodoslovenska distribucna": "VSD"  # accent-stripped
+      # VSE (parent of VSD)
+      "VSE": "VSE (Holding — East Slovakia)"
+      "VSE Energia": "VSE (Holding — East Slovakia)"
+      "Východoslovenská energetika": "VSE (Holding — East Slovakia)"
+      "Vychodoslovenska energetika": "VSE (Holding — East Slovakia)"
+      # VSD predecessor
+      "Východoslovenské energetické závody": "VSD-legacy"
+      "Vychodoslovenske energeticke zavody": "VSD-legacy"  # accent-stripped
+      # Cyrillic variants for DSOs (Convention #78 BINDING preemptive)
+      "зсд": "ZSD"
+      "ссд": "SSD"
+      "всд": "VSD"
+      # Slovenské elektrárne (SE — generation only, non-grid)
+      "Slovenské elektrárne": "Slovenské elektrárne (Generation)"
+      "Slovenske elektrarne": "Slovenské elektrárne (Generation)"
+      "SE": "Slovenské elektrárne (Generation)"
+      # Slovak Railways (Železnice Slovenskej republiky — electric traction only)
+      "ŽSR": "Slovak Railways (Electric)"
+      "Železnice Slovenskej republiky": "Slovak Railways (Electric)"
+      "Zeleznice Slovenskej republiky": "Slovak Railways (Electric)"  # accent-stripped
+      # US Steel Košice (major industrial captive in eastern Slovakia)
+      "U.S. Steel Košice": "U.S. Steel Košice (Industrial Captive)"
+      "US Steel Kosice": "U.S. Steel Košice (Industrial Captive)"  # accent-stripped
+      # Slovnaft (Bratislava oil refinery industrial captive)
+      "Slovnaft": "Slovnaft (Industrial Captive)"
+      "Slovnaft a.s.": "Slovnaft (Industrial Captive)"
+      # Typographic-quote variant preemptive per Estonia + Latvia precedent
+      # Slovak uses „..." typographic quotes (like Czech/German/Latvian)
+      # Convention #78 BINDING enforcement: preemptively mapped
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/slovakia/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # SEPS TSO threshold + 3-DSO NUTS-3 geofence + 60+ aliases + preemptive Cyrillic + typographic quotes
+    - osm_overpass.py  # single-query fetch (~49k km²)
+    - merge_into_ssi_data.py  # 500m proximity + Step 4b retroactive + Step 5 alias-retighten scaffold
+  pattern_reused_from: hungary (NUTS-3 region-jurisdiction × voltage-class precedent)
+  differentiators_vs_hungary:
+    - operator_language: Slovak (West Slavic, č š ž ď ľ ň ť ĺ ŕ diacritics) vs Hungarian (Uralic, á é í ó ú ő ű diacritics)
+    - script: Latin with West Slavic diacritics vs Hungarian NFC diacritics
+    - cyrillic_bridging: Eastern Slovakia (Rusyn/Ukrainian minority) — DEEPER than Hungary (no Cyrillic community)
+    - holding_structure: 3 regional DSO parents (51% state / 49% RWE/EPH/E.ON) — mixed public-private
+    - baltic_trio_context: NO — Slovakia is Visegrád Group, EU synchronised pre-2025 (already Continental EU zone)
+    - hvdc_cross_border: NO HVDC to Nordic (unlike EE Estlink); Slovakia interconnects HVAC to CZ + PL + HU + UA + AT
+    - typographic_quote_convention: „..." Slovak typographic quotes per Estonia + Latvia precedent (Convention #78 BINDING preemptive)
+    - historical_alias_depth: 4 predecessor lineages (SEPS + 3 DSO predecessors from post-1993 Czechoslovak split)
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # 4-operator (SEPS + 3 DSO) resolver catches all
+  post_merge_voltage_coverage: 50-90%  # from 100% baseline to multi-tier
+  post_merge_substations: 2500-6000  # empirical post-Baltic Trio range
+  post_merge_lines: 3500-9000  # sparse baseline permits substantial OSM densification
+  km_of_lines: 8000-16000
+
+risks_flagged:
+  - risk_1: >
+      110 kV is a MIXED tier in Slovakia — SEPS operates transmission
+      backbone at 110 kV AND regional DSOs operate subtransmission at
+      110 kV. Empirically the baseline is 63.2% at 110 kV (dominant tier),
+      so partitioning at 110 kV threshold gives SEPS transmission subs
+      + DSO subtransmission. May require voltage threshold refinement
+      post-merge based on empirical OSM operator tags.
+  - risk_2: >
+      Historical Czechoslovak-era operator names may appear on very old
+      OSM tags (pre-1993 unified Czech-Slovak grid). Alias map catches
+      predecessor variants → legacy tags.
+  - risk_3: >
+      5-country border zones with Czech Republic (NW) + Poland (N) +
+      Ukraine (E — 750 kV Mir/Slavia HVDC) + Hungary (S) + Austria (W —
+      small). Discipline #36 cross-border filter uses slovakia/bounds.json.
+      Mir/Slavia 750 kV Ukraine cross-border may generate coastal-analogue
+      edge cases at Vysoké Tatry mountain range crossings.
+  - risk_4: >
+      Cyrillic alias handling — Eastern Slovakia (Prešov + Košice) has
+      Rusyn + Ukrainian minority populations (~2% total, concentrated
+      near Ukraine border). Convention #78 BINDING enforcement preemptive
+      Cyrillic aliases (СЕПС / ЗСД / ССД / ВСД / Словенска ELEKTRIZAČNA
+      pre-Nova su STAVA / equivalents) mapped in alias table.
+  - risk_5: >
+      Semi-colon compound operator tags (per Estonia + Latvia precedent)
+      likely to surface — SEPS;VSD / SEPS;SSD / SEPS;ZSD shared-node
+      transmission↔distribution handoffs. Convention #56 preserves as-is.
+  - risk_6: >
+      Typographic-quote variants (per Latvia precedent) — Slovak uses
+      „..." typographic quotes (like Czech/German/Latvian). Convention
+      #78 BINDING enforcement preemptive mapping. Test whether preemptive
+      mapping produces first-cohort clean output (Estonia precedent =
+      zero Step 5 patches) or requires post-merge retighten (Latvia
+      precedent = 122 subs retightened).
+
+convention_preservation:
+  discipline_36:
+    scope: Slovakia bounds CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      SEPS + 3 DSO 4-operator monopoly is Convention #56-compliant —
+      all genuinely operate 100% of national grid via clean regional
+      partition. Historical Czechoslovak-era + pre-2002/2005 predecessors
+      preserved distinctly for audit trail. Semi-colon compound tags
+      + typographic-quote variants preserved as-is per Convention #78
+      BINDING preemptive discipline.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to slovakia/ + scripts/pipeline/ingestion/slovakia/.
+  convention_78:
+    scope: >
+      ⚡ FIRST EMPIRICAL TEST post-BINDING promotion. Preemptive
+      multi-script alias mapping (Cyrillic СЕПС/ЗСД/ССД/ВСД + Slovak
+      NFC + typographic-quote variants) codified at Step 3 connector
+      authoring time. Convention #78 BINDING enforcement HYPOTHESIS:
+      preemptive mapping produces first-cohort clean output at Step 4
+      merge (Estonia precedent = zero Step 5 patches needed) rather
+      than post-merge retighten (Latvia precedent = 122 subs retightened
+      because typographic-quote sub-convention wasn't preemptively
+      mapped). Empirical outcome will empirically validate or refine the
+      BINDING enforcement discipline.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.slovakia.osm_overpass`
+    locally. Expected wall-clock <2 min.
+  step_3: L1 connector shipped in same batch as this pre-flight — Convention #78 BINDING enforced.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.slovakia.merge_into_ssi_data`.
+  step_5: >
+    Empirical outcome codified — first-cohort clean output (Convention #78
+    BINDING enforcement effective) OR retighten patches applied
+    (BINDING enforcement partial). Latter case triggers HOUSEKEEPING
+    review of alias map preemptive discipline.
+
+status: READY_FOR_STEP_2

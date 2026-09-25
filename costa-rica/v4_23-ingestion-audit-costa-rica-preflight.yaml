@@ -1,0 +1,210 @@
+# Costa Rica v4.23 Ingestion Audit — Pre-flight
+# =============================================
+# Task: #218 (WAVE2-Step1 Costa Rica)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: costa-rica
+  iso2: CR
+  iso3: CRI
+  wave: 2
+  priority: 13
+  step: 1
+  target: "Owner enrichment via OSM Overpass — 3rd monopoly-class instance with nested multi-DSO overlay"
+  rationale: >
+    Costa Rica carries 169 substations with 0% owner tagged and 100% voltage-
+    tagged (91 at 230 kV + 76 at 138 kV — a transmission-heavy baseline, likely
+    ICE-owned TSO only). Third application of the monopoly-class pattern
+    (after Greenland pure + Luxembourg + municipal overlay) with the twist of
+    a larger 7-DSO nested overlay via ICE subsidiary + 2 municipal + 4 rural
+    cooperatives. Regulatory structure: ARESEP (regulator) + MINAE (ministry)
+    + ICE (state-owned TSO + majority DSO) + 7 non-ICE DSOs.
+
+baseline_state:
+  ssi_data_substations: 169
+  grid_geo_substations: 170  # estimated
+  grid_geo_lines: 575
+  lines_per_substation_ratio: 3.40  # clean transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0
+  region_coverage_pct: 100.0  # 7 provinces populated
+  provinces_split:
+    alajuela: 51    # 30.2% — north-central (largest)
+    san-jose: 34    # 20.1% — Central Valley + Los Santos + Puriscal
+    guanacaste: 33  # 19.5% — NW Pacific dry corridor
+    cartago: 18     # 10.7% — central-east + Turrialba
+    puntarenas: 12  # 7.1%  — elongated Pacific coast
+    heredia: 12     # 7.1%  — north-central + Sarapiquí
+    limon: 9        # 5.3%  — Caribbean coast
+  voltage_class_baseline:
+    230_kv: 91  # 53.8% — EHV interconnection + SIEPAC regional grid
+    138_kv: 76  # 45.0% — HV national trunk
+    24.9_kv: 1  # 0.6%  — MV distribution isolated case
+    34.5_kv: 1  # 0.6%  — MV distribution isolated case
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [-85.95, 8.03, -82.55, 11.22]  # west, south, east, north
+    strategy: >
+      Single-query pattern — Costa Rica bbox ~51k km² (~2× Slovenia, ~2.6× Belgium).
+      Sub-3-minute fetch expected. Split by element type for substations.
+    expected_yield:
+      substations: 500-1500
+      lines: 2000-6000
+    tag_completeness_hypothesis: >
+      Costa Rica OSM tagging density typically 40-60% for GAM (Greater
+      Metropolitan Area — San José + Alajuela + Heredia + Cartago). Rural
+      Guanacaste + Limón + Puntarenas 20-40%.
+    lp_dd_class: canonical
+
+  fallback_monopoly_with_multi_overlay:
+    strategy: ice_monopoly_default_plus_7_dso_geofence_overlay
+    rationale: >
+      Third application of the monopoly-class pattern with expanded
+      overlay depth. ICE (Instituto Costarricense de Electricidad,
+      established 1949) is the state-owned vertically-integrated TSO+DSO,
+      handling ALL transmission ≥138 kV nationally + ~40% direct DSO
+      coverage. 7 non-ICE DSOs handle specific cantons/territories via
+      nested geofence overlay.
+    tso_threshold_kv: 138  # ICE operates all transmission at 230 kV + 138 kV
+    tso_operator: ICE  # Instituto Costarricense de Electricidad
+    dso_territories_by_canton_geofence:
+      # Priority ordering (most-specific-first for overlap resolution)
+      "Priority 1 — Coopealfaroruiz RL":
+        canton: Zarcero (Alfaro Ruiz) + partial Naranjo + partial Grecia
+        rough_bbox: "10.15-10.30°N, -84.50 to -84.30°W"
+      "Priority 2 — ESPH":
+        cantons: Heredia central + Barva + Santo Domingo + San Rafael + San Isidro + San Pablo
+        rough_bbox: "9.98-10.10°N, -84.15 to -84.02°W"
+      "Priority 3 — JASEC":
+        cantons: Cartago central + Alvarado + Oreamuno + El Guarco + Paraíso
+        rough_bbox: "9.83-9.92°N, -83.95 to -83.80°W"
+      "Priority 4 — Coopesantos RL":
+        cantons: Tarrazú + Dota + León Cortés + Acosta + partial Aserrí + partial Parrita
+        rough_bbox: "9.55-9.85°N, -84.30 to -83.85°W"
+      "Priority 5 — Coopelesca RL":
+        cantons: San Carlos + Los Chiles + Guatuso + Upala + partial Sarapiquí
+        rough_bbox: "10.30-11.10°N, -84.90 to -84.20°W"
+      "Priority 6 — Coopeguanacaste RL":
+        cantons: Santa Cruz + Nicoya + Nandayure + Carrillo + Hojancha + partial Liberia
+        rough_bbox: "9.85-10.65°N, -85.80 to -85.20°W"
+      "Priority 7 — CNFL":
+        cantons: San José + Escazú + Desamparados + Aserrí + Mora + Puriscal + Santa Ana + Alajuelita + Vázquez de Coronado + Tibás + Moravia + Montes de Oca + Curridabat + Goicoechea
+        rough_bbox: "9.85-10.05°N, -84.30 to -84.00°W"
+        note: "CNFL is ICE subsidiary but operates as distinct DSO"
+      "Priority 8 (default) — ICE":
+        scope: >
+          All remaining territory (rural Puntarenas + rural Limón +
+          Sarapiquí north + rural Guanacaste east + rural Cartago +
+          Turrialba + Alajuela SW + Alajuela NW east of Zarcero)
+        rationale: "Convention #56 visibly-honest monopoly default"
+
+  dso_alias_normalisation:
+    aliases:
+      # ICE variants
+      "ICE": "ICE"
+      "Instituto Costarricense de Electricidad": "ICE"
+      "I.C.E.": "ICE"
+      "ICE — Servicio Eléctrico": "ICE"
+      # CNFL variants
+      "CNFL": "CNFL"
+      "Compañía Nacional de Fuerza y Luz": "CNFL"
+      "Cia Nacional Fuerza y Luz": "CNFL"
+      "C.N.F.L.": "CNFL"
+      # ESPH variants
+      "ESPH": "ESPH"
+      "Empresa de Servicios Públicos de Heredia": "ESPH"
+      "ESPH S.A.": "ESPH"
+      # JASEC variants
+      "JASEC": "JASEC"
+      "Junta Administrativa del Servicio Eléctrico de Cartago": "JASEC"
+      # Cooperativa variants
+      "Coopeguanacaste": "Coopeguanacaste"
+      "Coopeguanacaste R.L.": "Coopeguanacaste"
+      "Coopeguanacaste RL": "Coopeguanacaste"
+      "Coopelesca": "Coopelesca"
+      "Coopelesca R.L.": "Coopelesca"
+      "Coopelesca RL": "Coopelesca"
+      "Coopesantos": "Coopesantos"
+      "Coopesantos R.L.": "Coopesantos"
+      "Coopesantos RL": "Coopesantos"
+      "Coopealfaroruiz": "Coopealfaroruiz"
+      "Coopealfaroruiz R.L.": "Coopealfaroruiz"
+      "Coopealfaroruiz RL": "Coopealfaroruiz"
+      # Generation-side (unlikely on substations but preserved)
+      "MINAE": "MINAE"
+      "ARESEP": "ARESEP"  # regulator
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/costa-rica/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # ICE TSO threshold + 7-DSO geofence + ICE monopoly default + alias map
+    - osm_overpass.py  # single-query fetch (~51k km²)
+    - merge_into_ssi_data.py  # 500m proximity + province-based fallback
+  pattern_reused_from: luxembourg (monopoly + nested municipal overlay)
+  differentiators_vs_luxembourg:
+    - dso_overlay_count: 7 non-monopoly DSOs vs Luxembourg's 4
+    - monopoly_dominance: ICE ~40% direct + all TSO vs Creos ~90% direct
+    - state_ownership: ICE state-owned + CNFL ICE subsidiary + 4 rural cooperatives + 2 municipal utilities
+    - tso_threshold: 138 kV vs Luxembourg's (no explicit threshold — Creos handles all)
+    - regional_metadata: province names populated in baseline (Layer 2 could use province, but geofence more precise for CNFL vs ICE overlap in San José)
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # ICE default catches all
+  post_merge_voltage_coverage: 60-80%  # from 100% transmission-only to multi-tier including MV
+  post_merge_substations: 500-1500
+  post_merge_lines: 2000-6000
+  km_of_lines: 4000-10000
+
+risks_flagged:
+  - risk_1: >
+      SJ metropolitan overlap zone: CNFL and ICE both operate in San José
+      province. Baseline shows all 34 SJ subs at transmission tier (likely
+      ICE). Post-merge net-new distribution subs need geofence resolution
+      to avoid mis-attributing CNFL urban DSO subs to ICE default.
+  - risk_2: >
+      Coopealfaroruiz canton is small (Zarcero ~155 km²) — bbox will be
+      tight. Verify against Naranjo/Grecia overlap.
+  - risk_3: >
+      2-country border zones with Nicaragua (N) + Panama (SE). Discipline
+      #36 cross-border filter should handle these cleanly — SIEPAC 230 kV
+      cross-border interconnections at Peñas Blancas (NIC) + Río Claro (PAN)
+      may show up as boundary edge cases.
+
+convention_preservation:
+  discipline_36:
+    scope: Costa Rica bounds already CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      ICE monopoly default is Convention #56-compliant because ICE genuinely
+      operates in all remaining territory as the state utility. This is not
+      a fabrication — it's an empirical default based on ICE's ~40% direct
+      coverage + rural fallback role. Non-ICE DSO attribution preserved
+      via province + canton geofence with provenance tag.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to costa-rica/ + scripts/pipeline/ingestion/costa-rica/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.costa-rica.osm_overpass`
+    locally. Expected wall-clock <3 min (small country).
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.costa-rica.merge_into_ssi_data`.
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2

@@ -1,0 +1,181 @@
+# Australia v4.23 Ingestion Audit — Pre-flight
+# ============================================
+# Task: #183 (WAVE2-Step1 Australia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: australia
+  iso2: AU
+  iso3: AUS
+  wave: 2
+  priority: 6  # continues P1-Canada, P2-Norway, P3-Mexico, P4-Austria, P5-Greenland
+  step: 1
+  target: "Owner enrichment via OSM Overpass — task #2 from SSI_COHORT_AUDIT_SWEEP_20260713.md priority tier"
+  rationale: >
+    Australia carries 8,078 substations with 0% owner coverage (cohort-wide baseline gap).
+    Highest LP-DD visibility among the 3+ WARN countries. Federal-fragmented grid
+    architecture (AEMO NEM East + WEM West + 5 state DNSPs) makes state-jurisdiction
+    fallback the canonical strategy for post-OSM untagged substations.
+
+baseline_state:
+  ssi_data_substations: 8078
+  grid_geo_substations: 8500
+  grid_geo_lines: 9111
+  lines_per_substation_ratio: 1.07  # transmission-only (MV not currently ingested)
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: ~99.0
+  region_split:
+    New South Wales: 2696
+    Queensland: 1807
+    Victoria: 1579
+    Western Australia: 838
+    South Australia: 694
+    Tasmania: 294
+    Australian Capital Territory: 109
+    Northern Territory: 61
+  voltage_class_top:
+    33_kv: 1598
+    66_kv: 1231
+    132_kv: 1231
+    220_kv: 817
+    110_kv: 812
+    22_kv: 791
+    11_kv: 788
+    330_kv: 397
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [96.816, -43.639, 168.001, -10.062]  # Australia + Tasmania + islands
+    strategy: >
+      Continental scale (7.7M km²) — likely requires bbox partitioning per
+      state/territory (matches Austria 4-quadrant + Greenland power-class split
+      patterns). Recommended: 8 partitions, one per state/territory.
+    expected_yield:
+      substations: 8000-12000  # aligns with GSA / OSM Australia known baseline
+      lines: 40000-80000
+    tag_completeness_hypothesis: >
+      Metro areas (Sydney/Melbourne/Brisbane/Perth/Adelaide) likely have 40-60%
+      operator= tags. Rural (WA outback + NT + rural QLD) likely 5-15%. Overall
+      target 25-40% direct tag; remaining 60-75% resolved via state fallback.
+    lp_dd_class: canonical  # gap-audit already lists Overpass as accepted canonical
+
+  fallback_operator_registry:
+    strategy: state_jurisdiction_by_voltage_class
+    rationale: >
+      Australia's federal structure means each state has 1 TSO + 1-5 DNSPs.
+      Voltage class disambiguates: >132 kV → state TSO; ≤132 kV → state DNSP
+      (with metro-vs-rural refinement for multi-DNSP states).
+    state_mapping:
+      NSW:  # 2696 subs
+        tso: TransGrid
+        dnsp_default: Essential Energy  # rural default
+        dnsp_metro: Ausgrid  # Sydney metro + Central Coast + Hunter (lat < -32.5 + lon > 150.5)
+        dnsp_western: Endeavour Energy  # Greater Western Sydney + Blue Mountains
+      QLD:  # 1807
+        tso: Powerlink
+        dnsp_seq: Energex  # SEQ south-east corner (lat > -28.5 + lon < 153.5)
+        dnsp_default: Ergon Energy  # rest of QLD
+      VIC:  # 1579 — 5 DNSPs, most complex
+        tso: AEMO Victoria  # VIC only Aussie state where AEMO is TSO
+        dnsp_1: AusNet Services  # east + north-east metro
+        dnsp_2: CitiPower  # inner Melbourne CBD
+        dnsp_3: Powercor  # west VIC rural
+        dnsp_4: Jemena  # north-west metro
+        dnsp_5: United Energy  # east + south-east metro
+        # For VIC — default to AusNet Services unless OSM tag or geofence resolves
+      WA:  # 838
+        tso: Western Power  # SWIS grid TSO+DNSP combined
+        dnsp_regional: Horizon Power  # off-grid + regional WA (lat > -25 + inland)
+      SA:  # 694
+        tso: ElectraNet
+        dnsp: SA Power Networks
+      TAS:  # 294
+        tso_dnsp_combined: TasNetworks
+      ACT:  # 109
+        combined: Evoenergy  # subsidiary of Icon Water + AGL joint venture
+      NT:  # 61
+        combined: Power and Water Corporation
+
+  aemo_market_context:
+    name: AEMO NEM + WEM
+    scope: >
+      National Electricity Market (NEM) covers NSW/QLD/VIC/SA/TAS/ACT.
+      Wholesale Electricity Market (WEM) covers WA-SWIS separately.
+      NT + rural WA + islanded grids operate outside NEM/WEM.
+    lp_dd_class: informational  # not a substation registry; context only
+
+  arena_infrastructure_registry:
+    name: ARENA + AER Registered Participants
+    endpoint: https://www.aer.gov.au/system/files/List-of-registered-participants.xlsx
+    scope: Federal registry of AER-regulated network businesses
+    lp_dd_class: cross_validation  # regulatory anchor, not asset-level
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/australia/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # AustraliaSubstationRecord + AustraliaLineRecord + fallback logic
+    - osm_overpass.py  # multi-endpoint fetch with bbox partitioning
+    - merge_into_ssi_data.py  # 500m proximity match + state fallback
+  pattern_reused_from: austria (federal-fragmented + no monopoly-fallback rule)
+  differentiators_vs_austria:
+    - bbox_partitioning: 8 partitions (per state) vs Austria's 4 quadrants
+    - state_fallback_logic: multi-DNSP disambiguation via metro/rural geofence
+    - line_fetch_strategy: may split by power class like Greenland if 504 errors
+
+expected_deltas:
+  post_merge_owner_coverage: 60-85%  # from 0% baseline
+  post_merge_substations: 8078-12000  # existing + OSM net-new
+  post_merge_lines: 30000-70000  # significant net-new (transmission + MV distribution)
+  km_of_lines: 250000-450000  # continental scale estimate
+
+risks_flagged:
+  - risk_1: >
+      Overpass 504 gateway on continental bbox likely on first attempt. Strategy:
+      bbox-partitioned per state, sequential fetches with 30s inter-request delay.
+  - risk_2: >
+      VIC 5-DNSP disambiguation adds complexity — may need to leave as
+      "Victoria DNSP (unresolved multi-provider)" for the 1,579 VIC subs that
+      OSM doesn't directly tag. Acceptable per Convention #56 visibly-honest
+      degradation.
+  - risk_3: >
+      Line ingest at MV level could push grid-geo.json past 90 MB threshold
+      like Norway pre-optimization. Monitor at Step 4; run optimise_grid_geo.py
+      if needed (task #157 tool).
+
+convention_preservation:
+  discipline_36:  # cross-border enforcement
+    scope: Australia has minor territorial coastal deviations — same
+      tolerance mechanism used for other island/coastal countries applies.
+  discipline_41:  # substation-line coupling invariant
+    scope: EVERY net-new substation MUST have >= 1 connecting line per operator
+      directive "if we add substations we add connecting power lines".
+  convention_56:  # visibly-honest degradation
+    scope: Unresolved multi-DNSP tags (VIC) show as explicit "state DNSP
+      (unresolved multi-provider)" rather than silent generic fallback.
+  convention_60:  # Ikenga IS the ESG provider
+    scope: No commercial ESG-rating providers — OSM + state regulators only.
+  convention_64:  # strict per-country resolution
+    scope: All changes contained to australia/ + scripts/pipeline/ingestion/australia/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.australia.osm_overpass
+    --fetch-all` locally. Expected wall-clock: 8-15 min for full continent
+    fetch with bbox partitioning + inter-request delays.
+  step_3: >
+    Post-fetch: build L1 connector body + merge script + delta audit YAML.
+  step_4: >
+    Merge execution + verification. Update landing page + Australia country page.
+  step_5: >
+    Cohort audit sweep re-run — expect Australia owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2

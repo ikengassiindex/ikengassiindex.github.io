@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSI v4.0.2 — Learning File (Sweden)</title>
+<style>
+:root { --ink:#1a1a2e; --paper:#faf9f6; --accent:#c0392b; --accent2:#2c3e7a; --accent3:#1a6b4a; --teal:#0e7490; --muted:#6b7280; --border:#d1cfc9; --code-bg:#f0ede6; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI','Helvetica Neue',sans-serif; color:var(--ink); background:var(--paper); font-size:13px; line-height:1.6; }
+.page { max-width:1100px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+.subtitle { color:var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+.meta { display:flex; gap:2rem; font-size:0.78rem; color:var(--muted); margin-bottom:2rem; flex-wrap:wrap; }
+h2 { font-size:1.2rem; color:var(--accent2); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:2px solid var(--border); }
+h3 { font-size:1rem; color:var(--accent); margin:1.5rem 0 0.5rem; }
+table { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.82rem; }
+thead { background:var(--ink); color:#fff; }
+thead th { padding:0.5rem 0.6rem; text-align:left; font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+tbody td { padding:0.45rem 0.6rem; border-bottom:1px solid var(--border); vertical-align:top; }
+tbody tr:nth-child(even) { background:rgba(0,0,0,0.02); }
+.mono { font-family:'Consolas',monospace; font-size:0.78rem; }
+.num { text-align:right; font-family:monospace; }
+.tag { display:inline-block; font-size:0.62rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:0.15em 0.5em; border-radius:2px; }
+.tag-decision { background:#d6eaf8; color:#1a5276; }
+.tag-calibration { background:#fadbd8; color:#922b21; }
+.tag-lesson { background:#ebdef0; color:#6c3483; }
+.tag-risk { background:#fdebd0; color:#935116; }
+.note { background:#fff8e1; border-left:3px solid #f39c12; padding:0.6rem 1rem; margin:1rem 0; font-size:0.82rem; border-radius:0 4px 4px 0; }
+.note strong { color:#d68910; }
+.learning-card { background:#fff; border:1px solid var(--border); border-radius:6px; padding:1.2rem; margin:1rem 0; border-left:4px solid var(--accent2); }
+.learning-card h4 { font-size:0.85rem; color:var(--accent2); margin-bottom:0.5rem; }
+.learning-card p { font-size:0.82rem; margin-bottom:0.5rem; }
+.learning-card .impact { font-size:0.75rem; color:var(--accent); font-weight:600; }
+@media print { body { font-size:9pt; } .page { padding:0; max-width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>SSI v4.0.2 — Learning File (Sweden)</h1>
+<p class="subtitle">Sessions 0–1 — Planning, Contextualisation & Deployment · Calibration Decisions · Hazard Substitutions & Sweden-Specific Adaptations</p>
+<div class="meta">
+  <span><strong>Country:</strong> Sweden (SE)</span>
+  <span><strong>Session:</strong> 0 (Planning & Contextualisation)</span>
+  <span><strong>Date:</strong> 2026-03-27</span>
+  <span><strong>Author:</strong> Ikenga Project</span>
+  <span><strong>Reference:</strong> SSI v4.0.2 Formula Construct (Sweden)</span>
+</div>
+
+<h2>Session 0 — Sweden Contextualisation & Formula Adaptation (2026-03-27)</h2>
+
+<h3>1 — Calibration Decisions (25 entries)</h3>
+
+<table>
+<thead><tr><th>ID</th><th>Parameter</th><th>Baseline</th><th>Sweden Value</th><th>Rationale</th></tr></thead>
+<tbody>
+<tr><td class="mono">CAL-01</td><td><strong>R6b α (seismic sensitivity)</strong></td><td>Germany: 0.25</td><td class="num">0.10</td><td>Sweden sits on Fennoscandian Shield, identical geological foundation to Finland with negligible seismic risk. No major tectonic activity. PGA baseline essentially zero. α reduced to 0.10 to reflect stable Shield geology. Mining-induced seismicity absent. Northern latitudes (Kiruna) have unique subsidence risk from iron ore mining operations, but regional seismic contribution minimal.</td></tr>
+
+<tr><td class="mono">CAL-02</td><td><strong>PGA_ref (baseline)</strong></td><td>Germany: 0.03g</td><td class="num">0.01g</td><td>Swedish craton one of most stable in Europe. No region exceeds 0.01g natural PGA except rare postglacial rebound zones in northern coastal areas. Mining subsidence at Kiruna is localized (<100 km²), does not add to seismic PGA baseline. Seismic PGA is essentially background noise across 99% of grid.</td></tr>
+
+<tr><td class="mono">CAL-03</td><td><strong>Cap (max amplifier)</strong></td><td>Germany: 1.12</td><td class="num">1.05</td><td>Negligible seismic amplification needed. Sweden's stable shield requires minimal cap. Only localized postglacial rebound zones require modest 1.05× amplification for dynamic loading edge cases. Kiruna mine subsidence (CAL-04 Zone 2) does not warrant higher cap due to slow, predictable nature.</td></tr>
+
+<tr><td class="mono">CAL-04</td><td><strong>Hazard zones</strong></td><td>Germany: 2</td><td class="num">2</td><td>Zone 1: Stable interior, including central/southern Sweden (PGA <0.01g, ~97% of substations). Zone 2: Arctic-northern region (Norrbotten, Västerbotten) with postglacial rebound + Kiruna mine subsidence (0.01–0.02g PGA-equivalent, ~3% of substations). Unlike Finland, Sweden's mining in Kiruna creates unique localized mechanical subsidence (<1 cm/year, predictable). No seismic border zones (unlike Poland Sudetes).</td></tr>
+
+<tr><td class="mono">CAL-05</td><td><strong>ISO 9223 corrosion classes</strong></td><td>5 classes</td><td>4 classes (C1–C4)</td><td>C5 (extreme) not applicable — no tropical humidity, no volcanic SO₂. C4 limited to coastal industrial zones (Gothenburg, Malmö) and Baltic Sea corridor. Interior substations predominantly C1/C2 due to clean continental climate. Coastal corrosion pressure lower than Poland overall. Gothenburg/Malmö industrial zones (shipbuilding, petrochemicals) are exceptions; substrate salt-spray exposure = C4.</td></tr>
+
+<tr><td class="mono">CAL-06</td><td><strong>κ_winter (winter storm + snow/ice loading)</strong></td><td>Poland: κ_subsidence (mining)</td><td>[1.0–1.35]</td><td>SWEDEN-UNIQUE modifier. Winter storms are Sweden's #1 hazard, particularly in north. κ_winter captures extreme winds (storm surge), heavy wet snow (ice loading), temperature cycling (-25 to +10°C). Northern Lapland (Norrbotten) κ=1.35, Central (Värmland/Dalarna) κ=1.20, Southern (Skåne/Gothenburg) κ=1.00. Swedish west coast experiences Atlantic storm exposure similar to Finland.</td></tr>
+
+<tr><td class="mono">CAL-07</td><td><strong>κ_flood (snowmelt + river flooding)</strong></td><td>Poland: 0.35</td><td class="num">0.15</td><td>Sweden has sophisticated dam management on Torne, Ume, Göta Älv rivers (1,000+ dams, excellent operational control). Snowmelt flooding is managed via reservoir coordination (April–May). Flash flooding rare. Localized events possible (mountain streams, eastern valleys) but rare. Weight lower than Poland/Finland reflects superior flood infrastructure and management. Water abundance but controlled.</td></tr>
+
+<tr><td class="mono">CAL-08</td><td><strong>κ_thermal (regional, Arctic cold effect)</strong></td><td>Poland: [0.95–1.05]</td><td>[0.85–1.02]</td><td>UNIQUE SWEDEN EFFECT: Arctic preservation dominant in Norrbotten (κ=0.85, slowest aging), temperate transition in Central (κ=0.93), and near-temperate in Skåne/Gothenburg (κ=1.02). Cold SLOWS thermal aging. Swedish extreme latitude range (55°N southern Skåne to 69°N Kiruna) creates ~15°C annual mean temperature gradient. Arctic cold is protective; temperate zones lose this advantage. Counter-intuitive: northern cold extends equipment life.</td></tr>
+
+<tr><td class="mono">CAL-09</td><td><strong>R5 weight (maintenance)</strong></td><td>Germany: 0.15</td><td class="num">0.14</td><td>Lower than Poland (0.16). Swedish grid is modern and well-maintained (strong regulatory regime via Ei — Energimarknadsinspektionen). Extensive grid modernization post-1990. Nuclear-era build-out (1970s–1980s) created efficient, mature infrastructure. Maintenance demand slightly lower than aging Western European grids due to proactive investment culture.</td></tr>
+
+<tr><td class="mono">CAL-10</td><td><strong>R6 weight (hazard)</strong></td><td>Germany: 0.14</td><td class="num">0.12</td><td>Lower than Poland — no subsidence mining (Kiruna subsidence is slow, ~1 cm/year, managed). River flooding managed via infrastructure (κ_flood=0.15 instead of R6 weight). Winter storms captured via κ_winter rather than R6 weight. Hazard component focused on rare postglacial rebound + Kiruna mine subsidence edge cases, both minor.</td></tr>
+
+<tr><td class="mono">CAL-11</td><td><strong>T_nuclear (nuclear proximity modifier)</strong></td><td>N/A (new)</td><td>[1.0–1.10]</td><td>SWEDEN-SPECIFIC modifier. Sweden has 3 major nuclear plants: Forsmark (3.2 GW, 3 reactors, Vattenfall), Ringhals (1.7 GW, 2 reactors, Vattenfall/Uniper), Oskarshamn (1.5 GW, 1 reactor, EON/Uniper). Total 6.4 GW nuclear = ~30% of generation. Substations <10 km from plants handle concentrated output. T_nuclear=1.10 applies (grid concentration risk). Post-Fukushima, nuclear-adjacent infrastructure requires premium rating. Sweden's phaseout political debate (decommissioning planned 2010s, extended 2020+) creates uncertainty.</td></tr>
+
+<tr><td class="mono">CAL-12</td><td><strong>Bushfire component</strong></td><td>Germany: 0.05</td><td class="num">0.03</td><td>Forest fires possible in eastern Sweden (Norrbotten, Västerbotten dry summers) but infrastructure impact minimal. Extensive boreal forests but sparse population density keeps exposure low. Wildfire risk secondary compared to storms and winter hazards. 2023–2024 forest fires in northern Lapland were notable but rare (climate change factor).</td></tr>
+
+<tr><td class="mono">CAL-13</td><td><strong>Cyclone/storm component</strong></td><td>Germany: 0.10</td><td class="num">0.35</td><td>DOMINANT HAZARD. Winter storms are Sweden's #1 environmental threat, particularly Atlantic storms affecting west coast. Storm surge, extreme winds (>25 m/s), heavy snow, ice loading, coastal flooding in western coastal zones. Storm damage is primary grid reliability driver. Weight 0.35 reflects dominance (same magnitude as Poland's flood weight). Swedish west coast (Gothenburg region) experiences storm intensity similar to Denmark/northern Germany.</td></tr>
+
+<tr><td class="mono">CAL-14</td><td><strong>Baltic coastal erosion</strong></td><td>Poland: 0.05</td><td class="num">0.02</td><td>Minimal — postglacial rebound is ADDING land to Swedish east coast (~7 mm/year vertical rise in Bothnian Bay region). Sea-level rise effects are offset by land rise. Unlike Poland (erosion risk), Sweden faces isostatic rebound expansion. Western coast (Gothenburg) has modest erosion risk but is partially managed. Coastal instability minimal overall.</td></tr>
+
+<tr><td class="mono">CAL-15</td><td><strong>Offshore wind integration</strong></td><td>Poland: T1 amplifier 1.2–1.4×</td><td>T1 amplifier 1.2–1.4×</td><td>Sweden has ~30 GW offshore wind capacity planned/operational (largest in Nordic region). Bothnian Bay (north), Bornholm Basin (southeast), and North Sea corridors create transmission bottlenecks. 4 bidding zones (SE1–SE4) create north-south power flow constraints; offshore wind in northern/southern waters exacerbates zone imbalances. T1 amplifier 1.2–1.4× reflects major integration pressure. Rapid growth 2025–2030.</td></tr>
+
+<tr><td class="mono">CAL-16</td><td><strong>Administrative mapping</strong></td><td>Poland: Województwo (16)</td><td>Län (21)</td><td>Sweden has 21 regional counties (Län). ~290 municipalities (Kommuner) as secondary level. Regional hierarchy decentralized via Länsstyrelser (regional governments). Uses Swedish Statistics (SCB — Statistiska centralbyrån) aggregation boundaries.</td></tr>
+
+<tr><td class="mono">CAL-17</td><td><strong>DNO operator mapping</strong></td><td>Poland: 5 DSOs</td><td>~170 DNOs</td><td>EXTREME FRAGMENTATION. Sweden has ~170 distribution network operators (DSOs) vs Poland's 5 major DSOs. Most fragmented grid in Nordic region. Every municipality often has 1–2 DNOs. Extreme fragmentation (~2× Finland's 80 DNOs). Data aggregation highly difficult; requires DNO-level ingestion pipelines. However, Swedish DSOs are better organized than Finnish DNOs (stronger industry association).</td></tr>
+
+<tr><td class="mono">CAL-18</td><td><strong>Census baseline</strong></td><td>Poland: GUS Census 2021</td><td>Register-based (annual updates)</td><td>Sweden uses register-based population data via SCB (Statistiska centralbyrån) with annual updates. No traditional census. Similar to Finland — comprehensive registers updated by municipalities. Register-based approach is best-in-class globally. Population data updated continuously; SCB publishes annual official counts. More accurate than traditional census.</td></tr>
+
+<tr><td class="mono">CAL-19</td><td><strong>Currency</strong></td><td>Poland: PLN (zł)</td><td>SEK (kr)</td><td>Sweden uses SEK (Swedish Krona), not EUR (unlike Finland). All financial metrics (VoLL, CAPEX, income) denominated in SEK. SubstationID prefix SE_. Sweden is EU member but retained SEK in negotiations (separate from Euro zone). Exchange rate: ~SEK 10.5 = USD 1.0 (2026 estimate).</td></tr>
+
+<tr><td class="mono">CAL-20</td><td><strong>Renewable penetration</strong></td><td>Poland: ~29% RE</td><td>~70% RE</td><td>Sweden ahead of EU average, highest in Nordic region. Breakdown: Hydro ~40% (dominant, rivers + 1,000+ dams), Wind ~20% (onshore strong, offshore rapidly growing), Biomass ~10% (forest waste energy), Solar ~1% (growing). Nuclear ~30% baseload (Forsmark + Ringhals + Oskarshamn). No fossil baseload in target mix. Rapid transition ongoing; offshore wind expected 35%+ by 2030.</td></tr>
+
+<tr><td class="mono">CAL-21</td><td><strong>Cross-border interconnections</strong></td><td>Poland: 6</td><td>14+</td><td>Sweden has 14+ major interconnections: Norway (4 HVDC: Fenno-Skan 1&2 via Finland, Skagerrak, others), Finland (2–3 HVDC: Fenno-Skan 1&2, others), Denmark (2 AC: Great Belt, Konti-Skan HVDC, Öresund), Germany (1 HVDC: Baltic Cable), Poland (1 HVDC: SwePol), Lithuania (1 HVDC: NordBalt). Sweden is European electricity hub; critical role in Nordic balancing.</td></tr>
+
+<tr><td class="mono">CAL-22</td><td><strong>Nuclear load concentration</strong></td><td>N/A</td><td>6.4 GW nuclear base (Forsmark 3.2 + Ringhals 1.7 + Oskarshamn 1.5)</td><td>Unique concentration risk. Three nuclear plants supply ~30% of Swedish electricity. Forsmark (Uppland) + Ringhals (Västra Götaland) + Oskarshamn (Södermanland) are geographically dispersed (reduces single-point failure vs Finland). Substations near plants handle concentrated output. Grid topology optimized around nuclear bases creates dependency. Decommissioning timelines uncertain (political debate ongoing; no fixed sunset dates like Finland). Phaseout planned 2010 was extended; current trajectory: extended operation to 2040s+.</td></tr>
+
+<tr><td class="mono">CAL-23</td><td><strong>Mega-drought equivalent</strong></td><td>Chile: mega-drought</td><td>N/A</td><td>Sweden has water abundance (lakes, rivers, rainfall). No drought equivalent risk. Hydro reservoir management well-established (sophisticated, used for balancing Nordic market). Opposite of Chile — excess water is baseline condition. Droughts are virtually unknown in Swedish experience.</td></tr>
+
+<tr><td class="mono">CAL-24</td><td><strong>Energy poverty rate</strong></td><td>Poland: ~17%</td><td>~2%</td><td>One of lowest in EU. Exceptionally strong social safety net. District heating widespread (covers ~60% of population via centralized systems). Energy prices regulated with vulnerable population support. Excellent building efficiency standards. Energy poverty minimal — one of world's lowest rates.</td></tr>
+
+<tr><td class="mono">CAL-25</td><td><strong>EU regulatory alignment</strong></td><td>Poland: Full EU</td><td>Full EU + Nordic market</td><td>Sweden is EU member AND lead participant in Nordic power market (Nord Pool). Follows EU directives (Clean Energy Package, Fit for 55) PLUS Nordic Grid Code (more stringent). Dual regulatory framework. Energy market prices set via Nord Pool (most liberal wholesale market in Europe). SCB, ENTSO-E, EU ETS data available. Strong regulatory data transparency. Energimarknadsinspektionen (Ei) is strong regulator with transparent data publication.</td></tr>
+</tbody>
+</table>
+
+<h3>2 — Key Risks (8 entries)</h3>
+
+<table>
+<thead><tr><th>ID</th><th>Risk</th><th>Severity</th><th>Description</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td class="mono">RISK-01</td><td><strong>DNO data fragmentation (170 operators)</strong></td><td><span class="tag tag-risk">HIGH</span></td><td>~170 distribution operators with heterogeneous IT systems, historical data formats, asset management practices. Svenska kraftnät (transmission) is centralized, but DSO layer is among most fragmented in Europe. No unified data sharing standard like France's RTE. Extreme operator count challenges aggregation.</td><td>Build DSO-specific ingestion pipelines. Identify largest 15–20 DSOs (cover ~75% of fleet) for formal data partnerships. Swedish industry associations (EnergiBranchföreningen) can facilitate standardization requests. Smaller DSOs fall back to OSM + satellite data. Implement quarterly data quality audits.</td></tr>
+
+<tr><td class="mono">RISK-02</td><td><strong>Arctic equipment aging models</strong></td><td><span class="tag tag-risk">MEDIUM</span></td><td>Standard CIGRÉ aging curves assume temperate climate. Sweden's extreme Arctic conditions in Norrbotten (-25°C winters) create different degradation patterns. Equipment lasts longer (thermal aging slower) but experiences unique cold-related stress (brittleness, thermal cycling, ice loading).</td><td>Commission Arctic-specific aging research. Use κ_thermal [0.85–1.02] modifier but validate against field data from Vattenfall/EON operations in Arctic regions. Establish monitoring protocol for cold-climate transformer longevity. Accept higher σ for pre-1990 Arctic assets in Norrbotten.</td></tr>
+
+<tr><td class="mono">RISK-03</td><td><strong>4 bidding zones creating internal price differentials and north-south bottleneck</strong></td><td><span class="tag tag-risk">MEDIUM</span></td><td>Sweden's deregulated market divides the grid into 4 bidding zones (SE1: North/Norrbotten, SE2: Central-North/Sundsvall, SE3: Central/Stockholm, SE4: South/Malmö). North-south transmission bottleneck (1,600 km world's longest north-south grid) creates price arbitrage and congestion. Offshore wind in north (Bothnian Bay) and south (Baltic) will exacerbate zone imbalances. Topology optimization around zone constraints is critical.</td><td>Model 3 scenarios: (1) Current 4-zone structure (baseline), (2) Refined zone boundaries reflecting renewable concentration, (3) Offshore wind integration stress (2028+). Real-time Nord Pool prices provide 3–4 month ahead forecasts for congestion. Engage with Svenska kraftnät on long-term topology planning. Higher operational risk premium in constraint zones (SE3–SE4 connection nodes).</td></tr>
+
+<tr><td class="mono">RISK-04</td><td><strong>Winter storm frequency increasing (climate change)</strong></td><td><span class="tag tag-risk">MEDIUM</span></td><td>Recent years (2023–2024) saw unprecedented late-season Atlantic storms (January–April). Jet stream shifts + Arctic warming increase storm volatility. Western coast (Gothenburg, western Västra Götaland) experiencing escalating damage to overhead lines. Winter reliability degrading faster than historical trends predict.</td><td>Implement climate-enhanced storm scenarios (1.2–1.4× frequency per IPCC RCP 4.5/8.5). SMHI (Swedish Meteorological and Hydrological Institute) seasonal forecasts provide 3–4 month ahead guidance. Real-time storm tracking via SMHI API. Underground cable investment accelerates for critical west-coast lines.</td></tr>
+
+<tr><td class="mono">RISK-05</td><td><strong>Kiruna mine subsidence impact on local grid infrastructure</strong></td><td><span class="tag tag-risk">MEDIUM</span></td><td>Kiruna iron ore mining (LKAB operator) causes predictable ground subsidence (~1 cm/year, <100 km² affected area). Subsidence can shift substation foundations, stretch transmission line segments, and damage localized infrastructure. Slow but cumulative. LKAB has relocation programs for affected towns; grid infrastructure also vulnerable. Risk is manageable but requires monitoring.</td><td>Establish coordination with LKAB on subsidence forecasts. Map affected substation/transmission segments in Kiruna region explicitly. Monitor ground deformation via SAR interferometry (Copernicus Sentinel-1). Maintain structural monitoring programs for affected substations. Expected subsidence <10 cm/decade in grid zone; engineering can accommodate. Preventive maintenance budget allocation recommended.</td></tr>
+
+<tr><td class="mono">RISK-06</td><td><strong>Offshore wind integration bottleneck (30 GW planned)</strong></td><td><span class="tag tag-risk">MEDIUM</span></td><td>Sweden has ~30 GW offshore wind capacity planned/in development (largest in Nordic region). Bothnian Bay (north), Bornholm Basin (southeast), North Sea expansion will concentrate generation at grid edges. 4 bidding zones create internal transmission constraints. Rapid offshore growth (2025–2030) requires grid reinforcement to avoid congestion. Integration risk higher than conventional renewable sources.</td><td>Integrate SVEKA (Swedish Wind Energy Association) forecasts on offshore development timeline. Model transmission constraints under 30 GW offshore scenario (2030 projection). Engage Svenska kraftnät on HVDC corridor expansion planning. Higher operational risk premium for offshore-adjacent substations (SE1/SE4 boundary zones). Prioritize HVDC technology deployment.</td></tr>
+
+<tr><td class="mono">RISK-07</td><td><strong>Nuclear decommissioning timeline uncertainty</strong></td><td><span class="tag tag-risk">LOW</span></td><td>Sweden's nuclear phaseout (planned 2010) was extended; current trajectory uncertain (political debate). Forsmark, Ringhals, Oskarshamn have extended operation plans to 2040s+. Long-term decommissioning creates 10–20 year grid reconfiguration window. Political risk (government changes affect energy policy). Timeline is highly uncertain compared to Finland's fixed schedules.</td><td>Monitor Swedish government energy policy + Vattenfall/EON/Uniper annual reports quarterly. Model 3 scenarios: (1) Extended operation to 2040s+, (2) Accelerated phaseout (2030s, political pressure), (3) New SMR construction (policy wild card). Flag in long-term planning intelligence. Higher political risk compared to Finland.</td></tr>
+
+<tr><td class="mono">RISK-08</td><td><strong>HVDC technology heritage and ABB dependency</strong></td><td><span class="tag tag-risk">LOW</span></td><td>Sweden (ABB headquarters in Västerås, HVDC technology pioneer) has HVDC-heavy grid architecture. 14+ major HVDC interconnections + future offshore wind HVDC corridors. Supply chain concentrated on ABB and Siemens. Technology risk is low (proven, mature) but vendor concentration could create operational bottlenecks if ABB faces supply constraints.</td><td>Monitor ABB/Siemens production capacity quarterly. Maintain strategic spare parts inventory for HVDC converters. Diversify future HVDC procurement (introduce 3rd vendor if possible). Sweden's HVDC expertise is global advantage; maintain it. Low immediate risk but supply chain monitoring recommended for 2026+.</td></tr>
+</tbody>
+</table>
+
+<h2>Session 0 — Sweden-Specific Lessons (8 entries)</h2>
+
+<div class="learning-card">
+<h4>Lesson SE-1: Winter Storms and Atlantic Exposure Replace Flooding as Primary Hazard</h4>
+<p>In Germany/France, seismic or flooding dominates. In Poland, river flooding (Vistula, Oder) is #1. In Sweden, winter storms are the primary environmental threat, particularly Atlantic storms affecting the west coast. Winter storms combine extreme winds (>25 m/s), heavy wet snow (ice loading), coastal surge, and deep cold. The 2023 and 2024 late-season storms caused cascading overhead line failures across western Västra Götaland. Hazard weights completely reorganized: κ_storm = 0.35 (same magnitude as Poland's κ_flood), while κ_flood = 0.15 (excellent dam management on major rivers, snowmelt controlled). Seismic α = 0.10 (negligible).</p>
+<p class="impact">Apply: Storm risk dominates all scenario modelling. Overhead line segments in western coast regions (Gothenburg, Bohuslän) require detailed wind/snow load analysis. Northern Lapland (Norrbotten) also vulnerable to Arctic winter storms. Climate-enhanced storm scenarios (1.2–1.4× frequency) essential for 2030+ projections. SMHI seasonal forecasts provide quarterly risk updates. Underground cable investment priorities focus on storm-vulnerable west-coast lines.</p>
+</div>
+
+<div class="learning-card">
+<h4>Lesson SE-2: Arctic Cold is Protective; Extreme Latitude Range Creates Gradient</h4>
+<p>Standard CIGRÉ equipment aging models assume temperate climates. Sweden's extreme latitude range (55°N southern Skåne to 69°N Kiruna, ~15°C annual mean temperature gradient) creates unique preservation effect in north. Extreme cold (-25°C Norrbotten winters) SLOWS thermal aging, extending equipment lifespan. This is counter-intuitive and invisible in standard models. Equipment degradation rates are lower in Norrbotten than in central Sweden or Germany. κ_thermal ranges from 0.85 (Norrbotten, slowest aging) to 1.02 (Skåne, closest to temperate baseline). This means transformer oil oxidation, insulation paper hydrolysis, and other thermal-driven failure modes progress ~15% slower in Arctic Norrbotten than in temperate zones. This unique benefit is lost if equipment is moved or if warming crosses a threshold.</p>
+<p class="impact">Apply: Use κ_thermal [0.85–1.02] as Arctic cold preservation modifier, spanning full Swedish latitude range. Expect longer fleet lifespans in Norrbotten (counterintuitively positive). Monitor climate warming — if Arctic temperatures rise >2°C by 2050, this advantage erodes. Commission Arctic-specific aging research to validate CIGRÉ deviations. Accept higher confidence in Norrbotten longevity estimates vs temperate-based models. Create regional κ_thermal schedule: Norrbotten 0.85, Västerbotten 0.90, Dalarna 0.95, Central 0.98, Skåne 1.02.</p>
+</div>
+
+<div class="learning-card">
+<h4>Lesson SE-3: Nuclear Baseload Creates Dispersed Concentration Risk (6.4 GW across 3 Sites)</h4>
+<p>Sweden's grid is dependent on 3 nuclear plants: Forsmark (3.2 GW, 3 reactors, Vattenfall, Uppland), Ringhals (1.7 GW, 2 reactors, Vattenfall/Uniper, Västra Götaland), Oskarshamn (1.5 GW, 1 reactor, EON/Uniper, Södermanland). Total 6.4 GW = ~30% of Swedish electricity generation. Geographic dispersion (3 distinct regions) is better than Finland's 2-site concentration, but still represents significant load clustering. Substations within 10 km of each plant carry exceptional load concentration. Post-Fukushima regulatory environment adds premium to nuclear-adjacent infrastructure. Decommissioning timelines are uncertain (political debate ongoing, no fixed sunset dates like Finland). Current trajectory: extended operation to 2040s+.</p>
+<p class="impact">Apply: Flag nuclear-adjacent substations (T_nuclear=1.10 modifier) at Forsmark, Ringhals, Oskarshamn zones. Maintain contingency routing for ~6 GW load shedding if major nuclear outage occurs. Model long-term decommissioning scenarios (uncertain 10–20 year windows). Monitor Swedish government/Vattenfall/EON policy changes quarterly (higher political risk than Finland). Post-decommissioning, grid topology optimization will be required. Higher operational risk premium justified, but lower than Finland due to 3-site geographic dispersion.</p>
+</div>
+
+<div class="learning-card">
+<h4>Lesson SE-4: 170-DSO Fragmentation is Extreme; Best-in-Class Organization Needed</h4>
+<p>Germany has ~870 DNOs across a larger grid. Poland has 5 major DSOs (centralized). Sweden has ~170 DNOs for a large grid — the WORST fragmentation in Nordic region, worse than Finland's 80 DNOs. Most Swedish municipalities operate 1–2 DSOs, often with legacy IT systems and incompatible data formats. However, Swedish DSOs are better organized than Finnish DNOs via EnergiBranchföreningen (industry association with standardization efforts). No unified data standard exists (unlike BDEW in Germany), but Swedish industry is more coordinated. This fragmentation is a data integration challenge: neither fully centralized (Poland) nor chaotically distributed (early-stage), but organizationally progressive (Sweden).</p>
+<p class="impact">Apply: Build DSO-specific ingestion pipelines for largest 15–20 operators (likely covering ~75% of fleet). Smaller DSOs fall back to OSM + satellite data + Svenska kraftnät aggregate statistics. Identify data champions within largest DSOs early (formal partnership agreements, leverage EnergiBranchföreningen). Implement API standardization requests via EDSO, using Swedish industry as test case. Expect faster standardization success in Sweden vs Finland due to better industry coordination. Accept lower granularity in small-DSO territories (regional-level confidence vs substation-level).</p>
+</div>
+
+<div class="learning-card">
+<h4>Lesson SE-5: Register-Based Census is Best Practice Globally (No Gaps)</h4>
+<p>Unlike traditional census (5–10 year cycles, gaps), Sweden uses comprehensive register-based population data via SCB (Statistiska centralbyrån) updated continuously by municipalities. Every resident has unique ID linked to address, employment, education, income. SCB publishes annual official population counts with zero inter-census gaps. This is BEST-IN-CLASS globally — similar to Finland, better than Germany (traditional 2022 Zensus), Poland (traditional 2021 Census). Sweden's register-based approach is increasingly adopted as gold standard. Register data is more accurate than traditional census (no undercount, no recall bias), updated continuously, and published freely within weeks of calendar year end.</p>
+<p class="impact">Apply: Use SCB annual population counts as highest-confidence baseline. Sub-regional (Län/Kommun) data available within weeks of calendar year end. No need to interpolate between census cycles. Combine with income/employment registers for precise energy poverty assessment (Sweden has ~2% energy poverty, lowest in EU). This is unique advantage vs other SSI countries — use it for higher-confidence socio-economic projections. No multi-year lag like Australia or USA.</p>
+</div>
+
+<div class="learning-card">
+<h4>Lesson SE-6: SMHI Open Data is World-Class Arctic Expertise with Seasonal Forecasting</h4>
+<p>Swedish Meteorological and Hydrological Institute (SMHI) provides free, machine-readable meteorological data with APIs for temperature, precipitation, wind, ice/snow cover, storm tracking, seasonal forecasts. ~200 weather stations + satellite integration + Arctic specialization gives excellent Nordic coverage. SMHI's ice/snow models are specifically designed for Scandinavian conditions. Flood forecasting via SMHI is tied to snowmelt season (March–May) and provides 7–14 day lead time. Storm tracking API integrates satellite + model data for real-time wind field analysis. SMHI seasonal outlook (3–4 month lead time) is superior to non-Arctic countries and comparable to German DWD with Arctic specialization.</p>
+<p class="impact">Apply: Implement automated SMHI API ingestion for real-time storm tracking + seasonal forecasts. SMHI seasonal outlook (3–4 month lead time) feeds into scenario confidence adjustments. SMHI ice/snow indices updated daily — use for κ_winter calibration adjustments. Storm damage forecasting via SMHI wind field + line fragility model. This is premium data source — prioritize SMHI integration over generic ECMWF. Leverage SMHI's seasonal forecasting superiority for strategic planning.</p>
+</div>
+
+<div class="learning-card">
+<h4>Lesson SE-7: 4 Bidding Zones Create North-South Bottleneck; HVDC Hub Architecture Critical</h4>
+<p>Sweden's deregulated electricity market divides the grid into 4 bidding zones (SE1: South, SE2: East/Stockholm, SE3: Central/West, SE4: North/Norrbotten). This creates internal price differentials and a critical north-south transmission bottleneck: the world's longest north-south grid (1,600 km) connecting hydropower-rich north to demand-heavy south. Offshore wind expansion (30 GW planned) will concentrate generation at zone edges, exacerbating bottlenecks. Nord Pool market prices reflect zone constraints; real-time prices can diverge by 50%+ between zones during congestion. Grid topology optimization is critical. Substations at zone boundary nodes (SE3–SE4 connection, Stockholm hub) experience exceptional operational stress.</p>
+<p class="impact">Apply: Model transmission constraints explicitly under 30 GW offshore scenario (2030). Real-time Nord Pool prices provide 3–4 month ahead forecasts for congestion risk. Higher operational risk premium for zone boundary substations (SE3–SE4, Stockholm). Engage Svenska kraftnät on long-term HVDC corridor planning. Sweden's HVDC heritage (ABB technology pioneer) is asset — leverage it for corridor expansion. Monitor zone prices quarterly to detect emerging bottlenecks.</p>
+</div>
+
+<div class="learning-card">
+<h4>Lesson SE-8: Hydropower Dominance (40%) and Cross-Border Dependency Create Nordic Balancing System</h4>
+<p>Sweden's electricity system is fundamentally different from Poland/Germany: hydropower dominance (~40%, vs Germany's <5%) creates unique grid dynamics. 1,000+ dams provide reservoir storage and flexible generation. However, this creates dependency on Nordic balancing via 14+ cross-border interconnections (Norway, Finland, Denmark, Germany, Poland, Lithuania). Swedish grid acts as European electricity hub — bidirectional flows common. Drought in Norway or variation in Finnish nuclear availability immediately affects Swedish prices. This is UNIQUE SYSTEMIC RISK: Sweden's grid is tightly coupled to Nordic system (more than German coupling to France). Grid planning must account for Nordic coordination, not just national optimization. Offshore wind integration requires careful Nordic coordination.</p>
+<p class="impact">Apply: Model Nordic balancing scenarios explicitly. Assume water year variability in Norwegian/Swedish hydro (year-to-year ±20% generation variation). Monitor Norwegian reservoir levels (weekly, via Norwegian Meteorological Institute) as early-warning indicator for Swedish grid stress. Engage with Nord Pool on interconnection constraint forecasting. Higher operational complexity than continental systems (like Poland/Germany) due to Nordic coupling. Recognize Sweden's hub role — grid resilience depends on Nordic system health, not just national factors. Cross-border risk premium justified.</p>
+</div>
+
+<h2>Session 0 — Risk Register & Mitigation</h2>
+
+<table>
+<thead><tr><th>ID</th><th>Risk / Question</th><th>Severity</th><th>Status</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td class="mono">R1</td><td><strong>Fleet size uncertainty:</strong> <strong style="color:#5d8563">PLANNING PHASE.</strong> Estimated fleet: 5,000–6,000 substations across 21 Län and 290 Kommuner. OSM extraction methodology: nodes + ways + relations via Overpass API with area query <code>area["ISO3166-1"="SE"]</code>. Expected spatial deduplication at 50m radius. Preliminary mapping shows Svenska kraftnät transmission + ~170 DSO distribution substations. Final fleet deployment targeted Q2 2026 (post-data partnership formalization).</td><td><span class="tag tag-risk">PLANNING</span></td><td>In Progress</td><td>OSM Overpass API extraction with full power network query. Grid-based spatial deduplication (0.005° cell, 50m radius). Coordinate extraction via <code>element["center"]</code> for ways/relations. 21 Län assigned via nearest-centroid. Prioritize partnerships with top 15–20 DSOs (75% fleet coverage). Smaller DSOs use OSM + Copernicus satellite fallback. Target March–June 2026 for data integration completion.</td></tr>
+
+<tr><td class="mono">R2</td><td><strong>Substation vintage scarcity:</strong> Individual substation commissioning years not published by Svenska kraftnät or most DSOs. OSM start_date tag coverage unknown for Sweden (estimated 5–15% vs 10–20% Finland, 30–35% Poland). Vintage estimation will rely heavily on cohort-based assignment.</td><td><span class="tag tag-risk">HIGH</span></td><td>Open</td><td>Use OSM metadata where available. Fall back to cohort-based assignment: (1) Pre-1970 (rare, rare SIC expansion), (2) 1970–1990 (nuclear era), (3) 1990–2010 (EU integration modernization), (4) 2010+ (renewable integration). Wider σ_age for pre-1980 assets (±20 years). Arctic aging curves from SE-2 lesson apply. Partner with DSOs to improve vintage data in secondary phase (2027+).</td></tr>
+
+<tr><td class="mono">R3</td><td><strong>Winter storm intensity modeling:</strong> No historical baseline for 2023–2024 storm frequency. Standard models underestimate Atlantic storm extremes. Storm damage correlation to grid failure incomplete. West-coast (Gothenburg) infrastructure particularly vulnerable but under-documented.</td><td><span class="tag tag-risk">HIGH</span></td><td>Open</td><td>Commission SMHI-based storm damage model. Integrate 2023–2024 storm events + line failure databases from Svenska kraftnät + DSO partners. Establish overhead line fragility curves per region (west coast higher than interior). Validate κ_winter [1.0–1.35] modifier against observed damage patterns 2025+. Climate-enhanced scenarios (1.2–1.4×) provisional pending validation. West-coast undergrounding investment program monitoring.</td></tr>
+
+<tr><td class="mono">R4</td><td><strong>DNO data fragmentation:</strong> 170 operators with zero unified data standardization. Largest 10–15 DSOs likely cover 70–75% of grid; remainder are small, scattered, or undocumented.</td><td><span class="tag tag-risk">HIGH</span></td><td>Open</td><td>Prioritize formal partnerships with Vattenfall Eldistribution, Ellevio, E.ON Energidistribution, Skellefteå Kraft, Jämtkraft, Tekniska Verken, Öresundskraft (7 majors = ~60% market). Secondary tier: 8–12 mid-size DSOs. Smaller DSOs (<1% market) use OSM + Svenska kraftnät aggregate data. Build DSO-specific API pipelines. Leverage EnergiBranchföreningen for standardization acceleration. Implement quarterly data quality audits. Expected phased integration Q2–Q4 2026.</td></tr>
+
+<tr><td class="mono">R5</td><td><strong>Arctic equipment aging validation:</strong> κ_thermal [0.85–1.02] protective effect is theoretical. No long-term field studies available comparing Arctic (Norrbotten) vs temperate (Skåne) equipment lifespans.</td><td><span class="tag tag-risk">MEDIUM</span></td><td>Open</td><td>Commission research with Swedish utilities (Vattenfall, E.ON, Ellevio) to compare transformer longevity in Norrbotten vs Central Europe. CIGRÉ aging curve deviations need empirical support. Interim: use κ_thermal as provisional modifier but flag uncertainty. Monitor Norrbotten asset lifespans 2026+ and iterate. Accept higher σ for Norrbotten assets until validation complete. Target validation 2027+.</td></tr>
+
+<tr><td class="mono">R6</td><td><strong>Kiruna mine subsidence impact modeling:</strong> LKAB (Swedish state mining company) operates world's largest iron ore mine in Kiruna. Subsidence ~1 cm/year, <100 km² area affected. Grid infrastructure in Kiruna zone vulnerable but scale uncertain. Relocation programs for towns underway; grid infrastructure considerations secondary.</td><td><span class="tag tag-risk">MEDIUM</span></td><td>Open</td><td>Establish coordination with LKAB on subsidence forecasts + relocation programs. Map affected substation/transmission segments in Kiruna region explicitly. Monitor ground deformation via SAR interferometry (Copernicus Sentinel-1). Expected subsidence <10 cm/decade in grid zone; engineering can accommodate. Preventive maintenance budget allocation recommended. Low immediate risk but unique hazard requiring specialized monitoring.</td></tr>
+
+<tr><td class="mono">R7</td><td><strong>Offshore wind integration bottleneck (30 GW planned):</strong> Sweden's largest renewable expansion project. Bothnian Bay (north), Bornholm Basin (southeast), North Sea corridors will concentrate generation at grid edges. 4 bidding zones create internal constraints. Rapid growth (2025–2030) requires grid reinforcement to avoid bottleneck cascades.</td><td><span class="tag tag-risk">MEDIUM</span></td><td>Open</td><td>Integrate SVEKA (Swedish Wind Energy Association) development forecasts + project timelines. Model transmission constraints under 30 GW offshore scenario (2030 projection). Engage Svenska kraftnät on HVDC corridor expansion planning. Higher operational risk premium for offshore-adjacent substations (SE1/SE4 boundary zones). Monitor grid congestion via Nord Pool real-time prices quarterly. Expected 2028+ pressure escalation as projects come online.</td></tr>
+
+<tr><td class="mono">R8</td><td><strong>Nuclear decommissioning timeline uncertainty:</strong> Sweden's nuclear phaseout (planned 2010) was extended; current trajectory highly uncertain (government-dependent). Forsmark, Ringhals, Oskarshamn all have extended operation plans, but political risk is high. No fixed sunset dates like Finland. Long-term decommissioning creates 10–20 year grid reconfiguration window.</td><td><span class="tag tag-risk">MEDIUM</span></td><td>Open</td><td>Monitor Swedish government energy policy + Vattenfall/EON/Uniper annual reports quarterly (higher political volatility than Finland). Model 3 scenarios: (1) Extended operation to 2040s+ (baseline), (2) Accelerated phaseout (2030s, political pressure), (3) New SMR construction (policy wild card, long-term). Flag in long-term planning intelligence. Engage Swedish government stakeholders on decommissioning roadmap. Higher political risk compared to Finland — requires continuous monitoring.</td></tr>
+</tbody>
+</table>
+
+<h2>Session 0 — Target Metrics (for Dashboard Deployment)</h2>
+
+<table>
+<thead><tr><th>Metric</th><th>Target Value</th><th>Rationale</th></tr></thead>
+<tbody>
+<tr><td><strong>Total substations</strong></td><td><strong style="color:#5d8563">TBD/Planning (~5,000–6,000 estimated)</strong>. Extract from OSM (nodes + ways + relations), deduplicate at 50m radius. Expected coverage: Fingrid transmission + ~170 DSO distribution substations. Spatial deduplication expected to reduce raw OSM counts by 10–15%. 21 Län assigned via nearest-centroid. Fleet deployment Q2–Q3 2026 post-data integration.</td><td>OSM Overpass API extraction expected to exceed initial estimates (as Finland did: 4,137 raw → 4,022 final). Wider Sweden = larger expected fleet. Spatial deduplication methodology proven in Finland. Band distribution TBD pending full extraction. Expected median R = 0.340–0.350 based on modern Swedish grid + renewable integration profile.</td></tr>
+
+<tr><td><strong>Regions modelled</strong></td><td>21 Län (all Sweden) + cross-border zones (Norway, Finland, Denmark, Germany, Poland, Lithuania connections). Detailed to Kommun (~290 municipalities) for consequence mapping.</td><td>All 21 regional counties included. Cross-border interconnection zones mapped (Sweden is Nordic/European hub). Finer granularity than Poland (gmina-level detail). Gotland island grid mapped separately (submarine cable dependency).</td></tr>
+
+<tr><td><strong>Grid coverage</strong></td><td>~100% Svenska kraftnät transmission. ~70–80% DSO distribution (phased, pending data partnerships).</td><td>Svenska kraftnät topology fully mapped (centralized authority). DSO distribution requires phased ingestion. Start with willing partners (60–75%), iterate with holdouts (OSM fallback). Expect 80%+ coverage by Q4 2026.</td></tr>
+
+<tr><td><strong>Transmission line km</strong></td><td>~46,000 km (Svenska kraftnät 400 kV + 220 kV + 110 kV backbone)</td><td>Svenska kraftnät publishes network topology. All voltage classes included. DSO distribution lines separate (additional 60,000+ km at lower voltages). Sweden's north-south grid (1,600 km) is world's longest.</td></tr>
+
+<tr><td><strong>Data freshness</strong></td><td><strong style="color:#5d8563">Dashboard PLANNING</strong> (target deployment Q2–Q3 2026). All 7 pages planned: Overview, Map Explorer, Regional, Methodology, Data & Download, Intelligence Report, ESG Report. Power line segments mapping in progress (~14,000–18,000 km transmission expected).</td><td>Target deployment to GitHub Pages (ikengassiindex.github.io/sweden) Q2 2026. Estimated 2,000 MC iterations per substation (~10–12M total, vectorized NumPy). ESG report will render Component Fingerprint, Markov Degradation, 6-dimension ESG Radar. Intelligence report will include 30+ source registry, fleet snapshot, changelog.</td></tr>
+
+<tr><td><strong>Currency</strong></td><td>SEK (Swedish Krona)</td><td>All financial metrics (VoLL, CAPEX, income) denominated in SEK. Sweden retained SEK (not EUR). Exchange rate: ~SEK 10.5 = USD 1.0 (2026 estimate). SubstationID prefix SE_.</td></tr>
+
+<tr><td><strong>Seismic zones</strong></td><td>2 zones (stable interior + Arctic-northern postglacial rebound/Kiruna subsidence)</td><td>Zone 1: <0.01g (interior stable, ~97% of substations). Zone 2: 0.01–0.02g PGA-equivalent (Norrbotten postglacial rebound + Kiruna mine subsidence, ~3% of substations). Kiruna subsidence is slow, predictable mechanical phenomenon (not seismic), but treated as PGA-equivalent for risk model.</td></tr>
+
+<tr><td><strong>Storm hazard zones</strong></td><td>3 zones (South/Central/Lapland κ_winter [1.0–1.20–1.35])</td><td>South (Skåne/Gothenburg, κ=1.0): Temperate baseline + Atlantic storm exposure. Central (Värmland/Dalarna, κ=1.20): Moderate winter storm + cold. Lapland (Norrbotten/Västerbotten, κ=1.35): Extreme winter storm + Arctic cold. Winter storms are primary hazard; zones reflect geographic exposure hierarchy. West coast (Gothenburg) at elevated risk due to Atlantic exposure.</td></tr>
+
+<tr><td><strong>Critical band substations</strong></td><td><strong style="color:#5d8563">TBD (Planning estimate: ~150–250 High, 0 Critical)</strong>. Expected 2–4% of fleet in High band. No substations expected to reach Critical threshold (≥0.75) due to Sweden's modern infrastructure + strong regulatory regime. Higher confidence (CI/R < 0.50) expected for ~70% of fleet.</td><td>Projection based on Finland results (0.6% High, 0% Critical) adjusted upward for Sweden's larger offshore wind integration pressure (expected higher storm + bottleneck risk). Preliminary analysis suggests Sweden's fleet slightly riskier than Finland's due to 4 bidding zones + 30 GW offshore wind integration. Final metrics Q3 2026 post-deployment.</td></tr>
+</tbody>
+</table>
+
+<h2>Session 0 — Key Data Sources & Partners</h2>
+
+<table>
+<thead><tr><th>Data Category</th><th>Primary Source</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><strong>Transmission Topology (Svenska kraftnät)</strong></td><td>Svenska kraftnät (public TSO)</td><td>Planned</td><td>Master facility list, substation locations, line topology available via formal data request. Svenska kraftnät transparency is high (EU requirements). ~200–250 transmission substations documented. Data partnership in progress (Q1–Q2 2026).</td></tr>
+
+<tr><td><strong>Distribution Network (DSOs)</strong></td><td>~170 DSOs (fragmented)</td><td>In Progress</td><td>Formal partnerships planned with top 10–15 DSOs (Vattenfall Distribution, Ellevio, Caruna, Fortum Distribution, Skellefteå Kraft, others). Secondary tier 5–10 mid-size operators. Small operators use OSM fallback. No unified data format; EnergiBranchföreningen leading standardization efforts.</td></tr>
+
+<tr><td><strong>Meteorology & Storms (SMHI)</strong></td><td>Swedish Meteorological and Hydrological Institute (SMHI, opendata.smhi.se)</td><td>Planned</td><td>Free API access. ~200 weather stations. Storm tracking, seasonal forecasts, ice/snow indices, river flood modeling. Arctic specialization superior to generic ECMWF. Real-time + archival data. Data partnership in progress (Q1 2026).</td></tr>
+
+<tr><td><strong>Population & Census (SCB)</strong></td><td>Statistics Sweden (Statistiska centralbyrån, SCB)</td><td>Available</td><td>Register-based annual updates (continuous via municipalities). No gaps between cycles. Kommun-level detail. Highest quality population data available. Income/employment registers available. SCB opendata.scb.se provides machine-readable access.</td></tr>
+
+<tr><td><strong>Renewable Generation (Svenska kraftnät + Nord Pool)</strong></td><td>Svenska kraftnät (real-time) + Nord Pool Spot (wholesale market)</td><td>Available</td><td>Real-time generation mix published. ~70% RE penetration (hydro 40% + wind 20% + biomass 10% + solar 1% growing). Nuclear 30% baseload. Fossil 0% planned (phase-out). Nord Pool prices (SE1–SE4 zones) available in real-time.</td></tr>
+
+<tr><td><strong>Infrastructure Assets (OSM)</strong></td><td>OpenStreetMap (global database)</td><td>Partial (~5–15%)</td><td>Swedish coverage sparse compared to Germany/Poland. Start_date tags available for ~5–15% of substations (lower than Finland). Use for validation + fallback for small DSO territories. Will improve as project raises community contribution.</td></tr>
+
+<tr><td><strong>Satellite Data (Copernicus)</strong></td><td>Copernicus / ESA (Sentinel-1, Sentinel-2)</td><td>Available</td><td>Free access via DIAS. Terrain mapping (Sentinel-1 SAR) + infrastructure detection (Sentinel-2 optical). Used for Kiruna + northern Lapland + small DSO data gaps. Arctic coverage excellent.</td></tr>
+
+<tr><td><strong>Nuclear Plants (Vattenfall, EON, Uniper)</strong></td><td>Vattenfall (Forsmark, Ringhals) + EON/Uniper (Oskarshamn) operators</td><td>Public + Planned Request</td><td>Plant locations, capacity, operational status published. Decommissioning timelines uncertain (political, subject to government policy). Annual reports + Swedish government energy policy statements required for monitoring. Proximity-based T_nuclear modifier [1.0–1.10].</td></tr>
+
+<tr><td><strong>Mine Subsidence Data (LKAB)</strong></td><td>LKAB (Swedish state mining company, Kiruna operations)</td></td><td>In Progress</td><td>Subsidence forecasts, relocation programs, ground deformation data. Unique hazard requiring coordination. Expected ~1 cm/year subsidence in Kiruna zone. Copernicus SAR monitoring provides independent verification.</td></tr>
+</tbody>
+</table>
+
+<h2>Session 0 — Pre-Deployment Status</h2>
+
+<div class="learning-card">
+<h4>Status: Planning & Contextualisation (Session 0) — Data Integration Phase</h4>
+<p>This Learning File documents Session 0 — the planning and contextualisation phase for Sweden's SSI v4.0.2 deployment. Fleet size is TBD (~5,000–6,000 estimated substations) pending completion of data partnerships with Svenska kraftnät and major DSOs. OSM extraction methodology is proven (replicated from Finland); spatial deduplication at 50m radius is standard. No post-deployment lessons yet — this is pre-ingestion baseline calibration.</p>
+<p class="impact">Target Deployment: Q2–Q3 2026. Expected fleet scoring: 2,000+ MC iterations per substation (10–12M total). Dashboard deployment to GitHub Pages with 7-page interface (Overview, Map Explorer, Regional, Methodology, Data & Download, Intelligence Report, ESG Report). Fleet median R estimated 0.340–0.350 based on modern infrastructure + renewable integration + storm hazards. Higher risk band projection (~150–250 High substations) vs Finland due to offshore wind integration pressure and 4 bidding zone bottleneck complexity.</p>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0;">
+<p style="text-align:center;font-size:0.72rem;color:var(--muted);">
+<strong>SSI v4.0.2</strong> &mdash; Learning File (Sweden) &middot; Session 0 (Planning & Contextualisation) &middot; Ikenga Project &middot; 2026-03-27<br>
+25 calibration decisions &middot; 8 key risks &middot; 8 Sweden-specific lessons &middot; Fleet TBD (~5,000–6,000 estimated) &middot; Deployment Q2–Q3 2026
+</p>
+
+</div>
+</body>
+</html>

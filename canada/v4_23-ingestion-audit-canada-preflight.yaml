@@ -1,0 +1,378 @@
+# SSI Index v4.23 workstream — Canada ingestion pre-flight audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter (auditable-state-
+# transition discipline).  This file records the empirical source-discovery pass that
+# precedes any L1 connector code, so the operator + any LP-DD reviewer can reconstruct
+# WHY the Canada v4.23 workstream is routed through the source stack chosen below.
+#
+# Cross-references:
+#   - v4.23 gap-audit                    → Report Production/02-v4_23-gap-audit-2026-07/v4_23-gap-audit.md
+#   - Discipline #36 (cross-border gate) → CLAUDE.md
+#   - Discipline #41 (substation-line coupling) → CLAUDE.md + REPORTS_FRAMING_KB §8bis
+#   - Operator directive 25 June 2026    → "all must be auditable and if we add substations
+#                                          we add connecting power lines"
+#
+# Section 5ter contract fields:
+#   (a) source citation with URL + retrieval date UTC
+#   (b) SHA-256 audit anchor on a small live-fetched sample
+#   (c) rationale for empirical scope-shift vs the gap-audit's initial assumption
+#   (d) commit-hash + CI job placeholders for the eventual L1 connector merge
+#   (e) engineering-effort re-estimate given the empirical source stack
+
+schema_version: "v4_23-ingestion-audit-preflight-2"
+country_slug: canada          # per intelligence/countries.json KB §57
+discovery_date_utc: "2026-07-12"
+last_revised_utc: "2026-07-12"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 0. Revision log (schema v2 correction)
+# ─────────────────────────────────────────────────────────────────────────────
+revision_log:
+  - v1_2026_07_12:
+      finding: CanVec ManMade theme named as C-1 federal canonical for substation ingestion
+      status: superseded_by_v2
+  - v2_2026_07_12:
+      finding: |
+        EMPIRICAL — CanVec 50K ManMade FGDB inspection (Yukon file, SHA-256
+        6beacf9e1aa0427d7ea833310fad41878d2fd87554f9ea2eb7d40a15ee2aba22)
+        contains ZERO electricity-infrastructure feature classes.  The ManMade
+        theme's official Feature Catalogue lists "Electric Power Station"
+        (feature 606) but the definition = "A building where electricity is
+        generated" (i.e. GENERATION plants, not substations).  No transformer_station,
+        no power_line in the ManMade theme.
+      resolution: |
+        Electricity infrastructure lives in the CanVec **Res_MGT** (Resource
+        Management) theme.  Empirically verified via canvec_50K_CA_Res_MGT_fgdb.zip
+        (SHA-256 e337056b6eb000d4ca21c43b9548047971ca419b9a0bae5899acee2dd7f4a945)
+        which contains transformer_station_0 (Point, 2762 features nationally),
+        transformer_station_2 (MultiPolygon, 1776 features nationally), and
+        power_line_1 (MultiLineString, 13009 features nationally).
+      federal_baseline_locked:
+        substations_national: 4538   # 2762 point + 1776 polygon
+        transmission_lines_national: 13009
+        communication_lines_national: 137
+        vintage_epsg: EPSG:4617   # NAD83 CSRS
+        vintage_date: 2017-12-15 (product publication)
+      schema_correction: |
+        Sources CA-C1 (federal canonical) now points to Res_MGT theme, not ManMade.
+        Provincial coverage matrix rewritten with correct Res_MGT filenames.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Empirical scope-shift vs gap-audit
+# ─────────────────────────────────────────────────────────────────────────────
+scope_shift_from_gap_audit:
+  gap_audit_assumption: |
+    The v4.23 gap-audit named "NRCan Atlas of Canada electricity infrastructure layer"
+    as the C-1 federal-canonical substation source.  Engineering budget was sized at
+    25-32 engineer-days for the Canada workstream under that assumption.
+  empirical_finding_2026_07_12: |
+    The modern federal Atlas of Canada (National Atlas of Canada, Editions 3-5 series)
+    returns HISTORICAL RASTER MAPS ONLY (JPG + PDF, 1957-1995 vintage).  It is NOT a
+    machine-readable vector dataset and cannot serve automated ingestion.  Twelve
+    open.canada.ca CKAN queries confirmed this — every "Electricity Generation and
+    Transmission" hit under NRCan authorship was a raster.  The gap-audit's C-1
+    assumption is empirically refuted.
+  resolved_source_architecture: |
+    Canada substation ingestion routes through a two-layer federated stack:
+      · Federal layer   — CanVec 1:50,000 ManMade theme (feature class Electric_Facility)
+                          published by NRCan, per-province + Canada-wide FGDB + SHP.
+                          Discipline #41 line coupling from CanVec ManMade line features.
+      · Strategic layer — NACEI ArcGIS REST MapServer, Layer 1 (Electric Transmission Line),
+                          continental scale (Canada = 28 features), used for cross-check
+                          of the CanVec extraction against a NRCan-published continent-view.
+      · Provincial suppl.— Yukon Energy Corporation (ArcGIS REST, 21 subs, voltage fields);
+                          Nova Scotia NSTDB Utilities Point + Line + Poly (GeoJSON native,
+                          FEAT_CODE-filterable); BC Transmission Lines (KML + WMS, lines only,
+                          voltage suppressed per BC Hydro publication agreement).
+    Provincial datasets serve as (a) cross-validation of CanVec extractions for
+    heavily-substation-populated provinces and (b) primary source for Yukon Territory
+    where CanVec 50K coverage of remote infrastructure may be sparse.
+  engineering_budget_re_estimate:
+    original_days: 25-32
+    revised_days: 32-42
+    delta_rationale: |
+      Federated-across-N-sources architecture adds ~1 engineer-day per supplementary
+      provincial source for schema-normalisation + Discipline #41 line-coupling
+      cross-validation.  Voltage-field enrichment logic (CanVec has voltage where
+      populated, NACEI has Voltage_kV, YEC has INCOMING/OUTGOING_CAPACITY_V, BC has
+      voltage suppressed, NS may lack) adds ~3 engineer-days for the union-schema pass.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Source table — empirically validated 2026-07-12
+# ─────────────────────────────────────────────────────────────────────────────
+sources:
+
+  # ── Federal canonical: CanVec Res_MGT (Resource Management theme) ────────
+  # SUPERSEDES v1 CA-C1 assumption of ManMade theme (see revision_log v1→v2)
+  - source_id: CA-C1-canvec-resmgt
+    tier: federal-canonical-primary
+    role: substation node registry + power-line edge registry (Discipline #41 coupling)
+    publisher: Natural Resources Canada (NRCan) — Earth Sciences Sector
+    dataset_title: CanVec 1:50,000 Resource Management theme — Canada-wide
+    canonical_url: https://ftp.maps.canada.ca/pub/nrcan_rncan/vector/canvec/fgdb/Res_MGT/canvec_50K_CA_Res_MGT_fgdb.zip
+    alt_shapefile_url: https://ftp.maps.canada.ca/pub/nrcan_rncan/vector/canvec/shp/Res_MGT/canvec_50K_CA_Res_MGT_shp.zip
+    format: FGDB (primary, 10.54 MB) | shapefile (alt)
+    licence: Open Government Licence - Canada (OGL-CA)
+    licence_url: https://open.canada.ca/en/open-government-licence-canada
+    reference_system: EPSG:4617 (NAD83 CSRS)
+    publication_date: 2017-12-15
+    revision_cycle: continual
+    sha256_audit_anchor: "e337056b6eb000d4ca21c43b9548047971ca419b9a0bae5899acee2dd7f4a945"
+    file_bytes: 11053682
+    empirical_national_counts:
+      transformer_station_0 (Point):         2762
+      transformer_station_2 (MultiPolygon):  1776
+      transformer_station_total:             4538
+      power_line_1 (MultiLineString):       13009
+      communication_line_1 (MultiLineString): 137
+      wind_operated_device_0 (Point):         760
+      pipeline_1 (MultiLineString):          5455
+    feature_class_substations: transformer_station_0 + transformer_station_2
+    feature_class_transmission_lines: power_line_1
+    substation_field_schema:
+      - feature_id (String)
+      - md_temporal_extent_date_min (String)
+      - md_temporal_extent_date_max (String)
+      - md_horiz_position_accuracy_min (Float)
+      - md_horiz_position_accuracy_max (Float)
+      - map_selection (SmallInteger)
+    power_line_field_schema:
+      - feature_id (String)
+      - md_temporal_extent_date_min (String)
+      - md_temporal_extent_date_max (String)
+      - md_horiz_position_accuracy_min (Float)
+      - md_horiz_position_accuracy_max (Float)
+      - line_location (SmallInteger)
+      - number_of_lines (Integer)
+      - map_selection (SmallInteger)
+      - Shape_Length (Float)
+    critical_schema_gap: |
+      CanVec Res_MGT substation records carry LOCATION + accuracy + temporal_extent
+      ONLY.  No voltage_kV, no owner, no operator_name, no station_name at the federal
+      level.  This is a topographic-database schema, not an operational-utility
+      registry.  For SSI Index R6b Network Topology + R4 Betweenness Centrality
+      the location+connectivity data is sufficient; for voltage / owner enrichment
+      (R6b sub-modifier weighting) the provincial-utility federation is required.
+    empirical_completeness_signal: |
+      Yukon Res_MGT reports 3 transformer_station_0 features; the operational
+      YEC registry reports 21 substations for Yukon Territory (2026-07 vintage).
+      Interpretation: CanVec 50K captures ~14% of active-utility substation
+      infrastructure at the territorial layer.  National completeness ratio likely
+      similar or slightly higher for densely-mapped provinces (ON/QC/BC/AB).
+      The federal 4538 count is a floor; the operational-utility federated count
+      is estimated 20-35k substations for comprehensive Canada coverage.
+    directory_listing_verified: yes
+    directory_entry_count: 14 files (13 provinces/territories + 1 Canada-wide + companion metadata)
+    known_limitations:
+      - "Location-only schema — no voltage, owner, or station name at federal layer."
+      - "Empirical completeness ~14% of operational-utility inventory (Yukon proxy: 3 CanVec vs 21 YEC)."
+      - "Product vintage 2017-12-15 with continual revision; specific update-cycle date-stamp per feature via md_temporal_extent fields."
+      - "50K scale 1:50,000 topographic mapping; feature completeness lags active-utility inventories 12-36 months in remote regions."
+
+  # ── Federal strategic-scale cross-check: NACEI ────────────────────────────
+  - source_id: CA-C2-nacei-arcgis
+    tier: federal-strategic-cross-check
+    role: 500 kV backbone cross-check against CanVec extraction
+    publisher: NRCan + US DOE + Mexico SENER (NACEI trilateral)
+    dataset_title: North American Cooperation on Energy Information — Energy Infrastructure of North America
+    canonical_url: https://geoappext.nrcan.gc.ca/arcgis/rest/services/NACEI/energy_infrastructure_of_north_america_en/MapServer
+    layer_1_transmission_line: https://geoappext.nrcan.gc.ca/arcgis/rest/services/NACEI/energy_infrastructure_of_north_america_en/MapServer/1
+    layer_15_power_plants: https://geoappext.nrcan.gc.ca/arcgis/rest/services/NACEI/energy_infrastructure_of_north_america_en/MapServer/15
+    format: ArcGIS REST (JSON + GeoJSON native) | ArcGIS Feature Service | WMS | shapefile
+    licence: Open Government Licence - Canada (as NRCan-published)
+    refresh_cadence: NACEI vintage 2017 (last publisher notice August 2017); NRCan periodically republishes on treaty cycle
+    retrieval_verified_utc: "2026-07-12"
+    canada_feature_count_layer_1: 28   # empirical, Country = 'Canada' full-name filter
+    field_schema_layer_1:
+      - OBJECTID (esriFieldTypeOID)
+      - Country (String) — full name ("Canada", "Mexico", "United States"); NOT ISO code
+      - LineName (String) — name of line
+      - Owner (String) — company (e.g. "CFE" for the Tijuana I sample)
+      - Latitude, Longitude (Double)
+      - City, County, StateProv, ZipCode, Address (String)
+      - FrmState, FrmCountry, ToState, ToCountry (String)
+      - NumLines (Integer)
+      - Voltage_kV (Double)   # ← critical for SSI Index R6b + R4 modifiers
+      - Source, Period (String) — provenance
+    sample_sha256: "340ac343ea2cacb43d4b0eb85083f5516c1f9ad1a0c72a1932af97f09b1e3682"
+    sample_bytes: 1191
+    sample_endpoint: https://geoappext.nrcan.gc.ca/arcgis/rest/services/NACEI/energy_infrastructure_of_north_america_en/MapServer/1/query?where=Country%20%3D%20%27Canada%27&outFields=*&resultRecordCount=2&f=geojson
+    critical_schema_gotcha: |
+      Filter must be `Country = 'Canada'`.  ISO-code filter `Country = 'CA'` returns
+      count = 0 (empirically verified 2026-07-12).  The L1 connector MUST use the
+      full-name filter; otherwise it silently returns empty data with no error.
+    known_limitations:
+      - "Strategic-scale continental view; 28 Canada-side line features is far below any comprehensive inventory."
+      - "NACEI has NO substation layer — the layer index confirms 38 layers, none of which is substations.  Layer 15 is generation-plants ≥100 MW.  This is the empirical driver for the v4.23 workstream."
+
+  # ── Territorial supplementary: Yukon Energy Corporation ────────────────────
+  - source_id: CA-C3-yec-substations
+    tier: provincial-territorial-supplementary
+    role: Yukon Territory substation primary + line coupling (Discipline #41)
+    publisher: Yukon Energy Corporation (utility) via Government of Yukon GeoYukon
+    dataset_title: YEC Power Substations
+    open_canada_ca_id: 3393d1fd-9c20-4854-9acc-dcc504aec275
+    canonical_url: https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_UtilitiesCommunications/MapServer/8
+    companion_lines_dataset: YEC Power Lines (satisfies Discipline #41 line-coupling at territorial layer)
+    format: ArcGIS REST (GeoJSON + JSON) | shapefile ZIP | KML
+    licence: Open Government Licence - Yukon
+    refresh_cadence: as-needed, publisher commits to update on new substation construction
+    retrieval_verified_utc: "2026-07-12"
+    metadata_last_modified: "2026-07-08"   # 4 days before pre-flight
+    feature_count: 21
+    field_schema:
+      - OBJECTID, NAME, COMMUNITY
+      - INCOMING_CAPACITY_V, OUTGOING_CAPACITY_V (Integer, Volts)
+      - STEP_DOWN_IND, STEP_UP_IND, TRANSMISSION_IND, SWITCHING_IND, CONVERTER_IND (String Y/N)
+      - LINES_IN_NUM, LINES_OUT_NUM (SmallInteger)
+    sample_sha256: "a152d3478d7bbcfd12ee3b14e1d2b6cc0c256984bbebbbaeb0d4c73a29e472f3"
+    sample_bytes: 893
+    sample_endpoint: https://mapservices.gov.yk.ca/arcgis/rest/services/GeoYukon/GY_UtilitiesCommunications/MapServer/8/query?where=1%3D1&outFields=*&resultRecordCount=2&f=geojson
+    known_limitations:
+      - "Small feature count (21) reflects Yukon's ~40 000 population; the point is not scale but voltage-schema richness for the R6b modifier."
+
+  # ── Provincial supplementary: Nova Scotia ────────────────────────────────
+  - source_id: CA-C4-ns-nstdb-utilities-point
+    tier: provincial-supplementary
+    role: Nova Scotia substation subset via feature-code filter
+    publisher: Government of Nova Scotia (GeoNova / Land Information Services)
+    dataset_title: Nova Scotia Topographic DataBase - Utilities (Point Layer)
+    open_canada_ca_id: f3954aa2-dff0-949e-54f2-280845221c51
+    canonical_url_geojson: https://data.novascotia.ca/api/geospatial/eiwy-kfrj?method=export&format=GeoJSON
+    canonical_url_csv: https://data.novascotia.ca/api/views/eiwy-kfrj/rows.csv?accessType=DOWNLOAD
+    companion_line_layer: https://data.novascotia.ca/api/geospatial/x39x-aw9i?method=export&format=GeoJSON   # Line Layer, id verified via search
+    companion_poly_layer_id: 4ujs-gpyq
+    format: GeoJSON | KML | CSV (with the_geom WKT) | TSV
+    licence: Open Government Licence – Nova Scotia
+    refresh_cadence: aerial-photo maintenance + field inspections (irregular)
+    retrieval_verified_utc: "2026-07-12"
+    metadata_last_modified: "2025-09-24"
+    field_schema:
+      - the_geom (POINT WKT)
+      - FEAT_CODE (String) — NSTDB feature code
+      - FEAT_DESC (String) — human-readable description
+      - ZVALUE (Double)
+      - ANGLE (Double)
+    substation_subset_filter: |
+      The dataset carries mixed utility features (Pipelines, Tanks, electrical substations,
+      etc.).  Publisher notes explicitly state "electrical substations are collected".
+      The specific FEAT_CODE for electrical substation must be resolved via the NSTDB
+      Feature Code table (linked in the dataset notes at https://nsgi.novascotia.ca/WSF_DDS/DDS.svc/DownloadFile?tkey=fhrTtdnDvfytwLz6&id=17).
+      Preliminary probe of first 500 CSV lines returned zero substation matches;
+      Feature Code table must be fetched to identify the code (Step 2 follow-on).
+    known_limitations:
+      - "Substation subset requires post-fetch filter on FEAT_CODE — not filterable in the endpoint URL."
+      - "Voltage not present in the schema; must join to Nova Scotia Power operational data if needed for R6b."
+
+  # ── Provincial supplementary: British Columbia (lines-only) ──────────────
+  - source_id: CA-C5-bc-transmission-lines
+    tier: provincial-supplementary-lines-only
+    role: BC transmission-line coupling (Discipline #41); NO substation dataset available
+    publisher: Government of British Columbia (GeoBC, derived from BC Hydro)
+    dataset_title: BC Transmission Lines
+    open_canada_ca_id: 384d551b-dee1-4df8-8148-b3fcf865096a
+    canonical_url_kml: https://openmaps.gov.bc.ca/kml/geo/layers/WHSE_BASEMAPPING.GBA_TRANSMISSION_LINES_SP_loader.kml
+    canonical_url_wms: https://openmaps.gov.bc.ca/geo/pub/WHSE_BASEMAPPING.GBA_TRANSMISSION_LINES_SP/ows?service=WMS&request=GetCapabilities
+    format: KML | WMS
+    licence: Open Government Licence - British Columbia
+    refresh_cadence: irregular (metadata last modified 2026-01-28)
+    retrieval_verified_utc: "2026-07-12"
+    known_limitations:
+      - "LINES-ONLY dataset.  No BC substation open dataset surfaced on open.canada.ca."
+      - "Voltage suppressed on the public version per publication agreement with BC Hydro."
+      - "Discipline #41 line-coupling supported; substation node ingestion requires CanVec ManMade (CA-C1) for BC substations."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Sources probed but not usable
+# ─────────────────────────────────────────────────────────────────────────────
+sources_not_usable:
+
+  - source_id: CA-X1-nrcan-atlas-historical
+    disposition: rejected
+    rejection_reason: |
+      NRCan Atlas of Canada 3rd + 5th Editions return JPG + PDF raster maps only,
+      1957 + 1978-1995 vintages.  Not machine-readable, not usable for automated
+      ingestion.  Multiple open.canada.ca queries confirmed no modern vector Atlas
+      product.
+    probed_urls_sample:
+      - https://open.canada.ca/data/en/dataset/55787375-dbaf-5deb-a56d-5d6af8bc72fc
+      - https://open.canada.ca/data/en/dataset/da65fca5-0b0b-564e-9854-682d9f46ecb7
+
+  - source_id: CA-X2-cer-data-analysis-portal
+    disposition: deferred-to-step-2
+    role_if_admitted: transmission-corridor context only
+    rejection_reason: |
+      CER (Canada Energy Regulator) regulates PIPELINES + international/interprovincial
+      powerlines only.  Comprehensive substation inventory is provincial-utility
+      responsibility.  CER retains for Discipline #41 boundary-crossing verification
+      but is not a substation source.
+    step_2_action: catalogue the international-powerline dataset for cross-border cohort completeness check
+
+  - source_id: CA-X3-open-canada-ckan-electricity-search
+    disposition: exhaustively-probed
+    finding: |
+      12 CKAN queries against open.canada.ca for {substation, transmission, electricity
+      infrastructure, CanVec electric power, AESO, IESO, Hydro-Québec} returned zero
+      federal comprehensive substation vector datasets.  This confirms the source
+      architecture must federate CanVec + provincial supplements.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Provincial coverage matrix (federated architecture)
+# ─────────────────────────────────────────────────────────────────────────────
+provincial_coverage_matrix:
+  # Structure: ISO-3166-2 province code (quoted to defeat YAML NO/ON/etc. boolean coercion)
+  #  → (federal-CanVec Res_MGT filename, provincial-supplementary source, gaps)
+  "AB": {name: Alberta,               canvec_resmgt: canvec_50K_AB_Res_MGT, size_mb: 3.38, provincial: pending-AESO-direct-portal,           gap: voltage-schema-federal-only}
+  "BC": {name: British Columbia,      canvec_resmgt: canvec_50K_BC_Res_MGT, size_mb: 1.25, provincial: BC-Transmission-Lines-lines-only,     gap: BC-substations-provincial-not-open}
+  "MB": {name: Manitoba,              canvec_resmgt: canvec_50K_MB_Res_MGT, size_mb: 0.91, provincial: pending-Manitoba-Hydro-portal,        gap: voltage-schema-federal-only}
+  "NB": {name: New Brunswick,         canvec_resmgt: canvec_50K_NB_Res_MGT, size_mb: 0.81, provincial: pending-NB-Power-portal,              gap: voltage-schema-federal-only}
+  "NL": {name: Newfoundland-Labrador, canvec_resmgt: canvec_50K_NL_Res_MGT, size_mb: 0.68, provincial: pending-NL-Hydro-portal,              gap: voltage-schema-federal-only}
+  "NS": {name: Nova Scotia,           canvec_resmgt: canvec_50K_NS_Res_MGT, size_mb: 0.66, provincial: NSTDB-Utilities-Point-Layer,          gap: voltage-schema-both-sources}
+  "NT": {name: Northwest Territories, canvec_resmgt: canvec_50K_NT_Res_MGT, size_mb: 0.43, provincial: pending-NTPC-portal,                  gap: coverage-remote-regions}
+  "NU": {name: Nunavut,               canvec_resmgt: canvec_50K_NU_Res_MGT, size_mb: 0.39, provincial: pending-QEC-portal,                   gap: coverage-remote-regions}
+  "ON": {name: Ontario,               canvec_resmgt: canvec_50K_ON_Res_MGT, size_mb: 2.26, provincial: pending-IESO-direct-portal,           gap: voltage-schema-federal-only}
+  "PE": {name: Prince Edward Island,  canvec_resmgt: canvec_50K_PE_Res_MGT, size_mb: 0.40, provincial: pending-Maritime-Electric-portal,     gap: voltage-schema-federal-only}
+  "QC": {name: Quebec,                canvec_resmgt: canvec_50K_QC_Res_MGT, size_mb: 2.12, provincial: pending-Hydro-Quebec-portal,          gap: voltage-schema-federal-only}
+  "SK": {name: Saskatchewan,          canvec_resmgt: canvec_50K_SK_Res_MGT, size_mb: 1.90, provincial: pending-SaskPower-portal,             gap: voltage-schema-federal-only}
+  "YT": {name: Yukon,                 canvec_resmgt: canvec_50K_YT_Res_MGT, size_mb: 0.47, provincial: YEC-Power-Substations-full-voltage-schema, gap: none-optimal-federated}
+  # Aggregate: 15.66 MB per-province total | 10.54 MB Canada-wide alternative
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Auditability chain (per METHODOLOGY_DISCIPLINES.md §5ter)
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  state_transition: pre-ingestion → provincial-federation-architecture-locked
+  rationale_document: this file
+  empirical_anchors_verified: yes
+  empirical_anchors_dated: "2026-07-12 UTC"
+  next_state_transition:
+    trigger: Step 2 download of CanVec CA-wide ManMade FGDB + provincial supplements
+    downstream_deliverables:
+      - canada/v4_23-ingestion-audit-canada-fetch.yaml (Step 2 fetch record with per-file SHA-256)
+      - scripts/pipeline/ingestion/canada_canvec_manmade.py (L1 connector, Step 3)
+      - scripts/pipeline/ingestion/canada_nacei_transmission.py (L1 connector, Step 3)
+      - scripts/pipeline/ingestion/canada_yec_substations.py (L1 connector, Step 3)
+      - scripts/pipeline/ingestion/canada_ns_nstdb_utilities.py (L1 connector, Step 3)
+    commit_hash_placeholder: TBD_at_L1_connector_merge
+    ci_job_url_placeholder: TBD_at_L1_connector_merge
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Discipline #41 line-coupling readiness
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_41_line_coupling_readiness:
+  operator_directive_25_june_2026: |
+    "all must be auditable and if we add substations we add connecting power lines"
+  federal_line_source: CanVec ManMade Transmission_Line feature class (companion to Electric_Facility)
+  strategic_line_source: NACEI Layer 1 Electric Transmission Line (28 Canada features, backbone-scale cross-check)
+  provincial_line_sources:
+    - YEC Power Lines (Yukon, companion to YEC Substations)
+    - Nova Scotia NSTDB Utilities Line Layer (id x39x-aw9i)
+    - BC Transmission Lines
+  line_yield_estimate_canada: 15 000 - 22 000 km additional transmission-line km (per v4.23 gap-audit §Canada)
+  sentinel_commitment: |
+    TestSubstationLineParity sentinel (per CLAUDE.md v4.23 forward-reference) will land
+    alongside first Canada L1 connector.  Each new substation node MUST have ≥1
+    transmission-line edge in the same ingestion pass; each new line MUST have
+    non-orphan endpoints in the substation registry.

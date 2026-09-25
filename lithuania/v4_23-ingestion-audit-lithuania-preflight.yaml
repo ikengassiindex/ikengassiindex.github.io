@@ -1,0 +1,196 @@
+# Lithuania v4.23 Ingestion Audit — Pre-flight
+# ============================================
+# Task: #233 (WAVE2-Step1 Lithuania)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: lithuania
+  iso2: LT
+  iso3: LTU
+  wave: 2
+  priority: 16
+  step: 1
+  target: "Owner enrichment via OSM Overpass — 2-operator vertically-integrated state monopoly via EPSO-G holding"
+  rationale: >
+    Lithuania carries 505 substations with 0% owner tagged, 97.4% voltage
+    tagged (492/505 covering 110/35/330/30/10/400 kV), and 100% region
+    tagged (10 Lithuanian counties: Vilniaus, Kauno, Klaipėdos, Šiaulių,
+    Panevėžio, Alytaus, Tauragės, Telšių, Marijampolės, Utenos). Lithuania's
+    electricity architecture is architecturally the SIMPLEST 2-operator
+    resolver yet cohort-wide: Litgrid (state TSO ≥110 kV via EPSO-G) +
+    ESO (unified state DSO ≤110 kV via EPSO-G). Both 100% state-owned via
+    EPSO-G holding company — pure vertically-integrated state architecture.
+
+baseline_state:
+  ssi_data_substations: 505
+  grid_geo_substations: 506  # estimated
+  grid_geo_lines: 1486
+  lines_per_substation_ratio: 2.94  # clean transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 97.4  # 492/505 — 13 unknown-voltage subs
+  region_coverage_pct: 100.0  # 10 Lithuanian counties populated
+  county_split:
+    Vilniaus: 118      # 23.4% — Vilnius capital + surroundings
+    Kauno: 101         # 20.0% — Kaunas 2nd city + surroundings
+    Klaipėdos: 71      # 14.1% — Klaipėda port + Baltic coast
+    Šiaulių: 60        # 11.9% — Šiauliai north
+    Panevėžio: 51      # 10.1% — Panevėžys north-central
+    Alytaus: 34        # 6.7%  — Alytus south
+    Tauragės: 21       # 4.2%  — Tauragė west
+    Telšių: 20         # 4.0%  — Telšiai NW (Samogitia)
+    Marijampolės: 16   # 3.2%  — Marijampolė SW (Suvalkija)
+    Utenos: 13         # 2.6%  — Utena NE
+  voltage_class_baseline:
+    110_kv: 270          # 53.5% — Litgrid TSO backbone + subtransmission overlap
+    35_kv: 170           # 33.7% — ESO subtransmission
+    330_kv: 27           # 5.3%  — Soviet-era HV backbone (Litgrid)
+    30_kv: 14            # 2.8%  — ESO MV (Soviet-era holdover)
+    10_kv: 10            # 2.0%  — ESO MV distribution
+    400_kv: 1            # 0.2%  — LitPol Link / NordBalt HVDC cross-border (Litgrid)
+    unknown: 13          # 2.6%  — voltage-null
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [20.90, 53.85, 26.90, 56.50]  # west, south, east, north (Lithuania bounds)
+    strategy: >
+      Single-query pattern — Lithuania bbox ~65k km² (~3× Slovenia, ~30×
+      Luxembourg). Sub-3-minute fetch expected.
+    expected_yield:
+      substations: 700-2000
+      lines: 2000-5000
+    tag_completeness_hypothesis: >
+      Lithuania OSM tagging density typically 50-70% for Vilnius/Kaunas
+      metropolitan + coastal Klaipėda. Rural east + border regions 30-50%.
+      Historical Soviet-era operator names may appear on older-tagged subs.
+    lp_dd_class: canonical
+
+  fallback_pure_monopoly_2_operator:
+    strategy: litgrid_tso_threshold_plus_eso_monopoly_default
+    rationale: >
+      Simplest 2-operator resolver yet cohort-wide. Lithuania's power grid
+      is entirely state-owned via EPSO-G (Energijos skirstymo operatorius
+      grupė) holding company. Litgrid AB (TSO) + ESO (unified national DSO)
+      are both 100% state-owned subsidiaries of EPSO-G. No private IPPs or
+      regional overlays — Ignitis Group (state generator/retailer) is
+      separate legal entity that doesn't own grid infrastructure. Baltic
+      Trio (Lithuania + Latvia + Estonia) desynchronised from Russian IPS
+      grid February 2025, synchronised with Continental EU grid — 400 kV
+      cross-border to Poland (LitPol Link) + NordBalt HVDC to Sweden.
+    tso_threshold_kv: 110  # Litgrid operates 400 + 330 + 110 kV transmission
+    tso_operator: Litgrid  # Litgrid AB (100% state-owned via EPSO-G)
+    monopoly_default_operator: ESO  # Elektros skirstymo operatorius AB
+    holding_company: EPSO-G  # Energijos skirstymo operatorius grupė
+    system_operator_note: >
+      Litgrid handles both TSO ownership AND SO functions in Lithuania.
+      No separate system operator entity like Noga (Israel), XM SA ESP
+      (Colombia), or Statnett SO (Norway).
+
+  operator_alias_normalisation:
+    aliases:
+      # Litgrid variants (English + Lithuanian + legacy Soviet-era)
+      "Litgrid": "Litgrid"
+      "Litgrid AB": "Litgrid"
+      "Litgrid A.B.": "Litgrid"
+      "AB Litgrid": "Litgrid"
+      "Lietuvos energija": "Litgrid-legacy"  # historical name pre-2011 unbundling
+      "Lietuvos Energija": "Litgrid-legacy"
+      # ESO variants (English + Lithuanian + legacy)
+      "ESO": "ESO"
+      "ESO AB": "ESO"
+      "AB ESO": "ESO"
+      "Elektros skirstymo operatorius": "ESO"
+      "Elektros Skirstymo Operatorius": "ESO"
+      "AB Elektros skirstymo operatorius": "ESO"
+      # LESTO — legacy DSO name pre-2016 merger with LITGAS
+      "LESTO": "ESO-legacy"
+      "LESTO AB": "ESO-legacy"
+      "AB LESTO": "ESO-legacy"
+      # EPSO-G holding (parent — non-owner but may appear on OSM tags)
+      "EPSO-G": "EPSO-G (Holding Company)"
+      "AB EPSO-G": "EPSO-G (Holding Company)"
+      # Ignitis Group (generation/retail — non-grid but may appear)
+      "Ignitis": "Ignitis Group (Generation/Retail)"
+      "Ignitis Group": "Ignitis Group (Generation/Retail)"
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/lithuania/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # Litgrid TSO threshold + ESO monopoly default + alias map
+    - osm_overpass.py  # single-query fetch (~65k km²)
+    - merge_into_ssi_data.py  # 500m proximity + Step 4b retroactive + Step 5 alias-retighten
+  pattern_reused_from: israel (pure monopoly with alias) + greenland (single-default fallback)
+  differentiators_vs_israel:
+    - operator_count: 2 (Litgrid + ESO) vs Israel's 1 (IEC)
+    - holding_structure: EPSO-G holding groups both TSO + DSO vs IEC vertical integration
+    - alias_language: Lithuanian (Latin script with diacritics) vs Hebrew (RTL Unicode)
+    - historical_alias_depth: LESTO (pre-2016 DSO) + Lietuvos energija (pre-2011 TSO) → legacy tags
+    - baltic_trio_context: Recent Feb 2025 grid synchronisation event with EU (LT+LV+EE trio decoupled from Russia IPS)
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # 2-operator monopoly catches all
+  post_merge_voltage_coverage: 50-80%  # from 97.4% transmission-only to multi-tier
+  post_merge_substations: 700-2000
+  post_merge_lines: 2000-5000
+  km_of_lines: 3000-8000
+
+risks_flagged:
+  - risk_1: >
+      110 kV is a MIXED tier in Lithuania — Litgrid operates transmission
+      backbone at 110 kV AND ESO operates subtransmission distribution at
+      110 kV. Empirically the baseline is transmission-heavy (only 505
+      subs for ~65k km²), so most 110 kV subs are Litgrid. Threshold at
+      110 kV gives Litgrid the majority; below-110 kV goes to ESO default.
+      Some misattribution possible for ESO 110 kV subs (small fraction).
+  - risk_2: >
+      Historical Soviet-era operator names may appear on very old OSM tags
+      (Lietuvos energija predecessor). Alias map catches "Lietuvos energija"
+      → "Litgrid-legacy" for audit trail; can be retighten-pass-collapsed
+      to Litgrid at Step 5 if needed.
+  - risk_3: >
+      2-country border zones with Latvia (N) + Belarus (SE) + Poland (SW) +
+      Russia/Kaliningrad (SW). Discipline #36 cross-border filter uses
+      lithuania/bounds.json. NordBalt HVDC subsea to Sweden + LitPol Link
+      to Poland cross the polygon boundary at coastal Klaipėdos.
+  - risk_4: >
+      Kaliningrad Oblast enclave is Russian territory sandwiched between
+      Lithuania (N/E) and Poland (S) + Baltic Sea (W). Lithuanian territory
+      wraps the Curonian Spit (Kuršių nerija) — thin sand-spit peninsula
+      may show OSM subs at edge of polygon.
+
+convention_preservation:
+  discipline_36:
+    scope: Lithuania bounds CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      Litgrid + ESO 2-operator monopoly is Convention #56-compliant —
+      both genuinely operate 100% of national grid via EPSO-G state
+      holding. Historical Litgrid-legacy + ESO-legacy variants preserved
+      distinctly for audit trail; can be collapsed via retighten pass.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to lithuania/ + scripts/pipeline/ingestion/lithuania/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.lithuania.osm_overpass`
+    locally. Expected wall-clock <3 min.
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.lithuania.merge_into_ssi_data`
+    (includes Step 4b retroactive attribution + Step 5 alias-retighten).
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2

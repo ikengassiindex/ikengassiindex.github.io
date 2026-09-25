@@ -1,0 +1,67 @@
+# Slovenia v4.23 Ingestion Audit — Step 2 Fetch
+# ==============================================
+# Task: #214 (WAVE2-Step2 Slovenia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: slovenia/v4_23-ingestion-audit-slovenia-preflight.yaml
+# Status: FETCH_COMPLETE (post Layer 3 lat/lon geofence hotfix)
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: slovenia
+source_id: SI-C1-osm-overpass
+fetched_at_utc: "2026-07-13T00:00:00Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 461675
+raw_sha256: a7986b1a229d4031c0b7ca48557c022078ab3bbce80fdaf8865fdeaf5d6946ab
+provincial_scope: null  # Single-query, whole country
+
+empirical_counts:
+  substations: 1825  # post Discipline #36 filter (15 dropped from 1,840 raw)
+  transmission_lines: 4429  # post Discipline #36 filter
+
+owner_resolution_provenance:
+  # Post-hotfix state (re-parsed from cache via fixed Layer 3 resolver)
+  direct_osm_operator_tag: 145
+  alias_normalised_osm_operator: 28
+  layer_1_ELES_TSO_threshold_ge_110kv: 40
+  layer_2_nuts3_map: 0  # OSM Slovenia doesn't populate ref:nuts:3
+  layer_3_lat_lon_geofence: 1612  # 88% of subs via new geofence layer
+  unresolved: 6  # 0.3% — outside all 5 DSO territories
+
+layer_3_geofence_distribution:
+  # Only for net-new subs resolved via lat/lon (not direct OSM tag)
+  Elektro_Maribor: 636
+  Elektro_Primorska: 347
+  Elektro_Ljubljana: 274
+  Elektro_Gorenjska: 115
+  Elektro_Celje: 240  # Savinjska basin + Golte wolf's tooth
+
+discipline_41_line_parity:
+  post_fetch: PASS (1,825 subs + 4,429 lines, ratio 2.43 clean transmission-tier)
+
+discipline_36_cross_border_filter:
+  polygon_source: slovenia/bounds.json
+  tolerance_km: 0.1  # default
+  subs_dropped_outside_polygon: 15  # 0.8% overshoot (border-adjacent OSM tags)
+  lines_dropped_outside_polygon: 0  # bounds handled cleanly on line geometry
+
+wall_clock:
+  step_1_fetch_first_run_seconds: ~240  # substations + line query with 429 backoff
+  step_2_re_parse_from_cache_seconds: ~1  # hotfix re-run
+  cache_hit_second_run: true
+
+warnings:
+  - "Convention #56 partial — first line-query attempt failed on 429 rate limit; retried via kumi.systems endpoint successfully"
+  - "Discipline #36 — dropped 15 substations + 0 lines outside Slovenia polygon (100m default tolerance)"
+  - "OSM tagging density check — 0 of 1,825 subs carried ref:nuts:3 tag (empirical finding — Layer 3 geofence became primary DSO resolver)"
+
+auditability_chain:
+  parent_preflight: slovenia/v4_23-ingestion-audit-slovenia-preflight.yaml
+  step_2_fetch: slovenia/v4_23-ingestion-audit-slovenia-fetch.yaml
+  step_4_merge: slovenia/v4_23-ingestion-audit-slovenia-merge.yaml
+  hotfix_commit: c54f1762  # Layer 3 lat/lon geofence hotfix
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: slovenia/ssi-data.json
+
+status: READY_FOR_STEP_4

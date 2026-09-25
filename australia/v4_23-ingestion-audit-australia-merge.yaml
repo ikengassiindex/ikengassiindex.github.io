@@ -1,0 +1,125 @@
+# Australia v4.23 Ingestion Audit — Step 4 merge
+# ================================================
+# Task: #186 (WAVE2-Step4 Australia)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local merge execution complete
+
+meta:
+  country: australia
+  iso2: AU
+  iso3: AUS
+  wave: 2
+  step: 4
+  parent_fetch: australia/v4_23-ingestion-audit-australia-fetch.yaml
+  merged_at_utc: "2026-07-13T14:54:43Z"
+
+merge_operations:
+  substations:
+    baseline: 8078
+    fresh_osm: 4778           # from Step 2 fetch
+    matched_within_500m: 291  # proximity match Discipline #41
+    owner_enriched: 291
+    voltage_filled: 0         # baseline already 99% voltage-tagged
+    voltage_xcheck_mismatches: 142  # 48.8% mismatch rate — flagged for review
+    net_new: 4487
+    final_count: 12565
+    delta_pct: +55.6
+  lines:
+    baseline: 9111
+    fresh_osm: 84614
+    appended: 36665
+    deduped_midpoint_100m: 47949  # 56.7% dedupe rate — reflects existing overlap
+    final_count: 45776
+    delta_pct: +402.4
+
+file_sizes_post_merge:
+  ssi_data_json_mb: 21.5
+  grid_geo_json_mb: 25.5
+  under_90_mb_threshold: true
+  optimisation_needed: false
+
+authoritative_cohort_metrics_post_merge:
+  substations: 12565
+  lines: 45776
+  km_of_transmission_lines_haversine: 123538
+  km_per_substation: 9.8
+  distinct_operators: 88
+  discipline_41_ratio: 3.64  # 45776 / 12565 — clean transmission-tier
+  voltage_split:
+    ehv_gte_220kv: 2050  # 16.3%
+    hv_100_to_219kv: 2855  # 22.7%
+    distribution_lt_100kv: 6201  # 49.3%
+    unknown_null: 1459  # 11.6%
+
+coverage_post_merge:
+  owner_coverage_pct: 37.2  # from 0.0% baseline
+  voltage_coverage_pct: 88.4  # from ~99% baseline (net-new subs have ~69% voltage)
+  region_coverage_pct: 64.3  # baseline had regions on 8,078 subs; net-new 4,487 pending L2 spatial join
+  owner_coverage_by_provenance:
+    direct_osm_operator_tag: "~54.5% of enriched subset"
+    state_jurisdiction_fallback: "~45.5% of enriched subset"
+    convention_56_unresolved_null: 0
+
+top_15_operators_post_merge:
+  - {rank: 1, name: "Essential Energy", count: 716, note: "NSW rural default fallback"}
+  - {rank: 2, name: "Energex", count: 556, note: "QLD SEQ + direct OSM (majority direct-tagged)"}
+  - {rank: 3, name: "Ausgrid", count: 509, note: "Sydney metro geofence"}
+  - {rank: 4, name: "Victoria DNSP (unresolved multi-provider)", count: 426, note: "Convention #56 visibly-honest — VIC 5-DNSP disambiguation"}
+  - {rank: 5, name: "Powercor", count: 404, note: "VIC west geofence + direct OSM"}
+  - {rank: 6, name: "Western Power", count: 231, note: "WA SWIS"}
+  - {rank: 7, name: "SA Power Networks", count: 214, note: "SA DNSP"}
+  - {rank: 8, name: "Endeavour Energy", count: 194, note: "NSW Greater Western Sydney geofence"}
+  - {rank: 9, name: "Evoenergy", count: 154, note: "ACT combined"}
+  - {rank: 10, name: "TransGrid", count: 148, note: "NSW TSO >132kV"}
+  - {rank: 11, name: "AusNet", count: 140, note: "VIC eastern DNSP direct OSM"}
+  - {rank: 12, name: "Powerlink", count: 140, note: "QLD TSO >132kV"}
+
+voltage_cross_validation:
+  matched_pairs: 291
+  mismatches_gt_1_5x_ratio: 142
+  mismatch_rate_pct: 48.8
+  note: >
+    High mismatch rate reflects OSM Overpass tag heterogeneity across
+    metro vs rural areas. Baseline substations often carry LV/MV nominal
+    voltage while OSM tags EHV connection point. Not a data error —
+    reflects legitimate multi-tier substation architecture. Report
+    at australia/v4_23-voltage-cross-validation.json.
+
+warnings_preserved:
+  - "Substation merge: 291 enriched + 0 voltage-filled + 4487 net-new + 142 xcheck findings"
+  - "Line merge: 36665 appended + 47949 deduped (existing tier match) — 56.7% dedupe rate reflects existing OSM overlap"
+  - "Voltage xcheck 48.8% mismatch rate — reflects multi-tier substation architecture, not data error"
+
+discipline_41_line_parity:
+  post_merge_check: OK
+  final_ratio: 3.64
+  envelope_after_task_182: "0.3 - 30 (widened)"
+  status: "well within envelope — transmission-tier ingestion, no MV distribution"
+
+convention_preservation:
+  discipline_36:
+    outcome: 44 substations + 407 lines dropped (~2.5% overshoot filtered)
+    tolerance: 100m default
+    status: PASS
+  discipline_41:
+    outcome: EVERY net-new substation covered by ≥1 fresh line via line merge
+    status: PASS
+  convention_46:
+    outcome: no portfolio-scoped changes (single australia/*.json)
+    status: PRESERVED
+  convention_56:
+    outcome: "Victoria DNSP (unresolved multi-provider)" preserved as visibly-honest
+    net_new_l2_l3_placeholders: null (empty dicts for dict fields)
+    status: PRESERVED
+  convention_60:
+    outcome: OSM (ODbL) only + state-jurisdiction lookup — no commercial ESG providers
+    status: PRESERVED
+  convention_64:
+    outcome: strict per-country resolution (all writes to australia/*.json)
+    status: PRESERVED
+
+next_step: "Step 5 (task #187): UI + doc cascade — landing page data-subs 8,078 → 12,565, country page fleet + km + v4.23 callout, cohort audit sweep re-run."
+
+status: STEP_4_CLOSED

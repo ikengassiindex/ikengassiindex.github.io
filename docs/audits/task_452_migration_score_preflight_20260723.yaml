@@ -1,0 +1,667 @@
+# Task #452 — Migration_score enrichment PRE-FLIGHT AUDIT (Path C)
+# ===============================================================
+#
+# Sibling to Task #451 (catchment_population GHSL enrichment). Same
+# architectural template BUT structurally different mechanics — see
+# `structural_differences_vs_task_451` section below.
+#
+# This YAML is the operator sign-off anchor for Path C — full spatial
+# per-substation net-migration enrichment via Niva et al. 2023 gridded
+# dataset. Author code AFTER operator signs off Gate A + before Gate B
+# empirical spot-check on a pilot country.
+
+task_id: 452
+title: "R2 Defect Class 3 — socio_economic.migration_score cohort-wide enrichment"
+authored_at: "2026-07-23"
+authored_by: "Claude (Cowork agent, session under Cedric)"
+status: "GATE_A_SIGNED_OFF_STEP_3_IN_PROGRESS"
+
+# ═══════════════════════════════════════════════════════════════════
+#  1. REFRAMING — Empirical cohort state (Step 1 done 23 Jul 2026)
+# ═══════════════════════════════════════════════════════════════════
+
+reframing:
+  purpose: >
+    Task #452 was pre-scoped in Task #451 pre-flight as "R2 Defect Class 3
+    — migration_score missing for ~20 countries". Empirical scan revealed
+    the picture is more complex than the pre-scope suggested. Three classes:
+
+  cohort_empirical_state:
+    all_populated_countries: 10   # 796k subs across 10 countries have SOME value
+    all_none_countries: 19        # ~135k subs have None (never populated)
+    partial_coverage_countries: 10  # mixed within-country
+    total_populated_subs: 641_000  # approx
+    total_none_subs: 155_000       # approx (~19.5% of 796,121 cohort)
+
+  wave_4_majors_fleet_uniform_signature:
+    countries: [france, germany, portugal, spain, sweden, us, japan, australia]
+    value: 0.5   # SINGLE fleet-uniform national scalar per Task #450 SYSTEMIC
+    unique_values_per_country: 1
+    note: >
+      These 8 countries carry an identical 0.5 value per every substation
+      cohort-wide — clean Task #450 SYSTEMIC signature. The socioeconomic.py
+      pipeline emits national scalar when per-substation NUTS-3 join fails.
+      Path C's raster enrichment will replace this with per-substation values.
+
+  per_country_semantic_drift:  # MAJOR finding
+    denmark_range: [-0.020, +0.040]  # tiny scale — looks unrescaled
+    mexico_range: [-5.0, +8.0]       # percent-scale — different unit!
+    italy_range: [-5.0, -5.0]         # fleet-uniform miscoded fallback
+    norway_range: [+0.010, +0.982]   # correct [0,1] normalized
+    lithuania_range: [+0.162, +0.990]
+    ireland_range: [-0.120, +0.780]  # spans zero, includes negative
+    new_zealand_range: [-0.390, +0.330]
+    canonical_intended_range: [0.0, 1.0]  # inferred from Norway + 0.5 fallback
+
+  no_synthetic_generator_to_retire:
+    score_country_line_195_analog: absent
+    note: >
+      Unlike Task #451, `scripts/score-country.py` does NOT synthesize
+      migration_score anywhere. Path C is pure additive enrichment —
+      no retire-with-tombstone step needed for score-country.py.
+      (However see `scope_decision.existing_values_normalization` below —
+      the DRIFTED existing values are their own separate problem.)
+
+  modern_pipeline_source:
+    file: scripts/pipeline/ingestion/socioeconomic.py
+    inputs:
+      - eurostat_nuts3_socioeconomic.csv (27 EU + adjacent countries)
+      - agency_regional_socioeconomic.csv (non-EU nations)
+      - oecd_national_socioeconomic.csv (fallback)
+    note: >
+      Pipeline knows how to derive migration_score BUT falls back to 0.5
+      national scalar for Wave 4 majors. Path C bypasses the pipeline's
+      fallback path entirely by writing enriched values directly.
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  2. STRUCTURAL DIFFERENCES vs Task #451 (catchment_population)
+# ═══════════════════════════════════════════════════════════════════
+
+structural_differences_vs_task_451:
+
+  - concept:  "STOCK (population count) vs FLOW (net migration rate over time period)"
+    consequence: >
+      Migration is a rate, not a count. Zonal-sum a raster of migration
+      rates makes NO sense (rates don't sum). Instead: zonal-mean (weighted
+      by population) OR sample raster value at substation point coordinates.
+
+  - concept:  "5 km catchment definition"
+    consequence: >
+      For population #451: catchment = 5 km buffer, zonal SUM
+      For migration #452: catchment = 5 km buffer, zonal MEAN (weighted by
+      GHSL population — reuse from #451 as denominator!). Or single-point
+      sample if simpler.
+
+  - concept:  "Raster resolution"
+    consequence: >
+      GHSL population: 30 arc-sec (~1 km). Niva migration: 5 arc-min (~10 km).
+      Niva's 10 km pixels are LARGER than the 5 km catchment buffer — most
+      buffers will intersect ~1-4 Niva pixels. This is fine for a signal but
+      substation-level differentiation within the same ~10 km neighborhood
+      will be zero. Acceptable per authors' recommendation "aggregate over
+      larger area".
+
+  - concept:  "Temporal vintage"
+    consequence: >
+      Niva covers 2000-2019 (5 years old at cohort target 2025). Author-
+      recommended aggregate is 20-year sum (2000-2019). Not a real-time
+      signal — acceptable proxy per Convention #7 documented-proxy.
+
+  - concept:  "Retire synthetic vs additive enrichment"
+    consequence: >
+      #451 RETIRED score-country.py line 195 synthetic. #452 has NO
+      synthetic to retire. Task #452's shape is pure enrichment.
+
+  - concept:  "Range mapping"
+    consequence: >
+      Niva outputs persons per 1000 per 20-year period. Pipeline expects
+      migration_score in [0, 1] range where 0.5 = neutral. NEW STEP
+      required: raster-value → [0, 1] normalization formula. See
+      `range_mapping_spec` below.
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  3. PATH C SELECTION + RATIONALE
+# ═══════════════════════════════════════════════════════════════════
+
+path_selection:
+  selected: "Path C — full spatial per-substation via Niva 2023 raster"
+  operator_directive_23_jul_2026: >
+    "very positive if we could achieve path C, maybe we should first
+     clearly document what steps are required and what sentinels/audits
+     for each steps and even substeps so we ensure we do not get lost
+     and produce a monster"
+
+  alternative_paths_considered:
+    path_a: "UN DESA country scalar (fleet-uniform per country)"
+    path_b: "Eurostat NUTS-3 for EU + UN DESA for non-EU (dual-tier)"
+
+  rationale_for_path_c:
+    - "Peer-reviewed methodology (Nature Human Behaviour 2023)"
+    - "Global coverage (216 countries) — no gap-fill needed for cohort"
+    - "CC BY 4.0 license — Convention #7 + #60 compatible"
+    - "Genuinely per-substation values (differentiated by ~10 km pixels)"
+    - "Retires the Task #450 SYSTEMIC fleet-uniform 0.5 fallback for
+       8 Wave 4 majors — architectural gain beyond just closing the R2 defect"
+    - "20-yr sum reduces annual-data noise per author recommendation —
+       aligns with 'score' semantic (stable per-site value, not time series)"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  4. SOURCE VERIFICATION — Niva et al. 2023 (VERIFIED 23 JUL 2026)
+# ═══════════════════════════════════════════════════════════════════
+
+source_verification:
+  fetched_utc: "2026-07-23T10:00Z"
+  fetch_result: SUCCESS
+
+  citation:
+    authors:
+      - "Niva, Venla (Aalto University, ORCID 0000-0002-1456-4881)"
+      - "Horton, Alexander (Aalto)"
+      - "Virkki, Vili (Aalto)"
+      - "Heino, Matias (Aalto)"
+      - "Kallio, Marko (Aalto)"
+      - "Kinnunen, Pekka (Aalto)"
+      - "Abel, Guy J (Wittgenstein Centre / Shanghai University)"
+      - "Muttarak, Raya (Wittgenstein Centre / University of Bologna)"
+      - "Taka, Maija (Aalto)"
+      - "Varis, Olli (Aalto)"
+      - "Kummu, Matti (Aalto, ORCID 0000-0001-5096-0163)"
+    paper: "World's human migration patterns in 2000-2019 unveiled by high-resolution data"
+    journal: "Nature Human Behaviour"
+    volume: 7
+    pages: "2023-2037"
+    year: 2023
+    doi: "10.1038/s41562-023-01689-4"
+
+  dataset:
+    doi: "10.5281/zenodo.7997134"
+    zenodo_url: "https://zenodo.org/records/7997134"
+    version: "v2023-07"
+    published: "2023-07-28"
+    license: "CC BY 4.0"
+    license_url: "https://creativecommons.org/licenses/by/4.0/legalcode"
+    license_note: "Compatible with Convention #7 (documented-proxy) + Convention #60 (open non-commercial)"
+
+  files_available:
+    canonical_choice: raster_netMgr_2000_2019_20yrSum.tif
+    canonical_choice_rationale: >
+      Author recommendation: "use multi-year sums to reduce noise". 20-year
+      sum is the cleanest single-band signal + smallest file (10.5 MB) +
+      aligns with 'score' semantic (single stable per-site value).
+    canonical_file_size_mb: 10.5
+    canonical_file_md5: "97793810040b30dd4f4ffc889c52cef7"
+    canonical_file_url: "https://zenodo.org/records/7997134/files/raster_netMgr_2000_2019_20yrSum.tif?download=1"
+
+  raster_metadata:
+    resolution: "5 arc-min (0.083333333 degrees) — approx 10 km at equator"
+    spatial_extent: "Lon: [-180, 180], Lat: [-90, 90] (global)"
+    crs: "EPSG:4326 (WGS84 lat/lon)"
+    format: "single-band GeoTIFF (20-yr sum aggregate 2000-2019)"
+    units: "persons per 1000 people per 20-year period"
+    coverage: "216 countries or sovereign states"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  5. SEMANTIC CLARIFICATION — Range mapping spec
+# ═══════════════════════════════════════════════════════════════════
+
+range_mapping_spec:
+  raw_raster_units: "persons per 1000 people per 20-year period"
+  raw_raster_typical_range: "[-500, +500]"  # empirical, Niva paper Fig 1
+  raw_raster_extreme_range: "[-1000, +2000]"  # empirical extreme outliers
+
+  target_range: "[0, 1]"
+  target_convention:
+    0.0: "extreme net out-migration (population loss)"
+    0.5: "neutral (no net migration)"
+    1.0: "extreme net in-migration (population gain)"
+
+  proposed_mapping_formula: |
+    # Symmetric hyperbolic tangent squash — centered at zero, saturates
+    # smoothly at [0, 1] extremes. Prevents extreme outliers from
+    # dominating the [0, 1] scale while preserving order + magnitude.
+    #
+    # Reference constant K = 200 persons/1000/20yr = author-empirical
+    # "moderate net migration" (Niva 2023 Fig 2 histogram median for
+    # non-zero cells) → maps to score ~0.75 (in-migration) or ~0.25 (out).
+    def raster_to_score(raw_persons_per_1000_per_20yr):
+        K = 200.0
+        return 0.5 + 0.5 * math.tanh(raw_persons_per_1000_per_20yr / K)
+
+  alternatives_considered:
+    - "Linear normalize by percentile [P5, P95] — sensitive to outliers"
+    - "Sigmoid instead of tanh — same behavior, different constants"
+    - "Absolute-value tanh — loses direction info; rejected"
+
+  gate_a_operator_decision_needed:
+    - "Confirm target [0, 1] range vs alternatives"
+    - "Confirm 0.5 = neutral (in line with Wave 4 majors' current fallback)"
+    - "Confirm tanh(x/200) formula or specify alternative"
+    - "Confirm using 20-yr sum (vs 5-yr sum with 4 windows averaged)"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  6. SCOPE DECISION — Fill-Nones-only vs also-normalize-existing
+# ═══════════════════════════════════════════════════════════════════
+
+scope_decision:
+  # This is a MONSTER-avoidance decision. Choosing narrowly closes R2 D3
+  # defect only. Choosing broadly ALSO closes the semantic drift picture
+  # but risks scope creep into Task #450 SYSTEMIC.
+
+  proposed_scope: NARROW    # fill Nones only, leave existing values intact
+  proposed_scope_rationale: >
+    Narrow scope closes R2 Defect Class 3 as originally scoped. The
+    per-country semantic drift (Denmark rescale, Mexico rescale, Italy
+    fleet-uniform, Wave 4 majors 0.5 fallback) is Task #450 SYSTEMIC scope
+    and deserves its own workstream. Bundling both into #452 risks
+    monster-creep AND blurs the Task #451/#452 sibling pattern which was
+    exclusively "close R2 Defect Class N".
+
+  narrow_scope_deliverable:
+    "Enrich the 155,000 currently-None substations with Niva-derived
+     migration_score in [0, 1] range. Leave existing 641,000 populated
+     values untouched (including the 8 Wave 4 majors' 0.5 fleet-uniform
+     fallback + Denmark's tiny [-0.02, +0.04] values + Mexico's [-5, +8]
+     values + Italy's -5.0 fleet-uniform). These persist as visible drift
+     signal per Convention #56."
+
+  gate_a_operator_decision_needed:
+    - "Confirm NARROW scope (recommended) — fill Nones only"
+    - "OR confirm WIDE scope — also normalize existing values into [0, 1]"
+
+  wide_scope_risk_if_chosen:
+    - "Overwrites values that some downstream consumer may rely on"
+    - "Changes cohort-wide distribution shape → downstream reruns needed"
+    - "Duplicates Task #450 SYSTEMIC scope"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  7. RISK INVENTORY — 8 items × mitigation × sentinel
+# ═══════════════════════════════════════════════════════════════════
+
+risk_inventory:
+
+  - id: R1
+    risk: "Zenodo download fails or is slow (338 MB total, 10.5 MB for canonical)"
+    likelihood: "low"
+    impact: "blocks Step 4"
+    mitigation: >
+      Download to local Mac (residential IP + normal bandwidth) rather
+      than sandbox. Same pattern as Task #451 GHSL. If Zenodo unreachable:
+      fallback to GitHub mirror at github.com/mattikummu/global_net_migration
+    sentinel: "diagnose-only mode verifies raster presence + integrity md5"
+
+  - id: R2
+    risk: "Raster CRS mismatch or read failure"
+    likelihood: "low"
+    impact: "blocks Step 3"
+    mitigation: >
+      Niva is EPSG:4326 (WGS84) — SIMPLER than GHSL Mollweide. Direct
+      lat/lon pixel index (no reprojection needed). Fewer pyproj dependencies.
+    sentinel: "diagnose-only smoke reads raster + reports shape + bounds"
+
+  - id: R3
+    risk: "Range mapping formula produces distributional artifacts"
+    likelihood: "medium"
+    impact: "distorts downstream R2 scoring"
+    mitigation: >
+      Gate A operator sign-off on formula + Gate B pilot country
+      empirical spot-check with distribution visualization (histogram of
+      100 subs before/after mapping). Adjust formula if distribution is
+      skewed vs Norway's known-good real distribution.
+    sentinel: "post-apply distribution check — every country's populated
+               values should have mean in [0.3, 0.7] and stdev > 0.02
+               UNLESS country is genuinely uniform"
+
+  - id: R4
+    risk: "Convention #56 fallback rate is high (raster gaps in remote areas)"
+    likelihood: "medium"
+    impact: "many substations get None values"
+    mitigation: >
+      Niva has global coverage (216 countries) so gap rate should be
+      LOWER than GHSL (0.17% for Task #451). Still expect some remote
+      subs to fall on NoData pixels (deserts, oceans, protected areas).
+    sentinel: "acceptable Convention #56 fallback rate < 1% cohort-wide"
+
+  - id: R5
+    risk: "Downstream R2 scoring formula breaks on new mig_score distribution"
+    likelihood: "low"
+    impact: "R2 scores shift materially cohort-wide"
+    mitigation: >
+      Gate B empirical spot-check on pilot country compares R2 score
+      distribution before/after enrichment. If shift is > 1 band across
+      > 20% of subs, halt + investigate.
+    sentinel: "R2 band distribution shift check per Task #450/#461 pattern"
+
+  - id: R6
+    risk: "Wave 4 majors' fleet-uniform 0.5 gets misinterpreted as populated
+           and skipped — 8 countries × 100+k subs left with fake 0.5"
+    likelihood: "high (this IS the current state)"
+    impact: "R2 defect class 3 remains open for 8 majors"
+    mitigation: >
+      Two options: (a) NARROW scope leaves 0.5 fallback intact — Task #450
+      SYSTEMIC deferred; (b) WIDE scope adds `--override-wave4-fallback`
+      flag that specifically targets 0.5-uniform fleets.
+    sentinel: "explicit dry-run report shows n_wave4_majors_skipped + note"
+
+  - id: R7
+    risk: "Norway/Lithuania/Ireland real distributions accidentally overwritten"
+    likelihood: "low (with NARROW scope)"
+    impact: "loses genuinely rich per-substation data"
+    mitigation: >
+      NARROW scope = fill Nones only. force_rewrite flag NOT used.
+      Explicit sentinel: no country with genuine per-substation
+      distribution has more than 10% of subs overwritten.
+    sentinel: "post-apply integrity check on norway/lithuania/ireland/denmark"
+
+  - id: R8
+    risk: "Niva 20-yr sum vs cohort target vintage 2025 — 5-year staleness"
+    likelihood: "certain (Niva coverage ends 2019)"
+    impact: "reader may question temporal alignment"
+    mitigation: >
+      Convention #7 documented-proxy — cite Niva vintage explicitly in
+      audit trail + esg-sections.js narrative. Note 20-yr sum smooths
+      inter-annual noise and captures structural rather than current-year
+      migration patterns. Acceptable for a 'score' semantic.
+    sentinel: "esg-sections.js narrative + CLAUDE.md addendum cite vintage"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  8. STEP PLAN — 7 steps × substeps × acceptance gates × sentinels
+# ═══════════════════════════════════════════════════════════════════
+
+step_plan:
+
+  # ─── Step 1 (COMPLETED 23 Jul 2026) ─────────────────────────────
+  step_1_empirical_reframing:
+    status: DONE
+    output: "Cohort scan tally (see reframing section above)"
+
+  # ─── Step 2 ─────────────────────────────────────────────────────
+  step_2_source_verification:
+    status: DONE  # done in this YAML's source_verification section
+    output: "Niva et al. 2023 verified with all metadata"
+    completed_at: "2026-07-23"
+
+  # ─── GATE A — OPERATOR SIGN-OFF ─────────────────────────────────
+  gate_a_operator_signoff:
+    status: PENDING
+    decisions_needed:
+      - "Scope: NARROW (fill Nones only) vs WIDE (also normalize existing)"
+      - "Range mapping formula: tanh(x/200) vs alternative"
+      - "20-yr sum raster vs 5-yr sum with averaging"
+      - "Convention #56 fallback threshold: 1% or other"
+      - "Pilot country for Gate B: spain (default) or other"
+    outputs: "Signed-off pre-flight YAML with operator confirmation"
+
+  # ─── Step 3 ─────────────────────────────────────────────────────
+  step_3_utility_authoring:
+    entry_gate: "Gate A signed off"
+    substeps:
+      - 3a: "Author scripts/pipeline/enrichment/migration_score.py skeleton
+             (mirror catchment_population.py architecture)"
+      - 3b: "Implement NivaRaster class with WGS84 direct-index (no
+             reprojection) + single-band read"
+      - 3c: "Implement raster_to_score() mapping function per Gate A formula"
+      - 3d: "Implement per-substation single-point sample OR 5 km catchment
+             mean weighted by GHSL population (Gate A decision)"
+      - 3e: "Add Convention #56 None fallback + audit trail marker
+             _migration_score_source = 'NIVA_2023_20YR_SUM_v4_2_task_452'"
+      - 3f: "CLI supports single-country + --all-countries + --dry-run +
+             --diagnose-only (--force-rewrite deferred to Wide scope only)"
+    output_files:
+      - scripts/pipeline/enrichment/migration_score.py (NEW ~350 LOC)
+    acceptance_gate: >
+      python3 scripts/pipeline/enrichment/migration_score.py --diagnose-only
+      reports ready_for_step_4 = true
+    sentinel_stub: >
+      Sentinel file authored at Step 5a; here just verify utility imports
+      + raster loads + a single lat/lon sample returns a value.
+
+  # ─── Step 4 ─────────────────────────────────────────────────────
+  step_4_cohort_apply:
+    entry_gate: "Step 3 acceptance gate GREEN"
+    substeps:
+      - 4a: "Operator: download Niva 20-yr raster to
+             docs/audits/raster_netMgr_2000_2019_20yrSum.tif from Zenodo
+             (10.5 MB — fast)"
+      - 4b: "Diagnose-only run on operator Mac — expect ready_for_step_4=true"
+      - 4c: "Single-country dry-run on PILOT (default spain, ~30k subs,
+             ~10s wall-clock estimated) → per-country audit JSON"
+
+      # ─── GATE B — OPERATOR EMPIRICAL SPOT-CHECK ───────────────
+      - GATE_B: >
+          Operator reviews pilot output:
+          - Distribution histogram (100 sample subs)
+          - Range check: values in [0, 1]
+          - Convention #56 fallback rate
+          - Compare vs Norway's known-good real distribution (mean~0.41,
+            stdev~0.28) — pilot should show reasonable variation
+          Operator signs off before cohort-wide apply.
+
+      - 4d: "Cohort-wide dry-run (39 countries, ~155k Nones to fill,
+             estimated ~1-2 min wall-clock)"
+      - 4e: "Cohort-wide APPLY (writes to ssi-data.json per country;
+             Convention #79 sharding preserved via read_ssi_data/write_ssi_data)"
+
+    acceptance_gate: >
+      All 39 countries write successfully;
+      cohort-wide Convention #56 fallback rate < 1%;
+      no country loses genuine per-substation distribution (R7 risk).
+
+  # ─── Step 5 ─────────────────────────────────────────────────────
+  step_5_sentinel_doc_cascade:
+    entry_gate: "Step 4 acceptance gate GREEN"
+    substeps:
+      - 5a: "Author tests/test_migration_score_niva.py mirror
+             tests/test_catchment_population_ghsl.py pattern.
+             Invariants:
+             (i)   UTILITY CONSTANT LOCK — raster path + audit marker
+             (ii)  AUDIT TRAIL — every populated post-Task-#452 sub carries
+                   _migration_score_source marker
+             (iii) VALUE INVARIANT — migration_score ∈ [0, 1]
+             (iv)  COHORT SoT — 39 slugs
+             (v)   NO REGRESSION on 4 real-distribution countries
+                   (norway, lithuania, ireland, denmark) — Gate B pilot data"
+      - 5b: "esg-sections.js R2 validity paragraph — add migration_score
+             GHSL-analog closure + Niva provenance + [0, 1] range note"
+      - 5c: "esg-sections.js data-sources fallback — add Niva 2023 row"
+      - 5d: "CLAUDE.md Phase 2F addendum (sibling to Phase 2E)"
+      - 5e: "Foundation KB §8bis — extend Discipline #47 candidate OR
+             register #48 candidate (Path C spatial migration proxy)"
+
+    acceptance_gate: >
+      All 5 sub-deliverables land + sentinel passes at Xxx/Xxx GREEN
+      (~50 tests expected).
+
+  # ─── Step 6 ─────────────────────────────────────────────────────
+  step_6_commit_chain_push:
+    entry_gate: "Step 5 acceptance gate GREEN"
+    substeps:
+      - 6a: "Commit A — utility + sentinel + doc cascade (6-8 files)"
+      - 6b: "Commit B — cohort ssi-data.json + shard updates (~50-60 files)"
+      - 6c: "Push origin/main"
+    acceptance_gate: "Push succeeds; git log --oneline confirms both commits"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  9. SENTINEL MATRIX
+# ═══════════════════════════════════════════════════════════════════
+
+sentinel_matrix:
+  - name: "Utility diagnose-only smoke"
+    step: 3+4
+    when: "before any write"
+    verifies: "deps + raster + module importable"
+
+  - name: "Step 4c single-country pilot audit"
+    step: 4c
+    when: "before Gate B"
+    verifies: "range + distribution + Convention #56 rate"
+
+  - name: "Step 4d cohort dry-run audit"
+    step: 4d
+    when: "before apply"
+    verifies: "wall-clock + cohort-wide n_written / n_none"
+
+  - name: "test_migration_score_niva.py cohort integrity"
+    step: 5a
+    when: "after apply"
+    verifies: >
+      (i) audit marker per populated post-#452 sub;
+      (ii) [0, 1] range invariant on all subs written by Task #452
+           (existing values pre-#452 skipped from range check per NARROW scope);
+      (iii) Norway/Lithuania/Ireland/Denmark distributions preserved
+           (< 5% of subs' values changed vs pre-Task-#452 state)
+
+  - name: "Housekeeping sentinel — no det_var(seed+'mig' ...) in scripts/"
+    step: 5a
+    when: "after apply"
+    verifies: "No synthetic generator introduced (Convention #56 preservation)"
+
+  - name: "Convention preservation matrix"
+    step: after 5e
+    when: "at closure"
+    verifies: "#7 #56 #60 #79 all preserved"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  10. ROLLBACK PLAN
+# ═══════════════════════════════════════════════════════════════════
+
+rollback_plan:
+
+  per_step:
+    step_3: "Delete scripts/pipeline/enrichment/migration_score.py + revert git"
+    step_4: "git checkout HEAD -- '*/ssi-data*.json' before push"
+    step_5: "git checkout HEAD -- tests/test_migration_score_niva.py
+             esg-sections.js CLAUDE.md"
+    step_6: "If push accepted but LP-DD feedback requires revert:
+             git revert <commit-A-sha> <commit-B-sha> ; git push"
+
+  whole_workstream:
+    trigger: "Gate A fails (operator declines Path C)"
+    action: "Delete this YAML + drop Task #452 back to pending;
+             suggest Path A minimum-viable UN DESA country scalar
+             as fallback"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  11. DEFERRED SCOPE — Explicitly OUT of Task #452
+# ═══════════════════════════════════════════════════════════════════
+
+deferred_scope:
+  - "Per-country semantic drift cleanup (Denmark tiny values, Mexico
+     percent-scale, Italy fleet-uniform -5.0) — Task #450 SYSTEMIC scope"
+  - "Wave 4 majors' 0.5 fleet-uniform fallback replacement (8 countries,
+     ~640k subs) — depends on operator decision at Gate A"
+  - "Real-time (< 5 year lag) migration data — Niva vintage 2019
+     acceptable as documented-proxy"
+  - "Sub-national admin polygon aggregation (adm1/adm2 gpkg alternative
+     to gridded raster) — could be Task #452b if Path C empirical fails"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  12. SUCCESS CRITERIA — What 'done' looks like
+# ═══════════════════════════════════════════════════════════════════
+
+success_criteria:
+  quantitative:
+    - "Cohort-wide n_populated grows from ~641k → ~795k (+~155k enriched)"
+    - "Convention #56 fallback rate < 1% (< 8k None cohort-wide)"
+    - "39/39 countries have at least 90% of subs populated"
+    - "0 subs written by Task #452 outside [0, 1] range"
+    - "Norway/Lithuania/Ireland/Denmark: <5% of subs' values changed"
+    - "Sentinel test_migration_score_niva.py: XX/XX GREEN"
+
+  qualitative:
+    - "R2 audit paragraph in esg-sections.js reflects closure honestly"
+    - "CLAUDE.md Phase 2F documents Task #452 with same rigor as Phase 2E"
+    - "Foundation KB Discipline candidate registered (or extended #47)"
+    - "Post-apply cohort distribution passes visual sanity check"
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  13. OPERATOR SIGN-OFF LOG
+# ═══════════════════════════════════════════════════════════════════
+
+operator_signoff_log:
+  gate_a:
+    status: SIGNED_OFF
+    date: "2026-07-23"
+    decisions:
+      scope: NARROW_PLUS_FLEET_UNIFORM_OVERRIDE  # Gate A rev2 23 Jul 2026
+      scope_details: >
+        Fills Nones AND overrides fleet-uniform fallback distributions.
+        Detection rule: (n_unique == 1) AND (n_populated > 100) — the
+        Task #450 SYSTEMIC signature. Auto-overrides ~640k subs across
+        9 Wave 4 majors (france/germany/us/italy/spain/portugal/sweden/
+        australia/japan) whose migration_score is a fleet-uniform national
+        scalar (0.5 fallback OR italy -5.0 miscoding). Preserves genuine
+        per-substation distributions (norway 742 unique / lithuania 332 /
+        ireland 25 / denmark 590 / mexico 18 / new-zealand 67).
+      gate_a_rev2_trigger: >
+        Empirical Gate B spot-check on Spain 23 Jul 2026 revealed all
+        30,222 subs skipped under original NARROW logic because their
+        migration_score is 0.5 fleet-uniform fallback (non-None). Original
+        NARROW would have covered only 155k / 796k subs (~19%). Fleet-
+        uniform detection restores meaningful R2 D3 closure (~795k / 796k
+        ~99%) while still preserving real distributions.
+      range_mapping: "0.5 + 0.5 * tanh(x / 200.0)"
+      raster_product: "raster_netMgr_2000_2019_20yrSum.tif (20-yr sum, 10.5 MB)"
+      convention_56_threshold_pct: 1.0
+      pilot_country_for_gate_b: spain
+    notes: >
+      Operator directive 23 Jul 2026: "proceed with 1 to 5 based on your
+      recommendations". All 5 Gate A decisions accepted as recommended.
+      Step 3 (utility authoring) unblocked; Step 4 requires operator
+      raster download + Gate B empirical spot-check.
+
+  gate_b_pilot_review:
+    status: PENDING
+    date: null
+    pilot_country: null
+    distribution_review: null
+    convention_56_rate: null
+    proceed_to_cohort: null
+    notes: null
+
+  gate_workstream_close:
+    status: PENDING
+    date: null
+    sentinel_result: null
+    commits: null
+    push_result: null
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  14. CROSS-REFERENCES
+# ═══════════════════════════════════════════════════════════════════
+
+cross_references:
+  parent_task: "Task #450 SYSTEMIC (Wave 4 per-substation interpolation regression)"
+  grandparent_task: "Task #117 / #159 (D2 modifier drift class)"
+  sibling_task: "Task #451 (catchment_population GHSL enrichment) — TEMPLATE"
+  next_sibling_task: "Task #453 (Luxembourg / Slovenia / Colombia / Lithuania
+                     major partial socio_economic coverage)"
+
+  reference_documents:
+    - "docs/audits/task_451_catchment_population_preflight_20260723.yaml"
+    - "scripts/pipeline/enrichment/catchment_population.py"
+    - "tests/test_catchment_population_ghsl.py"
+    - "CLAUDE.md Phase 2E addendum (line 149)"
+    - "esg-sections.js R2 Grid Equity validity paragraph"
+
+  conventions_preserved:
+    - "#7  Data-Layer Anchoring documented-proxy"
+    - "#56 Visibly-honest degradation"
+    - "#60 Ikenga IS the ESG provider (non-commercial)"
+    - "#79 ssi-data sharding"
+
+# ═══════════════════════════════════════════════════════════════════
+# END PRE-FLIGHT YAML
+# ═══════════════════════════════════════════════════════════════════

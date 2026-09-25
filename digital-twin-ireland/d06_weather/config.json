@@ -1,0 +1,85 @@
+{
+  "module": "d06_weather",
+  "country": "Ireland",
+  "country_code": "IE",
+  "description": "ERA5/Open-Meteo weather extraction — county-level climate statistics",
+  "data_sources": [
+    {
+      "name": "Open-Meteo Historical Weather API",
+      "url": "https://open-meteo.com/en/docs/historical-weather-api",
+      "license": "CC BY 4.0"
+    },
+    {
+      "name": "ERA5 Reanalysis (via Copernicus)",
+      "url": "https://www.ecmwf.int/en/era5-land",
+      "license": "CC BY 4.0"
+    }
+  ],
+  "climate_profile": {
+    "classification": "Maritime temperate oceanic",
+    "characteristics": [
+      "Mild winters (rarely below -5°C)",
+      "Cool summers (15-20°C average)",
+      "Frequent precipitation year-round",
+      "Strong Atlantic winds dominant",
+      "High humidity (> 80% annual average)"
+    ]
+  },
+  "variables": [
+    "temperature_2m",
+    "wind_speed_10m",
+    "wind_direction_10m",
+    "precipitation",
+    "snowfall",
+    "ice_days",
+    "frost_days",
+    "relative_humidity"
+  ],
+  "temporal_coverage": {
+    "baseline_period": "2020-2025",
+    "years": 5,
+    "temporal_resolution": "daily"
+  },
+  "spatial_resolution": {
+    "level": "county",
+    "total_counties": 26,
+    "grid_spacing_km": 2.5
+  },
+  "validation_ranges": {
+    "temperature_2m_celsius": [-10, 30],
+    "wind_speed_10m_ms": [0, 30],
+    "precipitation_mm": [0, 200],
+    "snowfall_cm": [0, 100],
+    "relative_humidity_pct": [0, 100],
+    "ice_days_per_year": [0, 40]
+  },
+  "regional_parameters": {
+    "atlantic_coast_counties": ["Donegal", "Sligo", "Mayo", "Galway", "Kerry", "Clare", "Cork", "Waterford"],
+    "inland_counties": ["Cavan", "Monaghan", "Leitrim", "Roscommon", "Westmeath", "Longford", "Offaly", "Laois"],
+    "southern_counties": ["Cork", "Kerry", "Limerick", "Waterford", "Tipperary", "Carlow", "Wexford"],
+    "northern_counties": ["Donegal", "Leitrim", "Cavan", "Monaghan", "Louth", "Meath"],
+    "urban_centers": ["Dublin", "Cork", "Galway", "Limerick", "Waterford"]
+  },
+  "hazard_indices": {
+    "I1": {
+      "name": "Snow/Ice hazard",
+      "components": ["snowfall", "ice_days", "frost_days"]
+    },
+    "I2": {
+      "name": "Storm/Wind hazard",
+      "components": ["wind_speed_10m", "precipitation"]
+    },
+    "I3": {
+      "name": "Heat hazard",
+      "components": ["temperature_2m"],
+      "note": "Minimal for Ireland"
+    }
+  },
+  "reference_year": 2025,
+  "refresh_freq": "annual",
+  "quality_control": {
+    "missing_data_tolerance_pct": 5,
+    "outlier_detection": true,
+    "interpolation_method": "kriging"
+  }
+}

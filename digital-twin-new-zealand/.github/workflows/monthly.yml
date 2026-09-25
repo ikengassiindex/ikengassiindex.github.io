@@ -1,0 +1,50 @@
+name: Monthly Refresh — New Zealand Digital Twin
+
+on:
+  schedule:
+    - cron: '0 10 1 * *'   # 1st of each month, 10:00 UTC
+  workflow_dispatch:         # manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  monthly-refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: d04_statistics — Grid performance refresh
+        run: python d04_statistics/main.py
+
+      - name: d06_weather — Weather data refresh
+        run: python d06_weather/main.py
+
+      - name: Validate outputs
+        run: |
+          python -c "
+          import json, sys
+          for m in ['d04_statistics', 'd06_weather']:
+              with open(f'{m}/output.json') as f:
+                  data = json.load(f)
+              assert 'meta' in data and 'data' in data, f'{m} output missing required keys'
+              assert data['meta']['version'] == '4.0.2', f'{m} version mismatch'
+              print(f'  ✓ {m}: {data[\"meta\"][\"records\"]} records')
+          print('Monthly refresh validation passed')
+          "
+
+      - name: Commit updated outputs
+        run: |
+          git config user.name "SSI Pipeline Bot"
+          git config user.email "pipeline@ikenga.eu"
+          git add d04_statistics/output.json d06_weather/output.json
+          git diff --staged --quiet || git commit -m "chore: monthly refresh NZ $(date +%Y-%m)"
+          git push

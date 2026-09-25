@@ -1,0 +1,107 @@
+# ════════════════════════════════════════════════════════════════════════════
+# C DEFINITIONS — France.  Layer 0 of the C mosaic.
+# Every quotation below was read at its cited source on 25 September 2026.
+# §7.6.
+# ════════════════════════════════════════════════════════════════════════════
+
+jurisdiction: france
+regulator: CRE
+operator: Enedis
+compiled: 2026-09-25
+
+indices:
+
+  C1_unplanned_long_min:
+    source_label: Durée moyenne de coupure par client BT — "Critère B"
+    url: https://opendata.enedis.fr/datasets/duree-moyenne-de-coupure-bt
+    unit_geographic: national
+    unit: minutes per LV customer per year
+    cre_definition: >
+      "la durée moyenne annuelle de coupure par utilisateur des réseaux
+      publics de distribution raccordé en BT"
+    cre_source: https://www.cre.fr/fileadmin/Documents/Rapports_et_etudes/import/101029_RapportQualiteElectricite.pdf
+    enedis_exclusions: >
+      "Les valeurs affichées correspondent à des durées moyennes annuelles de
+      coupure sur le réseau géré par Enedis hors événements exceptionnels et
+      hors RTE."
+    basis: >
+      UNPLANNED, EXCEPTIONAL EVENTS EXCLUDED, UPSTREAM TRANSMISSION EXCLUDED.
+      This is the critical reading. CRE's own taxonomy distinguishes
+      "critère B TCC" (toutes causes confondues, which includes the
+      "critère B travaux" planned component) from "critère B HIX" (hors
+      incidents exceptionnels). What Enedis publishes open is the HIX-type
+      figure and it additionally removes RTE-origin events.
+    voltage: BT (low voltage) only. The HTA counterpart is published
+             separately and CRE calls it "Critère M".
+
+  C2_unplanned_longshort_n:
+    source_label: Fréquence moyenne de coupure par client BT
+    url: https://opendata.enedis.fr/datasets/frequence-moyenne-de-coupure-par-client-bt/
+    unit_geographic: national
+    unit: interruptions per LV customer per year
+    threshold: >
+      "Cet indicateur tient compte à la fois des coupures longues
+      (supérieures à 3 min) et des coupures brèves (entre 1s et 3 min)."
+    published_split: >
+      three columns — frequence_moyenne_de_coupure_longue_non_planifiee,
+      frequence_moyenne_de_coupure_longue_planifiee, and
+      frequence_moyenne_de_coupure_breve. C2 on Italy's basis (unplanned long
+      AND short) is longue_non_planifiee + breve.
+    exclusions: same as C1 — hors événements exceptionnels et hors RTE
+
+  C4_planned_min:
+    source_label: >
+      duree_annuelle_moyenne_de_coupure_planifiees_par_client_minutes, in the
+      critère B dataset
+    unit_geographic: national
+    unit: minutes per LV customer per year
+    note: >
+      France publishes planned interruption DURATION in minutes, as Italy
+      does. The estate's typed France file emitted "C4_planned_count" — a
+      count. No French source publishes that quantity. C4 is a duration and
+      the schema must say so.
+
+  C3_mt_exceed_pct:
+    source_label: Indicateur réglementaire continuité d'alimentation
+    url: https://opendata.enedis.fr/datasets/indicateur-continuite-dalimentation/
+    unit_geographic: département
+    unit_count: 94
+    years: 2009 to 2024
+    unit: per cent of a département's HTA and BT customers
+    meaning: >
+      the share of customers falling outside the regulatory continuity
+      standard. This is C3_MT_exceed_pct, the string the metric registry
+      blocks C3 on, and it is the ONLY sub-national continuity metric France
+      publishes.
+    licence: Licence Ouverte / Open Licence 2.0
+
+comparability_with_italy:
+  like_for_like_2024:
+    france_C1: 53.300   # hors événements exceptionnels, hors RTE
+    italy_C1: 44.840    # "altre cause" — own MV/LV origin
+    reading: >
+      These two are the comparable pair. France's published critère B already
+      excludes exceptional events and upstream transmission, which is the
+      same exclusion Italy's "altre cause" column applies. France is the
+      worse of the two on this basis.
+  do_not_compare:
+    france_C1_against_italy_all_causes: >
+      Italy's 73.11 is "tutte le cause" and includes exceptional events and
+      upstream origin. France publishes no all-causes equivalent open. Setting
+      53.300 beside 73.11 makes France look 27 per cent better when on a
+      matched basis it is 19 per cent worse. That error was made in this
+      session before these definitions were read.
+
+open_residual:
+  what: >
+    Whether the critère B DURATION series counts only interruptions longer
+    than three minutes. The FREQUENCY series states the 1s-3min / >3min split
+    explicitly; the duration series states its cause exclusions but not its
+    length treatment.
+  bound: >
+    France's 2024 brève count is 1.338 per customer. Even if every brève ran
+    the full three minutes and all were counted, the effect on a 53.300
+    minute figure is at most about 4 minutes, roughly 7 per cent, and the
+    realistic figure is far smaller. It is bounded, not resolved, and it is
+    recorded here rather than assumed away.
+  route: CRE's current qualité de l'électricité reporting, not yet read.

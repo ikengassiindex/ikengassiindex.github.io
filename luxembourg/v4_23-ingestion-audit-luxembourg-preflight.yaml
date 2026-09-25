@@ -1,0 +1,149 @@
+# Luxembourg v4.23 Ingestion Audit — Pre-flight
+# =============================================
+# Task: #208 (WAVE2-Step1 Luxembourg)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: luxembourg
+  iso2: LU
+  iso3: LUX
+  wave: 2
+  priority: 11
+  step: 1
+  target: "Owner enrichment via OSM Overpass — smallest cohort country by area"
+  rationale: >
+    Luxembourg carries 89 substations with 0% owner tagged and 72% voltage-null.
+    Second application of Greenland monopoly-class pattern (fastest possible
+    close): Creos Luxembourg S.A. is unified TSO+DSO covering ~90% of country,
+    with 4 small municipal DSOs (Sudstroum + Diekirch + Ettelbruck + Vianden).
+
+baseline_state:
+  ssi_data_substations: 89
+  grid_geo_substations: 91
+  grid_geo_lines: 628
+  lines_per_substation_ratio: 7.05  # high — reflects MV distribution ingestion in tiny country
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: ~28.1  # 25/89 tagged — 72% NULL
+  region_coverage_pct: ~100.0  # all 11 cantons populated
+  cantons_split:
+    Esch-sur-Alzette: 18
+    Luxembourg: 16
+    Mersch: 13
+    Capellen: 10
+    Clervaux: 7
+    Diekirch: 7
+    Grevenmacher: 6
+    Echternach: 4
+    Redange: 3
+    Wiltz: 3
+    Remich: 2
+  voltage_class_top:
+    null: 64   # 72% NULL — largest fill opportunity ratio
+    220_kv: 10  # EHV interconnection (Belgium + Germany)
+    65_kv: 9    # Luxembourg-specific HV tier (unusual — most EU is 66/110/132)
+    20_kv: 6    # MV distribution
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [5.7, 49.4, 6.55, 50.20]  # west, south, east, north
+    strategy: >
+      Single-query pattern — Luxembourg bbox ~2.6k km² (SMALLEST cohort-wide,
+      ~1/12 Belgium). Sub-1-minute fetch expected.
+    expected_yield:
+      substations: 150-400
+      lines: 500-2000
+    tag_completeness_hypothesis: >
+      Luxembourg OSM tagging density typically 60-80% for metropolitan
+      (Luxembourg City + Esch-sur-Alzette). Rural cantons 30-50%.
+    lp_dd_class: canonical
+
+  fallback_monopoly_registry:
+    strategy: creos_monopoly_default
+    rationale: >
+      Second application of Greenland's monopoly-class pattern. Creos
+      Luxembourg S.A. is the dominant vertically-integrated TSO+DSO
+      (~90% country coverage). Small municipal DSOs picked up via
+      direct OSM operator= tag or optional geofence.
+    primary: Creos Luxembourg S.A.
+    optional_municipal_geofences:
+      Sudstroum: "south (Esch-sur-Alzette canton, lat ~49.50 lon ~5.98)"
+      Ville de Diekirch: "Diekirch canton small city center"
+      Ville d'Ettelbruck: "Ettelbruck small city center"
+      Ville de Vianden: "Vianden small city center (north)"
+
+  dso_alias_normalisation:
+    aliases:
+      "Creos Luxembourg S.A.": Creos
+      "Creos Luxembourg SA": Creos
+      "Creos Luxembourg": Creos
+      "Creos": Creos
+      "CEGEDEL": Creos  # pre-2009 predecessor
+      "Enovos": Creos  # sister company (supply); grid is Creos
+      Sudstroum: Sudstroum
+      "Ville de Diekirch": "Ville de Diekirch"
+      "Ville d'Ettelbruck": "Ville d'Ettelbruck"
+      "Ville de Vianden": "Ville de Vianden"
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/luxembourg/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # Creos monopoly default + optional municipal geofence
+    - osm_overpass.py  # single-query (smallest cohort)
+    - merge_into_ssi_data.py  # 500m proximity + region fallback
+  pattern_reused_from: greenland (pure MONOPOLY with historical alias)
+  differentiators_vs_greenland:
+    - vertically_integrated_operator: Creos is TSO+DSO combined vs Greenland's Nukissiorfiit generation-focus
+    - municipal_dso_overlay: 4 small municipal DSOs distinct from Creos vs Greenland's pure monopoly
+    - historical_alias_deeper: CEGEDEL pre-2009 predecessor + Enovos sibling co consolidation
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # monopoly pattern trivial
+  post_merge_voltage_coverage: 50-80%  # from 28% baseline — moderate fill
+  post_merge_substations: 89-500
+  post_merge_lines: 700-2500
+  km_of_lines: 3000-8000
+
+risks_flagged:
+  - risk_1: >
+      Luxembourg is a cross-border grid hub — 220 kV interconnections to
+      Belgium (Elia via Aubange) + Germany (Amprion via Vianden pumped
+      storage). Discipline #36 cross-border filter should handle these
+      cleanly, but a few OSM substations may sit exactly on borders.
+  - risk_2: >
+      Small size means single OSM ingestion vintage difference can dominate
+      results. Compact country makes geofence resolution reliable.
+
+convention_preservation:
+  discipline_36:
+    scope: Luxembourg bounds already CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      CEGEDEL (pre-2009 predecessor) preserved via osm_original_operator
+      for historical audit.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to luxembourg/ + scripts/pipeline/ingestion/luxembourg/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.luxembourg.osm_overpass`
+    locally. Expected wall-clock <1 min (smallest cohort by area).
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.luxembourg.merge_into_ssi_data`.
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2

@@ -1,0 +1,128 @@
+# Belgium v4.23 Ingestion Audit — Step 4 merge
+# ================================================
+# Task: #191 (WAVE2-Step4 Belgium)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local merge execution complete
+
+meta:
+  country: belgium
+  iso2: BE
+  iso3: BEL
+  wave: 2
+  step: 4
+  parent_fetch: belgium/v4_23-ingestion-audit-belgium-fetch.yaml
+  merged_at_utc: "2026-07-13T15:14:58Z"
+  wall_clock_secs: ~120  # 2 min — very fast
+
+merge_operations:
+  substations:
+    baseline: 1219
+    fresh_osm: 7299
+    matched_within_500m: 1867  # HIGHER than baseline 1,219 — metro clustering: multiple OSM subs within 500m of some baseline substation
+    owner_enriched: 1867
+    voltage_filled: 19  # small — most baseline nulls didn't have nearby OSM match
+    voltage_xcheck_mismatches: 58  # 3.1% mismatch rate — MUCH cleaner than Australia's 48.8%
+    net_new: 5432
+    final_count: 6651
+    delta_pct: +445.6
+  lines:
+    baseline: 4017
+    fresh_osm: 8428
+    appended: 3215
+    deduped_midpoint_100m: 5213  # 61.9% dedupe rate — heavy existing overlap
+    final_count: 7232
+    delta_pct: +80.0
+
+file_sizes_post_merge:
+  ssi_data_json_mb: 10.0
+  grid_geo_json_mb: 2.4
+  under_90_mb_threshold: true
+  optimisation_needed: false
+
+authoritative_cohort_metrics_post_merge:
+  substations: 6651
+  lines: 7232
+  km_of_transmission_lines_haversine: 8364
+  km_per_substation: 1.3  # very compact — Belgium is small + dense
+  distinct_operators: 60
+  discipline_41_ratio: 1.09  # 7232 / 6651 — clean transmission-tier
+  voltage_split:
+    ehv_gte_220kv: 71  # 1.1% — small EHV footprint
+    hv_100_to_219kv: 201  # 3.0%
+    distribution_lt_100kv: 1476  # 22.2%
+    unknown_null: 4903  # 73.7% — reflects OSM tag heterogeneity on net-new LV subs
+
+coverage_post_merge:
+  owner_coverage_pct: 100.0  # ! from 0.0% baseline — MASSIVE WIN
+  voltage_coverage_pct: 26.3  # from 50.3% baseline — dropped because 5,432 net-new mostly LV without voltage tags
+  region_coverage_pct: 18.3  # baseline had regions on 1,219 subs; net-new 5,432 pending L2 spatial join
+  owner_coverage_by_provenance:
+    direct_osm_operator_tag: "24.4% of fresh OSM (1,780/7,299)"
+    dnsp_alias_normalised: "2.3% of fresh OSM (168/7,299) — Eandis/Infrax → Fluvius"
+    region_jurisdiction_fallback: "75.6% of fresh OSM (5,519/7,299)"
+    convention_56_unresolved_null: 0  # ZERO unresolved — clean-cut 3-region geofence
+
+top_15_operators_post_merge:
+  - {rank: 1, name: "Fluvius", count: 5037, note: "Flanders single DNSP (post-2018 Eandis+Infrax merger)"}
+  - {rank: 2, name: "ORES", count: 816, note: "Wallonia 4-province default"}
+  - {rank: 3, name: "Elia", count: 376, note: "TSO ≥150 kV federal network"}
+  - {rank: 4, name: "Sibelga", count: 113, note: "Brussels-Capital combined DNSP"}
+  - {rank: 5, name: "Resa", count: 102, note: "Wallonia Liège metro (geofence-resolved)"}
+  - {rank: 6, name: "Infrabel", count: 82, note: "Belgian railway infrastructure (direct-tagged, not normalised)"}
+  - {rank: 7, name: "Electrabel", count: 18, note: "Generation utility (direct-tagged)"}
+  - {rank: 8, name: "Ores", count: 14, note: "case-mismatch alias — should normalise to ORES (residual)"}
+  - {rank: 9, name: "PBE", count: 9, note: "Provinciale Brabantse Energiemaatschappij intermunicipal (direct-tagged)"}
+  - {rank: 10, name: "De Lijn", count: 6, note: "Flanders public transport traction (direct-tagged)"}
+  - {rank: 11, name: "Interelectra", count: 6, note: "intermunicipal (pre-Fluvius merger, direct-tagged)"}
+  - {rank: 12, name: "WVEM", count: 5, note: "West Vlaamse Energie- en Teledistributiemaatschappij (direct-tagged)"}
+  - {rank: 13, name: "EANDIS", count: 4, note: "case-mismatch alias — should normalise to Fluvius (residual)"}
+
+residual_alias_normalisation:
+  count_residual: 18  # Ores 14 + EANDIS 4
+  breakdown: |
+    Small residual case-sensitive alias-map misses. Fix in future refresh
+    with case-insensitive lookup in normalise_owner_alias. Not blocking —
+    18 subs / 6,651 = 0.27% of cohort.
+
+voltage_cross_validation:
+  matched_pairs: 1867
+  mismatches_gt_1_5x_ratio: 58
+  mismatch_rate_pct: 3.1
+  note: >
+    Very low mismatch rate (Australia was 48.8%). Reflects Belgium's higher
+    OSM voltage-tag consistency at metropolitan substations. Report at
+    belgium/v4_23-voltage-cross-validation.json.
+
+discipline_41_line_parity:
+  post_merge_check: OK
+  final_ratio: 1.09
+  envelope_after_task_182: "0.3 - 30 (widened)"
+  status: "very clean — transmission-tier only, minimal MV distribution ingested"
+
+convention_preservation:
+  discipline_36:
+    outcome: 3 substations + 31 lines dropped (~0.04% overshoot filtered)
+    tolerance: 100m default
+    status: PASS
+  discipline_41:
+    outcome: All net-new substations covered by ≥1 fresh line via line merge
+    status: PASS
+  convention_46:
+    outcome: no portfolio-scoped changes (single belgium/*.json)
+    status: PRESERVED
+  convention_56:
+    outcome: "DNSP alias normalisation preserves original OSM tag in raw_attributes.osm_original_operator"
+    residual_case_mismatches: 18 subs (0.27%) flagged for future case-insensitive refinement
+    status: PRESERVED
+  convention_60:
+    outcome: OSM (ODbL) + region-fallback (jurisdiction lookup) — no commercial providers
+    status: PRESERVED
+  convention_64:
+    outcome: strict per-country resolution (all writes to belgium/*.json)
+    status: PRESERVED
+
+next_step: "Step 5 (task #192): UI + doc cascade — landing page data-subs → 6,651, country page fleet + km + v4.23 callout, cohort audit sweep re-run."
+
+status: STEP_4_CLOSED

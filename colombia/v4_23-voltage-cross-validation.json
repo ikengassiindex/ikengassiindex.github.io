@@ -1,0 +1,43 @@
+{
+  "schema_version": "v4_23-voltage-cross-validation-1",
+  "generated_at_utc": "2026-07-13T19:03:53Z",
+  "source_pair": {
+    "existing_source": "OSM voltage= tags (colombia/ssi-data.json, prior vintage)",
+    "new_source": "CO-C1-osm-overpass fresh OSM voltage= tags"
+  },
+  "methodology": "For each matched substation pair (500 m proximity threshold), compare existing OSM-derived voltage_kv vs fresh OSM voltage_kv. Flag as 'voltage_tier_mismatch' when ratio exceeds 1.5x.",
+  "counts": {
+    "matched_pairs_evaluated": 404,
+    "voltage_tier_mismatches": 3,
+    "voltage_tier_mismatch_rate_pct": 0.74
+  },
+  "findings": [
+    {
+      "substation_id": "CO_000201",
+      "match_distance_m": 117.5,
+      "existing_voltage_kv": 115,
+      "osm_voltage_kv": 230.0,
+      "ratio": 2.0,
+      "osm_feature_id": "osm_way_169248620",
+      "flag": "voltage_tier_mismatch"
+    },
+    {
+      "substation_id": "CO_000280",
+      "match_distance_m": 201.5,
+      "existing_voltage_kv": 110,
+      "osm_voltage_kv": 220.0,
+      "ratio": 2.0,
+      "osm_feature_id": "osm_way_203164420",
+      "flag": "voltage_tier_mismatch"
+    },
+    {
+      "substation_id": "CO_000297",
+      "match_distance_m": 187.1,
+      "existing_voltage_kv": 110,
+      "osm_voltage_kv": 220.0,
+      "ratio": 2.0,
+      "osm_feature_id": "osm_way_691268607",
+      "flag": "voltage_tier_mismatch"
+    }
+  ]
+}

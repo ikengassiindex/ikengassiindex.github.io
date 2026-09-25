@@ -1,0 +1,161 @@
+# Belgium v4.23 Ingestion Audit — Pre-flight
+# ==========================================
+# Task: #188 (WAVE2-Step1 Belgium)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: belgium
+  iso2: BE
+  iso3: BEL
+  wave: 2
+  priority: 7  # continues P1-Canada, P2-Norway, P3-Mexico, P4-Austria, P5-Greenland, P6-Australia
+  step: 1
+  target: "Owner enrichment via OSM Overpass — task #2 from SSI_COHORT_AUDIT_SWEEP_20260713.md priority tier"
+  rationale: >
+    Belgium carries 1,219 substations with 0% owner coverage. EU cluster candidate
+    with clean federal architecture (3 regions, ~5 primary DNSPs, 1 TSO). Fastest
+    close in wave 2 owner-enrichment queue. OSM Overpass single-query safe (small
+    bbox 2.5°N × 3°E).
+
+baseline_state:
+  ssi_data_substations: 1219
+  grid_geo_substations: 1220
+  grid_geo_lines: 4017
+  lines_per_substation_ratio: 3.30  # clean transmission
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: ~50.3  # 606/1219 have voltage_kv=None — LARGE FILL OPPORTUNITY
+  region_coverage_pct: ~100.0  # all provinces populated
+  region_split:
+    Limburg: 298
+    East Flanders: 144
+    West Flanders: 138
+    Flemish Brabant: 126
+    Antwerp: 125
+    Liege: 124
+    Hainaut: 100
+    Namur: 53
+    Luxembourg (BE): 50
+    Walloon Brabant: 43
+  voltage_class_top:
+    null: 606  # 49.7% voltage-null — big OSM fill opportunity
+    150_kv: 197  # Elia HV
+    70_kv: 137   # Elia sub-transmission
+    10_kv: 59    # DNSP LV distribution
+    36_kv: 59    # DNSP MV
+    15_kv: 54    # DNSP MV
+    380_kv: 36   # Elia EHV (interconnector)
+    11_kv: 22    # DNSP LV distribution
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [2.55, 49.5, 6.4, 51.55]  # west, south, east, north (small Belgium bbox)
+    strategy: >
+      Single-query safe — Belgium bbox is small (~30k km²). No partitioning needed.
+      Falls back to element-type split (way/node/relation) only if single query 504s.
+    expected_yield:
+      substations: 2000-4000  # EU OSM tag density high
+      lines: 5000-15000
+    tag_completeness_hypothesis: >
+      Metropolitan areas (Brussels/Antwerp/Ghent/Charleroi/Liege) likely 60-80%
+      operator= tags. Rural WAL/LIM areas 30-50%. Overall target 45-65% direct
+      tag; remaining 35-55% resolved via region fallback.
+    lp_dd_class: canonical
+
+  fallback_region_registry:
+    strategy: region_jurisdiction_by_voltage_class
+    rationale: >
+      Belgium federal architecture: 3 regions × distinct DNSPs. Voltage class
+      disambiguates: >=150 kV → Elia TSO; <150 kV → region DNSP.
+    region_mapping:
+      Flanders:  # 831 subs (68.2%) — 5 provinces
+        tso: Elia
+        dnsp: Fluvius  # post-2018 Eandis+Infrax merger, single Flanders DNSP
+        provinces: [Antwerp, East Flanders, West Flanders, Flemish Brabant, Limburg]
+      Wallonia:  # 370 subs (30.4%) — 5 provinces
+        tso: Elia
+        dnsp_default: ORES  # Opérateur de Réseaux d'Énergie — 4 of 5 provinces
+        dnsp_liege_metro: Resa  # formerly Tecteo — Liège city + surrounding
+        provinces: [Hainaut, Liege, Luxembourg (BE), Namur, Walloon Brabant]
+        # Liege geofence: lat 50.55-50.72, lon 5.45-5.75 → Resa
+        # Elsewhere in Wallonia → ORES
+      Brussels-Capital:  # 18 subs (1.5%) — dense metro
+        tso: Elia
+        dnsp: Sibelga
+        bbox: [4.31, 50.76, 4.49, 50.91]
+
+  elia_open_data:
+    name: Elia Open Data Portal
+    scope: >
+      Elia (TSO) publishes substation + line data for the 150/220/380 kV federal
+      network. Cross-validation source, not primary — Elia only covers ≥150 kV.
+    lp_dd_class: cross_validation
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/belgium/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # BelgiumSubstationRecord + region-jurisdiction fallback logic
+    - osm_overpass.py  # single-query fetch (no partitioning)
+    - merge_into_ssi_data.py  # 500m proximity match + region fallback
+  pattern_reused_from: austria (federal-fragmented + no monopoly-fallback rule)
+  differentiators_vs_austria:
+    - single_query_no_partitioning: small bbox 30k km² (Austria was 84k km²)
+    - region_dnsp_mapping: 3 regions × 5 primary DNSPs
+    - liege_metro_geofence: only VIC-style multi-DNSP case is Wallonia Liège (Resa vs ORES)
+    - voltage_fill_opportunity: 606 baseline nulls → OSM refresh may fill many
+
+expected_deltas:
+  post_merge_owner_coverage: 65-85%  # EU OSM density higher than Australia
+  post_merge_voltage_coverage: 75-90%  # from 50.3% baseline — big fill opportunity
+  post_merge_substations: 1219-3500  # existing + OSM net-new
+  post_merge_lines: 5000-15000
+  km_of_lines: 15000-40000
+
+risks_flagged:
+  - risk_1: >
+      OSM operator= tag heterogeneity in Wallonia — Resa vs ORES boundary may
+      be fuzzy in Liège suburbs. Fallback to Resa if lat/lon in Liège geofence,
+      ORES otherwise. Convention #56 preserves any ambiguity as explicit note.
+  - risk_2: >
+      Fluvius covers ALL of Flanders since 2018 Eandis+Infrax merger — simple.
+      Historical OSM tags may still show pre-merger names (Eandis/Infrax) —
+      merge script normalises these to canonical "Fluvius".
+  - risk_3: >
+      Sibelga scope is tiny (Brussels-Capital 18 baseline subs) — potential
+      OSM under-coverage in metro Brussels vs suburbs. Not expected to matter
+      given absolute count.
+
+convention_preservation:
+  discipline_36:
+    scope: Belgium bounds already remediated (task #58 Mode 2 not needed —
+      Belgium was CLEAN pre-workstream). 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: Wallonia Liège boundary ambiguity flagged explicitly if any.
+      Historical pre-merger DNSP names normalised.
+  convention_60:
+    scope: OSM + Elia open data only — no commercial providers.
+  convention_64:
+    scope: All changes contained to belgium/ + scripts/pipeline/ingestion/belgium/.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.belgium.osm_overpass`
+    locally. Expected wall-clock: 2-5 min single-query.
+  step_3: >
+    L1 connector shipped in same batch as this pre-flight (small country, quick).
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.belgium.merge_into_ssi_data`.
+  step_5: >
+    Cohort audit sweep re-run — expect Belgium owner_coverage WARN retired.
+
+status: READY_FOR_STEP_2

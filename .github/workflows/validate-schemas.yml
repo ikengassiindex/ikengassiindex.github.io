@@ -1,0 +1,92 @@
+name: Phase 1 — Data contract + JS parse validation
+
+# Runs on every push to main + every PR. Fails the build if:
+#   1. Any country's data file violates schemas/*.schema.json
+#   2. nav.js auto-section is out of sync with countries.json
+#   3. Any inline <script> block in country HTML fails node --check
+#      (Phase 1.7 — catches the apostrophe/typo class that took down
+#       Slovenia's Section D today)
+# Reference: KB §65.4.3 + §65.4.7
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*/grid-geo.json'
+      - '*/ssi-data.json'
+      - '*/bounds.json'
+      - '*/*.html'
+      - 'intelligence/countries.json'
+      - 'schemas/**'
+      - 'scripts/run_schema_validation.py'
+      - 'scripts/check_page_data_agreement.py'
+      - 'scripts/generate_nav_data.py'
+      - 'scripts/check_inline_js_parse.py'
+      - 'nav.js'
+      - '.github/workflows/validate-schemas.yml'
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          # countries.json + data files only — no need for large LFS objects
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema==4.26.0
+
+      # Every check below carries `if: always()`. GitHub Actions stops a job
+      # at the first failing step, and schema validation has been failing on
+      # real data defects — so nav sync, inline-JS parse and cache-buster
+      # verification produced no result at all for as long as that was true.
+      # Four correct checks, silently inert. The job still fails if any step
+      # fails; they simply all get to run and report first.
+      - name: Run schema validation (strict — fails build on any error)
+        run: python3 scripts/run_schema_validation.py --strict
+
+      # Every published figure carries a data-canonical attribute naming
+      # what it claims to be. Nothing compared those claims to the data
+      # until 27 August 2026, when 253 of 443 disagreed — france's map
+      # tooltip read 0 against 175,660, and japan's six non-index pages
+      # had shown a two-generations-stale 5,981 through every remediation
+      # this year.
+      #
+      # --strict fails on page figures that disagree with their source.
+      # The twelve config-vs-data administrative-tier findings are
+      # reported but do not gate: they are an open data decision, and a
+      # permanently red check is one people learn to ignore.
+      - name: Page/data agreement
+        if: always()
+        run: python3 scripts/check_page_data_agreement.py --all --strict
+
+      - name: Verify nav.js auto-section in sync with countries.json
+        if: always()
+        run: python3 scripts/generate_nav_data.py --check
+
+      - name: Set up Node.js (for inline JS parse-check)
+        if: always()
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Parse-check every inline <script> in country HTML pages (Phase 1.7)
+        if: always()
+        run: python3 scripts/check_inline_js_parse.py --strict
+
+      - name: Verify ?v= cache-busters match git-hash of target files (Phase 1.8)
+        if: always()
+        run: python3 scripts/bump_cache_busters.py --check

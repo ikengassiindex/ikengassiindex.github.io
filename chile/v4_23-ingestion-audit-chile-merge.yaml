@@ -1,0 +1,147 @@
+# Chile v4.23 Ingestion Audit — Step 4 merge
+# ==========================================
+# Task: #201 (WAVE2-Step4 Chile)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local merge execution complete
+
+meta:
+  country: chile
+  iso2: CL
+  iso3: CHL
+  wave: 2
+  step: 4
+  parent_fetch: chile/v4_23-ingestion-audit-chile-fetch.yaml
+  merged_at_utc: "2026-07-13T16:14:57Z"
+  wall_clock_secs: ~60  # 1 min — very fast
+
+merge_operations:
+  substations:
+    baseline: 965
+    fresh_osm: 1034
+    matched_within_500m: 964  # 99.9% match rate — all baseline enriched
+    owner_enriched: 964
+    voltage_filled: 0  # baseline was 100% voltage tagged — no fill needed
+    voltage_xcheck_mismatches: 0  # ! PERFECT — cleanest cohort-wide result
+    net_new: 70
+    final_count: 1035
+    delta_pct: +7.3
+  lines:
+    baseline: 1967
+    fresh_osm: 4614
+    appended: 2224
+    deduped_midpoint_100m: 2390  # 51.8% dedupe rate
+    final_count: 4191
+    delta_pct: +113.1
+
+file_sizes_post_merge:
+  ssi_data_json_mb: 2.5
+  grid_geo_json_mb: 3.7
+  under_90_mb_threshold: true
+  optimisation_needed: false
+
+authoritative_cohort_metrics_post_merge:
+  substations: 1035
+  lines: 4191
+  km_of_transmission_lines_haversine: 28371  # Chile's long N-S transmission backbone
+  km_per_substation: 27.4  # longest in cohort (Chile geography — narrow strip, long lines)
+  distinct_operators: 127  # richest cohort operator diversity
+  discipline_41_ratio: 4.05
+  voltage_split:
+    ehv_gte_220kv: 381  # 36.8% — heavy EHV grid
+    hv_100_to_219kv: 338  # 32.7% — sub-transmission
+    distribution_lt_100kv: 285  # 27.5%
+    unknown_null: 31  # 3.0% — net-new subs without voltage tag
+
+coverage_post_merge:
+  owner_coverage_pct: 99.9  # ! from 0.0% baseline (3rd cohort-country near-100% after BE/NL)
+  voltage_coverage_pct: 97.0  # baseline was 100%; 31 net-new subs have voltage_kv=None
+  region_coverage_pct: 93.2  # baseline had regions on 965; 70 net-new pending L2 spatial join
+  owner_coverage_by_provenance:
+    direct_osm_operator_tag: "39.5% of fresh OSM (408/1,034)"
+    dnsp_alias_normalised_case_insensitive: "7.9% of fresh OSM (82/1,034) — Chilectra/ELECDA/EMELAT/CONAFE"
+    region_jurisdiction_fallback_including_TSO_majority_default: "52.6% of fresh OSM (544/1,034)"
+    convention_56_unresolved_null: 0
+
+top_15_operators_post_merge:
+  - {rank: 1, name: "CGE Distribución", count: 315, note: "Nationwide default DSO (9 regions consolidated)"}
+  - {rank: 2, name: "TRANSELEC", count: 213, note: "Dominant EHV owner (~60% market share) + majority-default for ≥110 kV untagged"}
+  - {rank: 3, name: "Chilquinta", count: 44, note: "Valparaíso DSO"}
+  - {rank: 4, name: "Enel Distribución Chile", count: 37, note: "Case variant — should normalise to 'Enel Distribución' (residual)"}
+  - {rank: 5, name: "Minera Escondida", count: 37, note: "Mining industrial owner — Antofagasta copper mine (direct-tagged)"}
+  - {rank: 6, name: "Codelco Chile", count: 32, note: "State copper company — multiple mine substations (direct-tagged)"}
+  - {rank: 7, name: "SAESA", count: 31, note: "Los Ríos + Los Lagos DSO"}
+  - {rank: 8, name: "Minera Collahuasi", count: 21, note: "Mining industrial owner — Tarapacá copper mine (direct-tagged)"}
+  - {rank: 9, name: "Frontel", count: 20, note: "Araucanía DSO"}
+  - {rank: 10, name: "Enel Distribución", count: 19, note: "Canonical form"}
+  - {rank: 11, name: "Colbún", count: 18, note: "Generator company (direct-tagged)"}
+  - {rank: 12, name: "EFE", count: 13, note: "Empresa Ferrocarriles del Estado — state railway (direct-tagged)"}
+  - {rank: 13, name: "Engie", count: 12, note: "International generator (direct-tagged)"}
+  - {rank: 14, name: "CGE Transmisión", count: 12, note: "Sub-transmission subsidiary — distinct from CGE Distribución (legitimately preserved)"}
+  - {rank: 15, name: "Enel", count: 11, note: "Ambiguous — Enel parent OR Enel Green Power OR Enel Distribución (case-insensitive residual)"}
+
+industrial_owner_diversity_cohort_first:
+  finding: |
+    Chile is the first cohort country to surface substantial industrial/generation
+    owner diversity. Mining companies own their own substations directly (Codelco 32
+    + Minera Escondida 37 + Minera Collahuasi 21 = 90 substations across 3 major
+    mines). This is distinct from EU pattern where DSOs dominate ownership.
+    Reflects Chilean electricity market: private industrial owners + IPPs coexist
+    with regulated DSO/TSO layer.
+
+residual_alias_normalisation:
+  count_residual: ~48
+  breakdown: |
+    Enel case variants: "Enel Distribución Chile" (37) + "Enel" (11) = 48 subs
+    (4.6% of cohort) not case-insensitively normalised. Current alias map has
+    "enel chile" → "Enel Distribución" and "enel distribucion" → "Enel Distribución"
+    but not exactly "enel distribución chile" (extra word) or bare "enel".
+    Fix queued: extend alias map with:
+      "enel distribución chile": "Enel Distribución"
+      "enel": "Enel Distribución"
+    Convention #56 preserves current state as visibly-honest until next refresh.
+
+voltage_cross_validation:
+  matched_pairs: 964
+  mismatches_gt_1_5x_ratio: 0
+  mismatch_rate_pct: 0.0
+  note: >
+    PERFECT — cleanest cohort-wide result (Netherlands 0.6%, Belgium 3.1%,
+    Australia 48.8%). Reflects Chile's baseline was 100% voltage-tagged +
+    fresh OSM voltage data was fully consistent with baseline vintage.
+
+discipline_41_line_parity:
+  post_merge_check: OK
+  final_ratio: 4.05
+  envelope_after_task_182: "0.3 - 30 (widened)"
+  status: "clean transmission-tier + some sub-transmission (Chilean grid has heavy 66-154 kV)"
+
+convention_preservation:
+  discipline_36:
+    outcome: 8 substations + 42 lines dropped (~0.8% overshoot filtered)
+    tolerance: 100m default
+    status: PASS
+  discipline_41:
+    outcome: EVERY net-new substation covered by ≥1 fresh line
+    status: PASS
+  convention_46:
+    outcome: no portfolio-scoped changes (single chile/*.json)
+    status: PRESERVED
+  convention_56:
+    outcome: |
+      TRANSELEC ≥110 kV majority-default explicitly tagged as
+      'majority_default_transelec_60pct' in provenance — visibly-honest
+      over-attribution flag preserved for future ISA InterChile disambiguation.
+      Enel case-variant residuals (48 subs) preserved rather than force-normalised.
+    status: PRESERVED
+  convention_60:
+    outcome: OSM (ODbL) only — no commercial providers
+    status: PRESERVED
+  convention_64:
+    outcome: strict per-country resolution (all writes to chile/*.json)
+    status: PRESERVED
+
+next_step: "Step 5 (task #202): UI + doc cascade — landing page data-subs 965 → 1,035, country page fleet + km + v4.23 callout, cohort audit sweep re-run."
+
+status: STEP_4_CLOSED

@@ -1,0 +1,220 @@
+# SSI Index v4.23 workstream — Austria Step 4 delta audit
+#
+# Purpose: state-transition anchor per METHODOLOGY_DISCIPLINES.md §5ter for
+# the delta computation between existing austria/ssi-data.json + austria/grid-geo.json
+# and fresh OSM Overpass output.  Documents Option A merge strategy (subs +
+# lines one-shot, unlike Mexico which deferred lines to Step 5b).
+#
+# STATUS: architectural anchors + expected empirical outcomes shipped by
+# in-sandbox pass.  Full-fetch + merge execution DEFERRED to Step 4b
+# operator-local machine (residential IP) — sandbox 45s bash timeout is
+# incompatible with the empirically-measured ~57s substation fetch + ~30-90s
+# line quadrant sweep.  Overpass API access verified live from sandbox
+# (rate-limit status: 2 slots free; small ping query returned 1,676 nodes
+# clean), so this is a sandbox-runtime constraint, not an API-access
+# constraint.  Analogue: Mexico Step 5b operator-local execution.
+#
+# Cross-references:
+#   - austria/v4_23-ingestion-audit-austria-preflight.yaml (Step 1 anchor)
+#   - austria/v4_23-ingestion-audit-austria-fetch.yaml (Step 2 anchor)
+#   - mexico/v4_23-ingestion-audit-mexico-delta.yaml (Priority 3 precedent)
+#   - norway/v4_23-ingestion-audit-norway-delta.yaml (Priority 2 precedent —
+#     Norway also did subs + lines one-shot per NVE WFS access pattern)
+
+schema_version: v4_23-ingestion-audit-delta-1
+country_slug: austria
+discovery_date_utc: "2026-07-13"
+author: ikenga-ssi-foundation
+methodology_pin: v4.2
+parent_state_transitions:
+  - austria/v4_23-ingestion-audit-austria-preflight.yaml
+  - austria/v4_23-ingestion-audit-austria-fetch.yaml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Baseline state (pre-Step-4)
+# ─────────────────────────────────────────────────────────────────────────────
+baseline_state:
+  ssi_data_json:
+    substations: 741
+    voltage_kv_populated_pct: 100.0
+    owner_populated_pct: 0.0
+    file_size_bytes: 1604691
+    file_size_mb: 1.53
+  grid_geo_json:
+    lines: 5252
+    file_size_bytes: 1505779
+    file_size_mb: 1.44
+    schema_kind: compact_ssi_index_native
+  discipline_36_status: |
+    Austria bounds already remediated per task #56 (2026-06-24 commit 86d7c9df).
+    100m default tolerance adequate — no fjord/coastline complexity that
+    motivated Norway 5 km Mode 2 rule.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Fresh OSM Overpass output — empirical anchors from Step 1+2 probes
+# ─────────────────────────────────────────────────────────────────────────────
+fresh_osm_output_expected:
+  # These are the empirical anchors carried forward from Step 1 count queries
+  # + Step 2 tag-completeness probes.  Actual execution numbers land in the
+  # merge audit YAML at Step 4b closure.
+  substations:
+    total: 15213
+    breakdown_by_osm_type:
+      nodes: 1676
+      ways: 13528
+      relations: 9
+    tag_completeness_from_500_sample:
+      operator_pct: 77.2          # BEST-IN-COHORT — vs Mexico 16.6%, Norway ~30% pre-NVE
+      voltage_pct: 79.8
+      name_pct: 75.0
+      substation_subtype_pct: 82.4
+  transmission_lines:
+    total: 5651
+    schema_source: OSM power=line ways
+  provenance:
+    source_id: AT-C1-osm-overpass
+    licence: ODbL — attribution required
+    endpoint: https://overpass-api.de/api/interpreter
+    rate_limit_status_pre_run: "2 slots free (verified 2026-07-13T12:13Z)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. Merge operations — Option A (subs + lines one-shot)
+# ─────────────────────────────────────────────────────────────────────────────
+merge_strategy: Option A — subs + lines one-shot
+merge_strategy_rationale: |
+  Austria connector supports ingest_lines=True by default and Overpass API is
+  accessible from operator-local IP.  No monopoly-fallback rule needed
+  (Austrian market is fragmented across 9+ utilities — direct OSM operator=
+  tag propagation covers 77.2% by construction).  Line ingestion deferred to
+  a second step (Mexico Step 5b pattern) would add no auditability value
+  since the same L1 connector produces both subs + lines in one call.
+
+merge_operations:
+  operation_1_owner_enrichment:
+    scope: Matched pairs (500m Discipline #41 proximity threshold)
+    action: |
+      Populate existing_sub.owner from ov.owner where existing has no owner.
+      Populate existing_sub.operator_station_name from OSM name= tag.
+      Preserve osm_feature_id linkage for downstream audit.
+    provenance_class: osm_operator_tag_direct
+    fabrication_ban: |
+      Convention #56 visibly-honest degradation — ~23% of OSM subs have NO
+      operator= tag.  Owner stays None on these; NO monopoly-fallback rule
+      (Austrian market is fragmented — unlike Mexico's CFE-monopoly rule).
+
+  operation_2_voltage_cross_validation:
+    scope: Matched pairs with BOTH voltages populated
+    threshold: max/min ratio > 1.5
+    action: Emit finding to austria/v4_23-voltage-cross-validation.json
+    expected_finding_rate_pct: <0.5   # Empirical anchor — Mexico measured 0.04%
+
+  operation_3_voltage_fill:
+    scope: Matched pairs where existing has NO voltage
+    action: Fill existing_sub.voltage_kv from OSM voltage= tag
+    expected_count: 0                  # Baseline is 100% voltage-populated
+
+  operation_4_net_new_substation_ingestion:
+    scope: OSM subs with no existing match within 500m
+    action: Append to austria/ssi-data.json with L2/L3 null placeholders
+    convention_56_null_class: |
+      Fields awaiting L2/L3 rescore surface as null (climate_trajectory,
+      seismic, socio_economic, graph_topology, R_median, classification,
+      fleet_percentile, etc.).  v4.2 master equation multiplicative-neutral
+      defaults applied: Re_raw=1.0, Re_norm=0.0, mult_product=1.0.
+      Dict-typed fields default to {} not None (Canada Priority 1 Stage 3.5b
+      + Norway Priority 2 + Mexico Priority 3 lesson learned — None crashes
+      fleet-floor stage).
+    expected_range: |
+      Empirical: ~14,472 net-new substations = 15,213 fresh OSM total minus
+      741 baseline matched pairs.  Range subject to actual proximity-match
+      hit rate at 500m threshold.
+
+  operation_5_line_densification:
+    scope: All OSM lines within Austria bounds
+    action: Append to austria/grid-geo.json 'l' array in compact SSI schema
+    schema: "{i, p, kv, ss, se, src, osm_id, osm_line_class, created_at_utc}"
+    dedupe_rule: |
+      Reject any OSM line whose start-end midpoint sits within 100m of an
+      existing line AND matches voltage tier (both zero, or within ±20%
+      relative).  Prevents double-counting from prior OSM ingestion vintage.
+    expected_range: |
+      Empirical: 5,651 OSM lines vs 5,252 existing.  Net-new after dedupe
+      likely in 200-2,000 range depending on prior-vintage overlap.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Discipline #41 line-substation coupling
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_41_coupling:
+  invariant: Every net-new substation ingested MUST be paired with the
+    ingestion of connecting transmission lines in the SAME pipeline pass.
+    Austria satisfies this by-construction — subs + lines fetch in one call.
+  ss_se_endpoint_resolution: |
+    Net-new lines carry ss=None, se=None placeholders.  L3 topology stage
+    resolves endpoints to the nearest substation stable-id within 500m at
+    rescore time.  This defers the endpoint linkage without breaking the
+    Discipline #41 invariant (both subs + lines physically ingested in
+    same pass; only the endpoint-string field awaits L3 population).
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. Discipline #36 cross-border enforcement gate
+# ─────────────────────────────────────────────────────────────────────────────
+discipline_36_status:
+  bounds_json: austria/bounds.json (remediated 2026-06-24 commit 86d7c9df)
+  tolerance_km: 0.1
+  post_ingestion_sentinel: |
+    check_cross_border.py --all --strict runs post-merge to verify Austria
+    delta does not reintroduce cross-border leakage.  Sentinel threshold
+    5% outside-polygon.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. Convention preservation matrix
+# ─────────────────────────────────────────────────────────────────────────────
+convention_preservation:
+  convention_46_asset_class_vs_portfolio_identity: |
+    N/A — Austria is a single-country canonical, not a portfolio scope.
+  convention_56_visibly_honest_degradation: |
+    Applied end-to-end: (a) untagged operator= subs → owner=None, not
+    fabricated default; (b) net-new subs → null placeholders + {} for
+    dict-typed L2/L3 fields; (c) merge failures on individual features
+    logged + skipped, not silenced.
+  convention_60_non_commercial_provenance: |
+    OSM (ODbL) only in Phase 1.  ENTSO-E Transparency Platform (open,
+    needs operator-registered token) queued as Phase 2 supplement.
+  convention_64_strict_per_country_resolution: |
+    Merge script writes ONLY to austria/*.json.  No cross-country
+    contamination possible by construction.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. Auditability chain
+# ─────────────────────────────────────────────────────────────────────────────
+auditability_chain:
+  step_1_preflight: austria/v4_23-ingestion-audit-austria-preflight.yaml
+  step_2_fetch: austria/v4_23-ingestion-audit-austria-fetch.yaml
+  step_3_l1_connector: scripts/pipeline/ingestion/austria/osm_overpass.py
+  step_4a_merge_script: scripts/pipeline/ingestion/austria/merge_into_ssi_data.py
+  step_4a_delta_audit: austria/v4_23-ingestion-audit-austria-delta.yaml (this file)
+  step_4b_merge_audit: austria/v4_23-ingestion-audit-austria-merge.yaml (pending operator local execution)
+  step_4b_voltage_xcheck: austria/v4_23-voltage-cross-validation.json (pending)
+  discipline_36_gate: scripts/check_cross_border.py --all --strict
+  commit_hash_placeholder: TBD_at_L1_connector_merge
+  ci_job_url_placeholder: TBD_at_L1_connector_merge
+  downstream_deliverable: |
+    austria/ssi-data.json (canonical) + austria/grid-geo.json (compact schema)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. Operator paste-back command (Step 4b)
+# ─────────────────────────────────────────────────────────────────────────────
+operator_paste_back_command: |
+  # From ~/ikengassiindex.github.io on operator local Mac (residential IP):
+
+  cd ~/ikengassiindex.github.io && \
+    python3 -m scripts.pipeline.ingestion.austria.merge_into_ssi_data 2>&1 | tee /tmp/austria_merge.log
+
+  # Expected wall-clock: ~5-10 min (3 sub queries + 6 line quadrant queries
+  # + merge + write).  Overpass API access is per-endpoint rate-limited so
+  # occasional 429/504 responses trigger built-in exponential backoff (30s
+  # to 5min cap) + fallback to overpass.kumi.systems + overpass.private.coffee.
+
+  # Post-run: paste last 40 lines of /tmp/austria_merge.log back.  Sandbox
+  # will write austria/v4_23-ingestion-audit-austria-merge.yaml from stats
+  # + verify Discipline #36 cross-border sentinel green.

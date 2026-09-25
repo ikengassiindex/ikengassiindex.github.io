@@ -1,0 +1,276 @@
+# Latvia v4.23 Ingestion Audit — Pre-flight
+# ==========================================
+# Task: #244 (WAVE2-Step1 Latvia)
+# Date: 16 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: PRE-FLIGHT — awaiting Step 2 operator local OSM Overpass fetch
+
+meta:
+  country: latvia
+  iso2: LV
+  iso3: LVA
+  wave: 2
+  priority: 18
+  step: 1
+  target: "Owner enrichment via OSM Overpass — 2-operator vertically-integrated state monopoly via Latvenergo holding (Baltic Trio 3rd instance — empirical completion)"
+  rationale: >
+    Latvia carries 1,219 substations with 0% owner tagged, 99.0% voltage
+    tagged (1,207/1,219 — near-perfect coverage), and 100% region tagged
+    across 6 Latvian NUTS-3 regions. Latvia's electricity architecture
+    parallels Lithuania + Estonia: 2-operator vertically-integrated state
+    monopoly via Latvenergo AS state holding company. AST (state TSO
+    ≥110 kV via Latvenergo, 2011 unbundling spinoff) + Sadales tīkls
+    (unified state DSO ≤110 kV via Latvenergo, 2007 rename from Sadales
+    tīkli). Baltic Trio 3rd instance — empirical completion queued for
+    Convention #78 sub-convention BINDING promotion methodology-version
+    event at 3-country cumulative validation.
+
+baseline_state:
+  ssi_data_substations: 1219
+  grid_geo_substations: 1219  # matches
+  grid_geo_lines: 16245  # 10.9× Lithuania baseline · 4.3× Estonia baseline
+  lines_per_substation_ratio: 13.33  # near-outlier-territory (task #182 threshold 15+)
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 99.0  # 1,207/1,219 — nearly perfect
+  region_coverage_pct: 100.0  # 6 Latvian NUTS-3 regions populated
+  region_split:
+    Rīga: 490          # 40.2% — capital city
+    Pierīga: 276       # 22.6% — Riga surroundings
+    Latgale: 213       # 17.5% — RUSSIAN-SPEAKING region (higher share than Estonia's Ida-Virumaa 14.3%)
+    Vidzeme: 180       # 14.8% — north-central (historical Livonia)
+    Kurzeme: 42        # 3.4%  — western coast (historical Courland)
+    Zemgale: 18        # 1.5%  — south-central
+  voltage_class_baseline:
+    330_kv: 18         # 1.5%  — Soviet-era EHV backbone (AST)
+    110_kv: 133        # 10.9% — AST TSO subtransmission + Sadales tīkls overlap
+    20_kv: 668         # 54.8% — Sadales tīkls MV distribution (DOMINANT tier)
+    10_kv: 366         # 30.0% — Sadales tīkls MV secondary
+    6_kv: 11           # 0.9%  — legacy
+    3_kv: 10           # 0.8%  — legacy
+    0.6_kv: 1          # 0.1%  — legacy
+    unknown: 12        # 1.0%  — voltage-null
+
+  empirical_flag_dense_line_baseline: >
+    Latvia's baseline had 16,245 lines vs 1,219 substations = ratio 13.33.
+    This is NEAR TASK #182 OUTLIER TERRITORY (Norway + Israel at 15+ post-
+    merge). Latvia's OSM community appears to have exhaustively pre-
+    mapped MV distribution lines without proportional substation
+    tagging. Post-merge may push ratio HIGHER (task #182 outlier
+    triggered) or LOWER (OSM adds sub-heavy tags balancing baseline).
+    Latvia empirical outcome will determine whether Latvia joins
+    Norway + Israel as 3rd cohort-wide line-density outlier.
+
+source_options:
+  canonical:
+    name: OSM Overpass
+    endpoint_primary: https://overpass-api.de/api/interpreter
+    endpoint_fallback_1: https://overpass.kumi.systems/api/interpreter
+    endpoint_fallback_2: https://overpass.private.coffee/api/interpreter
+    query_scope: power=substation + power=line + power=minor_line + power=cable
+    bbox: [20.90, 55.60, 28.30, 58.10]  # west, south, east, north (Latvia bounds)
+    strategy: >
+      Single-query pattern — Latvia bbox ~65k km² (~1.4× Estonia, ~same
+      as Lithuania). Sub-3-minute fetch expected. Endpoint-fallback
+      strategy per Lithuania + Estonia precedent — Baltic countries have
+      benefited from very active OSM contributor communities.
+    expected_yield:
+      substations: 2500-5000  # Baltic Trio bracket: between LT +871% and EE +192%
+      lines: 4000-9000  # baseline 16,245 already dense; OSM densification uncertain
+    tag_completeness_hypothesis: >
+      Baltic OSM tagging density empirically established as HIGH.
+      Latvia is expected to bracket Lithuania + Estonia empirical range:
+      LT +871% (5,094 subs from 505 baseline) vs EE +192% (1,794 subs
+      from 614 baseline). Latvia's larger baseline (1,219) suggests
+      OSM density may add fewer proportional subs — expect 2,500-5,000
+      total range. Historical Soviet-era operator names may appear
+      (Latvijas Elektrostacijas pre-2005 predecessor to Latvenergo TS
+      → AST). Cyrillic aliases likely DEEPER in Latgale (17.5% baseline
+      share, 25%+ Russian-speaking population per 2011 census) than
+      Estonia's Ida-Virumaa (14.3% baseline share).
+    lp_dd_class: canonical
+
+  fallback_pure_monopoly_2_operator:
+    strategy: ast_tso_threshold_plus_sadales_tikls_monopoly_default
+    rationale: >
+      2-operator resolver mirror of Estonia + Lithuania Baltic Trio
+      pattern. Latvia's power grid is entirely state-owned via Latvenergo
+      AS holding company. AST (Augstsprieguma tīkls, TSO, spun out 2011
+      from Latvenergo Transmission) + Sadales tīkls (unified state DSO,
+      2007 rename from Sadales tīkli) are both 100% state-owned
+      subsidiaries of Latvenergo Group. Latvenergo AS itself is
+      generation + retail (like Ignitis in Lithuania, Eesti Energia in
+      Estonia — separate legal entity that doesn't own grid infrastructure).
+      Baltic Trio (Latvia + Estonia + Lithuania) desynchronised from
+      Russian IPS grid February 2025, synchronised with Continental EU
+      grid — LatEst 330 kV cross-border to Estonia + LitPol/NordBalt
+      cross-border via Lithuania to Poland/Sweden.
+    tso_threshold_kv: 110  # AST operates 330 + 110 kV transmission
+    tso_operator: AST  # Augstsprieguma tīkls (100% state-owned via Latvenergo)
+    monopoly_default_operator: Sadales tīkls  # AS Sadales tīkls
+    holding_company: Latvenergo Group  # Latvenergo AS
+    system_operator_note: >
+      AST handles both TSO ownership AND SO functions in Latvia. No
+      separate system operator entity like Noga (Israel) or XM SA ESP
+      (Colombia). AST also operates natural gas transmission via
+      Conexus Baltic Grid (separate legal entity from 2017 unbundling),
+      but scope here is electricity only.
+
+  operator_alias_normalisation:
+    aliases:
+      # AST variants (English + Latvian + legal-form)
+      "AST": "AST"
+      "AS AST": "AST"
+      "AST AS": "AST"
+      "Augstsprieguma tīkls": "AST"
+      "AS Augstsprieguma tīkls": "AST"
+      "Augstsprieguma tikls": "AST"  # accent-stripped
+      # Latvijas Elektrostacijas — pre-2005 TSO predecessor
+      "Latvijas Elektrostacijas": "AST-legacy"
+      "AS Latvijas Elektrostacijas": "AST-legacy"
+      "Latvenergo Transmission": "AST-legacy"  # 2005-2011 predecessor
+      # Sadales tīkls variants (English + Latvian + legal-form)
+      "Sadales tīkls": "Sadales tīkls"
+      "AS Sadales tīkls": "Sadales tīkls"
+      "Sadales tīkls AS": "Sadales tīkls"
+      "Sadales tikls": "Sadales tīkls"  # accent-stripped
+      "AS Sadales tikls": "Sadales tīkls"
+      # Sadales tīkli — pre-2007 rename
+      "Sadales tīkli": "Sadales tīkls-legacy"
+      "AS Sadales tīkli": "Sadales tīkls-legacy"
+      "Latvenergo Sadale": "Sadales tīkls-legacy"  # even earlier predecessor
+      # Latvenergo holding (parent — non-owner but may appear on OSM tags)
+      "Latvenergo": "Latvenergo Group (Holding Company)"
+      "Latvenergo AS": "Latvenergo Group (Holding Company)"
+      "AS Latvenergo": "Latvenergo Group (Holding Company)"
+      "Latvenergo Group": "Latvenergo Group (Holding Company)"
+      # Cyrillic-script variants (Latgale Russian-speaking population — deeper than Estonia's Narva)
+      # Preemptively included per Convention #78 sub-convention on multi-script OSM handling
+      "аст": "AST"  # Cyrillic rendering
+      "садалес тиклс": "Sadales tīkls"  # Cyrillic rendering
+      "латвэнерго": "Latvenergo Group (Holding Company)"  # Cyrillic
+      # Latvian Railways (Latvijas dzelzceļš — electric traction only)
+      "Latvijas dzelzceļš": "Latvian Railways (Electric)"
+      "LDz": "Latvian Railways (Electric)"
+      "Latvijas dzelzcels": "Latvian Railways (Electric)"  # accent-stripped
+      # Semi-colon compound tag preemptive (per Estonia Priority 17 precedent)
+      # Convention #56 preserves these as-is — no explicit mapping needed
+      # but map documents architectural expectation
+
+architecture:
+  connector_layout: scripts/pipeline/ingestion/latvia/
+  files_to_ship:
+    - __init__.py
+    - _base.py         # AST TSO threshold + Sadales tīkls monopoly default + alias map
+    - osm_overpass.py  # single-query fetch (~65k km²)
+    - merge_into_ssi_data.py  # 500m proximity + Step 4b retroactive + Step 5 alias-retighten
+  pattern_reused_from: estonia (Baltic Trio 2nd instance, cleanest empirical template)
+  differentiators_vs_estonia:
+    - operator_language: Latvian (Baltic / Indo-European, ā ē ī ō ū č ģ ķ ļ ņ š ž diacritics)
+      vs Estonian (Finno-Ugric / Uralic, ä ö õ ü š ž diacritics)
+    - script: Latin with more diverse diacritics vs Estonian ä ö õ ü
+    - cyrillic_bridging: Latgale (17.5% baseline share, 25%+ Russian-speaking) DEEPER than
+      Estonia's Ida-Virumaa (14.3% baseline, ~35% Russian-speaking) — expect higher
+      Cyrillic hit count in absolute terms
+    - holding_structure: Latvenergo Group (unbundling 2005+2007+2011) vs Eesti Energia (2010+2013)
+    - baltic_trio_context: Same Feb 2025 EU synchronisation event
+    - hvdc_cross_border: NO direct HVDC to Nordic (NordBalt goes via Lithuania+Sweden;
+      LatEst is 330 kV AC to Estonia); expected fewer subsea-cable cross-border edge subs
+    - island_topology: Latvia is mainland-only (no islands like Estonia's Saaremaa/Hiiumaa)
+    - historical_alias_depth: Latvijas Elektrostacijas (pre-2005) + Latvenergo Transmission
+      (2005-2011) + Sadales tīkli (pre-2007) + Latvenergo Sadale — DEEPER historical alias
+      depth than Estonia (2 predecessors) or Lithuania (2 predecessors)
+
+expected_deltas:
+  post_merge_owner_coverage: 100%  # 2-operator monopoly catches all
+  post_merge_voltage_coverage: 40-90%  # from 99.0% baseline to multi-tier (some OSM dilution expected)
+  post_merge_substations: 2500-5000  # Baltic Trio bracket
+  post_merge_lines: 16000-22000  # baseline already dense; modest OSM densification expected
+  km_of_lines: 20000-30000  # baseline km unknown but large
+
+risks_flagged:
+  - risk_1: >
+      110 kV is a MIXED tier in Latvia — AST operates transmission
+      backbone at 110 kV AND Sadales tīkls operates subtransmission at
+      110 kV. Empirically the baseline is transmission-heavy (only 133
+      subs at 110 kV of 1,219 total), so most 110 kV subs are AST.
+      Threshold at 110 kV gives AST the majority; below-110 kV goes to
+      Sadales tīkls default.
+  - risk_2: >
+      Historical Soviet-era operator names may appear on very old OSM
+      tags (Latvijas Elektrostacijas pre-2005 TSO predecessor,
+      Latvenergo Transmission 2005-2011 predecessor, Sadales tīkli
+      pre-2007 DSO predecessor). Alias map catches all 3 historical
+      variants → legacy tags; can be retighten-pass-collapsed to
+      primary owner at Step 5 if needed.
+  - risk_3: >
+      3-country border zones with Estonia (N) + Lithuania (S) + Belarus
+      (SE) + Russia (E — Latgale-Pskov). Discipline #36 cross-border
+      filter uses latvia/bounds.json. LatEst 330 kV AC cross-border to
+      Estonia at Riga-Tallinn axis + Lithuania cross-border to LT at
+      Latvia-Šiauliai axis. No direct HVDC to Nordic (NordBalt goes via
+      Lithuania+Sweden). Belarus/Russia grid interconnection formally
+      disconnected Feb 2025.
+  - risk_4: >
+      Cyrillic alias handling — Latgale (17.5% of subs = 213) has ~25%+
+      Russian-speaking population per 2011 census, DEEPER than Estonia's
+      Narva. Expect ~40-60 Cyrillic alias hits (higher absolute count
+      than Estonia's 20). AST/Sadales tīkls/Latvenergo Cyrillic
+      renderings (аст / садалес тиклс / латвэнерго) preemptively
+      included in alias map per Convention #78 sub-convention.
+  - risk_5: >
+      Semi-colon compound operator tags (per Estonia Priority 17
+      precedent) likely to surface — AST;Sadales tīkls shared-node
+      transmission↔distribution handoff. Convention #56 preserves as-is.
+  - risk_6: >
+      Task #182 line-density outlier candidate — baseline ratio 13.33
+      is near cohort outlier threshold (Norway + Israel at 15+). Post-
+      merge could push ratio HIGHER (adding OSM lines without matching
+      subs) or LOWER (OSM adds sub-heavy tags). Latvia may join
+      Norway + Israel as 3rd cohort-wide line-density outlier.
+
+convention_preservation:
+  discipline_36:
+    scope: Latvia bounds CLEAN. 100m tolerance adequate.
+  discipline_41:
+    scope: EVERY net-new substation MUST have ≥1 connecting line.
+  convention_56:
+    scope: >
+      AST + Sadales tīkls 2-operator monopoly is Convention #56-compliant
+      — both genuinely operate 100% of national grid via Latvenergo state
+      holding. Historical AST-legacy + Sadales tīkls-legacy variants
+      preserved distinctly for audit trail. Semi-colon compound tags
+      (expected AST;Sadales tīkls per Estonia precedent) preserved
+      as-is. Latvian NFC diacritics (ā ē ī ō ū č ģ ķ ļ ņ š ž) + Cyrillic
+      variants normalised with original tag preserved in v43_provenance
+      sidecar.
+  convention_60:
+    scope: OSM only — no commercial providers.
+  convention_64:
+    scope: All changes contained to latvia/ + scripts/pipeline/ingestion/latvia/.
+  convention_78:
+    scope: >
+      3rd Baltic Trio empirical instance — completion queued for
+      Convention #78 sub-convention BINDING promotion methodology-version
+      event. Cumulative cohort-wide validation: LT 1 + EE 20 + LV
+      expected 40-60 = 61-81 total Cyrillic + NFC alias hits across
+      3-country Baltic Trio. WELL ABOVE Convention #76 5-10 cadence
+      threshold. Post-Latvia closure: propose Convention #78 sub-
+      convention BINDING promotion at 3-country cumulative validation.
+
+next_steps:
+  step_2: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.latvia.osm_overpass`
+    locally. Expected wall-clock <3 min. May hit Overpass rate limits
+    per Lithuania + Estonia precedent — endpoint-fallback strategy
+    established.
+  step_3: L1 connector shipped in same batch as this pre-flight.
+  step_4: >
+    Operator runs `python3 -m scripts.pipeline.ingestion.latvia.merge_into_ssi_data`
+    (includes Step 4b retroactive attribution + Step 5 alias-retighten).
+  step_5: >
+    Cohort audit sweep re-run — expect owner_coverage WARN retired.
+    Baltic Trio empirical completion + Convention #78 sub-convention
+    BINDING promotion methodology-version event proposed.
+
+status: READY_FOR_STEP_2

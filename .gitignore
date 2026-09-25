@@ -1,0 +1,164 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Session notes (internal)
+SESSION-*-NOTES.md
+
+# Temp files
+*.zip
+*.bak
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Pipeline cache
+scripts/pipeline/.cache/
+scripts/pipeline/cache/
+scoring-output/
+
+# Phase 1.5 ingestion — large source files (P15-A-3 + P15-B-2, 8 June 2026)
+# These exceed GitHub's 100 MB hard limit on push. Operator downloads
+# locally; the bbox-clipped per-country CSVs that derive from them ARE
+# committed (small, ~10-25 MB total).
+#
+# Sources:
+#   gshm-2023-1.tif        — GEM 2023.1 Global Seismic Hazard Map (~173 MB)
+#                            Download: https://cloud.openquake.org/s/6SnFk2f92JEr76H
+#                            License: CC BY-NC-SA 4.0
+#   era5land_*.nc          — ERA5-Land NetCDF intermediate cache (~50-200 MB each)
+#                            Re-downloadable via CDS API; not deliverable artifacts
+scripts/pipeline/data/cross-cutting/gshm-2023-1.tif
+scripts/pipeline/data/cross-cutting/*.tif
+*.nc
+*.grib
+*.grib2
+
+# Phase 1 housekeeping (8 June 2026): backup files are local-only working state
+*.pre-*-backup
+*.pre-*.backup
+*.bak
+.coverage
+.coverage.*
+
+# Discipline #36 cross-border audit (18 June 2026): per-country rejection
+# logs from scripts/remediate_cross_border.py + clean_grid_geo.py. These
+# are forensic audit-trail artifacts (full record of which substations
+# were removed at remediation time) — useful locally for review but too
+# large for the repo (Canada's alone is 52 MB). The audit memo
+# CROSS_BORDER_SUBSTATION_AUDIT_20260618.md preserves the per-country
+# summary; the full rejection lists stay on the operator's machine.
+*/ingestion_rejected_*.json
+
+# OneDrive / FUSE synced-cloud filesystem artifacts (Mac client leaves .fuse_hidden*
+# during file operations while the sync daemon holds handles open)
+.fuse_hidden*
+
+# v4.23 workstream L1 connector ingestion caches (13 July 2026) — these are
+# operator-runtime downloads from federal canonical sources + OSM Overpass.
+# Contents:
+#   canada/_canvec_cache/       NRCan CanVec 50K Res_MGT GDB + PDF (37 MB)
+#   norway/_nve_cache/          NVE Nettanlegg WFS response cache (209 MB)
+#   mexico/_osm_cache/          OSM Overpass query response cache (~1 MB)
+#   austria/_osm_cache/         OSM Overpass query response cache (empty during sandbox block)
+#   greenland/_osm_cache/       OSM Overpass query response cache (small)
+# All are re-fetchable on demand via each L1 connector.  Downstream federation +
+# merge outputs (canada/ssi-data.json, norway/ssi-data.json, etc.) ARE committed.
+scripts/pipeline/data/*/_canvec_cache/
+scripts/pipeline/data/*/_nve_cache/
+scripts/pipeline/data/*/_osm_cache/
+
+# v4.23 workstream intermediate federation JSONs — these are the raw L1 output
+# before merge into per-country ssi-data.json.  Regenerable on demand.
+scripts/pipeline/data/*/substations_federated.json
+scripts/pipeline/data/*/transmission_lines_federated.json
+
+# Pipeline run artifacts (13 July 2026)
+pipeline-run.log
+pipeline-report-*.json
+
+# Wave 2 v4.23 — Overpass raw fetch cache (per-country _osm_cache subdirs;
+# regenerable via python -m scripts.pipeline.ingestion.<country>.osm_overpass;
+# NOT source of truth; content-hashed by cache_path_for(query) per Convention #78)
+scripts/pipeline/ingestion/data/
+scripts/pipeline/data/*/_osm_cache/
+
+# Wave 4 v4.23 per-country OSM Overpass raw cache dirs (Sweden P32 +
+# Portugal P33 + Italy P34 + Japan P35 + Spain P36 + France P37 + Germany
+# P38 + US P39 pattern). Files are regenerable via:
+#   python -m scripts.pipeline.ingestion.<country>.osm_overpass
+# NEVER committed — sibling countries already have _cache/ untracked;
+# France P37 got caught by `git add -A france/` and hit GitHub 100 MB
+# hard limit on overpass-lines-raw.json (216 MB).
+*/_cache/
+
+# Wave 4 v4.23 per-country ingestion log files. Local audit-trail
+# artifacts only. Sibling countries have these untracked already.
+*/v4_23-osm-overpass.log
+*/v4_23-merge.log
+*/v4_23-phase-4c-refresh.log
+
+# Task #452 Step 4 (23 Jul 2026): Niva 2023 gridded net-migration raster —
+# ~10.5 MB GeoTIFF from Nature Human Behaviour paper (Zenodo 7997134,
+# CC BY 4.0). Regenerable via:
+#   curl -L -o docs/audits/raster_netMgr_2000_2019_20yrSum.tif \
+#     "https://zenodo.org/records/7997134/files/raster_netMgr_2000_2019_20yrSum.tif?download=1"
+# Ref: Niva et al. 2023, Nature Human Behaviour 7:2023-2037,
+# DOI 10.1038/s41562-023-01689-4. NEVER committed — Convention #79 sharding
+# doesn't apply to source rasters; keep local-only.
+docs/audits/raster_netMgr_*.tif
+
+# Task #451 Step 4 (23 Jul 2026): GHSL Population Grid raster —
+# ~500 MB extracted GeoTIFF from EC JRC / Copernicus. Regenerable via:
+#   curl -L -o /tmp/ghs_pop.zip https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2025_GLOBE_R2023A_54009_1000/V1-0/GHS_POP_E2025_GLOBE_R2023A_54009_1000_V1_0.zip
+#   unzip -j /tmp/ghs_pop.zip 'GHS_POP_E2025_GLOBE_R2023A_54009_1000_V1_0.tif' -d docs/audits/
+# License: EC JRC / Copernicus Emergency Management Service — attribution-required
+# open license (Convention #7 + #60 compatible). NEVER committed — exceeds
+# GitHub 100 MB hard limit.
+docs/audits/GHS_POP_*.tif
+docs/audits/GHS_POP_*.zip
+docs/audits/ghs_pop.*
+*.bak_shardfix
+*.log
+logs/
+scripts/pipeline/ingestion/*/cache/
+
+# dedupe audit sidecars live in the SSI Index folder, not the repo
+ssi_dedupe_audit_*.json
+
+# Count-refresh backups (refresh_country_counts.py --from-data) and the
+# quarantine folder used instead of deletion, since device tooling cannot rm.
+*.pre-count-refresh-*.backup
+_to_delete/
+
+# Run logs written beside the scripts that produce them. They are diagnostic
+# output of a single run, not estate content, and they were reaching `git
+# status` on every session and competing for attention with real changes.
+cerra_fetch.log
+pipeline-run.log
+_MOUNT_CHECK.txt
+
+# ── Published but referenced by nothing (24 September 2026) ──
+# ikengassiindex.github.io is a PUBLIC repository serving GitHub Pages with
+# .nojekyll, so every tracked file is retrievable at
+# https://ikengassiindex.github.io/<path>. These two directories were 1.75 GB
+# of that surface — 2,543 files — and no live HTML or JS links into either.
+#
+# Copied to Ikenga SL OneDrive at "SSI Index/_site_archive/" and verified
+# file-by-file (2,141 files / 1,218,404,996 bytes and 402 files /
+# 530,390,604 bytes, exact on both count and size) BEFORE being untracked.
+# See that directory's MANIFEST.md.
+#
+# They are ignored rather than merely removed so they cannot return by a
+# later `git add` on a country folder.
+archive/
+*/_v4.0.2.backup/
+intelligence/*.bak

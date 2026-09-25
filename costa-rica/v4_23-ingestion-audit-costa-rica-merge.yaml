@@ -1,0 +1,191 @@
+# Costa Rica v4.23 Ingestion Audit — Step 4 Merge
+# ================================================
+# Task: #221 (WAVE2-Step4 Costa Rica)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: costa-rica/v4_23-ingestion-audit-costa-rica-preflight.yaml
+# Sibling fetch:      costa-rica/v4_23-ingestion-audit-costa-rica-fetch.yaml
+# Status: MERGE_COMPLETE (with Step 5 retroactive attribution follow-on)
+
+schema_version: v4_23-ingestion-audit-merge-1
+country_slug: costa-rica
+source_id: CR-C1-osm-overpass
+merged_at_utc: "2026-07-13T00:00:00Z"
+
+baseline_state:
+  ssi_data_substations: 169
+  grid_geo_substations: 170  # estimated
+  grid_geo_lines: 575
+  lines_per_substation_ratio: 3.40  # clean transmission-tier
+  owner_coverage_pct: 0.0
+  voltage_coverage_pct: 100.0  # baseline captured EHV/HV only
+  region_coverage_pct: 100.0   # 7 provinces populated
+  voltage_split_baseline:
+    230_kv: 91
+    138_kv: 76
+    34.5_kv: 1
+    24.9_kv: 1
+
+merge_stats:
+  enriched: 112              # OSM subs matched existing (500m proximity)
+  voltage_filled: 0          # baseline already 100% voltage-tagged
+  net_new_substations: 0     # OSM had fewer subs than baseline; all matched
+  voltage_xcheck_findings: 0 # perfect voltage consistency
+  lines_appended: 195        # substantial line densification (34% net-new)
+  lines_deduped: 385         # baseline lines matched OSM
+
+step_5_retroactive_owner_attribution:
+  rationale: >
+    OSM Costa Rica had only 112 substations vs 169 in baseline. Merge is
+    OSM-driven (walks OSM subs, matches to existing), so 58 baseline subs
+    without OSM neighbor within 500m proximity stayed unenriched. Applied
+    same monopoly-with-overlay resolver retroactively to close the gap.
+  retroactively_attributed: 58
+  breakdown:
+    ICE_via_layer_1_TSO_threshold_ge_138kv: 58
+  rationale_all_ICE: >
+    All 58 unmatched baseline subs are at 230 kV (35) or 138 kV (23) —
+    Costa Rica transmission-tier is 100% ICE-owned. Layer 1 TSO threshold
+    resolved all cleanly. Provenance tag "retroactive_monopoly_fallback_ICE_TSO_threshold_ge_138kv"
+    preserved in v43_provenance sidecar for audit trail.
+
+final_state:
+  ssi_data_substations: 169
+  grid_geo_lines: 770
+  lines_per_substation_ratio: 4.56  # clean transmission-tier (baseline 3.40 + line densification)
+  ssi_data_bytes: ~500_000  # 0.5 MB
+  grid_geo_bytes: ~400_000  # 0.4 MB
+
+owner_coverage_post:
+  total: 100.0%  # 169/169 including 58 retroactive attributions
+  by_operator:
+    ICE: 138                    # 81.7% — state utility (transmission + rural default)
+    CNFL: 16                    # 9.5%  — SJ metro (ICE subsidiary, distinct legal entity)
+    Coopesantos: 6              # 3.6%  — Los Santos rural cooperative
+    Coopelesca: 3               # 1.8%  — San Carlos rural cooperative
+    ESPH: 3                     # 1.8%  — Heredia municipal utility
+    Coopeguanacaste: 2          # 1.2%  — NW Guanacaste rural cooperative
+    JASEC: 1                    # 0.6%  — Cartago municipal utility
+  distinct_operators: 7
+  unresolved: 0                 # 100% attribution — cleanest cohort result
+
+voltage_split_post:
+  ehv_ge_220kv: 91              # 230 kV SIEPAC backbone + cross-border interconnections
+  hv_100_to_219kv: 76           # 138 kV national trunk
+  distribution_lt_100kv: 2      # 34.5 + 24.9 kV — very sparse OSM MV coverage
+  unknown: 0                    # baseline was 100% voltage-tagged
+  voltage_coverage_pct: 100.0
+
+region_split_post:
+  provinces_populated: 169      # baseline had all 7 provinces populated
+  region_coverage_pct: 100.0
+
+grid_geo:
+  total_km: 3525  # haversine
+  lines_per_substation: 4.56
+
+discipline_36_cross_border_filter:
+  polygon_source: costa-rica/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 0
+  lines_dropped_outside_polygon: 3
+  final_state: CLEAN  # 0/169 outside polygon
+  polygon_healing: "7 self-intersecting features healed via buffer(0) during ingestion"
+
+discipline_41_line_parity:
+  post_merge: PASS
+  substation_orphans: 0
+  line_orphans: 0
+  ratio_state: "3.40 (baseline) → 4.56 (post-merge, clean transmission-tier)"
+
+convention_preservation:
+  discipline_36:
+    status: HELD
+    outside_polygon_dropped: 0%
+  discipline_41:
+    status: HELD
+    line_substation_coupling: preserved
+  convention_46:
+    status: HELD
+    scope: All changes contained to costa-rica/ + scripts/pipeline/ingestion/costa_rica/
+  convention_56:
+    status: HELD
+    scope: >
+      Monopoly-with-overlay pattern preserves visibly-honest provenance at
+      3 layers (TSO threshold + DSO geofence + ICE default). Retroactive
+      step-5 attribution tagged distinctly in v43_provenance sidecar.
+      100% attribution reflects Costa Rica's genuine architecture: ICE is
+      the state utility with de facto national coverage where non-ICE DSOs
+      don't operate.
+  convention_60:
+    status: HELD
+    scope: OSM only — no commercial providers used.
+  convention_64:
+    status: HELD
+    scope: Grupotec + Rely + Config B / C valuation paths unaffected.
+
+architectural_pattern:
+  fallback_class: monopoly-with-overlay (ICE TSO threshold + 7-DSO geofence + ICE default)
+  reuse_source: luxembourg (monopoly + municipal geofence overlay)
+  wave_2_priority_number: 13
+  cumulative_countries_closed: 13
+  cohort_progress: >
+    Wave 1 (5 of 5): Canada + Norway + Mexico + Austria + Greenland
+    Wave 2 (8 of 5-6, +3): Australia + Belgium + Netherlands + Chile + Hungary +
+    Luxembourg + Slovenia + Costa Rica
+  fallback_classes_empirically_validated: 5
+  monopoly_class_applications: 3 (Greenland + Luxembourg + Costa Rica)
+
+lessons_generalised:
+  - >
+      **Monopoly + multi-DSO overlay scales cleanly from 4 to 7 nested territories**:
+      Costa Rica extends Luxembourg's monopoly + 4 municipal geofence pattern to
+      ICE default + 7 non-ICE DSOs (CNFL SJ + ESPH + JASEC + 4 rural cooperatives).
+      Priority ordering (most-specific-first) resolves overlap zones. Pattern
+      generalises to countries with state utility as majority + patchwork of
+      municipal/cooperative DSOs (India + Bangladesh + Kenya + Tanzania).
+  - >
+      **Step 5 retroactive owner attribution pattern**: when OSM baseline
+      is smaller than ssi-data baseline (Costa Rica 112 OSM vs 169 baseline),
+      the OSM-driven merge leaves unmatched baseline subs without owner. The
+      same resolver applied retroactively closes the gap cleanly. Provenance
+      tagged distinctly ("retroactive_" prefix) for audit trail. Should be
+      wired into future merge scripts as a Step 4b post-pass for countries
+      where OSM sub count < baseline count.
+  - >
+      **All 3 coverage dimensions at 100% simultaneously — cleanest cohort result**:
+      Costa Rica is the FIRST cohort-country to reach 100% on ALL three
+      dimensions (owner + voltage + region) simultaneously. Baseline was
+      already 100% voltage + 100% region; Step 5 retroactive closed the
+      owner gap. Reflects the small country + clean transmission-tier
+      baseline + monopoly-dominated distribution architecture.
+  - >
+      **Line densification exceeded substation densification**: OSM added
+      195 net-new lines (34% growth) but 0 net-new substations. Costa Rica's
+      transmission-tier baseline was already comprehensive; OSM contributed
+      distribution-tier line detail (mostly 34.5 + 24.9 kV MV lines). Line-
+      ratio moved from clean 3.40 to clean 4.56.
+  - >
+      **Small OSM footprint doesn't imply incomplete country — baseline is
+      the arbiter**: Pre-flight estimated 500-1500 OSM subs; actual 112.
+      This isn't a country-onboarding failure; it reflects that Costa Rica's
+      distribution grid is underrepresented in OSM globally. The baseline
+      canonical (169 subs) is the source of truth; OSM is enrichment.
+
+deployment_state:
+  pipeline_ready: true
+  ui_refresh_ready: true
+  register_hash_pin: 2ca50d583f43  # unchanged (methodology-invariant enrichment)
+  nn_tag_pin: v33-calibrated-scipy-20260427T074651Z
+
+auditability_chain:
+  parent_preflight: costa-rica/v4_23-ingestion-audit-costa-rica-preflight.yaml
+  step_2_fetch: costa-rica/v4_23-ingestion-audit-costa-rica-fetch.yaml
+  step_4_merge: costa-rica/v4_23-ingestion-audit-costa-rica-merge.yaml
+  step_5_retroactive: 58_baseline_subs_attributed_via_layer_1_TSO_threshold
+  commit_hash_placeholder: TBD_at_step_5_close
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: costa-rica/ssi-data.json + costa-rica/grid-geo.json
+
+status: READY_FOR_STEP_5

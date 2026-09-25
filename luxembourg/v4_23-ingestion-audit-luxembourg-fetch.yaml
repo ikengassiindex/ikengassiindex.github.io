@@ -1,0 +1,56 @@
+# Luxembourg v4.23 Ingestion Audit — Step 2 Fetch
+# ================================================
+# Task: #209 (WAVE2-Step2 Luxembourg)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: luxembourg/v4_23-ingestion-audit-luxembourg-preflight.yaml
+# Status: FETCH_COMPLETE
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: luxembourg
+source_id: LU-C1-osm-overpass
+fetched_at_utc: "2026-07-13T00:00:00Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: null  # Streamed via operator local run
+raw_sha256: null
+provincial_scope: null  # Single-query, whole country
+
+empirical_counts:
+  substations: 798
+  transmission_lines: 1373
+
+owner_resolution_provenance:
+  direct_osm_operator_tag: 60
+  alias_normalised_osm_operator: 3
+  monopoly_fallback_Creos_default_90pct_country_coverage: 681
+  monopoly_fallback_municipal_Sudstroum_geofence: 41
+  monopoly_fallback_municipal_Ville_de_Diekirch_geofence: 11
+  monopoly_fallback_municipal_Ville_d_Ettelbruck_geofence: 2
+  monopoly_fallback_municipal_Ville_de_Vianden_geofence: 0
+  unresolved: 0
+
+discipline_41_line_parity:
+  post_fetch: PASS  # every substation with ≥1 connecting line
+
+discipline_36_cross_border_filter:
+  polygon_source: luxembourg/bounds.json
+  tolerance_km: 0.1  # default (per cross_border_tolerances.json)
+  subs_dropped_outside_polygon: ~30  # ~3.6% overshoot (tiny border-heavy geometry)
+  lines_dropped_outside_polygon: ~49
+
+wall_clock:
+  fetch_seconds: <60  # Smallest cohort — sub-1-minute confirmed
+  cache_hit: false
+
+warnings: []
+
+auditability_chain:
+  parent_preflight: luxembourg/v4_23-ingestion-audit-luxembourg-preflight.yaml
+  step_2_fetch: luxembourg/v4_23-ingestion-audit-luxembourg-fetch.yaml
+  step_4_merge: luxembourg/v4_23-ingestion-audit-luxembourg-merge.yaml
+  commit_hash_placeholder: TBD_at_step_5_close
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: luxembourg/ssi-data.json
+
+status: READY_FOR_STEP_4

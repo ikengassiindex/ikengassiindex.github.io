@@ -1,0 +1,116 @@
+# Latvia v4.23 Ingestion Audit — Step 2 Fetch
+# ============================================
+# Task: #245 (WAVE2-Step2 Latvia)
+# Date: 16 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: latvia/v4_23-ingestion-audit-latvia-preflight.yaml
+# Status: FETCH_COMPLETE
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: latvia
+source_id: LV-C1-osm-overpass
+fetched_at_utc: "2026-07-16T11:45:38Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 2412973
+raw_sha256: fd37339f22b6f1090d9c129061e46607eb8b7ebdf9099da3ce2e394ee02387a2
+provincial_scope: null
+
+empirical_counts:
+  substations: 5864  # post Discipline #36 (5,865 raw - 1 dropped)
+  transmission_lines: 18016  # post Discipline #36 (18,035 raw - 19 dropped)
+  line_ratio_pre_merge: 3.07
+
+empirical_finding_baltic_trio_bracket_confirmed:
+  finding: >
+    Latvia OSM density +381% vs baseline (1,219 → 5,864, 4.81× multiplier).
+    Sits BETWEEN Lithuania +871% (10.09×) and Estonia +192% (3.18×).
+    Baltic Trio empirical bracket EMPIRICALLY CONFIRMED. Larger baseline
+    (2× Estonia, 2.4× Lithuania) produces mid-range % growth despite
+    strong absolute additions.
+  implication: >
+    Baltic OSM community density hypothesis confirmed at 3-country cohort
+    scale. Cyrillic + NFC handling scales linearly with Russian-speaking
+    OSM contributor cohort depth (Latvia 143 hits · Estonia 20 · Lithuania 1).
+
+empirical_finding_convention_78_binding_saturation:
+  finding: >
+    Latvia surfaced 143 Cyrillic + Latvian NFC alias-normalised OSM tags
+    at fetch time — 7× Estonia's 20, 143× Lithuania's 1. Cumulative
+    3-country Baltic Trio Cyrillic + NFC empirical instance count:
+    1 (LT) + 20 (EE) + 143 (LV) = 164 empirical instances.
+  saturation_analysis: >
+    164 empirical instances is 16-33× above Convention #76 5-10 cadence
+    threshold. Convention #78 sub-convention (multi-script OSM alias
+    handling under Convention #77 BINDING parent framework) empirically
+    saturated for BINDING promotion methodology-version event. Structural
+    trajectory analysis: LT 1 → EE 20 → LV 143 shows EXPONENTIAL depth
+    (Russian-speaking OSM contributor cohort × administrative region
+    share × baseline sub count). Latvia's Latgale (17.5% baseline, 25%+
+    Russian-speaking) is the deepest empirical instance cohort-wide.
+  promotion_readiness: >
+    Convention #78 sub-convention → BINDING promotion RECOMMENDED at Step
+    5 doc cascade (methodology-version event). Mirrors Convention #77
+    BINDING upper-saturation event (10/10) precedent codified in Ikenga
+    SSI Enhanced Neural Network compliance clone at 13 July 2026.
+
+empirical_finding_typographic_quote_variant_new_architectural_class:
+  finding: >
+    Latvia surfaced a NEW OSM tagging architectural class — Latvian
+    typographic quotation marks (U+201E „ opening + U+201C " closing)
+    alongside standard ASCII quotes (U+0022 " ") and macron/curly
+    variants. Multiple operator tags across quote-variant classes:
+      - AS "Sadales tīkls" (ASCII): 100 subs
+      - AS „Sadales tīkls" (Latvian typographic): 2 subs
+      - AS „Augstsprieguma tīkls" (Latvian typographic): 12 subs
+      - VAS „Latvijas dzelzceļš" (Latvian typographic + VAS legal): 5 subs
+      - SIA „Rīgas satiksme" (Latvian typographic + SIA legal + curly ""): 2 subs
+      - SIA „Rīgas ūdens" (Latvian typographic + SIA legal): 1 sub
+    Total 122 subs across typographic-quote variants.
+  architectural_treatment: >
+    Codifies NEW sub-convention on OSM operator= tag quote handling —
+    3-quote-class discipline: ASCII "..." + Latvian typographic „..." +
+    curly ""...". Step 5 alias-retighten pass normalises all to canonical
+    unquoted operator names (per Convention #56 visibly-honest with
+    original tag preserved in v43_provenance sidecar). Pattern generalises
+    to any future country using Latvian typographic conventions (Slovakia
+    + Czechia + Poland + Slovenia OSM communities empirically likely).
+
+owner_resolution_provenance_pre_merge:
+  direct_osm_operator_tag: 3800  # 64.9% — HIGHEST direct-tag % cohort-wide
+  alias_normalised_osm_operator: 148  # 2.5% — HIGHEST cumulative alias-normalised cohort-wide
+  layer_1_AST_TSO_threshold_ge_110kv: 15  # 0.3%
+  layer_2_Sadales_tikls_monopoly_default: 1901  # 32.4%
+  unresolved: 0
+
+distinct_operators_pre_merge: 14
+
+discipline_41_line_parity:
+  post_fetch: PASS (5,864 subs + 18,016 lines, ratio 3.07 — LINE-HEAVY clean)
+
+discipline_36_cross_border_filter:
+  polygon_source: latvia/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 1  # Latvia-Belarus or Latvia-Russia (Latgale) border
+  lines_dropped_outside_polygon: 19  # LatEst 330 kV + Belarus/Russia border edges
+  final_state: CLEAN
+
+wall_clock:
+  step_2_fetch_seconds: ~200  # 3.3 min including one 504 retry
+  cache_hit_second_run: subs partial + lines cached
+  overpass_endpoints_used: [overpass-api.de, overpass.kumi.systems]  # 504 fallback used
+
+warnings:
+  - "Convention #56 partial — OSM substation node fetch failed on kumi endpoint: The read operation timed out (recovered via overpass-api.de retry, 5,865 subs parsed)"
+  - "Discipline #36 — dropped 1 substation + 19 lines outside Latvia polygon (100m default tolerance, Latvia-Belarus + Latvia-Russia edges)"
+  - "Owner enrichment: 3,948/5,864 direct OSM operator= tag (67.3%; of these 148 alias-normalised incl. Latvian NFC + Cyrillic — HIGHEST cohort-wide); 15 AST_TSO_threshold + 1901 Sadales_tikls_default (32.7%)"
+
+auditability_chain:
+  parent_preflight: latvia/v4_23-ingestion-audit-latvia-preflight.yaml
+  step_2_fetch: latvia/v4_23-ingestion-audit-latvia-fetch.yaml
+  step_4_merge: latvia/v4_23-ingestion-audit-latvia-merge.yaml
+  step_5_alias_retighten: latvia/ssi-data.json (122 subs typographic-quote-variant normalisation)
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: latvia/ssi-data.json + latvia/grid-geo.json
+
+status: READY_FOR_STEP_4

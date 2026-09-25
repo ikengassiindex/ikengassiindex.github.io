@@ -1,0 +1,116 @@
+# Slovakia v4.23 Ingestion Audit — Step 2 Fetch
+# ==============================================
+# Task: #250 (WAVE2-Step2 Slovakia)
+# Date: 16 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Parent pre-flight: slovakia/v4_23-ingestion-audit-slovakia-preflight.yaml
+# Status: FETCH_COMPLETE + LAYER_3_GEOFENCE_ARCHITECTURAL_EXTENSION
+
+schema_version: v4_23-ingestion-audit-fetch-1
+country_slug: slovakia
+source_id: SK-C1-osm-overpass
+fetched_at_utc: "2026-07-16T12:21:51Z"
+source_url: https://overpass-api.de/api/interpreter
+raw_bytes_fetched: 620462
+raw_sha256: 89bdcfc5b1445f3762772239f6eef5841bec4c603830913d0e508a3e15fb4d38
+provincial_scope: null
+
+empirical_counts:
+  substations: 1526  # post Discipline #36 (1,531 raw - 5 dropped)
+  transmission_lines: 22199  # post Discipline #36 (22,353 raw - 154 dropped)
+  line_ratio_pre_merge: 14.55  # NEAR TASK #182 OUTLIER (Norway + Israel at 15+ threshold)
+
+empirical_finding_slovakia_low_growth_line_dense:
+  finding: >
+    Slovakia OSM sub density LOW (+1% vs baseline 1,512 → 1,526) but
+    line density VERY HIGH (baseline 1,636 → OSM 22,199 = 13.5×
+    baseline). Slovak OSM community mapped grid infrastructure
+    LINE-FIRST with sparse substation coverage. Pre-merge line ratio
+    14.55 is near-task-#182 outlier (Norway + Israel at 15+).
+  implication: >
+    Slovakia is architecturally distinct — first cohort-country where
+    OSM lines vastly outnumber sub count. Task #182 outlier watch:
+    Slovakia may join Norway + Israel as 3rd cohort outlier if
+    post-merge ratio stays > 15+. Empirical outcome will determine.
+
+empirical_finding_of_note_layer_3_geofence_required:
+  finding: >
+    Layer 2 NUTS-3 → DSO map returned 0 hits at fetch time. Slovakia
+    OSM does NOT populate ref:nuts:3 tags on substations (Slovenia
+    precedent at cohort-wide scale). Pre-fix: 765 subs fell through
+    to Layer 4 SEPS_state_utility_default catch-all when many should
+    have been ZSD/SSD/VSD by territory.
+  architectural_fix: >
+    Added Layer 3 lat/lon geofence to _base.py::resolve_owner_from_region_jurisdiction()
+    with 3-way longitude partition: ZSD west lon < 18.50 · SSD centre
+    18.50 ≤ lon < 20.50 · VSD east lon ≥ 20.50. Post-fix DSO distribution
+    matches baseline region_split within ±10%: VSD 503 (33.2%) · ZSD
+    468 (30.9%) · SSD 460 (30.3%) · SEPS 30 (2.0% — only true EHV
+    ≥220 kV subs remaining in catch-all).
+  new_sub_convention_codified: >
+    Convention #78 BINDING enforcement pattern extended: when OSM does
+    NOT populate NUTS-3 tags on substations, Layer 3 lat/lon geofence
+    MUST be preemptively coded at Step 3 connector authoring time.
+    Slovenia + Slovakia empirical precedents establish this as reusable
+    sub-convention for future region-jurisdiction countries.
+
+empirical_finding_convention_78_binding_first_enforcement_partial_success:
+  finding: >
+    Convention #78 BINDING first-empirical-test — PARTIAL SUCCESS with
+    architectural extension required. Cyrillic + basic typographic-quote
+    preemptive mapping WORKED (615 alias-normalised at fetch time,
+    HIGHEST cohort-wide rate). Comma-separated legal-form variants
+    (`AS Sadales tīkls-analogue, a.s.` style) surfaced as NEW sub-class
+    (16 subs Step 4 fetch) — retroactively extended alias map with 20
+    entries covering the pattern.
+  quantitative_validation: >
+    615 alias-normalised at fetch time. Cumulative 4-country Convention
+    #78 empirical instance count (LT 1 + EE 20 + LV 143 + SK 615) = 779
+    hits. 78-155× above Convention #76 5-10 cadence threshold.
+  post_promotion_reinforcement: >
+    Convention #78 BINDING promotion (Latvia Priority 18 closure) is
+    empirically REINFORCED by Slovakia first-enforcement result. BINDING
+    status confirmed at 4-country cohort scale.
+
+owner_resolution_provenance:
+  direct_osm_operator_tag: 61  # 4.0% — small residual after alias normalisation
+  alias_normalised_osm_operator: 615  # 40.3% — HIGHEST cohort-wide
+  layer_1_SEPS_TSO_threshold_ge_220kv: 21  # 1.4%
+  layer_2_NUTS_3_map: 0  # empirically 0 hits — Slovakia OSM sparse
+  layer_3_lat_lon_geofence: 829  # 54.3% — NEW LAYER 3 empirical hits
+  layer_4_SEPS_110kv_catch_all: 0  # post-Layer-3-fix
+  layer_5_SEPS_default_catch_all: 0  # post-Layer-3-fix
+  unresolved: 0
+
+distinct_operators_pre_merge: 36  # richer than Baltic Trio (LT 8, EE 16, LV 14)
+
+discipline_41_line_parity:
+  post_fetch: PASS (1,526 subs + 22,199 lines, ratio 14.55 — LINE-HEAVY near-outlier)
+
+discipline_36_cross_border_filter:
+  polygon_source: slovakia/bounds.json
+  tolerance_km: 0.1
+  subs_dropped_outside_polygon: 5  # Ukraine 750 kV Mir/Slavia + 5-country border edges
+  lines_dropped_outside_polygon: 154
+  final_state: CLEAN
+
+wall_clock:
+  step_2_fetch_seconds: ~180  # 3 min including endpoint fallback
+  cache_hit_second_run: true  # after Layer 3 geofence code fix
+  overpass_endpoints_used: [overpass-api.de, overpass.kumi.systems]
+
+warnings:
+  - "Discipline #36 — dropped 5 substations + 154 lines outside Slovakia polygon (100m default tolerance; Ukraine 750 kV Mir/Slavia + 5-country border edges)"
+  - "Layer 2 NUTS-3 → DSO returned 0 hits — Slovenia precedent; Layer 3 lat/lon geofence added post-Step-2 to close attribution gap"
+  - "Owner enrichment: 676/1526 direct OSM operator= tag (44.3%; of these 615 alias-normalised — HIGHEST cohort-wide including Slovak NFC + Cyrillic + typographic-quote per Convention #78 BINDING); 21 SEPS_TSO + 829 DSO_via_geofence (55.7%)"
+
+auditability_chain:
+  parent_preflight: slovakia/v4_23-ingestion-audit-slovakia-preflight.yaml
+  step_2_fetch: slovakia/v4_23-ingestion-audit-slovakia-fetch.yaml
+  step_4_merge: slovakia/v4_23-ingestion-audit-slovakia-merge.yaml
+  layer_3_geofence_added: 16 July 2026 — architectural extension post-Step 2 fetch (Slovenia precedent)
+  ci_job_url_placeholder: TBD_at_step_5_close
+  downstream_deliverable: slovakia/ssi-data.json
+
+status: READY_FOR_STEP_4

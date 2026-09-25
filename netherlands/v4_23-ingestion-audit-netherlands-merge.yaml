@@ -1,0 +1,144 @@
+# Netherlands v4.23 Ingestion Audit — Step 4 merge
+# ================================================
+# Task: #196 (WAVE2-Step4 Netherlands)
+# Date: 13 July 2026
+# Author: ikenga-ssi-foundation
+# Methodology pin: v4.2
+# Status: CLOSED — operator local merge execution complete
+
+meta:
+  country: netherlands
+  iso2: NL
+  iso3: NLD
+  wave: 2
+  step: 4
+  parent_fetch: netherlands/v4_23-ingestion-audit-netherlands-fetch.yaml
+  merged_at_utc: "2026-07-13T15:50:26Z"
+  wall_clock_secs: ~60  # 1 min — very fast
+
+merge_operations:
+  substations:
+    baseline: 5449  # NOTE: baseline had grown from 1,639 in pre-flight to 5,449 via prior pipeline run
+    fresh_osm: 6958
+    matched_within_500m: 6958  # 100% match rate — every fresh OSM within 500m of existing
+    owner_enriched: 6958
+    voltage_filled: 3  # very small — matched-pair osm voltage tags matched existing
+    voltage_xcheck_mismatches: 41  # 0.6% mismatch rate — CLEANEST cohort-wide (Belgium 3.1%, Australia 48.8%)
+    net_new: 0  # baseline already comprehensive; fresh OSM added no new locations
+    final_count: 5449
+    delta_pct: 0.0  # unchanged count, but owner attribution transformed 0% → 100%
+    clustering_ratio: 1.28  # 6,958 fresh subs / 5,449 baseline = many-to-one metropolitan clustering
+  lines:
+    baseline: 8693
+    fresh_osm: 20496
+    appended: 0
+    deduped_midpoint_100m: 20496  # 100% dedupe rate — all fresh OSM lines matched existing
+    final_count: 8693
+    delta_pct: 0.0
+
+file_sizes_post_merge:
+  ssi_data_json_mb: 9.2
+  grid_geo_json_mb: unchanged  # no writes
+  under_90_mb_threshold: true
+  optimisation_needed: false
+
+authoritative_cohort_metrics_post_merge:
+  substations: 5449
+  lines: 8693
+  km_of_transmission_lines_haversine: 7200
+  km_per_substation: 1.3  # compact dense grid (matches Belgium's density)
+  distinct_operators: 60
+  discipline_41_ratio: 1.60
+  voltage_split:
+    ehv_gte_220kv: 128  # 2.3%
+    hv_100_to_219kv: 452  # 8.3%
+    distribution_lt_100kv: 860  # 15.8%
+    unknown_null: 4009  # 73.6% — reflects OSM tag heterogeneity + baseline nulls preserved
+
+coverage_post_merge:
+  owner_coverage_pct: 100.0  # ! from 0.0% baseline — MASSIVE WIN (2nd cohort-country to reach 100%)
+  voltage_coverage_pct: 26.4  # baseline was ~50% but that was on 1,639 subs; net expanded baseline is 5,449 with more nulls
+  region_coverage_pct: 30.1  # 1,639 baseline subs had regions; 3,810 net-added had region=None
+  owner_coverage_by_provenance:
+    direct_osm_operator_tag: "39.2% of fresh OSM (2,728/6,958)"
+    dnsp_alias_normalised_case_insensitive: "0.03% of fresh OSM (2/6,958)"
+    region_jurisdiction_fallback: "60.8% of fresh OSM (4,230/6,958)"
+    convention_56_unresolved_null: 0  # ZERO unresolved
+
+top_15_operators_post_merge:
+  - {rank: 1, name: "Liander", count: 2070, note: "4-province DSO (Noord-Holland/Gelderland/Friesland/Flevoland)"}
+  - {rank: 2, name: "Stedin", count: 1681, note: "3-province DSO (Zuid-Holland/Utrecht/Zeeland via Enduris)"}
+  - {rank: 3, name: "Enexis", count: 889, note: "5-province DSO (Overijssel/Drenthe/Groningen/Noord-Brabant/Limburg)"}
+  - {rank: 4, name: "TenneT", count: 528, note: "TSO ≥110 kV federal network"}
+  - {rank: 5, name: "Westland Infra", count: 78, note: "Small DSO — Westland horticultural region geofence"}
+  - {rank: 6, name: "ProRail", count: 44, note: "Railway infrastructure (direct-tagged, not normalised — legitimate separate operator)"}
+  - {rank: 7, name: "Coteq", count: 38, note: "Small DSO — Almelo area geofence"}
+  - {rank: 8, name: "Rendo", count: 19, note: "Small DSO — Zwolle/Steenwijk geofence"}
+  - {rank: 9, name: "HTM", count: 8, note: "Den Haag public transport traction (direct-tagged)"}
+  - {rank: 10, name: "liander", count: 7, note: "CASE MISMATCH — should normalise to Liander (residual)"}
+  - {rank: 11, name: "stedin", count: 7, note: "CASE MISMATCH — should normalise to Stedin (residual)"}
+  - {rank: 12, name: "Infraspeed", count: 6, note: "HSL-Zuid high-speed rail infra (direct-tagged)"}
+  - {rank: 13, name: "ENEXIS", count: 4, note: "CASE MISMATCH — should normalise to Enexis (residual)"}
+  - {rank: 14, name: "Nuon", count: 4, note: "Pre-2011 splitsingswet Nuon parent — grid function since split to Alliander/Liander; preserved as OSM tag per Convention #56"}
+  - {rank: 15, name: "Eneco", count: 4, note: "Pre-2011 Eneco parent — grid function since split to Stedin; preserved as OSM tag per Convention #56"}
+
+residual_alias_normalisation:
+  count_residual: 26  # liander 7 + stedin 7 + ENEXIS 4 + Nuon 4 + Eneco 4
+  breakdown: |
+    Case-mismatch residuals (18 subs — liander/stedin/ENEXIS): case-insensitive
+    alias map has 'stedin netbeheer' etc. but not bare canonical names.
+    Fix in future refresh: add canonical DSO names as self-mapping identity
+    entries in _DNSP_ALIAS_MAP.
+    Pre-2011 splitsingswet historicals (8 subs — Nuon/Eneco): preserved per
+    Convention #56 visibly-honest degradation — grid function has since been
+    unbundled but OSM tag reflects historical vintage.
+  future_fix_queued: |
+    Add to _base.py::_DNSP_ALIAS_MAP:
+      "liander": "Liander",
+      "stedin": "Stedin",
+      "enexis": "Enexis",
+      "tennet": "TenneT",
+    (self-mapping identity entries would catch all case variants)
+
+voltage_cross_validation:
+  matched_pairs: 6958
+  mismatches_gt_1_5x_ratio: 41
+  mismatch_rate_pct: 0.6
+  note: >
+    CLEANEST cohort-wide result (Belgium 3.1%, Australia 48.8%, Denmark future).
+    Reflects Netherlands' highly consistent OSM voltage tagging in metropolitan
+    areas + baseline was already OSM-derived (fresh OSM matched fresh OSM
+    with tiny drift). Report at netherlands/v4_23-voltage-cross-validation.json.
+
+discipline_41_line_parity:
+  post_merge_check: OK
+  final_ratio: 1.60
+  envelope_after_task_182: "0.3 - 30 (widened)"
+  status: "very clean — transmission-tier only"
+
+convention_preservation:
+  discipline_36:
+    outcome: 6 substations + 203 lines dropped (~0.1% overshoot filtered)
+    tolerance: 100m default
+    status: PASS
+  discipline_41:
+    outcome: All substations have ≥1 connecting line (existing grid-geo was already complete)
+    status: PASS
+  convention_46:
+    outcome: no portfolio-scoped changes (single netherlands/*.json)
+    status: PRESERVED
+  convention_56:
+    outcome: |
+      Case-mismatch residuals (18 subs) + pre-splitsingswet historicals (8 subs)
+      preserved rather than force-normalised. Fix queued for future refresh.
+    status: PRESERVED
+  convention_60:
+    outcome: OSM (ODbL) only — no commercial providers
+    status: PRESERVED
+  convention_64:
+    outcome: strict per-country resolution (all writes to netherlands/*.json)
+    status: PRESERVED
+
+next_step: "Step 5 (task #197): UI + doc cascade — landing page data-subs 1,220 → 5,449, country page fleet + km + v4.23 callout, cohort audit sweep re-run."
+
+status: STEP_4_CLOSED
