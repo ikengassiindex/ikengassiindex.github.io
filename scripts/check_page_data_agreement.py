@@ -59,6 +59,19 @@ Per country, against <slug>/ssi-data.json and <slug>/grid-geo.json:
                                 a data finding, not as a page error.
     fleet.grid_lines            line records in grid-geo, shards resolved
 
+AND WHAT IT DOES NOT COMPARE — AMENDED 11 October (E270)
+--------------------------------------------------------
+The pages mark TWENTY-FIVE keys with data-canonical. The six above are the ones
+this gate compares, and page_claims() narrows even that to `fleet.` keys whose
+published value is an integer. The other nineteen - the five fleet.engine.*
+figures, the four exemplars, fleet.grid_lines_km, cfg.country_name, the three
+admin labels and the five meta counts - are compared by nothing, and seventeen
+of them are mentioned by nothing in the estate's code or configuration at all.
+Until 11 October this gate printed "every published figure matches its source"
+over that scope. It now counts the scope and states it. See
+doctrine/FINDING_the_pages_carry_25_canonical_figures_the_gate_checks_6_and_17_are_derived_by_nothing_in_the_estate.md
+and D-P.
+
 Plus, once for the cohort, the root index.html data-subs attribute on each
 country's map path — the figure shown in the landing-page tooltip.
 
@@ -142,12 +155,34 @@ def count_lines(slug: str):
     return n
 
 
+import sys as _sys, pathlib as _pathlib
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+import _ssi_region_counts as region_counts
+
+
 def config_regions(slug: str):
     p = REPO / "intelligence" / "country-configs" / f"{slug}.json"
     if not p.exists():
         return None
     l1 = (json.loads(p.read_text()).get("admin") or {}).get("l1") or {}
     return l1.get("count")
+
+
+# RULED 8 October 2026 - C2, "both, named apart". A page states ONE key,
+# `fleet.n_regions`, for a figure with TWO declared readings: rows in the
+# regions table (placeholder included) and administrative regions
+# (placeholder excluded). All 39 pages use that one key - measured, 78
+# occurrences - so there is nothing for a page to "map" to a second field, and
+# the gate accepts EITHER declared value and NAMES which one matched.
+#
+# WHAT THIS GIVES UP, STATED: the two differ by exactly one wherever a
+# placeholder exists, so the gate can no longer catch a +/-1 error on this one
+# figure. It still catches anything else, including the Italy-clone family this
+# gate was written for - "20" published on 38 pages against France's 102.
+#
+# WHAT IT BUYS: no page edit, so no pin 1 exposure, and the definition each
+# page uses becomes visible in the output instead of silently passing.
+DUAL_DEFINITION_KEYS = ("fleet.n_regions",)
 
 
 def truth_for(slug: str) -> dict:
@@ -187,6 +222,25 @@ def page_claims(slug: str) -> dict:
     return claims
 
 
+def published_keys(slugs) -> set:
+    """Every data-canonical key on the pages this run read.
+
+    E267/E270: this gate's pass line used to read "every published figure
+    matches its source" while comparing six keys of the twenty-five the pages
+    mark. A printed sentence about the data is a measurement, so the scope is
+    counted here and stated rather than implied. page_claims() narrows further
+    still - it reads only `fleet.` keys whose value is an integer.
+    """
+    seen = set()
+    for slug in slugs:
+        for page in PAGES:
+            p = REPO / slug / page
+            if p.exists():
+                seen.update(re.findall(r'data-canonical="([^"]+)"',
+                                       p.read_text(errors="replace")))
+    return seen
+
+
 def landing_claims() -> dict:
     p = REPO / "index.html"
     if not p.exists():
@@ -217,6 +271,8 @@ def main():
     slugs = cohort_slugs() if (args.all or not args.countries) else args.countries
     landing = landing_claims()
     findings, checked = [], 0
+    definitions = []   # (slug, key, value, which declared reading it matched)
+    compared = set()   # E270: the keys this run actually compared
 
     for slug in slugs:
         truth = truth_for(slug)
@@ -224,11 +280,23 @@ def main():
             continue
         claims = page_claims(slug)
 
+        accepted = region_counts.accepted_page_values(REPO, slug)
         for key, expected in truth.items():
             if expected is None:
                 continue
+            compared.add(key)
             for claimed, pages in (claims.get(key) or {}).items():
                 checked += 1
+                if key in DUAL_DEFINITION_KEYS and accepted:
+                    if claimed in accepted:
+                        definitions.append((slug, key, claimed, accepted[claimed]))
+                        continue
+                    findings.append({
+                        "slug": slug, "key": key, "claimed": claimed,
+                        "expected": " or ".join(str(v) for v in sorted(accepted)),
+                        "pages": sorted(set(pages)), "scope": "country_page",
+                    })
+                    continue
                 if claimed != expected:
                     findings.append({
                         "slug": slug, "key": key, "claimed": claimed,
@@ -237,8 +305,11 @@ def main():
                     })
 
         # config vs data regions — a data finding, not a page error
-        data_n = len(root_of(slug).get("regions") or []) if root_of(slug) else None
-        cfg_n = config_regions(slug)
+        root = root_of(slug)
+        dc = region_counts.data_counts(root) if root else None
+        cc = region_counts.config_counts(REPO, slug)
+        data_n = dc["rows"] if dc else None
+        cfg_n = cc["rows"]
         if cfg_n is not None and data_n is not None and cfg_n != data_n:
             findings.append({
                 "slug": slug, "key": "regions: config vs data",
@@ -246,6 +317,27 @@ def main():
                 "pages": ["intelligence/country-configs/%s.json" % slug],
                 "scope": "data_tier",
             })
+        # the ADMINISTRATIVE count, declared against measured
+        if cc["admin"] is not None and dc and cc["admin"] != dc["admin"]:
+            findings.append({
+                "slug": slug, "key": "admin regions: config vs data",
+                "claimed": cc["admin"], "expected": dc["admin"],
+                "pages": ["intelligence/country-configs/%s.json" % slug],
+                "scope": "data_tier",
+            })
+        # AND the stored fleet_summary.n_regions, which nothing checked before
+        # 8 October. The uk carries None there against 244 regions and a config
+        # of 244, so config-vs-data agreed and the null was invisible.
+        if dc:
+            fs = (root.get("fleet_summary") or {}) if isinstance(root, dict) else {}
+            stored = fs.get("n_regions")
+            if stored != dc["rows"]:
+                findings.append({
+                    "slug": slug, "key": "fleet_summary.n_regions vs data",
+                    "claimed": stored, "expected": dc["rows"],
+                    "pages": ["%s/ssi-data.json" % slug],
+                    "scope": "data_tier",
+                })
 
         if slug in landing:
             checked += 1
@@ -270,9 +362,32 @@ def main():
                   f"{f['expected']:>12,}")
         print("-" * 68)
 
+    if definitions:
+        both = {}
+        for slug, key, val, which in definitions:
+            both.setdefault(which, []).append(slug)
+        print("\n  fleet.n_regions — TWO declared readings, C2 ruled 8 October 2026;")
+        print("  each page is accepted against the one it states:")
+        for which in sorted(both):
+            fl = sorted(set(both[which]))
+            print(f"    {which:<16} {len(fl):>3} countries   {', '.join(fl[:8])}"
+                  + (" …" if len(fl) > 8 else ""))
+
+    all_keys = published_keys(slugs)
+    unchecked = sorted(all_keys - compared)
+
     print(f"\n  {len(findings)} disagreements across {len(by_country)} countries")
+    print(f"  SCOPE: {len(compared)} of the {len(all_keys)} data-canonical keys on "
+          f"these pages were compared.")
+    if unchecked:
+        print(f"  The other {len(unchecked)} are compared by nothing here: "
+              f"{', '.join(unchecked[:4])}"
+              + (f", … (+{len(unchecked) - 4})" if len(unchecked) > 4 else ""))
+        print("  E270 measured them; D-P is the decision. This gate's verdict "
+              "below covers")
+        print("  only the keys named in SCOPE.")
     if not findings:
-        print("  every published figure matches its source.")
+        print(f"  every one of those {len(compared)} figures matches its source.")
     else:
         worst = sorted(by_country.items(), key=lambda kv: -kv[1])[:5]
         print("  most affected: " + ", ".join(f"{s} ({n})" for s, n in worst))
@@ -291,7 +406,9 @@ def main():
             print(f"STRICT: {len(gating)} page figures disagree with their source "
                   f"-> exit 1")
             return 1
-        print("STRICT: every published figure matches its source.")
+        print(f"STRICT: the {len(compared)} compared figures match their sources; "
+              f"{len(unchecked)} of {len(all_keys)} published keys are compared by "
+              f"nothing (E270, D-P).")
     return 0
 
 

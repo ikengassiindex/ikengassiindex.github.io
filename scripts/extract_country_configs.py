@@ -22,6 +22,12 @@ USAGE:
   python3 scripts/extract_country_configs.py --validate-only # don't write, just check
 """
 import json
+
+# One place owns the two-count rule; see its docstring.
+import pathlib as _pathlib
+import sys as _sys
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+from _ssi_region_counts import data_counts as _region_counts
 import re
 import sys
 from pathlib import Path
@@ -77,6 +83,14 @@ def parse_country_html(slug: str) -> dict:
                 out['regions_count'] = len(d['regions'])
             elif isinstance(d.get('regions'), dict):
                 out['regions_count'] = len(d['regions'])
+            # The TWO counts, ruled 8 October 2026 (C2, "both, named apart").
+            # The rule lives in scripts/_ssi_region_counts.py and is NOT
+            # reimplemented here: three consumers already read this figure, and
+            # a fourth divergent copy is exactly how the C loader's defect was
+            # made (FINDING_the_C_loader_treats_one_absent_metric_...).
+            _rc = _region_counts(d)
+            out['regions_count_admin'] = _rc['admin']
+            out['regions_placeholder'] = _rc['placeholder']
             # Substation count from fleet_summary
             if isinstance(d.get('fleet_summary'), dict):
                 out['substations_count'] = d['fleet_summary'].get('total', 0)
@@ -106,6 +120,13 @@ def build_config(slug: str, country_meta: dict, extracted: dict) -> dict:
                 'label_en': country_meta.get('admin_l1_label', 'region'),
                 'label_short': country_meta.get('admin_l1_label_short', 'region'),
                 'count': extracted.get('regions_count') or country_meta.get('regions_count') or 1,
+                # Absent rather than guessed where the regions table was not
+                # read: config_counts() returns None and the gate skips it,
+                # which is Convention #56 applied to a declaration.
+                **({'count_admin_regions': extracted['regions_count_admin']}
+                   if extracted.get('regions_count_admin') is not None else {}),
+                **({'placeholder_row': extracted.get('regions_placeholder')}
+                   if 'regions_count_admin' in extracted else {}),
             }
         },
     }

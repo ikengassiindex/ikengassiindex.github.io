@@ -126,6 +126,23 @@ def count_lines(slug: str):
     return n
 
 
+# RULED 8 October 2026 - C2, "both, named apart". `fleet.n_regions` on a page
+# may legitimately state EITHER declared reading: rows in the regions table
+# (placeholder included) or administrative regions (placeholder excluded).
+# 28 pages state the first and 11 the second, and all eleven match the
+# administrative count exactly.
+#
+# THIS SCRIPT REWRITES PAGES. Before this guard it set `fleet.n_regions` from
+# the config's row count unconditionally, so a single `--apply` would have
+# overwritten all eleven administrative counts and silently undone the ruling.
+# The rule lives in scripts/_ssi_region_counts.py and is not duplicated here.
+import sys as _sys, pathlib as _pathlib
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parent))
+import _ssi_region_counts as region_counts
+
+DUAL_DEFINITION_KEYS = ("fleet.n_regions",)
+
+
 def config_regions(slug: str):
     """(declared count, declared label, needs_editorial) from the country config."""
     p = REPO / "intelligence" / "country-configs" / f"{slug}.json"
@@ -135,6 +152,24 @@ def config_regions(slug: str):
     label = l1.get("label_en")
     messy = bool(label and ("(" in label))
     return l1.get("count"), label, messy
+
+
+_STATED_RE_CACHE = {}
+
+
+def _stated_values(html: str, key: str) -> set:
+    """Every integer the page currently states for `key`, as a set."""
+    import re as _re
+    pat = _STATED_RE_CACHE.get(key)
+    if pat is None:
+        pat = _re.compile(r'data-canonical="%s">([^<]*)<' % _re.escape(key))
+        _STATED_RE_CACHE[key] = pat
+    out = set()
+    for raw in pat.findall(html):
+        t = raw.replace(",", "").strip()
+        if t.isdigit():
+            out.add(int(t))
+    return out
 
 
 def truth_for(slug: str) -> dict:
@@ -236,6 +271,7 @@ def main():
             label_gaps.append((slug, label))
 
         edits, pages_touched, detail = 0, 0, []
+        kept = globals().setdefault("_KEPT", [])
         for page in PAGES:
             p = REPO / slug / page
             if not p.exists():
@@ -245,6 +281,16 @@ def main():
                 v = truth.get(key)
                 if v is None:
                     continue
+                if key in DUAL_DEFINITION_KEYS:
+                    # Leave the page alone when what it states is one of the
+                    # two declared readings. Only a value that is NEITHER is
+                    # rewritten, and then to the row count.
+                    stated = _stated_values(html, key)
+                    ok_vals = region_counts.accepted_page_values(REPO, slug)
+                    if stated and ok_vals and all(x in ok_vals for x in stated):
+                        kept.append((slug, key, sorted(stated)[0],
+                                     ok_vals[sorted(stated)[0]]))
+                        continue
                 html, n = rewrite(html, key, v)
                 if n:
                     edits += n

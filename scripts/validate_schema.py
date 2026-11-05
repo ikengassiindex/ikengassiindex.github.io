@@ -54,6 +54,12 @@ import sys
 from pathlib import Path
 from typing import Tuple, List, Dict, Any, Optional
 
+# E456: the one home for Method B's guard.
+try:                                                        # ROOT on sys.path
+    from scripts._ssi_method_b import span_is_degenerate    # noqa: E402
+except ImportError:                                         # ROOT/scripts on it
+    from _ssi_method_b import span_is_degenerate            # noqa: E402
+
 
 # ═══════════════════════════════════════════════════════════
 #  Country geographic bounds (lat_min, lat_max, lon_min, lon_max)
@@ -655,7 +661,7 @@ def validate_file(filepath: str) -> Tuple[List[str], List[str]]:
 
     def _norm(r, p5, p95):
         """The record's position in its own country's distribution, or None."""
-        if r is None or p5 is None or p95 is None or (p95 - p5) <= 0:
+        if r is None or span_is_degenerate(p5, p95):
             return None
         return max(0.0, min(1.0, (r - p5) / (p95 - p5)))
 

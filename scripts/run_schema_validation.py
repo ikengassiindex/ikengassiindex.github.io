@@ -14,11 +14,28 @@ import os
 import sys
 from pathlib import Path
 
-# jsonschema package
+# jsonschema package. E315: the message used to say "not installed" for both
+# causes, and on a machine carrying jsonschema 3.2.0 that is false -- the
+# package IS installed and only Draft202012Validator is missing, which arrived
+# in 4.0. A reader who followed the old message ran pip install and was told
+# "Requirement already satisfied", which is where the diagnosis stopped.
+# .github/workflows/validate-schemas.yml pins jsonschema==4.26.0, so CI is
+# unaffected; this is the local path.
 try:
     from jsonschema import Draft202012Validator
 except ImportError:
-    print("ERROR: jsonschema package not installed. Run: pip install jsonschema --break-system-packages")
+    try:
+        import jsonschema as _js
+    except ImportError:
+        print("ERROR: jsonschema is NOT INSTALLED. Run: pip install "
+              "'jsonschema>=4' --break-system-packages")
+        sys.exit(2)
+    _v = getattr(_js, "__version__", "unknown")
+    print("ERROR: jsonschema IS installed, at version %s, and it does not carry "
+          "Draft202012Validator -- that arrived in 4.0. Run: pip install "
+          "--upgrade 'jsonschema>=4' --break-system-packages" % _v)
+    print("       (CI pins jsonschema==4.26.0 in "
+          ".github/workflows/validate-schemas.yml, so this is the local path.)")
     sys.exit(2)
 
 REPO = Path(__file__).resolve().parent.parent

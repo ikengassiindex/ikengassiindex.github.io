@@ -173,8 +173,15 @@ def severity(pct_out: float) -> str:
 
 
 # ─── Statistics recomputation ──────────────────────────────────────────────
-def percentile(values, p):
-    """Compute the p-th percentile (0-100). Uses linear interpolation."""
+def percentile_pct(values, p):
+    """Compute the p-th percentile (0-100). Uses linear interpolation.
+
+    NAMED percentile_pct SINCE WQ, and the name is the whole point: `p` here is
+    0..100, while scripts/_ssi_method_b.py's `percentile(sorted_values, q)`
+    takes q in 0..1. Calling that one with 5 asks for a quantile above the
+    maximum; calling this one with 0.05 asks for the minimum AND RETURNS IT
+    SILENTLY. The two cannot now be confused by a name. E428.
+    """
     if not values:
         return None
     vs = sorted(values)
@@ -208,8 +215,8 @@ def recompute_fleet_summary(subs, original_summary):
     summary["total"] = n
     summary["median_R"] = round(statistics.median(r_bases), 4) if r_bases else None
     summary["mean_R"] = round(statistics.mean(r_bases), 4) if r_bases else None
-    p5 = percentile(r_bases, 5)
-    p95 = percentile(r_bases, 95)
+    p5 = percentile_pct(r_bases, 5)
+    p95 = percentile_pct(r_bases, 95)
     summary["P5"] = round(p5, 4) if p5 is not None else None
     summary["P95"] = round(p95, 4) if p95 is not None else None
     summary["bands"] = bands

@@ -117,10 +117,23 @@ def main():
             with shard.open(encoding="utf-8", errors="replace") as fh:
                 head = fh.read(262144)
             m = re.search(r'"_metrics_source"\s*:\s*"([^"]*)"', head)
-            if not m:
+            # D-14 OPTION B, 3 OCTOBER 2026 — FOLLOW THE POINTER.
+            # The record's _metrics_source is being normalised to a provenance
+            # code plus the ids of the metrics that record carries, with the
+            # fleet statement moved VERBATIM to the manifest's
+            # meta._metrics_source. The code form names NO FILE, so the findall
+            # below would return nothing and this gate would not fail -- it would
+            # SILENTLY STOP CHECKING THAT JURISDICTION. A gate quietly covering
+            # one fewer fleet is worse than a gate that fails, so the manifest's
+            # statement is scanned alongside the record's.
+            texts = [m.group(1)] if m else []
+            meta_stmt = (d.get("meta") or {}).get("_metrics_source")
+            if isinstance(meta_stmt, str) and meta_stmt:
+                texts.append(meta_stmt)
+            if not texts:
                 continue
             for doc in re.findall(r"[A-Za-z0-9_.\-]+\.(?:md|html|yaml|json)",
-                                  m.group(1)):
+                                  " ".join(texts)):
                 seen.setdefault(doc, set()).add(country)
                 if doc not in present:
                     dangling.setdefault(doc, set()).add(country)

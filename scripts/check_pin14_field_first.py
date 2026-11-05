@@ -13,12 +13,19 @@ call — vary, _det_var, det_var, stable_hash, or hashlib.md5 — and reports th
 target field, so the question becomes "what writes this field?" rather than
 "what does this generator write?".
 
-Discovery only. It does not test reproduction; it tells you what to test.
-Read-only.
+Discovery, and since 2 October a VERDICT. It still does not test reproduction
+-- that is check_pin14_name_hash_sweep.py -- but it no longer passes silently
+while the set of hash-written fields grows. It answers to the ratchet in
+doctrine/PIN14_BASELINE.txt and exits 1 when that surface gets larger.
+
+Read-only with respect to the estate; it writes no file.
 """
 from __future__ import annotations
 import ast, os, sys
 from collections import defaultdict
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _pin14_baseline  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HASHY = {"vary", "_det_var", "det_var", "stable_hash", "md5", "_hash_unit",
@@ -86,7 +93,8 @@ def target_path(t):
     elif isinstance(cur, ast.Attribute): parts.append(cur.attr)
     return ".".join(reversed(parts))
 
-def main():
+def discover():
+    """The scan, callable, so the verdict is computed on data not on text."""
     found = defaultdict(list)
     files = 0
     unparsed = []
@@ -117,6 +125,11 @@ def main():
                         if isinstance(t, (ast.Subscript, ast.Attribute)):
                             found[target_path(t)].append(
                                 (os.path.relpath(p, REPO), node.lineno, gen))
+    return found, files, unparsed
+
+
+def main():
+    found, files, unparsed = discover()
 
     # A hash used to DETECT fabrication is the opposite of one used to CREATE
     # it, and the first version of this scan reported both in one list — which
@@ -155,7 +168,23 @@ def main():
     if unparsed:
         print("\nUNPARSED (reported, not swallowed): %d" % len(unparsed))
         for f, e in unparsed[:10]: print("   %s — %s" % (f, e[:70]))
-    return 0
+
+    # ── THE FAILURE PATH ──────────────────────────────────────────────────
+    # Until 2 October this function ended `return 0`, and preflight ran it as
+    # gate D#59. Twenty-eight hash-written field targets passed as green, and a
+    # twenty-ninth would have too. The ratchet is in doctrine/PIN14_BASELINE.txt
+    # and _pin14_baseline.py explains why it is a ratchet and not a threshold.
+    measured = {"distinct_field_targets": len(found),
+                "fabricator_files": len(fab)}
+    for f in sorted(fab):
+        measured["fab:" + f] = len({fld for fld, _ln, _g in fab[f]})
+    print("\n" + "=" * 104)
+    print("RATCHET — doctrine/PIN14_BASELINE.txt")
+    print("=" * 104)
+    rc, lines = _pin14_baseline.verdict("field_first", measured)
+    for line in lines:
+        print(line)
+    return rc
 
 if __name__ == "__main__":
     sys.exit(main())

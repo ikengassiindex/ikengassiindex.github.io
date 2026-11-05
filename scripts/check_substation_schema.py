@@ -41,12 +41,43 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # Minimum field count per substation (catches KR 24-field regression)
 MIN_FIELDS = 35
 
-# Per-region variance checks: (path, min_unique_values, severity)
-# Field names match IS/HU/KR canonical socio_economic dict (verified May 29, 2026).
-# Per-region variance checks. Only ERROR-severity fields are enforced as gates.
-# Fields kept at WARN are informational (not all countries emit them at substation level).
+# Per-region variance checks. Field names match the IS/HU/KR canonical
+# socio_economic dict (verified May 29, 2026). Only ERROR severity is enforced.
+#
+# E412 AND E414, 19 October 2026: THE FLOOR WAS MEASURING THE WRONG THING, AND
+# IT WAS SATISFIED BY THE FABRICATION IT WAS BUILT TO CATCH.
+#
+# The floor exists because Korea emitted ONE hard-coded value across 17
+# regions (hotfix #7). But `rd_pct_gdp` was, estate-wide, the national figure
+# jittered by the md5 of each substation's own NAME - so the hash's spread
+# satisfied the floor, while A SINGLE SOURCED REGIONAL FIGURE WOULD FAIL IT.
+# Measured on 19 October before the write: luxembourg's 723 records carried
+# ELEVEN hash values and sit in exactly ONE NUTS 2 region, so the measurement
+# that replaces the hash has one value and the hash passed where the truth
+# would not. Seven fleets were in that position - estonia, finland, ireland,
+# lithuania, luxembourg, slovakia, slovenia - every one of them because the
+# country IS fewer than five NUTS 2 regions.
+#
+# THE DISCRIMINATOR IS PROVENANCE AND NOT SPREAD. A record carrying
+# `source_marker` has a declared source, and its value is whatever its source
+# says - uniform or not. A record without one is an emission, and the floor
+# stands over those exactly as it did.
+#
+# WHAT THIS IS NOT. It is not a softening to let a write through: E414 ruled
+# that "a gate changed without the data to satisfy it is a gate changed to
+# pass", which is why this lands in the SAME commit as the series. The two
+# fleets failing today - italy and spain, three unique values each - fail
+# because their value is a hash with no source, and they go on failing until
+# the write gives them one.
+#
+# AND THE UNSOURCED RESIDUE IS REPORTED, NEVER SILENT. The floor is applied to
+# the unsourced population only where that population is the fleet's MAJORITY,
+# because the defect the floor was built for was a constant across a WHOLE
+# fleet; a few hundred records left behind by a join gap is a different finding
+# with its own row, and it is printed with its count either way.
 VARIANCE_CHECKS = [
-    ("socio_economic.rd_pct_gdp",       5, "ERROR"),  # KR hotfix #7 root cause — REQUIRED variance
+    {"path": "socio_economic.rd_pct_gdp", "min_unique": 5, "severity": "ERROR",
+     "source_marker": "_rd_pct_gdp_source"},   # KR hotfix #7 root cause
 ]
 
 
@@ -94,6 +125,65 @@ def count_fields(sub):
     return _count(sub)
 
 
+def variance_verdict(substations, vc, n_regions):
+    """THE WHOLE VARIANCE DECISION, as a pure function of three inputs.
+
+    Returns a list of (severity, message); severity is "ERROR" or "WARN".
+
+    IT IS A FUNCTION AND NOT INLINE SO THAT THE BLOCK THAT PROVES IT REFUSES
+    RUNS THIS CODE AND NOT A SECOND COPY OF IT. Two copies of one check is
+    how an inline version and MH's gate D disagreed about the same script
+    inside an hour.
+    """
+    path_str = vc["path"]
+    min_unique = vc["min_unique"]
+    severity = vc["severity"]
+    marker = vc.get("source_marker")
+    out = []
+    # SOURCED AND UNSOURCED ARE SEPARATED FIRST. A value with a declared
+    # source is whatever its source says; the floor is about EMISSIONS.
+    sourced, values = [], []
+    for s in substations:
+        v = get_nested(s, path_str)
+        if v is None:
+            continue
+        if marker and s.get(marker):
+            sourced.append(v)
+        else:
+            values.append(v)
+    if sourced:
+        out.append(("WARN", f"variance check {path_str}: {len(sourced)} record(s) "
+                            f"carry a declared source and are exempt "
+                            f"({len(set(sourced))} distinct); "
+                            f"{len(values)} unsourced"))
+    if not values and not sourced:
+        out.append(("WARN", f"variance check {path_str}: field absent in all substations"))
+        return out
+    if not values:
+        return out
+    # THE FLOOR APPLIES TO THE UNSOURCED POPULATION, and only where it is this
+    # fleet's MAJORITY: a residue left by a join gap is not the whole-fleet
+    # constant this floor was built for, and it is reported above with its
+    # count either way.
+    if sourced and len(values) <= len(sourced):
+        return out
+    unique_count = len(set(values))
+    # Only enforce variance where there are enough regions to expect it
+    # (countries with fewer than eight naturally have low variance).
+    if n_regions >= 8 and unique_count < min_unique:
+        msg = (f"variance check {path_str}: only {unique_count} unique values "
+               f"across {n_regions} regions (expected ≥ {min_unique})")
+        if severity == "ERROR":
+            out.append(("ERROR", msg + " — KR uniform-emission regression"))
+        else:
+            out.append(("WARN", msg))
+    elif n_regions < 8 and unique_count == 1 and len(values) > 5:
+        out.append(("WARN", f"variance check {path_str}: uniform value across "
+                            f"{len(values)} substations (small country, "
+                            f"n_regions={n_regions})"))
+    return out
+
+
 def check_country(slug):
     """Run schema check on one country. Returns (passes, fails, warns)."""
     fails, warns = [], []
@@ -135,29 +225,15 @@ def check_country(slug):
             fails.append((slug, f"substation field count median {median_count} < {MIN_FIELDS} across first 50 subs"))
 
     # 2. Variance checks (catches uniform-constant emissions like KR rd_pct_gdp=4.8% uniform)
-    for path_str, min_unique, severity in VARIANCE_CHECKS:
-        values = [get_nested(s, path_str) for s in substations]
-        values = [v for v in values if v is not None]
-        if not values:
-            warns.append((slug, f"variance check {path_str}: field absent in all substations"))
-            continue
-        unique_count = len(set(values))
-        # Only enforce variance if we have enough substations to expect it
-        # (countries with <10 regions naturally have low variance)
-        regions = data.get("regions", [])
-        if isinstance(regions, dict):
-            regions = list(regions.values())
-        n_regions = len(regions)
-        if n_regions >= 8 and unique_count < min_unique:
-            msg = f"variance check {path_str}: only {unique_count} unique values across {n_regions} regions (expected ≥ {min_unique})"
-            if severity == "ERROR":
-                fails.append((slug, msg + " — KR uniform-emission regression"))
+    regions = data.get("regions", [])
+    if isinstance(regions, dict):
+        regions = list(regions.values())
+    for _vc in VARIANCE_CHECKS:
+        for sev, msg in variance_verdict(substations, _vc, len(regions)):
+            if sev == "ERROR":
+                fails.append((slug, msg))
             else:
                 warns.append((slug, msg))
-        elif n_regions < 8 and unique_count == 1:
-            # Even small-region countries shouldn't have uniform constants if multiple substations have the field
-            if len(values) > 5:
-                warns.append((slug, f"variance check {path_str}: uniform value across {len(values)} substations (small country, n_regions={n_regions})"))
 
     passes = [(slug, "OK")] if not fails else []
     return passes, fails, warns

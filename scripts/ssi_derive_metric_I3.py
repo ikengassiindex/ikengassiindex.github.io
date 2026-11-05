@@ -138,10 +138,16 @@ ANCHOR = 51.93
 IRI_TOP = 0.30
 
 
-def method_b(x, p5, p95):
-    if p5 is None or p95 is None or p95 <= p5:
-        return None
-    return max(0.0, min(1.0, (x - p5) / (p95 - p5)))
+# ONE HOME FOR METHOD B — E428. percentile and method_b were defined in this
+# file; they are identical, bit for bit, to scripts/_ssi_method_b.py's, which
+# is asserted over 200,000 random pairs by that module's own test. The
+# two-line import is deliberate: this repository is run with ROOT on sys.path
+# in some places and ROOT/scripts in others, and a single form would break
+# half the call sites.
+try:                                                        # ROOT on sys.path
+    from scripts._ssi_method_b import percentile, method_b  # noqa: F401,E402
+except ImportError:                                         # ROOT/scripts on it
+    from _ssi_method_b import percentile, method_b          # noqa: F401,E402
 
 
 def method_c(x):
@@ -171,13 +177,6 @@ def iri_current(x):
     n = method_c(x)
     return None if n is None else round(IRI_TOP * n, 5)
 
-
-def percentile(sv, q):
-    if not sv:
-        return None
-    i = q * (len(sv) - 1)
-    lo, hi = int(i), min(int(i) + 1, len(sv) - 1)
-    return sv[lo] + (sv[hi] - sv[lo]) * (i - lo)
 
 
 def load_years(slug, lat_slice=None):

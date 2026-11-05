@@ -57,10 +57,16 @@ COUNTRY_RELATIVE = {
 }
 
 
-def method_b(x, p5, p95):
-    if p5 is None or p95 is None or p95 <= p5:
-        return None
-    return max(0.0, min(1.0, (x - p5) / (p95 - p5)))
+# ONE HOME FOR METHOD B — E428. percentile and method_b were defined in this
+# file; they are identical, bit for bit, to scripts/_ssi_method_b.py's, which
+# is asserted over 200,000 random pairs by that module's own test. The
+# two-line import is deliberate: this repository is run with ROOT on sys.path
+# in some places and ROOT/scripts in others, and a single form would break
+# half the call sites.
+try:                                                        # ROOT on sys.path
+    from scripts._ssi_method_b import percentile, method_b  # noqa: F401,E402
+except ImportError:                                         # ROOT/scripts on it
+    from _ssi_method_b import percentile, method_b          # noqa: F401,E402
 
 
 def live_anchors(man):

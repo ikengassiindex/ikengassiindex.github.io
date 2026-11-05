@@ -93,22 +93,11 @@ def load_slugs():
     return [c["slug"] for c in (d["countries"] if isinstance(d, dict) else d)]
 
 
-def load_substations(slug):
-    m = json.loads((ROOT / slug / "ssi-data.json").read_text())
-    shards = m.get("substations_shards")
-    if not shards:
-        subs = m.get("substations")
-        if subs is None:
-            raise ValueError("manifest has neither substations nor shards")
-        return subs
-    out = []
-    for e in shards:
-        p = ROOT / slug / pathlib.Path(e["path"]).name
-        raw = json.loads(p.read_text())
-        out.extend(raw if isinstance(raw, list) else (raw.get("substations") or []))
-    if not out:
-        raise ValueError(f"{len(shards)} shards declared but no records read")
-    return out
+# E25 — the one definition. This file carried its own copy until
+# 28 September 2026; ten existed across the estate in eight forms, of which two
+# returned [] where the other six raised. See doctrine/PLAN_OF_WORK.md E25.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+from scripts._ssi_data_shard_reader import load_substations  # noqa: E402
 
 
 def numeric_paths(subs, probe=400):

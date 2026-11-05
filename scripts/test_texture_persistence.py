@@ -2,6 +2,12 @@
 """
 Is texture a property of the site, or of the weather? Pre-registered test.
 
+NOT WIRED: it requires --fine-a, --fine-b and --coarse, three CERRA/ERA5 files
+    that are not in the repository and are tens of gigabytes. A runner cannot
+    supply them. Naming it in a comment to explain this is what broke the E18
+    counter on 2 October, which is why the counter now reads executable lines
+    only - see runs() in scripts/ssi_tracker_state.py.
+
     python3 scripts/test_texture_persistence.py \
         --fine-a <cerra month A> --fine-b <cerra month B> --coarse <era5 file>
 

@@ -170,7 +170,13 @@ def load_substations(country, repo_root=None):
             import sys as _sys
             _sys.path.insert(0, str(Path(repo_root)))
             from scripts._ssi_data_shard_reader import load_substations as _load_sharded
-            raw_subs = _load_sharded(country)
+            # strict=False, deliberately. E25 made the shared reader raise
+            # by default because six of its eight callers expected it; this
+            # one does not. geo.py is imported by pipeline ingestion and
+            # merge, its own ImportError fallback below also skips a missing
+            # shard silently, and making the pipeline raise here is a separate
+            # change with its own blast radius. One line, when it is ruled on.
+            raw_subs = _load_sharded(country, strict=False)
         except ImportError:
             # Fallback — inline shard concatenation
             raw_subs = []

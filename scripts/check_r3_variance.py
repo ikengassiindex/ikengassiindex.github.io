@@ -47,6 +47,53 @@ import sys
 import glob
 import argparse
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from scripts._ssi_data_shard_reader import load_ssi_data as _load_ssi_data
+except Exception as _ex:                                    # pragma: no cover
+    _load_ssi_data = None
+    _LOAD_ERR = str(_ex)
+
+
+def _read_fleet(slug, repo_root="."):
+    """Convention #79 shard-aware read, via the one shared reader.
+
+    Until 28 September 2026 this gate read `data["substations"]` directly. On a
+    sharded manifest that key is absent, so the gate filed the country as
+    "EXEMPT no substations" -- france, germany, italy, poland, uk and us, being
+    479,939 records and 77.1% of the estate. It is the class of defect the gate
+    itself exists to detect, and the gate could not see the four largest
+    instances of it. Discipline #29, §7.5, and
+    doctrine/FINDING_nine_gates_have_no_runner_and_two_cannot_fail.md §6.
+
+    Refuses rather than exempting. The shared reader skips a shard file it
+    cannot find, because it is also imported by pipeline ingestion and merge and
+    making it throw is outside this change; so the refusal lives here, by
+    comparing what was read against what the manifest declares.
+
+    Returns (manifest, substations) or raises.
+    """
+    if _load_ssi_data is None:
+        raise RuntimeError(f"the Convention #79 reader is not importable: {_LOAD_ERR}. "
+                           "A gate that cannot read the sharded countries must "
+                           "say so, not pass without them.")
+    data, subs, sharded = _load_ssi_data(slug, repo_root=repo_root)
+    if not sharded:
+        if data.get("substations") is None:
+            raise ValueError("manifest declares neither substations nor shards")
+        return data, subs
+    refs = data.get("substations_shards") or data.get("shards") or []
+    if not refs:
+        raise ValueError('manifest says "sharded" and lists no shards')
+    if any(not isinstance(e, dict) or "count" not in e for e in refs):
+        raise ValueError(f"{len(refs)} shard refs, not all declaring a count -- "
+                         "the read cannot be checked against the manifest")
+    declared = sum(int(e["count"]) for e in refs)
+    if len(subs) != declared:
+        raise ValueError(f"{len(refs)} shards declare {declared:,} records, "
+                         f"{len(subs):,} read")
+    return data, subs
+
 
 def check_country(slug, repo_root="."):
     """Return dict with verdict + diagnostic stats for one country."""
@@ -55,14 +102,13 @@ def check_country(slug, repo_root="."):
         return {"slug": slug, "status": "EXEMPT", "reason": "no ssi-data.json"}
 
     try:
-        with open(path) as f:
-            data = json.load(f)
+        data, raw_subs = _read_fleet(slug, repo_root)
     except Exception as e:
-        return {"slug": slug, "status": "ERROR", "reason": str(e)[:80]}
+        return {"slug": slug, "status": "ERROR", "reason": str(e)[:120]}
 
-    raw_subs = data.get("substations", [])
     if not raw_subs:
-        return {"slug": slug, "status": "EXEMPT", "reason": "no substations"}
+        return {"slug": slug, "status": "ERROR",
+                "reason": "a readable manifest with zero records -- not an exemption"}
 
     # Handle compact array format
     if isinstance(raw_subs[0], list):
@@ -88,7 +134,11 @@ def check_country(slug, repo_root="."):
 
     n = len(vals)
     if n == 0:
-        return {"slug": slug, "status": "EXEMPT", "reason": "no R3_C_mult values"}
+        # A genuine exemption, and distinct from the one this gate used to
+        # report: the fleet WAS read, and no record carries the modifier.
+        # Convention #56 removes R3_C_mult where no catchment was measured.
+        return {"slug": slug, "status": "EXEMPT",
+                "reason": f"{len(raw_subs):,} records read, none carrying R3_C_mult"}
 
     unique = len(set(vals))
     ratio = unique / n
@@ -189,7 +239,10 @@ def main():
     if fails:
         print(f"Failed: {' '.join(fails)}")
 
-    if args.strict and n_fail > 0:
+    if args.strict and (n_fail > 0 or n_error > 0):
+        # n_error added 28 September. A country the gate could not read is not
+        # a country that passed -- Convention #56. Before the shard fix the
+        # unreadable six were filed EXEMPT and this branch never saw them.
         return 1
     return 0
 

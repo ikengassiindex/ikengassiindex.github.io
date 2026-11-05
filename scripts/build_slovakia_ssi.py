@@ -95,14 +95,14 @@ r_values = sorted(s['R_median'] for s in substations)
 fleet_median = statistics.median(r_values) if r_values else 0
 fleet_mean = statistics.mean(r_values) if r_values else 0
 
-def percentile(arr, p):
+def percentile_pct(arr, p):
     if not arr: return 0
     k = (len(arr) - 1) * (p / 100.0)
     f = int(k); c = min(f + 1, len(arr) - 1)
     return arr[f] + (arr[c] - arr[f]) * (k - f)
 
-fleet_p5 = percentile(r_values, 5)
-fleet_p95 = percentile(r_values, 95)
+fleet_p5 = percentile_pct(r_values, 5)
+fleet_p95 = percentile_pct(r_values, 95)
 
 # Post-process each substation
 for s in substations:

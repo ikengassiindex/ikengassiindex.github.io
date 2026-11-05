@@ -86,24 +86,11 @@ def load_slugs():
     return [c["slug"] for c in (d["countries"] if isinstance(d, dict) else d)]
 
 
-def load_substations(slug):
-    """Shard-aware. Raises rather than returning an empty list (Task #520)."""
-    man = ROOT / slug / "ssi-data.json"
-    m = json.loads(man.read_text())
-    shards = m.get("substations_shards")
-    if not shards:
-        subs = m.get("substations")
-        if subs is None:
-            raise ValueError("manifest has neither substations nor shards")
-        return subs
-    out = []
-    for e in shards:
-        p = ROOT / slug / pathlib.Path(e["path"]).name
-        r = json.loads(p.read_text())
-        out.extend(r if isinstance(r, list) else (r.get("substations") or []))
-    if not out:
-        raise ValueError(f"{len(shards)} shards declared but no records read")
-    return out
+# E25 — the one definition. This file carried its own copy until
+# 28 September 2026; ten existed across the estate in eight forms, of which two
+# returned [] where the other six raised. See doctrine/PLAN_OF_WORK.md E25.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+from scripts._ssi_data_shard_reader import load_substations  # noqa: E402
 
 
 def classify_confidence(p5, p95):
@@ -243,10 +230,38 @@ def main() -> int:
         if unreadable:
             print("\nSTRICT: countries unreadable.")
             return 1
-        if regressions:
-            print("\nSTRICT: coherence regressed against baseline.")
+        # The baseline is recorded PER COUNTRY, and --strict is read the same
+        # way. Until 28 September 2026 this branch tested `regressions`, the
+        # COHORT AGGREGATE, which is a quantity no entry in the baseline file
+        # describes. The consequence, measured that day: the gate printed
+        # new-zealand +30 DEGENERATE, new-zealand +30 IMPOSTOR, finland +1 and
+        # iceland +1 in its own output, and then exited 0, because the cohort
+        # had improved by ~398,000 records in the same period. One country's
+        # regression was paid for by another country's repair.
+        #
+        # `worse` is the per-country list the gate already builds, already
+        # prints, and never gated on.
+        #   doctrine/FINDING_nine_gates_have_no_runner_and_two_cannot_fail.md §4
+        #   tests/test_a_country_regression_is_not_netted_by_the_cohort.py
+        if worse:
+            countries = sorted({s for s, _, _ in worse})
+            # The sum is over (country, check) pairs, so a record that broke
+            # two checks is counted twice. Named as the excess, not as records.
+            excess = sum(d for _, _, d in worse)
+            print(f"\nSTRICT: {len(worse)} country-check pair(s) above "
+                  f"baseline by {excess:,} in total, in "
+                  f"{len(countries)} country(ies): {', '.join(countries)}.")
             return 1
-        print("\nSTRICT: no coherence regression against baseline.")
+        if regressions:
+            # Unreachable by construction: every baseline summed here belongs
+            # to a country in `live`, so an aggregate above baseline requires
+            # at least one country above its own. Kept as an assertion rather
+            # than deleted, because the day it fires the arithmetic above has
+            # changed and that is worth knowing loudly.
+            print("\nSTRICT: the aggregate is above baseline while no single "
+                  "country is. This should not be reachable — report it.")
+            return 1
+        print("\nSTRICT: no country is above its own baseline on any check.")
     return 0
 
 

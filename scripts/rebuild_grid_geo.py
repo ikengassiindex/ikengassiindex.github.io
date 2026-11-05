@@ -74,15 +74,12 @@ REPO = Path(__file__).resolve().parent.parent
 SNAP_M = 250.0          # substation-to-line-endpoint incidence distance
 
 
-def load_substations(slug):
-    d = json.loads((REPO / slug / "ssi-data.json").read_text(encoding="utf-8"))
-    if isinstance(d.get("substations"), list):
-        return d["substations"]
-    out = []
-    for sh in d.get("substations_shards") or []:
-        q = sh["path"] if isinstance(sh, dict) else sh
-        out += json.loads((REPO / slug / Path(q).name).read_text(encoding="utf-8"))
-    return out
+import pathlib
+# E25 — the one definition. This file carried its own copy until
+# 28 September 2026; ten existed across the estate in eight forms, of which two
+# returned [] where the other six raised. See doctrine/PLAN_OF_WORK.md E25.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+from scripts._ssi_data_shard_reader import load_substations  # noqa: E402
 
 
 def load_lines(slug, g):

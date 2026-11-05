@@ -54,41 +54,95 @@ def _js_unicode_escape(s: str) -> str:
     return ''.join(out)
 
 
-def _read_substations(slug):
-    """Convention #79 shard-aware. Reading data['substations'] on a sharded
-    manifest returns nothing, which is how france's landing tooltip came to
-    display 0."""
+def _voltage_kv(s):
+    """The caller's own predicate, lifted out of the loop it used to sit in so
+    that the tally below and any future reader share ONE definition of what a
+    voltage band is."""
+    v = s.get('voltage_kv')
+    return v if isinstance(v, (int, float)) else 0
+
+
+def _tally_substations(slug):
+    """(n, ehv, hv) with ONE SHARD RESIDENT AT A TIME. Convention #79
+    shard-aware.
+
+    THIS REPLACED A MATERIALISING READER, AND THE REASON IS MEASURED. It was:
+
+        def _read_substations(slug):   # returned a list of EVERY record
+            ...
+            out = []
+            for e in d['substations_shards']:
+                ...
+                out += q if isinstance(q, list) else (q.get('substations') or [])
+            return out
+
+    and its only caller took three numbers off that list. Measured 5 November
+    2026 on the device bridge, `generate_nav_data.py --check` peaked at
+    3.62 GB of RSS on a machine with 3,906 MB and NO SWAP, so the instrument
+    ran within about 290 MB of the ceiling and its cost was decided by what
+    else was resident. A sibling instrument at 3.47 GB was killed outright -
+    rc=-9, empty stdout, empty stderr. The largest single shard is 47.0 MB.
+
+    The reader that returned the list is GONE rather than kept beside this
+    one: nothing in scripts/, tests/ or doctrine/ imported it, and leaving a
+    3.6 GB materialiser in the module for a later shift to call again would be
+    the defect waiting to be re-entered.
+
+    NO NUMBER MOVES: all 39 fleets were computed both ways and the four
+    figures the caller uses agree on every one.
+    """
     p = REPO / slug / 'ssi-data.json'
     if not p.exists():
-        return []
+        return 0, 0, 0
     d = json.loads(p.read_text())
+    n = ehv = hv = 0
+
+    def tally(rows):
+        nonlocal n, ehv, hv
+        for s in rows:
+            n += 1
+            v = _voltage_kv(s)
+            if v >= 220:
+                ehv += 1
+            elif 110 <= v < 220:
+                hv += 1
+
     if isinstance(d, list):
-        return d
+        tally(d)
+        return n, ehv, hv
     if d.get('substations_shards'):
-        out = []
-        for e in d['substations_shards']:
+        shards = list(d['substations_shards'])
+        del d
+        for e in shards:
             rel = e['path'] if isinstance(e, dict) else e
             sp = p.parent / Path(rel).name
             if sp.exists():
                 q = json.loads(sp.read_text())
-                out += q if isinstance(q, list) else (q.get('substations') or [])
-        return out
-    return d.get('substations') or []
+                tally(q if isinstance(q, list) else (q.get('substations') or []))
+                del q
+        return n, ehv, hv
+    tally(d.get('substations') or [])
+    return n, ehv, hv
 
 
 def _read_line_count(slug):
-    """Convention #80 shard-aware."""
+    """Convention #80 shard-aware, and STREAMING for the same measured reason
+    as _tally_substations above: the largest single line shard is 80.8 MB and
+    the whole family is 571 MB, which used to be resident at once."""
     p = REPO / slug / 'grid-geo.json'
     if not p.exists():
         return 0
     g = json.loads(p.read_text())
     n = len(g.get('l') or [])
-    for e in (g.get('l_shards') or []):
+    shards = list(g.get('l_shards') or [])
+    del g
+    for e in shards:
         rel = e['path'] if isinstance(e, dict) else e
         sp = p.parent / Path(rel).name
         if sp.exists():
             q = json.loads(sp.read_text())
             n += len(q if isinstance(q, list) else (q.get('l') or q.get('lines') or []))
+            del q
     return n
 
 
@@ -137,17 +191,14 @@ def render_auto_section(countries: list) -> str:
     stats_lines = []
     for c in countries:
         slug = c['slug']
-        subs = _read_substations(slug)
+        n_subs, ehv, hv = _tally_substations(slug)
         n_lines = _read_line_count(slug)
         n_regions, cfg_label = _read_admin_l1(slug)
-        kv = lambda s: s.get('voltage_kv') if isinstance(s.get('voltage_kv'), (int, float)) else 0
-        ehv = sum(1 for s in subs if kv(s) >= 220)
-        hv = sum(1 for s in subs if 110 <= kv(s) < 220)
-        dist = len(subs) - ehv - hv
+        dist = n_subs - ehv - hv
         seg = ['95 variables']
         if c.get('footer_sources'):
             seg.append(f"{c['footer_sources']} sources")
-        seg.append(f"{len(subs):,} substations ({ehv:,} EHV \u2265220 kV \u00b7 "
+        seg.append(f"{n_subs:,} substations ({ehv:,} EHV \u2265220 kV \u00b7 "
                    f"{hv:,} HV 110\u2013220 kV \u00b7 {dist:,} distribution-tier)")
         tail = f"{n_lines:,} power lines"
         if n_regions is not None:

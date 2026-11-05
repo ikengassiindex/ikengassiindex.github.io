@@ -116,19 +116,55 @@ def get_counts(country):
         meta = data.get("meta", {})
         n_hv_meta = meta.get("n_HV")
         n_mv_meta = meta.get("n_MV")
-        total = meta.get("n_substations") or meta.get("total") or len(data.get("substations", []))
+        # ── WS, 17 October: THE RECORDS COME FIRST. E436. ────────────────
+        # This line read
+        #     meta.get("n_substations") or meta.get("total") or len(subs)
+        # and PREFERRED THE MANIFEST'S HEADER over the records themselves.
+        # That header is stale in SIX of the 39 manifests - france, germany,
+        # italy, spain, us overstating and sweden understating, 89,259 records
+        # of overstatement in all - because the dedupe of 27-28 August rewrote
+        # fleet_summary.total and the shard counts and left the header alone.
+        # This mode replaces BARE STRINGS in the pages, so the next run of it
+        # on one of those six would have written the stale figure onto seven
+        # pages. The records are the thing the index publishes; the header is
+        # a header.
+        subs_now = data.get("substations", [])
+        total = (len(subs_now) if subs_now
+                 else (meta.get("n_substations") or meta.get("total") or 0))
+        _hdr = meta.get("n_substations", meta.get("total"))
+        if subs_now and isinstance(_hdr, int) and _hdr != total:
+            # REPORTED LOUDLY AND NOT SILENTLY CORRECTED. The caller is about
+            # to rewrite page text; it is owed the fact that this manifest
+            # disagrees with itself.
+            print("    E436: meta.n_substations says %d and the records say %d"
+                  % (_hdr, total))
+            print("          — using the RECORDS. The header is stale and is")
+            print("            corrected in its own landing, not here.")
         subs = data.get("substations", [])
         # Recount voltage tiers from substations (most reliable)
-        # EHV ≥ 220 kV  ·  HV 110-220 kV  ·  Distribution < 110 kV or untagged
-        n_ehv = sum(1 for s in subs
-                    if isinstance(s.get("voltage_kv"), (int, float))
-                    and s["voltage_kv"] >= 220)
+        # EHV >= 220 kV · HV 110-220 kV · Distribution 0-110 kV · NOT RECORDED
+        #
+        # The fourth bucket was added on 1 October 2026. This function used to
+        # count an untagged record as distribution-tier, which published an
+        # unknown as a known: belgium 588, czechia 685, netherlands 731,
+        # luxembourg 62 and turkey 24 records had no voltage_kv at all and were
+        # counted as sub-110 kV anyway.
+        #
+        # It also honours _voltage_kv_fallback. Ruling 3 of 1 October leaves
+        # turkey's 1,786 records at the hardcoded 66 kV in place for a
+        # re-derivation from OSM rather than nulling them, so the marker is what
+        # keeps them out of the published tier counts in the meantime. Without
+        # this clause the marking would be invisible to the figure it exists to
+        # correct.
+        def _measured(s):
+            return (isinstance(s.get("voltage_kv"), (int, float))
+                    and not s.get("_voltage_kv_fallback"))
+        n_ehv = sum(1 for s in subs if _measured(s) and s["voltage_kv"] >= 220)
         n_hv_110_220 = sum(1 for s in subs
-                           if isinstance(s.get("voltage_kv"), (int, float))
-                           and 110 <= s["voltage_kv"] < 220)
+                           if _measured(s) and 110 <= s["voltage_kv"] < 220)
         n_distribution = sum(1 for s in subs
-                             if (not isinstance(s.get("voltage_kv"), (int, float)))
-                             or s.get("voltage_kv", 0) < 110)
+                             if _measured(s) and s["voltage_kv"] < 110)
+        n_not_recorded = len(subs) - n_ehv - n_hv_110_220 - n_distribution
         # Aggregate HV ≥ 60 kV (matches existing n_HV semantics)
         n_hv_agg = sum(1 for s in subs
                        if isinstance(s.get("voltage_kv"), (int, float))
@@ -141,6 +177,7 @@ def get_counts(country):
             "ehv": n_ehv,
             "hv_110_220": n_hv_110_220,
             "distribution": n_distribution,
+            "not_recorded": n_not_recorded,
         }
 
     return counts_of(pre), counts_of(post)
@@ -177,6 +214,11 @@ def build_replacements(pre, post):
     if pre["distribution"] != post["distribution"]:
         repls.append((fmt(pre["distribution"]), fmt(post["distribution"])))
         repls.append((str(pre["distribution"]), str(post["distribution"])))
+    # Records with no measured voltage — added 1 October 2026 so the generator
+    # and the published string agree. Five countries' strings carry this term.
+    if pre.get("not_recorded") != post.get("not_recorded"):
+        repls.append((fmt(pre["not_recorded"]), fmt(post["not_recorded"])))
+        repls.append((str(pre["not_recorded"]), str(post["not_recorded"])))
     # Dedup preserving order
     seen, out = set(), []
     for k in repls:
@@ -196,8 +238,44 @@ PAGE_FILES = [
 ]
 
 
+# ── WS: THE LEGACY MODE REFUSES WHERE IT WOULD BE GUESSING. E436. ─────────
+# build_replacements() replaces BARE STRINGS: it searches the pages for the
+# pre-remediation figure and substitutes the post one. That is exactly the
+# substring hazard the --from-data mode was written to end (Task #520: austria's
+# "262" inside "262,807" became "14070,807"), and it is tolerable only while
+# the two figures it is given are both TRUE. One of them comes from a backup
+# and the other from the live manifest, so when the live manifest's header
+# disagrees with its own records this mode has no business editing a page.
+#
+# IT IS NOT REMOVED, because it is the only path that knows the PRE figure and
+# the estate may still need it on a fleet whose pages were never anchored. It
+# refuses instead, names the defect, and names the mode that does not guess.
+def _manifest_disagrees(country):
+    import json as _json
+    mp = REPO_ROOT / country / "ssi-data.json"
+    if not mp.exists():
+        return None
+    m = _json.loads(mp.read_text())
+    meta = m.get("meta") or {}
+    fs = m.get("fleet_summary") or {}
+    hdr = meta.get("n_substations", meta.get("total"))
+    truth = fs.get("total", fs.get("n_scored"))
+    if isinstance(hdr, int) and isinstance(truth, int) and hdr != truth:
+        return (hdr, truth)
+    return None
+
+
 def refresh_country(country, dry_run=False):
     print(f"\n=== Refreshing page counts for {country} ===")
+    bad = _manifest_disagrees(country)
+    if bad:
+        print(f"  REFUSING — E436: {country}/ssi-data.json's header says "
+              f"{bad[0]:,} and its own fleet_summary says {bad[1]:,}.")
+        print(f"  This mode replaces BARE STRINGS in page text and will not do "
+              f"that from a manifest that disagrees with itself.")
+        print(f"  Use:  python3 scripts/refresh_country_counts.py --from-data "
+              f"{country}   (it counts the records and writes BY ANCHOR)")
+        return 1
     pre, post = get_counts(country)
     if pre is None:
         print(f"  ⚠ no ssi-data.json.pre-remediate-*.backup found — skipped "
@@ -365,6 +443,60 @@ def _canon_in_text(text):
     return found
 
 
+# ── THE THIRD ANCHOR: data-canonical-content="page-headline" ──────────────
+#
+# Added 17 October 2026. The estate marks its page headlines canonical - 227
+# substation counts sit inside a data-canonical-content="page-headline"
+# element across the 39 fleets - and until this change NOTHING MAINTAINED
+# THEM. build_pages.py is the generator and has refused to write since 24
+# August (its templates do not even emit the hook); this file knew only
+# `fleet.total` and `fleet.voltage.*`. Measured consequence: of 722 counts at
+# the two keys this file did know, ZERO were wrong; of 227 at the headline,
+# 48 were - 31 of 39 fleets, every esg-report.html at its v4.0.2 clone count
+# and six index.html og:descriptions at their pre-remediate July count.
+#
+# THE NUMERAL IS LOCATED BY ADJACENCY TO THE WORD, IN ONE DIRECTION ONLY.
+# A pattern that also read the numeral after "substations" called australia's
+# "12,565 substations plus 123,538 km of transmission lines" a claim of
+# 123,538, and every "...substations. 101 variables" a claim of 101. Reading
+# only the numeral that IMMEDIATELY PRECEDES the word is the whole rule, and
+# a count stated after the word is not touched.
+_HEADLINE = re.compile(r'<[^<>]*data-canonical-content="page-headline"[^<>]*>')
+_HNUM = re.compile(r'([0-9]{1,3}(?:[,.\u202f ][0-9]{3})+|[0-9]{3,})'
+                   r'([\s\u00a0\u202f-]{0,3}substations?)', re.I)
+
+
+def _headline_counts(text):
+    """Every substation count stated inside a page-headline element."""
+    out = set()
+    for m in _HEADLINE.finditer(text):
+        for g in _HNUM.finditer(m.group(0)):
+            out.add(int(re.sub(r"[,.\u202f ]", "", g.group(1))))
+    return out
+
+
+def _rewrite_headline(text, total):
+    """Rewrite the count inside every page-headline element. (text, n)."""
+    n = 0
+
+    def one_tag(tm):
+        nonlocal n
+        def num(g):
+            nonlocal n
+            # THE SEPARATOR THE PAGE ITSELF USES IS KEPT. A headline writing
+            # "13251-substation" is not silently regrouped to "13,251", because
+            # this function's business is the VALUE and not the typography, and
+            # Pin 1 is about not touching what is not mine to touch.
+            cur = g.group(1)
+            new = fmt(total) if ("," in cur or "." in cur or " " in cur) else str(total)
+            if cur != new:
+                n += 1
+            return new + g.group(2)
+        return _HNUM.sub(num, tm.group(0))
+
+    return _HEADLINE.sub(one_tag, text), n
+
+
 def _rewrite(text, truth):
     """Replace canonical values by anchor. Returns (new_text, n_changes)."""
     n = 0
@@ -401,10 +533,17 @@ def refresh_from_data(slug, dry_run=False):
     stale = []
     for f in files:
         text = f.read_text(errors="replace")
+        hit = False
         for k, vals in _canon_in_text(text).items():
             if any(v != truth[k] for v in vals):
-                stale.append(f)
+                hit = True
                 break
+        # AND THE HEADLINE, which no instrument maintained before today.
+        if not hit and any(v != truth["fleet.total"]
+                           for v in _headline_counts(text)):
+            hit = True
+        if hit:
+            stale.append(f)
     if not stale:
         return 0
 
@@ -415,6 +554,11 @@ def refresh_from_data(slug, dry_run=False):
             published |= _canon_in_text(f.read_text(errors="replace")).get(k, set())
         if published and published != {truth[k]}:
             print(f"      {k:30} {sorted(published)} -> {truth[k]:,}")
+    hpub = set()
+    for f in stale:
+        hpub |= _headline_counts(f.read_text(errors="replace"))
+    if hpub and hpub != {truth["fleet.total"]}:
+        print(f"      {'page-headline':30} {sorted(hpub)} -> {truth['fleet.total']:,}")
     if dry_run:
         return 0
 
@@ -422,6 +566,8 @@ def refresh_from_data(slug, dry_run=False):
     for f in stale:
         original = f.read_text(errors="replace")
         updated, n = _rewrite(original, truth)
+        updated, nh = _rewrite_headline(updated, truth["fleet.total"])
+        n += nh
         if updated == original:
             continue
         backup = f.with_name(f"{f.name}.pre-count-refresh-{ts}.backup")
@@ -432,6 +578,10 @@ def refresh_from_data(slug, dry_run=False):
         check = _canon_in_text(f.read_text(errors="replace"))
         wrong = {k: sorted(v) for k, v in check.items()
                  if any(x != truth[k] for x in v)}
+        hleft = {v for v in _headline_counts(f.read_text(errors="replace"))
+                 if v != truth["fleet.total"]}
+        if hleft:
+            wrong["page-headline"] = sorted(hleft)
         if wrong:
             shutil.copy2(backup, f)
             raise SystemExit(

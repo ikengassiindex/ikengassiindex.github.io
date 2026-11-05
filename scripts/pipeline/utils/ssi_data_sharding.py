@@ -58,14 +58,77 @@ logger = logging.getLogger(__name__)
 # New 45 MB target restores ~35% headroom. Sentinel
 # test_ssi_data_sharding_invariants.py::test_shard_thresholds_pinned
 # pins these constants against regression.
-SSI_DATA_SHARD_THRESHOLD_MB = 60.0   # Below → single file; above → shard (was 90.0 pre-v4.24)
-SSI_DATA_SHARD_TARGET_MB = 45.0      # Each shard target size (was 60.0 pre-v4.24)
+# ─── RULED 17 October 2026 by the flag officer. THE UNIT IS MiB, AND IT
+#     ALWAYS WAS: _json_size_mb() divides by 1024 twice, so the old constants
+#     named MB were MiB, and 60 "MB" was 62.9 real MB. GitHub warns above
+#     50.00 MB = 47.68 MiB, so the old threshold sat 12.3 MiB ABOVE the line
+#     the host warns at, and there was a 12.3 MiB band in which every push
+#     warned and the convention was perfectly satisfied. portugal spent
+#     16 October inside it (E407, E409, E418).
+#     Threshold 45 MiB leaves 2.68 MiB of headroom under the warning; target
+#     30 MiB leaves a re-cut file room for two more metric columns.
+#     The old names are kept as aliases because 89 doctrine documents and
+#     several scripts name them, and a rename that breaks a citation is E321.
+SSI_DATA_SHARD_THRESHOLD_MIB = 45.0  # Below → single file; above → shard
+SSI_DATA_SHARD_TARGET_MIB = 30.0     # Each shard target size
+SSI_DATA_SHARD_THRESHOLD_MB = SSI_DATA_SHARD_THRESHOLD_MIB   # alias, same value
+SSI_DATA_SHARD_TARGET_MB = SSI_DATA_SHARD_TARGET_MIB         # alias, same value
 SSI_DATA_MIN_SUBS_PER_SHARD = 500    # Never shard smaller than this
 
 
+# ─── THE CANONICAL SERIALISATION (1 October 2026) ────────────────────────────
+# Compact JSON, ONE RECORD PER LINE.
+#
+# Until today this module emitted the whole document on one line. That is why
+# `git diff --stat` reported `| 2 +-` for a fourteen-byte key rename and for a
+# one-megabyte reformat alike, and why a 1,018,959-byte reformat of turkey's
+# register rode undetected inside 9d2d8c03, a commit about a voltage flag. See
+# doctrine/FINDING_a_write_reformats_32_of_39_registers_and_the_diff_cannot_show_it.md
+#
+# One newline per record costs 622,174 bytes across all 622,104 records — 0.62 MB
+# on a 2.04 GB estate — and makes a diff name the records that changed.
+#
+# KEY ORDER IS PRESERVED. The document is emitted key by key in its own order,
+# with the records array expanded in place, so normalising a register moves no
+# key and the only bytes that change are the newlines.
+RECORD_KEY = "substations"
+
+
+def dumps_canonical(doc: Any) -> bytes:
+    """The document as this module writes it: compact, one record per line."""
+    def rec(s):
+        return json.dumps(s, separators=(",", ":"),
+                          ensure_ascii=False).encode("utf-8")
+
+    def arr(records):
+        if not records:
+            return b"[]"
+        return b"[\n" + b",\n".join(rec(s) for s in records) + b"\n]"
+
+    if isinstance(doc, list):
+        return arr(doc)
+    if not isinstance(doc, dict) or RECORD_KEY not in doc:
+        return rec(doc)
+    out = [b"{"]
+    first = True
+    for key, value in doc.items():
+        if not first:
+            out.append(b",")
+        first = False
+        out.append(json.dumps(key, ensure_ascii=False).encode("utf-8"))
+        out.append(b":")
+        out.append(arr(value) if key == RECORD_KEY else rec(value))
+    out.append(b"}")
+    return b"".join(out)
+
+
 def _json_size_mb(obj: Any) -> float:
-    """Estimate compact JSON size in MB."""
-    return len(json.dumps(obj, separators=(",", ":"), ensure_ascii=False).encode("utf-8")) / 1024 / 1024
+    """Size in MB of the document AS THIS MODULE WRITES IT.
+
+    It must measure the emitted format, not a different one, or the sharding
+    threshold is decided on a number no file will ever have.
+    """
+    return len(dumps_canonical(obj)) / 1024 / 1024
 
 
 def _estimate_avg_sub_bytes(subs: list, sample_size: int = 200) -> float:
@@ -89,6 +152,201 @@ def _compute_subs_per_shard(subs: list, target_shard_mb: float) -> int:
     # Account for JSON array overhead (`[` + `]` + N-1 commas ≈ ~1% overhead)
     subs_per_shard = int(target_bytes / (avg_bytes * 1.02))
     return max(subs_per_shard, SSI_DATA_MIN_SUBS_PER_SHARD)
+
+
+def _canonical_array_size(record_bytes_sum: int, n: int) -> int:
+    """Exact bytes of `dumps_canonical(list)` from the records' own sizes.
+
+    `arr` writes b"[\n" + b",\n".join(rec(s)) + b"\n]", so the framing is 2
+    bytes at each end and 2 bytes between records: sum + 2n + 2 for n >= 1, and
+    exactly 2 for the empty list. DERIVED FROM THE WRITER, not estimated,
+    because the threshold is decided on it.
+    """
+    if n <= 0:
+        return 2
+    return record_bytes_sum + 2 * n + 2
+
+
+def _canonical_doc_size(doc: dict, array_size: int) -> int:
+    """Exact bytes of `dumps_canonical(doc)` with the records' array measured.
+
+    Mirrors the dict branch of `dumps_canonical` key for key: b"{", then for
+    each key its JSON name, b":", its value, b"," between pairs, b"}".
+    """
+    total = 2                                   # the braces
+    first = True
+    for key, value in doc.items():
+        if not first:
+            total += 1                          # the comma
+        first = False
+        total += len(json.dumps(key, ensure_ascii=False).encode("utf-8"))
+        total += 1                              # the colon
+        if key == RECORD_KEY:
+            total += array_size
+        else:
+            total += len(json.dumps(value, separators=(",", ":"),
+                                    ensure_ascii=False).encode("utf-8"))
+    return total
+
+
+def write_ssi_data_streamed(
+    ssi_doc: dict,
+    subs_factory,
+    total_count: int,
+    path: Path,
+    *,
+    threshold_mb: float = SSI_DATA_SHARD_THRESHOLD_MB,
+    target_shard_mb: float = SSI_DATA_SHARD_TARGET_MB,
+) -> dict:
+    """Convention #79's writer, without ever holding the fleet.
+
+    WW, 18 October. THE REMEDY `RESULT_four_fleets_recut_byte_identically_and_
+    france_refuses_on_memory` NAMED AND DID NOT TAKE: "write_ssi_data wants a
+    streaming path - size the shard from the sample it already takes, then fill
+    shards from an iterator over the source files, writing each as it
+    completes."
+
+    WHAT MADE FRANCE UNWRITABLE, and it was not the shards. `write_ssi_data`
+    begins with `_json_size_mb(ssi_doc)`, which serialises the WHOLE document -
+    manifest plus every record - purely to compare it with the threshold. On
+    france that is a half-gigabyte bytes object beside 168,894 records, and the
+    re-cut was killed at about 3.9 GiB against a 3.66 GiB window with nothing
+    written.
+
+    `subs_factory` is a CALLABLE returning a fresh iterator, not an iterator,
+    because the size has to be known before the first shard is written and the
+    records therefore have to be walked twice. Re-reading shards from disk is
+    cheap; holding them is what cost france. Peak memory is one record plus one
+    shard payload.
+
+    IT NEVER DELETES. `write_ssi_data` calls `cleanup_stale_shards`, which
+    removes files beyond the new count - that is a deletion, and deletion is
+    the flag officer's under Pin 8. So this path REFUSES when the new layout
+    would have fewer shards than the old, naming the files that would have to
+    go, rather than deleting them or leaving them to be read as data.
+
+    EVERY WRITE IS ATOMIC AND NO FILE MOVES UNTIL ALL OF THEM CAN. The old
+    writer used `path.write_bytes` directly, which is the truncation that cost
+    the uk a recovered fleet on 5 October; shards are staged to the same
+    `.writing.tmp` siblings the in-place writer uses and replaced only once
+    every shard has been written and checked.
+    """
+    import os as _os
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    doc = {k: v for k, v in ssi_doc.items()
+           if k not in (RECORD_KEY, "substations_shards")}
+
+    # ── PASS ONE: measure, and sample for the shard size ──────────────────
+    rec_sum = 0
+    n = 0
+    sample_total = 0
+    sample_n = 0
+    every = max(1, (total_count or 1) // 200)
+    for r in subs_factory():
+        b = len(json.dumps(r, separators=(",", ":"),
+                           ensure_ascii=False).encode("utf-8"))
+        rec_sum += b
+        if n % every == 0 and sample_n < 200:
+            sample_total += b
+            sample_n += 1
+        n += 1
+    if total_count is not None and n != total_count:
+        raise ValueError(
+            "the iterator yielded %d record(s) and %d were declared — refusing "
+            "rather than writing a fleet of unknown length" % (n, total_count))
+
+    array_size = _canonical_array_size(rec_sum, n)
+    single = _canonical_doc_size(dict(doc, **{RECORD_KEY: []}), array_size)
+    total_size_mb = single / 1024 / 1024
+
+    # ── SINGLE FILE, if it fits ───────────────────────────────────────────
+    if total_size_mb < threshold_mb:
+        payload = dumps_canonical(dict(doc, **{RECORD_KEY: list(subs_factory())}))
+        if len(payload) != single:
+            raise ValueError(
+                "the measured size %d and the written size %d disagree — the "
+                "size rule and the writer have drifted apart"
+                % (single, len(payload)))
+        _atomic_write(path, payload)
+        return {"sharded": False, "size_mb": total_size_mb, "shard_count": 0,
+                "shards": [], "manifest_size_mb": total_size_mb,
+                "stale_shards_cleaned": 0, "streamed": True}
+
+    # ── SHARDED: size from the sample, fill from the iterator ─────────────
+    avg = (sample_total / sample_n) if sample_n else 0.0
+    per_shard = (max(int(target_shard_mb * 1024 * 1024 / (avg * 1.02)),
+                     SSI_DATA_MIN_SUBS_PER_SHARD) if avg else (n or 1))
+    want = (n + per_shard - 1) // per_shard
+    existing = sorted(path.parent.glob("ssi-data-substations-*.json"))
+    if want < len(existing):
+        raise ValueError(
+            "%s: the new layout wants %d shard(s) and %d exist — completing it "
+            "would DELETE %s, and deletion is the flag officer's under Pin 8. "
+            "Refusing." % (path.parent.name, want, len(existing),
+                           ", ".join(q.name for q in existing[want:])))
+
+    staged = []
+    try:
+        idx = 0
+        chunk = []
+        for r in subs_factory():
+            chunk.append(r)
+            if len(chunk) == per_shard:
+                idx += 1
+                staged.append(_stage_shard(path.parent, idx, chunk))
+                chunk = []
+        if chunk:
+            idx += 1
+            staged.append(_stage_shard(path.parent, idx, chunk))
+            chunk = []
+    except BaseException:
+        for _d, _t, _c, _b in staged:
+            try:
+                if _t.exists():
+                    _t.unlink()
+            except OSError:
+                pass
+        raise
+
+    shards_info = []
+    for dest, tmp, count, nbytes in staged:
+        _os.replace(str(tmp), str(dest))
+        shards_info.append({"path": dest.name, "count": count,
+                            "size_mb": round(nbytes / 1024 / 1024, 3)})
+    doc["sharded"] = True
+    doc["substations_shards"] = shards_info
+    manifest_payload = dumps_canonical(doc)
+    _atomic_write(path, manifest_payload)
+    return {"sharded": True, "size_mb": total_size_mb,
+            "shard_count": len(shards_info), "shards": shards_info,
+            "manifest_size_mb": len(manifest_payload) / 1024 / 1024,
+            "stale_shards_cleaned": 0, "streamed": True}
+
+
+def _atomic_write(path: Path, payload: bytes) -> None:
+    """Write through a temporary sibling so a kill cannot truncate the file."""
+    import os as _os
+    tmp = path.with_name(path.name + ".writing.tmp")
+    try:
+        tmp.write_bytes(payload)
+        _os.replace(str(tmp), str(path))
+    except BaseException:
+        try:
+            if tmp.exists():
+                tmp.unlink()
+        except OSError:
+            pass
+        raise
+
+
+def _stage_shard(parent: Path, idx: int, chunk: list):
+    """Serialise one shard to its .writing.tmp and return where it waits."""
+    dest = parent / ("ssi-data-substations-%02d.json" % idx)
+    payload = dumps_canonical(chunk)
+    tmp = dest.with_name(dest.name + ".writing.tmp")
+    tmp.write_bytes(payload)
+    return (dest, tmp, len(chunk), len(payload))
 
 
 def write_ssi_data(
@@ -119,8 +377,8 @@ def write_ssi_data(
     total_size_mb = _json_size_mb(ssi_doc)
     if total_size_mb < threshold_mb:
         # Single file — no sharding needed
-        payload = json.dumps(ssi_doc, separators=(",", ":"), ensure_ascii=False)
-        path.write_text(payload)
+        payload = dumps_canonical(ssi_doc)
+        path.write_bytes(payload)
         cleanup_count = cleanup_stale_shards(path)
         logger.info(
             f"Wrote {path} ({total_size_mb:.2f} MB single-file — under {threshold_mb} MB threshold)"
@@ -152,9 +410,9 @@ def write_ssi_data(
         chunk = subs[start:start + subs_per_shard]
         shard_name = f"ssi-data-substations-{shard_idx:02d}.json"
         shard_path = path.parent / shard_name
-        shard_payload = json.dumps(chunk, separators=(",", ":"), ensure_ascii=False)
-        shard_bytes = len(shard_payload.encode("utf-8"))
-        shard_path.write_text(shard_payload)
+        shard_payload = dumps_canonical(chunk)
+        shard_bytes = len(shard_payload)
+        shard_path.write_bytes(shard_payload)
         shards_info.append({
             "path": shard_name,
             "count": len(chunk),
@@ -169,9 +427,9 @@ def write_ssi_data(
     # ── Step 3: write manifest (ssi-data.json with sharded=true) ──
     ssi_doc["sharded"] = True
     ssi_doc["substations_shards"] = shards_info
-    manifest_payload = json.dumps(ssi_doc, separators=(",", ":"), ensure_ascii=False)
-    manifest_size_mb = len(manifest_payload.encode("utf-8")) / 1024 / 1024
-    path.write_text(manifest_payload)
+    manifest_payload = dumps_canonical(ssi_doc)
+    manifest_size_mb = len(manifest_payload) / 1024 / 1024
+    path.write_bytes(manifest_payload)
 
     # ── Step 4: cleanup any stale shards beyond our count ──
     cleanup_count = cleanup_stale_shards(path, active_shard_count=len(shards_info))
